@@ -25,8 +25,9 @@ import { ADMIN_NAV, ADMIN_NAV_BUILT, isAdminNavItemActive } from '@/lib/admin/na
  * Phase 2 is measurement, so the arithmetic is what must be trustworthy. These cases
  * target the ways a funnel goes quietly wrong: a pre-instrumentation account counted as a
  * step-0 drop-off (risk R15), a deleted user inflating a bucket past its denominator, a
- * missing verification source rendered as "nobody verified", and a non-monotonic step
- * funnel. The return-cohort and review arithmetic themselves are covered by the Phase 0.B
+ * missing verification source rendered as "nobody verified", and the onboarding
+ * reach→completion reduction after Phase 4A (ADR-007) collapsed onboarding to a single
+ * screen. The return-cohort and review arithmetic themselves are covered by the Phase 0.B
  * baseline suite, which this phase reuses rather than re-deriving.
  */
 
@@ -57,30 +58,32 @@ describe('computeOnboardingStepFunnel', () => {
     expect(result.steps[0].pctOfCohort).toBe(100)
   })
 
-  it('produces a monotonically non-increasing funnel with correct per-step ratios', () => {
+  it('reduces to a single "reached onboarding" stage after the Phase 4A single-screen collapse', () => {
+    // Post-4A accounts only ever reach step 1; a pre-4A account may carry a higher marker.
+    // Both fold into the one "reached onboarding" stage — the only signal comparable across
+    // the collapse, since the step numbers no longer mean the same thing (ADR-007).
     const users: OnboardingStepUserRow[] = [
       stepUser(1),
-      stepUser(2),
-      stepUser(3),
-      stepUser(4, true),
+      stepUser(1),
+      stepUser(3), // pre-4A account that reached a now-removed step
+      stepUser(1, true),
     ]
     const { steps } = computeOnboardingStepFunnel(users)
 
-    expect(steps.map((s) => s.reached)).toEqual([4, 3, 2, 1])
-    expect(steps[0].pctOfPrevious).toBeNull()
-    expect(steps[1].pctOfPrevious).toBe(75) // 3 of 4
-    expect(steps[2].pctOfPrevious).toBe(66.7) // 2 of 3
-    expect(steps[3].pctOfPrevious).toBe(50) // 1 of 2
+    expect(steps).toHaveLength(1)
     expect(steps.map((s) => s.label)).toEqual([...ONBOARDING_STEP_LABELS])
+    expect(steps[0].reached).toBe(4) // every instrumented account reached onboarding
+    expect(steps[0].pctOfCohort).toBe(100)
+    expect(steps[0].pctOfPrevious).toBeNull()
   })
 
-  it('distinguishes reaching the final step from actually completing', () => {
-    // Two learners saw step 4; only one launched (completed).
-    const users: OnboardingStepUserRow[] = [stepUser(4, true), stepUser(4, false)]
+  it('distinguishes reaching onboarding from actually completing it', () => {
+    // Two learners reached the onboarding screen; only one submitted.
+    const users: OnboardingStepUserRow[] = [stepUser(1, true), stepUser(1, false)]
     const result = computeOnboardingStepFunnel(users)
 
-    expect(result.steps[3].reached).toBe(2) // both reached step 4
-    expect(result.completed).toBe(1) // one dropped at the final CTA
+    expect(result.steps[0].reached).toBe(2) // both reached onboarding
+    expect(result.completed).toBe(1) // one dropped before submitting
     expect(result.pctCompleted).toBe(50)
   })
 

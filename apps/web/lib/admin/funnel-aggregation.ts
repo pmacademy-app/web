@@ -46,17 +46,31 @@ function pct(part: number, whole: number): number {
  * what this reads.
  */
 export interface OnboardingStepUserRow {
-  /** Furthest wizard step reached (1..4). NULL = account predates instrumentation. */
+  /**
+   * Furthest onboarding step reached. NULL = account predates instrumentation.
+   *
+   * Phase 4A (ADR-007) collapsed the multi-step onboarding wizard into a single screen
+   * (goal + experience), so `recordOnboardingStep` now only ever records step 1 for new
+   * accounts. The step NUMBER's meaning also changed across that boundary — a pre-4A
+   * "step 1" was the old Profile step, a post-4A "step 1" is the single goal+experience
+   * screen — so intermediate step numbers are no longer comparable across the collapse.
+   * Only the "reached onboarding (≥1) → completed" reduction is meaningful for both
+   * regimes, which is what this funnel now reports.
+   */
   onboarding_step_reached: number | null
   onboarding_completed: boolean
 }
 
-/** The four wizard steps, in order. Labels mirror `OnboardingWizard.tsx`. */
+/**
+ * Onboarding stages, in order. Since Phase 4A (ADR-007) collapsed the wizard into a single
+ * goal + experience screen, onboarding is a single step: reaching the screen. The old
+ * per-step labels were removed because the step numbers no longer describe the live flow and
+ * are not comparable across the collapse (see `OnboardingStepUserRow.onboarding_step_reached`);
+ * the meaningful signal is now reached-onboarding → completed, carried by `completed` /
+ * `pctCompleted` below.
+ */
 export const ONBOARDING_STEP_LABELS = [
-  'Step 1 · Profile',
-  'Step 2 · About You',
-  'Step 3 · Interests',
-  'Step 4 · Your Path',
+  'Reached onboarding',
 ] as const
 
 export interface OnboardingStepFunnelStage {
@@ -88,18 +102,20 @@ export interface OnboardingStepFunnel {
 }
 
 /**
- * Per-step onboarding drop-off, over the instrumented cohort only.
+ * Onboarding reach → completion, over the instrumented cohort only.
  *
- * "Instrumented" = a non-null `onboarding_step_reached`. The wizard writes the marker on
- * mount and on each advance, so any account that reached onboarding after 2026-09-27 has
- * one. A NULL marker therefore means the account predates instrumentation; per
- * IMPLEMENTATION_PLAN.md R15 those accounts are excluded and surfaced separately rather
- * than counted as having dropped out at step 0.
+ * "Instrumented" = a non-null `onboarding_step_reached`. The wizard writes the marker when
+ * the learner reaches the onboarding screen, so any account that reached onboarding after
+ * instrumentation shipped has one. A NULL marker therefore means the account predates
+ * instrumentation; per IMPLEMENTATION_PLAN.md R15 those accounts are excluded and surfaced
+ * separately rather than counted as having dropped out before onboarding.
  *
- * `reached` for step k is the count of instrumented accounts whose furthest step is ≥ k,
- * which is monotonically non-increasing in k — a genuine funnel. `completed` is a stricter
- * signal than reaching step 4: both final-screen CTAs submit, so a learner who saw step 4
- * but never launched is a real, and interesting, last-mile drop.
+ * Since Phase 4A (ADR-007) onboarding is a single screen, so `steps` holds the one
+ * "reached onboarding" stage and `reachedAtLeast(1)` counts every instrumented account. The
+ * arithmetic stays a general ≥k funnel (monotonically non-increasing) so pre-4A rows with a
+ * higher marker are still folded in as "reached onboarding" rather than dropped. `completed`
+ * is the stricter signal — a learner can reach the screen but never submit — so
+ * reached-onboarding → completed is the real last-mile drop.
  */
 export function computeOnboardingStepFunnel(
   users: OnboardingStepUserRow[]
