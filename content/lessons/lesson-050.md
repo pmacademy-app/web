@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-This lesson closes Module 5 by integrating nearly everything the module has taught into a single, coherent growth strategy. Product-led growth (PLG) is not a new concept introduced from scratch here — it is the deliberate combination of the funnel discipline from Lesson 43, the retention discipline from Lesson 44, the growth loop mechanics from Lesson 46, and the go-to-market motion selection from Lesson 49, applied specifically to a strategy where the product itself, rather than a sales team or marketing campaign, does the primary work of acquiring, converting, and retaining customers.
+This lesson closes Module 5 by integrating nearly everything the module has taught into a single, coherent growth strategy. Product-led growth (PLG) is not a new concept introduced from scratch here it is the deliberate combination of the funnel discipline from Lesson 43, the retention discipline from Lesson 44, the growth loop mechanics from Lesson 46, and the go-to-market motion selection from Lesson 49, applied specifically to a strategy where the product itself, rather than a sales team or marketing campaign, does the primary work of acquiring, converting, and retaining customers.
 
-This lesson matters because PLG has become one of the most discussed, and most frequently misapplied, strategies in modern product management. Many teams adopt PLG language and tactics — a free trial, a freemium tier, in-product prompts — without the underlying product characteristics that actually make product-led growth work, producing the appearance of a PLG strategy without its substance. This lesson gives you the specific prerequisites a product must genuinely satisfy for PLG to succeed, and the integrated flywheel model for understanding how PLG's component parts reinforce each other when it does.
+This lesson matters because PLG has become one of the most discussed, and most frequently misapplied, strategies in modern product management. Many teams adopt PLG language and tactics a free trial, a freemium tier, in-product prompts without the underlying product characteristics that actually make product-led growth work, producing the appearance of a PLG strategy without its substance. This lesson gives you the specific prerequisites a product must genuinely satisfy for PLG to succeed, and the integrated flywheel model for understanding how PLG's component parts reinforce each other when it does.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because PLG has become one of the most discussed, and most f
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 50 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis), Lesson 46 (Growth Loops & Virality), Lesson 49 (Go-To-Market Strategy — product-led motion) |
-| **Next Lesson** | Lesson 51 — Communicating with Executives (opens Module 6) |
-| **Future Topics Unlocked** | Lesson 51 (Communicating with Executives), Lesson 55 (Building and Leading Product Teams), Lesson 58 (AI in Product Management) — all reference the PLG flywheel and PQL concepts introduced here |
+| **Prerequisites** | Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis), Lesson 46 (Growth Loops & Virality), Lesson 49 (Go-To-Market Strategy product-led motion) |
+| **Next Lesson** | Lesson 51 Communicating with Executives (opens Module 6) |
+| **Future Topics Unlocked** | Lesson 51 (Communicating with Executives), Lesson 55 (Building and Leading Product Teams), Lesson 58 (AI in Product Management) all reference the PLG flywheel and PQL concepts introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes fluency with **Lesson 43's** funnel and activation concepts,
 
 ### PLG as an Integration, Not a Standalone Tactic
 
-**Product-led growth** describes a strategy where the product itself — not a sales team, not a marketing campaign — is the primary driver of customer acquisition, conversion, retention, and expansion. This definition is deliberately broader than "offering a free trial" or "having a freemium tier," which are common PLG *tactics* but not PLG itself. A product genuinely practicing PLG integrates several disciplines this module has already covered:
+**Product-led growth** describes a strategy where the product itself not a sales team, not a marketing campaign is the primary driver of customer acquisition, conversion, retention, and expansion. This definition is deliberately broader than "offering a free trial" or "having a freemium tier," which are common PLG *tactics* but not PLG itself. A product genuinely practicing PLG integrates several disciplines this module has already covered:
 
 ```mermaid
 %%{init: {
@@ -83,7 +83,7 @@ graph TD
     C["Growth loop mechanics<br/>(Lesson 46):<br/>genuine reinvestment<br/>of users into new users"] --> D
 ```
 
-A product missing any one of these — a funnel with high friction to activation, weak underlying retention, or no genuine growth loop — cannot sustain product-led growth regardless of how many PLG-style tactics (free trials, in-product prompts) are layered on top, because those tactics only accelerate a system that must already be structurally sound in these three respects.
+A product missing any one of these a funnel with high friction to activation, weak underlying retention, or no genuine growth loop cannot sustain product-led growth regardless of how many PLG-style tactics (free trials, in-product prompts) are layered on top, because those tactics only accelerate a system that must already be structurally sound in these three respects.
 
 ### The PLG Readiness Checklist
 
@@ -96,11 +96,11 @@ Before adopting a product-led strategy, a product should genuinely satisfy sever
 | Clear, identifiable "aha moment" | A specific, identifiable point where a new user first experiences the product's core value | Without a known activation signal, a team cannot optimize the funnel toward the moment that actually matters |
 | Natural expansion path | Usage or team size naturally growing over time creates a credible path to increased value and willingness to pay | Without organic expansion, a PLG motion has no mechanism for growing revenue from an existing account over time |
 
-A product failing several of these checks — particularly one requiring significant setup, configuration, or organizational buy-in before any value is realized — is very likely a poor fit for a pure product-led motion, regardless of how appealing PLG's growth economics might sound in the abstract.
+A product failing several of these checks particularly one requiring significant setup, configuration, or organizational buy-in before any value is realized is very likely a poor fit for a pure product-led motion, regardless of how appealing PLG's growth economics might sound in the abstract.
 
 ### Product-Qualified Leads (PQLs)
 
-In a traditional sales-led motion, a **marketing-qualified lead (MQL)** is someone who has engaged with marketing content, and a **sales-qualified lead (SQL)** is someone a sales team has vetted as a genuine prospect. A **product-qualified lead (PQL)** is a specific, PLG-native concept: a free or trial user whose in-product behavior signals strong buying intent or a natural fit for expansion — reaching a certain usage threshold, inviting several teammates, or hitting a feature limit that a paid tier would remove. PQL scoring allows a hybrid PLG-plus-sales motion (introduced in Lesson 49) to work efficiently: rather than a sales team cold-prospecting broadly, it can focus its limited capacity on free users whose actual in-product behavior already indicates strong intent and fit, dramatically improving the efficiency of that sales capacity compared to undifferentiated outbound effort.
+In a traditional sales-led motion, a **marketing-qualified lead (MQL)** is someone who has engaged with marketing content, and a **sales-qualified lead (SQL)** is someone a sales team has vetted as a genuine prospect. A **product-qualified lead (PQL)** is a specific, PLG-native concept: a free or trial user whose in-product behavior signals strong buying intent or a natural fit for expansion reaching a certain usage threshold, inviting several teammates, or hitting a feature limit that a paid tier would remove. PQL scoring allows a hybrid PLG-plus-sales motion (introduced in Lesson 49) to work efficiently: rather than a sales team cold-prospecting broadly, it can focus its limited capacity on free users whose actual in-product behavior already indicates strong intent and fit, dramatically improving the efficiency of that sales capacity compared to undifferentiated outbound effort.
 
 ```mermaid
 %%{init: {
@@ -141,7 +141,7 @@ graph LR
 
 ### The PLG Flywheel
 
-Integrating this module's components into a single system: a genuine PLG flywheel connects acquisition (often through a growth loop, Lesson 46), fast activation (Lesson 43's funnel discipline applied to a specific, identified aha moment), durable retention (Lesson 44), and both referral and expansion, with each stage's output feeding the next — new activated users generate referral loop input (per Lesson 46's reinvestment principle) and, over time, generate expansion revenue as their usage or team grows, which in turn funds continued product investment that improves activation and retention further, closing the loop.
+Integrating this module's components into a single system: a genuine PLG flywheel connects acquisition (often through a growth loop, Lesson 46), fast activation (Lesson 43's funnel discipline applied to a specific, identified aha moment), durable retention (Lesson 44), and both referral and expansion, with each stage's output feeding the next new activated users generate referral loop input (per Lesson 46's reinvestment principle) and, over time, generate expansion revenue as their usage or team grows, which in turn funds continued product investment that improves activation and retention further, closing the loop.
 
 ```mermaid
 %%{init: {
@@ -202,7 +202,7 @@ Without a specific, identified activation signal, a team cannot optimize its fun
 
 **Mistake 4: Treating PLG as purely a growth/acquisition strategy, ignoring the retention component**
 
-A PLG flywheel depends on durable retention (Lesson 44) to sustain referral and expansion — a product driving significant free signups without genuine retention will show impressive top-of-funnel numbers while the flywheel itself fails to spin, since churned users generate neither referrals nor expansion revenue.
+A PLG flywheel depends on durable retention (Lesson 44) to sustain referral and expansion a product driving significant free signups without genuine retention will show impressive top-of-funnel numbers while the flywheel itself fails to spin, since churned users generate neither referrals nor expansion revenue.
 
 **Mistake 5: Applying PLG uniformly across all customer segments, including ones better served by a sales-led motion**
 
@@ -256,27 +256,27 @@ graph TD
     F --> B
 ```
 
-Use the PLG Flywheel as a standing diagnostic whenever a PLG strategy underperforms: identify specifically which stage of the flywheel is weak — is acquisition strong but activation weak (a funnel problem, Lesson 43)? Is activation strong but retention weak (a cohort problem, Lesson 44)? Is retention strong but referral/expansion weak (a loop problem, Lesson 46)? A weak flywheel stage anywhere will eventually constrain the whole system's growth, regardless of how strong the other stages are, since each stage's output is the next stage's essential input.
+Use the PLG Flywheel as a standing diagnostic whenever a PLG strategy underperforms: identify specifically which stage of the flywheel is weak is acquisition strong but activation weak (a funnel problem, Lesson 43)? Is activation strong but retention weak (a cohort problem, Lesson 44)? Is retention strong but referral/expansion weak (a loop problem, Lesson 46)? A weak flywheel stage anywhere will eventually constrain the whole system's growth, regardless of how strong the other stages are, since each stage's output is the next stage's essential input.
 
 ---
 
 ## Real Company Example
 
-**Notion** has been publicly associated, through its own product growth and community writing, with a strong product-led growth model built on fast individual time-to-value, a generous free tier enabling broad initial adoption, and organic team-based expansion — a single user's adoption within an organization frequently expanding, over time, into broader team or company-wide usage as that individual invites colleagues and shares templates — before eventually adding more structured offerings for larger organizations.
+**Notion** has been publicly associated, through its own product growth and community writing, with a strong product-led growth model built on fast individual time-to-value, a generous free tier enabling broad initial adoption, and organic team-based expansion a single user's adoption within an organization frequently expanding, over time, into broader team or company-wide usage as that individual invites colleagues and shares templates before eventually adding more structured offerings for larger organizations.
 
-The underlying principle connects directly to this lesson's Theory: Notion's growth reflects the PLG Flywheel's structure closely — fast individual activation, genuine retention driving continued usage, and a natural expansion path (from individual to team to organization) providing the flywheel's referral and expansion stages, illustrating how a product satisfying this lesson's readiness checklist can sustain compounding, largely self-serve growth.
+The underlying principle connects directly to this lesson's Theory: Notion's growth reflects the PLG Flywheel's structure closely fast individual activation, genuine retention driving continued usage, and a natural expansion path (from individual to team to organization) providing the flywheel's referral and expansion stages, illustrating how a product satisfying this lesson's readiness checklist can sustain compounding, largely self-serve growth.
 
-*(Assumption flagged: this reflects general, publicly available descriptions of Notion's product-led growth model discussed in company and industry writing over time, not a confirmed, complete, or current account of Notion's specific internal growth strategy or metrics today. Specific practices and their internal measurement evolve continuously at any company; the durable lesson is the underlying principle — genuine PLG requires fast activation, real retention, and a natural expansion path working together — rather than a claim about Notion's exact current growth mechanics.)*
+*(Assumption flagged: this reflects general, publicly available descriptions of Notion's product-led growth model discussed in company and industry writing over time, not a confirmed, complete, or current account of Notion's specific internal growth strategy or metrics today. Specific practices and their internal measurement evolve continuously at any company; the durable lesson is the underlying principle genuine PLG requires fast activation, real retention, and a natural expansion path working together rather than a claim about Notion's exact current growth mechanics.)*
 
 ---
 
 ## Real World Perspective: Product-Led Growth at Different Company Stages
 
 **At a startup:**
-PLG is often an attractive strategy precisely because it requires less upfront sales infrastructure investment, but the risk of Mistake 1 is especially high — a young company eager to grow quickly may adopt PLG tactics without first honestly assessing whether its product actually satisfies the readiness checklist's prerequisites, particularly fast time-to-value and a clear aha moment.
+PLG is often an attractive strategy precisely because it requires less upfront sales infrastructure investment, but the risk of Mistake 1 is especially high a young company eager to grow quickly may adopt PLG tactics without first honestly assessing whether its product actually satisfies the readiness checklist's prerequisites, particularly fast time-to-value and a clear aha moment.
 
 **At a mid-size company:**
-This is typically the stage where a hybrid PLG-plus-sales motion becomes genuinely valuable, using PQL scoring to direct limited sales capacity efficiently, echoing both this lesson's Theory and Lesson 49's motion evolution — and where the flywheel's individual stages (acquisition, activation, retention, referral, expansion) typically become instrumented and monitored separately, rather than tracked only as an undifferentiated aggregate.
+This is typically the stage where a hybrid PLG-plus-sales motion becomes genuinely valuable, using PQL scoring to direct limited sales capacity efficiently, echoing both this lesson's Theory and Lesson 49's motion evolution and where the flywheel's individual stages (acquisition, activation, retention, referral, expansion) typically become instrumented and monitored separately, rather than tracked only as an undifferentiated aggregate.
 
 **At Big Tech:**
 PLG strategies are often deeply sophisticated, with dedicated growth teams responsible for each flywheel stage, extensive experimentation (Lesson 45) on activation and expansion mechanics, and careful segmentation to apply PLG, hybrid, and pure sales-led motions to the appropriate customer segments simultaneously. The PM's job shifts toward correctly diagnosing which flywheel stage is the actual constraint on growth and prioritizing investment accordingly, rather than intuitively assuming acquisition is always the bottleneck.
@@ -287,15 +287,15 @@ PLG strategies are often deeply sophisticated, with dedicated growth teams respo
 
 Consider a simplified, illustrative scenario common at teams adopting PLG tactics without first validating the underlying readiness prerequisites.
 
-A company selling a moderately complex data-integration product, historically sold through a sales-led motion, decides to add a free trial and self-serve signup flow to accelerate growth, reasoning that "PLG is what successful companies do now." The trial signup flow is well-designed and generates strong initial signup numbers. However, activation — defined loosely, without a specific identified milestone — never reaches meaningful levels: most trial users sign up, encounter the product's genuinely complex initial setup (connecting multiple data sources, configuring transformation rules), and abandon within the first session, never reaching any point where the product's core value becomes apparent.
+A company selling a moderately complex data-integration product, historically sold through a sales-led motion, decides to add a free trial and self-serve signup flow to accelerate growth, reasoning that "PLG is what successful companies do now." The trial signup flow is well-designed and generates strong initial signup numbers. However, activation defined loosely, without a specific identified milestone never reaches meaningful levels: most trial users sign up, encounter the product's genuinely complex initial setup (connecting multiple data sources, configuring transformation rules), and abandon within the first session, never reaching any point where the product's core value becomes apparent.
 
-Leadership initially interprets the strong signup numbers as evidence the PLG strategy is working, while the underlying trial-to-paid conversion rate remains far below what the sales-led motion had historically achieved for comparable prospects. Only after several quarters of disappointing conversion does a deeper analysis reveal that the product's genuine complexity — the very thing that had always justified a sales-led motion with hands-on onboarding support — was fundamentally incompatible with a self-serve trial experience, regardless of how polished the surrounding signup flow was.
+Leadership initially interprets the strong signup numbers as evidence the PLG strategy is working, while the underlying trial-to-paid conversion rate remains far below what the sales-led motion had historically achieved for comparable prospects. Only after several quarters of disappointing conversion does a deeper analysis reveal that the product's genuine complexity the very thing that had always justified a sales-led motion with hands-on onboarding support was fundamentally incompatible with a self-serve trial experience, regardless of how polished the surrounding signup flow was.
 
 **What went wrong?**
 
-Using the PLG Readiness Checklist: this product failed at least two of the four prerequisites from the start — it lacked fast time-to-value (the setup required to reach any real value was extensive) and lacked low initial complexity (multi-source data integration is inherently involved). No amount of investment in the surrounding trial infrastructure (the signup flow, marketing messaging) could compensate for these fundamental mismatches, because PLG tactics accelerate an already-sound underlying system — they don't create soundness in a system that structurally lacks it, exactly the distinction this lesson's Theory establishes between PLG tactics and genuine PLG readiness.
+Using the PLG Readiness Checklist: this product failed at least two of the four prerequisites from the start it lacked fast time-to-value (the setup required to reach any real value was extensive) and lacked low initial complexity (multi-source data integration is inherently involved). No amount of investment in the surrounding trial infrastructure (the signup flow, marketing messaging) could compensate for these fundamental mismatches, because PLG tactics accelerate an already-sound underlying system they don't create soundness in a system that structurally lacks it, exactly the distinction this lesson's Theory establishes between PLG tactics and genuine PLG readiness.
 
-The corrective response required recognizing that this specific product was likely better served by the hybrid motion Lesson 49 describes: retaining the free trial as a top-of-funnel lead generation and qualification tool (allowing prospects to explore and self-educate) while reintroducing a guided, sales-assisted onboarding process before genuine activation — rather than expecting a fully self-serve path to work for a product whose actual complexity had never changed. Using PQL-style behavioral signals (which trial users engaged deeply enough with initial setup steps to signal genuine intent) to route the right prospects to sales support, rather than either abandoning the trial entirely or leaving every trial user unsupported, is the specific hybrid design this lesson's Theory recommends for exactly this kind of situation.
+The corrective response required recognizing that this specific product was likely better served by the hybrid motion Lesson 49 describes: retaining the free trial as a top-of-funnel lead generation and qualification tool (allowing prospects to explore and self-educate) while reintroducing a guided, sales-assisted onboarding process before genuine activation rather than expecting a fully self-serve path to work for a product whose actual complexity had never changed. Using PQL-style behavioral signals (which trial users engaged deeply enough with initial setup steps to signal genuine intent) to route the right prospects to sales support, rather than either abandoning the trial entirely or leaving every trial user unsupported, is the specific hybrid design this lesson's Theory recommends for exactly this kind of situation.
 
 ---
 
@@ -321,7 +321,7 @@ A team investing broadly across "growth initiatives" without first using this ta
 *What the interviewer is actually evaluating:* Whether the candidate can articulate the specific readiness prerequisites (fast time-to-value, low complexity, clear aha moment, natural expansion path) rather than describing PLG purely in terms of surface tactics like free trials.
 
 **Typical question 2: "How would you decide when a free/trial user should be handed off to sales?"**
-*What the interviewer is actually evaluating:* Whether the candidate understands PQL scoring — using in-product behavioral signals to identify genuine intent — rather than either handing off every signup indiscriminately or never involving sales at all.
+*What the interviewer is actually evaluating:* Whether the candidate understands PQL scoring using in-product behavioral signals to identify genuine intent rather than either handing off every signup indiscriminately or never involving sales at all.
 
 **Typical question 3: "A company's free trial signups are strong, but paid conversion is weak. What would you investigate?"**
 *What the interviewer is actually evaluating:* Whether the candidate's diagnostic process moves through the flywheel stages systematically (acquisition looks fine; is activation, retention, or something else the actual constraint?) rather than assuming the whole strategy has simply failed.
@@ -330,19 +330,19 @@ A team investing broadly across "growth initiatives" without first using this ta
 
 ## Summary
 
-Product-led growth integrates the funnel discipline from Lesson 43, the retention discipline from Lesson 44, and the growth loop mechanics from Lesson 46 into a single strategy where the product itself drives acquisition, conversion, retention, and expansion — it is not simply the presence of a free trial or freemium tier, which are tactics that only work when layered onto a product genuinely satisfying this lesson's readiness prerequisites: fast time-to-value, low initial complexity, a clear identifiable aha moment, and a natural expansion path. Product-qualified leads (PQLs) — free or trial users whose in-product behavior signals strong intent — enable an efficient hybrid PLG-plus-sales motion, directing limited sales capacity toward genuinely high-intent prospects rather than eliminating sales altogether, extending Lesson 49's motion-fit reasoning. The PLG Flywheel connects acquisition, activation, retention, referral, and expansion into a single reinforcing system, and diagnosing an underperforming PLG strategy requires identifying which specific stage is the actual constraint — precisely the discipline this lesson's Case Study illustrates through a company that adopted PLG tactics for a product whose genuine complexity made self-serve activation fundamentally unachievable, regardless of how polished the surrounding trial experience was.
+Product-led growth integrates the funnel discipline from Lesson 43, the retention discipline from Lesson 44, and the growth loop mechanics from Lesson 46 into a single strategy where the product itself drives acquisition, conversion, retention, and expansion it is not simply the presence of a free trial or freemium tier, which are tactics that only work when layered onto a product genuinely satisfying this lesson's readiness prerequisites: fast time-to-value, low initial complexity, a clear identifiable aha moment, and a natural expansion path. Product-qualified leads (PQLs) free or trial users whose in-product behavior signals strong intent enable an efficient hybrid PLG-plus-sales motion, directing limited sales capacity toward genuinely high-intent prospects rather than eliminating sales altogether, extending Lesson 49's motion-fit reasoning. The PLG Flywheel connects acquisition, activation, retention, referral, and expansion into a single reinforcing system, and diagnosing an underperforming PLG strategy requires identifying which specific stage is the actual constraint precisely the discipline this lesson's Case Study illustrates through a company that adopted PLG tactics for a product whose genuine complexity made self-serve activation fundamentally unachievable, regardless of how polished the surrounding trial experience was.
 
 ---
 
 ## Key Takeaways
 
-- Product-led growth integrates funnel (Lesson 43), retention (Lesson 44), and growth loop (Lesson 46) disciplines into a single strategy — it is not simply the presence of a free trial or freemium tier.
+- Product-led growth integrates funnel (Lesson 43), retention (Lesson 44), and growth loop (Lesson 46) disciplines into a single strategy it is not simply the presence of a free trial or freemium tier.
 - A genuine PLG strategy requires a product to satisfy specific prerequisites: fast time-to-value, low initial complexity, a clear identifiable aha moment, and a natural expansion path.
 - PLG tactics accelerate an already-structurally-sound product; they cannot create soundness in a product that fundamentally lacks these prerequisites, as this lesson's Case Study demonstrates.
 - Product-qualified leads (PQLs) use in-product behavioral signals to identify high-intent free/trial users, enabling an efficient hybrid PLG-plus-sales motion rather than eliminating sales entirely.
-- The PLG Flywheel connects acquisition, activation, retention, referral, and expansion into a reinforcing system — a weak stage anywhere constrains the whole system's growth.
+- The PLG Flywheel connects acquisition, activation, retention, referral, and expansion into a reinforcing system a weak stage anywhere constrains the whole system's growth.
 - Diagnosing an underperforming PLG strategy requires identifying the specific constraining flywheel stage, using the Flywheel Stage Diagnostic, rather than assuming the whole strategy has failed uniformly.
-- Even within a successful PLG company, some customer segments may still genuinely warrant a sales-led motion — PLG doesn't need to be applied uniformly across every segment.
+- Even within a successful PLG company, some customer segments may still genuinely warrant a sales-led motion PLG doesn't need to be applied uniformly across every segment.
 
 ---
 
@@ -353,7 +353,7 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 - **PLG = integration:** funnel discipline + retention discipline + genuine growth loops, not just a free trial.
 - **Readiness checklist:** fast time-to-value, low initial complexity, clear aha moment, natural expansion path.
 - **PLG tactics ≠ PLG readiness:** tactics accelerate a sound product; they don't fix a structurally mismatched one.
-- **PQL:** in-product behavior signaling strong intent — enables efficient hybrid PLG-plus-sales.
+- **PQL:** in-product behavior signaling strong intent enables efficient hybrid PLG-plus-sales.
 - **PLG Flywheel:** acquisition → activation → retention → referral/expansion → reinvestment, each stage feeding the next.
 - **Diagnose by stage:** identify which specific flywheel stage is the actual constraint before investing broadly.
 - **Not one-size-fits-all:** even successful PLG companies may still need sales-led motion for certain segments.
@@ -374,9 +374,9 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 
 ## Further Reading / Resources
 
-- *The Product-Led Growth Playbook* and related writing by Wes Bush / ProductLed — a widely referenced practitioner treatment of PLG readiness and flywheel mechanics.
-- *Traction* by Gabriel Weinberg and Justin Mares — background on evaluating and matching growth strategy to product and market characteristics.
-- OpenView Partners' "Product-Led Growth" research and PQL scoring frameworks — practitioner-oriented resources on hybrid PLG-plus-sales motion design.
+- *The Product-Led Growth Playbook* and related writing by Wes Bush / ProductLed a widely referenced practitioner treatment of PLG readiness and flywheel mechanics.
+- *Traction* by Gabriel Weinberg and Justin Mares background on evaluating and matching growth strategy to product and market characteristics.
+- OpenView Partners' "Product-Led Growth" research and PQL scoring frameworks practitioner-oriented resources on hybrid PLG-plus-sales motion design.
 
 ---
 
@@ -408,13 +408,13 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 
 **Card 5**
 - Front: What are the five stages of the PLG Flywheel?
-- Back: Acquisition, activation, retention, referral, and expansion — each stage's output feeds the next, with expansion revenue funding continued product investment that improves activation.
+- Back: Acquisition, activation, retention, referral, and expansion each stage's output feeds the next, with expansion revenue funding continued product investment that improves activation.
 - Difficulty: 2
 - Tags: plg-flywheel
 
 **Card 6**
 - Front: In the Detailed Case Study, why did the data-integration product's free trial fail to activate users, despite a well-designed signup flow?
-- Back: The product's genuine complexity (multi-source data integration, configuration) meant it lacked fast time-to-value and low initial complexity — two PLG readiness prerequisites — which no amount of surrounding trial polish could fix.
+- Back: The product's genuine complexity (multi-source data integration, configuration) meant it lacked fast time-to-value and low initial complexity two PLG readiness prerequisites which no amount of surrounding trial polish could fix.
 - Difficulty: 2
 - Tags: case-study
 
@@ -423,12 +423,12 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 
 Consider the following novel scenario: You're a PM at a company considering adding a free tier to a product that currently requires a multi-week implementation process involving IT approval and custom configuration before most customers see any real value.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the PLG Readiness Checklist and Flywheel Stage Diagnostic, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the PLG Readiness Checklist and Flywheel Stage Diagnostic, not to reach one "right" answer.
 
 1. Using the PLG Readiness Checklist, score this product against each of the four prerequisites, and justify your scores.
 2. Based on your scores, would you recommend a pure PLG motion, a hybrid PLG-plus-sales motion, or continuing with the existing sales-led motion? Justify your answer.
 3. If you do proceed with some form of free tier, what specific in-product behavioral signals might indicate a PQL worth routing to sales, given this product's complexity?
-4. What would "fast time-to-value" realistically look like for this product, even if full implementation genuinely takes weeks — is there a smaller, faster value moment that could be surfaced earlier?
+4. What would "fast time-to-value" realistically look like for this product, even if full implementation genuinely takes weeks is there a smaller, faster value moment that could be surfaced earlier?
 5. If a free tier is launched and trial-to-paid conversion is disappointing, how would you use the Flywheel Stage Diagnostic to determine whether the problem is activation, retention, or something else?
 
 ---
@@ -507,7 +507,7 @@ C) Free trials are barred for complex products
 D) Time-to-value has no bearing on conversion
 
 *Correct answer: A*
-*Explanation: A trial only shortens the path to a value that already has to exist within reach — it can't manufacture that value if genuine setup or complexity stands in the way.*
+*Explanation: A trial only shortens the path to a value that already has to exist within reach it can't manufacture that value if genuine setup or complexity stands in the way.*
 *Learning objective tested: #2, #5*
 *Difficulty: Easy*
 
@@ -559,7 +559,7 @@ C) Acquisition invariably outweighs retention
 D) Referral and expansion need users to stay
 
 *Correct answer: D*
-*Explanation: A flywheel spun by acquisition alone still needs retention to hand it forward — a user who churns produces neither a referral nor an expansion, whatever the signup numbers say.*
+*Explanation: A flywheel spun by acquisition alone still needs retention to hand it forward a user who churns produces neither a referral nor an expansion, whatever the signup numbers say.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
@@ -598,7 +598,7 @@ C) No further check; retention confirms health
 D) The pricing model alone, no other check
 
 *Correct answer: A*
-*Explanation: With acquisition, activation, and retention all reading healthy, the weak stage sits specifically at referral and expansion — worth checking directly rather than assumed.*
+*Explanation: With acquisition, activation, and retention all reading healthy, the weak stage sits specifically at referral and expansion worth checking directly rather than assumed.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
@@ -611,7 +611,7 @@ C) Adding a trial, judging readiness quarters later
 D) Assuming readiness from team enthusiasm alone
 
 *Correct answer: A*
-*Explanation: The other three each substitute something else — someone else's success, a trial's own results, or internal enthusiasm — for actually checking the product against the prerequisites first.*
+*Explanation: The other three each substitute something else someone else's success, a trial's own results, or internal enthusiasm for actually checking the product against the prerequisites first.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
@@ -624,7 +624,7 @@ C) Require the same free tier regardless of need
 D) Reassess whether the motion actually transfers before assuming it does
 
 *Correct answer: D*
-*Explanation: A motion earning trust with one segment says nothing about a segment with a fundamentally different buying complexity — exactly the fit question Lesson 49 said should be reopened, not skipped.*
+*Explanation: A motion earning trust with one segment says nothing about a segment with a fundamentally different buying complexity exactly the fit question Lesson 49 said should be reopened, not skipped.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
@@ -634,10 +634,10 @@ D) Reassess whether the motion actually transfers before assuming it does
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 49 — Go-To-Market Strategy | Develops the product-led motion introduced in Lesson 49 into a full, integrated growth system |
-| **Current Lesson** | Lesson 50 — Product-Led Growth | PLG Readiness Checklist; PQLs; PLG Flywheel; Flywheel Stage Diagnostic |
-| **Next Lesson** | Lesson 51 — Communicating with Executives (opens Module 6) | Shifts from quantitative growth strategy to the leadership and communication skills needed to advocate for and explain strategies like PLG to senior stakeholders |
+| **Previous Lesson** | Lesson 49 Go-To-Market Strategy | Develops the product-led motion introduced in Lesson 49 into a full, integrated growth system |
+| **Current Lesson** | Lesson 50 Product-Led Growth | PLG Readiness Checklist; PQLs; PLG Flywheel; Flywheel Stage Diagnostic |
+| **Next Lesson** | Lesson 51 Communicating with Executives (opens Module 6) | Shifts from quantitative growth strategy to the leadership and communication skills needed to advocate for and explain strategies like PLG to senior stakeholders |
 | **Future Concepts Unlocked** | Lesson 55 (Building and Leading Product Teams) | Builds on flywheel thinking when structuring growth-focused team organization |
 | | Lesson 58 (AI in Product Management) | Revisits PQL-style behavioral scoring in the context of AI-driven personalization and automation |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the PLG Flywheel and readiness checklist with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the PLG Flywheel and readiness checklist with you they will not be re-explained, only re-applied in new contexts.

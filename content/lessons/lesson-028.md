@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 27's Detailed Case Study ended with a design team solving a cognitive-load problem by splitting a single overloaded screen into a staged, progressively disclosed flow. That solution worked because someone had implicitly made a decision about *how information should be organized and grouped* — which fields belong together, which can wait, what the underlying categories even are. This lesson makes that implicit decision explicit and gives it a name: **information architecture**, the practice of organizing, structuring, labeling, and connecting content and functionality so that people can find what they need and understand where they are, across an entire product, not just within a single screen or flow.
+Lesson 27's Detailed Case Study ended with a design team solving a cognitive-load problem by splitting a single overloaded screen into a staged, progressively disclosed flow. That solution worked because someone had implicitly made a decision about *how information should be organized and grouped* which fields belong together, which can wait, what the underlying categories even are. This lesson makes that implicit decision explicit and gives it a name: **information architecture**, the practice of organizing, structuring, labeling, and connecting content and functionality so that people can find what they need and understand where they are, across an entire product, not just within a single screen or flow.
 
-This lesson matters because information architecture problems are often invisible until they cause real damage — a confusing category structure, an inconsistent labeling scheme, or a navigation hierarchy that doesn't match how users actually think about a product's content rarely shows up as a single dramatic bug. Instead, it shows up as a slow, steady accumulation of failed searches, abandoned tasks, and support tickets asking "where do I find X," each individually minor but collectively reflecting a structural problem no single screen-level fix can resolve. This is the module's final design-specific lesson before Lesson 29 folds everything covered so far into a formal prioritization discipline.
+This lesson matters because information architecture problems are often invisible until they cause real damage a confusing category structure, an inconsistent labeling scheme, or a navigation hierarchy that doesn't match how users actually think about a product's content rarely shows up as a single dramatic bug. Instead, it shows up as a slow, steady accumulation of failed searches, abandoned tasks, and support tickets asking "where do I find X," each individually minor but collectively reflecting a structural problem no single screen-level fix can resolve. This is the module's final design-specific lesson before Lesson 29 folds everything covered so far into a formal prioritization discipline.
 
 ---
 
@@ -12,12 +12,12 @@ This lesson matters because information architecture problems are often invisibl
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design |
+| **Module** | 3 Product Design |
 | **Current Lesson** | 28 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 15 (User Journey Mapping), Lesson 18 (Customer Segmentation), Lesson 27 (UX Principles for Product Managers) |
-| **Next Lesson** | Lesson 29 — Prioritization Fundamentals (closing Module 3) |
+| **Next Lesson** | Lesson 29 Prioritization Fundamentals (closing Module 3) |
 | **Future Topics Unlocked** | Lesson 29 (Prioritization Fundamentals) |
 
 ---
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 15 (User Journey Mapping), Lesson 18 (Customer Segmentation), and Lesson 27 (UX Principles for Product Managers). This lesson assumes fluency with mapping a user's actual behavior and mental model (rather than assumption), validating segments against real evidence rather than convenient categories, and applying cognitive-load principles — information architecture combines all three into a discipline for organizing an entire product's content and navigation.
+Lesson 15 (User Journey Mapping), Lesson 18 (Customer Segmentation), and Lesson 27 (UX Principles for Product Managers). This lesson assumes fluency with mapping a user's actual behavior and mental model (rather than assumption), validating segments against real evidence rather than convenient categories, and applying cognitive-load principles information architecture combines all three into a discipline for organizing an entire product's content and navigation.
 
 ---
 
@@ -46,9 +46,9 @@ Lesson 15 (User Journey Mapping), Lesson 18 (Customer Segmentation), and Lesson 
 
 Information architecture (IA) is the practice of organizing, structuring, labeling, and connecting a product's content and functionality so that users can find what they need and understand where they are within it. It's useful to distinguish IA precisely from its neighbors:
 
-- **Visual design** concerns how things look — color, typography, imagery.
+- **Visual design** concerns how things look color, typography, imagery.
 - **Interaction design** concerns how specific interface elements behave when a user engages with them.
-- **Information architecture** concerns how content and functionality are organized, categorized, labeled, and connected — the underlying structure that visual design and interaction design are then applied on top of.
+- **Information architecture** concerns how content and functionality are organized, categorized, labeled, and connected the underlying structure that visual design and interaction design are then applied on top of.
 
 ```mermaid
 %%{init: {
@@ -88,7 +88,7 @@ graph TD
     B --> E[Foundation Interaction and<br/>Visual Design Are Built on Top Of]
 ```
 
-A product can have excellent visual design and interaction design while still suffering from a fundamentally confusing information architecture — users may find each individual screen visually polished and each individual interaction smooth, while still struggling to locate the right screen or feature in the first place, because the underlying organizational structure doesn't match how they think about the product's content.
+A product can have excellent visual design and interaction design while still suffering from a fundamentally confusing information architecture users may find each individual screen visually polished and each individual interaction smooth, while still struggling to locate the right screen or feature in the first place, because the underlying organizational structure doesn't match how they think about the product's content.
 
 ### Card Sorting: Validating Structure Against Real Mental Models
 
@@ -136,9 +136,9 @@ Card sorting directly extends this curriculum's recurring research discipline (L
 
 ### Mental Model Organization vs. Internal Organizational Structure
 
-A specific, common, and costly failure — closely related to Lesson 14's fictional-character-persona warning — is organizing a product's information architecture around the company's own internal organizational structure (which team owns which feature, which department handles which function) rather than around users' actual mental models of the product's content.
+A specific, common, and costly failure closely related to Lesson 14's fictional-character-persona warning is organizing a product's information architecture around the company's own internal organizational structure (which team owns which feature, which department handles which function) rather than around users' actual mental models of the product's content.
 
-For example, a company with separate internal teams for "billing," "account settings," and "notification preferences" might structure a product's navigation around these same three categories, simply because that's how the company itself is organized internally — even if, from a user's actual mental model, "notification preferences" feels more naturally grouped with "account settings" than as its own separate top-level category. Users navigating the product have no visibility into, and no reason to care about, the company's internal team structure; a navigation scheme built around that internal structure, rather than genuine user mental models (validated through techniques like card sorting), will frequently confuse and frustrate users regardless of how logical it seems to the internal teams who built it.
+For example, a company with separate internal teams for "billing," "account settings," and "notification preferences" might structure a product's navigation around these same three categories, simply because that's how the company itself is organized internally even if, from a user's actual mental model, "notification preferences" feels more naturally grouped with "account settings" than as its own separate top-level category. Users navigating the product have no visibility into, and no reason to care about, the company's internal team structure; a navigation scheme built around that internal structure, rather than genuine user mental models (validated through techniques like card sorting), will frequently confuse and frustrate users regardless of how logical it seems to the internal teams who built it.
 
 ```mermaid
 %%{init: {
@@ -182,7 +182,7 @@ graph LR
 
 **Findability** describes how easily and reliably a user can locate specific content or functionality within a product. Two specific, common failure patterns undermine findability:
 
-- **Ambiguous labeling**: category or navigation labels that are vague, internally jargon-heavy, or open to multiple reasonable interpretations, forcing users to guess or explore multiple options before finding what they need — a direct instance of Lesson 22's under-specification concern, now applied to navigation labels rather than written requirements.
+- **Ambiguous labeling**: category or navigation labels that are vague, internally jargon-heavy, or open to multiple reasonable interpretations, forcing users to guess or explore multiple options before finding what they need a direct instance of Lesson 22's under-specification concern, now applied to navigation labels rather than written requirements.
 - **"Org chart as navigation"**: the specific instance of the mental-model-versus-internal-structure failure described above, where a product's top-level navigation categories map directly onto internal team or department boundaries rather than user-facing conceptual groupings.
 
 ```mermaid
@@ -225,7 +225,7 @@ graph TD
 
 ### Avoiding Over-Engineering: Validation Proportional to Stakes
 
-As with several other artifacts covered in this module (MVP scope, prototype fidelity), information architecture validation should be proportional to the actual stakes and complexity involved — a small product with a handful of clearly distinct sections may not require extensive, formal card-sorting studies to arrive at a sensible structure, while a large, content-rich product with many overlapping categories and a broad, diverse user base likely benefits significantly from rigorous, validated research. Over-investing in exhaustive taxonomy development for a genuinely simple product wastes effort without corresponding benefit, echoing this module's recurring theme (Lesson 21's MVP creep, Lesson 26's over-engineered prototype) that validation effort should match the actual complexity and risk of the specific problem at hand, not a fixed, one-size-fits-all standard.
+As with several other artifacts covered in this module (MVP scope, prototype fidelity), information architecture validation should be proportional to the actual stakes and complexity involved a small product with a handful of clearly distinct sections may not require extensive, formal card-sorting studies to arrive at a sensible structure, while a large, content-rich product with many overlapping categories and a broad, diverse user base likely benefits significantly from rigorous, validated research. Over-investing in exhaustive taxonomy development for a genuinely simple product wastes effort without corresponding benefit, echoing this module's recurring theme (Lesson 21's MVP creep, Lesson 26's over-engineered prototype) that validation effort should match the actual complexity and risk of the specific problem at hand, not a fixed, one-size-fits-all standard.
 
 ---
 
@@ -233,11 +233,11 @@ As with several other artifacts covered in this module (MVP scope, prototype fid
 
 **Mistake 1: Organizing product navigation around internal team or organizational structure rather than user mental models**
 
-This is the "org chart as navigation" failure — users have no visibility into internal structure and will be confused by a navigation scheme that reflects it rather than their own way of thinking about the product's content.
+This is the "org chart as navigation" failure users have no visibility into internal structure and will be confused by a navigation scheme that reflects it rather than their own way of thinking about the product's content.
 
 **Mistake 2: Assuming a category structure is intuitive because it makes sense to the team that built it**
 
-The team's familiarity with the product's internal logic and terminology is precisely what makes them poor judges of whether a structure is genuinely intuitive to someone encountering it fresh — validation (via card sorting or similar techniques) is needed rather than internal confidence alone.
+The team's familiarity with the product's internal logic and terminology is precisely what makes them poor judges of whether a structure is genuinely intuitive to someone encountering it fresh validation (via card sorting or similar techniques) is needed rather than internal confidence alone.
 
 **Mistake 3: Using ambiguous, jargon-heavy, or internally-coined labels for user-facing categories**
 
@@ -256,7 +256,7 @@ Validation effort should be proportional to actual complexity and stakes, not ap
 
 ## Mental Model: The Mental Model Match Test
 
-This lesson's mental model is the **Mental Model Match Test** — a quick diagnostic for evaluating whether a proposed information architecture reflects users' actual thinking or the organization's internal structure.
+This lesson's mental model is the **Mental Model Match Test** a quick diagnostic for evaluating whether a proposed information architecture reflects users' actual thinking or the organization's internal structure.
 
 ```mermaid
 %%{init: {
@@ -292,7 +292,7 @@ This lesson's mental model is the **Mental Model Match Test** — a quick diagno
 graph TD
     A[Proposed Category or<br/>Navigation Structure] --> B{Does This Structure Reflect How Real<br/>Users, Validated Through Card Sorting or<br/>Interviews, Group This Content?}
     B -->|Yes| C[Likely to Support Genuine Findability]
-    B -->|No — It Reflects Internal Team<br/>Structure or Assumption Instead| D["Org Chart as Navigation"<br/>— Revisit Before Finalizing]
+    B -->|No It Reflects Internal Team<br/>Structure or Assumption Instead| D["Org Chart as Navigation"<br/> Revisit Before Finalizing]
 ```
 
 Apply this test to any proposed navigation or category structure before finalizing it: has this structure actually been validated against real users' mental models, using a technique like card sorting or past-behavior interviews (Lesson 12), or does it simply reflect how the team internally thinks about the product (often shaped by internal organizational boundaries)? A structure that has not passed this test should be treated as an unvalidated hypothesis, not a finished decision.
@@ -301,7 +301,7 @@ Apply this test to any proposed navigation or category structure before finalizi
 
 ## Real Company Example
 
-**Etsy**'s well-documented use of card sorting and related information architecture research methods to organize its extensive product category structure is a widely discussed illustration of this lesson's core technique applied at meaningful scale. Public design and research commentary from Etsy has described using card sorting and related studies specifically to validate how shoppers actually think about and group the platform's enormous range of product categories, rather than relying on an internally convenient taxonomy — a genuinely challenging information architecture problem given the platform's scale and the sheer diversity of items sold, where an internally intuitive structure could easily diverge substantially from how real shoppers browsing the platform actually think about finding what they want.
+**Etsy**'s well-documented use of card sorting and related information architecture research methods to organize its extensive product category structure is a widely discussed illustration of this lesson's core technique applied at meaningful scale. Public design and research commentary from Etsy has described using card sorting and related studies specifically to validate how shoppers actually think about and group the platform's enormous range of product categories, rather than relying on an internally convenient taxonomy a genuinely challenging information architecture problem given the platform's scale and the sheer diversity of items sold, where an internally intuitive structure could easily diverge substantially from how real shoppers browsing the platform actually think about finding what they want.
 
 *(Assumption flagged: this reflects publicly shared design research commentary from the company rather than a claim about its complete, current internal information architecture process, which this curriculum does not claim certainty about.)*
 
@@ -310,13 +310,13 @@ Apply this test to any proposed navigation or category structure before finalizi
 ## Real World Perspective: Information Architecture at Different Company Stages
 
 **At a startup:**
-Information architecture decisions are often made quickly and intuitively by a small team, given a genuinely simple, limited initial product with few distinct sections — the risk of "org chart as navigation" is often lower at this stage simply because there isn't yet much internal organizational structure to inadvertently reflect, though the risk of confusing, internally-coined labeling can still emerge even in a small, early product.
+Information architecture decisions are often made quickly and intuitively by a small team, given a genuinely simple, limited initial product with few distinct sections the risk of "org chart as navigation" is often lower at this stage simply because there isn't yet much internal organizational structure to inadvertently reflect, though the risk of confusing, internally-coined labeling can still emerge even in a small, early product.
 
 **At a mid-size company:**
-Information architecture challenges typically grow substantially as a product adds features and content over time, and this is often the stage where card sorting and similar validation techniques become genuinely valuable — an initially sensible, small-scale structure frequently needs deliberate revalidation and restructuring as the product's scope expands well beyond its original, simpler form.
+Information architecture challenges typically grow substantially as a product adds features and content over time, and this is often the stage where card sorting and similar validation techniques become genuinely valuable an initially sensible, small-scale structure frequently needs deliberate revalidation and restructuring as the product's scope expands well beyond its original, simpler form.
 
 **At Big Tech:**
-Information architecture at scale often needs to account for multiple overlapping products, teams, and content types simultaneously, and the "org chart as navigation" failure pattern becomes both more likely (given genuinely complex internal organizational structures) and more costly (given the scale of confused users affected) — dedicated information architecture and research functions at this scale exist substantially to counteract this specific, recurring risk.
+Information architecture at scale often needs to account for multiple overlapping products, teams, and content types simultaneously, and the "org chart as navigation" failure pattern becomes both more likely (given genuinely complex internal organizational structures) and more costly (given the scale of confused users affected) dedicated information architecture and research functions at this scale exist substantially to counteract this specific, recurring risk.
 
 ---
 
@@ -326,19 +326,19 @@ Consider a simplified, illustrative scenario common across B2B SaaS platforms.
 
 A project management software company's settings page is organized into four top-level sections, each corresponding directly to the internal engineering team responsible for that area: "Workspace Configuration" (owned by the platform infrastructure team), "Notification Rules" (owned by the notifications team), "Billing & Plans" (owned by the monetization team), and "Integrations" (owned by the partnerships team). This structure emerged organically over time, as each team independently built and shipped their own section without coordinating on an overall, user-validated organizational scheme.
 
-Customer support data reveals a recurring pattern: a substantial share of support tickets involve users unable to find how to change their email notification frequency, despite this setting existing clearly within the "Notification Rules" section. Closer investigation, including a card sorting study conducted with a sample of real users, reveals that most users' actual mental model groups notification preferences together with general account and profile settings — a conceptual category the existing structure had no corresponding home for, since "Notification Rules" had been established as its own separate top-level section purely because a separate internal team happened to own that functionality.
+Customer support data reveals a recurring pattern: a substantial share of support tickets involve users unable to find how to change their email notification frequency, despite this setting existing clearly within the "Notification Rules" section. Closer investigation, including a card sorting study conducted with a sample of real users, reveals that most users' actual mental model groups notification preferences together with general account and profile settings a conceptual category the existing structure had no corresponding home for, since "Notification Rules" had been established as its own separate top-level section purely because a separate internal team happened to own that functionality.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
-1. **The navigation structure directly mirrored internal team ownership rather than user mental models** — a clear instance of the "org chart as navigation" failure pattern, emerging not from any single deliberate decision but from the organic, uncoordinated accumulation of each team's independently shipped section.
-2. **No card sorting or similar validation had ever been conducted** before the structure was finalized and shipped — the team's internal familiarity with "of course notifications are their own section, since that's a distinct team's responsibility" masked the fact that this internal logic didn't match how actual users conceptually organized the same content.
+1. **The navigation structure directly mirrored internal team ownership rather than user mental models** a clear instance of the "org chart as navigation" failure pattern, emerging not from any single deliberate decision but from the organic, uncoordinated accumulation of each team's independently shipped section.
+2. **No card sorting or similar validation had ever been conducted** before the structure was finalized and shipped the team's internal familiarity with "of course notifications are their own section, since that's a distinct team's responsibility" masked the fact that this internal logic didn't match how actual users conceptually organized the same content.
 3. **The findability problem was discovered only through accumulated support ticket volume**, a slow, indirect signal, rather than through proactive, upfront validation that would have caught the mismatch before launch, at a fraction of the ongoing support cost.
 
-A team applying this lesson's discipline from the outset would have conducted a card sort (open or closed) with real users before finalizing the settings page structure, very likely revealing that users' mental model grouped notification preferences with general account settings rather than as its own distinct top-level category — allowing the team to restructure navigation around validated user mental models rather than internal team boundaries, before the structure had already shipped and accumulated real usage and support burden.
+A team applying this lesson's discipline from the outset would have conducted a card sort (open or closed) with real users before finalizing the settings page structure, very likely revealing that users' mental model grouped notification preferences with general account settings rather than as its own distinct top-level category allowing the team to restructure navigation around validated user mental models rather than internal team boundaries, before the structure had already shipped and accumulated real usage and support burden.
 
-This case connects directly back to **Lesson 14's fictional-character-persona warning** and **Lesson 18's demographic-versus-behavioral segmentation distinction**: in all three cases, the same underlying failure recurs — organizing around what's convenient or intuitive from the organization's internal perspective, rather than what's been genuinely validated against real user behavior and mental models.
+This case connects directly back to **Lesson 14's fictional-character-persona warning** and **Lesson 18's demographic-versus-behavioral segmentation distinction**: in all three cases, the same underlying failure recurs organizing around what's convenient or intuitive from the organization's internal perspective, rather than what's been genuinely validated against real user behavior and mental models.
 
 ---
 
@@ -353,7 +353,7 @@ A practical checklist for evaluating whether a proposed information architecture
 | Is the validation effort proportional to the product's actual organizational complexity and stakes? | Prevents both under-validation (a large, complex product with no research) and over-engineering (exhaustive taxonomy work for a genuinely simple product) |
 | Has the structure been revisited since new content or features were added, rather than treated as a permanent, one-time decision? | Prevents the structure from becoming overloaded or inconsistent over time |
 
-A structure that fails several of these checks risks the exact kind of accumulated, hard-to-diagnose findability problem shown in this lesson's Detailed Case Study — a problem that often surfaces slowly, through support burden and quiet user frustration, rather than through any single obvious failure.
+A structure that fails several of these checks risks the exact kind of accumulated, hard-to-diagnose findability problem shown in this lesson's Detailed Case Study a problem that often surfaces slowly, through support burden and quiet user frustration, rather than through any single obvious failure.
 
 ---
 
@@ -363,24 +363,24 @@ A structure that fails several of these checks risks the exact kind of accumulat
 *What the interviewer is actually evaluating:* Whether the candidate names a specific technique like card sorting, rather than relying on internal team consensus or intuition alone, and whether they connect this to the broader research discipline covered earlier in this curriculum.
 
 **Typical question 2: "Tell me about a time users struggled to find something in a product, and what caused it."**
-*What the interviewer is actually evaluating:* Whether the candidate can diagnose a genuine findability problem — ambiguous labeling, org-chart-driven structure, or a mismatch with user mental models — rather than attributing the issue vaguely to "bad UX" without deeper structural diagnosis.
+*What the interviewer is actually evaluating:* Whether the candidate can diagnose a genuine findability problem ambiguous labeling, org-chart-driven structure, or a mismatch with user mental models rather than attributing the issue vaguely to "bad UX" without deeper structural diagnosis.
 
 **Typical question 3: "How do you decide how much information architecture research is warranted for a given product?"**
-*What the interviewer is actually evaluating:* Awareness of the proportionality principle — whether the candidate can articulate that validation effort should scale with actual organizational complexity and stakes, rather than applying either no validation or maximal validation regardless of context.
+*What the interviewer is actually evaluating:* Awareness of the proportionality principle whether the candidate can articulate that validation effort should scale with actual organizational complexity and stakes, rather than applying either no validation or maximal validation regardless of context.
 
 ---
 
 ## Summary
 
-Information architecture is the practice of organizing, structuring, labeling, and connecting a product's content and functionality — distinct from visual design (appearance) and interaction design (specific element behavior) — and forms the underlying foundation those other disciplines are built on top of. Card sorting is a widely used technique for validating (or discovering) a category structure against users' genuine mental models, rather than assuming internal team familiarity translates to user-facing intuitiveness. A specific, common, and costly failure — "org chart as navigation" — occurs when a product's structure mirrors internal organizational boundaries rather than validated user mental models, producing findability problems that often surface slowly through accumulated support burden rather than a single obvious failure, as shown in this lesson's Detailed Case Study. Findability also depends on clear, unambiguous labeling, free of internal jargon that may be unfamiliar to actual users. Finally, information architecture validation effort should scale proportionally with a product's actual organizational complexity and stakes, avoiding both under-validation for complex products and over-engineering for genuinely simple ones.
+Information architecture is the practice of organizing, structuring, labeling, and connecting a product's content and functionality distinct from visual design (appearance) and interaction design (specific element behavior) and forms the underlying foundation those other disciplines are built on top of. Card sorting is a widely used technique for validating (or discovering) a category structure against users' genuine mental models, rather than assuming internal team familiarity translates to user-facing intuitiveness. A specific, common, and costly failure "org chart as navigation" occurs when a product's structure mirrors internal organizational boundaries rather than validated user mental models, producing findability problems that often surface slowly through accumulated support burden rather than a single obvious failure, as shown in this lesson's Detailed Case Study. Findability also depends on clear, unambiguous labeling, free of internal jargon that may be unfamiliar to actual users. Finally, information architecture validation effort should scale proportionally with a product's actual organizational complexity and stakes, avoiding both under-validation for complex products and over-engineering for genuinely simple ones.
 
 ---
 
 ## Key Takeaways
 
-- Information architecture organizes, structures, labels, and connects content and functionality — the foundation visual design and interaction design are built on top of.
+- Information architecture organizes, structures, labels, and connects content and functionality the foundation visual design and interaction design are built on top of.
 - Card sorting validates a category structure against users' actual mental models, rather than assuming internal team familiarity translates into user-facing intuitiveness.
-- "Org chart as navigation" — structuring a product around internal team boundaries rather than validated user mental models — is a specific, common, and costly failure pattern.
+- "Org chart as navigation" structuring a product around internal team boundaries rather than validated user mental models is a specific, common, and costly failure pattern.
 - Findability also depends on clear, unambiguous labeling, free of internal jargon that may confuse actual users.
 - Findability problems often surface slowly, through accumulated support burden or quiet user frustration, rather than through a single obvious failure.
 - Information architecture requires periodic revalidation as a product grows and adds content, rather than being treated as a permanent, one-time decision.
@@ -392,12 +392,12 @@ Information architecture is the practice of organizing, structuring, labeling, a
 
 *A two-minute review of everything in this lesson.*
 
-- **Information architecture** = organizing, structuring, labeling, and connecting content — the foundation under visual and interaction design.
-- **Card sorting** validates category structure against real user mental models — open (users create categories) or closed (users sort into predefined ones).
-- **Avoid "org chart as navigation"** — don't mirror internal team structure; validate against user mental models instead.
+- **Information architecture** = organizing, structuring, labeling, and connecting content the foundation under visual and interaction design.
+- **Card sorting** validates category structure against real user mental models open (users create categories) or closed (users sort into predefined ones).
+- **Avoid "org chart as navigation"** don't mirror internal team structure; validate against user mental models instead.
 - **Ambiguous, jargon-heavy labels** undermine findability, regardless of how logical the underlying structure is.
-- **Revisit IA periodically** as products grow — it's not a permanent, one-time decision.
-- **Scale validation effort to actual complexity** — don't over-engineer a simple product's taxonomy, don't under-validate a complex one.
+- **Revisit IA periodically** as products grow it's not a permanent, one-time decision.
+- **Scale validation effort to actual complexity** don't over-engineer a simple product's taxonomy, don't under-validate a complex one.
 
 ---
 
@@ -414,9 +414,9 @@ Information architecture is the practice of organizing, structuring, labeling, a
 
 ## Further Reading / Resources
 
-- Peter Morville and Louis Rosenfeld, *Information Architecture for the Web and Beyond* — the foundational, widely referenced text on information architecture practice, including card sorting methodology.
-- Donna Spencer, *Card Sorting: Designing Usable Categories* — a detailed, practical guide to conducting and interpreting card sorting studies.
-- Abby Covert, *How to Make Sense of Any Mess* — an accessible, practitioner-oriented introduction to information architecture principles for people without formal IA training.
+- Peter Morville and Louis Rosenfeld, *Information Architecture for the Web and Beyond* the foundational, widely referenced text on information architecture practice, including card sorting methodology.
+- Donna Spencer, *Card Sorting: Designing Usable Categories* a detailed, practical guide to conducting and interpreting card sorting studies.
+- Abby Covert, *How to Make Sense of Any Mess* an accessible, practitioner-oriented introduction to information architecture principles for people without formal IA training.
 
 ---
 
@@ -424,7 +424,7 @@ Information architecture is the practice of organizing, structuring, labeling, a
 
 **Card 1**
 - Front: What is information architecture, and how does it differ from visual and interaction design?
-- Back: The practice of organizing, structuring, labeling, and connecting content and functionality — the underlying foundation that visual design (appearance) and interaction design (element behavior) are built on top of.
+- Back: The practice of organizing, structuring, labeling, and connecting content and functionality the underlying foundation that visual design (appearance) and interaction design (element behavior) are built on top of.
 - Difficulty: 2
 - Tags: ia-definition
 
@@ -448,7 +448,7 @@ Information architecture is the practice of organizing, structuring, labeling, a
 
 **Card 5**
 - Front: Why is a team's internal familiarity with a category structure a poor indicator of whether it's genuinely intuitive to users?
-- Back: The team's deep familiarity with the product's internal logic and terminology is precisely what makes them poor judges of a fresh user's actual experience — validation through techniques like card sorting is needed rather than internal confidence alone.
+- Back: The team's deep familiarity with the product's internal logic and terminology is precisely what makes them poor judges of a fresh user's actual experience validation through techniques like card sorting is needed rather than internal confidence alone.
 - Difficulty: 2
 - Tags: internal-bias
 
@@ -460,7 +460,7 @@ Information architecture is the practice of organizing, structuring, labeling, a
 
 **Card 7**
 - Front: How should information architecture validation effort scale, according to this lesson?
-- Back: Proportionally to the product's actual organizational complexity and stakes — avoiding both under-validation for complex, high-stakes products and over-engineering exhaustive taxonomy work for genuinely simple ones.
+- Back: Proportionally to the product's actual organizational complexity and stakes avoiding both under-validation for complex, high-stakes products and over-engineering exhaustive taxonomy work for genuinely simple ones.
 - Difficulty: 2
 - Tags: proportional-validation
 
@@ -555,7 +555,7 @@ C) Because a separate internal team owned that functionality
 D) Because notification settings relate to no other product function
 
 *Correct answer: C*
-*Explanation: Nobody decided it should be top-level for users. It became top-level because a team owned it, which is how this pattern usually arrives — organically, undecided.*
+*Explanation: Nobody decided it should be top-level for users. It became top-level because a team owned it, which is how this pattern usually arrives organically, undecided.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -682,9 +682,9 @@ D) Disregard segment differences, since architecture ignores them anyway
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 27 — UX Principles for Product Managers | Extends cognitive load and choice-organization principles from individual screens into full-product structural organization |
-| **Current Lesson** | Lesson 28 — Information Architecture | Card sorting; mental models vs. internal structure; findability failures; proportional validation |
-| **Next Lesson** | Lesson 29 — Prioritization Fundamentals | Synthesizes design, research, and strategic considerations from this entire module into a formal prioritization framework, closing Module 3 |
+| **Previous Lesson** | Lesson 27 UX Principles for Product Managers | Extends cognitive load and choice-organization principles from individual screens into full-product structural organization |
+| **Current Lesson** | Lesson 28 Information Architecture | Card sorting; mental models vs. internal structure; findability failures; proportional validation |
+| **Next Lesson** | Lesson 29 Prioritization Fundamentals | Synthesizes design, research, and strategic considerations from this entire module into a formal prioritization framework, closing Module 3 |
 | **Future Concepts Unlocked** | Module 5 (Metrics, Experimentation & Growth) | Uses findability and navigation structure as one lens for interpreting funnel and behavioral analytics data |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "the navigation" or "how content is organized" assumes the Mental Model Match Test covered here — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "the navigation" or "how content is organized" assumes the Mental Model Match Test covered here this will not be re-explained, only re-applied.

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Module 8 has introduced nine distinct mental models across ten lessons: the Strategy Cascade (Lesson 71), the Enterprise Adoption Ladder (Lesson 72), the Stakeholder Compass (Lesson 73), the Expansion Wedge (Lesson 74), the Moat Durability Matrix (Lesson 75), the Integration Continuum (Lesson 76), the Portfolio Health Grid (Lesson 77), the Capability Sourcing Matrix (Lesson 78), and the Concession Exchange Map (Lesson 79). Each answers a specific strategic question — how to make a vision falsifiable, how an account climbs toward organizational adoption, who actually needs to be satisfied for a B2B deal to close, how packaging should create expansion, whether a competitive advantage is genuinely durable, how to integrate an acquisition, how to evaluate a bet at its actual maturity stage, whether to build or buy a capability, and which concessions to trade in a negotiation.
+Module 8 has introduced nine distinct mental models across ten lessons: the Strategy Cascade (Lesson 71), the Enterprise Adoption Ladder (Lesson 72), the Stakeholder Compass (Lesson 73), the Expansion Wedge (Lesson 74), the Moat Durability Matrix (Lesson 75), the Integration Continuum (Lesson 76), the Portfolio Health Grid (Lesson 77), the Capability Sourcing Matrix (Lesson 78), and the Concession Exchange Map (Lesson 79). Each answers a specific strategic question how to make a vision falsifiable, how an account climbs toward organizational adoption, who actually needs to be satisfied for a B2B deal to close, how packaging should create expansion, whether a competitive advantage is genuinely durable, how to integrate an acquisition, how to evaluate a bet at its actual maturity stage, whether to build or buy a capability, and which concessions to trade in a negotiation.
 
-Module 7 closed with a synthesis lesson establishing that real platform problems are rarely single-dimensional, and that genuine platform judgment means recognizing which combination of models applies to an ambiguous situation. The same principle applies with even greater force at the level of company-wide strategy, because strategic problems at this altitude routinely span sales, product, competitive positioning, and organizational structure simultaneously. A declining account, a stalled deal, an underperforming acquisition, or a competitor's sudden gain in market share rarely has a single cause locatable in a single Module 8 lesson — it is usually a genuine confluence of several, and a strategist who reaches for only one model risks correctly diagnosing a fraction of the problem while missing the rest.
+Module 7 closed with a synthesis lesson establishing that real platform problems are rarely single-dimensional, and that genuine platform judgment means recognizing which combination of models applies to an ambiguous situation. The same principle applies with even greater force at the level of company-wide strategy, because strategic problems at this altitude routinely span sales, product, competitive positioning, and organizational structure simultaneously. A declining account, a stalled deal, an underperforming acquisition, or a competitor's sudden gain in market share rarely has a single cause locatable in a single Module 8 lesson it is usually a genuine confluence of several, and a strategist who reaches for only one model risks correctly diagnosing a fraction of the problem while missing the rest.
 
 This closing lesson of Module 8 consolidates the module's nine tools into a single integrated diagnostic practice, following the same synthesis discipline Lesson 70 modeled for Module 7's platform toolkit.
 
@@ -14,13 +14,13 @@ This closing lesson of Module 8 consolidates the module's nine tools into a sing
 
 | Field | Detail |
 |---|---|
-| **Module** | 8 — Advanced Strategy, Innovation & Enterprise/B2B Product Management |
+| **Module** | 8 Advanced Strategy, Innovation & Enterprise/B2B Product Management |
 | **Current Lesson** | 80 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 45 minutes (reading) + 20 minutes (reflection + quiz) |
 | **Prerequisites** | Lessons 71–79 (all Module 8 mental models), Lesson 70 (Platform Health Radar, as a model of connected synthesis) |
-| **Next Lesson** | Lesson 81 — Regulated Industries: PM in Healthcare, Finance, and Government |
-| **Future Topics Unlocked** | Lesson 84 (PM in AI-Native Companies), Lesson 88 (Building and Scaling a Product Organization), Lesson 90 (Capstone) — all draw on this integrated Module 8 toolkit as established canon |
+| **Next Lesson** | Lesson 81 Regulated Industries: PM in Healthcare, Finance, and Government |
+| **Future Topics Unlocked** | Lesson 84 (PM in AI-Native Companies), Lesson 88 (Building and Scaling a Product Organization), Lesson 90 (Capstone) all draw on this integrated Module 8 toolkit as established canon |
 
 ---
 
@@ -95,11 +95,11 @@ graph TD
     R --> I[Concession Exchange Map:<br/>Are negotiation trades efficient, or precedent-setting?]
 ```
 
-The Radar's discipline is running through all nine questions whenever a significant strategic problem surfaces, rather than stopping at the first model that seems to fit, since real strategic incidents — as this lesson's Case Study will show — are frequently the product of failures across more than one axis simultaneously.
+The Radar's discipline is running through all nine questions whenever a significant strategic problem surfaces, rather than stopping at the first model that seems to fit, since real strategic incidents as this lesson's Case Study will show are frequently the product of failures across more than one axis simultaneously.
 
 ### The Cross-Lesson Strategic Diagnostic Protocol
 
-When a strategic symptom is observed — a stalled deal, a declining account, an underperforming acquisition, an eroding competitive position — this lesson recommends a **Cross-Lesson Strategic Diagnostic Protocol** with a deliberate order of investigation:
+When a strategic symptom is observed a stalled deal, a declining account, an underperforming acquisition, an eroding competitive position this lesson recommends a **Cross-Lesson Strategic Diagnostic Protocol** with a deliberate order of investigation:
 
 1. **Check the bet** (Strategy Cascade, Lesson 71): is the underlying strategic bet actually falsifiable, with pre-defined success criteria, or is this a vague aspiration that was never set up to be judged?
 2. **Check the rung** (Enterprise Adoption Ladder, Lesson 72): if this is an account-level problem, which rung is it stalled at, and what specific capability does the next rung require?
@@ -111,11 +111,11 @@ When a strategic symptom is observed — a stalled deal, a declining account, an
 8. **Check the sourcing** (Capability Sourcing Matrix, Lesson 78): is a relevant capability being built, bought, or partnered for in a way that matches its genuine differentiation and market maturity?
 9. **Check the concessions** (Concession Exchange Map, Lesson 79): have any pricing or contract concessions been traded efficiently, or have they set a costly precedent?
 
-As with Module 7's protocol, this ordered checklist does not mean every investigation touches all nine steps equally — a well-trained strategist learns to move quickly past steps that clearly don't apply — but the discipline of checking each axis, rather than assuming only one applies, is what distinguishes genuine strategic diagnostic skill from pattern-matching a symptom to the first familiar-sounding model.
+As with Module 7's protocol, this ordered checklist does not mean every investigation touches all nine steps equally a well-trained strategist learns to move quickly past steps that clearly don't apply but the discipline of checking each axis, rather than assuming only one applies, is what distinguishes genuine strategic diagnostic skill from pattern-matching a symptom to the first familiar-sounding model.
 
 ### How the Models Interconnect
 
-The nine models connect directly. The Strategy Cascade (Lesson 71) provides the foundational discipline — falsifiability — that the Portfolio Health Grid (Lesson 77) later applies specifically to bets at different maturity stages. The Enterprise Adoption Ladder (Lesson 72) and Stakeholder Compass (Lesson 73) both describe the same underlying B2B adoption process from complementary angles — rungs of organizational progress and the people who gate that progress, respectively. The Expansion Wedge (Lesson 74) depends directly on the Enterprise Adoption Ladder, since its Enterprise Tier must be built around Rung 3 and 4 capability needs. The Moat Durability Matrix (Lesson 75) feeds directly into the Capability Sourcing Matrix (Lesson 78), since genuine differentiation is one of the Sourcing Matrix's two core axes. The Integration Continuum (Lesson 76) is, in effect, a specialized application of rationale-matching thinking to the specific context of post-acquisition integration. The Concession Exchange Map (Lesson 79) closes the loop by addressing what happens once a deal, having successfully navigated the Adoption Ladder and Stakeholder Compass, reaches the negotiation table.
+The nine models connect directly. The Strategy Cascade (Lesson 71) provides the foundational discipline falsifiability that the Portfolio Health Grid (Lesson 77) later applies specifically to bets at different maturity stages. The Enterprise Adoption Ladder (Lesson 72) and Stakeholder Compass (Lesson 73) both describe the same underlying B2B adoption process from complementary angles rungs of organizational progress and the people who gate that progress, respectively. The Expansion Wedge (Lesson 74) depends directly on the Enterprise Adoption Ladder, since its Enterprise Tier must be built around Rung 3 and 4 capability needs. The Moat Durability Matrix (Lesson 75) feeds directly into the Capability Sourcing Matrix (Lesson 78), since genuine differentiation is one of the Sourcing Matrix's two core axes. The Integration Continuum (Lesson 76) is, in effect, a specialized application of rationale-matching thinking to the specific context of post-acquisition integration. The Concession Exchange Map (Lesson 79) closes the loop by addressing what happens once a deal, having successfully navigated the Adoption Ladder and Stakeholder Compass, reaches the negotiation table.
 
 ---
 
@@ -139,7 +139,7 @@ The same precedent-cost logic applies whenever any concession is granted that ot
 
 **Mistake 5: Assuming strategic judgment is complete once all nine models are individually memorized**
 
-Genuine strategic judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
+Genuine strategic judgment is the ability to recognize which combination applies to a novel, real situation a skill built through practice, not memorization alone.
 
 ---
 
@@ -164,9 +164,9 @@ A strategist who runs this full Radar, rather than stopping at the first familia
 
 ## Real Company Example
 
-Adobe's strategic history offers a useful synthesis example spanning several of Module 8's dimensions simultaneously. Adobe's 2013 transition from perpetual-license software to its subscription-based Creative Cloud model (Lesson 44's example) illustrates the Strategy Cascade and Expansion Wedge together, requiring a falsifiable bet about subscriber retention and a packaging structure supporting expansion from individual creators to full enterprise deployments. Adobe's announced-then-abandoned $20 billion acquisition of Figma — announced September 2022, terminated December 2023 after Adobe and Figma jointly concluded there was "no clear path" to antitrust approval in the UK and EU, per Reuters' and CNBC's reporting, with Adobe paying a $1 billion termination fee under the deal's own reverse-breakup clause — illustrates both the Moat Durability Matrix (Adobe was explicitly paying a premium to neutralize a genuinely emerging threat to its design-tool moat, not just to acquire revenue) and the Integration Continuum (extensive public discussion, before the deal collapsed, of how a genuinely independent, browser-native competitor with its own distinct product culture would need to be integrated without destroying what made it valuable). Public commentary on Adobe's enterprise sales motion further illustrates the Stakeholder Compass and Concession Exchange Map in its large-account negotiation practices.
+Adobe's strategic history offers a useful synthesis example spanning several of Module 8's dimensions simultaneously. Adobe's 2013 transition from perpetual-license software to its subscription-based Creative Cloud model (Lesson 44's example) illustrates the Strategy Cascade and Expansion Wedge together, requiring a falsifiable bet about subscriber retention and a packaging structure supporting expansion from individual creators to full enterprise deployments. Adobe's announced-then-abandoned $20 billion acquisition of Figma announced September 2022, terminated December 2023 after Adobe and Figma jointly concluded there was "no clear path" to antitrust approval in the UK and EU, per Reuters' and CNBC's reporting, with Adobe paying a $1 billion termination fee under the deal's own reverse-breakup clause illustrates both the Moat Durability Matrix (Adobe was explicitly paying a premium to neutralize a genuinely emerging threat to its design-tool moat, not just to acquire revenue) and the Integration Continuum (extensive public discussion, before the deal collapsed, of how a genuinely independent, browser-native competitor with its own distinct product culture would need to be integrated without destroying what made it valuable). Public commentary on Adobe's enterprise sales motion further illustrates the Stakeholder Compass and Concession Exchange Map in its large-account negotiation practices.
 
-The Figma deal's collapse is itself an instructive coda: the $1 billion termination fee, agreed to at signing, was a deliberate contractual acknowledgment that regulatory risk was real and material even in September 2022 — a concrete illustration that M&A risk assessment (this lesson's Integration Continuum) has to account for deal-completion risk, not just post-close integration risk.
+The Figma deal's collapse is itself an instructive coda: the $1 billion termination fee, agreed to at signing, was a deliberate contractual acknowledgment that regulatory risk was real and material even in September 2022 a concrete illustration that M&A risk assessment (this lesson's Integration Continuum) has to account for deal-completion risk, not just post-close integration risk.
 
 *(Source: Reuters' and CNBC's December 2023 reporting on the deal's termination, corroborated by Adobe's own regulatory filing confirming the $1 billion termination fee.)*
 
@@ -174,11 +174,11 @@ The Figma deal's collapse is itself an instructive coda: the $1 billion terminat
 
 ## Real World Perspective: Module Synthesis: Advanced Strategic Judgment at Different Company Stages
 
-**Startup:** Early-stage companies typically encounter only a small subset of these nine models as immediately relevant — usually the Strategy Cascade and, once initial B2B traction emerges, the early rungs of the Enterprise Adoption Ladder — since moat durability, M&A integration, and sophisticated concession strategy typically become pressing concerns only once the company has scaled meaningfully.
+**Startup:** Early-stage companies typically encounter only a small subset of these nine models as immediately relevant usually the Strategy Cascade and, once initial B2B traction emerges, the early rungs of the Enterprise Adoption Ladder since moat durability, M&A integration, and sophisticated concession strategy typically become pressing concerns only once the company has scaled meaningfully.
 
 **Mid-size company:** This is typically where several models become simultaneously relevant for the first time, as growing enterprise accounts raise Stakeholder Compass and Expansion Wedge concerns together, while an early acquisition or two may raise Integration Continuum questions in the same period, testing whether a strategist can hold multiple frameworks in mind simultaneously.
 
-**Big Tech:** Mature organizations typically have dedicated specialists across different axes of this Radar — corporate development teams focused on the Integration Continuum, pricing and deal desk teams focused on the Concession Exchange Map, competitive strategy teams focused on the Moat Durability Matrix — making the PM's or strategist's synthesis role less about personally applying every model and more about ensuring specialized teams are coordinating around a shared, integrated understanding of the company's overall strategic position.
+**Big Tech:** Mature organizations typically have dedicated specialists across different axes of this Radar corporate development teams focused on the Integration Continuum, pricing and deal desk teams focused on the Concession Exchange Map, competitive strategy teams focused on the Moat Durability Matrix making the PM's or strategist's synthesis role less about personally applying every model and more about ensuring specialized teams are coordinating around a shared, integrated understanding of the company's overall strategic position.
 
 ---
 
@@ -186,11 +186,11 @@ The Figma deal's collapse is itself an instructive coda: the $1 billion terminat
 
 A mid-size enterprise software company noticed, over two consecutive quarters, a troubling combination of symptoms: a recently acquired competitor's technology had still not been meaningfully integrated into the core product a year after the deal closed; several large enterprise accounts that had shown strong departmental adoption had stalled before reaching organization-wide rollout; and a promising new product line, launched eighteen months earlier as an explicit exploratory bet, was facing internal pressure to be shut down for failing to show revenue comparable to the company's mature core business.
 
-A thorough investigation using the Cross-Lesson Strategic Diagnostic Protocol revealed that these three symptoms, while superficially unrelated, shared a common underlying pattern. The stalled acquisition integration, examined through the Integration Continuum, revealed that the deal's original rationale — acquiring a specific proprietary technology — had never been matched to an appropriate Selective Integration plan, with the acquired team instead left in an ambiguous, under-communicated limbo that had caused several key engineers to depart, taking much of the technology's practical value with them. The stalled enterprise accounts, examined through the Enterprise Adoption Ladder and Stakeholder Compass together, revealed that sales and success teams had been engaging only enthusiastic departmental Champions, never directly reaching the Technical Evaluators whose security sign-off Rung 3 required. The pressured new product line, examined through the Portfolio Health Grid, revealed the same premature-cancellation pattern from Lesson 77's case study: a Horizon 3 bet being judged against Horizon 1 revenue metrics it was structurally too early to satisfy.
+A thorough investigation using the Cross-Lesson Strategic Diagnostic Protocol revealed that these three symptoms, while superficially unrelated, shared a common underlying pattern. The stalled acquisition integration, examined through the Integration Continuum, revealed that the deal's original rationale acquiring a specific proprietary technology had never been matched to an appropriate Selective Integration plan, with the acquired team instead left in an ambiguous, under-communicated limbo that had caused several key engineers to depart, taking much of the technology's practical value with them. The stalled enterprise accounts, examined through the Enterprise Adoption Ladder and Stakeholder Compass together, revealed that sales and success teams had been engaging only enthusiastic departmental Champions, never directly reaching the Technical Evaluators whose security sign-off Rung 3 required. The pressured new product line, examined through the Portfolio Health Grid, revealed the same premature-cancellation pattern from Lesson 77's case study: a Horizon 3 bet being judged against Horizon 1 revenue metrics it was structurally too early to satisfy.
 
 **What went wrong?** Using the Strategic Judgment Radar across multiple axes at once, the true picture was a company-wide pattern of premature judgment and unmatched rigor: an acquisition integration approach that never matched its rationale, an enterprise sales motion that never engaged the full Stakeholder Compass, and a portfolio evaluation process that never accounted for genuine maturity stages. No single Module 8 lesson, applied in isolation, would have revealed this shared underlying pattern across three seemingly unrelated business problems.
 
-The company's recovery required addressing the pattern at its root rather than symptom by symptom: instituting a formal Integration Continuum rationale-check for all future acquisitions, a mandatory Technical Evaluator engagement step for any account approaching Rung 3, and a company-wide Portfolio Health Grid review requiring stage-appropriate metrics for every active bet — illustrating precisely why this lesson's synthesis, rather than any single model in isolation, was necessary to correctly diagnose and resolve the underlying pattern.
+The company's recovery required addressing the pattern at its root rather than symptom by symptom: instituting a formal Integration Continuum rationale-check for all future acquisitions, a mandatory Technical Evaluator engagement step for any account approaching Rung 3, and a company-wide Portfolio Health Grid review requiring stage-appropriate metrics for every active bet illustrating precisely why this lesson's synthesis, rather than any single model in isolation, was necessary to correctly diagnose and resolve the underlying pattern.
 
 ---
 
@@ -218,15 +218,15 @@ A thorough strategic investigation moves through this table deliberately, ruling
 
 **"Walk me through how you'd diagnose a company facing several simultaneous, seemingly unrelated business problems."** The interviewer is evaluating whether you approach this as a potentially connected, multi-dimensional problem, checking multiple axes rather than treating each symptom as an isolated issue requiring its own unrelated fix.
 
-**"How do enterprise adoption dynamics and stakeholder engagement relate to each other?"** The interviewer is testing whether you understand the interconnection between the Enterprise Adoption Ladder and Stakeholder Compass specifically — that progression through the rungs depends directly on engaging the right stakeholders at the right time.
+**"How do enterprise adoption dynamics and stakeholder engagement relate to each other?"** The interviewer is testing whether you understand the interconnection between the Enterprise Adoption Ladder and Stakeholder Compass specifically that progression through the rungs depends directly on engaging the right stakeholders at the right time.
 
-**"Tell me about the most complex strategic situation you've had to untangle, and how you approached it."** The interviewer is listening for evidence of genuine synthesis — an investigation that considered and connected multiple contributing causes — rather than a story where a single framework, applied once, fully explained everything.
+**"Tell me about the most complex strategic situation you've had to untangle, and how you approached it."** The interviewer is listening for evidence of genuine synthesis an investigation that considered and connected multiple contributing causes rather than a story where a single framework, applied once, fully explained everything.
 
 ---
 
 ## Summary
 
-Module 8 introduced nine distinct mental models, each answering a specific strategic question: whether a bet is falsifiable (Strategy Cascade), which rung an account occupies (Enterprise Adoption Ladder), which stakeholder needs engaging (Stakeholder Compass), whether packaging supports expansion (Expansion Wedge), whether a competitive advantage is genuinely durable (Moat Durability Matrix), whether an acquisition's integration matches its rationale (Integration Continuum), whether a bet is judged by appropriate evidence (Portfolio Health Grid), whether a capability should be built or bought (Capability Sourcing Matrix), and whether negotiation concessions are efficient or costly (Concession Exchange Map). Real strategic problems are frequently multi-dimensional, and the Strategic Judgment Radar, applied through the Cross-Lesson Strategic Diagnostic Protocol, provides a disciplined way to check all nine axes rather than stopping at whichever single model first seems to fit a given symptom. The models are not an unordered checklist but a connected structure — the Enterprise Adoption Ladder and Stakeholder Compass describe the same adoption process from complementary angles, the Moat Durability Matrix feeds directly into the Capability Sourcing Matrix, and the Portfolio Health Grid applies the Strategy Cascade's falsifiability discipline to bets at different maturity stages. Genuine advanced strategic judgment is the ability to recognize, in a real and often ambiguous situation, which combination of these tools actually applies — a skill this module has built lesson by lesson, and one this synthesis lesson has now explicitly connected into a single integrated practice, mirroring the same discipline Module 7 established for platform-specific diagnosis.
+Module 8 introduced nine distinct mental models, each answering a specific strategic question: whether a bet is falsifiable (Strategy Cascade), which rung an account occupies (Enterprise Adoption Ladder), which stakeholder needs engaging (Stakeholder Compass), whether packaging supports expansion (Expansion Wedge), whether a competitive advantage is genuinely durable (Moat Durability Matrix), whether an acquisition's integration matches its rationale (Integration Continuum), whether a bet is judged by appropriate evidence (Portfolio Health Grid), whether a capability should be built or bought (Capability Sourcing Matrix), and whether negotiation concessions are efficient or costly (Concession Exchange Map). Real strategic problems are frequently multi-dimensional, and the Strategic Judgment Radar, applied through the Cross-Lesson Strategic Diagnostic Protocol, provides a disciplined way to check all nine axes rather than stopping at whichever single model first seems to fit a given symptom. The models are not an unordered checklist but a connected structure the Enterprise Adoption Ladder and Stakeholder Compass describe the same adoption process from complementary angles, the Moat Durability Matrix feeds directly into the Capability Sourcing Matrix, and the Portfolio Health Grid applies the Strategy Cascade's falsifiability discipline to bets at different maturity stages. Genuine advanced strategic judgment is the ability to recognize, in a real and often ambiguous situation, which combination of these tools actually applies a skill this module has built lesson by lesson, and one this synthesis lesson has now explicitly connected into a single integrated practice, mirroring the same discipline Module 7 established for platform-specific diagnosis.
 
 ---
 
@@ -235,7 +235,7 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 - Module 8 introduced nine interconnected mental models: Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, and Concession Exchange Map.
 - The Strategic Judgment Radar assesses a strategic situation across all nine dimensions simultaneously, rather than applying one model in isolation.
 - The Cross-Lesson Strategic Diagnostic Protocol provides an ordered approach to investigating an ambiguous strategic problem across multiple axes.
-- The nine models form a connected structure, not an unordered checklist — for example, the Enterprise Adoption Ladder and Stakeholder Compass describe the same adoption process from complementary angles.
+- The nine models form a connected structure, not an unordered checklist for example, the Enterprise Adoption Ladder and Stakeholder Compass describe the same adoption process from complementary angles.
 - Real strategic incidents are frequently the product of failures across more than one axis simultaneously, as illustrated by the Multi-Front Strategic Stall case study.
 - A single-cause diagnosis applied to a genuinely multi-dimensional strategic problem often addresses only a fraction of the underlying issue.
 - Genuine strategic judgment is the applied skill of recognizing which combination of models fits a real situation, built through deliberate practice across increasingly complex scenarios.
@@ -247,9 +247,9 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 *A two-minute review of everything in this lesson.*
 
 - Nine axes: Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
-- Don't stop at the first model that fits — run the full Cross-Lesson Strategic Diagnostic Protocol.
+- Don't stop at the first model that fits run the full Cross-Lesson Strategic Diagnostic Protocol.
 - The models connect: Adoption Ladder ↔ Stakeholder Compass (same process, two angles). Moat Durability → feeds Capability Sourcing. Strategy Cascade → underlies Portfolio Health Grid.
-- Multi-front strategic problems need multi-front diagnosis — a single lever rarely explains a compounding pattern.
+- Multi-front strategic problems need multi-front diagnosis a single lever rarely explains a compounding pattern.
 - Strategic judgment = knowing which combination applies, not just memorizing each model individually.
 
 ---
@@ -289,7 +289,7 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 **Card 3**
 - Front: How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?
-- Back: They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.
+- Back: They describe the same B2B adoption process from complementary angles rungs of organizational progress, and the specific people who gate that progress at each rung.
 - Difficulty: 2
 - Tags: model-interconnection
 
@@ -301,7 +301,7 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 **Card 5**
 - Front: Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?
-- Back: The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.
+- Back: The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet three seemingly unrelated symptoms with one underlying root cause.
 - Difficulty: 2
 - Tags: case-study, multi-front-stall
 
@@ -313,7 +313,7 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 **Card 7**
 - Front: What does genuine "advanced strategic judgment" mean, per this synthesis lesson?
-- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation not simply memorizing each model individually.
 - Difficulty: 2
 - Tags: strategic-judgment
 
@@ -322,7 +322,7 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 You are the head of product strategy at a mid-size B2B software company. Over the past two quarters, you've observed: a technology acquisition from eighteen months ago still operating in organizational limbo with no clear integration plan; three large enterprise accounts stalled just short of company-wide rollout; and mounting internal pressure to cancel a year-old exploratory product line for its still-modest revenue.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Strategic Judgment Radar and Cross-Lesson Strategic Diagnostic Protocol to a genuinely multi-symptom scenario.
+There is no single correct answer to the prompts below the goal is to practice applying the Strategic Judgment Radar and Cross-Lesson Strategic Diagnostic Protocol to a genuinely multi-symptom scenario.
 
 1. Using the Cross-Lesson Strategic Diagnostic Protocol's nine steps, which steps would you investigate first given these three symptoms, and why?
 2. Could the stalled acquisition and the stalled enterprise accounts share any common underlying cause? What model would you use to check this?
@@ -533,9 +533,9 @@ D) Conclude the situation is too complex to address and take no action
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 79 — Pricing Strategy at Scale: Enterprise Contracts and Negotiation | Integrates the Concession Exchange Map as the ninth axis of the Strategic Judgment Radar |
-| **Current Lesson** | Lesson 80 — Module Synthesis: Advanced Strategic Judgment | Strategic Judgment Radar; Cross-Lesson Strategic Diagnostic Protocol; model interconnection; advanced strategic judgment |
-| **Next Lesson** | Lesson 81 — Regulated Industries: PM in Healthcare, Finance, and Government | Opens Module 9 by applying the accumulated toolkit from Modules 7 and 8 to the specific constraints of regulated domains |
+| **Previous Lesson** | Lesson 79 Pricing Strategy at Scale: Enterprise Contracts and Negotiation | Integrates the Concession Exchange Map as the ninth axis of the Strategic Judgment Radar |
+| **Current Lesson** | Lesson 80 Module Synthesis: Advanced Strategic Judgment | Strategic Judgment Radar; Cross-Lesson Strategic Diagnostic Protocol; model interconnection; advanced strategic judgment |
+| **Next Lesson** | Lesson 81 Regulated Industries: PM in Healthcare, Finance, and Government | Opens Module 9 by applying the accumulated toolkit from Modules 7 and 8 to the specific constraints of regulated domains |
 | **Future Concepts Unlocked** | Lesson 84 (PM in AI-Native Companies) | Draws on the full Module 8 toolkit, especially the Moat Durability Matrix and Capability Sourcing Matrix, when evaluating AI-native strategic positioning |
 | | Lesson 88 (Building and Scaling a Product Organization) | Extends the Strategic Judgment Radar into organizational design and scaling decisions |
 | | Lesson 90 (Capstone) | Treats the full, integrated Module 8 toolkit as established canon for the curriculum's final synthesis |

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 55 addressed the specific transition from individual-contributor PM work to leading a team of other PMs. This lesson steps back to address the broader landscape that transition sits within: the range of career paths available to a PM, and the reality that leading a team of PMs is only one possible direction, not an obligatory next step for every successful individual contributor. A significant number of PMs are better suited to, and more fulfilled by, continuing to deepen their individual craft — becoming a Staff or Principal PM with broadening scope but no direct reports — than to becoming a manager of other PMs, and treating management as the only legitimate marker of career progress is a common, costly mistake both for individuals and for the organizations that lose excellent individual-contributor judgment by pushing people toward a track that doesn't suit them.
+Lesson 55 addressed the specific transition from individual-contributor PM work to leading a team of other PMs. This lesson steps back to address the broader landscape that transition sits within: the range of career paths available to a PM, and the reality that leading a team of PMs is only one possible direction, not an obligatory next step for every successful individual contributor. A significant number of PMs are better suited to, and more fulfilled by, continuing to deepen their individual craft becoming a Staff or Principal PM with broadening scope but no direct reports than to becoming a manager of other PMs, and treating management as the only legitimate marker of career progress is a common, costly mistake both for individuals and for the organizations that lose excellent individual-contributor judgment by pushing people toward a track that doesn't suit them.
 
-This lesson matters because career decisions made under the assumption that "the only way up is management" frequently produce exactly the outcome Lesson 55's Case Study illustrated — a capable person placed into a role that doesn't match their actual strengths, either underperforming as a leader or resenting the loss of the individual craft work they were genuinely good at and enjoyed. Understanding the real shape of PM career paths, including the legitimate dual-track structure many organizations now offer, is essential for making a deliberate, well-informed choice rather than defaulting to whichever path seems most visible or prestigious.
+This lesson matters because career decisions made under the assumption that "the only way up is management" frequently produce exactly the outcome Lesson 55's Case Study illustrated a capable person placed into a role that doesn't match their actual strengths, either underperforming as a leader or resenting the loss of the individual craft work they were genuinely good at and enjoyed. Understanding the real shape of PM career paths, including the legitimate dual-track structure many organizations now offer, is essential for making a deliberate, well-informed choice rather than defaulting to whichever path seems most visible or prestigious.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because career decisions made under the assumption that "the
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career |
+| **Module** | 6 Leadership, Communication & Career |
 | **Current Lesson** | 56 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 55 (Building and Leading Product Teams — the leadership transition) |
-| **Next Lesson** | Lesson 57 — Ethics in Product Management |
-| **Future Topics Unlocked** | Lesson 57 (Ethics in Product Management), Lesson 60 (Capstone: Building Your Own Product Philosophy) — both draw on the self-assessment and scope concepts introduced here |
+| **Prerequisites** | Lesson 55 (Building and Leading Product Teams the leadership transition) |
+| **Next Lesson** | Lesson 57 Ethics in Product Management |
+| **Future Topics Unlocked** | Lesson 57 (Ethics in Product Management), Lesson 60 (Capstone: Building Your Own Product Philosophy) both draw on the self-assessment and scope concepts introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 55's** treatment of the individual-contributor-to-l
 
 ### The Dual-Ladder Structure
 
-Many mature product organizations maintain two parallel career ladders: a **management track** (Associate PM → PM → Senior PM → Group PM/Director → VP of Product), where increasing seniority means leading larger teams of other PMs, and an **individual-contributor (IC) track** (PM → Senior PM → Staff PM → Principal PM → Distinguished/Fellow-level PM), where increasing seniority means taking on broader, more strategically significant individual product ownership without directly managing other PMs. Both tracks can lead to comparable compensation, influence, and organizational seniority — the distinction is not "management is the real career path and IC is a consolation prize," but rather two genuinely different ways of adding increasing value as a PM's career progresses.
+Many mature product organizations maintain two parallel career ladders: a **management track** (Associate PM → PM → Senior PM → Group PM/Director → VP of Product), where increasing seniority means leading larger teams of other PMs, and an **individual-contributor (IC) track** (PM → Senior PM → Staff PM → Principal PM → Distinguished/Fellow-level PM), where increasing seniority means taking on broader, more strategically significant individual product ownership without directly managing other PMs. Both tracks can lead to comparable compensation, influence, and organizational seniority the distinction is not "management is the real career path and IC is a consolation prize," but rather two genuinely different ways of adding increasing value as a PM's career progresses.
 
 ```mermaid
 %%{init: {
@@ -123,7 +123,7 @@ graph LR
     A["Single feature<br/>within a product"] --> B["A full product<br/>or product line"] --> C["A portfolio of<br/>related products"] --> D["Company-wide<br/>product strategy"]
 ```
 
-At each stage of this scope progression, the underlying skills from this entire curriculum still apply — prioritization (Lesson 29), stakeholder management (Lesson 47), metrics discipline (Lesson 41) — but the altitude at which they're exercised (echoing Lesson 51's Altitude Dial) increases, and the specific judgment calls become less about a single feature's details and more about which products or initiatives deserve investment at all. This framing helps make sense of the dual-ladder structure: an IC-track Principal PM and a management-track Director may both be operating at a comparable scope of organizational impact, simply exercising it through different mechanisms — one through deep, direct product ownership and cross-organizational influence, the other through leading and developing a team of other PMs.
+At each stage of this scope progression, the underlying skills from this entire curriculum still apply prioritization (Lesson 29), stakeholder management (Lesson 47), metrics discipline (Lesson 41) but the altitude at which they're exercised (echoing Lesson 51's Altitude Dial) increases, and the specific judgment calls become less about a single feature's details and more about which products or initiatives deserve investment at all. This framing helps make sense of the dual-ladder structure: an IC-track Principal PM and a management-track Director may both be operating at a comparable scope of organizational impact, simply exercising it through different mechanisms one through deep, direct product ownership and cross-organizational influence, the other through leading and developing a team of other PMs.
 
 ### Assessing Genuine Fit for Each Track
 
@@ -131,7 +131,7 @@ A structured self-assessment, rather than a default assumption, should guide the
 
 ### Structured Early-Career Development: The APM Model
 
-Some organizations invest deliberately in structured early-career PM development, most notably through **Associate Product Manager (APM)** programs — typically rotational, cohort-based programs designed to develop foundational PM judgment systematically in early-career hires, often through mentorship, structured rotations across different product areas, and deliberate exposure to the kind of first-principles thinking this curriculum has emphasized throughout. These programs illustrate a broader principle: PM judgment, like any deep professional skill, benefits from deliberate, structured development rather than being left to develop purely through incidental on-the-job experience alone.
+Some organizations invest deliberately in structured early-career PM development, most notably through **Associate Product Manager (APM)** programs typically rotational, cohort-based programs designed to develop foundational PM judgment systematically in early-career hires, often through mentorship, structured rotations across different product areas, and deliberate exposure to the kind of first-principles thinking this curriculum has emphasized throughout. These programs illustrate a broader principle: PM judgment, like any deep professional skill, benefits from deliberate, structured development rather than being left to develop purely through incidental on-the-job experience alone.
 
 ---
 
@@ -151,11 +151,11 @@ This framing obscures the more useful question of whether a given move genuinely
 
 **Mistake 4: Assuming IC-track seniority is a consolation prize for those who "couldn't" become managers**
 
-This mischaracterizes the IC track entirely — Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through different mechanisms, not through a lesser or failed version of the same path.
+This mischaracterizes the IC track entirely Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through different mechanisms, not through a lesser or failed version of the same path.
 
 **Mistake 5: Expecting career development to happen purely through incidental experience, without deliberate structure or mentorship**
 
-As covered in Theory, structured programs (like APM programs) illustrate that deliberately designed development — mentorship, varied rotations, explicit skill-building — accelerates genuine judgment development more reliably than unstructured on-the-job learning alone.
+As covered in Theory, structured programs (like APM programs) illustrate that deliberately designed development mentorship, varied rotations, explicit skill-building accelerates genuine judgment development more reliably than unstructured on-the-job learning alone.
 
 ---
 
@@ -205,9 +205,9 @@ Use the Scope Ladder as a standing discipline whenever evaluating a potential ca
 
 ## Real Company Example
 
-**Google's Associate Product Manager (APM) program**, founded by Marissa Mayer in 2002, has a specific, well-documented origin: according to Business Insider's reporting, Mayer started it because Google was struggling to find early-career recruits who could operate effectively in the company's unusually consensus-driven, engineer-heavy power structure, where a traditional command-and-authority manager would flounder. The program became a structured, cohort-based, rotational path for developing early-career PM judgment systematically, with a notably selective acceptance rate, and its alumni list is itself well documented — including people who went on to found or lead major technology companies of their own.
+**Google's Associate Product Manager (APM) program**, founded by Marissa Mayer in 2002, has a specific, well-documented origin: according to Business Insider's reporting, Mayer started it because Google was struggling to find early-career recruits who could operate effectively in the company's unusually consensus-driven, engineer-heavy power structure, where a traditional command-and-authority manager would flounder. The program became a structured, cohort-based, rotational path for developing early-career PM judgment systematically, with a notably selective acceptance rate, and its alumni list is itself well documented including people who went on to found or lead major technology companies of their own.
 
-The underlying principle connects directly to this lesson's Theory: a deliberately structured program — combining mentorship, varied rotations across different product areas, and explicit early exposure to core PM judgment — illustrates how foundational product skill can be developed systematically rather than left entirely to unstructured, incidental on-the-job experience, echoing this lesson's caution against Mistake 5.
+The underlying principle connects directly to this lesson's Theory: a deliberately structured program combining mentorship, varied rotations across different product areas, and explicit early exposure to core PM judgment illustrates how foundational product skill can be developed systematically rather than left entirely to unstructured, incidental on-the-job experience, echoing this lesson's caution against Mistake 5.
 
 *(Source: Business Insider's reporting on the program's founding and alumni, corroborated by Reid Hoffman's own published account of Mayer's creation of the program. This curriculum does not claim certainty about the program's exact current-day structure, which may have evolved since its founding.)*
 
@@ -219,7 +219,7 @@ The underlying principle connects directly to this lesson's Theory: a deliberate
 A formal dual-ladder structure often doesn't yet exist, since the organization may be too small to support distinct IC and management tracks with meaningfully different scope at each level. Career growth at this stage is often defined more by increasing scope of ownership within a single, small team than by a formal track choice, though the underlying self-assessment questions from this lesson remain relevant as the person considers their own longer-term direction.
 
 **At a mid-size company:**
-This is typically the stage where a formal dual-ladder structure first emerges, and where the choice between IC and management tracks becomes a genuine, deliberate decision rather than an automatic default — making the self-assessment questions from this lesson's Theory especially valuable at this transition point.
+This is typically the stage where a formal dual-ladder structure first emerges, and where the choice between IC and management tracks becomes a genuine, deliberate decision rather than an automatic default making the self-assessment questions from this lesson's Theory especially valuable at this transition point.
 
 **At Big Tech:**
 Dual-ladder structures are often well-established and clearly defined, sometimes with explicit, publicly documented leveling criteria for both tracks, and structured early-career programs (like Google's APM program) may exist to deliberately develop talent from the earliest stages of a PM's career. The individual's job shifts toward making an increasingly deliberate, well-informed choice between tracks at each major transition point, using genuine self-assessment (per this lesson's Theory) rather than assumption about which track carries more prestige within a large, highly visible organization.
@@ -230,15 +230,15 @@ Dual-ladder structures are often well-established and clearly defined, sometimes
 
 Consider a simplified, illustrative scenario common among successful individual-contributor PMs facing their first management opportunity.
 
-A senior individual-contributor PM, widely respected for deep product judgment and hands-on ownership of a complex, high-impact product area, is offered a promotion to lead a team of three other PMs. The PM accepts, reasoning — without much genuine reflection — that this is simply "the next step," since no one in their organization had ever suggested continuing to grow as an individual contributor was a comparably legitimate path forward.
+A senior individual-contributor PM, widely respected for deep product judgment and hands-on ownership of a complex, high-impact product area, is offered a promotion to lead a team of three other PMs. The PM accepts, reasoning without much genuine reflection that this is simply "the next step," since no one in their organization had ever suggested continuing to grow as an individual contributor was a comparably legitimate path forward.
 
-Within a year, the PM is visibly less engaged and less effective than before the promotion. They continue gravitating toward hands-on product work themselves (echoing Lesson 55's bottleneck failure pattern), find coaching and organizational conversations draining rather than energizing, and privately confide to a mentor that they miss the depth and ownership of their previous individual-contributor role far more than they expected to. A candid conversation with that mentor reveals that the PM had never actually considered whether they wanted to lead people — they had simply assumed, without examining the assumption, that accepting the promotion was the only way to keep advancing their career.
+Within a year, the PM is visibly less engaged and less effective than before the promotion. They continue gravitating toward hands-on product work themselves (echoing Lesson 55's bottleneck failure pattern), find coaching and organizational conversations draining rather than energizing, and privately confide to a mentor that they miss the depth and ownership of their previous individual-contributor role far more than they expected to. A candid conversation with that mentor reveals that the PM had never actually considered whether they wanted to lead people they had simply assumed, without examining the assumption, that accepting the promotion was the only way to keep advancing their career.
 
 **What went wrong?**
 
-Using the dual-ladder framing and Mistake 2 from this lesson: the PM made a track choice based on an unexamined assumption (management is simply "the next step") rather than genuine self-assessment of fit and interest, precisely the failure this lesson's Theory warns against. The underlying skills that made them an excellent individual contributor — deep, hands-on product judgment — were genuinely valuable, but the specific role they moved into required a different set of skills and interests (coaching, delegation, organizational design, per Lesson 55) that had never actually been assessed for genuine fit before the decision was made.
+Using the dual-ladder framing and Mistake 2 from this lesson: the PM made a track choice based on an unexamined assumption (management is simply "the next step") rather than genuine self-assessment of fit and interest, precisely the failure this lesson's Theory warns against. The underlying skills that made them an excellent individual contributor deep, hands-on product judgment were genuinely valuable, but the specific role they moved into required a different set of skills and interests (coaching, delegation, organizational design, per Lesson 55) that had never actually been assessed for genuine fit before the decision was made.
 
-The corrective response, once the mismatch was identified, involved a candid conversation with organizational leadership about transitioning to an IC-track Staff PM role instead — a genuine lateral move in terms of scope and seniority, not a demotion, that better matched the individual's actual strengths and interests. This outcome illustrates the core value of the dual-ladder structure this lesson describes: when both tracks are genuinely available and respected, a mismatched initial choice can be corrected without the individual losing career standing, rather than being forced to either struggle indefinitely in an ill-fitting management role or leave the organization entirely. This same kind of honest self-reflection about fit, direction, and values is developed further and more comprehensively in **Lesson 60 (Capstone: Building Your Own Product Philosophy)**, which closes this curriculum's foundational modules.
+The corrective response, once the mismatch was identified, involved a candid conversation with organizational leadership about transitioning to an IC-track Staff PM role instead a genuine lateral move in terms of scope and seniority, not a demotion, that better matched the individual's actual strengths and interests. This outcome illustrates the core value of the dual-ladder structure this lesson describes: when both tracks are genuinely available and respected, a mismatched initial choice can be corrected without the individual losing career standing, rather than being forced to either struggle indefinitely in an ill-fitting management role or leave the organization entirely. This same kind of honest self-reflection about fit, direction, and values is developed further and more comprehensively in **Lesson 60 (Capstone: Building Your Own Product Philosophy)**, which closes this curriculum's foundational modules.
 
 ---
 
@@ -272,19 +272,19 @@ A person whose honest answers lean consistently toward the IC column, but who is
 
 ## Summary
 
-Product management careers typically follow one of two legitimate tracks — a management track, where seniority means leading progressively larger teams of other PMs, and an individual-contributor track, where seniority means taking on progressively broader and more strategically significant product ownership directly — and treating management as the only legitimate marker of progress is a common, costly mistake that this lesson's Scope Ladder mental model helps correct, by framing genuine career progression as increasing scope of ownership and impact rather than title alone. A structured self-assessment — what genuinely energizes versus drains a person, and whether interest in a management role reflects genuine attraction to the work or unexamined assumption and prestige-seeking — should guide the choice between tracks, since a mismatched decision, as this lesson's Case Study of a reluctant manager illustrates, tends to produce disengagement and underperformance that a genuine, well-informed choice would have avoided. Structured early-career development programs, such as Google's well-known APM program, illustrate that PM judgment benefits from deliberate, systematic development — mentorship, varied rotation, explicit skill-building — rather than being left entirely to unstructured, incidental on-the-job experience.
+Product management careers typically follow one of two legitimate tracks a management track, where seniority means leading progressively larger teams of other PMs, and an individual-contributor track, where seniority means taking on progressively broader and more strategically significant product ownership directly and treating management as the only legitimate marker of progress is a common, costly mistake that this lesson's Scope Ladder mental model helps correct, by framing genuine career progression as increasing scope of ownership and impact rather than title alone. A structured self-assessment what genuinely energizes versus drains a person, and whether interest in a management role reflects genuine attraction to the work or unexamined assumption and prestige-seeking should guide the choice between tracks, since a mismatched decision, as this lesson's Case Study of a reluctant manager illustrates, tends to produce disengagement and underperformance that a genuine, well-informed choice would have avoided. Structured early-career development programs, such as Google's well-known APM program, illustrate that PM judgment benefits from deliberate, systematic development mentorship, varied rotation, explicit skill-building rather than being left entirely to unstructured, incidental on-the-job experience.
 
 ---
 
 ## Key Takeaways
 
-- The dual-ladder structure (management track and individual-contributor track) means career progression doesn't require moving into people management — both tracks can lead to comparable seniority, influence, and compensation.
+- The dual-ladder structure (management track and individual-contributor track) means career progression doesn't require moving into people management both tracks can lead to comparable seniority, influence, and compensation.
 - Career progression is best understood as increasing scope of ownership and impact (the Scope Ladder), not simply a title or compensation change.
 - A structured self-assessment of genuine energy, interest, and motivation should guide the choice between IC and management tracks, rather than defaulting to management as the assumed "correct" path.
-- Pursuing a management-track move primarily for prestige, compensation signaling, or unexamined assumption — rather than genuine interest in coaching and organizational work — risks the disengagement and underperformance illustrated in this lesson's Case Study.
+- Pursuing a management-track move primarily for prestige, compensation signaling, or unexamined assumption rather than genuine interest in coaching and organizational work risks the disengagement and underperformance illustrated in this lesson's Case Study.
 - IC-track seniority (Staff, Principal PM) is not a consolation prize; it represents genuine, significant organizational scope and impact, exercised through deep product ownership rather than people leadership.
 - Structured early-career development programs, like APM programs, illustrate that PM judgment benefits from deliberate, systematic development rather than purely incidental, unstructured experience.
-- A mismatched initial track choice can often be corrected — as this lesson's Case Study shows — without loss of career standing, when an organization genuinely respects both tracks as legitimate.
+- A mismatched initial track choice can often be corrected as this lesson's Case Study shows without loss of career standing, when an organization genuinely respects both tracks as legitimate.
 
 ---
 
@@ -315,9 +315,9 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 ## Further Reading / Resources
 
-- *The Manager's Path* by Camille Fournier — a widely referenced treatment of the dual-ladder career structure and the IC-to-management transition, applicable beyond engineering to product roles.
-- *Cracking the PM Career* by Jackie Bavaro and Gayle Laakmann McDowell — a dedicated practitioner treatment of PM career progression, including IC and management track distinctions.
-- Public reporting on Google's Associate Product Manager (APM) program — background on this lesson's central worked example of structured early-career development.
+- *The Manager's Path* by Camille Fournier a widely referenced treatment of the dual-ladder career structure and the IC-to-management transition, applicable beyond engineering to product roles.
+- *Cracking the PM Career* by Jackie Bavaro and Gayle Laakmann McDowell a dedicated practitioner treatment of PM career progression, including IC and management track distinctions.
+- Public reporting on Google's Associate Product Manager (APM) program background on this lesson's central worked example of structured early-career development.
 
 ---
 
@@ -331,7 +331,7 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 **Card 2**
 - Front: What does the Scope Ladder frame career progression as, rather than title alone?
-- Back: Increasing scope of ownership and impact — from a single feature, to a full product, to a portfolio, to company-wide strategy.
+- Back: Increasing scope of ownership and impact from a single feature, to a full product, to a portfolio, to company-wide strategy.
 - Difficulty: 1
 - Tags: scope-ladder
 
@@ -343,7 +343,7 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 **Card 4**
 - Front: Why is IC-track seniority (Staff, Principal PM) not a consolation prize?
-- Back: Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through deep product ownership rather than people leadership — a genuinely different, not lesser, path.
+- Back: Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through deep product ownership rather than people leadership a genuinely different, not lesser, path.
 - Difficulty: 2
 - Tags: ic-track-value
 
@@ -355,7 +355,7 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 **Card 6**
 - Front: What does Google's APM program illustrate about PM career development, according to this lesson?
-- Back: That PM judgment benefits from deliberate, structured development — mentorship, varied rotations, explicit skill-building — rather than being left entirely to unstructured, incidental on-the-job experience.
+- Back: That PM judgment benefits from deliberate, structured development mentorship, varied rotations, explicit skill-building rather than being left entirely to unstructured, incidental on-the-job experience.
 - Difficulty: 2
 - Tags: apm-program
 
@@ -364,10 +364,10 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 Consider the following novel scenario: You've been offered a promotion to lead a team of two other PMs. You're flattered by the offer and slightly worried that declining it might signal you're not ambitious or that you'll miss a rare opportunity, but you're honestly unsure whether you'd enjoy the actual day-to-day work of managing people.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Fit Table and Scope Ladder, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Fit Table and Scope Ladder, not to reach one "right" answer.
 
-1. Using the IC vs. Management Track Fit Table, work through each question honestly for your own (hypothetical) situation — what pattern emerges?
-2. Using the Scope Ladder, what would genuine IC-track progression look like for you if you declined this specific management offer — what would "increasing scope" mean in your current role?
+1. Using the IC vs. Management Track Fit Table, work through each question honestly for your own (hypothetical) situation what pattern emerges?
+2. Using the Scope Ladder, what would genuine IC-track progression look like for you if you declined this specific management offer what would "increasing scope" mean in your current role?
 3. How would you distinguish, honestly, whether your interest in accepting this offer is driven by genuine attraction to the work itself, versus a fear of appearing unambitious?
 4. If you accept the role and, a year in, notice signs similar to this lesson's Case Study (disengagement, gravitating back toward hands-on work), what would be your plan for addressing it?
 5. How would you have this conversation with your own manager, being honest about your uncertainty without appearing to lack confidence or ambition?
@@ -506,7 +506,7 @@ D) Staff and Principal IC PMs often carry scope comparable to management leaders
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked whether they're interested in a management or IC track long-term, and answers: "Management, obviously — that's the only way to keep growing." What does this answer signal?**
+**11. (Interview Reasoning) A candidate is asked whether they're interested in a management or IC track long-term, and answers: "Management, obviously that's the only way to keep growing." What does this answer signal?**
 A) A lack of genuine self-assessment, defaulting to management by assumption
 B) Correct understanding, since management is indeed the sole growth path
 C) Appropriate ambition that interviewers view as an entirely positive sign
@@ -539,7 +539,7 @@ C) Accept the promotion regardless, since declining might appear unambitious
 D) Accept the role but privately plan to minimize actual management duties
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core recommendation — using honest self-assessment to guide the choice, rather than defaulting to acceptance out of assumption or fear of appearing unambitious.*
+*Explanation: This reflects the lesson's core recommendation using honest self-assessment to guide the choice, rather than defaulting to acceptance out of assumption or fear of appearing unambitious.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
@@ -565,7 +565,7 @@ C) Eliminate the individual's role entirely if they decline the promotion
 D) Assume no IC-track alternative could ever fit the organization's needs
 
 *Correct answer: A*
-*Explanation: This applies the lesson's dual-ladder principle at the organizational level — recognizing that forcing a mismatched choice due to a missing genuine IC track is itself a fixable structural gap, not an unavoidable constraint, echoing the lesson's broader argument for legitimate dual-ladder structures.*
+*Explanation: This applies the lesson's dual-ladder principle at the organizational level recognizing that forcing a mismatched choice due to a missing genuine IC track is itself a fixable structural gap, not an unavoidable constraint, echoing the lesson's broader argument for legitimate dual-ladder structures.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
@@ -575,9 +575,9 @@ D) Assume no IC-track alternative could ever fit the organization's needs
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 55 — Building and Leading Product Teams | Positions the leadership transition from Lesson 55 as one legitimate path among others, not the singular definition of career progress |
-| **Current Lesson** | Lesson 56 — Product Management Career Paths | Dual-ladder structure; Scope Ladder; IC vs. Management Track Fit Table; structured early-career development |
-| **Next Lesson** | Lesson 57 — Ethics in Product Management | Shifts from personal career direction to the broader ethical responsibilities that come with increasing scope of influence on either track |
+| **Previous Lesson** | Lesson 55 Building and Leading Product Teams | Positions the leadership transition from Lesson 55 as one legitimate path among others, not the singular definition of career progress |
+| **Current Lesson** | Lesson 56 Product Management Career Paths | Dual-ladder structure; Scope Ladder; IC vs. Management Track Fit Table; structured early-career development |
+| **Next Lesson** | Lesson 57 Ethics in Product Management | Shifts from personal career direction to the broader ethical responsibilities that come with increasing scope of influence on either track |
 | **Future Concepts Unlocked** | Lesson 60 (Capstone: Building Your Own Product Philosophy) | Builds directly on this lesson's self-assessment practice when synthesizing a personal, durable product philosophy |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the dual-ladder structure and the Scope Ladder with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the dual-ladder structure and the Scope Ladder with you they will not be re-explained, only re-applied in new contexts.

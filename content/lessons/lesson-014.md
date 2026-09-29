@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-You now have two research engines running: deep, qualitative interviews (Lesson 12) and broad, quantitative surveys (Lesson 13). Both produce raw findings — quotes, transcripts, percentages, cross-tabs. Neither, by itself, gives a team an easy way to keep that evidence alive in daily decision-making, months after the research was conducted. A **persona** is the artifact that tries to solve this specific problem: a synthesized, evidence-based representation of a distinct user segment, built to make research findings memorable, referenceable, and usable in day-to-day product conversations, long after the original interviews and surveys have faded from anyone's immediate memory.
+You now have two research engines running: deep, qualitative interviews (Lesson 12) and broad, quantitative surveys (Lesson 13). Both produce raw findings quotes, transcripts, percentages, cross-tabs. Neither, by itself, gives a team an easy way to keep that evidence alive in daily decision-making, months after the research was conducted. A **persona** is the artifact that tries to solve this specific problem: a synthesized, evidence-based representation of a distinct user segment, built to make research findings memorable, referenceable, and usable in day-to-day product conversations, long after the original interviews and surveys have faded from anyone's immediate memory.
 
-This lesson matters because personas have a well-earned reputation for going wrong in a specific, recognizable way: a poorly built persona — invented from assumption rather than research, or built around demographic details with no connection to actual behavior — becomes worse than useless. It doesn't just fail to help; it actively misleads, because it wears the visual trappings of rigor (a name, a photo, a job title, a quote) while smuggling in exactly the kind of unvalidated assumption this entire curriculum has been teaching you to catch. This lesson is about building personas that earn their place as a genuine synthesis of Lessons 6, 11, 12, and 13, rather than a fictional character dressed up as research.
+This lesson matters because personas have a well-earned reputation for going wrong in a specific, recognizable way: a poorly built persona invented from assumption rather than research, or built around demographic details with no connection to actual behavior becomes worse than useless. It doesn't just fail to help; it actively misleads, because it wears the visual trappings of rigor (a name, a photo, a job title, a quote) while smuggling in exactly the kind of unvalidated assumption this entire curriculum has been teaching you to catch. This lesson is about building personas that earn their place as a genuine synthesis of Lessons 6, 11, 12, and 13, rather than a fictional character dressed up as research.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because personas have a well-earned reputation for going wro
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 14 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 6 (Jobs To Be Done), Lesson 12 (Customer Interviews), Lesson 13 (Surveys) |
-| **Next Lesson** | Lesson 15 — User Journey Mapping |
-| **Future Topics Unlocked** | Lesson 15 (User Journey Mapping — often built per persona), Lesson 18 (Customer Segmentation — a more rigorous, quantitative complement to personas), Lesson 22 (PRDs — often reference specific personas directly) |
+| **Next Lesson** | Lesson 15 User Journey Mapping |
+| **Future Topics Unlocked** | Lesson 15 (User Journey Mapping often built per persona), Lesson 18 (Customer Segmentation a more rigorous, quantitative complement to personas), Lesson 22 (PRDs often reference specific personas directly) |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 6 (Jobs To Be Done), Lesson 12 (Customer Interviews), and Lesson 13 (Surveys). This lesson assumes you can articulate a job statement, have conducted or reviewed interviews designed to surface past behavior, and understand how survey data can validate prevalence — a persona is the synthesis point where all three come together into a single, referenceable artifact.
+Lesson 6 (Jobs To Be Done), Lesson 12 (Customer Interviews), and Lesson 13 (Surveys). This lesson assumes you can articulate a job statement, have conducted or reviewed interviews designed to surface past behavior, and understand how survey data can validate prevalence a persona is the synthesis point where all three come together into a single, referenceable artifact.
 
 ---
 
@@ -44,16 +44,16 @@ Lesson 6 (Jobs To Be Done), Lesson 12 (Customer Interviews), and Lesson 13 (Surv
 
 ### The Core Definition, and the Trap Hiding Inside It
 
-A persona is a synthesized representation of a distinct group of users, built from research, that captures their goals, jobs to be done, behaviors, and pain points in a form the whole team can quickly recall and reference. The trap hiding inside this definition is that a persona's most visible features — a name, a photo, a fictional biographical detail ("Sarah, 34, marketing manager, enjoys hiking on weekends") — are almost never the load-bearing part of a genuinely useful persona, yet they are frequently the part teams spend the most effort polishing.
+A persona is a synthesized representation of a distinct group of users, built from research, that captures their goals, jobs to be done, behaviors, and pain points in a form the whole team can quickly recall and reference. The trap hiding inside this definition is that a persona's most visible features a name, a photo, a fictional biographical detail ("Sarah, 34, marketing manager, enjoys hiking on weekends") are almost never the load-bearing part of a genuinely useful persona, yet they are frequently the part teams spend the most effort polishing.
 
-The load-bearing part of a persona is the **job, the goals, and the pain points** — the same underlying concepts covered in Lesson 6 (Jobs to Be Done) and surfaced through the interview and survey techniques in Lessons 12 and 13. A persona's demographic and biographical detail should exist only to the extent it is genuinely predictive of behavior relevant to the product; when it is included purely for narrative color, it risks distracting from, or actively substituting for, the actual research-based substance the persona is supposed to convey.
+The load-bearing part of a persona is the **job, the goals, and the pain points** the same underlying concepts covered in Lesson 6 (Jobs to Be Done) and surfaced through the interview and survey techniques in Lessons 12 and 13. A persona's demographic and biographical detail should exist only to the extent it is genuinely predictive of behavior relevant to the product; when it is included purely for narrative color, it risks distracting from, or actively substituting for, the actual research-based substance the persona is supposed to convey.
 
 ### Behavior-Based Personas vs. Demographic "Fictional Character" Personas
 
 This lesson draws a sharp distinction between two very different things that both get called "personas" in practice:
 
-- **A demographic, fictional-character persona** is built primarily around surface-level attributes — age, job title, hobbies, a stock photo — often invented or assumed rather than derived from actual research, and frequently more memorable as a character than useful as a decision-making tool.
-- **A behavior-based, job-oriented persona** is built primarily around a validated job to be done (Lesson 6), specific goals, and specific pain points, drawn directly from synthesized interview and survey findings — with demographic detail included only when it is genuinely correlated with a meaningfully different job or behavior pattern.
+- **A demographic, fictional-character persona** is built primarily around surface-level attributes age, job title, hobbies, a stock photo often invented or assumed rather than derived from actual research, and frequently more memorable as a character than useful as a decision-making tool.
+- **A behavior-based, job-oriented persona** is built primarily around a validated job to be done (Lesson 6), specific goals, and specific pain points, drawn directly from synthesized interview and survey findings with demographic detail included only when it is genuinely correlated with a meaningfully different job or behavior pattern.
 
 ```mermaid
 %%{init: {
@@ -93,11 +93,11 @@ graph TD
     C --> E[Built from Synthesized Interviews and<br/>Surveys; Anchored in Job, Goals, and<br/>Pain Points]
 ```
 
-The clearest diagnostic question for distinguishing the two: **if you removed the name, photo, and biographical color from this persona, would there still be something specific and useful left** — a distinct job, a distinct set of goals, distinct pain points, validated by real research? If the answer is no, what remains is a fictional character, not a behavior-based persona, regardless of how polished its visual presentation is.
+The clearest diagnostic question for distinguishing the two: **if you removed the name, photo, and biographical color from this persona, would there still be something specific and useful left** a distinct job, a distinct set of goals, distinct pain points, validated by real research? If the answer is no, what remains is a fictional character, not a behavior-based persona, regardless of how polished its visual presentation is.
 
 ### Why Personas Must Be Built from Research, Not Assumption
 
-A persona invented from a team's collective assumption about "our typical user," without grounding in actual interviews or survey data, inherits every bias this curriculum has already covered — most dangerously, it tends to reflect the team's own mental model of the user (often shaped by whoever is loudest or most senior in the room) rather than an evidence-based account of real behavior. This is a direct extension of Lesson 11's core warning: an unvalidated assumption dressed up in a specific, professional-looking format (a persona document, complete with name and photo) is not made more trustworthy by that formatting — if anything, the polished presentation can make an unvalidated assumption feel more authoritative than it has actually earned the right to feel.
+A persona invented from a team's collective assumption about "our typical user," without grounding in actual interviews or survey data, inherits every bias this curriculum has already covered most dangerously, it tends to reflect the team's own mental model of the user (often shaped by whoever is loudest or most senior in the room) rather than an evidence-based account of real behavior. This is a direct extension of Lesson 11's core warning: an unvalidated assumption dressed up in a specific, professional-looking format (a persona document, complete with name and photo) is not made more trustworthy by that formatting if anything, the polished presentation can make an unvalidated assumption feel more authoritative than it has actually earned the right to feel.
 
 A behavior-based persona built from actual synthesized research carries a specific kind of authority a fictional one cannot: it can be pointed back to specific interview quotes, specific survey response patterns, and specific validated jobs, meaning a team member who questions the persona's accuracy can actually be shown the underlying evidence, rather than simply being told to trust the persona because it was written down.
 
@@ -107,20 +107,20 @@ A useful, research-grounded persona template includes:
 
 - **Persona name and one-line summary**: a short, memorable label, but understood as a convenience for reference, not the substance of the persona.
 - **Primary job to be done**: stated using the Lesson 6 structure ("When [situation], I want to [motivation], so I can [outcome]").
-- **Goals**: what this segment is ultimately trying to achieve, distinct from the specific job statement — often a slightly higher-altitude version of the job.
+- **Goals**: what this segment is ultimately trying to achieve, distinct from the specific job statement often a slightly higher-altitude version of the job.
 - **Pain points**: specific, concrete frustrations with current solutions (including workarounds and non-consumption, per Lesson 6), ideally drawn directly from interview findings.
 - **Behavioral patterns**: how this segment actually uses (or doesn't use) relevant tools today, drawn from revealed-preference data (Lesson 11) wherever possible.
-- **Representative quote(s)**: a real, sourced quote from actual research — never an invented quote presented as if it were real — used to keep the persona anchored to genuine evidence.
+- **Representative quote(s)**: a real, sourced quote from actual research never an invented quote presented as if it were real used to keep the persona anchored to genuine evidence.
 - **Validated prevalence** (where available): an indication, from survey data (Lesson 13), of roughly how large or significant this segment is, distinguishing a persona representing a large, common segment from one representing a small, niche one.
 
-A persona missing the job, goals, and pain points sections — or filling them with vague, generic language rather than specific findings — has not actually completed the synthesis work a persona is meant to represent, regardless of how complete its demographic section looks.
+A persona missing the job, goals, and pain points sections or filling them with vague, generic language rather than specific findings has not actually completed the synthesis work a persona is meant to represent, regardless of how complete its demographic section looks.
 
 ### The "Too Many Personas" and "Persona as Decoration" Failure Patterns
 
 Two specific, common failure patterns deserve direct attention:
 
-- **Too many personas**: creating a large number of personas (sometimes a dozen or more) in an attempt to represent every possible variation observed in research. This dilutes the artifact's core purpose — making research memorable and actionable — since a team cannot realistically hold more than a small handful of distinct personas in mind during a typical prioritization discussion. A large number of personas often indicates that the underlying segments haven't actually been prioritized or consolidated around the segments that matter most for the product's current strategy (Lesson 10).
-- **Persona as decoration**: creating polished persona documents (often as posters, slide decks, or wiki pages) that are well-received when first presented, but never actually referenced again in a real prioritization or design decision. This is the persona equivalent of Lesson 8's discovery theater — the visible form of a research-synthesis artifact, without the artifact ever actually functioning as a genuine decision-making tool.
+- **Too many personas**: creating a large number of personas (sometimes a dozen or more) in an attempt to represent every possible variation observed in research. This dilutes the artifact's core purpose making research memorable and actionable since a team cannot realistically hold more than a small handful of distinct personas in mind during a typical prioritization discussion. A large number of personas often indicates that the underlying segments haven't actually been prioritized or consolidated around the segments that matter most for the product's current strategy (Lesson 10).
+- **Persona as decoration**: creating polished persona documents (often as posters, slide decks, or wiki pages) that are well-received when first presented, but never actually referenced again in a real prioritization or design decision. This is the persona equivalent of Lesson 8's discovery theater the visible form of a research-synthesis artifact, without the artifact ever actually functioning as a genuine decision-making tool.
 
 ---
 
@@ -140,18 +140,18 @@ A large number of personas dilutes the artifact's core purpose and often indicat
 
 **Mistake 4: Treating personas as static, one-time artifacts that never need updating**
 
-As markets, products, and user behavior change over time, a persona built from research conducted years earlier may no longer accurately reflect the current segment it claims to represent — personas should be periodically revisited against fresh research, similar to Lesson 9's guidance on revisiting a vision when the underlying evidence has genuinely shifted.
+As markets, products, and user behavior change over time, a persona built from research conducted years earlier may no longer accurately reflect the current segment it claims to represent personas should be periodically revisited against fresh research, similar to Lesson 9's guidance on revisiting a vision when the underlying evidence has genuinely shifted.
 
 **Mistake 5: Building a persona that is well-received once, then never referenced again in real decisions**
 
-This is the persona-as-decoration failure — a polished artifact that never actually functions as an ongoing decision-making tool, which suggests the persona was built for a presentation moment rather than for genuine, ongoing use.
+This is the persona-as-decoration failure a polished artifact that never actually functions as an ongoing decision-making tool, which suggests the persona was built for a presentation moment rather than for genuine, ongoing use.
 
 ---
 
 
 ## Mental Model: The Persona Substance Test
 
-This lesson's mental model is the **Persona Substance Test** — a quick diagnostic for evaluating whether a given persona document is a genuine, behavior-based synthesis or a fictional character in disguise.
+This lesson's mental model is the **Persona Substance Test** a quick diagnostic for evaluating whether a given persona document is a genuine, behavior-based synthesis or a fictional character in disguise.
 
 ```mermaid
 %%{init: {
@@ -187,7 +187,7 @@ This lesson's mental model is the **Persona Substance Test** — a quick diagnos
 graph TD
     A[Persona Document] --> B{Remove Name, Photo, and<br/>Biographical Color. What Remains?}
     B -->|Specific, Validated Job, Goals, and Pain<br/>Points, Traceable to Real Research| C[Genuine Behavior-Based Persona]
-    B -->|Little or Nothing<br/>Specific; Mostly Demographic Flavor| D[Fictional Character —<br/>Not yet a Real Persona]
+    B -->|Little or Nothing<br/>Specific; Mostly Demographic Flavor| D[Fictional Character <br/>Not yet a Real Persona]
     C --> E[Usable for<br/>Prioritization and Design Decisions]
     D --> F[Requires Further<br/>Research Synthesis Before Use]
 ```
@@ -198,7 +198,7 @@ Apply this test to any persona document before relying on it in a real decision:
 
 ## Real Company Example
 
-**Microsoft**'s long-running use of detailed personas in its product design practice is a widely discussed example of behavior-based persona development at scale. Public accounts of Microsoft's design and research practices over the years have described building personas grounded in extensive usability research and behavioral data across different product lines, rather than personas built primarily around demographic guesswork — with an explicit emphasis on tying persona goals and pain points back to specific, observed user behavior and research findings, precisely the discipline this lesson emphasizes as the difference between a genuinely useful persona and a fictional character.
+**Microsoft**'s long-running use of detailed personas in its product design practice is a widely discussed example of behavior-based persona development at scale. Public accounts of Microsoft's design and research practices over the years have described building personas grounded in extensive usability research and behavioral data across different product lines, rather than personas built primarily around demographic guesswork with an explicit emphasis on tying persona goals and pain points back to specific, observed user behavior and research findings, precisely the discipline this lesson emphasizes as the difference between a genuinely useful persona and a fictional character.
 
 *(Assumption flagged: this reflects widely reported descriptions of Microsoft's general design research practices rather than a claim about the company's current, complete internal methodology, which this curriculum does not claim certainty about.)*
 
@@ -207,13 +207,13 @@ Apply this test to any persona document before relying on it in a real decision:
 ## Real World Perspective: Personas at Different Company Stages
 
 **At a startup:**
-Personas are often built from a small number of qualitative interviews (Lesson 12) rather than large-scale survey validation, given limited research resources, and are typically kept few in number — often just one or two — reflecting the startup's need for sharp strategic focus (echoing Lesson 10's exclusion discipline) rather than an attempt to represent every possible user variation.
+Personas are often built from a small number of qualitative interviews (Lesson 12) rather than large-scale survey validation, given limited research resources, and are typically kept few in number often just one or two reflecting the startup's need for sharp strategic focus (echoing Lesson 10's exclusion discipline) rather than an attempt to represent every possible user variation.
 
 **At a mid-size company:**
 Personas often become a more formalized, cross-functional artifact, ideally validated with both qualitative interviews and quantitative survey data (Lesson 13) to establish prevalence, and periodically revisited as the product and market evolve. This is often where the "too many personas" failure pattern first emerges, as different teams each push to have their own preferred segment represented.
 
 **At Big Tech:**
-Personas often need to be coordinated across multiple product lines, and a significant part of research and design leadership's work involves preventing persona proliferation across a large organization — consolidating overlapping or redundant personas defined independently by different teams into a smaller, more strategically coherent set that the whole organization can reference consistently.
+Personas often need to be coordinated across multiple product lines, and a significant part of research and design leadership's work involves preventing persona proliferation across a large organization consolidating overlapping or redundant personas defined independently by different teams into a smaller, more strategically coherent set that the whole organization can reference consistently.
 
 ---
 
@@ -223,34 +223,34 @@ Consider a simplified, illustrative scenario common across B2B software companie
 
 A team building an expense-reporting tool holds a workshop to define target personas. Without conducting new research, the team draws on their collective impressions from prior sales conversations and internal opinions, producing three polished personas: "Efficient Emma," a detail-oriented finance manager who loves organization; "Busy Ben," a traveling sales executive who hates paperwork; and "Cautious Carla," a compliance-focused controller worried about audit risk. Each persona includes a stock photo, a fabricated quote written by the design team to sound plausible, and a short biography.
 
-The personas are presented enthusiastically at an all-hands meeting and printed as posters for the office. Six months later, a new product manager, preparing a roadmap review, asks the team to point to the specific interview or survey evidence behind "Busy Ben's" stated pain point ("he hates filling out detailed expense categories while traveling"). No one in the room can locate a source — the pain point, on closer inspection, turns out to have been an assumption someone voiced during the original workshop that was written into the persona document as if it were an established finding.
+The personas are presented enthusiastically at an all-hands meeting and printed as posters for the office. Six months later, a new product manager, preparing a roadmap review, asks the team to point to the specific interview or survey evidence behind "Busy Ben's" stated pain point ("he hates filling out detailed expense categories while traveling"). No one in the room can locate a source the pain point, on closer inspection, turns out to have been an assumption someone voiced during the original workshop that was written into the persona document as if it were an established finding.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
-1. **The personas were built from assumption, not research** — no interviews or surveys informed the stated jobs, goals, or pain points, meaning the personas inherited the team's pre-existing beliefs rather than reflecting actual customer behavior.
-2. **The quotes were fabricated rather than sourced**, directly violating the template's requirement that representative quotes be real and traceable — a fabricated quote presented as genuine creates a false impression of evidentiary support that does not actually exist.
+1. **The personas were built from assumption, not research** no interviews or surveys informed the stated jobs, goals, or pain points, meaning the personas inherited the team's pre-existing beliefs rather than reflecting actual customer behavior.
+2. **The quotes were fabricated rather than sourced**, directly violating the template's requirement that representative quotes be real and traceable a fabricated quote presented as genuine creates a false impression of evidentiary support that does not actually exist.
 3. **The Persona Substance Test would have failed immediately** had anyone applied it at the time of creation: stripping away "Busy Ben's" name, photo, and biography would have left only an unvalidated assumption about travel-related pain points, with no research trail behind it.
 
 A team applying this lesson's discipline from the outset would have conducted at least a small round of interviews (Lesson 12) with actual traveling sales executives before writing any persona document, sourced any quotes directly from those transcripts, and explicitly flagged any remaining assumption-based content as a hypothesis requiring further validation rather than presenting it as an established finding indistinguishable from validated research.
 
-This case connects directly back to **Lesson 11's core warning**: a polished, professional-looking artifact (here, a persona poster) does not become more trustworthy simply because of its presentation quality — the underlying evidentiary basis is what determines whether it deserves to inform real decisions.
+This case connects directly back to **Lesson 11's core warning**: a polished, professional-looking artifact (here, a persona poster) does not become more trustworthy simply because of its presentation quality the underlying evidentiary basis is what determines whether it deserves to inform real decisions.
 
 ---
 
 ## Framework Explanation: The Persona Prioritization Filter
 
-Once a small number of genuine, research-based personas exist, a useful practical framework is the **Persona Prioritization Filter** — using personas to evaluate proposed roadmap items in a manner directly parallel to Lesson 7's Value Proposition Filter and Lesson 9's Vision Filter:
+Once a small number of genuine, research-based personas exist, a useful practical framework is the **Persona Prioritization Filter** using personas to evaluate proposed roadmap items in a manner directly parallel to Lesson 7's Value Proposition Filter and Lesson 9's Vision Filter:
 
 | Question | Purpose |
 |---|---|
 | Which specific persona(s) does this proposed feature serve? | Forces explicit identification, preventing vague appeals to "users" in general |
-| Does it address that persona's validated job, goal, or pain point — or something adjacent that wasn't actually part of the research synthesis? | Distinguishes genuine persona-fit from scope creep dressed up in persona language |
+| Does it address that persona's validated job, goal, or pain point or something adjacent that wasn't actually part of the research synthesis? | Distinguishes genuine persona-fit from scope creep dressed up in persona language |
 | If this serves a persona representing a small, niche segment, is the investment proportionate to that segment's validated prevalence? | Prevents disproportionate investment in a vivid but numerically small segment |
 | Does this feature serve one persona at the expense of another's validated pain points? | Surfaces trade-offs explicitly, echoing Lesson 5's Stakeholder Ledger applied at the persona level |
 
-This filter only functions correctly if the underlying personas have passed the Persona Substance Test — applying this filter to fictional-character personas built from assumption simply launders unvalidated guesses through an official-looking prioritization process, producing false confidence rather than genuine rigor.
+This filter only functions correctly if the underlying personas have passed the Persona Substance Test applying this filter to fictional-character personas built from assumption simply launders unvalidated guesses through an official-looking prioritization process, producing false confidence rather than genuine rigor.
 
 ---
 
@@ -263,23 +263,23 @@ This filter only functions correctly if the underlying personas have passed the 
 *What the interviewer is actually evaluating:* Awareness of the "too many personas" failure pattern, and whether the candidate can articulate a principled basis (strategic focus, distinct validated jobs, meaningfully different pain points) for consolidating or reducing the set, rather than treating persona count as an unconstrained creative exercise.
 
 **Typical question 3: "How do you keep a persona from becoming 'shelfware' that no one actually references?"**
-*What the interviewer is actually evaluating:* Whether the candidate has concrete practices for keeping a persona alive in ongoing decisions — such as the Persona Prioritization Filter — versus treating persona creation as a one-time presentation exercise (the persona-as-decoration failure).
+*What the interviewer is actually evaluating:* Whether the candidate has concrete practices for keeping a persona alive in ongoing decisions such as the Persona Prioritization Filter versus treating persona creation as a one-time presentation exercise (the persona-as-decoration failure).
 
 ---
 
 ## Summary
 
-A persona is a synthesized, research-based representation of a distinct user segment's job, goals, and pain points, meant to keep genuine research findings alive and referenceable in day-to-day product decisions. The load-bearing content of a genuinely useful persona is its validated job (Lesson 6), goals, and pain points — not its demographic detail or fictional biography, which should be included only when genuinely predictive of behavior. Personas must be built from synthesized interview (Lesson 12) and survey (Lesson 13) research, never from team assumption, since a polished, professional-looking persona document does not become more trustworthy simply through good formatting. Two common failure patterns — creating too many personas, and building personas that are well-received once but never referenced again in real decisions — both undermine a persona's core purpose. The Persona Substance Test (what remains when the name, photo, and biographical color are stripped away) is a quick diagnostic for distinguishing a genuine behavior-based persona from a fictional character, and the Persona Prioritization Filter extends genuine personas into an ongoing, practical prioritization tool, directly parallel to the Value Proposition and Vision Filters from Lessons 7 and 9.
+A persona is a synthesized, research-based representation of a distinct user segment's job, goals, and pain points, meant to keep genuine research findings alive and referenceable in day-to-day product decisions. The load-bearing content of a genuinely useful persona is its validated job (Lesson 6), goals, and pain points not its demographic detail or fictional biography, which should be included only when genuinely predictive of behavior. Personas must be built from synthesized interview (Lesson 12) and survey (Lesson 13) research, never from team assumption, since a polished, professional-looking persona document does not become more trustworthy simply through good formatting. Two common failure patterns creating too many personas, and building personas that are well-received once but never referenced again in real decisions both undermine a persona's core purpose. The Persona Substance Test (what remains when the name, photo, and biographical color are stripped away) is a quick diagnostic for distinguishing a genuine behavior-based persona from a fictional character, and the Persona Prioritization Filter extends genuine personas into an ongoing, practical prioritization tool, directly parallel to the Value Proposition and Vision Filters from Lessons 7 and 9.
 
 ---
 
 ## Key Takeaways
 
-- A persona's load-bearing content is job, goals, and pain points — not demographic detail or fictional biography, which should only be included when genuinely predictive of behavior.
+- A persona's load-bearing content is job, goals, and pain points not demographic detail or fictional biography, which should only be included when genuinely predictive of behavior.
 - Personas must be built from synthesized interview and survey research, never from team assumption; polished presentation does not confer evidentiary trustworthiness.
-- The Persona Substance Test — what remains after removing name, photo, and biography — distinguishes a genuine behavior-based persona from a fictional character.
+- The Persona Substance Test what remains after removing name, photo, and biography distinguishes a genuine behavior-based persona from a fictional character.
 - "Too many personas" dilutes the artifact's core purpose and often signals unfinished strategic consolidation; a small, focused set is more useful than an exhaustive one.
-- "Persona as decoration" describes a well-received but never-referenced artifact — the persona equivalent of discovery theater from Lesson 8.
+- "Persona as decoration" describes a well-received but never-referenced artifact the persona equivalent of discovery theater from Lesson 8.
 - The Persona Prioritization Filter uses genuine personas to evaluate proposed features, directly paralleling the Value Proposition Filter (Lesson 7) and Vision Filter (Lesson 9).
 - Personas should be periodically revisited against fresh research, since market and behavioral shifts can make an older persona inaccurate over time.
 
@@ -289,12 +289,12 @@ A persona is a synthesized, research-based representation of a distinct user seg
 
 *A two-minute review of everything in this lesson.*
 
-- **Load-bearing content:** job, goals, pain points — not demographics or fictional biography.
-- **Personas require research** (interviews + surveys), never assumption — polish doesn't confer trust.
-- **Persona Substance Test:** strip the name, photo, and biography — what specific, validated content remains?
+- **Load-bearing content:** job, goals, pain points not demographics or fictional biography.
+- **Personas require research** (interviews + surveys), never assumption polish doesn't confer trust.
+- **Persona Substance Test:** strip the name, photo, and biography what specific, validated content remains?
 - **Too many personas** dilutes focus; **persona as decoration** means it's never actually used.
 - **Persona Prioritization Filter:** which persona does this serve, does it hit their validated job/pain point, is investment proportionate to prevalence, and what trade-off does it create?
-- **Quotes must be real and sourced** — never fabricated to sound plausible.
+- **Quotes must be real and sourced** never fabricated to sound plausible.
 - **Revisit personas periodically** as research and markets evolve.
 
 ---
@@ -315,9 +315,9 @@ A persona is a synthesized, research-based representation of a distinct user seg
 
 ## Further Reading / Resources
 
-- Alan Cooper, *The Inmates Are Running the Asylum* — the original, widely cited source for persona methodology in software design, emphasizing goal-directed design over demographic caricature.
-- Indi Young, *Practical Empathy* — a detailed treatment of building research-grounded personas (sometimes framed as "mental models") anchored specifically in behavior and motivation rather than demographics.
-- Steve Mulder and Ziv Yaar, *The User Is Always Right* — a practical guide to building and maintaining personas as living, ongoing organizational tools rather than one-time creative artifacts.
+- Alan Cooper, *The Inmates Are Running the Asylum* the original, widely cited source for persona methodology in software design, emphasizing goal-directed design over demographic caricature.
+- Indi Young, *Practical Empathy* a detailed treatment of building research-grounded personas (sometimes framed as "mental models") anchored specifically in behavior and motivation rather than demographics.
+- Steve Mulder and Ziv Yaar, *The User Is Always Right* a practical guide to building and maintaining personas as living, ongoing organizational tools rather than one-time creative artifacts.
 
 ---
 
@@ -325,7 +325,7 @@ A persona is a synthesized, research-based representation of a distinct user seg
 
 **Card 1**
 - Front: What is the load-bearing content of a genuinely useful persona?
-- Back: The validated job, goals, and pain points — not demographic detail or fictional biography, which should only be included when genuinely predictive of behavior.
+- Back: The validated job, goals, and pain points not demographic detail or fictional biography, which should only be included when genuinely predictive of behavior.
 - Difficulty: 1
 - Tags: persona-substance, fundamentals
 
@@ -349,7 +349,7 @@ A persona is a synthesized, research-based representation of a distinct user seg
 
 **Card 5**
 - Front: What is "persona as decoration"?
-- Back: A well-received, polished persona document that is never actually referenced again in real prioritization or design decisions — the persona equivalent of discovery theater.
+- Back: A well-received, polished persona document that is never actually referenced again in real prioritization or design decisions the persona equivalent of discovery theater.
 - Difficulty: 2
 - Tags: persona-as-decoration
 
@@ -361,7 +361,7 @@ A persona is a synthesized, research-based representation of a distinct user seg
 
 **Card 7**
 - Front: In the Detailed Case Study, what specific rule did the fabricated persona quotes violate?
-- Back: The template's requirement that representative quotes be real and sourced from actual research — a fabricated quote presented as genuine creates a false impression of evidentiary support that doesn't exist.
+- Back: The template's requirement that representative quotes be real and sourced from actual research a fabricated quote presented as genuine creates a false impression of evidentiary support that doesn't exist.
 - Difficulty: 3
 - Tags: case-study, sourced-quotes
 
@@ -376,7 +376,7 @@ Work through the following, in writing, before reading further:
 2. List two specific, concrete pain points this persona might have, and describe what kind of interview evidence (a specific past-behavior finding, not a vague impression) would need to exist to justify including each one.
 3. Apply the Persona Substance Test to your draft: if you removed a name and biography, what specific, research-traceable content would remain?
 4. Using the Persona Prioritization Filter, evaluate a hypothetical proposed feature (a "verified reviews" badge for contractors) against your persona's validated job and pain points.
-5. Consider whether a second, distinct persona (perhaps a contractor-side persona, given the marketplace's two-sided nature — recall Lesson 5) is genuinely needed, or whether it would risk the "too many personas" failure pattern in this specific case.
+5. Consider whether a second, distinct persona (perhaps a contractor-side persona, given the marketplace's two-sided nature recall Lesson 5) is genuinely needed, or whether it would risk the "too many personas" failure pattern in this specific case.
 
 There is no single correct answer. The purpose of this exercise is to practice building a persona that passes the Persona Substance Test, rather than defaulting to demographic or biographical detail as a substitute for genuine research synthesis.
 
@@ -443,7 +443,7 @@ C) A persona carrying an excessive amount of visual design detail
 D) A persona well received once, then never used again
 
 *Correct answer: D*
-*Explanation: This is the persona form of discovery theater — the visible artefact of research synthesis, produced and admired, without ever functioning as a decision-making tool.*
+*Explanation: This is the persona form of discovery theater the visible artefact of research synthesis, produced and admired, without ever functioning as a decision-making tool.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -583,10 +583,10 @@ D) Discard it entirely and decline to use personas going forward
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 13 — Surveys | Provides the quantitative prevalence data that helps validate and prioritize among candidate personas |
-| **Current Lesson** | Lesson 14 — Personas | Behavior-based vs. fictional-character personas; the Persona Substance Test; the Persona Prioritization Filter |
-| **Next Lesson** | Lesson 15 — User Journey Mapping | Often builds a detailed journey map per validated persona, tracing their experience through a specific process end to end |
+| **Previous Lesson** | Lesson 13 Surveys | Provides the quantitative prevalence data that helps validate and prioritize among candidate personas |
+| **Current Lesson** | Lesson 14 Personas | Behavior-based vs. fictional-character personas; the Persona Substance Test; the Persona Prioritization Filter |
+| **Next Lesson** | Lesson 15 User Journey Mapping | Often builds a detailed journey map per validated persona, tracing their experience through a specific process end to end |
 | **Future Concepts Unlocked** | Lesson 18 (Customer Segmentation) | A more rigorous, quantitatively validated complement to persona-based segmentation |
 | | Lesson 22 (Product Requirements Document) | Frequently references specific personas directly when describing the intended audience for a proposed solution |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a "persona" assumes it has passed the Persona Substance Test and is grounded in real research — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a "persona" assumes it has passed the Persona Substance Test and is grounded in real research this will not be re-explained, only re-applied.

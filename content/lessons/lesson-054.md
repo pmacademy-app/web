@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 53 addressed negotiation and influence as a discipline applied to specific, often one-time asks — securing another team's engineering time, resolving a particular contentious decision. This lesson addresses something related but structurally different: the ongoing, ambient relationship management a PM maintains continuously with their own manager (managing up) and with peers across the organization (managing across), independent of any single specific request. These relationships are the accumulated context and trust that make Lesson 53's negotiation techniques work when they're actually needed — a PM who has never invested in the ongoing relationship has far less coalition support and goodwill to draw on when a specific, high-stakes ask arrives.
+Lesson 53 addressed negotiation and influence as a discipline applied to specific, often one-time asks securing another team's engineering time, resolving a particular contentious decision. This lesson addresses something related but structurally different: the ongoing, ambient relationship management a PM maintains continuously with their own manager (managing up) and with peers across the organization (managing across), independent of any single specific request. These relationships are the accumulated context and trust that make Lesson 53's negotiation techniques work when they're actually needed a PM who has never invested in the ongoing relationship has far less coalition support and goodwill to draw on when a specific, high-stakes ask arrives.
 
-This lesson matters because many PMs treat their relationship with their own manager and peer stakeholders as something that simply happens in the background, rather than something to be actively and deliberately managed — and the PMs who manage these relationships well are consistently better positioned to get support, avoid unpleasant surprises, and navigate organizational friction than those who leave these relationships to develop passively. Managing up is not about flattery or manipulation; it's about proactively ensuring your manager has the information and context they need, adapted to how they actually prefer to receive it, before they have to ask for it.
+This lesson matters because many PMs treat their relationship with their own manager and peer stakeholders as something that simply happens in the background, rather than something to be actively and deliberately managed and the PMs who manage these relationships well are consistently better positioned to get support, avoid unpleasant surprises, and navigate organizational friction than those who leave these relationships to develop passively. Managing up is not about flattery or manipulation; it's about proactively ensuring your manager has the information and context they need, adapted to how they actually prefer to receive it, before they have to ask for it.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because many PMs treat their relationship with their own man
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career |
+| **Module** | 6 Leadership, Communication & Career |
 | **Current Lesson** | 54 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 47 (Stakeholder Management — power/interest grid), Lesson 51 (Communicating with Executives — Altitude Dial), Lesson 53 (Negotiation & Influence Without Authority — currencies of exchange) |
-| **Next Lesson** | Lesson 55 — Building and Leading Product Teams |
-| **Future Topics Unlocked** | Lesson 55 (Building and Leading Product Teams), Lesson 56 (Product Management Career Paths) — both build on the ongoing relationship-maintenance principles introduced here |
+| **Prerequisites** | Lesson 47 (Stakeholder Management power/interest grid), Lesson 51 (Communicating with Executives Altitude Dial), Lesson 53 (Negotiation & Influence Without Authority currencies of exchange) |
+| **Next Lesson** | Lesson 55 Building and Leading Product Teams |
+| **Future Topics Unlocked** | Lesson 55 (Building and Leading Product Teams), Lesson 56 (Product Management Career Paths) both build on the ongoing relationship-maintenance principles introduced here |
 
 ---
 
@@ -80,14 +80,14 @@ The single most consequential practice in managing up is ensuring a manager neve
 graph LR
     A[Problem becomes known<br/>with reasonable confidence] --> B{Disclosed to manager<br/>promptly and directly?}
     B -->|Yes| C[Trust preserved or<br/>strengthened, even if<br/>the news itself is bad]
-    B -->|No, delayed or<br/>learned elsewhere| D[Trust damaged —<br/>manager questions what<br/>else isn't being shared]
+    B -->|No, delayed or<br/>learned elsewhere| D[Trust damaged <br/>manager questions what<br/>else isn't being shared]
 ```
 
-This directly extends Lesson 47's difficult-news framework, applied specifically and continuously to the manager relationship: delivering bad news directly, promptly, with clear reasoning, is not just a one-time technique for a specific difficult conversation — it's an ongoing discipline that defines how a manager relationship develops over time.
+This directly extends Lesson 47's difficult-news framework, applied specifically and continuously to the manager relationship: delivering bad news directly, promptly, with clear reasoning, is not just a one-time technique for a specific difficult conversation it's an ongoing discipline that defines how a manager relationship develops over time.
 
 ### Adapting to a Manager's Working Style
 
-Managers vary meaningfully in how they prefer to receive information and make decisions, and adapting to these preferences — rather than expecting a manager to adapt to a PM's own natural style — is a core managing-up skill. Some managers prefer detailed written updates they can read at their own pace; others prefer brief verbal check-ins and find long documents a burden. Some want to be looped into decisions early and often; others prefer to delegate broadly and be informed only at key checkpoints. Some communicate primarily through structured 1:1 meetings; others are more responsive to asynchronous, ongoing updates.
+Managers vary meaningfully in how they prefer to receive information and make decisions, and adapting to these preferences rather than expecting a manager to adapt to a PM's own natural style is a core managing-up skill. Some managers prefer detailed written updates they can read at their own pace; others prefer brief verbal check-ins and find long documents a burden. Some want to be looped into decisions early and often; others prefer to delegate broadly and be informed only at key checkpoints. Some communicate primarily through structured 1:1 meetings; others are more responsive to asynchronous, ongoing updates.
 
 | Style Dimension | Question to Ask (or Infer) |
 |---|---|
@@ -96,11 +96,11 @@ Managers vary meaningfully in how they prefer to receive information and make de
 | Involvement preference | Does this manager want to be consulted early and often on decisions, or prefer broad delegation with periodic checkpoints? |
 | Timing preference | Does this manager prefer scheduled, structured updates, or ongoing, as-needed communication? |
 
-Adapting to a manager's actual preferences along these dimensions — rather than communicating in whatever style feels most natural to the PM personally — tends to produce a smoother, more trusting relationship, echoing this curriculum's repeated emphasis (Lesson 47, Lesson 51) on tailoring communication to the actual audience rather than a single default style.
+Adapting to a manager's actual preferences along these dimensions rather than communicating in whatever style feels most natural to the PM personally tends to produce a smoother, more trusting relationship, echoing this curriculum's repeated emphasis (Lesson 47, Lesson 51) on tailoring communication to the actual audience rather than a single default style.
 
 ### Managing Across: The Ongoing Peer Relationship
 
-**Managing across** refers to the deliberate, ongoing maintenance of relationships with peers — other PMs, cross-functional partners, adjacent team leads — independent of any specific, immediate request. This extends Lesson 53's currencies of exchange model from a single negotiation into a sustained practice: a PM who regularly checks in with peer teams, offers help proactively, and maintains visibility into their priorities and pressures — even when nothing specific is currently needed from them — builds a reserve of goodwill and mutual understanding that makes any future specific request (exactly the kind of negotiation Lesson 53 covers) far more likely to succeed.
+**Managing across** refers to the deliberate, ongoing maintenance of relationships with peers other PMs, cross-functional partners, adjacent team leads independent of any specific, immediate request. This extends Lesson 53's currencies of exchange model from a single negotiation into a sustained practice: a PM who regularly checks in with peer teams, offers help proactively, and maintains visibility into their priorities and pressures even when nothing specific is currently needed from them builds a reserve of goodwill and mutual understanding that makes any future specific request (exactly the kind of negotiation Lesson 53 covers) far more likely to succeed.
 
 ```mermaid
 %%{init: {
@@ -140,7 +140,7 @@ graph TD
     E --> F["Future requests face<br/>more resistance"]
 ```
 
-A PM who only reaches out to a peer team when they need something specific — never otherwise investing in the relationship — is, in effect, attempting to draw on a currency-of-exchange account they've never actually deposited into, and should not be surprised when that account has little goodwill available when it's finally needed.
+A PM who only reaches out to a peer team when they need something specific never otherwise investing in the relationship is, in effect, attempting to draw on a currency-of-exchange account they've never actually deposited into, and should not be surprised when that account has little goodwill available when it's finally needed.
 
 ---
 
@@ -160,11 +160,11 @@ As covered in Theory, this produces a one-sided relationship pattern that peers 
 
 **Mistake 4: Assuming a manager's working style preferences are fixed and identical to a previous manager's**
 
-A PM moving to a new manager, or a manager changing roles, should actively re-assess working style preferences rather than assuming continuity — applying an old manager's preferred style to a new manager risks the exact mismatch Mistake 2 describes.
+A PM moving to a new manager, or a manager changing roles, should actively re-assess working style preferences rather than assuming continuity applying an old manager's preferred style to a new manager risks the exact mismatch Mistake 2 describes.
 
 **Mistake 5: Treating managing up as flattery or telling a manager only what they want to hear**
 
-This confuses managing up with ingratiation — genuine managing up is about ensuring accurate, timely, well-adapted communication, including uncomfortable information, not about curating an artificially positive picture that will eventually be contradicted by reality.
+This confuses managing up with ingratiation genuine managing up is about ensuring accurate, timely, well-adapted communication, including uncomfortable information, not about curating an artificially positive picture that will eventually be contradicted by reality.
 
 ---
 
@@ -212,19 +212,19 @@ graph TD
     D -->|No| C
 ```
 
-Use the Manager Operating Manual as a standing practice: rather than guessing at a manager's preferences indefinitely, ask directly (most managers respond well to a direct question like "how do you prefer to receive updates — detailed written docs, or brief verbal check-ins?") and revisit the answer periodically, since preferences can shift as trust builds or circumstances change, and since a new manager should never be assumed to share an old manager's exact preferences.
+Use the Manager Operating Manual as a standing practice: rather than guessing at a manager's preferences indefinitely, ask directly (most managers respond well to a direct question like "how do you prefer to receive updates detailed written docs, or brief verbal check-ins?") and revisit the answer periodically, since preferences can shift as trust builds or circumstances change, and since a new manager should never be assumed to share an old manager's exact preferences.
 
 ---
 
 ## Real Company Example
 
-**Andy Grove**'s *High Output Management* (1983) — written from his years running Intel, and still widely assigned in tech management today — makes a specific, structural argument about "managing up" through the one-on-one meeting that goes further than generic communication advice: Grove argued the one-on-one should be regarded as *the subordinate's meeting*, with its agenda and pacing set by the report, not the manager, precisely because the report typically holds information the manager doesn't have yet (a stuck project, an early warning sign, a disagreement worth surfacing) and a manager-driven agenda tends to crowd that information out in favor of status-checking the manager already cares about.
+**Andy Grove**'s *High Output Management* (1983) written from his years running Intel, and still widely assigned in tech management today makes a specific, structural argument about "managing up" through the one-on-one meeting that goes further than generic communication advice: Grove argued the one-on-one should be regarded as *the subordinate's meeting*, with its agenda and pacing set by the report, not the manager, precisely because the report typically holds information the manager doesn't have yet (a stuck project, an early warning sign, a disagreement worth surfacing) and a manager-driven agenda tends to crowd that information out in favor of status-checking the manager already cares about.
 
-This is a directly useful, checkable illustration of this lesson's core argument rather than generic advice to "communicate proactively": Grove's specific mechanism — who sets the agenda — is itself a concrete practice a PM can adopt in their own upward communication, and it reframes "managing up" as actively creating the structural opportunity for information to surface, not just being transparent when directly asked.
+This is a directly useful, checkable illustration of this lesson's core argument rather than generic advice to "communicate proactively": Grove's specific mechanism who sets the agenda is itself a concrete practice a PM can adopt in their own upward communication, and it reframes "managing up" as actively creating the structural opportunity for information to surface, not just being transparent when directly asked.
 
 *(Source: Andrew S. Grove's *High Output Management*, a firsthand account written by Grove himself during his tenure as Intel's CEO. This curriculum does not claim certainty about how universally this specific format is practiced across companies today, though it remains widely referenced management guidance.)*
 
-The underlying principle connects directly to this lesson's Theory: proactive, structurally-created opportunities for upward information flow — not passive reporting or waiting to be asked — tend to produce stronger, more trusting manager relationships, and Grove's agenda-ownership mechanism is one concrete way to build that structure deliberately rather than leave it to individual initiative alone.
+The underlying principle connects directly to this lesson's Theory: proactive, structurally-created opportunities for upward information flow not passive reporting or waiting to be asked tend to produce stronger, more trusting manager relationships, and Grove's agenda-ownership mechanism is one concrete way to build that structure deliberately rather than leave it to individual initiative alone.
 
 ---
 
@@ -234,7 +234,7 @@ The underlying principle connects directly to this lesson's Theory: proactive, s
 Managing up is often less formal, since a PM may work in close daily proximity to their manager (frequently a founder), with natural, frequent informal communication reducing the risk of significant surprises simply through sheer contact frequency. The habits from this lesson are still valuable to build early, even if the immediate stakes feel lower at this scale.
 
 **At a mid-size company:**
-Managing up typically requires more deliberate practice, since a manager now oversees multiple PMs or a broader scope and has correspondingly less bandwidth for passive, ambient awareness of any one report's specific situation — the "no surprises" discipline and working-style adaptation become genuinely necessary practices rather than automatic byproducts of proximity.
+Managing up typically requires more deliberate practice, since a manager now oversees multiple PMs or a broader scope and has correspondingly less bandwidth for passive, ambient awareness of any one report's specific situation the "no surprises" discipline and working-style adaptation become genuinely necessary practices rather than automatic byproducts of proximity.
 
 **At Big Tech:**
 Managing up and across often becomes especially consequential given organizational scale and the number of peer relationships a PM may need to maintain simultaneously across many adjacent teams. The PM's job shifts toward systematically prioritizing which peer relationships warrant the most ongoing investment (echoing Lesson 47's power/interest reasoning, applied here to peers rather than external stakeholders) and toward maintaining a genuinely current, revisited Manager Operating Manual as reporting structures and manager assignments change more frequently at scale.
@@ -247,13 +247,13 @@ Consider a simplified, illustrative scenario common among PMs new to managing up
 
 A PM discovers, roughly three weeks before a major planned launch, that a key dependency from another team is significantly behind schedule and will likely delay the launch by several weeks. Uncertain how their manager will react and hoping the other team might still recover the timeline, the PM decides to wait and see, rather than raising the issue immediately, reasoning that it would be better to have a fully resolved update (either "we recovered the timeline" or "here's our complete revised plan") rather than raising an unresolved problem.
 
-Two weeks later, in a broader leadership review meeting the PM's manager attends, another executive mentions, in passing, having heard from the dependency team about their own delays and asks the PM's manager directly what impact this will have on the upcoming launch — a question the manager cannot answer, since the PM never raised it with them. The manager, visibly caught off guard in front of other leaders, later has a pointed conversation with the PM about being informed of risks proactively, and the PM notices a subtle but real decline in how readily the manager takes their subsequent updates at face value.
+Two weeks later, in a broader leadership review meeting the PM's manager attends, another executive mentions, in passing, having heard from the dependency team about their own delays and asks the PM's manager directly what impact this will have on the upcoming launch a question the manager cannot answer, since the PM never raised it with them. The manager, visibly caught off guard in front of other leaders, later has a pointed conversation with the PM about being informed of risks proactively, and the PM notices a subtle but real decline in how readily the manager takes their subsequent updates at face value.
 
 **What went wrong?**
 
-This is a direct, worked violation of the no-surprises principle: the PM had genuine, reasonable-confidence knowledge of a significant risk three weeks before the launch, and chose to delay disclosure specifically to avoid an uncomfortable, unresolved conversation — precisely Mistake 1's failure pattern. The damage wasn't primarily caused by the dependency delay itself, which was outside the PM's direct control and not, by itself, a reflection of their judgment; the damage came from the manager learning about it from someone else, in a public setting, which directly and visibly signaled a gap between what the PM knew and what the PM had shared.
+This is a direct, worked violation of the no-surprises principle: the PM had genuine, reasonable-confidence knowledge of a significant risk three weeks before the launch, and chose to delay disclosure specifically to avoid an uncomfortable, unresolved conversation precisely Mistake 1's failure pattern. The damage wasn't primarily caused by the dependency delay itself, which was outside the PM's direct control and not, by itself, a reflection of their judgment; the damage came from the manager learning about it from someone else, in a public setting, which directly and visibly signaled a gap between what the PM knew and what the PM had shared.
 
-The corrective practice going forward required exactly what this lesson's Theory prescribes: raising risks as soon as they're known with reasonable confidence, even (especially) when the situation isn't yet fully resolved, framed honestly as "here's a risk I'm tracking and here's my current plan for managing it," rather than waiting for a tidy, complete resolution before saying anything. This does not mean raising every minor, low-confidence concern reflexively — that would create its own noise and erode a manager's ability to distinguish genuine signal from routine uncertainty — but a risk of this scale and confidence level, three weeks before a major launch, clearly warranted immediate, proactive disclosure.
+The corrective practice going forward required exactly what this lesson's Theory prescribes: raising risks as soon as they're known with reasonable confidence, even (especially) when the situation isn't yet fully resolved, framed honestly as "here's a risk I'm tracking and here's my current plan for managing it," rather than waiting for a tidy, complete resolution before saying anything. This does not mean raising every minor, low-confidence concern reflexively that would create its own noise and erode a manager's ability to distinguish genuine signal from routine uncertainty but a risk of this scale and confidence level, three weeks before a major launch, clearly warranted immediate, proactive disclosure.
 
 ---
 
@@ -287,7 +287,7 @@ A PM who has never explicitly worked through this matrix for their current manag
 
 ## Summary
 
-Managing up and managing across are the ongoing, ambient relationship disciplines that make the negotiation techniques from Lesson 53 actually work when they're needed, since accumulated trust and goodwill — not a single persuasive moment — is what a PM draws on during any specific ask. The no-surprises principle means proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence, rather than waiting for full resolution — a PM who delays disclosure risks a manager learning about a problem from someone else, which damages trust far more than the underlying bad news itself, precisely the failure illustrated in this lesson's Case Study of a launch delay surfaced first in a leadership review rather than by the PM directly. Adapting to a manager's specific working-style preferences — detail level, format, involvement, and timing — using a structured Working Styles Matrix, produces smoother communication than assuming a manager will adapt to the PM's own natural style, or than assuming a new manager shares a previous one's preferences. Managing across extends Lesson 53's currencies of exchange model into an ongoing practice: peer relationships maintained through regular, non-transactional investment accumulate goodwill that makes future specific requests far more likely to succeed than relationships engaged only transactionally, when something is immediately needed.
+Managing up and managing across are the ongoing, ambient relationship disciplines that make the negotiation techniques from Lesson 53 actually work when they're needed, since accumulated trust and goodwill not a single persuasive moment is what a PM draws on during any specific ask. The no-surprises principle means proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence, rather than waiting for full resolution a PM who delays disclosure risks a manager learning about a problem from someone else, which damages trust far more than the underlying bad news itself, precisely the failure illustrated in this lesson's Case Study of a launch delay surfaced first in a leadership review rather than by the PM directly. Adapting to a manager's specific working-style preferences detail level, format, involvement, and timing using a structured Working Styles Matrix, produces smoother communication than assuming a manager will adapt to the PM's own natural style, or than assuming a new manager shares a previous one's preferences. Managing across extends Lesson 53's currencies of exchange model into an ongoing practice: peer relationships maintained through regular, non-transactional investment accumulate goodwill that makes future specific requests far more likely to succeed than relationships engaged only transactionally, when something is immediately needed.
 
 ---
 
@@ -296,10 +296,10 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 - The no-surprises principle means proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence, not waiting for full resolution.
 - A manager learning about a problem from someone else, or later than they reasonably should have, damages trust more than the underlying bad news itself.
 - Adapting to a manager's specific working-style preferences (detail level, format, involvement, timing) using a structured framework produces smoother communication than assuming a single default style will work for everyone.
-- A new manager, or a manager changing roles, should never be assumed to share a previous manager's exact working-style preferences — reassess directly.
+- A new manager, or a manager changing roles, should never be assumed to share a previous manager's exact working-style preferences reassess directly.
 - Managing across extends Lesson 53's currencies of exchange model into an ongoing practice: peer relationships maintained through regular, non-transactional investment produce more durable cooperation than purely transactional engagement.
 - A PM who only engages peer teams when something specific is needed is drawing on a goodwill account they've never actually invested in.
-- Managing up is not flattery or curating an artificially positive picture — it's ensuring accurate, timely, well-adapted communication, including uncomfortable information.
+- Managing up is not flattery or curating an artificially positive picture it's ensuring accurate, timely, well-adapted communication, including uncomfortable information.
 
 ---
 
@@ -307,13 +307,13 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 *A two-minute review of everything in this lesson.*
 
-- **No surprises:** disclose risks and bad news as soon as reasonably known — don't wait for full resolution.
+- **No surprises:** disclose risks and bad news as soon as reasonably known don't wait for full resolution.
 - **Surprise damage > bad-news damage:** a manager learning from someone else hurts trust more than the news itself.
-- **Working Styles Matrix:** detail level, format, involvement, timing — ask directly, don't assume.
+- **Working Styles Matrix:** detail level, format, involvement, timing ask directly, don't assume.
 - **New manager ≠ old manager's preferences:** reassess style explicitly with every new manager.
 - **Managing across = ongoing investment:** maintain peer relationships continuously, not just when you need something.
 - **Transactional-only peer engagement backfires:** it reads as one-sided and makes future requests harder.
-- **Managing up ≠ flattery:** it's accurate, timely, adapted communication — including the uncomfortable parts.
+- **Managing up ≠ flattery:** it's accurate, timely, adapted communication including the uncomfortable parts.
 
 ---
 
@@ -330,9 +330,9 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 ## Further Reading / Resources
 
-- *Managing Up: How to Move Up, Win at Work, and Succeed with Any Type of Boss* by Mary Abbajay — a dedicated practitioner treatment of managing-up technique and style adaptation.
-- "Managing Oneself" by Peter Drucker — foundational, widely referenced writing on understanding one's own and one's manager's working style.
-- *The First 90 Days* by Michael Watkins — relevant background on quickly assessing and adapting to a new manager's or organization's working style.
+- *Managing Up: How to Move Up, Win at Work, and Succeed with Any Type of Boss* by Mary Abbajay a dedicated practitioner treatment of managing-up technique and style adaptation.
+- "Managing Oneself" by Peter Drucker foundational, widely referenced writing on understanding one's own and one's manager's working style.
+- *The First 90 Days* by Michael Watkins relevant background on quickly assessing and adapting to a new manager's or organization's working style.
 
 ---
 
@@ -346,7 +346,7 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 **Card 2**
 - Front: Why does a manager learning about a problem from someone else damage trust more than the bad news itself?
-- Back: It signals a gap between what the PM knew and what they shared, making the manager reasonably wonder what else might be similarly withheld — the surprise itself, not the underlying news, is what erodes trust.
+- Back: It signals a gap between what the PM knew and what they shared, making the manager reasonably wonder what else might be similarly withheld the surprise itself, not the underlying news, is what erodes trust.
 - Difficulty: 2
 - Tags: surprise-vs-bad-news
 
@@ -370,7 +370,7 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 **Card 6**
 - Front: In the Detailed Case Study, what was the actual root cause of the trust damage, as opposed to the launch delay itself?
-- Back: The manager learned about the delay risk from another executive in a public leadership review, rather than from the PM directly and early — the surprise, not the underlying delay (which was outside the PM's direct control), caused the trust damage.
+- Back: The manager learned about the delay risk from another executive in a public leadership review, rather than from the PM directly and early the surprise, not the underlying delay (which was outside the PM's direct control), caused the trust damage.
 - Difficulty: 2
 - Tags: case-study
 
@@ -379,7 +379,7 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 Consider the following novel scenario: You've just started reporting to a new manager after a reorganization. Your previous manager preferred brief, verbal daily check-ins and minimal written documentation. You don't yet know your new manager's preferences.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Manager Operating Manual and Working Styles Matrix, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Manager Operating Manual and Working Styles Matrix, not to reach one "right" answer.
 
 1. Using the Manager Operating Manual practice, what would be your first concrete step in this new reporting relationship?
 2. What specific questions could you ask your new manager directly to understand their working-style preferences, without assuming they share your previous manager's style?
@@ -554,7 +554,7 @@ C) Keep sending long written reports regardless
 D) Insist the manager adapt to the PM's format
 
 *Correct answer: A*
-*Explanation: This is the matrix's actual test in practice — noticing which format gets real engagement, and adapting to that rather than a personal default.*
+*Explanation: This is the matrix's actual test in practice noticing which format gets real engagement, and adapting to that rather than a personal default.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
@@ -590,9 +590,9 @@ D) Disclose now, hedged, and learn their style too
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 53 — Negotiation & Influence Without Authority | Extends the currencies of exchange model from a single negotiation into ongoing, ambient relationship maintenance |
-| **Current Lesson** | Lesson 54 — Managing Up and Across | No surprises principle; Working Styles Matrix; Manager Operating Manual; managing up vs. across |
-| **Next Lesson** | Lesson 55 — Building and Leading Product Teams | Builds on relationship-management discipline when structuring and leading a broader product organization |
+| **Previous Lesson** | Lesson 53 Negotiation & Influence Without Authority | Extends the currencies of exchange model from a single negotiation into ongoing, ambient relationship maintenance |
+| **Current Lesson** | Lesson 54 Managing Up and Across | No surprises principle; Working Styles Matrix; Manager Operating Manual; managing up vs. across |
+| **Next Lesson** | Lesson 55 Building and Leading Product Teams | Builds on relationship-management discipline when structuring and leading a broader product organization |
 | **Future Concepts Unlocked** | Lesson 56 (Product Management Career Paths) | Builds on managing-up practice when discussing career growth conversations with managers |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the no-surprises principle and the Working Styles Matrix with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the no-surprises principle and the Working Styles Matrix with you they will not be re-explained, only re-applied in new contexts.

@@ -2,7 +2,7 @@
 
 ## Why This Lesson Matters
 
-Lesson 36 taught you how to launch a feature safely within an existing product — staged rollouts, feature flags, launch tiers, cross-functional readiness checklists. Lesson 48 taught you how to price and package what you've built. This lesson connects those threads into something broader: how an entire product, or a significant new capability, actually reaches its intended market and finds its first real customers. Go-to-market (GTM) strategy is the discipline of deciding not just *that* something is ready to ship, but *how* it will be positioned, to whom, through which channels, and via what underlying sales or adoption motion — decisions that determine whether genuinely good product work ever finds the audience it deserves.
+Lesson 36 taught you how to launch a feature safely within an existing product staged rollouts, feature flags, launch tiers, cross-functional readiness checklists. Lesson 48 taught you how to price and package what you've built. This lesson connects those threads into something broader: how an entire product, or a significant new capability, actually reaches its intended market and finds its first real customers. Go-to-market (GTM) strategy is the discipline of deciding not just *that* something is ready to ship, but *how* it will be positioned, to whom, through which channels, and via what underlying sales or adoption motion decisions that determine whether genuinely good product work ever finds the audience it deserves.
 
 This lesson matters because a mismatched go-to-market strategy is one of the most common ways strong products fail commercially despite being technically excellent. A product built for simple, fast, self-serve adoption but sold through a slow, high-touch enterprise sales process will frustrate the customers who wanted the former and underwhelm the sales team expecting the latter. A product genuinely suited to a complex, considered enterprise sale but launched with a lightweight, self-serve motion will struggle to build the trust and customization such a purchase decision requires. This lesson gives you the vocabulary and structural tools to match a product's actual nature to the go-to-market motion that will actually work for it.
 
@@ -12,13 +12,13 @@ This lesson matters because a mismatched go-to-market strategy is one of the mos
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 49 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 36 (Release Planning & Launch Management — launch tiers), Lesson 48 (Pricing & Monetization Strategy) |
-| **Next Lesson** | Lesson 50 — Product-Led Growth |
-| **Future Topics Unlocked** | Lesson 50 (Product-Led Growth, which develops one specific GTM motion in depth), Lesson 51 (Communicating with Executives), Lesson 59 (International & Localization Considerations) — all build on the positioning and motion-selection concepts introduced here |
+| **Prerequisites** | Lesson 36 (Release Planning & Launch Management launch tiers), Lesson 48 (Pricing & Monetization Strategy) |
+| **Next Lesson** | Lesson 50 Product-Led Growth |
+| **Future Topics Unlocked** | Lesson 50 (Product-Led Growth, which develops one specific GTM motion in depth), Lesson 51 (Communicating with Executives), Lesson 59 (International & Localization Considerations) all build on the positioning and motion-selection concepts introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 36's** launch tiering and Launch Readiness Checklis
 
 ### Positioning: The Foundation Beneath Every GTM Decision
 
-Before deciding how to launch something, a team needs to agree on what it actually *is*, relative to the market — this is **positioning**. A widely used positioning framework (adapted from Geoffrey Moore's work) structures this as a small number of specific claims:
+Before deciding how to launch something, a team needs to agree on what it actually *is*, relative to the market this is **positioning**. A widely used positioning framework (adapted from Geoffrey Moore's work) structures this as a small number of specific claims:
 
 ```mermaid
 %%{init: {
@@ -84,7 +84,7 @@ graph TD
     D --> E["unlike [primary alternative]"]
 ```
 
-Each element forces a specific, falsifiable claim: naming a precise target market (not "everyone"), naming the category the product will be understood against (since customers interpret new products by comparing them to something familiar), stating the single most important differentiator (not an exhaustive feature list), and explicitly naming the primary alternative being displaced. A positioning statement vague on any of these — an undefined target market, no clear category, a differentiator that's really just a feature list — tends to produce downstream confusion in messaging, sales conversations, and marketing, since every subsequent GTM decision implicitly depends on this foundational clarity.
+Each element forces a specific, falsifiable claim: naming a precise target market (not "everyone"), naming the category the product will be understood against (since customers interpret new products by comparing them to something familiar), stating the single most important differentiator (not an exhaustive feature list), and explicitly naming the primary alternative being displaced. A positioning statement vague on any of these an undefined target market, no clear category, a differentiator that's really just a feature list tends to produce downstream confusion in messaging, sales conversations, and marketing, since every subsequent GTM decision implicitly depends on this foundational clarity.
 
 ### Three GTM Motions
 
@@ -96,11 +96,11 @@ A **go-to-market motion** describes the primary mechanism by which a product acq
 | Sales-led | A sales team actively engages prospects, builds a relationship, demonstrates value, and negotiates a deal, often over weeks or months | Higher price point, complex buying decisions involving multiple stakeholders, significant customization or integration needs |
 | Channel/partner-led | Third-party partners (resellers, systems integrators, marketplaces) handle some or all of customer acquisition and relationship management | Products that benefit from bundling with complementary offerings, or markets where trusted intermediary relationships are essential to adoption |
 
-These motions are not mutually exclusive — many mature companies run a hybrid, with a product-led motion serving smaller customers and a sales-led motion engaging larger enterprise accounts for the same underlying product, often called a "land and expand" or "PLG-plus-sales" hybrid strategy. What matters is that the chosen motion (or combination) actually matches the product's price point and buying complexity, rather than being chosen by organizational habit or founder preference alone.
+These motions are not mutually exclusive many mature companies run a hybrid, with a product-led motion serving smaller customers and a sales-led motion engaging larger enterprise accounts for the same underlying product, often called a "land and expand" or "PLG-plus-sales" hybrid strategy. What matters is that the chosen motion (or combination) actually matches the product's price point and buying complexity, rather than being chosen by organizational habit or founder preference alone.
 
 ### Why Motion-Product Mismatch Fails
 
-The core risk this lesson addresses: applying the wrong motion to a given product creates friction on both sides of the transaction. A low-price, simple product forced through a slow, high-touch sales process frustrates prospects who expected (and whose price point justifies) a fast, self-serve path, while consuming expensive sales capacity on deals too small to justify the effort. A complex, high-price product pushed through a self-serve motion, with no direct human guidance, leaves prospects who need customization, security review, or stakeholder buy-in — support a self-serve flow can't provide — struggling to navigate a purchase decision the product's own complexity demands more structure for.
+The core risk this lesson addresses: applying the wrong motion to a given product creates friction on both sides of the transaction. A low-price, simple product forced through a slow, high-touch sales process frustrates prospects who expected (and whose price point justifies) a fast, self-serve path, while consuming expensive sales capacity on deals too small to justify the effort. A complex, high-price product pushed through a self-serve motion, with no direct human guidance, leaves prospects who need customization, security review, or stakeholder buy-in support a self-serve flow can't provide struggling to navigate a purchase decision the product's own complexity demands more structure for.
 
 ```mermaid
 %%{init: {
@@ -142,7 +142,7 @@ graph LR
 
 ### Extending Launch Tiers to a Full GTM Launch
 
-Recall Lesson 36's launch tiering system, which classified releases by potential impact and assigned proportional cross-functional coordination. A full go-to-market launch is, in effect, the highest tier of this same system, extended beyond Lesson 36's engineering-and-support-focused checklist to include marketing (messaging, campaign timing), sales (enablement materials, target account lists), and external communication (press, partner announcements, customer communication). The same underlying principle applies: the level of GTM coordination and ceremony should be proportional to the launch's actual significance, not applied uniformly regardless of scale — a minor feature update doesn't need a full GTM campaign, while a new product line or a significant repositioning very likely does.
+Recall Lesson 36's launch tiering system, which classified releases by potential impact and assigned proportional cross-functional coordination. A full go-to-market launch is, in effect, the highest tier of this same system, extended beyond Lesson 36's engineering-and-support-focused checklist to include marketing (messaging, campaign timing), sales (enablement materials, target account lists), and external communication (press, partner announcements, customer communication). The same underlying principle applies: the level of GTM coordination and ceremony should be proportional to the launch's actual significance, not applied uniformly regardless of scale a minor feature update doesn't need a full GTM campaign, while a new product line or a significant repositioning very likely does.
 
 ---
 
@@ -154,7 +154,7 @@ A target market of "businesses" or a differentiator of "easy to use" fails to fo
 
 **Mistake 2: Choosing a GTM motion based on organizational habit rather than product fit**
 
-A company with an established enterprise sales team may default to a sales-led motion for a new, simpler, lower-priced product line simply because that's the existing organizational muscle — even when the product's actual complexity and price point would be far better served by a product-led approach.
+A company with an established enterprise sales team may default to a sales-led motion for a new, simpler, lower-priced product line simply because that's the existing organizational muscle even when the product's actual complexity and price point would be far better served by a product-led approach.
 
 **Mistake 3: Treating every launch as warranting the same level of GTM ceremony**
 
@@ -162,7 +162,7 @@ Echoing Lesson 36's launch tiering caution directly: applying a full marketing-a
 
 **Mistake 4: Assuming a GTM failure means the product itself is flawed**
 
-A product can be genuinely excellent while failing commercially due to unclear positioning, a mismatched motion, or poor channel choice — diagnosing which layer actually failed (product, positioning, motion, or channel) is essential before concluding the underlying product needs to change.
+A product can be genuinely excellent while failing commercially due to unclear positioning, a mismatched motion, or poor channel choice diagnosing which layer actually failed (product, positioning, motion, or channel) is essential before concluding the underlying product needs to change.
 
 **Mistake 5: Designing positioning and messaging without direct input from the sales or customer-facing teams who will actually use it in conversations**
 
@@ -173,7 +173,7 @@ Positioning developed in isolation, without testing whether it holds up in real 
 
 ## Mental Model: The Positioning Pyramid
 
-This lesson's core takeaway tool visualizes how a foundational positioning claim should cascade down into progressively more specific, tactical GTM decisions — each layer depending on the one above it being genuinely clear:
+This lesson's core takeaway tool visualizes how a foundational positioning claim should cascade down into progressively more specific, tactical GTM decisions each layer depending on the one above it being genuinely clear:
 
 ```mermaid
 %%{init: {
@@ -212,29 +212,29 @@ graph TD
     C --> D["Channel and launch tactics<br/>(campaigns, sales enablement, timing)"]
 ```
 
-Use the Positioning Pyramid as a standing diagnostic whenever a GTM effort feels unfocused or a launch underperforms: trace the confusion upward, layer by layer, rather than only troubleshooting at the tactical bottom. A confused campaign is often actually a symptom of unclear messaging; unclear messaging is often actually a symptom of vague positioning — fixing the top of the pyramid frequently resolves problems that appear, at first glance, to live much further down.
+Use the Positioning Pyramid as a standing diagnostic whenever a GTM effort feels unfocused or a launch underperforms: trace the confusion upward, layer by layer, rather than only troubleshooting at the tactical bottom. A confused campaign is often actually a symptom of unclear messaging; unclear messaging is often actually a symptom of vague positioning fixing the top of the pyramid frequently resolves problems that appear, at first glance, to live much further down.
 
 ---
 
 ## Real Company Example
 
-**Dropbox**'s referral program is a more concretely documented illustration of engineered, product-led go-to-market than a general "word-of-mouth adoption" claim. Rather than relying on organic referrals happening by chance, Dropbox built referrals directly into the product mechanic: both the referring user and the new signup received additional free storage, giving existing users a direct, immediate incentive to invite others — turning growth into something the product itself produced, not something layered on top of it through separate marketing spend. Dropbox's own 2018 S-1 registration statement, filed with the SEC ahead of its IPO, explicitly names word-of-mouth referrals as central to its brand and user acquisition, and flags user dissatisfaction as a direct risk to that referral engine — a rare instance of a company's own regulatory filing, not just a case-study retelling, confirming how load-bearing the mechanic was to the business.
+**Dropbox**'s referral program is a more concretely documented illustration of engineered, product-led go-to-market than a general "word-of-mouth adoption" claim. Rather than relying on organic referrals happening by chance, Dropbox built referrals directly into the product mechanic: both the referring user and the new signup received additional free storage, giving existing users a direct, immediate incentive to invite others turning growth into something the product itself produced, not something layered on top of it through separate marketing spend. Dropbox's own 2018 S-1 registration statement, filed with the SEC ahead of its IPO, explicitly names word-of-mouth referrals as central to its brand and user acquisition, and flags user dissatisfaction as a direct risk to that referral engine a rare instance of a company's own regulatory filing, not just a case-study retelling, confirming how load-bearing the mechanic was to the business.
 
-The instructive point for this lesson is the mechanism, not just the outcome: this was a deliberately engineered incentive built into the product's core loop, matched to a genuinely low-friction, low-price, individually-adoptable product — GTM motion fit to product reality, exactly this lesson's core argument — rather than a GTM motion that would work independent of what was actually being sold.
+The instructive point for this lesson is the mechanism, not just the outcome: this was a deliberately engineered incentive built into the product's core loop, matched to a genuinely low-friction, low-price, individually-adoptable product GTM motion fit to product reality, exactly this lesson's core argument rather than a GTM motion that would work independent of what was actually being sold.
 
 *(Source: Dropbox's own S-1 registration statement, filed with the SEC in February 2018. This curriculum does not claim certainty about the referral program's exact quantitative impact, since third-party retellings of the specific growth percentages vary and are not independently verifiable against a single authoritative figure.)*
 
-The underlying principle connects directly to this lesson's Theory: Dropbox's referral mechanic matched its early product reality — low friction to try, individually adoptable, low or no initial price point — and a product-led motion built around a mechanic like this only works because it fits those conditions; a complex, high-price, committee-purchased enterprise product would need a fundamentally different GTM motion to reach the same buyers, not a referral incentive layered on top of an unsuited product.
+The underlying principle connects directly to this lesson's Theory: Dropbox's referral mechanic matched its early product reality low friction to try, individually adoptable, low or no initial price point and a product-led motion built around a mechanic like this only works because it fits those conditions; a complex, high-price, committee-purchased enterprise product would need a fundamentally different GTM motion to reach the same buyers, not a referral incentive layered on top of an unsuited product.
 
 ---
 
 ## Real World Perspective: Go-To-Market Strategy at Different Company Stages
 
 **At a startup:**
-GTM strategy is often simple by necessity — limited resources typically force a choice between a lightweight, product-led motion or a small, founder-led sales effort, rather than supporting multiple parallel motions. The risk here is Mistake 2's mirror image: a founding team with a sales background may default to a sales-led motion even for a product whose price point and complexity would actually be better served by product-led adoption, simply because that's the skill set already present.
+GTM strategy is often simple by necessity limited resources typically force a choice between a lightweight, product-led motion or a small, founder-led sales effort, rather than supporting multiple parallel motions. The risk here is Mistake 2's mirror image: a founding team with a sales background may default to a sales-led motion even for a product whose price point and complexity would actually be better served by product-led adoption, simply because that's the skill set already present.
 
 **At a mid-size company:**
-This is typically the stage where hybrid motions (PLG for smaller accounts, sales-led for larger ones) become genuinely valuable and organizationally feasible, echoing Slack's evolution — and where positioning discipline (the framework from this lesson's Theory) becomes worth formalizing, since messaging now needs to stay consistent across a growing marketing team, sales team, and expanding product line.
+This is typically the stage where hybrid motions (PLG for smaller accounts, sales-led for larger ones) become genuinely valuable and organizationally feasible, echoing Slack's evolution and where positioning discipline (the framework from this lesson's Theory) becomes worth formalizing, since messaging now needs to stay consistent across a growing marketing team, sales team, and expanding product line.
 
 **At Big Tech:**
 GTM strategy is often highly sophisticated, with dedicated product marketing functions responsible for positioning, multiple parallel motions serving different segments and product lines simultaneously, and rigorous coordination (echoing Lesson 36's launch tiers, extended to full GTM scale) across many teams for major launches. The PM's job shifts toward partnering effectively with product marketing and sales leadership to ensure GTM decisions remain grounded in genuine product fit rather than organizational momentum alone.
@@ -245,15 +245,15 @@ GTM strategy is often highly sophisticated, with dedicated product marketing fun
 
 Consider a simplified, illustrative scenario common at companies expanding into a new, lower-price product line without adjusting their existing GTM motion.
 
-A company with an established, successful high-touch enterprise sales motion — serving a complex, expensive core product with a months-long sales cycle involving multiple stakeholders — launches a new, much simpler, lower-priced product aimed at smaller teams, with genuinely low buying complexity: it can be evaluated and adopted by a single team lead within days. Following existing organizational habit, the company routes this new product through the same sales-led motion used for its core offering, assigning it to the same sales team and sales process.
+A company with an established, successful high-touch enterprise sales motion serving a complex, expensive core product with a months-long sales cycle involving multiple stakeholders launches a new, much simpler, lower-priced product aimed at smaller teams, with genuinely low buying complexity: it can be evaluated and adopted by a single team lead within days. Following existing organizational habit, the company routes this new product through the same sales-led motion used for its core offering, assigning it to the same sales team and sales process.
 
 Results are disappointing on both sides: prospective customers, expecting a fast, self-serve evaluation given the product's low price and simplicity, are frustrated by being routed into a multi-week sales process involving calls and demos that feel disproportionate to the purchase decision at hand, and many simply abandon the process rather than continue engaging with a mismatched sales cycle. Meanwhile, the sales team, evaluated on deal size and quota attainment calibrated to the much larger core product, deprioritizes the smaller, lower-value new product deals in favor of higher-value opportunities, meaning even the prospects willing to engage receive inconsistent, low-priority attention.
 
 **What went wrong?**
 
-Using the Positioning Pyramid and the motion-fit reasoning from Theory: the underlying product may have been genuinely well-built and well-positioned in terms of its target market and differentiation, but the GTM motion chosen for it — inherited from organizational habit rather than genuine fit assessment — was mismatched to its actual price point and buying complexity. This is a textbook illustration of Mistake 2 and Mistake 4 combined: the disappointing results could easily have been misread as evidence the *product* was flawed, when the more accurate diagnosis was a motion mismatch layered on top of a fundamentally sound product.
+Using the Positioning Pyramid and the motion-fit reasoning from Theory: the underlying product may have been genuinely well-built and well-positioned in terms of its target market and differentiation, but the GTM motion chosen for it inherited from organizational habit rather than genuine fit assessment was mismatched to its actual price point and buying complexity. This is a textbook illustration of Mistake 2 and Mistake 4 combined: the disappointing results could easily have been misread as evidence the *product* was flawed, when the more accurate diagnosis was a motion mismatch layered on top of a fundamentally sound product.
 
-The corrective response required building a genuinely product-led motion for the new offering — self-serve trial, in-product onboarding, and a lightweight, low-friction purchase path — decoupled from the existing enterprise sales team's process and incentives entirely, rather than attempting to force the new product through infrastructure built for a fundamentally different kind of purchase decision. Diagnosing this kind of layered failure — product versus positioning versus motion versus channel — before concluding what actually needs to change is the specific analytical discipline this lesson's Framework Explanation formalizes below.
+The corrective response required building a genuinely product-led motion for the new offering self-serve trial, in-product onboarding, and a lightweight, low-friction purchase path decoupled from the existing enterprise sales team's process and incentives entirely, rather than attempting to force the new product through infrastructure built for a fundamentally different kind of purchase decision. Diagnosing this kind of layered failure product versus positioning versus motion versus channel before concluding what actually needs to change is the specific analytical discipline this lesson's Framework Explanation formalizes below.
 
 ---
 
@@ -263,12 +263,12 @@ A second, more tactical tool: when a launch or ongoing GTM effort underperforms,
 
 | Layer | Diagnostic Question | Signal This Layer Is the Problem |
 |---|---|---|
-| Product | Do users who actually try the product report genuine value and continued usage? | Poor retention/engagement even among users who complete onboarding — a product problem |
+| Product | Do users who actually try the product report genuine value and continued usage? | Poor retention/engagement even among users who complete onboarding a product problem |
 | Positioning | Do prospects understand what the product is and why it's different, once they engage? | Confused or inconsistent descriptions of the product from prospects and even internal teams |
 | Motion | Does the buying process match the product's actual price point and complexity? | High abandonment specifically during a mismatched sales/evaluation process, as in this lesson's Case Study |
 | Channel | Is the product reaching the intended target market at all, through the chosen channels? | Low overall awareness or reach within the actual target segment, regardless of product or positioning quality |
 
-A team that jumps straight to "fix the product" without working through this table risks investing significant engineering effort addressing a problem that was never actually about the product itself — precisely the misdiagnosis illustrated in this lesson's Case Study.
+A team that jumps straight to "fix the product" without working through this table risks investing significant engineering effort addressing a problem that was never actually about the product itself precisely the misdiagnosis illustrated in this lesson's Case Study.
 
 ---
 
@@ -281,20 +281,20 @@ A team that jumps straight to "fix the product" without working through this tab
 *What the interviewer is actually evaluating:* Whether the candidate's diagnostic process distinguishes product, positioning, motion, and channel as separate potential failure layers, rather than jumping immediately to "the product must be wrong."
 
 **Typical question 3: "Write a one-sentence positioning statement for a product you know well."**
-*What the interviewer is actually evaluating:* Whether the candidate can produce the specific, falsifiable elements this lesson's positioning framework requires — precise target market, category, and differentiator — rather than a vague, marketing-brochure-style sentence that could describe almost any product.
+*What the interviewer is actually evaluating:* Whether the candidate can produce the specific, falsifiable elements this lesson's positioning framework requires precise target market, category, and differentiator rather than a vague, marketing-brochure-style sentence that could describe almost any product.
 
 ---
 
 ## Summary
 
-Go-to-market strategy determines how a product actually reaches its intended market, built on a foundation of clear positioning — a specific, falsifiable statement of target market, category, and differentiation — that cascades down through messaging into the choice of GTM motion (product-led, sales-led, or channel/partner-led) and finally into specific launch tactics, as this lesson's Positioning Pyramid illustrates. Choosing among these motions requires matching the product's actual price point and buying complexity to the motion's inherent characteristics, since a mismatch — a simple, low-price product forced through a high-touch sales process, or a complex, high-price product pushed through an unsupported self-serve flow — creates friction that can easily be misdiagnosed as a product failure rather than the motion mismatch it actually is, precisely the failure illustrated in this lesson's Case Study of an enterprise sales team struggling to sell a fundamentally self-serve product. A full go-to-market launch extends Lesson 36's launch tiering principle beyond engineering and support into marketing, sales, and external communication, with ceremony scaled proportionally to the launch's actual significance. When a GTM effort underperforms, a disciplined diagnosis — checking product, positioning, motion, and channel separately — is essential before concluding what actually needs to change.
+Go-to-market strategy determines how a product actually reaches its intended market, built on a foundation of clear positioning a specific, falsifiable statement of target market, category, and differentiation that cascades down through messaging into the choice of GTM motion (product-led, sales-led, or channel/partner-led) and finally into specific launch tactics, as this lesson's Positioning Pyramid illustrates. Choosing among these motions requires matching the product's actual price point and buying complexity to the motion's inherent characteristics, since a mismatch a simple, low-price product forced through a high-touch sales process, or a complex, high-price product pushed through an unsupported self-serve flow creates friction that can easily be misdiagnosed as a product failure rather than the motion mismatch it actually is, precisely the failure illustrated in this lesson's Case Study of an enterprise sales team struggling to sell a fundamentally self-serve product. A full go-to-market launch extends Lesson 36's launch tiering principle beyond engineering and support into marketing, sales, and external communication, with ceremony scaled proportionally to the launch's actual significance. When a GTM effort underperforms, a disciplined diagnosis checking product, positioning, motion, and channel separately is essential before concluding what actually needs to change.
 
 ---
 
 ## Key Takeaways
 
-- A positioning statement should force specific, falsifiable clarity on target market, category, and differentiator — vagueness here produces downstream confusion in every subsequent GTM decision.
-- The three core GTM motions — product-led, sales-led, and channel/partner-led — each fit different combinations of price point and buying complexity; many mature companies run a hybrid across different segments.
+- A positioning statement should force specific, falsifiable clarity on target market, category, and differentiator vagueness here produces downstream confusion in every subsequent GTM decision.
+- The three core GTM motions product-led, sales-led, and channel/partner-led each fit different combinations of price point and buying complexity; many mature companies run a hybrid across different segments.
 - Mismatching a product's actual complexity and price point to an unsuited GTM motion creates friction on both sides of the transaction, and can easily be misdiagnosed as a product failure.
 - A full go-to-market launch extends Lesson 36's launch tiering principle beyond engineering and support to marketing, sales, and external communication, with ceremony scaled to actual significance.
 - Diagnosing a GTM failure requires distinguishing product, positioning, motion, and channel as separate potential failure layers, using the GTM Failure Diagnosis Table, rather than assuming the product itself is flawed.
@@ -307,7 +307,7 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 *A two-minute review of everything in this lesson.*
 
-- **Positioning framework:** target market, category, differentiator, primary alternative — specific and falsifiable, not vague.
+- **Positioning framework:** target market, category, differentiator, primary alternative specific and falsifiable, not vague.
 - **Three motions:** product-led (low price/complexity), sales-led (high price/complexity), channel-led (intermediary-dependent markets).
 - **Match motion to product:** mismatch creates friction easily misread as a product problem.
 - **Positioning Pyramid:** positioning → messaging → motion → tactics; trace confusion upward, not just at the bottom.
@@ -332,9 +332,9 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 ## Further Reading / Resources
 
-- *Crossing the Chasm* by Geoffrey Moore — the foundational text on positioning and market segmentation referenced in this lesson's positioning framework.
-- *Obviously Awesome: How to Nail Product Positioning* by April Dunford — a widely used, practitioner-oriented treatment of the positioning framework applied in this lesson.
-- *The Sales Acceleration Formula* by Mark Roberge — background on sales-led motion design and its fit with specific product and pricing characteristics.
+- *Crossing the Chasm* by Geoffrey Moore the foundational text on positioning and market segmentation referenced in this lesson's positioning framework.
+- *Obviously Awesome: How to Nail Product Positioning* by April Dunford a widely used, practitioner-oriented treatment of the positioning framework applied in this lesson.
+- *The Sales Acceleration Formula* by Mark Roberge background on sales-led motion design and its fit with specific product and pricing characteristics.
 
 ---
 
@@ -354,7 +354,7 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 **Card 3**
 - Front: What determines which GTM motion best fits a given product?
-- Back: The product's actual price point and buying complexity — low price/complexity favors product-led, high price/complexity favors sales-led, intermediary-dependent markets favor channel-led.
+- Back: The product's actual price point and buying complexity low price/complexity favors product-led, high price/complexity favors sales-led, intermediary-dependent markets favor channel-led.
 - Difficulty: 2
 - Tags: motion-fit
 
@@ -366,7 +366,7 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 **Card 5**
 - Front: What does the Positioning Pyramid illustrate?
-- Back: Positioning cascades down into messaging, then GTM motion, then specific launch tactics — confusion at a lower layer is often actually caused by unclear positioning at the top.
+- Back: Positioning cascades down into messaging, then GTM motion, then specific launch tactics confusion at a lower layer is often actually caused by unclear positioning at the top.
 - Difficulty: 2
 - Tags: positioning-pyramid
 
@@ -381,7 +381,7 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 Consider the following novel scenario: You're a PM launching a new, moderately-priced product feature that requires some technical integration work by the customer but can ultimately be self-served by a technically capable user without direct sales involvement, though a small number of prospects have asked detailed integration questions your current documentation doesn't fully answer.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the motion-fit and diagnosis frameworks, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the motion-fit and diagnosis frameworks, not to reach one "right" answer.
 
 1. Using the motion-fit reasoning, would you recommend a pure product-led motion, a pure sales-led motion, or some hybrid for this specific product? Justify your answer.
 2. Draft a one-sentence positioning statement for this feature using this lesson's framework (target market, category, differentiator, primary alternative).
@@ -439,7 +439,7 @@ C) GTM motions must legally match price exactly
 D) Just a sales-led motion can create friction
 
 *Correct answer: A*
-*Explanation: Each direction fails a different way — one wastes an expensive sales process on a small deal, the other strands a buyer who genuinely needed guidance.*
+*Explanation: Each direction fails a different way one wastes an expensive sales process on a small deal, the other strands a buyer who genuinely needed guidance.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -452,7 +452,7 @@ C) It argues tiering should no longer apply
 D) It restricts tiering to sales teams alone
 
 *Correct answer: B*
-*Explanation: A full GTM launch is the same underlying idea — scale the ceremony to the actual stakes — carried past engineering and support into the rest of the launch.*
+*Explanation: A full GTM launch is the same underlying idea scale the ceremony to the actual stakes carried past engineering and support into the rest of the launch.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -556,7 +556,7 @@ C) Product, since it is clearly the whole issue
 D) Positioning, unrelated to conversion at all
 
 *Correct answer: B*
-*Explanation: Reach is fine and the product satisfies the people who complete it, which leaves the step in between — how the purchase itself gets closed — as the likely bottleneck.*
+*Explanation: Reach is fine and the product satisfies the people who complete it, which leaves the step in between how the purchase itself gets closed as the likely bottleneck.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
@@ -592,10 +592,10 @@ D) Use a channel-led motion regardless of fit
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 48 — Pricing & Monetization Strategy | GTM motion selection depends directly on the pricing and packaging decisions established in Lesson 48 |
-| **Current Lesson** | Lesson 49 — Go-To-Market Strategy | Positioning framework; Positioning Pyramid; GTM motions; motion-product fit; GTM Failure Diagnosis Table |
-| **Next Lesson** | Lesson 50 — Product-Led Growth | Develops the product-led motion introduced here in much greater depth |
+| **Previous Lesson** | Lesson 48 Pricing & Monetization Strategy | GTM motion selection depends directly on the pricing and packaging decisions established in Lesson 48 |
+| **Current Lesson** | Lesson 49 Go-To-Market Strategy | Positioning framework; Positioning Pyramid; GTM motions; motion-product fit; GTM Failure Diagnosis Table |
+| **Next Lesson** | Lesson 50 Product-Led Growth | Develops the product-led motion introduced here in much greater depth |
 | **Future Concepts Unlocked** | Lesson 51 (Communicating with Executives) | Builds on positioning discipline when communicating strategic narratives upward |
 | | Lesson 59 (International & Localization Considerations) | Extends GTM motion and channel reasoning to international market entry |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the positioning framework and GTM motion-fit reasoning with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the positioning framework and GTM motion-fit reasoning with you they will not be re-explained, only re-applied in new contexts.

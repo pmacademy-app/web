@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-This lesson returns to the condition this curriculum named in its very first lesson: a PM's responsibility without formal authority. Lessons 37, 47, and 51 have each addressed pieces of how a PM operates within that condition — building trust with engineering, managing stakeholders honestly, communicating persuasively with executives. This lesson addresses the condition directly and gives it a name: negotiation and influence without authority, the discipline of getting other people, who do not report to you and are not obligated to prioritize your request, to actually do so.
+This lesson returns to the condition this curriculum named in its very first lesson: a PM's responsibility without formal authority. Lessons 37, 47, and 51 have each addressed pieces of how a PM operates within that condition building trust with engineering, managing stakeholders honestly, communicating persuasively with executives. This lesson addresses the condition directly and gives it a name: negotiation and influence without authority, the discipline of getting other people, who do not report to you and are not obligated to prioritize your request, to actually do so.
 
-This lesson matters because a huge share of a PM's real, daily work involves exactly this challenge: convincing another team's engineering lead to prioritize a dependency your roadmap needs, persuading a skeptical stakeholder to support a direction they didn't originate, or securing a colleague's genuine buy-in rather than mere compliance. Doing this well is not about being persuasive in a manipulative sense — it's about understanding what actually drives agreement between people who have no obligation to defer to each other, and structuring requests and conversations around that understanding rather than around positional assertion, which simply doesn't work when you have no position to assert from.
+This lesson matters because a huge share of a PM's real, daily work involves exactly this challenge: convincing another team's engineering lead to prioritize a dependency your roadmap needs, persuading a skeptical stakeholder to support a direction they didn't originate, or securing a colleague's genuine buy-in rather than mere compliance. Doing this well is not about being persuasive in a manipulative sense it's about understanding what actually drives agreement between people who have no obligation to defer to each other, and structuring requests and conversations around that understanding rather than around positional assertion, which simply doesn't work when you have no position to assert from.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because a huge share of a PM's real, daily work involves exa
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career |
+| **Module** | 6 Leadership, Communication & Career |
 | **Current Lesson** | 53 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 1 (Responsibility without authority), Lesson 37 (Working with Engineering Teams — Trust Ladder), Lesson 47 (Stakeholder Management) |
-| **Next Lesson** | Lesson 54 — Managing Up and Across |
-| **Future Topics Unlocked** | Lesson 54 (Managing Up and Across), Lesson 55 (Building and Leading Product Teams) — both build on the influence and coalition-building concepts introduced here |
+| **Prerequisites** | Lesson 1 (Responsibility without authority), Lesson 37 (Working with Engineering Teams Trust Ladder), Lesson 47 (Stakeholder Management) |
+| **Next Lesson** | Lesson 54 Managing Up and Across |
+| **Future Topics Unlocked** | Lesson 54 (Managing Up and Across), Lesson 55 (Building and Leading Product Teams) both build on the influence and coalition-building concepts introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 1's** foundational framing of the PM's responsibili
 
 ### Interests vs. Positions
 
-A foundational distinction from negotiation theory, most closely associated with Roger Fisher and William Ury's *Getting to Yes*: a **position** is what someone says they want ("I need your team to prioritize this integration next Sprint"); an **interest** is the underlying reason they want it (a genuine business need, a personal incentive, a concern about risk). Negotiating over positions tends to produce adversarial, zero-sum dynamics — if two positions directly conflict, one side must "win" and the other "lose." Negotiating over interests frequently reveals that two seemingly conflicting positions are actually compatible, or that a creative solution exists serving both parties' underlying interests better than either party's original stated position.
+A foundational distinction from negotiation theory, most closely associated with Roger Fisher and William Ury's *Getting to Yes*: a **position** is what someone says they want ("I need your team to prioritize this integration next Sprint"); an **interest** is the underlying reason they want it (a genuine business need, a personal incentive, a concern about risk). Negotiating over positions tends to produce adversarial, zero-sum dynamics if two positions directly conflict, one side must "win" and the other "lose." Negotiating over interests frequently reveals that two seemingly conflicting positions are actually compatible, or that a creative solution exists serving both parties' underlying interests better than either party's original stated position.
 
 ```mermaid
 %%{init: {
@@ -84,13 +84,13 @@ graph TD
     C -->|Interests genuinely conflict| E[A harder trade-off conversation<br/>is genuinely necessary]
 ```
 
-A PM negotiating for another team's engineering time who leads only with their own position ("I need this prioritized") misses the opportunity to discover the other team's actual interests (perhaps their own roadmap pressure, a concern about scope creep, or an incentive structure that rewards different outcomes) — interests that, once understood, might reveal a way to reframe the request so it serves both parties, rather than framing it as a zero-sum competition for the same scarce engineering capacity.
+A PM negotiating for another team's engineering time who leads only with their own position ("I need this prioritized") misses the opportunity to discover the other team's actual interests (perhaps their own roadmap pressure, a concern about scope creep, or an incentive structure that rewards different outcomes) interests that, once understood, might reveal a way to reframe the request so it serves both parties, rather than framing it as a zero-sum competition for the same scarce engineering capacity.
 
 ### BATNA: Your Leverage, and Theirs
 
-**BATNA** (Best Alternative to a Negotiated Agreement) describes what each party would do if the current negotiation fails entirely. Understanding your own BATNA clarifies how much you should be willing to concede — a strong BATNA (a good alternative path if this specific negotiation fails) means less pressure to accept an unfavorable deal; a weak BATNA means correspondingly more pressure. Understanding the other party's likely BATNA is equally important: a counterpart with a strong alternative has little incentive to make concessions, while a counterpart with a weak alternative has more genuine reason to find an agreement with you specifically.
+**BATNA** (Best Alternative to a Negotiated Agreement) describes what each party would do if the current negotiation fails entirely. Understanding your own BATNA clarifies how much you should be willing to concede a strong BATNA (a good alternative path if this specific negotiation fails) means less pressure to accept an unfavorable deal; a weak BATNA means correspondingly more pressure. Understanding the other party's likely BATNA is equally important: a counterpart with a strong alternative has little incentive to make concessions, while a counterpart with a weak alternative has more genuine reason to find an agreement with you specifically.
 
-The overlap between what each party would accept, given their respective BATNAs, is sometimes called the **Zone of Possible Agreement (ZOPA)** — the range within which both parties' interests can genuinely be satisfied. A PM entering a negotiation without having thought through either their own BATNA or a reasonable estimate of the counterpart's is negotiating blind, unable to judge whether a given proposal is actually a good outcome or simply the first option presented.
+The overlap between what each party would accept, given their respective BATNAs, is sometimes called the **Zone of Possible Agreement (ZOPA)** the range within which both parties' interests can genuinely be satisfied. A PM entering a negotiation without having thought through either their own BATNA or a reasonable estimate of the counterpart's is negotiating blind, unable to judge whether a given proposal is actually a good outcome or simply the first option presented.
 
 ### The Currencies of Exchange Model
 
@@ -103,11 +103,11 @@ A framework developed by Allan Cohen and David Bradford for influence without fo
 | Relationship-related | Offering genuine trust, understanding, and a track record of reliability that makes future cooperation easier |
 | Personal | Offering gratitude, recognition, or simply being someone pleasant and low-friction to work with |
 
-The core insight this model offers: influence without authority is fundamentally an exchange, not a request — a PM asking for cooperation should think concretely about what currency they can genuinely offer in return, rather than assuming goodwill or organizational obligation alone will be sufficient motivation for someone who has no formal reason to prioritize the PM's request over their own.
+The core insight this model offers: influence without authority is fundamentally an exchange, not a request a PM asking for cooperation should think concretely about what currency they can genuinely offer in return, rather than assuming goodwill or organizational obligation alone will be sufficient motivation for someone who has no formal reason to prioritize the PM's request over their own.
 
 ### Building Coalitions Before the Key Conversation
 
-A specific, high-leverage practice: rather than attempting to persuade a key decision-maker in a single, isolated conversation, experienced PMs frequently build broader support incrementally beforehand — discussing the idea informally with a few relevant peers or stakeholders first, incorporating their feedback, and allowing genuine consensus to form gradually, so that by the time a formal decision conversation happens, the outcome feels far less like a surprise or an imposition and far more like a natural continuation of conversations the decision-maker may have already heard about from multiple directions. This approach respects the reality that influence compounds through pre-existing relationships and prior exposure to an idea, rather than depending entirely on the persuasive power of one single moment.
+A specific, high-leverage practice: rather than attempting to persuade a key decision-maker in a single, isolated conversation, experienced PMs frequently build broader support incrementally beforehand discussing the idea informally with a few relevant peers or stakeholders first, incorporating their feedback, and allowing genuine consensus to form gradually, so that by the time a formal decision conversation happens, the outcome feels far less like a surprise or an imposition and far more like a natural continuation of conversations the decision-maker may have already heard about from multiple directions. This approach respects the reality that influence compounds through pre-existing relationships and prior exposure to an idea, rather than depending entirely on the persuasive power of one single moment.
 
 ---
 
@@ -117,13 +117,13 @@ A specific, high-leverage practice: rather than attempting to persuade a key dec
 
 As covered in Theory, this tends to produce adversarial, zero-sum framing and misses opportunities to discover creative solutions that would actually serve both parties' genuine underlying needs.
 
-**Mistake 2: Entering a negotiation without having thought through BATNA — your own or the other party's**
+**Mistake 2: Entering a negotiation without having thought through BATNA your own or the other party's**
 
 Without this groundwork, a PM cannot judge whether a proposed outcome is genuinely favorable or simply the first thing offered, and risks either conceding too readily or holding out for something the other party has no reason to grant.
 
 **Mistake 3: Assuming goodwill or organizational obligation alone will secure cooperation from someone with no direct authority relationship**
 
-As covered in Theory, influence without authority is an exchange — a PM should think concretely about what genuine currency (per the Cohen/Bradford model) they can offer, rather than expecting cooperation to be freely given without any real reciprocity.
+As covered in Theory, influence without authority is an exchange a PM should think concretely about what genuine currency (per the Cohen/Bradford model) they can offer, rather than expecting cooperation to be freely given without any real reciprocity.
 
 **Mistake 4: Attempting to persuade a key decision-maker in a single, high-stakes conversation with no prior groundwork**
 
@@ -182,7 +182,7 @@ Use the Interest Iceberg as a standing discipline whenever a negotiation or infl
 
 ## Real Company Example
 
-**Microsoft**'s "One Microsoft" cultural shift under CEO Satya Nadella is directly corroborated by the company's own leadership, not just outside reporting: Kathleen Hogan, Microsoft's Chief People Officer, has described the transformation directly in on-the-record interviews, framing it as a deliberate move from a "know-it-all" culture — where individual and group status came partly from having the answer, which incentivized internal competition and made cross-group cooperation costly — to a "learn-it-all" culture, structurally reducing the silos that had previously made cross-team resource-sharing and influence especially difficult.
+**Microsoft**'s "One Microsoft" cultural shift under CEO Satya Nadella is directly corroborated by the company's own leadership, not just outside reporting: Kathleen Hogan, Microsoft's Chief People Officer, has described the transformation directly in on-the-record interviews, framing it as a deliberate move from a "know-it-all" culture where individual and group status came partly from having the answer, which incentivized internal competition and made cross-group cooperation costly to a "learn-it-all" culture, structurally reducing the silos that had previously made cross-team resource-sharing and influence especially difficult.
 
 The underlying principle connects directly to this lesson's Theory: an organizational culture and incentive structure that rewards cross-group collaboration (rather than one that implicitly pits internal teams against each other for the same recognition or resources) makes genuine, interest-based negotiation and influence without authority meaningfully easier to practice, since teams have less structural incentive to treat every cross-group request as adversarial or zero-sum by default.
 
@@ -196,10 +196,10 @@ The underlying principle connects directly to this lesson's Theory: an organizat
 Influence without authority is often less acute a challenge, since small teams typically share close working relationships and immediate, visible common goals, making genuine cooperation easier to secure through simple, direct conversation rather than requiring formal negotiation technique. The skills in this lesson still matter, but the stakes and structural friction are often lower at this scale.
 
 **At a mid-size company:**
-Cross-team dependencies typically multiply, and securing cooperation from teams with their own competing roadmaps and incentives becomes a genuinely frequent challenge — this is the stage where deliberately applying interests-based negotiation, BATNA awareness, and the currencies-of-exchange model becomes a valuable, distinct skill rather than something that happens automatically through proximity.
+Cross-team dependencies typically multiply, and securing cooperation from teams with their own competing roadmaps and incentives becomes a genuinely frequent challenge this is the stage where deliberately applying interests-based negotiation, BATNA awareness, and the currencies-of-exchange model becomes a valuable, distinct skill rather than something that happens automatically through proximity.
 
 **At Big Tech:**
-Cross-group negotiation is often a significant, ongoing part of a PM's role, given the scale of matrixed organizations and the genuine competition for shared, scarce resources (engineering capacity, executive attention, budget) across many teams simultaneously. The PM's job shifts toward building durable, long-term coalition relationships across the organization proactively, rather than only engaging negotiation skill reactively when a specific need arises — since, as Microsoft's cultural example illustrates, the broader organizational incentive structure significantly shapes how much genuine cooperation is available to draw on when needed.
+Cross-group negotiation is often a significant, ongoing part of a PM's role, given the scale of matrixed organizations and the genuine competition for shared, scarce resources (engineering capacity, executive attention, budget) across many teams simultaneously. The PM's job shifts toward building durable, long-term coalition relationships across the organization proactively, rather than only engaging negotiation skill reactively when a specific need arises since, as Microsoft's cultural example illustrates, the broader organizational incentive structure significantly shapes how much genuine cooperation is available to draw on when needed.
 
 ---
 
@@ -207,15 +207,15 @@ Cross-group negotiation is often a significant, ongoing part of a PM's role, giv
 
 Consider a simplified, illustrative scenario common at PMs needing cross-team engineering support.
 
-A PM needs a specific integration built by another team's engineering group to support a major upcoming feature. Their first attempt is direct and positional: an email explaining that the integration is "a top priority" for their own roadmap and requesting the other team schedule it into their next Sprint. The other team's engineering lead declines, citing their own team's existing commitments, and the exchange ends there, with the requesting PM concluding — incorrectly, as it turns out — that the other team is simply uncooperative.
+A PM needs a specific integration built by another team's engineering group to support a major upcoming feature. Their first attempt is direct and positional: an email explaining that the integration is "a top priority" for their own roadmap and requesting the other team schedule it into their next Sprint. The other team's engineering lead declines, citing their own team's existing commitments, and the exchange ends there, with the requesting PM concluding incorrectly, as it turns out that the other team is simply uncooperative.
 
-Reflecting on the failed attempt using this lesson's frameworks, the PM tries a different approach: rather than restating the same position more forcefully, they schedule a conversation specifically to understand the other team's actual priorities and constraints. This conversation reveals the other engineering lead's real underlying interest: their team is currently under significant pressure to reduce a backlog of technical debt (echoing Lesson 39) before their own upcoming roadmap commitments, and any new, unplanned request — regardless of its stated importance to another team — reads as a direct threat to that goal. The PM also learns, through this conversation, that the requested integration, if built with a slightly different technical approach than originally specified, would actually help address one of the very technical debt items the other team was already trying to resolve.
+Reflecting on the failed attempt using this lesson's frameworks, the PM tries a different approach: rather than restating the same position more forcefully, they schedule a conversation specifically to understand the other team's actual priorities and constraints. This conversation reveals the other engineering lead's real underlying interest: their team is currently under significant pressure to reduce a backlog of technical debt (echoing Lesson 39) before their own upcoming roadmap commitments, and any new, unplanned request regardless of its stated importance to another team reads as a direct threat to that goal. The PM also learns, through this conversation, that the requested integration, if built with a slightly different technical approach than originally specified, would actually help address one of the very technical debt items the other team was already trying to resolve.
 
 **What went wrong the first time, and what changed?**
 
-The first attempt failed exactly as this lesson's Theory predicts: it was framed entirely around the requesting PM's own position ("this is a priority for me"), with no attempt to understand or address the other team's actual interests, and no currency of exchange offered beyond the assertion of importance — assertion that carried no weight with a team facing its own, unrelated pressures. The second attempt succeeded because it engaged the Interest Iceberg directly: understanding the other team's genuine underlying concern (technical debt reduction) revealed a reframing where the requested integration could be positioned as *helping* address that concern, rather than competing with it — a task-related currency (per the Cohen/Bradford model) the first attempt never identified because it never asked the right questions.
+The first attempt failed exactly as this lesson's Theory predicts: it was framed entirely around the requesting PM's own position ("this is a priority for me"), with no attempt to understand or address the other team's actual interests, and no currency of exchange offered beyond the assertion of importance assertion that carried no weight with a team facing its own, unrelated pressures. The second attempt succeeded because it engaged the Interest Iceberg directly: understanding the other team's genuine underlying concern (technical debt reduction) revealed a reframing where the requested integration could be positioned as *helping* address that concern, rather than competing with it a task-related currency (per the Cohen/Bradford model) the first attempt never identified because it never asked the right questions.
 
-This distinction — a request that competes with someone's actual priorities versus one reframed to serve them — is precisely why negotiating over interests rather than positions matters practically, not just theoretically. The broader skill of maintaining this kind of collaborative relationship with peer teams and managers on an ongoing basis, rather than only engaging it reactively during a specific negotiation, is developed further in **Lesson 54 (Managing Up and Across)**.
+This distinction a request that competes with someone's actual priorities versus one reframed to serve them is precisely why negotiating over interests rather than positions matters practically, not just theoretically. The broader skill of maintaining this kind of collaborative relationship with peer teams and managers on an ongoing basis, rather than only engaging it reactively during a specific negotiation, is developed further in **Lesson 54 (Managing Up and Across)**.
 
 ---
 
@@ -225,7 +225,7 @@ A second, more tactical tool: before an important negotiation or influence attem
 
 | Question | Your Analysis |
 |---|---|
-| What is my actual position, and what interest does it serve? | State both explicitly — don't skip to the position alone |
+| What is my actual position, and what interest does it serve? | State both explicitly don't skip to the position alone |
 | What is my BATNA if this specific negotiation fails? | Be honest about how strong or weak your alternative actually is |
 | What is the other party's likely position, and what interest might it serve? | Consider their pressures and incentives, not just their stated request |
 | What is their likely BATNA? | Consider what they'd do if they simply declined your request |
@@ -242,7 +242,7 @@ Completing this worksheet before a significant negotiation, as this lesson's Cas
 *What the interviewer is actually evaluating:* Whether the candidate's approach involved understanding the other party's actual interests and offering genuine reciprocal value, rather than simply asserting the importance of their own request.
 
 **Typical question 2: "How do you decide how hard to push in a negotiation, versus when to concede?"**
-*What the interviewer is actually evaluating:* Whether the candidate reasons from BATNA — their own and the other party's — rather than an intuitive sense of how forcefully to advocate, unmoored from any actual leverage analysis.
+*What the interviewer is actually evaluating:* Whether the candidate reasons from BATNA their own and the other party's rather than an intuitive sense of how forcefully to advocate, unmoored from any actual leverage analysis.
 
 **Typical question 3: "Describe a negotiation that initially failed. What did you change, and why did it work the second time?"**
 *What the interviewer is actually evaluating:* Whether the candidate can diagnose the specific reason a first attempt failed (positional framing, no understanding of the other party's interests, no currency offered) rather than attributing it vaguely to the other party being difficult, mirroring this lesson's Case Study.
@@ -251,7 +251,7 @@ Completing this worksheet before a significant negotiation, as this lesson's Cas
 
 ## Summary
 
-Negotiation and influence without authority is the practical discipline underlying this curriculum's founding observation (Lesson 1) that a PM's job carries responsibility without formal authority over most of the people whose cooperation it depends on. Negotiating over interests — the underlying reasons behind a stated position — rather than positions themselves tends to reveal creative, mutually beneficial solutions that a purely positional negotiation would miss, as this lesson's Interest Iceberg mental model illustrates. Understanding BATNA, both your own and a counterpart's, clarifies genuine leverage and helps identify a realistic Zone of Possible Agreement, preventing either premature concession or unrealistic holdout. The Cohen/Bradford currencies of exchange model reframes influence without authority as a genuine exchange — task-related, position-related, relationship-related, or personal value offered in return for cooperation — rather than an appeal to goodwill or organizational obligation alone, precisely the reframing that turned a failed cross-team prioritization request into a successful one in this lesson's Case Study, once the requesting PM understood and addressed the other team's actual underlying interest rather than simply restating their own priority more forcefully. Building coalition support incrementally, before a single high-stakes conversation, further improves the odds of genuine, durable agreement over a purely reactive, single-moment persuasion attempt.
+Negotiation and influence without authority is the practical discipline underlying this curriculum's founding observation (Lesson 1) that a PM's job carries responsibility without formal authority over most of the people whose cooperation it depends on. Negotiating over interests the underlying reasons behind a stated position rather than positions themselves tends to reveal creative, mutually beneficial solutions that a purely positional negotiation would miss, as this lesson's Interest Iceberg mental model illustrates. Understanding BATNA, both your own and a counterpart's, clarifies genuine leverage and helps identify a realistic Zone of Possible Agreement, preventing either premature concession or unrealistic holdout. The Cohen/Bradford currencies of exchange model reframes influence without authority as a genuine exchange task-related, position-related, relationship-related, or personal value offered in return for cooperation rather than an appeal to goodwill or organizational obligation alone, precisely the reframing that turned a failed cross-team prioritization request into a successful one in this lesson's Case Study, once the requesting PM understood and addressed the other team's actual underlying interest rather than simply restating their own priority more forcefully. Building coalition support incrementally, before a single high-stakes conversation, further improves the odds of genuine, durable agreement over a purely reactive, single-moment persuasion attempt.
 
 ---
 
@@ -261,7 +261,7 @@ Negotiation and influence without authority is the practical discipline underlyi
 - BATNA (Best Alternative to a Negotiated Agreement) clarifies genuine negotiating leverage, both your own and a counterpart's, and helps identify a realistic Zone of Possible Agreement.
 - The Cohen/Bradford currencies of exchange model (task-related, position-related, relationship-related, personal) reframes influence without authority as a genuine exchange, not an appeal to goodwill alone.
 - Building coalition support incrementally before a key decision conversation often succeeds where a single, isolated persuasion attempt fails.
-- A failed influence attempt should be diagnosed specifically — was it positional framing, a misjudged BATNA, or a lack of any genuine currency offered — rather than attributed vaguely to the other party being uncooperative.
+- A failed influence attempt should be diagnosed specifically was it positional framing, a misjudged BATNA, or a lack of any genuine currency offered rather than attributed vaguely to the other party being uncooperative.
 - Understanding a counterpart's actual pressures and incentives can reveal a way to reframe a request as serving their interests, rather than competing with them, turning a zero-sum framing into a collaborative one.
 - Organizational culture and incentive structures shape how easy or difficult genuine cross-team influence is to practice, as illustrated by Microsoft's publicly discussed cultural evolution.
 
@@ -271,12 +271,12 @@ Negotiation and influence without authority is the practical discipline underlyi
 
 *A two-minute review of everything in this lesson.*
 
-- **Interests, not positions:** ask why someone wants what they say they want — that's where real agreement lives.
-- **BATNA:** know your own and estimate theirs — it tells you genuine leverage on both sides.
+- **Interests, not positions:** ask why someone wants what they say they want that's where real agreement lives.
+- **BATNA:** know your own and estimate theirs it tells you genuine leverage on both sides.
 - **ZOPA:** the overlap of what both parties would actually accept, given their respective BATNAs.
-- **Currencies of exchange:** task, position, relationship, personal — offer something real, don't just assert importance.
+- **Currencies of exchange:** task, position, relationship, personal offer something real, don't just assert importance.
 - **Build coalitions first:** informal groundwork before a key conversation beats a single, isolated persuasion attempt.
-- **Diagnose failed influence specifically:** positional framing? misjudged BATNA? no real currency offered? — don't just blame the other party.
+- **Diagnose failed influence specifically:** positional framing? misjudged BATNA? no real currency offered? don't just blame the other party.
 - **Reframe, don't just repeat:** a request that competes with someone's priorities can often be reframed to serve them instead.
 
 ---
@@ -287,7 +287,7 @@ Negotiation and influence without authority is the practical discipline underlyi
 |---|---|---|---|
 | Position (negotiation) | What someone explicitly states they want in a negotiation | Interest | 1 |
 | Interest (negotiation) | The underlying reason or need behind a stated position | Position, Interest Iceberg | 1 |
-| BATNA | Best Alternative to a Negotiated Agreement — what a party would do if the current negotiation fails | ZOPA | 2 |
+| BATNA | Best Alternative to a Negotiated Agreement what a party would do if the current negotiation fails | ZOPA | 2 |
 | ZOPA (Zone of Possible Agreement) | The range within which both parties' BATNAs and interests can genuinely be satisfied | BATNA | 2 |
 | Currencies of exchange | The Cohen/Bradford model of task-, position-, relationship-, and personal-related value offered in exchange for cooperation | Influence without authority | 2 |
 | Interest Iceberg | This lesson's mental model: visible positions sitting above hidden, more consequential underlying interests | Interests vs. positions | 1 |
@@ -296,9 +296,9 @@ Negotiation and influence without authority is the practical discipline underlyi
 
 ## Further Reading / Resources
 
-- *Getting to Yes: Negotiating Agreement Without Giving In* by Roger Fisher and William Ury — the foundational text on interests-based negotiation and BATNA referenced throughout this lesson.
-- *Influence Without Authority* by Allan R. Cohen and David L. Bradford — the source of the currencies of exchange model applied in this lesson.
-- *Never Split the Difference* by Chris Voss — a practitioner-oriented treatment of negotiation technique, complementing this lesson's more academic frameworks.
+- *Getting to Yes: Negotiating Agreement Without Giving In* by Roger Fisher and William Ury the foundational text on interests-based negotiation and BATNA referenced throughout this lesson.
+- *Influence Without Authority* by Allan R. Cohen and David L. Bradford the source of the currencies of exchange model applied in this lesson.
+- *Never Split the Difference* by Chris Voss a practitioner-oriented treatment of negotiation technique, complementing this lesson's more academic frameworks.
 
 ---
 
@@ -312,13 +312,13 @@ Negotiation and influence without authority is the practical discipline underlyi
 
 **Card 2**
 - Front: What is BATNA, and why does it matter?
-- Back: Best Alternative to a Negotiated Agreement — what a party would do if the negotiation fails; it clarifies genuine leverage and how much a party should be willing to concede.
+- Back: Best Alternative to a Negotiated Agreement what a party would do if the negotiation fails; it clarifies genuine leverage and how much a party should be willing to concede.
 - Difficulty: 2
 - Tags: batna
 
 **Card 3**
 - Front: What is ZOPA?
-- Back: Zone of Possible Agreement — the range within which both parties' interests and BATNAs can genuinely be satisfied.
+- Back: Zone of Possible Agreement the range within which both parties' interests and BATNAs can genuinely be satisfied.
 - Difficulty: 2
 - Tags: zopa
 
@@ -345,7 +345,7 @@ Negotiation and influence without authority is the practical discipline underlyi
 
 Consider the following novel scenario: You need a design team, which reports to a different manager and has its own competing priorities, to dedicate time to a redesign your team needs for an upcoming launch. Your first informal request was met with "we're slammed right now, maybe next quarter."
 
-There is no single correct answer to the prompts below — the goal is to practice applying this lesson's frameworks, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying this lesson's frameworks, not to reach one "right" answer.
 
 1. Using the Interest Iceberg, what questions would you ask to understand the design team's actual underlying interests and pressures, beyond their stated position ("we're slammed")?
 2. What is your own BATNA if this specific redesign request isn't granted this quarter? How does the strength or weakness of that BATNA affect how hard you should push?
@@ -494,7 +494,7 @@ C) Just a clear explanation works fine
 D) Exploring interests or offering value
 
 *Correct answer: D*
-*Explanation: Explaining importance harder is still a positional appeal — nothing here shows what the other side's actual interest was or what they got out of agreeing.*
+*Explanation: Explaining importance harder is still a positional appeal nothing here shows what the other side's actual interest was or what they got out of agreeing.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
@@ -533,7 +533,7 @@ C) Threatening escalation if they don't comply
 D) Repeating that the request matters to you
 
 *Correct answer: A*
-*Explanation: This is a task-related currency — real reciprocal value, rather than pressure or an appeal to obligation.*
+*Explanation: This is a task-related currency real reciprocal value, rather than pressure or an appeal to obligation.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
@@ -546,7 +546,7 @@ C) Keep arguing the original position unchanged
 D) Drop the underlying business goal to avoid conflict
 
 *Correct answer: B*
-*Explanation: The actual interest at stake is the business outcome, not the specific consolidation — once that's separated from the position, other structures may serve it just as well.*
+*Explanation: The actual interest at stake is the business outcome, not the specific consolidation once that's separated from the position, other structures may serve it just as well.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
@@ -556,9 +556,9 @@ D) Drop the underlying business goal to avoid conflict
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 52 — Storytelling and Narrative for PMs | Persuasion techniques from Lesson 52 combine with this lesson's negotiation frameworks when influence requires both compelling narrative and genuine reciprocal exchange |
-| **Current Lesson** | Lesson 53 — Negotiation & Influence Without Authority | Interests vs. positions; BATNA and ZOPA; currencies of exchange; coalition-building; the Interest Iceberg |
-| **Next Lesson** | Lesson 54 — Managing Up and Across | Extends this lesson's influence principles into the specific, ongoing context of managing relationships with one's own manager and peers |
+| **Previous Lesson** | Lesson 52 Storytelling and Narrative for PMs | Persuasion techniques from Lesson 52 combine with this lesson's negotiation frameworks when influence requires both compelling narrative and genuine reciprocal exchange |
+| **Current Lesson** | Lesson 53 Negotiation & Influence Without Authority | Interests vs. positions; BATNA and ZOPA; currencies of exchange; coalition-building; the Interest Iceberg |
+| **Next Lesson** | Lesson 54 Managing Up and Across | Extends this lesson's influence principles into the specific, ongoing context of managing relationships with one's own manager and peers |
 | **Future Concepts Unlocked** | Lesson 55 (Building and Leading Product Teams) | Builds on coalition-building and interest-based negotiation when structuring cross-functional team dynamics |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Interest Iceberg, BATNA, and the currencies of exchange model with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Interest Iceberg, BATNA, and the currencies of exchange model with you they will not be re-explained, only re-applied in new contexts.

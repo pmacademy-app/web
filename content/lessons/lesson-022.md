@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 21 ended with a genuinely, rigorously scoped MVP — small, complete, aimed squarely at the riskiest remaining assumption. But "scoped in a PM's head" and "specified clearly enough that a cross-functional team can build it correctly, without the PM in the room for every decision" are very different things. This lesson covers the artifact that bridges that gap: a **Product Requirements Document (PRD)**, a written specification that communicates what needs to be built, why, and for whom, precisely enough that engineering, design, and QA can work from a shared, unambiguous understanding rather than from fragments of hallway conversation and half-remembered Slack threads.
+Lesson 21 ended with a genuinely, rigorously scoped MVP small, complete, aimed squarely at the riskiest remaining assumption. But "scoped in a PM's head" and "specified clearly enough that a cross-functional team can build it correctly, without the PM in the room for every decision" are very different things. This lesson covers the artifact that bridges that gap: a **Product Requirements Document (PRD)**, a written specification that communicates what needs to be built, why, and for whom, precisely enough that engineering, design, and QA can work from a shared, unambiguous understanding rather than from fragments of hallway conversation and half-remembered Slack threads.
 
-A PRD's job is not to make a PM look thorough, and it is not a ritualistic document produced because "that's the process." It exists to solve a specific, recurring failure: without a shared written specification, different team members build from different mental models of what "the feature" actually is, discovering the gaps between those mental models only during implementation, code review, or — worse — after launch. This lesson treats the PRD as a communication tool first and a documentation artifact second, and covers what separates a PRD that actually prevents this failure from one that merely looks thorough while leaving the same ambiguities unresolved.
+A PRD's job is not to make a PM look thorough, and it is not a ritualistic document produced because "that's the process." It exists to solve a specific, recurring failure: without a shared written specification, different team members build from different mental models of what "the feature" actually is, discovering the gaps between those mental models only during implementation, code review, or worse after launch. This lesson treats the PRD as a communication tool first and a documentation artifact second, and covers what separates a PRD that actually prevents this failure from one that merely looks thorough while leaving the same ambiguities unresolved.
 
 ---
 
@@ -12,13 +12,13 @@ A PRD's job is not to make a PM look thorough, and it is not a ritualistic docum
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design |
+| **Module** | 3 Product Design |
 | **Current Lesson** | 22 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 17 (Problem Statements), Lesson 21 (MVP) |
-| **Next Lesson** | Lesson 23 — User Stories |
-| **Future Topics Unlocked** | Lesson 23 (User Stories — breaking a PRD into implementable units), Lesson 24 (Acceptance Criteria), Lesson 37 (Working with Engineering Teams) |
+| **Next Lesson** | Lesson 23 User Stories |
+| **Future Topics Unlocked** | Lesson 23 (User Stories breaking a PRD into implementable units), Lesson 24 (Acceptance Criteria), Lesson 37 (Working with Engineering Teams) |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 17 (Problem Statements) and Lesson 21 (MVP). This lesson assumes you can write a solution-free problem statement and can rigorously scope an MVP around a riskiest assumption — a PRD is the document that formally combines both: it restates the validated problem, then specifies the scoped MVP solution precisely enough for a cross-functional team to build it.
+Lesson 17 (Problem Statements) and Lesson 21 (MVP). This lesson assumes you can write a solution-free problem statement and can rigorously scope an MVP around a riskiest assumption a PRD is the document that formally combines both: it restates the validated problem, then specifies the scoped MVP solution precisely enough for a cross-functional team to build it.
 
 ---
 
@@ -47,7 +47,7 @@ Lesson 17 (Problem Statements) and Lesson 21 (MVP). This lesson assumes you can 
 A PRD is a written specification communicating what is being built, for whom, why, and to what specification, structured to give engineering, design, and QA a shared, unambiguous reference point throughout a project. While specific templates vary by organization, a PRD typically includes:
 
 - **Problem statement** (Lesson 17): the validated problem being addressed, stated without a solution.
-- **Goals and success metrics**: what outcome this solution is meant to produce, and how success will be measured — directly connecting to the desired outcome at the root of the Opportunity Solution Tree (Lesson 19).
+- **Goals and success metrics**: what outcome this solution is meant to produce, and how success will be measured directly connecting to the desired outcome at the root of the Opportunity Solution Tree (Lesson 19).
 - **Scope** (in and out): what the MVP (Lesson 21) does and, just as importantly, does not include, given the riskiest-assumption scoping discipline from the previous lesson.
 - **User flows or scenarios**: how a user actually moves through the solution, often connecting to persona and journey map work (Lessons 14–15).
 - **Functional requirements**: specific behaviors the solution must exhibit.
@@ -97,16 +97,16 @@ graph TD
 
 ### Problem Before Solution: Ordering Discipline Within a PRD
 
-A specific, important discipline — directly extending Lesson 17's solution-free problem statement practice — is the ordering of a PRD's content: the problem statement and goals must be established and agreed upon *before* functional requirements are specified, not written concurrently with, or after, the solution details. This ordering matters for the same reason Lesson 17 emphasized excluding solutions from problem statements in the first place: a PRD that opens directly with a list of functional requirements, without first anchoring the reader in the validated problem, invites reviewers to evaluate the requirements against their own private, unstated assumptions about the problem, rather than against a shared, explicit understanding — precisely the anchoring risk Lesson 12 warned about at the interview level and Lesson 17 warned about at the problem-framing level, now recurring at the level of an entire specification document's structure.
+A specific, important discipline directly extending Lesson 17's solution-free problem statement practice is the ordering of a PRD's content: the problem statement and goals must be established and agreed upon *before* functional requirements are specified, not written concurrently with, or after, the solution details. This ordering matters for the same reason Lesson 17 emphasized excluding solutions from problem statements in the first place: a PRD that opens directly with a list of functional requirements, without first anchoring the reader in the validated problem, invites reviewers to evaluate the requirements against their own private, unstated assumptions about the problem, rather than against a shared, explicit understanding precisely the anchoring risk Lesson 12 warned about at the interview level and Lesson 17 warned about at the problem-framing level, now recurring at the level of an entire specification document's structure.
 
 A PRD that begins with a clearly stated, evidence-cited problem (directly reusing Lesson 17's template) gives every subsequent requirement a test: does this requirement plausibly serve the stated problem, or has scope drifted toward something else? This is the same discipline as the Value Proposition Filter (Lesson 7) and Vision Filter (Lesson 9), now applied at the level of an individual document's internal consistency.
 
 ### Appropriate Precision vs. Over-Specification
 
-A genuinely difficult judgment call in PRD writing is choosing the right level of precision — specific enough that engineering and design can build confidently without constant clarification, but not so exhaustively detailed that the document becomes a rigid, premature commitment to implementation choices that are better made by the specialists actually doing that work.
+A genuinely difficult judgment call in PRD writing is choosing the right level of precision specific enough that engineering and design can build confidently without constant clarification, but not so exhaustively detailed that the document becomes a rigid, premature commitment to implementation choices that are better made by the specialists actually doing that work.
 
-- **Under-specification** leaves genuine ambiguity that different team members will resolve differently, discovering the mismatch only during implementation or QA — for example, a requirement stating "the system should handle errors gracefully" without specifying what "gracefully" means in any testable sense.
-- **Over-specification** dictates implementation details that are properly the domain of engineering or design expertise — for example, a PRD specifying the exact database schema or the precise pixel spacing of a UI element, decisions better made by the engineers and designers with the relevant technical and craft expertise, and decisions that, if specified prematurely by a PM without that expertise, risk being both wrong and unnecessarily constraining.
+- **Under-specification** leaves genuine ambiguity that different team members will resolve differently, discovering the mismatch only during implementation or QA for example, a requirement stating "the system should handle errors gracefully" without specifying what "gracefully" means in any testable sense.
+- **Over-specification** dictates implementation details that are properly the domain of engineering or design expertise for example, a PRD specifying the exact database schema or the precise pixel spacing of a UI element, decisions better made by the engineers and designers with the relevant technical and craft expertise, and decisions that, if specified prematurely by a PM without that expertise, risk being both wrong and unnecessarily constraining.
 
 ```mermaid
 %%{init: {
@@ -145,13 +145,13 @@ graph LR
     A --> D[Over-Specified Dictates Implementation<br/>Details Outside the PM Expertise or Role]
 ```
 
-The practical discipline for finding this middle ground: specify the **what and why** (the required behavior, the reason it matters, the success criteria) with real precision, while deliberately leaving the **how** (the specific technical implementation, the exact visual execution) to the engineers and designers whose expertise that decision belongs to — consulting them, and inviting their judgment, rather than pre-deciding it unilaterally in the document.
+The practical discipline for finding this middle ground: specify the **what and why** (the required behavior, the reason it matters, the success criteria) with real precision, while deliberately leaving the **how** (the specific technical implementation, the exact visual execution) to the engineers and designers whose expertise that decision belongs to consulting them, and inviting their judgment, rather than pre-deciding it unilaterally in the document.
 
 ### The "PRD as One-Way Document" Failure Pattern
 
-A specific, common organizational failure treats a PRD as a final, unquestionable decree — written by a PM, handed to engineering and design as a finished, non-negotiable specification, with any subsequent questions treated as deviations from an already-settled plan rather than legitimate, expected refinements. This directly echoes Lesson 20's discovery-delivery handoff warning, now applied specifically to the PRD document itself: treating a PRD as something "delivered" rather than something collaboratively developed risks losing exactly the kind of implementation-stage insight (technical constraints discovered mid-build, design considerations that only become apparent once real interface work begins) that a genuinely open, living document would incorporate.
+A specific, common organizational failure treats a PRD as a final, unquestionable decree written by a PM, handed to engineering and design as a finished, non-negotiable specification, with any subsequent questions treated as deviations from an already-settled plan rather than legitimate, expected refinements. This directly echoes Lesson 20's discovery-delivery handoff warning, now applied specifically to the PRD document itself: treating a PRD as something "delivered" rather than something collaboratively developed risks losing exactly the kind of implementation-stage insight (technical constraints discovered mid-build, design considerations that only become apparent once real interface work begins) that a genuinely open, living document would incorporate.
 
-A healthier practice treats a PRD as a starting point for structured collaboration: engineering and design review it early, before commitments are finalized, explicitly raising questions, proposing alternative approaches to functional requirements, and flagging any premature over-specification the PM may have unintentionally included. The document itself should be updated as this collaboration surfaces new information, rather than treated as immutable once initially written — directly paralleling Lesson 17's guidance that a finalized problem statement should function as an ongoing reference point checked against reality, not a one-time artifact.
+A healthier practice treats a PRD as a starting point for structured collaboration: engineering and design review it early, before commitments are finalized, explicitly raising questions, proposing alternative approaches to functional requirements, and flagging any premature over-specification the PM may have unintentionally included. The document itself should be updated as this collaboration surfaces new information, rather than treated as immutable once initially written directly paralleling Lesson 17's guidance that a finalized problem statement should function as an ongoing reference point checked against reality, not a one-time artifact.
 
 ---
 
@@ -182,7 +182,7 @@ A PRD that attempts to specify every individual implementable unit of work in ex
 
 ## Mental Model: The PRD Precision Dial
 
-This lesson's mental model is the **PRD Precision Dial** — a way of visualizing the trade-off between under- and over-specification, and consciously choosing where a given requirement should sit.
+This lesson's mental model is the **PRD Precision Dial** a way of visualizing the trade-off between under- and over-specification, and consciously choosing where a given requirement should sit.
 
 ```mermaid
 %%{init: {
@@ -226,7 +226,7 @@ Use this dial explicitly when drafting or reviewing a requirement: is this speci
 
 ## Real Company Example
 
-**Google**'s widely referenced internal "design docs" and product specification practices, particularly for engineering-heavy initiatives, are a commonly cited illustration of collaborative, living specification documents rather than one-way decrees. Public accounts and externally shared examples of Google's internal documentation culture have described a practice of circulating draft specifications broadly for comment before finalizing them, explicitly inviting engineering and design pushback on both the stated problem and the proposed approach, and treating a written specification as a structured starting point for cross-functional refinement rather than a finished, unquestionable plan — directly reflecting this lesson's corrective to the "PRD as one-way document" failure pattern.
+**Google**'s widely referenced internal "design docs" and product specification practices, particularly for engineering-heavy initiatives, are a commonly cited illustration of collaborative, living specification documents rather than one-way decrees. Public accounts and externally shared examples of Google's internal documentation culture have described a practice of circulating draft specifications broadly for comment before finalizing them, explicitly inviting engineering and design pushback on both the stated problem and the proposed approach, and treating a written specification as a structured starting point for cross-functional refinement rather than a finished, unquestionable plan directly reflecting this lesson's corrective to the "PRD as one-way document" failure pattern.
 
 *(Assumption flagged: this reflects widely reported, publicly shared descriptions of general documentation practices at Google rather than a claim about the company's current, complete, or universal internal PRD process, which this curriculum does not claim certainty about.)*
 
@@ -238,7 +238,7 @@ Use this dial explicitly when drafting or reviewing a requirement: is this speci
 PRDs are often lightweight and informal, sometimes replaced by a brief written brief or even a well-structured verbal alignment session, given small team size and close daily collaboration that reduces the risk of the divergent-mental-model problem a formal PRD exists to prevent. As teams grow beyond a size where informal alignment reliably works, the discipline of writing things down explicitly becomes increasingly valuable.
 
 **At a mid-size company:**
-PRDs typically become a more standard, expected artifact for any initiative involving more than a small handful of people, and organizations at this stage often develop templates codifying the sections this lesson describes — the main ongoing risk is the "PRD as one-way document" failure pattern, as team size grows enough that informal, continuous conversation with the PM becomes less automatic than it was at a smaller scale.
+PRDs typically become a more standard, expected artifact for any initiative involving more than a small handful of people, and organizations at this stage often develop templates codifying the sections this lesson describes the main ongoing risk is the "PRD as one-way document" failure pattern, as team size grows enough that informal, continuous conversation with the PM becomes less automatic than it was at a smaller scale.
 
 **At Big Tech:**
 PRDs and equivalent specification documents at scale often go through formal, multi-stage review processes involving multiple cross-functional stakeholders and sometimes explicit sign-off requirements, and a significant part of senior product leadership's role involves ensuring these formal review processes remain genuinely collaborative (inviting real pushback and iteration) rather than becoming a bureaucratic, one-way approval ritual that technically satisfies a process requirement without functioning as genuine cross-functional alignment.
@@ -249,9 +249,9 @@ PRDs and equivalent specification documents at scale often go through formal, mu
 
 Consider a simplified, illustrative scenario common across B2B software teams.
 
-A PM writes a PRD for a new notification system, based on a well-validated opportunity and a correctly scoped MVP (Lesson 21). The document opens directly with a detailed list of functional requirements — including a highly specific database table structure for storing notification preferences, and an exact specification of button placement and color within the settings interface — without ever explicitly restating the underlying problem statement or success metrics the notification system was meant to address.
+A PM writes a PRD for a new notification system, based on a well-validated opportunity and a correctly scoped MVP (Lesson 21). The document opens directly with a detailed list of functional requirements including a highly specific database table structure for storing notification preferences, and an exact specification of button placement and color within the settings interface without ever explicitly restating the underlying problem statement or success metrics the notification system was meant to address.
 
-Engineering, working from the PRD, builds exactly what was specified: the given database structure and the given interface layout. During implementation, an engineer notices that the specified database structure would make a common, expected future feature (notification digests, batching multiple notifications together) significantly harder to build later, and would have proposed a different structure — but, treating the PRD as a finalized, non-negotiable specification (rather than raising the concern, given the document's one-way framing), the engineer builds as specified rather than raising the issue.
+Engineering, working from the PRD, builds exactly what was specified: the given database structure and the given interface layout. During implementation, an engineer notices that the specified database structure would make a common, expected future feature (notification digests, batching multiple notifications together) significantly harder to build later, and would have proposed a different structure but, treating the PRD as a finalized, non-negotiable specification (rather than raising the concern, given the document's one-way framing), the engineer builds as specified rather than raising the issue.
 
 Separately, the design team, upon finally reviewing the PRD's specified button placement and color, disagrees with the choice on established design-system grounds, but similarly treats the specification as already decided rather than open for discussion, given how the document was originally framed and circulated.
 
@@ -262,12 +262,12 @@ Three months after launch, both concerns prove valid: a subsequent notification-
 Applying this lesson's frameworks:
 
 1. **The PRD opened with functional requirements rather than the problem statement and goals**, denying reviewers the shared context needed to evaluate whether the specific requirements (including the ones that later proved problematic) actually served the underlying need well.
-2. **The document was significantly over-specified in areas outside the PM's expertise** — the database schema and exact interface styling are properly engineering and design decisions, and specifying them unilaterally both risked being technically or aesthetically suboptimal and pre-empted the relevant experts' better judgment.
+2. **The document was significantly over-specified in areas outside the PM's expertise** the database schema and exact interface styling are properly engineering and design decisions, and specifying them unilaterally both risked being technically or aesthetically suboptimal and pre-empted the relevant experts' better judgment.
 3. **The PRD functioned as a one-way document rather than a living, collaboratively refined one.** Both the engineer and the designer had legitimate, valuable concerns, but the document's framing (and likely the surrounding team culture) discouraged raising them as an expected, welcomed part of the process.
 
-A team applying this lesson's discipline would have opened the PRD with the problem statement and goals, specified the required notification behavior and success criteria (the what and why) while explicitly inviting engineering to propose the database structure and design to propose the specific interface treatment (the how), and circulated the document for genuine review and pushback before finalizing — very likely catching both the schema limitation and the contrast issue well before either became a costly, post-launch problem.
+A team applying this lesson's discipline would have opened the PRD with the problem statement and goals, specified the required notification behavior and success criteria (the what and why) while explicitly inviting engineering to propose the database structure and design to propose the specific interface treatment (the how), and circulated the document for genuine review and pushback before finalizing very likely catching both the schema limitation and the contrast issue well before either became a costly, post-launch problem.
 
-This case connects directly back to **Lesson 20's discovery-delivery handoff pattern** and **Lesson 17's problem-before-solution discipline**: in both cases, the underlying failure is the same — treating a specification or research artifact as a finished, one-way deliverable rather than a living tool for ongoing, genuine collaboration.
+This case connects directly back to **Lesson 20's discovery-delivery handoff pattern** and **Lesson 17's problem-before-solution discipline**: in both cases, the underlying failure is the same treating a specification or research artifact as a finished, one-way deliverable rather than a living tool for ongoing, genuine collaboration.
 
 ---
 
@@ -283,7 +283,7 @@ A practical checklist for reviewing a draft PRD before circulating it as a final
 | Has the document been circulated for genuine review, with real opportunity for engineering and design pushback, before being treated as final? | Prevents the "one-way document" failure pattern |
 | Does the document avoid duplicating content that belongs in more granular artifacts (user stories, acceptance criteria)? | Keeps the PRD focused on its appropriate level of specification |
 
-A PRD that fails several of these checks risks the exact kind of costly, post-launch discovery shown in this lesson's Detailed Case Study — issues that could have been caught and resolved during specification and review, at a small fraction of the cost of catching them after implementation or launch.
+A PRD that fails several of these checks risks the exact kind of costly, post-launch discovery shown in this lesson's Detailed Case Study issues that could have been caught and resolved during specification and review, at a small fraction of the cost of catching them after implementation or launch.
 
 ---
 
@@ -296,13 +296,13 @@ A PRD that fails several of these checks risks the exact kind of costly, post-la
 *What the interviewer is actually evaluating:* Direct experience with under-specification (or, less commonly, over-specification) and whether the candidate can articulate the specific gap and how it was ultimately resolved, rather than attributing the miscommunication vaguely to "poor communication" without deeper diagnosis.
 
 **Typical question 3: "How do you decide how much implementation detail to include in a PRD versus leaving to engineering or design?"**
-*What the interviewer is actually evaluating:* Fluency with the Precision Dial — whether the candidate can articulate a principled distinction between specifying the what/why (appropriately the PM's domain) and the how (appropriately engineering/design's domain), rather than defaulting to either extreme without a clear rationale.
+*What the interviewer is actually evaluating:* Fluency with the Precision Dial whether the candidate can articulate a principled distinction between specifying the what/why (appropriately the PM's domain) and the how (appropriately engineering/design's domain), rather than defaulting to either extreme without a clear rationale.
 
 ---
 
 ## Summary
 
-A PRD is a written specification giving engineering, design, and QA a shared, unambiguous reference point for what is being built, why, and to what specification — its core sections typically include a problem statement, goals and success metrics, in/out scope, user flows, functional and non-functional requirements, and open questions. The problem statement and goals must be established before functional requirements are specified, directly extending Lesson 17's solution-free discipline, since a document opening with requirements invites readers to evaluate them against private, unstated assumptions about the problem. Appropriate specification precision sits between under-specification (vague requirements inviting inconsistent interpretation) and over-specification (dictating implementation details outside the PM's expertise), and the practical discipline is specifying the what and why with real precision while leaving the how to the relevant engineering and design experts. The "PRD as one-way document" failure pattern — treating a specification as a final, unquestionable decree rather than a living, collaboratively refined artifact — risks losing valuable implementation-stage insight, as shown in this lesson's Detailed Case Study, and the corrective is genuine, early cross-functional review with real opportunity for pushback before the document is treated as final.
+A PRD is a written specification giving engineering, design, and QA a shared, unambiguous reference point for what is being built, why, and to what specification its core sections typically include a problem statement, goals and success metrics, in/out scope, user flows, functional and non-functional requirements, and open questions. The problem statement and goals must be established before functional requirements are specified, directly extending Lesson 17's solution-free discipline, since a document opening with requirements invites readers to evaluate them against private, unstated assumptions about the problem. Appropriate specification precision sits between under-specification (vague requirements inviting inconsistent interpretation) and over-specification (dictating implementation details outside the PM's expertise), and the practical discipline is specifying the what and why with real precision while leaving the how to the relevant engineering and design experts. The "PRD as one-way document" failure pattern treating a specification as a final, unquestionable decree rather than a living, collaboratively refined artifact risks losing valuable implementation-stage insight, as shown in this lesson's Detailed Case Study, and the corrective is genuine, early cross-functional review with real opportunity for pushback before the document is treated as final.
 
 ---
 
@@ -312,7 +312,7 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 - Problem statement and goals must come before functional requirements, so readers evaluate requirements against a shared, explicit understanding rather than private assumptions.
 - Appropriate specification precision specifies the what and why clearly while leaving the how (technical and visual implementation) to engineering and design expertise.
 - Under-specification invites inconsistent interpretation; over-specification pre-empts expert judgment and risks being technically or aesthetically wrong.
-- "PRD as one-way document" — treating a specification as a final decree rather than a living, collaboratively refined artifact — risks losing valuable implementation-stage insight from engineering and design.
+- "PRD as one-way document" treating a specification as a final decree rather than a living, collaboratively refined artifact risks losing valuable implementation-stage insight from engineering and design.
 - A healthy PRD process circulates the document early for genuine cross-functional review and welcomes pushback, rather than treating questions as deviations from an already-settled plan.
 - A PRD should avoid duplicating content that belongs in more granular artifacts like user stories and acceptance criteria.
 
@@ -323,9 +323,9 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 *A two-minute review of everything in this lesson.*
 
 - **Core PRD sections:** problem statement, goals/metrics, scope (in/out), user flows, functional requirements, non-functional requirements, open questions.
-- **Problem before solution** — always, within the PRD's own structure, not just at the project level.
+- **Problem before solution** always, within the PRD's own structure, not just at the project level.
 - **Precision Dial:** specify the what/why clearly; leave the how to engineering/design expertise.
-- **Avoid "PRD as one-way document"** — circulate early, invite real pushback, treat it as living.
+- **Avoid "PRD as one-way document"** circulate early, invite real pushback, treat it as living.
 - **Don't duplicate** user stories/acceptance criteria content inside the PRD itself.
 - **PRD Review Checklist:** problem-first ordering? appropriate precision? open questions listed? genuinely reviewed, not just delivered?
 
@@ -347,7 +347,7 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 
 - Marty Cagan's public writing on the distinction between "PRDs" as traditionally practiced and lighter-weight, collaborative specification approaches used by empowered product teams.
 - Google's publicly shared design doc culture and templates, widely referenced as an example of collaborative, review-driven specification practice.
-- Julie Zhuo, *The Making of a Manager* — touches on cross-functional collaboration norms relevant to keeping specification documents genuinely open to design and engineering input.
+- Julie Zhuo, *The Making of a Manager* touches on cross-functional collaboration norms relevant to keeping specification documents genuinely open to design and engineering input.
 
 ---
 
@@ -367,7 +367,7 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 
 **Card 3**
 - Front: What is the PRD Precision Dial?
-- Back: A model for choosing appropriate specification precision — specifying the what/why clearly while leaving the how (implementation details) to engineering and design expertise, avoiding both under- and over-specification.
+- Back: A model for choosing appropriate specification precision specifying the what/why clearly while leaving the how (implementation details) to engineering and design expertise, avoiding both under- and over-specification.
 - Difficulty: 2
 - Tags: precision-dial
 
@@ -385,7 +385,7 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 
 **Card 6**
 - Front: In the Detailed Case Study, what two specific problems resulted from over-specification and one-way document treatment?
-- Back: A costly database migration later required due to a prematurely specified schema, and a user-facing accessibility contrast issue from a prematurely specified button color — both of which engineering and design had concerns about but didn't feel invited to raise.
+- Back: A costly database migration later required due to a prematurely specified schema, and a user-facing accessibility contrast issue from a prematurely specified button color both of which engineering and design had concerns about but didn't feel invited to raise.
 - Difficulty: 3
 - Tags: case-study
 
@@ -531,7 +531,7 @@ D) It should name the exact CSS styling to remove all ambiguity
 
 ---
 
-**10. (Product Thinking) A PM circulates a draft PRD and explicitly writes, "I'd like genuine pushback on the approach in section 3 — please propose alternatives if you see a better way to meet this goal." What discipline does this practice reflect?**
+**10. (Product Thinking) A PM circulates a draft PRD and explicitly writes, "I'd like genuine pushback on the approach in section 3 please propose alternatives if you see a better way to meet this goal." What discipline does this practice reflect?**
 A) Under-specification, since the requirements are not yet finalised
 B) Over-specification, since the PM dictates the feedback
 C) A deliberate move against the one-way document failure pattern
@@ -584,7 +584,7 @@ D) "Was the PRD framed as a living document that welcomed this pushback?"
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team's PRD process requires formal, multi-stakeholder sign-off before any implementation can begin, and stakeholders routinely approve documents without substantive comment, viewing the sign-off as a procedural formality. According to this lesson, does this satisfy the goal of collaborative, living specification?**
-A) No — a formality without engagement still works as a one-way document
+A) No a formality without engagement still works as a one-way document
 B) Yes, since a formal sign-off step suffices whatever its substance
 C) Yes, provided the PRD contains every section this lesson lists
 D) This scenario falls outside the scope of the lesson's framework entirely
@@ -596,7 +596,7 @@ D) This scenario falls outside the scope of the lesson's framework entirely
 
 ---
 
-**15. (Highest Difficulty) A team writes a PRD that correctly opens with a problem statement and goals, specifies functional requirements at an appropriate level of precision, explicitly lists open questions, and circulates the document for genuine review — but the underlying problem statement itself, inherited from an earlier stage, is later discovered to be based on an un-laddered, surface-level pain point (per Lesson 16) rather than its actual root cause. What does this scenario illustrate?**
+**15. (Highest Difficulty) A team writes a PRD that correctly opens with a problem statement and goals, specifies functional requirements at an appropriate level of precision, explicitly lists open questions, and circulates the document for genuine review but the underlying problem statement itself, inherited from an earlier stage, is later discovered to be based on an un-laddered, surface-level pain point (per Lesson 16) rather than its actual root cause. What does this scenario illustrate?**
 A) PRD discipline alone suffices, whatever the problem statement beneath
 B) A well-built PRD can still mislead if the problem beneath it was never laddered and validated
 C) Problem statements become unnecessary once requirements are precise
@@ -613,10 +613,10 @@ D) This scenario cannot occur if a PRD follows the structure described
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 21 — Minimum Viable Product (MVP) | Provides the scoped MVP that a PRD formally specifies for a cross-functional team |
-| **Current Lesson** | Lesson 22 — Product Requirements Document (PRD) | Core PRD sections; problem-before-solution ordering; the Precision Dial; the one-way-document failure pattern |
-| **Next Lesson** | Lesson 23 — User Stories | Breaks a PRD's functional requirements down into specific, implementable units of work |
+| **Previous Lesson** | Lesson 21 Minimum Viable Product (MVP) | Provides the scoped MVP that a PRD formally specifies for a cross-functional team |
+| **Current Lesson** | Lesson 22 Product Requirements Document (PRD) | Core PRD sections; problem-before-solution ordering; the Precision Dial; the one-way-document failure pattern |
+| **Next Lesson** | Lesson 23 User Stories | Breaks a PRD's functional requirements down into specific, implementable units of work |
 | **Future Concepts Unlocked** | Lesson 24 (Acceptance Criteria) | Formalizes testable conditions for each user story, extending a PRD's requirements to a more granular, verifiable level |
 | | Lesson 37 (Working with Engineering Teams) | Extends this lesson's collaborative-review discipline into a broader treatment of PM-engineering partnership |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "the spec" or "the requirements doc" assumes the problem-before-solution ordering and the Precision Dial covered here — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "the spec" or "the requirements doc" assumes the problem-before-solution ordering and the Precision Dial covered here this will not be re-explained, only re-applied.

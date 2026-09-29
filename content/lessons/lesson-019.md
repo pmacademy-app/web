@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Module 2 has built an entire research and synthesis pipeline: interviews and surveys (Lessons 12–13), personas and journey maps (Lessons 14–15), pain points characterized by severity and frequency (Lesson 16), problem statements written without solutions (Lesson 17), and validated segments (Lesson 18). At this point, a team typically has more validated problems, pain points, and segment insights than it could possibly act on simultaneously. This lesson answers the natural next question: given a genuinely large pool of validated candidates, how do you systematically identify and size which ones represent the biggest actual opportunities — before committing to solve any particular one?
+Module 2 has built an entire research and synthesis pipeline: interviews and surveys (Lessons 12–13), personas and journey maps (Lessons 14–15), pain points characterized by severity and frequency (Lesson 16), problem statements written without solutions (Lesson 17), and validated segments (Lesson 18). At this point, a team typically has more validated problems, pain points, and segment insights than it could possibly act on simultaneously. This lesson answers the natural next question: given a genuinely large pool of validated candidates, how do you systematically identify and size which ones represent the biggest actual opportunities before committing to solve any particular one?
 
-**Opportunity identification** is the practice of surfacing, characterizing, and comparatively sizing candidate problems or unmet needs, so that a team can make a deliberate choice about where to focus limited discovery and delivery resources, rather than defaulting to whichever problem statement was written most recently or championed most persuasively. This lesson sits at the seam between research (which surfaces raw material) and strategy (Lesson 10) and prioritization (Lesson 29, still ahead) — it is the disciplined practice of turning a pile of validated findings into a ranked, comparable set of genuine opportunities.
+**Opportunity identification** is the practice of surfacing, characterizing, and comparatively sizing candidate problems or unmet needs, so that a team can make a deliberate choice about where to focus limited discovery and delivery resources, rather than defaulting to whichever problem statement was written most recently or championed most persuasively. This lesson sits at the seam between research (which surfaces raw material) and strategy (Lesson 10) and prioritization (Lesson 29, still ahead) it is the disciplined practice of turning a pile of validated findings into a ranked, comparable set of genuine opportunities.
 
 ---
 
@@ -12,12 +12,12 @@ Module 2 has built an entire research and synthesis pipeline: interviews and sur
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 19 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 16 (Pain Points), Lesson 17 (Problem Statements), Lesson 18 (Customer Segmentation) |
-| **Next Lesson** | Lesson 20 — Product Discovery Process (opens Module 3 territory on structured discovery workflow) |
+| **Next Lesson** | Lesson 20 Product Discovery Process (opens Module 3 territory on structured discovery workflow) |
 | **Future Topics Unlocked** | Lesson 20 (Product Discovery Process), Lesson 21 (MVP), Lesson 29 (Prioritization Fundamentals) |
 
 ---
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 16 (Pain Points), Lesson 17 (Problem Statements), and Lesson 18 (Customer Segmentation). This lesson assumes you can characterize a pain point's severity and frequency, write a solution-free problem statement, and validate a segment — an opportunity, in this lesson's sense, is what emerges when these three prior artifacts are organized and compared against each other systematically.
+Lesson 16 (Pain Points), Lesson 17 (Problem Statements), and Lesson 18 (Customer Segmentation). This lesson assumes you can characterize a pain point's severity and frequency, write a solution-free problem statement, and validate a segment an opportunity, in this lesson's sense, is what emerges when these three prior artifacts are organized and compared against each other systematically.
 
 ---
 
@@ -44,7 +44,7 @@ Lesson 16 (Pain Points), Lesson 17 (Problem Statements), and Lesson 18 (Customer
 
 ### The Core Definition, and Distinguishing an Opportunity from Its Neighbors
 
-An opportunity is a validated, sized candidate for where a team could focus its next discovery and delivery effort — sitting conceptually between a raw pain point (Lesson 16) and a fully specified solution. It is useful to place these concepts on a single continuum:
+An opportunity is a validated, sized candidate for where a team could focus its next discovery and delivery effort sitting conceptually between a raw pain point (Lesson 16) and a fully specified solution. It is useful to place these concepts on a single continuum:
 
 ```mermaid
 %%{init: {
@@ -129,7 +129,7 @@ graph TD
     C --> G[Candidate Solution 2a]
 ```
 
-This structure enforces a specific, valuable discipline: multiple opportunities are laid out side by side, beneath a single shared outcome, *before* any solution work begins for any of them. This prevents a team from tunneling into deep solution work on the first opportunity that happened to surface, without ever seeing it alongside the full set of alternatives that might have delivered more value toward the same desired outcome. The tree also visually enforces Lesson 17's discipline at the opportunity level: a genuine opportunity, like a genuine problem statement, should sit at the level of a validated user problem, with candidate solutions kept as distinct child nodes underneath it — not merged into the opportunity itself.
+This structure enforces a specific, valuable discipline: multiple opportunities are laid out side by side, beneath a single shared outcome, *before* any solution work begins for any of them. This prevents a team from tunneling into deep solution work on the first opportunity that happened to surface, without ever seeing it alongside the full set of alternatives that might have delivered more value toward the same desired outcome. The tree also visually enforces Lesson 17's discipline at the opportunity level: a genuine opportunity, like a genuine problem statement, should sit at the level of a validated user problem, with candidate solutions kept as distinct child nodes underneath it not merged into the opportunity itself.
 
 ### Sizing an Opportunity: Combining Importance/Satisfaction and Prevalence
 
@@ -176,17 +176,17 @@ graph TD
     C --> D
 ```
 
-An opportunity that scores well on both dimensions — a large importance-satisfaction gap affecting a large, strategically valuable, validated segment — represents the clearest, highest-value candidate. An opportunity strong on only one dimension (a severe gap affecting a small, low-value segment, or a modest gap affecting a very large segment) requires the same kind of deliberate, explicit judgment Lesson 16 described for off-diagonal severity/frequency cases, rather than either automatic prioritization or automatic dismissal.
+An opportunity that scores well on both dimensions a large importance-satisfaction gap affecting a large, strategically valuable, validated segment represents the clearest, highest-value candidate. An opportunity strong on only one dimension (a severe gap affecting a small, low-value segment, or a modest gap affecting a very large segment) requires the same kind of deliberate, explicit judgment Lesson 16 described for off-diagonal severity/frequency cases, rather than either automatic prioritization or automatic dismissal.
 
 ### The "Opportunity Sprawl" Failure Pattern
 
-A specific, recurring failure — closely related to Lesson 14's "too many personas" and Lesson 18's "segmentation for its own sake" patterns — is **opportunity sprawl**: generating an ever-growing, unbounded list of candidate opportunities from ongoing research, without ever consolidating, comparing, or pruning the list down to a manageable set the team can actually reason about and act on. A list of forty loosely characterized "opportunities," none of which have been sized or compared against each other using the importance-satisfaction and prevalence dimensions above, provides essentially the same lack of direction as having identified no opportunities at all — the volume of raw material creates an illusion of thoroughness while actually obscuring which few items genuinely deserve the team's limited attention.
+A specific, recurring failure closely related to Lesson 14's "too many personas" and Lesson 18's "segmentation for its own sake" patterns is **opportunity sprawl**: generating an ever-growing, unbounded list of candidate opportunities from ongoing research, without ever consolidating, comparing, or pruning the list down to a manageable set the team can actually reason about and act on. A list of forty loosely characterized "opportunities," none of which have been sized or compared against each other using the importance-satisfaction and prevalence dimensions above, provides essentially the same lack of direction as having identified no opportunities at all the volume of raw material creates an illusion of thoroughness while actually obscuring which few items genuinely deserve the team's limited attention.
 
 The corrective discipline, directly parallel to Lesson 10's exclusion principle, is periodic, deliberate pruning: consolidating overlapping or redundant opportunities, explicitly deprioritizing (not merely ignoring) low-scoring candidates, and maintaining a genuinely short, actively reasoned-about list rather than an ever-growing backlog of undifferentiated possibilities.
 
 ### Distinguishing a Genuine Opportunity from a Restated Business Goal
 
-A final, important distinction, directly echoing Lesson 10's "mistaking goals for strategy" failure: a genuine opportunity names a specific, validated user problem or unmet need (echoing Lesson 17's problem statement discipline), while a restated business goal simply names a desired business outcome without identifying any specific underlying user-side driver. "Increase revenue by 15%" is a goal, not an opportunity — it says nothing about *which* validated user problem, if solved, would plausibly move that number. A genuine opportunity, sitting beneath a desired outcome in the Opportunity Solution Tree, must be specific enough to be evaluated using the importance-satisfaction and prevalence dimensions above; a restated goal cannot be evaluated this way at all, because it isn't yet a hypothesis about a specific underlying cause.
+A final, important distinction, directly echoing Lesson 10's "mistaking goals for strategy" failure: a genuine opportunity names a specific, validated user problem or unmet need (echoing Lesson 17's problem statement discipline), while a restated business goal simply names a desired business outcome without identifying any specific underlying user-side driver. "Increase revenue by 15%" is a goal, not an opportunity it says nothing about *which* validated user problem, if solved, would plausibly move that number. A genuine opportunity, sitting beneath a desired outcome in the Opportunity Solution Tree, must be specific enough to be evaluated using the importance-satisfaction and prevalence dimensions above; a restated goal cannot be evaluated this way at all, because it isn't yet a hypothesis about a specific underlying cause.
 
 ---
 
@@ -264,9 +264,9 @@ Use this grid whenever more than a small handful of validated problem statements
 
 ## Real Company Example
 
-**Intercom** is one of the more directly documented examples of a company building its product and go-to-market strategy around Jobs to Be Done: the company has published its own methodology publicly, including a dedicated book, *Intercom on Jobs-to-be-Done*, and co-founder Des Traynor has spoken and written extensively about applying it internally. Intercom's own account emphasizes Tony Ulwick's "opportunity algorithm" — the idea that an unmet need exists specifically where a job outcome is rated both highly important and poorly satisfied by current solutions — as the sizing method for comparing candidate opportunities before committing engineering resources to any one of them.
+**Intercom** is one of the more directly documented examples of a company building its product and go-to-market strategy around Jobs to Be Done: the company has published its own methodology publicly, including a dedicated book, *Intercom on Jobs-to-be-Done*, and co-founder Des Traynor has spoken and written extensively about applying it internally. Intercom's own account emphasizes Tony Ulwick's "opportunity algorithm" the idea that an unmet need exists specifically where a job outcome is rated both highly important and poorly satisfied by current solutions as the sizing method for comparing candidate opportunities before committing engineering resources to any one of them.
 
-This is a useful illustration of comparing multiple candidate opportunities before committing to a specific solution, precisely the discipline this lesson's Opportunity Solution Tree and importance-satisfaction sizing technique formalize: organize strategy discussions around a small number of clearly named customer outcomes, lay out multiple candidate opportunities against those outcomes, and let the comparison — not whichever feature idea was most recently discussed in a meeting — determine what gets built next.
+This is a useful illustration of comparing multiple candidate opportunities before committing to a specific solution, precisely the discipline this lesson's Opportunity Solution Tree and importance-satisfaction sizing technique formalize: organize strategy discussions around a small number of clearly named customer outcomes, lay out multiple candidate opportunities against those outcomes, and let the comparison not whichever feature idea was most recently discussed in a meeting determine what gets built next.
 
 *(Source: Intercom's own published blog and book on the topic, corroborated by public talks from co-founder Des Traynor. This curriculum does not claim certainty about the company's complete current internal prioritization process.)*
 
@@ -278,7 +278,7 @@ This is a useful illustration of comparing multiple candidate opportunities befo
 Opportunity identification is often concentrated on a small number of existentially important candidates, directly tied to whether the core product concept addresses a real, sufficiently important and underserved job at all (echoing Lesson 8's foundational discovery risk). Startups rarely have the luxury of an extensive Opportunity Solution Tree with many branches; the discipline instead often centers on rigorously validating whether the single most promising opportunity is real before committing scarce resources.
 
 **At a mid-size company:**
-Opportunity identification often becomes a more structured, recurring practice — periodically reviewing and re-scoring a maintained Opportunity Solution Tree as new research emerges, and using importance-satisfaction survey techniques at increasing scale to compare candidates more rigorously than a startup's more improvised, resource-constrained approach typically allows.
+Opportunity identification often becomes a more structured, recurring practice periodically reviewing and re-scoring a maintained Opportunity Solution Tree as new research emerges, and using importance-satisfaction survey techniques at increasing scale to compare candidates more rigorously than a startup's more improvised, resource-constrained approach typically allows.
 
 **At Big Tech:**
 Opportunity identification at scale often involves formal, recurring quantitative surveys (echoing Lesson 13) run across large populations specifically to maintain an up-to-date importance-satisfaction map across many potential opportunity areas simultaneously, and a significant part of senior product strategy work involves periodically pruning and consolidating an otherwise sprawling opportunity backlog across multiple product lines, preventing the exact "opportunity sprawl" failure this lesson warns against at organizational scale.
@@ -293,17 +293,17 @@ A team building a customer support platform adopts continuous discovery practice
 
 Despite the genuine research effort behind each item, the team finds itself increasingly unable to make forward progress: planning meetings devolve into lengthy debates about which of the 47 items to discuss, no consistent method exists for comparing their relative importance, and several near-duplicate opportunities (three separate entries describing closely related variations of "agents struggle to find relevant historical context on a ticket") are tracked separately, further inflating the list without adding genuinely distinct information.
 
-A new discovery lead, brought in to help, spends a full sprint specifically consolidating and re-scoring the list: merging near-duplicate opportunities, running a structured importance-satisfaction survey (Lesson 13's technique, applied per this lesson's sizing method) across a representative sample of support agents to establish genuine relative sizing rather than relying on interview-recency or vividness, and validating segment prevalence (Lesson 18) for the remaining candidates. The exercise reduces the list from 47 loosely characterized items to 6 genuinely distinct, sized, and ranked opportunities — and reveals that the single highest-scoring opportunity (agents lacking a fast way to see a customer's full prior interaction history across multiple channels) had been sitting in the original list, undifferentiated among 46 other items, for over a year without ever being specifically prioritized.
+A new discovery lead, brought in to help, spends a full sprint specifically consolidating and re-scoring the list: merging near-duplicate opportunities, running a structured importance-satisfaction survey (Lesson 13's technique, applied per this lesson's sizing method) across a representative sample of support agents to establish genuine relative sizing rather than relying on interview-recency or vividness, and validating segment prevalence (Lesson 18) for the remaining candidates. The exercise reduces the list from 47 loosely characterized items to 6 genuinely distinct, sized, and ranked opportunities and reveals that the single highest-scoring opportunity (agents lacking a fast way to see a customer's full prior interaction history across multiple channels) had been sitting in the original list, undifferentiated among 46 other items, for over a year without ever being specifically prioritized.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
-1. **The team fell into opportunity sprawl** — genuine research effort produced a continuously growing list without a corresponding, disciplined practice of consolidation, sizing, and pruning, echoing Lesson 14's "too many personas" pattern applied at the opportunity level.
+1. **The team fell into opportunity sprawl** genuine research effort produced a continuously growing list without a corresponding, disciplined practice of consolidation, sizing, and pruning, echoing Lesson 14's "too many personas" pattern applied at the opportunity level.
 2. **No importance-satisfaction or prevalence sizing was applied consistently across the list**, meaning opportunities were effectively being compared (when compared at all) based on how recently or memorably they had come up in a meeting, rather than through the systematic Opportunity Comparison Grid this lesson recommends.
 3. **Near-duplicate opportunities were tracked separately rather than consolidated**, artificially inflating the apparent size of the list and obscuring which underlying themes were actually most significant once properly merged.
 
-A team applying this lesson's discipline from the outset would have periodically (not just once, after the problem had already become severe) consolidated and re-scored its Opportunity Solution Tree, likely surfacing the historical-context opportunity — the eventual highest-scoring candidate — well before a full year had passed with it sitting undifferentiated among dozens of other, less significant items.
+A team applying this lesson's discipline from the outset would have periodically (not just once, after the problem had already become severe) consolidated and re-scored its Opportunity Solution Tree, likely surfacing the historical-context opportunity the eventual highest-scoring candidate well before a full year had passed with it sitting undifferentiated among dozens of other, less significant items.
 
 This case connects directly back to **Lesson 8's continuous discovery principle**: discovery itself was being conducted diligently and continuously in this case study, but the corresponding discipline of continuous *synthesis and pruning* was missing, showing that genuine research volume alone does not guarantee genuine strategic clarity.
 
@@ -320,26 +320,26 @@ A practical framework for preventing opportunity sprawl, structured as a recurri
 | **Explicitly deprioritize (not silently ignore) low-scoring candidates** | Quarterly | Maintains a genuinely short, actionable list, following Lesson 10's exclusion discipline |
 | **Re-validate the shared outcome at the root of the tree** | Whenever strategy (Lesson 10) or vision (Lesson 9) is revisited | Ensures the entire tree remains connected to current strategic priorities, not an outdated one |
 
-The recurring theme across this cadence: **opportunity identification is not a one-time exercise that produces a static, permanent list — it requires the same ongoing, disciplined maintenance this curriculum has emphasized for personas (Lesson 14), journey maps (Lesson 15), and segments (Lesson 18), or it will drift toward exactly the sprawl this lesson's Detailed Case Study describes.**
+The recurring theme across this cadence: **opportunity identification is not a one-time exercise that produces a static, permanent list it requires the same ongoing, disciplined maintenance this curriculum has emphasized for personas (Lesson 14), journey maps (Lesson 15), and segments (Lesson 18), or it will drift toward exactly the sprawl this lesson's Detailed Case Study describes.**
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How do you decide which of several validated customer problems to focus on next?"**
-*What the interviewer is actually evaluating:* Whether the candidate has a systematic comparison method (importance-satisfaction, segment prevalence) rather than defaulting to whichever problem was most recently or forcefully raised — directly echoing Lesson 16's related question, now applied at the level of comparing entire opportunities rather than individual pain points.
+*What the interviewer is actually evaluating:* Whether the candidate has a systematic comparison method (importance-satisfaction, segment prevalence) rather than defaulting to whichever problem was most recently or forcefully raised directly echoing Lesson 16's related question, now applied at the level of comparing entire opportunities rather than individual pain points.
 
 **Typical question 2: "Tell me about a time your team had too many candidate ideas or findings and needed to narrow them down."**
-*What the interviewer is actually evaluating:* Direct experience with the opportunity-sprawl problem and its correction — whether the candidate can describe a genuine consolidation and re-scoring process, echoing this lesson's Detailed Case Study, rather than simply describing an unstructured, intuitive winnowing process.
+*What the interviewer is actually evaluating:* Direct experience with the opportunity-sprawl problem and its correction whether the candidate can describe a genuine consolidation and re-scoring process, echoing this lesson's Detailed Case Study, rather than simply describing an unstructured, intuitive winnowing process.
 
 **Typical question 3: "What's the difference between a business goal and a product opportunity?"**
-*What the interviewer is actually evaluating:* Whether the candidate can articulate the specific distinction this lesson draws — a goal names a desired outcome, while an opportunity names a specific, validated user-side driver that could plausibly move that outcome, echoing Lesson 10's goal-versus-strategy distinction applied at the discovery level.
+*What the interviewer is actually evaluating:* Whether the candidate can articulate the specific distinction this lesson draws a goal names a desired outcome, while an opportunity names a specific, validated user-side driver that could plausibly move that outcome, echoing Lesson 10's goal-versus-strategy distinction applied at the discovery level.
 
 ---
 
 ## Summary
 
-An opportunity is a validated, sized candidate problem sitting between a raw pain point and a specific solution — it adds a comparative dimension that a problem statement alone does not provide, asking how a given validated problem compares in size and value to every other validated problem currently competing for limited resources. The Opportunity Solution Tree organizes multiple candidate opportunities beneath a single shared desired outcome, keeping opportunities distinct from candidate solutions and enabling side-by-side comparison before any solution work begins. Sizing an opportunity combines an importance-satisfaction gap (how important is this job, and how well is it currently served) with segment-validated prevalence (Lesson 18) and strategic value. "Opportunity sprawl" — an ever-growing, unconsolidated list of candidate opportunities — provides no more real direction than having identified none at all, and requires a disciplined, recurring pruning cadence to correct. Finally, a genuine opportunity must be distinguished from a restated business goal: a goal names a desired outcome, while an opportunity names the specific, validated user-side driver that could plausibly move it.
+An opportunity is a validated, sized candidate problem sitting between a raw pain point and a specific solution it adds a comparative dimension that a problem statement alone does not provide, asking how a given validated problem compares in size and value to every other validated problem currently competing for limited resources. The Opportunity Solution Tree organizes multiple candidate opportunities beneath a single shared desired outcome, keeping opportunities distinct from candidate solutions and enabling side-by-side comparison before any solution work begins. Sizing an opportunity combines an importance-satisfaction gap (how important is this job, and how well is it currently served) with segment-validated prevalence (Lesson 18) and strategic value. "Opportunity sprawl" an ever-growing, unconsolidated list of candidate opportunities provides no more real direction than having identified none at all, and requires a disciplined, recurring pruning cadence to correct. Finally, a genuine opportunity must be distinguished from a restated business goal: a goal names a desired outcome, while an opportunity names the specific, validated user-side driver that could plausibly move it.
 
 ---
 
@@ -348,10 +348,10 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 - An opportunity sits between a raw pain point and a specific solution, adding the comparative dimension of relative size and value against other validated candidates.
 - The Opportunity Solution Tree organizes multiple opportunities beneath a shared desired outcome, keeping opportunities distinct from candidate solutions to enable genuine side-by-side comparison.
 - Sizing an opportunity combines an importance-satisfaction gap with segment-validated prevalence and strategic value, not vivid anecdote alone.
-- "Opportunity sprawl" — an unconsolidated, ever-growing list — provides no more real direction than an empty list, and requires disciplined, recurring pruning.
+- "Opportunity sprawl" an unconsolidated, ever-growing list provides no more real direction than an empty list, and requires disciplined, recurring pruning.
 - A restated business goal ("increase revenue") is not itself an opportunity; a genuine opportunity names the specific, validated user-side driver that could plausibly move that goal.
 - Near-duplicate opportunities should be consolidated, not tracked separately, to avoid artificially inflating the apparent size of a candidate list.
-- Opportunity identification requires ongoing, periodic maintenance — consolidation, re-scoring, and explicit deprioritization — not a one-time exercise producing a static list.
+- Opportunity identification requires ongoing, periodic maintenance consolidation, re-scoring, and explicit deprioritization not a one-time exercise producing a static list.
 
 ---
 
@@ -360,8 +360,8 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 *A two-minute review of everything in this lesson.*
 
 - **Pain point → Problem Statement → Opportunity → Solution.** Each step adds specificity or comparison; don't skip the comparison step.
-- **Opportunity Solution Tree:** shared outcome at root, opportunities as branches, solutions as leaves — keep opportunities and solutions distinct nodes.
-- **Sizing = Importance-Satisfaction Gap + Segment Prevalence/Value** — not vivid anecdote.
+- **Opportunity Solution Tree:** shared outcome at root, opportunities as branches, solutions as leaves keep opportunities and solutions distinct nodes.
+- **Sizing = Importance-Satisfaction Gap + Segment Prevalence/Value** not vivid anecdote.
 - **Opportunity sprawl** = an unconsolidated, ever-growing list = no more useful than no list at all.
 - **Goal ≠ Opportunity.** "Increase revenue" isn't an opportunity; the specific validated driver behind it is.
 - **Pruning cadence:** consolidate duplicates → re-score → explicitly deprioritize → re-validate against current strategy.
@@ -382,9 +382,9 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 
 ## Further Reading / Resources
 
-- Teresa Torres, *Continuous Discovery Habits* — the primary source for the Opportunity Solution Tree structure referenced throughout this lesson.
-- Tony Ulwick, *What Customers Want* — the origin of the importance-satisfaction (outcome-driven innovation) sizing technique described in this lesson.
-- Marty Cagan, *Inspired* — discusses organizing product discovery around outcomes and opportunities rather than jumping directly to features, closely related to this lesson's overall framing.
+- Teresa Torres, *Continuous Discovery Habits* the primary source for the Opportunity Solution Tree structure referenced throughout this lesson.
+- Tony Ulwick, *What Customers Want* the origin of the importance-satisfaction (outcome-driven innovation) sizing technique described in this lesson.
+- Marty Cagan, *Inspired* discusses organizing product discovery around outcomes and opportunities rather than jumping directly to features, closely related to this lesson's overall framing.
 
 ---
 
@@ -392,13 +392,13 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 
 **Card 1**
 - Front: Where does an "opportunity" sit on the continuum from pain point to solution?
-- Back: Between a problem statement and a solution — it adds the comparative dimension of relative size and value against other validated candidates, which a problem statement alone does not provide.
+- Back: Between a problem statement and a solution it adds the comparative dimension of relative size and value against other validated candidates, which a problem statement alone does not provide.
 - Difficulty: 2
 - Tags: opportunity-definition
 
 **Card 2**
 - Front: What is an Opportunity Solution Tree?
-- Back: A structure with a shared desired outcome at the root, multiple candidate opportunities as branches, and candidate solutions as leaves beneath each opportunity — keeping opportunities and solutions as distinct nodes.
+- Back: A structure with a shared desired outcome at the root, multiple candidate opportunities as branches, and candidate solutions as leaves beneath each opportunity keeping opportunities and solutions as distinct nodes.
 - Difficulty: 3
 - Tags: opportunity-solution-tree
 
@@ -416,7 +416,7 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 
 **Card 5**
 - Front: Why is "increase revenue by 15%" not a genuine opportunity, according to this lesson?
-- Back: It names a desired business outcome, not a specific, validated user-side driver that could plausibly move that outcome — a genuine opportunity must be specific enough to be sized and compared.
+- Back: It names a desired business outcome, not a specific, validated user-side driver that could plausibly move that outcome a genuine opportunity must be specific enough to be sized and compared.
 - Difficulty: 2
 - Tags: goal-vs-opportunity
 
@@ -650,10 +650,10 @@ D) Assume permanent validity, given the original rigour of the sizing
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 18 — Customer Segmentation | Provides the validated segment prevalence and value data used directly in opportunity sizing |
-| **Current Lesson** | Lesson 19 — Opportunity Identification | The Opportunity Solution Tree; importance-satisfaction sizing; opportunity sprawl; goal-vs-opportunity distinction |
-| **Next Lesson** | Lesson 20 — Product Discovery Process | Formalizes a complete, repeatable discovery workflow, incorporating opportunity identification as one structured stage |
+| **Previous Lesson** | Lesson 18 Customer Segmentation | Provides the validated segment prevalence and value data used directly in opportunity sizing |
+| **Current Lesson** | Lesson 19 Opportunity Identification | The Opportunity Solution Tree; importance-satisfaction sizing; opportunity sprawl; goal-vs-opportunity distinction |
+| **Next Lesson** | Lesson 20 Product Discovery Process | Formalizes a complete, repeatable discovery workflow, incorporating opportunity identification as one structured stage |
 | **Future Concepts Unlocked** | Lesson 21 (MVP) | Uses the highest-scoring, chosen opportunity as the basis for scoping the smallest viable solution to test |
 | | Lesson 29 (Prioritization Fundamentals) | Incorporates opportunity sizing directly as an input into a broader, multi-factor prioritization scoring model |
 
-This curriculum is designed to be read as one continuous argument. Module 2 — Users & Research concludes with this lesson: Lessons 11 through 19 have built, in sequence, from the foundational discipline of trustworthy research (User Research, Interviews, Surveys), through synthesis artifacts (Personas, Journey Maps), through characterizing and formalizing specific findings (Pain Points, Problem Statements, Segmentation), to comparing and sizing validated candidates against each other (Opportunity Identification). Module 3 — Product Design begins next, addressing the concrete design and specification work that follows once a genuine opportunity has been chosen.
+This curriculum is designed to be read as one continuous argument. Module 2 Users & Research concludes with this lesson: Lessons 11 through 19 have built, in sequence, from the foundational discipline of trustworthy research (User Research, Interviews, Surveys), through synthesis artifacts (Personas, Journey Maps), through characterizing and formalizing specific findings (Pain Points, Problem Statements, Segmentation), to comparing and sizing validated candidates against each other (Opportunity Identification). Module 3 Product Design begins next, addressing the concrete design and specification work that follows once a genuine opportunity has been chosen.

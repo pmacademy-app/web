@@ -4,7 +4,7 @@
 
 Lesson 74 established that packaging should create natural expansion triggers, and Lesson 73 established that a B2B deal involves multiple stakeholders with distinct success criteria. This lesson addresses what happens at the specific moment those threads converge: the enterprise contract negotiation itself, where an Economic Buyer, often supported by a dedicated procurement function, actively pushes for concessions, and where a PM's decisions about what to concede, and how, have consequences that extend far beyond the single deal being negotiated.
 
-A common and costly mistake in enterprise pricing negotiations is treating every negotiation lever as equivalent to a straightforward price discount. A sales or product team under pressure to close a deal will often default to reducing price directly, since it's the simplest lever to understand and the most immediately legible way to respond to a customer's stated budget constraint. This default, however, is frequently a poor trade: a direct price discount is expensive for the vendor in a way that compounds across every future renewal and every other customer who learns of the discount, while other, less commonly considered concessions — extended payment terms, adjusted contract length, specific non-price commitments — can often deliver comparable or greater value to the customer at meaningfully lower cost to the vendor.
+A common and costly mistake in enterprise pricing negotiations is treating every negotiation lever as equivalent to a straightforward price discount. A sales or product team under pressure to close a deal will often default to reducing price directly, since it's the simplest lever to understand and the most immediately legible way to respond to a customer's stated budget constraint. This default, however, is frequently a poor trade: a direct price discount is expensive for the vendor in a way that compounds across every future renewal and every other customer who learns of the discount, while other, less commonly considered concessions extended payment terms, adjusted contract length, specific non-price commitments can often deliver comparable or greater value to the customer at meaningfully lower cost to the vendor.
 
 This lesson introduces the Concession Exchange Map, this lesson's core mental model, to give you a structured way to identify which concessions to offer in an enterprise negotiation, prioritizing trades that deliver genuine value to the customer without unnecessarily eroding the vendor's own long-term economics.
 
@@ -14,13 +14,13 @@ This lesson introduces the Concession Exchange Map, this lesson's core mental mo
 
 | Field | Detail |
 |---|---|
-| **Module** | 8 — Advanced Strategy, Innovation & Enterprise/B2B Product Management |
+| **Module** | 8 Advanced Strategy, Innovation & Enterprise/B2B Product Management |
 | **Current Lesson** | 79 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 73 (Stakeholder Compass, Economic Buyer), Lesson 74 (Expansion Wedge), Lesson 63 (take rate and value capture) |
-| **Next Lesson** | Lesson 80 — Module Synthesis: Advanced Strategic Judgment |
-| **Future Topics Unlocked** | Lesson 80 (Module Synthesis) — draws on the Concession Exchange Map as established canon |
+| **Next Lesson** | Lesson 80 Module Synthesis: Advanced Strategic Judgment |
+| **Future Topics Unlocked** | Lesson 80 (Module Synthesis) draws on the Concession Exchange Map as established canon |
 
 ---
 
@@ -84,9 +84,9 @@ This lesson introduces the **Concession Exchange Map**, plotting potential negot
   }
 }}%%
 graph TD
-    A["Low Vendor Cost +<br/>High Customer Value<br/>(ideal trade — offer these first)"]
+    A["Low Vendor Cost +<br/>High Customer Value<br/>(ideal trade offer these first)"]
     B["Low Vendor Cost +<br/>Low Customer Value<br/>(low-priority, marginal trades)"]
-    C["High Vendor Cost +<br/>High Customer Value<br/>(direct price discounts — use sparingly, as a last resort)"]
+    C["High Vendor Cost +<br/>High Customer Value<br/>(direct price discounts use sparingly, as a last resort)"]
     D["High Vendor Cost +<br/>Low Customer Value<br/>(avoid entirely)"]
 ```
 
@@ -94,7 +94,7 @@ The Concession Exchange Map's discipline is identifying and offering concessions
 
 ### Non-Price vs. Price-Based Levers
 
-**Price-based levers** directly reduce the amount the customer pays, either through a lower list price, a volume discount, or a promotional reduction, and these levers carry the compounding precedent cost described above. **Non-price-based levers** address a customer's underlying concern — cash flow timing, contract risk, implementation support, usage flexibility — without directly reducing the headline price, and these levers frequently do not carry the same precedent-setting cost, since they can often be tailored to the specific circumstances of an individual deal without establishing a new baseline expectation for every future customer. A skilled enterprise negotiator identifies which of a customer's stated concerns can genuinely be addressed through a non-price lever before defaulting to a price-based concession.
+**Price-based levers** directly reduce the amount the customer pays, either through a lower list price, a volume discount, or a promotional reduction, and these levers carry the compounding precedent cost described above. **Non-price-based levers** address a customer's underlying concern cash flow timing, contract risk, implementation support, usage flexibility without directly reducing the headline price, and these levers frequently do not carry the same precedent-setting cost, since they can often be tailored to the specific circumstances of an individual deal without establishing a new baseline expectation for every future customer. A skilled enterprise negotiator identifies which of a customer's stated concerns can genuinely be addressed through a non-price lever before defaulting to a price-based concession.
 
 ### The Compounding Cost of Precedent
 
@@ -132,7 +132,7 @@ A concession that satisfies the Economic Buyer's immediate budget concern may no
 The Concession Exchange Map introduced above is this lesson's core takeaway tool. Before granting any concession in an enterprise negotiation, ask:
 
 1. **What is the customer's underlying concern**, and is it genuinely about headline price, or about a related but distinct issue like cash flow, contract risk, or implementation confidence?
-2. **Where would the concession that addresses this concern actually fall on the Concession Exchange Map** — low vendor cost and high customer value, or high vendor cost and comparatively lower customer value?
+2. **Where would the concession that addresses this concern actually fall on the Concession Exchange Map** low vendor cost and high customer value, or high vendor cost and comparatively lower customer value?
 3. **Have lower-cost, high-value non-price concessions been genuinely explored before resorting to a direct price discount**, rather than defaulting to price as the first and only lever considered?
 4. **What precedent would this concession set for future renewals with this customer, and for other customers who may learn of it**, and is that precedent cost being genuinely weighed against the immediate benefit of closing this specific deal?
 
@@ -142,7 +142,7 @@ A negotiator who runs every concession decision through this Map is far more lik
 
 ## Real Company Example
 
-**Oracle's software license audit and true-up practice** is a specific, consistently documented mechanism, not just a general reputation for tough negotiation. Multiple independent enterprise-licensing advisory firms — including specialist compliance consultancies that publish detailed accounts of the process for their own clients — describe a consistent structure: Oracle's license agreements reserve the right to audit a customer's actual software deployment against what was licensed, and where usage has grown beyond the contracted terms, a "true-up" clause requires the customer to retroactively pay for that additional usage, often at list price rather than any negotiated discount. This shapes the entire negotiation dynamic this lesson addresses: because the true-up mechanism means under-provisioning now can become expensive later, Oracle's own contractual terms — not just its negotiators' skill in the room — do much of the work of protecting long-term pricing integrity across a large, growing enterprise account.
+**Oracle's software license audit and true-up practice** is a specific, consistently documented mechanism, not just a general reputation for tough negotiation. Multiple independent enterprise-licensing advisory firms including specialist compliance consultancies that publish detailed accounts of the process for their own clients describe a consistent structure: Oracle's license agreements reserve the right to audit a customer's actual software deployment against what was licensed, and where usage has grown beyond the contracted terms, a "true-up" clause requires the customer to retroactively pay for that additional usage, often at list price rather than any negotiated discount. This shapes the entire negotiation dynamic this lesson addresses: because the true-up mechanism means under-provisioning now can become expensive later, Oracle's own contractual terms not just its negotiators' skill in the room do much of the work of protecting long-term pricing integrity across a large, growing enterprise account.
 
 The specific lesson for a negotiator on the buying side, and for a PM who might one day design analogous terms on the selling side, is the same: a contractual mechanism like a true-up clause converts what looks like a one-time negotiation into an ongoing, structurally enforced pricing relationship, which is exactly why sophisticated enterprise buyers now bring dedicated software-asset-management expertise specifically to negotiate audit rights and true-up terms before signing, not just the headline discount.
 
@@ -162,13 +162,13 @@ The specific lesson for a negotiator on the buying side, and for a PM who might 
 
 ## Detailed Case Study: The Discount That Became the Floor
 
-A B2B software company was negotiating a large, strategically significant deal with a well-known enterprise customer whose logo the sales team believed would meaningfully help attract other customers in the same industry vertical. Under pressure to close the deal before the end of the fiscal quarter, the sales team granted a substantial direct price discount — considerably steeper than any discount previously offered to a customer of comparable size — reasoning internally that the strategic value of the logo justified the concession.
+A B2B software company was negotiating a large, strategically significant deal with a well-known enterprise customer whose logo the sales team believed would meaningfully help attract other customers in the same industry vertical. Under pressure to close the deal before the end of the fiscal quarter, the sales team granted a substantial direct price discount considerably steeper than any discount previously offered to a customer of comparable size reasoning internally that the strategic value of the logo justified the concession.
 
-Within the following year, several problems emerged. The customer, at renewal time, expected the same discounted rate to continue, treating the original discount as an established baseline rather than a one-time concession. Separately, industry conversation and informal benchmarking among customers in the same vertical meant that at least two subsequent prospective customers referenced the known discount level during their own negotiations, using it as a credible anchor to demand comparable treatment. The sales team, having never mapped the original concession against something like the Concession Exchange Map, had not considered offering non-price alternatives — extended payment terms, phased implementation support, or contract flexibility — that might have addressed the original customer's actual underlying concern (a tight initial budget cycle) without establishing a new, compounding price expectation across the broader market.
+Within the following year, several problems emerged. The customer, at renewal time, expected the same discounted rate to continue, treating the original discount as an established baseline rather than a one-time concession. Separately, industry conversation and informal benchmarking among customers in the same vertical meant that at least two subsequent prospective customers referenced the known discount level during their own negotiations, using it as a credible anchor to demand comparable treatment. The sales team, having never mapped the original concession against something like the Concession Exchange Map, had not considered offering non-price alternatives extended payment terms, phased implementation support, or contract flexibility that might have addressed the original customer's actual underlying concern (a tight initial budget cycle) without establishing a new, compounding price expectation across the broader market.
 
 **What went wrong?** Using the Concession Exchange Map, the failure is precise: the sales team defaulted directly to the highest-cost, most precedent-setting quadrant of concession (a direct price discount) without genuinely exploring lower-cost alternatives that might have addressed the same underlying concern, and without weighing the concession's compounding precedent cost against the immediate, visible benefit of closing a single strategically significant deal. The "logo value" rationale, however reasonable it felt in the moment, did not account for the ongoing cost the discount would impose across every subsequent negotiation in the same market segment.
 
-The company's recovery involved instituting a formal discount governance process requiring any significant price-based concession to be reviewed against available non-price alternatives before approval, explicitly documenting precedent risk as part of every major deal's negotiation record, and training the sales organization on the Concession Exchange Map's logic — a discipline this curriculum will connect to the broader Module 8 synthesis in Lesson 80.
+The company's recovery involved instituting a formal discount governance process requiring any significant price-based concession to be reviewed against available non-price alternatives before approval, explicitly documenting precedent risk as part of every major deal's negotiation record, and training the sales organization on the Concession Exchange Map's logic a discipline this curriculum will connect to the broader Module 8 synthesis in Lesson 80.
 
 ---
 
@@ -200,7 +200,7 @@ A "no" on Non-Price Alternatives Explored should be treated as a significant gap
 
 ## Summary
 
-Defaulting to a direct price discount as the first response to enterprise negotiation pressure is frequently a poor trade, since price-based concessions carry a specific, compounding cost — establishing a new baseline expectation for future renewals and providing a credible anchor for other customers' negotiations — that many non-price alternatives avoid. The Concession Exchange Map plots potential concessions along vendor cost and customer value, prioritizing the identification of low-cost, high-value trades — extended payment terms, flexible contract timing, implementation support commitments, usage flexibility — before resorting to the expensive, precedent-setting quadrant occupied by direct price discounts. A skilled negotiator identifies a customer's genuine underlying concern, which is often about cash flow timing, contract risk, or implementation confidence rather than headline price itself, and matches that concern to the specific stakeholder (per the Stakeholder Compass from Lesson 73) actually motivating the request, rather than treating every negotiation as a single-dimensional price conversation. The compounding cost of precedent is easy to overlook in the moment a concession is granted, since the immediate pressure is simply to close the deal in front of the negotiator, but a discount granted to close one visible or strategically significant deal can quietly become the expected floor for an entire category of future customers, a cost that dramatically exceeds the value of the single deal it was meant to secure.
+Defaulting to a direct price discount as the first response to enterprise negotiation pressure is frequently a poor trade, since price-based concessions carry a specific, compounding cost establishing a new baseline expectation for future renewals and providing a credible anchor for other customers' negotiations that many non-price alternatives avoid. The Concession Exchange Map plots potential concessions along vendor cost and customer value, prioritizing the identification of low-cost, high-value trades extended payment terms, flexible contract timing, implementation support commitments, usage flexibility before resorting to the expensive, precedent-setting quadrant occupied by direct price discounts. A skilled negotiator identifies a customer's genuine underlying concern, which is often about cash flow timing, contract risk, or implementation confidence rather than headline price itself, and matches that concern to the specific stakeholder (per the Stakeholder Compass from Lesson 73) actually motivating the request, rather than treating every negotiation as a single-dimensional price conversation. The compounding cost of precedent is easy to overlook in the moment a concession is granted, since the immediate pressure is simply to close the deal in front of the negotiator, but a discount granted to close one visible or strategically significant deal can quietly become the expected floor for an entire category of future customers, a cost that dramatically exceeds the value of the single deal it was meant to secure.
 
 ---
 
@@ -208,7 +208,7 @@ Defaulting to a direct price discount as the first response to enterprise negoti
 
 - Direct price discounts carry a compounding precedent cost that many non-price concessions avoid, making them a less efficient first negotiation lever.
 - The Concession Exchange Map plots concessions by vendor cost and customer value, prioritizing low-cost, high-value trades before resorting to price discounts.
-- A customer's stated price concern is often actually about a related but distinct issue — cash flow timing, contract risk, implementation confidence — addressable through a non-price lever.
+- A customer's stated price concern is often actually about a related but distinct issue cash flow timing, contract risk, implementation confidence addressable through a non-price lever.
 - Any significant concession can become a reference point in future negotiations, both at renewal and with entirely different customers who learn of it.
 - Concessions should be matched to the specific stakeholder (per the Stakeholder Compass) whose concern actually motivated the request.
 - Formal discount governance processes help prevent uncoordinated, precedent-setting concessions across a growing sales organization.
@@ -220,10 +220,10 @@ Defaulting to a direct price discount as the first response to enterprise negoti
 
 *A two-minute review of everything in this lesson.*
 
-- Price discounts compound in cost — they become the new floor for renewals and other customers.
+- Price discounts compound in cost they become the new floor for renewals and other customers.
 - Concession Exchange Map: low vendor cost + high customer value = ideal trade. Direct price discounts = expensive, last resort.
 - Ask what the customer's concern actually is before assuming it's about headline price.
-- Match concessions to the right stakeholder — Economic Buyer vs. Technical Evaluator have different concerns.
+- Match concessions to the right stakeholder Economic Buyer vs. Technical Evaluator have different concerns.
 - Document precedent risk before granting any significant concession.
 
 ---
@@ -297,7 +297,7 @@ Defaulting to a direct price discount as the first response to enterprise negoti
 
 You are the PM supporting a negotiation with a large prospective enterprise customer who has requested a 30% price reduction, citing budget constraints for the current fiscal year. Your sales team is under pressure to close the deal before quarter-end and is considering simply granting the requested discount.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Concession Exchange Map and the Enterprise Contract Negotiation Checklist before defaulting to a direct price concession.
+There is no single correct answer to the prompts below the goal is to practice applying the Concession Exchange Map and the Enterprise Contract Negotiation Checklist before defaulting to a direct price concession.
 
 1. What questions would you want the sales team to ask the customer to better understand whether the "budget constraint" concern is genuinely about headline price or about something else, like cash flow timing?
 2. Using the Concession Exchange Map, what non-price alternatives might address a genuine fiscal-year budget constraint without directly reducing the contract's total value?
@@ -508,9 +508,9 @@ D) Grant the discount without documenting its effect on future deals
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 78 — Build, Buy, or Partner: Platform vs. Point Solution Decisions | Extends total-cost-of-ownership and resource-allocation thinking into enterprise pricing negotiation |
-| **Current Lesson** | Lesson 79 — Pricing Strategy at Scale: Enterprise Contracts and Negotiation | Concession Exchange Map; price vs. non-price levers; precedent cost; Enterprise Contract Negotiation Checklist |
-| **Next Lesson** | Lesson 80 — Module Synthesis: Advanced Strategic Judgment | Consolidates the Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, and Concession Exchange Map into an integrated strategic toolkit |
+| **Previous Lesson** | Lesson 78 Build, Buy, or Partner: Platform vs. Point Solution Decisions | Extends total-cost-of-ownership and resource-allocation thinking into enterprise pricing negotiation |
+| **Current Lesson** | Lesson 79 Pricing Strategy at Scale: Enterprise Contracts and Negotiation | Concession Exchange Map; price vs. non-price levers; precedent cost; Enterprise Contract Negotiation Checklist |
+| **Next Lesson** | Lesson 80 Module Synthesis: Advanced Strategic Judgment | Consolidates the Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, and Concession Exchange Map into an integrated strategic toolkit |
 | **Future Concepts Unlocked** | Lesson 80 (Module Synthesis) | Treats the Concession Exchange Map as established canon for Module 8's closing synthesis |
 
 This curriculum continues to build as one continuous argument. From this lesson forward, any reference to an enterprise pricing negotiation assumes you can evaluate it through the Concession Exchange Map without re-explanation.

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 15 ended with a genuinely useful journey map — one grounded in real research, including uncomfortable friction the team hadn't expected, capturing thoughts and emotions alongside actions. It also ended with a specific, practical problem: a well-built journey map for even a single process typically surfaces *multiple* pain points, not one. The meal-kit company's map, for instance, surfaced both a portion-size overwhelm issue and a skip-week confusion issue. Which one gets fixed first? This lesson exists to answer that question with more rigor than "whichever one a senior stakeholder happened to notice."
+Lesson 15 ended with a genuinely useful journey map one grounded in real research, including uncomfortable friction the team hadn't expected, capturing thoughts and emotions alongside actions. It also ended with a specific, practical problem: a well-built journey map for even a single process typically surfaces *multiple* pain points, not one. The meal-kit company's map, for instance, surfaced both a portion-size overwhelm issue and a skip-week confusion issue. Which one gets fixed first? This lesson exists to answer that question with more rigor than "whichever one a senior stakeholder happened to notice."
 
-A **pain point** is a specific, concrete point of friction, frustration, or unmet need that a user experiences while trying to accomplish a job. This lesson treats pain points not just as things to identify — Lessons 12 and 15 already covered identification — but as things to characterize and prioritize with discipline, because not all pain points are equal, and treating them as if they were interchangeable in severity is a reliable way to spend engineering effort on the wrong problem first.
+A **pain point** is a specific, concrete point of friction, frustration, or unmet need that a user experiences while trying to accomplish a job. This lesson treats pain points not just as things to identify Lessons 12 and 15 already covered identification but as things to characterize and prioritize with discipline, because not all pain points are equal, and treating them as if they were interchangeable in severity is a reliable way to spend engineering effort on the wrong problem first.
 
 ---
 
@@ -12,13 +12,13 @@ A **pain point** is a specific, concrete point of friction, frustration, or unme
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 16 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 12 (Customer Interviews), Lesson 15 (User Journey Mapping) |
-| **Next Lesson** | Lesson 17 — Problem Statements |
-| **Future Topics Unlocked** | Lesson 17 (Problem Statements — formalizing a prioritized pain point), Lesson 21 (MVP), Lesson 29 (Prioritization Fundamentals) |
+| **Next Lesson** | Lesson 17 Problem Statements |
+| **Future Topics Unlocked** | Lesson 17 (Problem Statements formalizing a prioritized pain point), Lesson 21 (MVP), Lesson 29 (Prioritization Fundamentals) |
 
 ---
 
@@ -44,15 +44,15 @@ Lesson 12 (Customer Interviews) and Lesson 15 (User Journey Mapping). This lesso
 
 ### Defining a Pain Point with Real Specificity
 
-A pain point is a specific, concrete point of friction, frustration, or unmet need experienced while pursuing a job — and the operative word, once again, is specific. "Onboarding is confusing" is not yet a pain point in the useful sense this lesson intends; it is a vague complaint, one level of specificity short of being actionable. A genuine pain point names the specific step, the specific friction, and ideally the specific consequence: "62% of new users abandon at the bank-account-connection screen during onboarding, and interview data shows several hesitate specifically because they don't understand why a bank connection is required before they've seen any product value."
+A pain point is a specific, concrete point of friction, frustration, or unmet need experienced while pursuing a job and the operative word, once again, is specific. "Onboarding is confusing" is not yet a pain point in the useful sense this lesson intends; it is a vague complaint, one level of specificity short of being actionable. A genuine pain point names the specific step, the specific friction, and ideally the specific consequence: "62% of new users abandon at the bank-account-connection screen during onboarding, and interview data shows several hesitate specifically because they don't understand why a bank connection is required before they've seen any product value."
 
-This connects directly to Lesson 12's Interview Depth Staircase: a pain point sitting at Step 1 (a vague, surface-level complaint) has not yet been climbed to the level of specificity that makes it genuinely useful for prioritization or design work. Much of the discipline in this lesson is about ensuring pain points are captured, and compared, at a sufficiently deep and specific level — not at the level of the first vague complaint a team happens to hear.
+This connects directly to Lesson 12's Interview Depth Staircase: a pain point sitting at Step 1 (a vague, surface-level complaint) has not yet been climbed to the level of specificity that makes it genuinely useful for prioritization or design work. Much of the discipline in this lesson is about ensuring pain points are captured, and compared, at a sufficiently deep and specific level not at the level of the first vague complaint a team happens to hear.
 
 ### The Severity/Frequency Framework
 
 A foundational tool for comparing multiple pain points is a simple two-axis framework, plotting each identified pain point by:
 
-- **Severity**: how much does this specific friction actually cost the user — in time, frustration, financial loss, or complete task failure — when it occurs?
+- **Severity**: how much does this specific friction actually cost the user in time, frustration, financial loss, or complete task failure when it occurs?
 - **Frequency**: how often does this friction occur, and across how large a share of the relevant user population (ideally informed by survey or behavioral prevalence data, per Lesson 13, rather than assumption)?
 
 ```mermaid
@@ -94,11 +94,11 @@ graph TD
     B --> F[Low Severity, Low<br/>Frequency = Lowest Priority]
 ```
 
-The pain point sitting in the high-severity, high-frequency quadrant is generally the clearest priority — it affects many users and costs them significantly when it occurs. The more genuinely difficult judgment calls happen in the off-diagonal quadrants: a rare but catastrophic pain point (perhaps a data-loss bug affecting a small fraction of users) may still warrant urgent attention despite low frequency, precisely because severity alone can justify prioritization even without high prevalence — while a very common but genuinely minor annoyance may be worth a cheap, quick fix specifically because of its reach, even though no individual instance is severe.
+The pain point sitting in the high-severity, high-frequency quadrant is generally the clearest priority it affects many users and costs them significantly when it occurs. The more genuinely difficult judgment calls happen in the off-diagonal quadrants: a rare but catastrophic pain point (perhaps a data-loss bug affecting a small fraction of users) may still warrant urgent attention despite low frequency, precisely because severity alone can justify prioritization even without high prevalence while a very common but genuinely minor annoyance may be worth a cheap, quick fix specifically because of its reach, even though no individual instance is severe.
 
 ### Surface-Level vs. Root-Cause Pain Points
 
-Directly extending Lesson 6's laddering technique, a pain point as initially reported is often a symptom of a deeper, underlying cause, rather than the actual root issue itself. "Users complain the search feature is slow" might, on laddering, reveal that the actual underlying pain is not raw technical latency but a mismatch between what users are searching for and how the search index is structured — meaning a technically faster search that still returns poor-quality results would not resolve the actual pain, even though it would appear to address the surface-level complaint.
+Directly extending Lesson 6's laddering technique, a pain point as initially reported is often a symptom of a deeper, underlying cause, rather than the actual root issue itself. "Users complain the search feature is slow" might, on laddering, reveal that the actual underlying pain is not raw technical latency but a mismatch between what users are searching for and how the search index is structured meaning a technically faster search that still returns poor-quality results would not resolve the actual pain, even though it would appear to address the surface-level complaint.
 
 ```mermaid
 %%{init: {
@@ -137,22 +137,22 @@ graph TD
     C --> D[Root Cause: Search Results Are Poorly<br/>Matched to Intent, Not Merely Slow to<br/>Return]
 ```
 
-A team that fixes only the surface-level, reported version of a pain point — optimizing raw search speed, in this example — without laddering to the actual root cause risks shipping a technically successful fix that fails to resolve the underlying experience the pain point was actually describing, a failure pattern closely related to Lesson 8's Detailed Case Study (a version-history feature that solved an adjacent problem rather than the one customers were actually describing).
+A team that fixes only the surface-level, reported version of a pain point optimizing raw search speed, in this example without laddering to the actual root cause risks shipping a technically successful fix that fails to resolve the underlying experience the pain point was actually describing, a failure pattern closely related to Lesson 8's Detailed Case Study (a version-history feature that solved an adjacent problem rather than the one customers were actually describing).
 
 ### Common Prioritization Failure Patterns
 
 Two specific, common failure patterns distort pain point prioritization if not deliberately guarded against:
 
-- **"Loudest voice wins"**: a pain point championed by an especially vocal internal stakeholder, or reported by an especially insistent customer, receives disproportionate priority relative to its actual severity and frequency, simply because of how forcefully or persistently it was raised — directly echoing Lesson 5's warning about customer-channel signal being structurally louder than user-channel signal, regardless of actual relative importance.
+- **"Loudest voice wins"**: a pain point championed by an especially vocal internal stakeholder, or reported by an especially insistent customer, receives disproportionate priority relative to its actual severity and frequency, simply because of how forcefully or persistently it was raised directly echoing Lesson 5's warning about customer-channel signal being structurally louder than user-channel signal, regardless of actual relative importance.
 - **"Most recent complaint wins"**: a pain point surfaced in the most recent customer conversation, support ticket, or executive escalation receives outsized attention simply due to recency, rather than being weighed against the full, systematically gathered set of pain points a well-constructed journey map (Lesson 15) or research synthesis has surfaced. This is a close cousin of confirmation bias (Lesson 11) applied specifically to timing rather than pre-existing belief.
 
-Both patterns share a common underlying mechanism: they substitute a proxy (volume, forcefulness, or recency of complaint) for the actual severity/frequency analysis this lesson recommends, and both can be corrected by the same discipline — insisting that pain points be plotted on the severity/frequency framework using systematically gathered evidence (Lessons 12 and 13) before prioritization decisions are made, rather than allowing whichever pain point was most recently or most forcefully raised to implicitly set the agenda.
+Both patterns share a common underlying mechanism: they substitute a proxy (volume, forcefulness, or recency of complaint) for the actual severity/frequency analysis this lesson recommends, and both can be corrected by the same discipline insisting that pain points be plotted on the severity/frequency framework using systematically gathered evidence (Lessons 12 and 13) before prioritization decisions are made, rather than allowing whichever pain point was most recently or most forcefully raised to implicitly set the agenda.
 
 ### Vivid but Rare vs. Genuinely Widespread
 
-A particularly important and easy-to-miss distortion is the tendency to over-weight pain points that are **vivid** — emotionally striking, memorable, easy to describe in a compelling anecdote — relative to their actual prevalence. A single, dramatically described customer story (a user who lost significant data, or had an unusually frustrating support experience) can dominate a team's attention and prioritization discussion far out of proportion to how many actual users experience anything similar, precisely because vivid, specific stories are more memorable and more persuasive in a room than an aggregate statistic, even when the statistic represents a far larger and more consequential population.
+A particularly important and easy-to-miss distortion is the tendency to over-weight pain points that are **vivid** emotionally striking, memorable, easy to describe in a compelling anecdote relative to their actual prevalence. A single, dramatically described customer story (a user who lost significant data, or had an unusually frustrating support experience) can dominate a team's attention and prioritization discussion far out of proportion to how many actual users experience anything similar, precisely because vivid, specific stories are more memorable and more persuasive in a room than an aggregate statistic, even when the statistic represents a far larger and more consequential population.
 
-This connects directly to Lesson 13's survey-validated prevalence data: a pain point's frequency should ideally be established using systematically gathered evidence, not by how memorable or emotionally resonant its most vivid example happens to be. This does not mean vivid, severe outlier stories should be ignored — as the severity/frequency framework shows, a high-severity, low-frequency pain point can still warrant priority — but it does mean the decision to prioritize it should be made deliberately, with frequency correctly characterized as low, rather than allowing the story's vividness to implicitly (and inaccurately) suggest it represents a much more widespread problem than it actually does.
+This connects directly to Lesson 13's survey-validated prevalence data: a pain point's frequency should ideally be established using systematically gathered evidence, not by how memorable or emotionally resonant its most vivid example happens to be. This does not mean vivid, severe outlier stories should be ignored as the severity/frequency framework shows, a high-severity, low-frequency pain point can still warrant priority but it does mean the decision to prioritize it should be made deliberately, with frequency correctly characterized as low, rather than allowing the story's vividness to implicitly (and inaccurately) suggest it represents a much more widespread problem than it actually does.
 
 ---
 
@@ -183,7 +183,7 @@ Without a comparative framework, teams often default to fixing whatever is easie
 
 ## Mental Model: The Pain Point Priority Grid
 
-This lesson's mental model is the **Pain Point Priority Grid** — the severity/frequency plot introduced above, used as a standing discipline whenever multiple pain points (from a journey map, interviews, or support data) need to be compared.
+This lesson's mental model is the **Pain Point Priority Grid** the severity/frequency plot introduced above, used as a standing discipline whenever multiple pain points (from a journey map, interviews, or support data) need to be compared.
 
 ```mermaid
 %%{init: {
@@ -229,18 +229,18 @@ Use this grid as a required step before any pain point is elevated to a roadmap 
 
 ## Real Company Example
 
-**Amazon**'s well-documented "question-mark email" practice is a sharp illustration of laddering a single reported pain point to determine its true underlying severity and prevalence. Jeff Bezos has long kept a public customer-facing email address; when a complaint he receives looks like it could reflect something systemic rather than a one-off, he forwards it to the responsible executive with nothing but a single "?" — shorthand, as he's explained in public interviews, for "can you look into this, and why is this happening?" The receiving executive is then expected to research the actual root cause and scope of the issue (not just resolve the one complaint) and report back, often within 24 hours.
+**Amazon**'s well-documented "question-mark email" practice is a sharp illustration of laddering a single reported pain point to determine its true underlying severity and prevalence. Jeff Bezos has long kept a public customer-facing email address; when a complaint he receives looks like it could reflect something systemic rather than a one-off, he forwards it to the responsible executive with nothing but a single "?" shorthand, as he's explained in public interviews, for "can you look into this, and why is this happening?" The receiving executive is then expected to research the actual root cause and scope of the issue (not just resolve the one complaint) and report back, often within 24 hours.
 
-This is a direct, real-world instance of this lesson's core discipline: a single escalated complaint is treated as a *lead* worth investigating, not as a finished diagnosis — the investigation is what determines whether it reflects a broad, systemic pain point (worth prioritizing) or a genuine one-off (not worth broad engineering investment). The mechanism also has a documented cost worth naming honestly: multiple former employees have described the arrival of a "?" email as high-pressure and anxiety-inducing, which is a reasonable caution about *how* an organization builds this discipline — the goal is rigorous investigation of severity and prevalence, not a culture of fear around any single customer complaint.
+This is a direct, real-world instance of this lesson's core discipline: a single escalated complaint is treated as a *lead* worth investigating, not as a finished diagnosis the investigation is what determines whether it reflects a broad, systemic pain point (worth prioritizing) or a genuine one-off (not worth broad engineering investment). The mechanism also has a documented cost worth naming honestly: multiple former employees have described the arrival of a "?" email as high-pressure and anxiety-inducing, which is a reasonable caution about *how* an organization builds this discipline the goal is rigorous investigation of severity and prevalence, not a culture of fear around any single customer complaint.
 
-*(Source: consistent across Bezos's own public remarks — including a 2018 talk at the George W. Bush Presidential Center — and multiple independently reported employee accounts. This curriculum does not claim certainty about current-day frequency or process under Amazon's present leadership.)*
+*(Source: consistent across Bezos's own public remarks including a 2018 talk at the George W. Bush Presidential Center and multiple independently reported employee accounts. This curriculum does not claim certainty about current-day frequency or process under Amazon's present leadership.)*
 
 ---
 
 ## Real World Perspective: Pain Points at Different Company Stages
 
 **At a startup:**
-Pain point prioritization is often necessarily intuitive and fast, given limited research resources, but the core discipline of this lesson — resisting the urge to fix whatever the most recent or loudest customer complained about, and instead asking about actual severity and frequency across the broader (if still small) user base — remains just as important, since early-stage teams have the least slack to spend on the wrong problem first.
+Pain point prioritization is often necessarily intuitive and fast, given limited research resources, but the core discipline of this lesson resisting the urge to fix whatever the most recent or loudest customer complained about, and instead asking about actual severity and frequency across the broader (if still small) user base remains just as important, since early-stage teams have the least slack to spend on the wrong problem first.
 
 **At a mid-size company:**
 Pain point prioritization increasingly benefits from combining qualitative severity assessment (via interviews, Lesson 12) with quantitative frequency validation (via surveys or behavioral analytics, Lesson 13), and dedicated processes for systematically logging and categorizing pain points (rather than relying on individual team members' memory of recent conversations) become more valuable as the organization and its user base grow.
@@ -254,9 +254,9 @@ Pain point prioritization at scale often has access to extensive quantitative da
 
 Consider a simplified, illustrative scenario common across B2B SaaS support and product teams.
 
-A CRM software company's support team logs a recurring complaint: "Users say exporting reports takes too long and often times out." The complaint appears frequently across support tickets, and a product team, treating this as a straightforward performance problem, invests a full quarter optimizing the underlying export infrastructure — significantly improving raw processing speed and reducing timeout occurrences by a substantial margin.
+A CRM software company's support team logs a recurring complaint: "Users say exporting reports takes too long and often times out." The complaint appears frequently across support tickets, and a product team, treating this as a straightforward performance problem, invests a full quarter optimizing the underlying export infrastructure significantly improving raw processing speed and reducing timeout occurrences by a substantial margin.
 
-Despite this successful technical fix, essentially the same complaint — "exports are frustrating and don't work the way I need" — continues to appear in support tickets and customer interviews at nearly the same rate as before. A subsequent, more disciplined investigation, applying laddering to a fresh round of interviews specifically about report exports, reveals the actual underlying issue: the majority of complaining users were not primarily bothered by processing speed at all, but by the exported report's formatting requiring extensive manual cleanup before it could be used in their own external reporting tools — a formatting and structure problem entirely distinct from the raw speed problem the team had spent a full quarter solving.
+Despite this successful technical fix, essentially the same complaint "exports are frustrating and don't work the way I need" continues to appear in support tickets and customer interviews at nearly the same rate as before. A subsequent, more disciplined investigation, applying laddering to a fresh round of interviews specifically about report exports, reveals the actual underlying issue: the majority of complaining users were not primarily bothered by processing speed at all, but by the exported report's formatting requiring extensive manual cleanup before it could be used in their own external reporting tools a formatting and structure problem entirely distinct from the raw speed problem the team had spent a full quarter solving.
 
 **What went wrong?**
 
@@ -264,11 +264,11 @@ Applying this lesson's frameworks:
 
 1. **The reported pain point ("exporting takes too long") was accepted at its surface level**, without laddering to the actual root cause, echoing Lesson 8's version-history case study and Lesson 6's Job Ladder discipline directly.
 2. **Severity and frequency were both established from the original, un-laddered version of the complaint**, meaning the resulting fix was correctly targeted at solving *a* real problem (processing speed genuinely was slow), just not the problem most users were actually describing when they used similar language to report their dissatisfaction.
-3. **No one investigated whether "too long" and "times out" were being used by different complaining users to describe genuinely different underlying frustrations** — some may have genuinely meant literal processing speed, but a larger share, once laddered, revealed a formatting and structure complaint that happened to be described using similar surface-level language.
+3. **No one investigated whether "too long" and "times out" were being used by different complaining users to describe genuinely different underlying frustrations** some may have genuinely meant literal processing speed, but a larger share, once laddered, revealed a formatting and structure complaint that happened to be described using similar surface-level language.
 
-A team applying laddering from the outset — treating "exports take too long" as a starting point requiring further "why" questions, per Lessons 6 and 12, rather than a finished, actionable pain point — would likely have discovered the formatting root cause before investing a full quarter into a technically successful but only partially relevant infrastructure fix, and could have prioritized the formatting problem specifically, rather than needing a second full investigation cycle to find it.
+A team applying laddering from the outset treating "exports take too long" as a starting point requiring further "why" questions, per Lessons 6 and 12, rather than a finished, actionable pain point would likely have discovered the formatting root cause before investing a full quarter into a technically successful but only partially relevant infrastructure fix, and could have prioritized the formatting problem specifically, rather than needing a second full investigation cycle to find it.
 
-This case connects directly back to **Lesson 6's Job Ladder** and **Lesson 12's Interview Depth Staircase**: both tools exist specifically to prevent a team from stopping at the first, surface-level version of a stated problem, and this case study shows the real cost — a full quarter of otherwise well-executed engineering work — of skipping that step.
+This case connects directly back to **Lesson 6's Job Ladder** and **Lesson 12's Interview Depth Staircase**: both tools exist specifically to prevent a team from stopping at the first, surface-level version of a stated problem, and this case study shows the real cost a full quarter of otherwise well-executed engineering work of skipping that step.
 
 ---
 
@@ -283,7 +283,7 @@ A practical checklist for validating a pain point before it is elevated to the s
 | Is frequency based on survey or behavioral data (Lesson 13), or on how often this specific pain point happens to come up in conversation? | Prevents the "most recent" and "vivid but rare" distortions |
 | Has this pain point been compared against other identified pain points on the same grid, rather than evaluated in isolation? | Prevents "loudest voice" prioritization by forcing genuine comparison |
 
-A pain point that has not passed this checklist is not necessarily wrong or unimportant — it may simply not yet be characterized precisely enough to responsibly prioritize alongside other, more rigorously validated pain points.
+A pain point that has not passed this checklist is not necessarily wrong or unimportant it may simply not yet be characterized precisely enough to responsibly prioritize alongside other, more rigorously validated pain points.
 
 ---
 
@@ -293,27 +293,27 @@ A pain point that has not passed this checklist is not necessarily wrong or unim
 *What the interviewer is actually evaluating:* Whether the candidate has a systematic framework (severity/frequency) rather than defaulting to whichever pain point was raised most recently or most forcefully. A strong answer names specific evidence sources (interviews for severity, surveys or analytics for frequency) rather than describing an intuitive, unstructured judgment call.
 
 **Typical question 2: "Tell me about a time a fix didn't actually solve the problem it was meant to solve."**
-*What the interviewer is actually evaluating:* Whether the candidate has direct experience with the surface-level-versus-root-cause failure pattern, and whether they can describe the laddering process that eventually revealed the actual underlying issue — echoing this lesson's Detailed Case Study directly.
+*What the interviewer is actually evaluating:* Whether the candidate has direct experience with the surface-level-versus-root-cause failure pattern, and whether they can describe the laddering process that eventually revealed the actual underlying issue echoing this lesson's Detailed Case Study directly.
 
 **Typical question 3: "A senior executive is pushing hard for a fix based on one dramatic customer story. How do you respond?"**
-*What the interviewer is actually evaluating:* Whether the candidate can navigate the "vivid but rare" and "loudest voice" distortions diplomatically but firmly — acknowledging the story's legitimacy while insisting on establishing its actual frequency and severity relative to other known pain points, rather than either dismissing the executive's concern outright or capitulating without genuine analysis.
+*What the interviewer is actually evaluating:* Whether the candidate can navigate the "vivid but rare" and "loudest voice" distortions diplomatically but firmly acknowledging the story's legitimacy while insisting on establishing its actual frequency and severity relative to other known pain points, rather than either dismissing the executive's concern outright or capitulating without genuine analysis.
 
 ---
 
 ## Summary
 
-A pain point, to be genuinely useful, must be specific — naming the exact step, friction, and consequence — rather than a vague complaint. The severity/frequency framework provides a structured way to compare multiple identified pain points, with high-severity/high-frequency pain points as the clearest priority and off-diagonal cases (rare but severe, or common but minor) requiring deliberate, explicit judgment rather than default neglect. Laddering (Lesson 6) is essential for distinguishing a surface-level, reported pain point from its actual root cause, since fixing the surface-level version alone can leave the true underlying issue unresolved, as shown in this lesson's Detailed Case Study. Two common prioritization failure patterns — "loudest voice wins" and "most recent complaint wins" — substitute a proxy (forcefulness or recency) for genuine severity/frequency analysis, and a closely related distortion, over-weighting vivid but rare anecdotes relative to their actual prevalence, can be corrected only by establishing frequency through systematic evidence (surveys, behavioral data) rather than through how emotionally memorable a given story happens to be.
+A pain point, to be genuinely useful, must be specific naming the exact step, friction, and consequence rather than a vague complaint. The severity/frequency framework provides a structured way to compare multiple identified pain points, with high-severity/high-frequency pain points as the clearest priority and off-diagonal cases (rare but severe, or common but minor) requiring deliberate, explicit judgment rather than default neglect. Laddering (Lesson 6) is essential for distinguishing a surface-level, reported pain point from its actual root cause, since fixing the surface-level version alone can leave the true underlying issue unresolved, as shown in this lesson's Detailed Case Study. Two common prioritization failure patterns "loudest voice wins" and "most recent complaint wins" substitute a proxy (forcefulness or recency) for genuine severity/frequency analysis, and a closely related distortion, over-weighting vivid but rare anecdotes relative to their actual prevalence, can be corrected only by establishing frequency through systematic evidence (surveys, behavioral data) rather than through how emotionally memorable a given story happens to be.
 
 ---
 
 ## Key Takeaways
 
-- A pain point must be specific (which step, what friction, what consequence) — a vague complaint has not yet been climbed to a genuinely useful level of detail.
+- A pain point must be specific (which step, what friction, what consequence) a vague complaint has not yet been climbed to a genuinely useful level of detail.
 - The severity/frequency framework structures pain point comparison; high-severity/high-frequency cases are the clearest priority, and off-diagonal cases require deliberate, explicit judgment.
-- Laddering (Lesson 6) is essential for distinguishing a surface-level, reported pain point from its actual root cause — fixing the surface-level version can leave the true issue unresolved.
+- Laddering (Lesson 6) is essential for distinguishing a surface-level, reported pain point from its actual root cause fixing the surface-level version can leave the true issue unresolved.
 - "Loudest voice wins" and "most recent complaint wins" both substitute a proxy (forcefulness, recency) for genuine severity/frequency analysis.
 - Vivid, memorable anecdotes can dominate prioritization discussions far out of proportion to their actual prevalence unless frequency is established through systematic evidence.
-- A high-severity, low-frequency pain point can still warrant priority — the goal is deliberate, evidence-based judgment, not automatically favoring high-frequency issues over rare-but-severe ones.
+- A high-severity, low-frequency pain point can still warrant priority the goal is deliberate, evidence-based judgment, not automatically favoring high-frequency issues over rare-but-severe ones.
 - The Pain Point Validation Checklist (laddered? severity from real evidence? frequency from real evidence? compared against other pain points?) should be applied before elevating any pain point to a roadmap priority.
 
 ---
@@ -325,8 +325,8 @@ A pain point, to be genuinely useful, must be specific — naming the exact step
 - **Pain point = specific step + specific friction + specific consequence.** Vague complaints aren't yet pain points.
 - **Severity/Frequency Grid:** high/high = clear priority; off-diagonal cases need deliberate judgment, not default neglect.
 - **Ladder every pain point** (Lesson 6) to its root cause before fixing the surface-level symptom.
-- **Avoid "loudest voice wins" and "most recent complaint wins"** — both substitute a proxy for real analysis.
-- **Vivid ≠ widespread** — establish frequency from surveys/analytics, not from how memorable the story feels.
+- **Avoid "loudest voice wins" and "most recent complaint wins"** both substitute a proxy for real analysis.
+- **Vivid ≠ widespread** establish frequency from surveys/analytics, not from how memorable the story feels.
 - **Pain Point Validation Checklist:** laddered? severity from real evidence? frequency from real evidence? compared against alternatives?
 
 ---
@@ -346,9 +346,9 @@ A pain point, to be genuinely useful, must be specific — naming the exact step
 
 ## Further Reading / Resources
 
-- Teresa Torres, *Continuous Discovery Habits* — includes practical guidance on systematically capturing and comparing pain points (often framed as "opportunities") across ongoing discovery work.
+- Teresa Torres, *Continuous Discovery Habits* includes practical guidance on systematically capturing and comparing pain points (often framed as "opportunities") across ongoing discovery work.
 - Marty Cagan's public writing on distinguishing customer-reported symptoms from underlying product opportunities, closely related to this lesson's surface-versus-root-cause distinction.
-- Melissa Perri, *Escaping the Build Trap* — discusses the risk of solving surface-level, reported problems without addressing genuine underlying business or user outcomes.
+- Melissa Perri, *Escaping the Build Trap* discusses the risk of solving surface-level, reported problems without addressing genuine underlying business or user outcomes.
 
 ---
 
@@ -356,7 +356,7 @@ A pain point, to be genuinely useful, must be specific — naming the exact step
 
 **Card 1**
 - Front: What distinguishes a genuine pain point from a vague complaint?
-- Back: A genuine pain point is specific — naming the exact step, the specific friction, and ideally the specific consequence — rather than a general statement like "this is confusing."
+- Back: A genuine pain point is specific naming the exact step, the specific friction, and ideally the specific consequence rather than a general statement like "this is confusing."
 - Difficulty: 1
 - Tags: pain-point-specificity
 
@@ -392,7 +392,7 @@ A pain point, to be genuinely useful, must be specific — naming the exact step
 
 **Card 7**
 - Front: Can a high-severity, low-frequency pain point still warrant top priority? Why?
-- Back: Yes — severity alone can justify prioritization even without high prevalence (e.g., a rare but catastrophic data-loss bug), so off-diagonal cases require deliberate judgment rather than default neglect.
+- Back: Yes severity alone can justify prioritization even without high prevalence (e.g., a rare but catastrophic data-loss bug), so off-diagonal cases require deliberate judgment rather than default neglect.
 - Difficulty: 2
 - Tags: severity-frequency-tradeoffs
 
@@ -513,7 +513,7 @@ C) Confirming a pain point is laddered, evidence-based, and compared with others
 D) Measuring how quickly a given support ticket was resolved
 
 *Correct answer: C*
-*Explanation: Each question closes one of the failure modes — surface-level framing, assumed severity, assumed frequency, and evaluation in isolation rather than against the alternatives.*
+*Explanation: Each question closes one of the failure modes surface-level framing, assumed severity, assumed frequency, and evaluation in isolation rather than against the alternatives.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Medium*
 
@@ -560,7 +560,7 @@ D) Extensive practical experience with the Severity/Frequency Framework
 
 **12. (Product Thinking, Higher Difficulty) A team has survey data showing a pain point affects a large share of users, but qualitative interviews reveal that most affected users rate its severity as quite low (a minor annoyance, not a significant obstacle). Where does this pain point most likely sit on the Severity/Frequency Grid, and what does that suggest?**
 A) High severity and low frequency, calling for urgent top priority
-B) Low severity, high frequency — often worth a cheap fix
+B) Low severity, high frequency often worth a cheap fix
 C) High severity and high frequency, the clearest possible priority
 D) A contradictory combination of data that ought to be discarded
 
@@ -597,14 +597,14 @@ D) Build two independent fixes, one for each surface-level complaint
 
 ---
 
-**15. (Highest Difficulty) A team has rigorously validated a pain point's severity and frequency using systematic evidence, laddered it to a clear root cause, and confirmed it sits in the high-severity, high-frequency quadrant — but a competing, less-validated pain point is being pushed by a senior stakeholder based on a single vivid anecdote. According to this lesson, what is the most appropriate way to handle this conflict?**
+**15. (Highest Difficulty) A team has rigorously validated a pain point's severity and frequency using systematic evidence, laddered it to a clear root cause, and confirmed it sits in the high-severity, high-frequency quadrant but a competing, less-validated pain point is being pushed by a senior stakeholder based on a single vivid anecdote. According to this lesson, what is the most appropriate way to handle this conflict?**
 A) Present both on the grid, making the comparative case explicit
 B) Prioritise the stakeholder's, since seniority overrides the evidence
 C) Decline to discuss it, since it lacks systematic evidence
 D) Split resources evenly between them regardless of evidence strength
 
 *Correct answer: A*
-*Explanation: The anecdote may be the first sighting of something real and unmeasured, so it earns investigation rather than dismissal — but the comparison should be made in the open, on the same axes.*
+*Explanation: The anecdote may be the first sighting of something real and unmeasured, so it earns investigation rather than dismissal but the comparison should be made in the open, on the same axes.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
@@ -614,10 +614,10 @@ D) Split resources evenly between them regardless of evidence strength
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 15 — User Journey Mapping | A well-constructed journey map typically surfaces multiple pain points; this lesson provides the discipline for prioritizing among them |
-| **Current Lesson** | Lesson 16 — Pain Points | The Severity/Frequency Framework; surface-level vs. root-cause pain points; "loudest voice" and "most recent complaint" failure patterns; vivid-but-rare distortion |
-| **Next Lesson** | Lesson 17 — Problem Statements | Formalizes a validated, prioritized, laddered pain point into a structured, testable problem statement |
+| **Previous Lesson** | Lesson 15 User Journey Mapping | A well-constructed journey map typically surfaces multiple pain points; this lesson provides the discipline for prioritizing among them |
+| **Current Lesson** | Lesson 16 Pain Points | The Severity/Frequency Framework; surface-level vs. root-cause pain points; "loudest voice" and "most recent complaint" failure patterns; vivid-but-rare distortion |
+| **Next Lesson** | Lesson 17 Problem Statements | Formalizes a validated, prioritized, laddered pain point into a structured, testable problem statement |
 | **Future Concepts Unlocked** | Lesson 21 (MVP) | Uses a prioritized, root-cause pain point as the basis for scoping the smallest viable solution |
 | | Lesson 29 (Prioritization Fundamentals) | Incorporates the Severity/Frequency Framework as one input into a broader, multi-factor prioritization scoring model |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a "pain point" assumes it has been laddered to a specific root cause and characterized by real severity/frequency evidence — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a "pain point" assumes it has been laddered to a specific root cause and characterized by real severity/frequency evidence this will not be re-explained, only re-applied.

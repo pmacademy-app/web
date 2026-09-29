@@ -4,7 +4,7 @@
 
 Module 8 closed with a synthesis lesson establishing that advanced strategic judgment means recognizing which combination of tools applies to a genuinely multi-dimensional problem. Module 9 opens by applying that same accumulated judgment to a category of product work with its own distinct, non-negotiable constraint: building for healthcare, finance, or government, where the product's obligations extend well beyond satisfying a user or even a buying committee, to satisfying legal and regulatory requirements that exist specifically because getting the product wrong can cause serious, sometimes irreversible harm to real people.
 
-A PM moving into a regulated industry for the first time, having built strong instincts in an unregulated consumer or B2B context, tends to make a specific and consequential mistake: treating regulatory compliance as a checklist to satisfy after the product is essentially designed, rather than as a set of constraints that must shape the product's architecture from the earliest design decisions. This mistake is understandable, since in most unregulated contexts, legal and compliance considerations genuinely can be handled as a late-stage review layered on top of an otherwise-complete design. In regulated industries, this sequencing frequently doesn't work, because certain regulatory requirements — an audit trail of every decision, a human review step before a high-stakes automated action, a specific data-handling architecture — are structural, and retrofitting them into a product built without them in mind can require rebuilding core architecture rather than simply adding a feature.
+A PM moving into a regulated industry for the first time, having built strong instincts in an unregulated consumer or B2B context, tends to make a specific and consequential mistake: treating regulatory compliance as a checklist to satisfy after the product is essentially designed, rather than as a set of constraints that must shape the product's architecture from the earliest design decisions. This mistake is understandable, since in most unregulated contexts, legal and compliance considerations genuinely can be handled as a late-stage review layered on top of an otherwise-complete design. In regulated industries, this sequencing frequently doesn't work, because certain regulatory requirements an audit trail of every decision, a human review step before a high-stakes automated action, a specific data-handling architecture are structural, and retrofitting them into a product built without them in mind can require rebuilding core architecture rather than simply adding a feature.
 
 This lesson introduces the Regulatory Surface Map, this lesson's core mental model, to give you a structured way to identify which layers of your product regulation actually touches, so that regulatory constraints inform design from the outset rather than arriving as a late, disruptive surprise.
 
@@ -14,13 +14,13 @@ This lesson introduces the Regulatory Surface Map, this lesson's core mental mod
 
 | Field | Detail |
 |---|---|
-| **Module** | 9 — Specialized Domains and Synthesis |
+| **Module** | 9 Specialized Domains and Synthesis |
 | **Current Lesson** | 81 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 65 (Ownership Zones Model, error costs), Lesson 67 (Escalation Staircase, proportional enforcement), Lesson 80 (Strategic Judgment Radar, connected diagnosis) |
-| **Next Lesson** | Lesson 82 — Privacy, Security, and Compliance as Product Constraints |
-| **Future Topics Unlocked** | Lesson 82 (Privacy, Security, and Compliance), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management) — all depend on the Regulatory Surface Map introduced here |
+| **Next Lesson** | Lesson 82 Privacy, Security, and Compliance as Product Constraints |
+| **Future Topics Unlocked** | Lesson 82 (Privacy, Security, and Compliance), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management) all depend on the Regulatory Surface Map introduced here |
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes the Ownership Zones Model and error-cost framing from Lesson
 
 ### Why Regulation Must Shape Architecture, Not Just Review
 
-In an unregulated product context, legal and compliance review can often function as a final check applied to an otherwise-complete design, since the primary risks being managed are largely contractual or reputational, and can typically be addressed through policy language, disclaimers, or minor feature adjustments. In healthcare, finance, and government contexts, a meaningful category of regulatory requirements are instead structural: they specify not just what a product may or may not do, but how it must be built to do it — requiring, for instance, an immutable audit log of every decision affecting a patient's care, a specific human review step before a loan application can be denied, or a data architecture that physically segregates certain categories of information. A product built without these structural requirements in mind cannot simply have them added later through a policy update; the underlying system frequently has to be substantially rearchitected, at a cost far higher than if the requirement had been designed in from the start.
+In an unregulated product context, legal and compliance review can often function as a final check applied to an otherwise-complete design, since the primary risks being managed are largely contractual or reputational, and can typically be addressed through policy language, disclaimers, or minor feature adjustments. In healthcare, finance, and government contexts, a meaningful category of regulatory requirements are instead structural: they specify not just what a product may or may not do, but how it must be built to do it requiring, for instance, an immutable audit log of every decision affecting a patient's care, a specific human review step before a loan application can be denied, or a data architecture that physically segregates certain categories of information. A product built without these structural requirements in mind cannot simply have them added later through a policy update; the underlying system frequently has to be substantially rearchitected, at a cost far higher than if the requirement had been designed in from the start.
 
 ### The Regulatory Surface Map
 
@@ -85,21 +85,21 @@ This lesson introduces the **Regulatory Surface Map**, identifying four layers a
 }}%%
 graph TD
     A["Data Layer<br/>(what data can be collected, stored, shared, and how)"] --> B["Process Layer<br/>(what steps, approvals, or audit trails a decision must include)"]
-    B --> C["Outcome Layer<br/>(what results are permissible — non-discrimination, safety thresholds)"]
+    B --> C["Outcome Layer<br/>(what results are permissible non-discrimination, safety thresholds)"]
     C --> D["Liability Layer<br/>(who is legally accountable when something goes wrong)"]
 ```
 
-The **Data Layer** governs what information can be collected, how it must be stored or encrypted, who may access it, and under what conditions it can be shared — directly connecting to the privacy and security considerations this module will address further in Lesson 82. The **Process Layer** governs the specific steps a decision-making workflow must include, such as a documented approval chain, a mandatory waiting period, or an audit trail proving a particular review actually occurred. The **Outcome Layer** governs what results are permissible regardless of process — a lending algorithm that produces discriminatory outcomes across a protected class can violate regulation even if every individual step in its process was followed correctly. The **Liability Layer** governs who bears legal accountability when a decision causes harm, which frequently determines whether, and how, a human must be meaningfully involved in a given decision rather than allowing a fully automated system to act alone.
+The **Data Layer** governs what information can be collected, how it must be stored or encrypted, who may access it, and under what conditions it can be shared directly connecting to the privacy and security considerations this module will address further in Lesson 82. The **Process Layer** governs the specific steps a decision-making workflow must include, such as a documented approval chain, a mandatory waiting period, or an audit trail proving a particular review actually occurred. The **Outcome Layer** governs what results are permissible regardless of process a lending algorithm that produces discriminatory outcomes across a protected class can violate regulation even if every individual step in its process was followed correctly. The **Liability Layer** governs who bears legal accountability when a decision causes harm, which frequently determines whether, and how, a human must be meaningfully involved in a given decision rather than allowing a fully automated system to act alone.
 
-The Regulatory Surface Map's discipline is identifying, for any product feature operating in a regulated domain, which of these four layers actually apply, since a feature can pass scrutiny at one layer while still failing at another — a lending decision made through a scrupulously documented process (satisfying the Process Layer) can still violate the Outcome Layer if its results are discriminatory, regardless of how well-documented the process itself was.
+The Regulatory Surface Map's discipline is identifying, for any product feature operating in a regulated domain, which of these four layers actually apply, since a feature can pass scrutiny at one layer while still failing at another a lending decision made through a scrupulously documented process (satisfying the Process Layer) can still violate the Outcome Layer if its results are discriminatory, regardless of how well-documented the process itself was.
 
 ### Human-in-the-Loop Requirements and the Ownership Zones Model
 
-Many regulated contexts specifically require a human decision-maker to review or approve certain categories of automated decisions before they take effect — a requirement that connects directly to the Ownership Zones Model from Lesson 65. Regulators, in effect, are formalizing exactly the Zone 4 (Product Decision and Deployment) concern that lesson raised: a model's probabilistic output should not be treated as an automatic, unquestioned action, particularly when the decision carries significant consequences for a real person's health, financial standing, or legal status. In many regulated industries, this concern has been codified into a specific legal requirement rather than left as a best practice, meaning the Ownership Zones Model's Zone 4 discipline is, in these contexts, not optional judgment but mandatory compliance.
+Many regulated contexts specifically require a human decision-maker to review or approve certain categories of automated decisions before they take effect a requirement that connects directly to the Ownership Zones Model from Lesson 65. Regulators, in effect, are formalizing exactly the Zone 4 (Product Decision and Deployment) concern that lesson raised: a model's probabilistic output should not be treated as an automatic, unquestioned action, particularly when the decision carries significant consequences for a real person's health, financial standing, or legal status. In many regulated industries, this concern has been codified into a specific legal requirement rather than left as a best practice, meaning the Ownership Zones Model's Zone 4 discipline is, in these contexts, not optional judgment but mandatory compliance.
 
 ### Why Liability Assignment Shapes Product Design
 
-The Liability Layer often has the most direct and immediate influence on product architecture, because a product team must be able to demonstrate, after the fact, exactly who or what was responsible for a specific decision — a requirement that shapes not just process documentation, but the underlying system architecture itself, since a system that cannot reconstruct its own decision history cannot support the liability assignment regulation frequently requires. This is one of the clearest instances of a regulatory requirement that must be designed into a product's core architecture from the beginning, since an audit trail retrofitted after the fact can rarely reconstruct decisions that were never designed to be logged in the first place.
+The Liability Layer often has the most direct and immediate influence on product architecture, because a product team must be able to demonstrate, after the fact, exactly who or what was responsible for a specific decision a requirement that shapes not just process documentation, but the underlying system architecture itself, since a system that cannot reconstruct its own decision history cannot support the liability assignment regulation frequently requires. This is one of the clearest instances of a regulatory requirement that must be designed into a product's core architecture from the beginning, since an audit trail retrofitted after the fact can rarely reconstruct decisions that were never designed to be logged in the first place.
 
 ---
 
@@ -132,7 +132,7 @@ Regulations in healthcare, finance, and government contexts change, and a produc
 
 The Regulatory Surface Map introduced above is this lesson's core takeaway tool. For any product feature operating in a regulated domain, ask:
 
-1. **Which layer does this feature's regulatory obligation actually touch** — Data, Process, Outcome, or Liability — and has this been explicitly identified before development begins?
+1. **Which layer does this feature's regulatory obligation actually touch** Data, Process, Outcome, or Liability and has this been explicitly identified before development begins?
 2. **Does satisfying one layer create a false sense of complete compliance**, when a separate layer (most commonly Outcome, given how easy it is to satisfy Process while still producing an impermissible result) has not been independently verified?
 3. **Does a decision in this feature require human-in-the-loop review**, per applicable regulation, and does the Ownership Zones Model's Zone 4 discipline from Lesson 65 reflect that legal requirement rather than treating it as optional?
 4. **Can the system reconstruct its own decision history after the fact**, in a form sufficient to support the Liability Layer's accountability requirements?
@@ -143,7 +143,7 @@ A product team that runs every regulated feature through this Map before develop
 
 ## Real Company Example
 
-**Palantir's own product documentation** makes this lesson's Liability Layer concept directly inspectable rather than merely inferable. Palantir's Foundry platform documentation describes audit logging and access control as core, non-negotiable platform features — the company states directly that it "reject[s] the notion of gating, pay-walling, or upselling core security controls like audit logging, single sign-on, and multi-factor authentication," treating them as baseline requirements rather than premium add-ons. The documentation describes a specific mechanism worth naming: mandatory access controls that propagate automatically with each unit of data via what Palantir calls "provenance and lineage" tracking, so that a piece of data's access restrictions travel with it as it moves through the platform, rather than needing to be manually re-applied at every downstream point it's used. Palantir's own engineering blog further describes a next-generation audit system, "audit.3," built specifically to deliver near-real-time logs with a redesigned schema — an indication the company treats audit infrastructure as a product investment worth ongoing engineering effort, not a one-time compliance checkbox.
+**Palantir's own product documentation** makes this lesson's Liability Layer concept directly inspectable rather than merely inferable. Palantir's Foundry platform documentation describes audit logging and access control as core, non-negotiable platform features the company states directly that it "reject[s] the notion of gating, pay-walling, or upselling core security controls like audit logging, single sign-on, and multi-factor authentication," treating them as baseline requirements rather than premium add-ons. The documentation describes a specific mechanism worth naming: mandatory access controls that propagate automatically with each unit of data via what Palantir calls "provenance and lineage" tracking, so that a piece of data's access restrictions travel with it as it moves through the platform, rather than needing to be manually re-applied at every downstream point it's used. Palantir's own engineering blog further describes a next-generation audit system, "audit.3," built specifically to deliver near-real-time logs with a redesigned schema an indication the company treats audit infrastructure as a product investment worth ongoing engineering effort, not a one-time compliance checkbox.
 
 This is a directly verifiable illustration of the Liability Layer shaping core architecture rather than being bolted on afterward: data provenance and access-control propagation are structural properties of how Palantir's platform is built, which is precisely the distinction this lesson draws between compliance designed in from the outset and compliance retrofitted after the fact.
 
@@ -153,7 +153,7 @@ This is a directly verifiable illustration of the Liability Layer shaping core a
 
 ## Real World Perspective: Regulated Industries: PM in Healthcare, Finance, and Government at Different Company Stages
 
-**Startup:** Early-stage companies entering a regulated industry for the first time often underestimate how early regulatory architecture decisions must be made, since the instinct to move fast and iterate, well-suited to unregulated consumer products, can lead to costly rearchitecture once a structural compliance gap — an audit trail never built in, a human review step never designed — is discovered after significant product development has already occurred.
+**Startup:** Early-stage companies entering a regulated industry for the first time often underestimate how early regulatory architecture decisions must be made, since the instinct to move fast and iterate, well-suited to unregulated consumer products, can lead to costly rearchitecture once a structural compliance gap an audit trail never built in, a human review step never designed is discovered after significant product development has already occurred.
 
 **Mid-size company:** This is typically where a company's regulatory obligations first become genuinely complex, as growth into new geographies or new product lines within a regulated industry introduces additional, sometimes conflicting regulatory requirements that a single early compliance framework may not have anticipated.
 
@@ -165,11 +165,11 @@ This is a directly verifiable illustration of the Liability Layer shaping core a
 
 A fintech startup built an automated small-business loan approval product, using a machine learning model to assess creditworthiness and approve or deny loan applications with minimal human involvement, reasoning that full automation would allow the company to process applications faster than competitors relying on manual underwriting. The product team had carefully validated the model's technical accuracy and had documented the model's decision process, satisfying what the team believed was thorough regulatory diligence.
 
-Several months after launch, a regulatory review revealed two distinct problems. First, using the Regulatory Surface Map's Outcome Layer, the review found that the model's approval rates, while never explicitly using any protected characteristic as an input, produced a statistically significant disparity in approval rates across different demographic groups — a violation of fair lending regulation regardless of the fact that the model's *process* had been carefully documented and its inputs had never explicitly included the protected characteristic itself. Second, using the Liability Layer, the review found that the fully automated denial process had never incorporated a human review step for denied applications, a specific regulatory requirement for certain categories of credit decisions that the product team had not identified before building the fully automated system, since their focus had been entirely on technical model accuracy and process documentation rather than a systematic review of applicable Outcome and Liability Layer requirements.
+Several months after launch, a regulatory review revealed two distinct problems. First, using the Regulatory Surface Map's Outcome Layer, the review found that the model's approval rates, while never explicitly using any protected characteristic as an input, produced a statistically significant disparity in approval rates across different demographic groups a violation of fair lending regulation regardless of the fact that the model's *process* had been carefully documented and its inputs had never explicitly included the protected characteristic itself. Second, using the Liability Layer, the review found that the fully automated denial process had never incorporated a human review step for denied applications, a specific regulatory requirement for certain categories of credit decisions that the product team had not identified before building the fully automated system, since their focus had been entirely on technical model accuracy and process documentation rather than a systematic review of applicable Outcome and Liability Layer requirements.
 
-**What went wrong?** Using the Regulatory Surface Map, the failure is precise: the team had thoroughly addressed the Process Layer — documenting exactly how the model reached its decisions — while never independently verifying the Outcome Layer (whether those decisions produced permissible results across demographic groups) or the Liability Layer (whether a human review step was legally required before a final denial). Strong performance at one layer had created a false sense of complete regulatory diligence, masking gaps at two separate layers that a systematic Regulatory Surface Map review, applied before development began, would have surfaced.
+**What went wrong?** Using the Regulatory Surface Map, the failure is precise: the team had thoroughly addressed the Process Layer documenting exactly how the model reached its decisions while never independently verifying the Outcome Layer (whether those decisions produced permissible results across demographic groups) or the Liability Layer (whether a human review step was legally required before a final denial). Strong performance at one layer had created a false sense of complete regulatory diligence, masking gaps at two separate layers that a systematic Regulatory Surface Map review, applied before development began, would have surfaced.
 
-The company's recovery involved substantially rearchitecting the loan approval system to incorporate a mandatory human review step for denied applications — directly applying the Ownership Zones Model's Zone 4 discipline from Lesson 65 as a compliance requirement rather than an optional judgment call — and conducting a full model retraining and audit process specifically targeting demographic disparity in approval rates, a far more costly and disruptive process than incorporating these requirements during initial design would have been.
+The company's recovery involved substantially rearchitecting the loan approval system to incorporate a mandatory human review step for denied applications directly applying the Ownership Zones Model's Zone 4 discipline from Lesson 65 as a compliance requirement rather than an optional judgment call and conducting a full model retraining and audit process specifically targeting demographic disparity in approval rates, a far more costly and disruptive process than incorporating these requirements during initial design would have been.
 
 ---
 
@@ -191,7 +191,7 @@ A "no" on Outcome Layer Verification should be treated with particular urgency, 
 
 ## Interview Perspective: How Interviewers Think About This
 
-**"How would you approach building a product feature that makes automated decisions affecting people's financial or health outcomes?"** The interviewer is evaluating whether you propose systematically identifying applicable regulatory layers — data, process, outcome, and liability — before development begins, rather than treating compliance as a late-stage review.
+**"How would you approach building a product feature that makes automated decisions affecting people's financial or health outcomes?"** The interviewer is evaluating whether you propose systematically identifying applicable regulatory layers data, process, outcome, and liability before development begins, rather than treating compliance as a late-stage review.
 
 **"Why might a well-documented, carefully-followed decision-making process still violate regulation?"** The interviewer is testing whether you recognize the distinction between Process Layer and Outcome Layer compliance, and can explain why satisfying one doesn't guarantee satisfying the other.
 
@@ -201,7 +201,7 @@ A "no" on Outcome Layer Verification should be treated with particular urgency, 
 
 ## Summary
 
-Regulatory compliance in healthcare, finance, and government contexts frequently must shape product architecture from the earliest design decisions, since a meaningful category of regulatory requirements — audit trails, mandatory human review steps, specific data architectures — are structural and cannot simply be added as a late-stage policy update without substantial, costly rearchitecture. The Regulatory Surface Map identifies four layers at which regulation typically constrains a product — Data, Process, Outcome, and Liability — and its central discipline is recognizing that a feature can satisfy one layer while still failing another, most commonly satisfying a well-documented Process Layer while still producing an impermissible Outcome Layer result, exactly the failure this lesson's Case Study illustrates. Human-in-the-loop requirements, common across regulated industries, formalize the Ownership Zones Model's Zone 4 discipline from Lesson 65 into a legal obligation rather than an optional best practice, and the Liability Layer's demand for after-the-fact accountability frequently shapes a product's core architecture directly, since a system that cannot reconstruct its own decision history cannot support the accountability regulation requires. A product team operating in a regulated industry that identifies applicable Regulatory Surface Map layers before development begins is far better positioned to avoid the costly, disruptive experience of discovering a structural compliance gap only after significant product investment has already occurred.
+Regulatory compliance in healthcare, finance, and government contexts frequently must shape product architecture from the earliest design decisions, since a meaningful category of regulatory requirements audit trails, mandatory human review steps, specific data architectures are structural and cannot simply be added as a late-stage policy update without substantial, costly rearchitecture. The Regulatory Surface Map identifies four layers at which regulation typically constrains a product Data, Process, Outcome, and Liability and its central discipline is recognizing that a feature can satisfy one layer while still failing another, most commonly satisfying a well-documented Process Layer while still producing an impermissible Outcome Layer result, exactly the failure this lesson's Case Study illustrates. Human-in-the-loop requirements, common across regulated industries, formalize the Ownership Zones Model's Zone 4 discipline from Lesson 65 into a legal obligation rather than an optional best practice, and the Liability Layer's demand for after-the-fact accountability frequently shapes a product's core architecture directly, since a system that cannot reconstruct its own decision history cannot support the accountability regulation requires. A product team operating in a regulated industry that identifies applicable Regulatory Surface Map layers before development begins is far better positioned to avoid the costly, disruptive experience of discovering a structural compliance gap only after significant product investment has already occurred.
 
 ---
 
@@ -224,7 +224,7 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 - Regulatory compliance shapes architecture, not just a final review checklist.
 - Regulatory Surface Map: Data → Process → Outcome → Liability. A feature must satisfy all four, not just one.
 - Well-documented process ≠ permissible outcome. Check both separately.
-- Human-in-the-loop requirements are often legal obligations, not optional design choices — connects to Ownership Zones Model Zone 4.
+- Human-in-the-loop requirements are often legal obligations, not optional design choices connects to Ownership Zones Model Zone 4.
 - Audit trails and accountability structures must be designed in from the start; they're very hard to retrofit.
 
 ---
@@ -266,19 +266,19 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 
 **Card 3**
 - Front: Why can a well-documented process still fail regulatory compliance?
-- Back: Process Layer compliance doesn't guarantee Outcome Layer compliance — a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
+- Back: Process Layer compliance doesn't guarantee Outcome Layer compliance a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
 - Difficulty: 2
 - Tags: outcome-layer
 
 **Card 4**
 - Front: How do human-in-the-loop requirements connect to the Ownership Zones Model from Lesson 65?
-- Back: They formalize Zone 4's discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation rather than an optional best practice.
+- Back: They formalize Zone 4's discipline that a model's output shouldn't be treated as an automatic action into a legal obligation rather than an optional best practice.
 - Difficulty: 2
 - Tags: human-in-the-loop
 
 **Card 5**
 - Front: What two regulatory gaps did the Undocumented Lending Decision case study reveal?
-- Back: A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) — despite thorough Process Layer documentation.
+- Back: A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) despite thorough Process Layer documentation.
 - Difficulty: 2
 - Tags: case-study, regulatory-surface-map
 
@@ -299,7 +299,7 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 
 You are the PM for a healthtech startup building a symptom-checker tool that uses a machine learning model to suggest possible conditions and recommend whether a user should seek in-person medical care. Your engineering team is eager to launch quickly with a fully automated recommendation flow.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Regulatory Surface Map and the Regulated Product Readiness Checklist to a healthcare product before development is finalized.
+There is no single correct answer to the prompts below the goal is to practice applying the Regulatory Surface Map and the Regulated Product Readiness Checklist to a healthcare product before development is finalized.
 
 1. Using the Regulatory Surface Map, which layer(s) do you believe are most likely to constrain this specific product, and why?
 2. What questions would you ask a compliance or legal expert to determine whether a human-in-the-loop requirement applies to this specific type of health recommendation?
@@ -318,7 +318,7 @@ C) Regulators require every product roadmap to be published in advance
 D) Compliance staff are traditionally assigned directly to the design team
 
 *Correct answer: A*
-*Explanation: The lesson's central argument is that structural requirements — audit trails, mandatory review steps — are far more expensive to bolt on after development than to design in from the start.*
+*Explanation: The lesson's central argument is that structural requirements audit trails, mandatory review steps are far more expensive to bolt on after development than to design in from the start.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -500,7 +500,7 @@ C) Add human review only to approvals, leaving the fully automated denial flow u
 D) Audit for demographic disparity and add human review to denials if regulation requires it
 
 *Correct answer: D*
-*Explanation: Both gaps need to be addressed on their own terms — an Outcome Layer audit for disparity and a Liability Layer review step for denials — rather than assuming documentation is enough or abandoning the model outright.*
+*Explanation: Both gaps need to be addressed on their own terms an Outcome Layer audit for disparity and a Liability Layer review step for denials rather than assuming documentation is enough or abandoning the model outright.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
@@ -510,9 +510,9 @@ D) Audit for demographic disparity and add human review to denials if regulation
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 80 — Module Synthesis: Advanced Strategic Judgment | Opens Module 9 by applying the accumulated Modules 7–8 toolkit to the specific constraints of regulated domains |
-| **Current Lesson** | Lesson 81 — Regulated Industries: PM in Healthcare, Finance, and Government | Regulatory Surface Map; Data/Process/Outcome/Liability layers; human-in-the-loop requirements; Regulated Product Readiness Checklist |
-| **Next Lesson** | Lesson 82 — Privacy, Security, and Compliance as Product Constraints | Extends the Data Layer specifically into a full framework for privacy and security as product constraints |
+| **Previous Lesson** | Lesson 80 Module Synthesis: Advanced Strategic Judgment | Opens Module 9 by applying the accumulated Modules 7–8 toolkit to the specific constraints of regulated domains |
+| **Current Lesson** | Lesson 81 Regulated Industries: PM in Healthcare, Finance, and Government | Regulatory Surface Map; Data/Process/Outcome/Liability layers; human-in-the-loop requirements; Regulated Product Readiness Checklist |
+| **Next Lesson** | Lesson 82 Privacy, Security, and Compliance as Product Constraints | Extends the Data Layer specifically into a full framework for privacy and security as product constraints |
 | **Future Concepts Unlocked** | Lesson 84 (PM in AI-Native Companies) | Extends Outcome and Liability Layer concerns into the broader context of AI-driven product risk |
 | | Lesson 85 (Responsible AI Product Management) | Builds directly on human-in-the-loop and Outcome Layer discipline when addressing AI fairness and harm |
 

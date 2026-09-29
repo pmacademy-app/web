@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Two lessons ago, in the Reflection Exercise, a VP of Sales told you: "Three of our biggest enterprise prospects said they won't sign unless we add offline mode. Build it immediately." Last lesson, a workplace analytics company's customers all demanded a compliance dashboard. In both cases, this curriculum told you to pause before treating the request as a decision — but it did not yet give you a structured method for doing that pausing well. This lesson is that method.
+Two lessons ago, in the Reflection Exercise, a VP of Sales told you: "Three of our biggest enterprise prospects said they won't sign unless we add offline mode. Build it immediately." Last lesson, a workplace analytics company's customers all demanded a compliance dashboard. In both cases, this curriculum told you to pause before treating the request as a decision but it did not yet give you a structured method for doing that pausing well. This lesson is that method.
 
-**Jobs to Be Done (JTBD)** is the discipline of asking what underlying task, goal, or change a person is actually trying to accomplish, of which their stated request is only one possible, and often imperfect, solution. The core insight, most closely associated with the late Harvard Business School professor Clayton Christensen, is deceptively simple: **people don't want products; they "hire" products to make progress on a specific job in their life or work.** A person doesn't want a quarter-inch drill bit — they want a quarter-inch hole, and in some tellings of this idea, they don't really want the hole either; they want to hang a shelf, or fix something broken, or make a room feel finished.
+**Jobs to Be Done (JTBD)** is the discipline of asking what underlying task, goal, or change a person is actually trying to accomplish, of which their stated request is only one possible, and often imperfect, solution. The core insight, most closely associated with the late Harvard Business School professor Clayton Christensen, is deceptively simple: **people don't want products; they "hire" products to make progress on a specific job in their life or work.** A person doesn't want a quarter-inch drill bit they want a quarter-inch hole, and in some tellings of this idea, they don't really want the hole either; they want to hang a shelf, or fix something broken, or make a room feel finished.
 
-This matters urgently for a PM because nearly every stakeholder request you will ever receive — from users, from customers, from your own leadership — arrives pre-packaged as a proposed solution rather than as a stated problem. "We need offline mode." "We need a compliance dashboard." "We need dark mode." "We need an export button." JTBD is the discipline that lets you decompose any of these requests back into the underlying job, so that you can evaluate whether the proposed solution is actually the best available answer — or whether a cheaper, faster, or more effective solution exists that the requester simply didn't think to propose, because proposing solutions isn't their job. It's yours.
+This matters urgently for a PM because nearly every stakeholder request you will ever receive from users, from customers, from your own leadership arrives pre-packaged as a proposed solution rather than as a stated problem. "We need offline mode." "We need a compliance dashboard." "We need dark mode." "We need an export button." JTBD is the discipline that lets you decompose any of these requests back into the underlying job, so that you can evaluate whether the proposed solution is actually the best available answer or whether a cheaper, faster, or more effective solution exists that the requester simply didn't think to propose, because proposing solutions isn't their job. It's yours.
 
 ---
 
@@ -14,13 +14,13 @@ This matters urgently for a PM because nearly every stakeholder request you will
 
 | Field | Detail |
 |---|---|
-| **Module** | 1 — Foundations |
+| **Module** | 1 Foundations |
 | **Current Lesson** | 6 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (What is Product Management?), Lesson 5 (Users vs. Customers) |
-| **Next Lesson** | Lesson 7 — Value Proposition |
-| **Future Topics Unlocked** | Lesson 7 (Value Proposition — articulating value in job terms), Lesson 12 (Customer Interviews — the primary method for uncovering jobs), Lesson 17 (Problem Statements — formalizing a job into a workable statement), Lesson 21 (MVP — scoping a first solution to a validated job) |
+| **Next Lesson** | Lesson 7 Value Proposition |
+| **Future Topics Unlocked** | Lesson 7 (Value Proposition articulating value in job terms), Lesson 12 (Customer Interviews the primary method for uncovering jobs), Lesson 17 (Problem Statements formalizing a job into a workable statement), Lesson 21 (MVP scoping a first solution to a validated job) |
 
 ---
 
@@ -46,27 +46,27 @@ Lesson 1 (What is Product Management?) and Lesson 5 (Users vs. Customers). This 
 
 ### The Core Definition
 
-A **job to be done** is the progress a person is trying to make in a particular circumstance — the underlying task, goal, or change they are trying to achieve — independent of any specific product or feature. The person "hires" a product, service, or even an informal workaround to get that job done, and will "fire" it (switch away, stop using it, or never adopt it in the first place) if something else does the job better, cheaper, or more conveniently.
+A **job to be done** is the progress a person is trying to make in a particular circumstance the underlying task, goal, or change they are trying to achieve independent of any specific product or feature. The person "hires" a product, service, or even an informal workaround to get that job done, and will "fire" it (switch away, stop using it, or never adopt it in the first place) if something else does the job better, cheaper, or more conveniently.
 
 The classic formulation, drawn from Clayton Christensen's writing and popularized further by consultants such as Bob Moesta and Tony Ulwick, uses a specific structure:
 
 > When [situation/circumstance], I want to [motivation], so I can [expected outcome].
 
-Notice what this structure deliberately omits: it says nothing about a product, a feature, or a company. It describes a person's situation and their desired outcome only. This is intentional — a job statement written correctly should be just as true before your product existed as after, and should remain true even if a competitor's product, or no product at all, ends up being hired to do it.
+Notice what this structure deliberately omits: it says nothing about a product, a feature, or a company. It describes a person's situation and their desired outcome only. This is intentional a job statement written correctly should be just as true before your product existed as after, and should remain true even if a competitor's product, or no product at all, ends up being hired to do it.
 
 ### Why "The Customer Wants X" Is Usually the Wrong Level of Analysis
 
-Recall from Lesson 1's Common Beginner Mistake 4 and this lesson's opening example: stakeholders overwhelmingly express their needs as proposed solutions, not as jobs. This isn't a character flaw in stakeholders — it's a natural consequence of the fact that solving problems for a living is a specialized skill, and most people, most of the time, reach for the first plausible solution they can imagine rather than doing the harder work of naming the underlying problem precisely.
+Recall from Lesson 1's Common Beginner Mistake 4 and this lesson's opening example: stakeholders overwhelmingly express their needs as proposed solutions, not as jobs. This isn't a character flaw in stakeholders it's a natural consequence of the fact that solving problems for a living is a specialized skill, and most people, most of the time, reach for the first plausible solution they can imagine rather than doing the harder work of naming the underlying problem precisely.
 
-The risk is that a PM who takes stated solutions at face value inherits whatever blind spots the requester had. A sales VP who hears "we need offline mode" from prospects has correctly identified that *something* is blocking a sale, but has no particular expertise in solution design — that is the PM's job, and it is exactly the value a PM adds that a simple order-taker does not.
+The risk is that a PM who takes stated solutions at face value inherits whatever blind spots the requester had. A sales VP who hears "we need offline mode" from prospects has correctly identified that *something* is blocking a sale, but has no particular expertise in solution design that is the PM's job, and it is exactly the value a PM adds that a simple order-taker does not.
 
 ### The Three Dimensions of a Job: Functional, Social, Emotional
 
 A job to be done is rarely purely practical. JTBD theory distinguishes three overlapping dimensions:
 
-- **Functional dimension** — the practical task itself. ("I need to get my team's quarterly numbers reviewed before the board meeting.")
-- **Emotional dimension** — how the person wants to feel, or wants to avoid feeling, while getting the job done. ("I don't want to feel embarrassed presenting incomplete data.")
-- **Social dimension** — how the person wants to be perceived by others while getting the job done. ("I want my peers to see me as someone who runs a data-driven team.")
+- **Functional dimension** the practical task itself. ("I need to get my team's quarterly numbers reviewed before the board meeting.")
+- **Emotional dimension** how the person wants to feel, or wants to avoid feeling, while getting the job done. ("I don't want to feel embarrassed presenting incomplete data.")
+- **Social dimension** how the person wants to be perceived by others while getting the job done. ("I want my peers to see me as someone who runs a data-driven team.")
 
 A product that satisfies only the functional dimension while ignoring the emotional and social dimensions frequently underperforms a functionally weaker competitor that better addresses all three. This is one of the most common reasons "objectively better" products lose to seemingly inferior ones: the losing product solved the practical task but ignored how the person wanted to feel, or be seen, while doing it.
 
@@ -112,32 +112,32 @@ graph TD
 
 ### Laddering: Getting From a Stated Request to the Real Job
 
-The core technique for uncovering a job is **laddering** — repeatedly asking "why" or "what would that let you do" in response to a stated request, until you reach a level of explanation that would remain true regardless of which specific solution is chosen.
+The core technique for uncovering a job is **laddering** repeatedly asking "why" or "what would that let you do" in response to a stated request, until you reach a level of explanation that would remain true regardless of which specific solution is chosen.
 
 A worked example, continuing this lesson's opening scenario:
 
 > Stakeholder request: "We need offline mode."
-> **Why?** "Because our enterprise prospects work in facilities with unreliable Wi-Fi — warehouses, factory floors, field sites."
+> **Why?** "Because our enterprise prospects work in facilities with unreliable Wi-Fi warehouses, factory floors, field sites."
 > **Why does unreliable connectivity block a sale?** "Because if the app doesn't work, their staff can't log safety inspections in real time, and inspections are a regulatory requirement."
 > **What would solve that, fundamentally?** "A way to guarantee that a safety inspection gets recorded and eventually synced, regardless of connectivity at the moment it happens."
 
-Notice what happened during this ladder: the request moved from a specific technical implementation ("offline mode," which could mean full local data caching, conflict resolution, background sync, and a meaningful engineering investment) to a more precise underlying job ("guarantee an inspection gets recorded and eventually synced regardless of momentary connectivity"). The second framing opens up a wider solution space — a much lighter-weight "save now, sync automatically when reconnected" queuing mechanism might satisfy the actual job at a fraction of the engineering cost of a full offline mode, and might even be delivered faster, which also helps the sales timeline that motivated the original request.
+Notice what happened during this ladder: the request moved from a specific technical implementation ("offline mode," which could mean full local data caching, conflict resolution, background sync, and a meaningful engineering investment) to a more precise underlying job ("guarantee an inspection gets recorded and eventually synced regardless of momentary connectivity"). The second framing opens up a wider solution space a much lighter-weight "save now, sync automatically when reconnected" queuing mechanism might satisfy the actual job at a fraction of the engineering cost of a full offline mode, and might even be delivered faster, which also helps the sales timeline that motivated the original request.
 
-This is the payoff of laddering: **it is not merely an academic exercise — it routinely reveals solutions that are cheaper, faster to ship, or more broadly useful than the one originally proposed**, without sacrificing the underlying need the stakeholder actually cares about.
+This is the payoff of laddering: **it is not merely an academic exercise it routinely reveals solutions that are cheaper, faster to ship, or more broadly useful than the one originally proposed**, without sacrificing the underlying need the stakeholder actually cares about.
 
 ### Jobs, Not Personas, Segment Real Markets
 
-A common early instinct is to segment users by demographic persona — age, job title, industry. JTBD theory argues this is often the wrong segmentation axis, because two people with identical demographics can be trying to accomplish completely different jobs in a given moment, while two people with wildly different demographics can be trying to accomplish the exact same job.
+A common early instinct is to segment users by demographic persona age, job title, industry. JTBD theory argues this is often the wrong segmentation axis, because two people with identical demographics can be trying to accomplish completely different jobs in a given moment, while two people with wildly different demographics can be trying to accomplish the exact same job.
 
-The canonical illustration from Christensen's own research: a fast-food chain wanted to improve milkshake sales and initially segmented by traditional demographics (age, income) with little success. When researchers instead asked what job people were "hiring" a milkshake to do, they discovered a large, unexpected segment: commuters buying milkshakes alone, in the early morning, to make a long, boring commute more bearable and to stave off hunger until lunch — a job with almost nothing to do with dessert, indulgence, or the demographic profile the company had assumed. This job (a long, one-handed, slow-to-consume companion for a boring commute) suggested completely different product improvements — a thicker shake that lasts longer, a more convenient dispensing process for commuters in a hurry — than a demographic-based analysis ever would have.
+The canonical illustration from Christensen's own research: a fast-food chain wanted to improve milkshake sales and initially segmented by traditional demographics (age, income) with little success. When researchers instead asked what job people were "hiring" a milkshake to do, they discovered a large, unexpected segment: commuters buying milkshakes alone, in the early morning, to make a long, boring commute more bearable and to stave off hunger until lunch a job with almost nothing to do with dessert, indulgence, or the demographic profile the company had assumed. This job (a long, one-handed, slow-to-consume companion for a boring commute) suggested completely different product improvements a thicker shake that lasts longer, a more convenient dispensing process for commuters in a hurry than a demographic-based analysis ever would have.
 
 ### Competing Against Non-Consumption
 
-One of JTBD's most useful and counterintuitive ideas is that **a product's real competition is often not the obvious rival product, but non-consumption** — the alternative of not solving the job at all, or solving it with an improvised, non-product workaround.
+One of JTBD's most useful and counterintuitive ideas is that **a product's real competition is often not the obvious rival product, but non-consumption** the alternative of not solving the job at all, or solving it with an improvised, non-product workaround.
 
-A project management tool doesn't only compete with other project management tools; it competes with a shared spreadsheet, a whiteboard, a series of Slack messages, or simply the team's memory. A meal-kit delivery service doesn't only compete with other meal-kit companies; it competes with takeout, with skipping the meal, and with a jar of pasta sauce and whatever's already in the fridge. Understanding the true "job competitor" — frequently an informal workaround rather than a branded rival — reframes what "winning" actually requires: not necessarily being better than the nearest named competitor, but being clearly better than doing nothing, or doing it the old, unglamorous way.
+A project management tool doesn't only compete with other project management tools; it competes with a shared spreadsheet, a whiteboard, a series of Slack messages, or simply the team's memory. A meal-kit delivery service doesn't only compete with other meal-kit companies; it competes with takeout, with skipping the meal, and with a jar of pasta sauce and whatever's already in the fridge. Understanding the true "job competitor" frequently an informal workaround rather than a branded rival reframes what "winning" actually requires: not necessarily being better than the nearest named competitor, but being clearly better than doing nothing, or doing it the old, unglamorous way.
 
-This reframing matters directly for prioritization: a feature that only makes sense in a world where you're racing a specific named competitor may be far less valuable than a feature that converts non-consumers — people currently solving the job badly, informally, or not at all — into users.
+This reframing matters directly for prioritization: a feature that only makes sense in a world where you're racing a specific named competitor may be far less valuable than a feature that converts non-consumers people currently solving the job badly, informally, or not at all into users.
 
 ---
 
@@ -149,7 +149,7 @@ This reframing matters directly for prioritization: a feature that only makes se
 
 **Mistake 2: Confusing a persona with a job**
 
-"Our user is a 35-year-old marketing manager" describes a demographic, not a job. The same marketing manager may be hiring your product for entirely different jobs on a Monday morning (planning a campaign calendar) versus a Friday afternoon (quickly checking whether a report is ready before a client call) — and a single persona description flattens this into one undifferentiated profile.
+"Our user is a 35-year-old marketing manager" describes a demographic, not a job. The same marketing manager may be hiring your product for entirely different jobs on a Monday morning (planning a campaign calendar) versus a Friday afternoon (quickly checking whether a report is ready before a client call) and a single persona description flattens this into one undifferentiated profile.
 
 **Mistake 3: Assuming the job is purely functional**
 
@@ -157,18 +157,18 @@ Ignoring the emotional and social dimensions of a job (how the person wants to f
 
 **Mistake 4: Benchmarking only against named competitors**
 
-Focusing exclusively on feature parity with a known rival product, while ignoring the much larger population of people solving the job through an informal workaround or not solving it at all, causes teams to miss the biggest available growth opportunity — converting non-consumption.
+Focusing exclusively on feature parity with a known rival product, while ignoring the much larger population of people solving the job through an informal workaround or not solving it at all, causes teams to miss the biggest available growth opportunity converting non-consumption.
 
 **Mistake 5: Laddering endlessly until the "why" becomes meaningless**
 
-It is possible to ladder too far — asking "why" so many times that you arrive at something so abstract ("I want to be happy") that it no longer usefully constrains solution design. The correct stopping point is the most specific level of explanation that would remain stable across multiple possible solutions, not the most abstract level imaginable.
+It is possible to ladder too far asking "why" so many times that you arrive at something so abstract ("I want to be happy") that it no longer usefully constrains solution design. The correct stopping point is the most specific level of explanation that would remain stable across multiple possible solutions, not the most abstract level imaginable.
 
 ---
 
 
 ## Mental Model: The Job Ladder
 
-This lesson's mental model is the **Job Ladder** — a simple visual for the laddering technique described above, used as a standing habit whenever a stakeholder hands you a solution instead of a problem.
+This lesson's mental model is the **Job Ladder** a simple visual for the laddering technique described above, used as a standing habit whenever a stakeholder hands you a solution instead of a problem.
 
 ```mermaid
 %%{init: {
@@ -208,15 +208,15 @@ graph BT
     D --> E[Multiple Possible Solutions, Not Just<br/>the One Originally Proposed]
 ```
 
-Use the Job Ladder as a checkpoint, not a one-time exercise: every time a stakeholder request lands on your desk pre-packaged as a solution, climb the ladder at least two rungs before allowing yourself to evaluate feasibility or scope it for engineering. Skipping straight to scoping the originally proposed solution — even a solution that turns out to be correct — means you never actually checked whether it was correct; you got lucky, or you didn't, and you have no way of knowing which.
+Use the Job Ladder as a checkpoint, not a one-time exercise: every time a stakeholder request lands on your desk pre-packaged as a solution, climb the ladder at least two rungs before allowing yourself to evaluate feasibility or scope it for engineering. Skipping straight to scoping the originally proposed solution even a solution that turns out to be correct means you never actually checked whether it was correct; you got lucky, or you didn't, and you have no way of knowing which.
 
 ---
 
 ## Real Company Example
 
-**Netflix** offers a specific, on-the-record illustration of the "competing against non-consumption" idea. On an April 2017 earnings call, CEO Reed Hastings said Netflix was "competing with sleep, on the margin" — and months later, at the Summit LA17 conference, he repeated the point more bluntly: "You get a show or a movie you're really dying to watch, and you end up staying up late at night, so we actually compete with sleep. And we're winning." In the same remarks he named the actual competitive set even more broadly than sleep: not just HBO or Amazon, but everything a person might otherwise do to relax and unwind on a given night.
+**Netflix** offers a specific, on-the-record illustration of the "competing against non-consumption" idea. On an April 2017 earnings call, CEO Reed Hastings said Netflix was "competing with sleep, on the margin" and months later, at the Summit LA17 conference, he repeated the point more bluntly: "You get a show or a movie you're really dying to watch, and you end up staying up late at night, so we actually compete with sleep. And we're winning." In the same remarks he named the actual competitive set even more broadly than sleep: not just HBO or Amazon, but everything a person might otherwise do to relax and unwind on a given night.
 
-This is a job-level reframing, not a category-level one. The job Netflix is hired for isn't narrowly "watch a streaming show" — it's something closer to "unwind and be entertained at the end of the day," and *that* job has always been competing against sleep, video games, a walk, or a phone scroll, whether or not Netflix executives named it that way. Framing the job that broadly changes what counts as a real threat: a competitor doesn't have to make a better prestige drama to take share from Netflix — it only has to be a more convenient or more satisfying way to fill the same evening.
+This is a job-level reframing, not a category-level one. The job Netflix is hired for isn't narrowly "watch a streaming show" it's something closer to "unwind and be entertained at the end of the day," and *that* job has always been competing against sleep, video games, a walk, or a phone scroll, whether or not Netflix executives named it that way. Framing the job that broadly changes what counts as a real threat: a competitor doesn't have to make a better prestige drama to take share from Netflix it only has to be a more convenient or more satisfying way to fill the same evening.
 
 *(Assumption flagged: the quotes above are Hastings's own public statements, verifiable via contemporaneous reporting on the April 2017 earnings call and the November 2017 Summit LA appearance. What this curriculum does not claim certainty about is how deeply that framing shapes Netflix's current internal content-investment decisions day to day.)*
 
@@ -225,13 +225,13 @@ This is a job-level reframing, not a category-level one. The job Netflix is hire
 ## Real World Perspective: Jobs To Be Done at Different Company Stages
 
 **At a startup:**
-JTBD is often used at its most foundational level — determining whether a job is real, painful, and currently poorly served enough to justify building a product around it at all. Early-stage teams frequently conduct direct "switch interviews" (detailed conversations about the moment someone adopted, or considered adopting, a new solution) to understand the forces that pushed them away from their old approach and pulled them toward a new one. At this stage, JTBD is a discovery tool for validating that a market exists before committing meaningful engineering time.
+JTBD is often used at its most foundational level determining whether a job is real, painful, and currently poorly served enough to justify building a product around it at all. Early-stage teams frequently conduct direct "switch interviews" (detailed conversations about the moment someone adopted, or considered adopting, a new solution) to understand the forces that pushed them away from their old approach and pulled them toward a new one. At this stage, JTBD is a discovery tool for validating that a market exists before committing meaningful engineering time.
 
 **At a mid-size company:**
-JTBD is more often used to resolve specific prioritization disputes — deciding between two or more already-validated feature ideas by asking which better serves the core job, or to explain a puzzling metric (why a seemingly successful feature isn't driving the expected downstream behavior, because it addressed the functional job but ignored an emotional or social dimension that mattered more than expected).
+JTBD is more often used to resolve specific prioritization disputes deciding between two or more already-validated feature ideas by asking which better serves the core job, or to explain a puzzling metric (why a seemingly successful feature isn't driving the expected downstream behavior, because it addressed the functional job but ignored an emotional or social dimension that mattered more than expected).
 
 **At Big Tech:**
-JTBD often operates at the level of entire product-line strategy — determining whether a job is currently being served by an internal competing product line, an external competitor, or non-consumption, and using that analysis to decide where a large organization should invest scarce, high-leverage engineering resources across many possible initiatives, rather than at the level of a single feature decision.
+JTBD often operates at the level of entire product-line strategy determining whether a job is currently being served by an internal competing product line, an external competitor, or non-consumption, and using that analysis to decide where a large organization should invest scarce, high-leverage engineering resources across many possible initiatives, rather than at the level of a single feature decision.
 
 ---
 
@@ -245,16 +245,16 @@ The team builds a robust, well-reviewed version-history feature. Adoption is dis
 
 **What went wrong?**
 
-A closer laddering exercise, conducted after the disappointing launch, reveals the actual job was different from — and slightly upstream of — the stated request:
+A closer laddering exercise, conducted after the disappointing launch, reveals the actual job was different from and slightly upstream of the stated request:
 
 1. **Stated request:** "We need version history and a document viewer."
 2. **First why:** "Because we can never tell which version of a document is the current one when it's shared across email and chat."
 3. **Underlying functional job:** "I need to instantly know, without asking anyone, whether the file I'm looking at right now is the one my team is currently working from."
 4. **Emotional layer:** "I don't want to look careless in front of my team by working from an outdated file and having to be corrected."
 
-The company had built a *viewer* for comparing past versions — a genuinely useful capability, but one aimed at investigating history *after* confusion had already occurred. The actual job was almost entirely about *preventing* the moment of confusion in the first place — a single, unambiguous, always-visible indicator of "this is the current version" at the moment someone opens a file, requiring no investigation at all. The version-history viewer solved a real but adjacent problem; it did not solve the job customers were actually describing, which is why usage stayed low and the original complaint kept recurring almost verbatim.
+The company had built a *viewer* for comparing past versions a genuinely useful capability, but one aimed at investigating history *after* confusion had already occurred. The actual job was almost entirely about *preventing* the moment of confusion in the first place a single, unambiguous, always-visible indicator of "this is the current version" at the moment someone opens a file, requiring no investigation at all. The version-history viewer solved a real but adjacent problem; it did not solve the job customers were actually describing, which is why usage stayed low and the original complaint kept recurring almost verbatim.
 
-A team applying the Job Ladder from the beginning would likely have shipped a much smaller, cheaper feature first — a persistent "latest version" indicator — and might have discovered that the deeper version-history viewer, while still valuable to a smaller subset of power users, was not the thing driving the loudest and most common complaint at all.
+A team applying the Job Ladder from the beginning would likely have shipped a much smaller, cheaper feature first a persistent "latest version" indicator and might have discovered that the deeper version-history viewer, while still valuable to a smaller subset of power users, was not the thing driving the loudest and most common complaint at all.
 
 This case will be revisited in **Lesson 17 (Problem Statements)**, where we formalize the output of a Job Ladder exercise into a structured, testable problem statement, and again in **Lesson 21 (MVP)**, where we discuss scoping the smallest solution that addresses a validated job.
 
@@ -262,7 +262,7 @@ This case will be revisited in **Lesson 17 (Problem Statements)**, where we form
 
 ## Framework Explanation: The Forces of Progress
 
-A companion framework to the Job Ladder, widely used alongside JTBD, is the **Forces of Progress** model (associated with Bob Moesta's applied JTBD work), which explains *why* someone switches — or fails to switch — to a new solution. Four forces are in tension whenever someone considers a change:
+A companion framework to the Job Ladder, widely used alongside JTBD, is the **Forces of Progress** model (associated with Bob Moesta's applied JTBD work), which explains *why* someone switches or fails to switch to a new solution. Four forces are in tension whenever someone considers a change:
 
 ```mermaid
 %%{init: {
@@ -308,36 +308,36 @@ graph LR
 - **Anxiety**: uncertainty or fear about the new solution itself ("what if migrating loses our historical data, or the team refuses to learn a new tool").
 - **Habit/Inertia**: comfort with, and sunk investment in, the current approach, independent of whether it's actually good ("we've used this spreadsheet for six years and everyone already knows it").
 
-A switch only happens when Push plus Pull together exceed Anxiety plus Habit. This model directly explains a pattern many PMs find puzzling: a product can be functionally superior to an alternative and still fail to gain adoption, because the anxiety and habit forces holding people to their current (worse) solution were never addressed — onboarding friction, migration risk, or the social cost of admitting the old approach wasn't working can all outweigh a purely functional improvement. This is why JTBD-driven product work often includes deliberate anxiety-reduction and habit-breaking design (easy data import, low-commitment trials, social proof) alongside the core functional solution itself.
+A switch only happens when Push plus Pull together exceed Anxiety plus Habit. This model directly explains a pattern many PMs find puzzling: a product can be functionally superior to an alternative and still fail to gain adoption, because the anxiety and habit forces holding people to their current (worse) solution were never addressed onboarding friction, migration risk, or the social cost of admitting the old approach wasn't working can all outweigh a purely functional improvement. This is why JTBD-driven product work often includes deliberate anxiety-reduction and habit-breaking design (easy data import, low-commitment trials, social proof) alongside the core functional solution itself.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "A customer tells you they need Feature X. Walk me through how you'd respond."**
-*What the interviewer is actually evaluating:* Whether the candidate's instinct is to route the request directly to engineering (a weak, order-taking signal) or to ladder the request back to the underlying job before evaluating solutions. A strong answer names specific follow-up questions the candidate would ask, and gives at least one example of an alternative solution that might satisfy the same underlying need at lower cost or faster delivery — directly demonstrating the payoff of laddering, not just the concept of it.
+*What the interviewer is actually evaluating:* Whether the candidate's instinct is to route the request directly to engineering (a weak, order-taking signal) or to ladder the request back to the underlying job before evaluating solutions. A strong answer names specific follow-up questions the candidate would ask, and gives at least one example of an alternative solution that might satisfy the same underlying need at lower cost or faster delivery directly demonstrating the payoff of laddering, not just the concept of it.
 
 **Typical question 2: "Tell me about a time a 'better' product feature still failed to gain adoption. Why do you think that happened?"**
-*What the interviewer is actually evaluating:* Familiarity with the idea that functional superiority alone doesn't guarantee adoption — whether the candidate can name emotional, social, anxiety, or habit-related forces that outweighed a purely functional improvement, rather than attributing the failure only to execution quality or awareness/marketing.
+*What the interviewer is actually evaluating:* Familiarity with the idea that functional superiority alone doesn't guarantee adoption whether the candidate can name emotional, social, anxiety, or habit-related forces that outweighed a purely functional improvement, rather than attributing the failure only to execution quality or awareness/marketing.
 
 **Typical question 3: "Who is your product's biggest competitor?"**
-*What the interviewer is actually evaluating:* Whether the candidate defaults to naming the obvious branded rival, or whether they recognize non-consumption (a spreadsheet, a manual process, doing nothing) as frequently the true and larger competitor. A candidate who can articulate both — the named rival and the more significant non-consumption alternative — demonstrates a more complete strategic picture.
+*What the interviewer is actually evaluating:* Whether the candidate defaults to naming the obvious branded rival, or whether they recognize non-consumption (a spreadsheet, a manual process, doing nothing) as frequently the true and larger competitor. A candidate who can articulate both the named rival and the more significant non-consumption alternative demonstrates a more complete strategic picture.
 
 ---
 
 ## Summary
 
-Jobs to Be Done reframes every stakeholder request — from users, customers, or leadership — as a proposed solution to an underlying job, rather than as the job itself. The laddering technique (repeatedly asking "why" or "what would that let you do") decomposes a stated request into a more precise functional job, and reveals the emotional and social dimensions layered on top of it, both of which a complete solution must address. Jobs, not demographic personas, are the correct unit for segmenting real markets, since the same person can be hiring a product for entirely different jobs at different moments, and different demographics can be hiring it for the identical job. A product's true competition is frequently non-consumption — an informal workaround, or doing nothing at all — rather than only the obvious named rival, and this reframing changes what "winning" actually requires. Finally, the Forces of Progress model (Push, Pull, Anxiety, Habit) explains why even a functionally superior solution can fail to gain adoption if the anxiety and habit forces anchoring people to their current approach are never addressed.
+Jobs to Be Done reframes every stakeholder request from users, customers, or leadership as a proposed solution to an underlying job, rather than as the job itself. The laddering technique (repeatedly asking "why" or "what would that let you do") decomposes a stated request into a more precise functional job, and reveals the emotional and social dimensions layered on top of it, both of which a complete solution must address. Jobs, not demographic personas, are the correct unit for segmenting real markets, since the same person can be hiring a product for entirely different jobs at different moments, and different demographics can be hiring it for the identical job. A product's true competition is frequently non-consumption an informal workaround, or doing nothing at all rather than only the obvious named rival, and this reframing changes what "winning" actually requires. Finally, the Forces of Progress model (Push, Pull, Anxiety, Habit) explains why even a functionally superior solution can fail to gain adoption if the anxiety and habit forces anchoring people to their current approach are never addressed.
 
 ---
 
 ## Key Takeaways
 
-- A job to be done is the underlying progress a person is trying to make, independent of any specific product — people "hire" products to do jobs, and "fire" them for something that does the job better.
+- A job to be done is the underlying progress a person is trying to make, independent of any specific product people "hire" products to do jobs, and "fire" them for something that does the job better.
 - Laddering (repeated "why" questions) decomposes a stated solution request into its underlying job, often revealing a cheaper, faster, or broader solution space than the one originally proposed.
 - Jobs have functional, emotional, and social dimensions; solving only the functional dimension frequently underperforms a competitor that addresses all three.
 - Demographic personas are often the wrong segmentation axis; the same person can hire a product for different jobs at different moments, and different demographics can share the same job.
-- A product's real competitor is frequently non-consumption (an informal workaround, or doing nothing), not only the obvious named rival — and this reframes what growth opportunities actually look like.
+- A product's real competitor is frequently non-consumption (an informal workaround, or doing nothing), not only the obvious named rival and this reframes what growth opportunities actually look like.
 - The Forces of Progress (Push, Pull, Anxiety, Habit) explain why functional superiority alone doesn't guarantee adoption; a switch requires Push + Pull to exceed Anxiety + Habit.
 - Laddering has a correct stopping point: the most specific explanation that remains stable across multiple possible solutions, not the most abstract explanation imaginable.
 
@@ -352,7 +352,7 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 - **Laddering:** ask "why" or "what would that let you do" repeatedly until you reach a stable, solution-independent explanation.
 - **Three dimensions:** functional (the task), emotional (how they want to feel), social (how they want to be seen).
 - **Segment by job, not persona:** same person, different jobs at different times; different people, same job.
-- **Real competitor:** often non-consumption (a workaround, or nothing) — not just the obvious named rival.
+- **Real competitor:** often non-consumption (a workaround, or nothing) not just the obvious named rival.
 - **Forces of Progress:** switch happens when Push + Pull > Anxiety + Habit.
 - **Biggest trap:** stopping at the first stated request, treating it as the job itself.
 
@@ -374,9 +374,9 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 
 ## Further Reading / Resources
 
-- Clayton Christensen, Taddy Hall, Karen Dillon, and David S. Duncan, *Competing Against Luck: The Story of Innovation and Customer Choice* — the primary modern text formalizing Jobs to Be Done theory, including the milkshake research referenced above.
-- Bob Moesta and Chris Spiek's public writing and interviews on the Forces of Progress model and "switch interview" methodology — the applied, interview-based approach to uncovering jobs referenced in this lesson.
-- Tony Ulwick, *What Customers Want* — an alternative, more quantitative formalization of outcome-driven innovation built on related job-based thinking.
+- Clayton Christensen, Taddy Hall, Karen Dillon, and David S. Duncan, *Competing Against Luck: The Story of Innovation and Customer Choice* the primary modern text formalizing Jobs to Be Done theory, including the milkshake research referenced above.
+- Bob Moesta and Chris Spiek's public writing and interviews on the Forces of Progress model and "switch interview" methodology the applied, interview-based approach to uncovering jobs referenced in this lesson.
+- Tony Ulwick, *What Customers Want* an alternative, more quantitative formalization of outcome-driven innovation built on related job-based thinking.
 
 ---
 
@@ -384,13 +384,13 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 
 **Card 1**
 - Front: What is a "job to be done"?
-- Back: The underlying progress a person is trying to make in a given circumstance, independent of any specific product — products are "hired" to do jobs and "fired" for better alternatives.
+- Back: The underlying progress a person is trying to make in a given circumstance, independent of any specific product products are "hired" to do jobs and "fired" for better alternatives.
 - Difficulty: 1
 - Tags: jtbd, fundamentals
 
 **Card 2**
 - Front: What technique decomposes a stated request into its underlying job?
-- Back: Laddering — repeatedly asking "why" or "what would that let you do" until reaching a stable, solution-independent explanation.
+- Back: Laddering repeatedly asking "why" or "what would that let you do" until reaching a stable, solution-independent explanation.
 - Difficulty: 2
 - Tags: laddering, technique
 
@@ -402,7 +402,7 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 
 **Card 4**
 - Front: Why are demographic personas often the wrong axis for segmenting a market, according to JTBD theory?
-- Back: The same person can hire a product for different jobs at different moments, while very different demographics can share the exact same job — jobs, not demographics, better predict what people actually need.
+- Back: The same person can hire a product for different jobs at different moments, while very different demographics can share the exact same job jobs, not demographics, better predict what people actually need.
 - Difficulty: 3
 - Tags: segmentation, personas
 
@@ -420,7 +420,7 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 
 **Card 7**
 - Front: What is the correct stopping point when laddering a request?
-- Back: The most specific level of explanation that remains stable across multiple possible solutions — not the most abstract explanation imaginable, which would no longer usefully constrain solution design.
+- Back: The most specific level of explanation that remains stable across multiple possible solutions not the most abstract explanation imaginable, which would no longer usefully constrain solution design.
 - Difficulty: 3
 - Tags: laddering, stopping-point
 
@@ -434,10 +434,10 @@ Work through the following, in writing, before reading further:
 1. Write a first-pass job statement for this request using the structure: "When [situation], I want to [motivation], so I can [outcome]."
 2. Ladder the request at least two levels deeper. What functional job is likely underneath "hard block once we hit it"? Is there an emotional or social dimension layered on top (consider feelings like guilt, self-control, or accountability to a partner)?
 3. Using the "competing against non-consumption" idea, name at least one non-product way people currently try to solve this same job (a workaround, a habit, a manual method), and consider what it tells you about what a good solution needs to beat.
-4. Propose two different solutions to the underlying job you identified — the originally requested "hard block," and at least one alternative that might satisfy the same job differently (for example, a softer warning-based approach, or a social-accountability feature).
+4. Propose two different solutions to the underlying job you identified the originally requested "hard block," and at least one alternative that might satisfy the same job differently (for example, a softer warning-based approach, or a social-accountability feature).
 5. Using the Forces of Progress model, name one Anxiety or Habit force that might cause a user to resist adopting either solution, even if it perfectly addressed the underlying job.
 
-There is no single correct answer. The purpose of this exercise is to practice the full Job Ladder — from a specific stated request, through functional and emotional/social layers, to a genuinely reconsidered solution space — under a request that, unlike the lesson's worked examples, you have not seen laddered before.
+There is no single correct answer. The purpose of this exercise is to practice the full Job Ladder from a specific stated request, through functional and emotional/social layers, to a genuinely reconsidered solution space under a request that, unlike the lesson's worked examples, you have not seen laddered before.
 
 ---
 
@@ -489,7 +489,7 @@ C) Commuters hired milkshakes to make a long, dull drive bearable
 D) Demographic segmentation proved the most useful method after all
 
 *Correct answer: C*
-*Explanation: The job had almost nothing to do with dessert or indulgence, and it pointed to different improvements — a thicker shake that lasts the drive, a faster way to buy one — than any age or income cut would have surfaced.*
+*Explanation: The job had almost nothing to do with dessert or indulgence, and it pointed to different improvements a thicker shake that lasts the drive, a faster way to buy one than any age or income cut would have surfaced.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -509,10 +509,10 @@ D) Workarounds are cheaper to displace than a rival's product
 ---
 
 **6. A team ships a functionally superior tool, but adoption remains low because users are afraid of losing years of data during migration. Using the Forces of Progress model, which force is most directly responsible for this outcome?**
-A) Push — dissatisfaction with the current approach
-B) Pull — the attraction of the new solution on offer
-C) Habit — comfort with the existing way of working
-D) Anxiety — uncertainty about the new solution
+A) Push dissatisfaction with the current approach
+B) Pull the attraction of the new solution on offer
+C) Habit comfort with the existing way of working
+D) Anxiety uncertainty about the new solution
 
 *Correct answer: D*
 *Explanation: Anxiety is fear attached to the change itself, and migration risk is its clearest form. A switch happens only when Push plus Pull exceed Anxiety plus Habit, so a strong Pull alone will not carry it.*
@@ -528,7 +528,7 @@ C) A way to know at a glance if a file is the current version
 D) A way to permanently delete older superseded versions of a file
 
 *Correct answer: C*
-*Explanation: The job was about the moment of opening a file — avoiding the confusion entirely — rather than reconstructing what happened once confusion had already set in.*
+*Explanation: The job was about the moment of opening a file avoiding the confusion entirely rather than reconstructing what happened once confusion had already set in.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
@@ -606,7 +606,7 @@ C) A misreading of the question, which asked about the market
 D) A correct answer, since naming a specific rival is expected of candidates
 
 *Correct answer: B*
-*Explanation: A stronger answer names the branded rival and the workaround — the spreadsheet, the group chat, doing nothing — and says which represents the larger pool of the job going unserved.*
+*Explanation: A stronger answer names the branded rival and the workaround the spreadsheet, the group chat, doing nothing and says which represents the larger pool of the job going unserved.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
@@ -632,7 +632,7 @@ C) Build the lighter solution quietly, since the technical call is the PM's
 D) Escalate to engineering leadership for a binding technical ruling
 
 *Correct answer: B*
-*Explanation: Laddering widens the solution space; it does not transfer the decision to the PM. The VP may hold context — a signed commitment, a named account — that rules the lighter option out, and can only apply it if the alternative is put in front of them.*
+*Explanation: Laddering widens the solution space; it does not transfer the decision to the PM. The VP may hold context a signed commitment, a named account that rules the lighter option out, and can only apply it if the alternative is put in front of them.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
@@ -642,12 +642,12 @@ D) Escalate to engineering leadership for a binding technical ruling
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 5 — Users vs. Customers | Resolves this lesson's cliffhanger — how to evaluate any stakeholder's request, whether from a user or a customer, using the Job Ladder rather than taking it at face value |
-| **Current Lesson** | Lesson 6 — Jobs To Be Done | Laddering; functional/emotional/social dimensions; non-consumption; Forces of Progress |
-| **Next Lesson** | Lesson 7 — Value Proposition | Builds directly on a validated job to construct a value proposition — what a product uniquely offers to help someone get that job done better than alternatives |
+| **Previous Lesson** | Lesson 5 Users vs. Customers | Resolves this lesson's cliffhanger how to evaluate any stakeholder's request, whether from a user or a customer, using the Job Ladder rather than taking it at face value |
+| **Current Lesson** | Lesson 6 Jobs To Be Done | Laddering; functional/emotional/social dimensions; non-consumption; Forces of Progress |
+| **Next Lesson** | Lesson 7 Value Proposition | Builds directly on a validated job to construct a value proposition what a product uniquely offers to help someone get that job done better than alternatives |
 | **Future Concepts Unlocked** | Lesson 12 (Customer Interviews) | Provides the interview-based method (including "switch interviews") for uncovering jobs directly from real conversations, rather than inferring them from stated requests alone |
 | | Lesson 17 (Problem Statements) | Formalizes the output of a completed Job Ladder into a structured, testable problem statement |
 | | Lesson 21 (MVP) | Uses a validated job as the basis for scoping the smallest solution worth building first |
 | | Lesson 29 (Prioritization Fundamentals) | Uses job validation strength as one input into scoring competing initiatives |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any stated stakeholder request — from a user or a customer — is assumed to require laddering before it is treated as a decision; this will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any stated stakeholder request from a user or a customer is assumed to require laddering before it is treated as a decision; this will not be re-explained, only re-applied in new contexts.

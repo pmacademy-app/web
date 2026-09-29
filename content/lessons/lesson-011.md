@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Module 1 built an entire stack of frameworks — the Stakeholder Ledger, the Job Ladder, the Value Proposition Filter, assumption mapping, the Vision Filter, the Strategy Kernel — and every single one of them depends on the same hidden input: an honest, accurate picture of what real users and customers actually think, do, and need. A diagnosis (Lesson 10) built on guesses is not a diagnosis at all; a laddered job (Lesson 6) invented in a conference room rather than surfaced from a real conversation is speculation wearing the clothing of insight. This lesson, and the module it opens, exists to make sure the picture underneath all of that prior work is actually real.
+Module 1 built an entire stack of frameworks the Stakeholder Ledger, the Job Ladder, the Value Proposition Filter, assumption mapping, the Vision Filter, the Strategy Kernel and every single one of them depends on the same hidden input: an honest, accurate picture of what real users and customers actually think, do, and need. A diagnosis (Lesson 10) built on guesses is not a diagnosis at all; a laddered job (Lesson 6) invented in a conference room rather than surfaced from a real conversation is speculation wearing the clothing of insight. This lesson, and the module it opens, exists to make sure the picture underneath all of that prior work is actually real.
 
-**User research** is the disciplined practice of gathering direct evidence about users' behavior, needs, and context, using methods designed to minimize the many ways teams unintentionally fool themselves. The operative word is *disciplined*: talking to users is not, by itself, user research — a conversation can be run in ways that produce genuine insight or in ways that produce comfortable, misleading confirmation of what the team already believed. This lesson focuses on the foundational distinctions and failure modes that determine which of those two outcomes you get, before Module 2's later lessons cover specific methods (interviews, surveys, journey mapping) in depth.
+**User research** is the disciplined practice of gathering direct evidence about users' behavior, needs, and context, using methods designed to minimize the many ways teams unintentionally fool themselves. The operative word is *disciplined*: talking to users is not, by itself, user research a conversation can be run in ways that produce genuine insight or in ways that produce comfortable, misleading confirmation of what the team already believed. This lesson focuses on the foundational distinctions and failure modes that determine which of those two outcomes you get, before Module 2's later lessons cover specific methods (interviews, surveys, journey mapping) in depth.
 
 ---
 
@@ -12,13 +12,13 @@ Module 1 built an entire stack of frameworks — the Stakeholder Ledger, the Job
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 11 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 6 (Jobs To Be Done), Lesson 8 (Product Discovery) |
-| **Next Lesson** | Lesson 12 — Customer Interviews |
-| **Future Topics Unlocked** | Lesson 12 (Customer Interviews — the deepest, most detailed method), Lesson 13 (Surveys — the quantitative counterpart), Lesson 14 (Personas), Lesson 15 (Journey Mapping) |
+| **Next Lesson** | Lesson 12 Customer Interviews |
+| **Future Topics Unlocked** | Lesson 12 (Customer Interviews the deepest, most detailed method), Lesson 13 (Surveys the quantitative counterpart), Lesson 14 (Personas), Lesson 15 (Journey Mapping) |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 6 (Jobs To Be Done) and Lesson 8 (Product Discovery). This lesson assumes familiarity with laddering as a technique for uncovering underlying needs, and with the distinction between genuine discovery tests and "discovery theater" — user research is the primary practical toolkit for conducting the genuine version of that testing.
+Lesson 6 (Jobs To Be Done) and Lesson 8 (Product Discovery). This lesson assumes familiarity with laddering as a technique for uncovering underlying needs, and with the distinction between genuine discovery tests and "discovery theater" user research is the primary practical toolkit for conducting the genuine version of that testing.
 
 ---
 
@@ -46,7 +46,7 @@ Lesson 6 (Jobs To Be Done) and Lesson 8 (Product Discovery). This lesson assumes
 
 User research is the systematic collection and analysis of evidence about real users' behaviors, needs, motivations, and context, using methods specifically designed to reduce the many biases that distort casual observation. It is worth explicitly distinguishing this from several things it is commonly, and incorrectly, conflated with:
 
-- **Not the same as talking to users informally.** A hallway conversation with a friendly, enthusiastic customer is a data point, but without deliberate structure, it is far more likely to produce confirmation of existing beliefs than genuine new insight — precisely because informal conversations tend to happen with the most accessible, most engaged users, and tend to be steered, often unconsciously, toward topics the interviewer already has opinions about.
+- **Not the same as talking to users informally.** A hallway conversation with a friendly, enthusiastic customer is a data point, but without deliberate structure, it is far more likely to produce confirmation of existing beliefs than genuine new insight precisely because informal conversations tend to happen with the most accessible, most engaged users, and tend to be steered, often unconsciously, toward topics the interviewer already has opinions about.
 - **Not the same as stakeholder anecdotes.** A sales team's account of "what customers keep telling us" is valuable signal, but it is secondhand, filtered through the sales team's own incentives and framing (recall Lesson 5's structural bias toward customer-channel signal), and has typically not been gathered using methods designed to control for bias.
 - **Not the same as market research conducted for other purposes.** Market sizing studies, brand perception surveys, and competitive analyses can all be valuable, but they typically answer different questions (how big is this opportunity, how is our brand perceived) than the specific behavioral and needs-based questions user research is built to answer (what is this person actually trying to do, and why does our current solution fail or succeed at helping them).
 
@@ -54,8 +54,8 @@ User research is the systematic collection and analysis of evidence about real u
 
 A foundational distinction, which recurs throughout this module, is between qualitative and quantitative research:
 
-- **Qualitative research** (in-depth interviews, observational studies, open-ended surveys) is well suited to answering *why* and *how* questions — why does a user abandon a workflow partway through, how do they actually think about a problem, what mental model do they bring to a new feature. It typically involves small sample sizes and rich, detailed, hard-to-quantify data.
-- **Quantitative research** (large-scale surveys, usage analytics, A/B experiments) is well suited to answering *how many*, *how much*, and *is this actually true at scale* questions — what percentage of users experience a given problem, how does a specific change affect a specific metric, does an effect observed in a small qualitative sample generalize to the broader user base.
+- **Qualitative research** (in-depth interviews, observational studies, open-ended surveys) is well suited to answering *why* and *how* questions why does a user abandon a workflow partway through, how do they actually think about a problem, what mental model do they bring to a new feature. It typically involves small sample sizes and rich, detailed, hard-to-quantify data.
+- **Quantitative research** (large-scale surveys, usage analytics, A/B experiments) is well suited to answering *how many*, *how much*, and *is this actually true at scale* questions what percentage of users experience a given problem, how does a specific change affect a specific metric, does an effect observed in a small qualitative sample generalize to the broader user base.
 
 ```mermaid
 %%{init: {
@@ -97,15 +97,15 @@ graph TD
     E --> G[Statistical Confidence, Large Sample,<br/>Limited Depth of Understanding]
 ```
 
-A common and costly mistake is using the wrong tool for the question at hand: running a large quantitative survey to understand *why* users are confused by an onboarding flow (a question surveys are poorly suited to answer in depth), or relying on five qualitative interviews to determine *what percentage* of the user base is affected by a given problem (a sample far too small to support that kind of quantitative claim). The two methods are complementary, not competing — qualitative research is often best used to generate hypotheses about *why* something is happening, which quantitative research can then test for prevalence and scale.
+A common and costly mistake is using the wrong tool for the question at hand: running a large quantitative survey to understand *why* users are confused by an onboarding flow (a question surveys are poorly suited to answer in depth), or relying on five qualitative interviews to determine *what percentage* of the user base is affected by a given problem (a sample far too small to support that kind of quantitative claim). The two methods are complementary, not competing qualitative research is often best used to generate hypotheses about *why* something is happening, which quantitative research can then test for prevalence and scale.
 
 ### Stated Preference vs. Revealed Preference
 
 One of the single most important distinctions in all of user research is between **stated preference** (what someone says they want or would do) and **revealed preference** (what someone actually does when given a real opportunity, with real stakes, to do it).
 
-The gap between these two is large and well-documented across many domains: people routinely overstate their willingness to pay for something, overstate their intention to adopt a healthier habit or a new tool, and understate behaviors they perceive as embarrassing or socially undesirable — not necessarily out of dishonesty, but because predicting one's own future behavior in a hypothetical scenario is genuinely difficult, and because there is no real cost to answering generously in a research conversation the way there would be in an actual purchasing or adoption decision.
+The gap between these two is large and well-documented across many domains: people routinely overstate their willingness to pay for something, overstate their intention to adopt a healthier habit or a new tool, and understate behaviors they perceive as embarrassing or socially undesirable not necessarily out of dishonesty, but because predicting one's own future behavior in a hypothetical scenario is genuinely difficult, and because there is no real cost to answering generously in a research conversation the way there would be in an actual purchasing or adoption decision.
 
-This directly echoes Lesson 8's discovery theater warning: a research method that only ever captures stated preference (survey questions like "would you use this feature?" or "how likely are you to recommend this to a friend?") is systematically vulnerable to overstating genuine demand, precisely because answering "yes" or "very likely" costs the respondent nothing in the moment. Wherever possible, user research should be designed to capture some form of revealed preference — actual past behavior, a real (even if small-stakes) commitment such as a pre-order or a genuine time investment, or direct observation of what a person does rather than what they say they would do.
+This directly echoes Lesson 8's discovery theater warning: a research method that only ever captures stated preference (survey questions like "would you use this feature?" or "how likely are you to recommend this to a friend?") is systematically vulnerable to overstating genuine demand, precisely because answering "yes" or "very likely" costs the respondent nothing in the moment. Wherever possible, user research should be designed to capture some form of revealed preference actual past behavior, a real (even if small-stakes) commitment such as a pre-order or a genuine time investment, or direct observation of what a person does rather than what they say they would do.
 
 ### Common Research Biases
 
@@ -113,7 +113,7 @@ Several specific, well-documented biases distort research findings if not delibe
 
 - **Confirmation bias**: the tendency to notice, weight, and remember evidence that supports an existing belief, while discounting or forgetting evidence that contradicts it. A researcher who already believes a feature is a good idea will tend to interpret ambiguous interview responses more favorably than a neutral observer would.
 - **Leading questions**: questions phrased in a way that suggests a preferred answer ("Don't you find it frustrating when...?" rather than "How do you feel about...?"), which prompt respondents to agree rather than to report their genuine, independent perspective.
-- **Social desirability bias**: the tendency for respondents to answer in ways that make them look good to the researcher, rather than reporting their actual behavior or belief — particularly strong around topics involving health, money, productivity, or anything perceived as a personal shortcoming.
+- **Social desirability bias**: the tendency for respondents to answer in ways that make them look good to the researcher, rather than reporting their actual behavior or belief particularly strong around topics involving health, money, productivity, or anything perceived as a personal shortcoming.
 - **The "would you use this" trap**: as described above, hypothetical questions about future behavior, especially about a polished concept or prototype, reliably overstate genuine adoption intent, because there is no real cost to a generous, encouraging answer.
 
 ### A Basic Trustworthiness Checklist
@@ -123,8 +123,8 @@ Given these biases, a practical checklist for evaluating whether a piece of rese
 1. **Was the sample representative of the actual population the decision concerns**, or drawn disproportionately from the most accessible, most enthusiastic, or most vocal users?
 2. **Were questions open-ended and neutrally phrased**, rather than leading respondents toward a particular answer?
 3. **Does the evidence reflect revealed preference (actual behavior, real stakes) or only stated preference (hypothetical, low-stakes responses)?**
-4. **Was the research conducted, and interpreted, by someone without a strong prior stake in a particular conclusion** — or at minimum, were disconfirming findings actively sought out rather than only confirming ones?
-5. **Is the sample size and method appropriate to the type of claim being made** — a qualitative finding used to generate a hypothesis, versus a quantitative finding used to support a claim about prevalence or scale across the whole user base?
+4. **Was the research conducted, and interpreted, by someone without a strong prior stake in a particular conclusion** or at minimum, were disconfirming findings actively sought out rather than only confirming ones?
+5. **Is the sample size and method appropriate to the type of claim being made** a qualitative finding used to generate a hypothesis, versus a quantitative finding used to support a claim about prevalence or scale across the whole user base?
 
 A piece of evidence that fails several of these checks is not necessarily worthless, but it should be weighted accordingly, and ideally supplemented with additional, more rigorous research before it is allowed to drive a significant, costly decision.
 
@@ -134,7 +134,7 @@ A piece of evidence that fails several of these checks is not necessarily worthl
 
 **Mistake 1: Treating a handful of enthusiastic conversations as sufficient validation**
 
-As covered in Lesson 8, a small number of positive conversations with self-selected, engaged users is highly vulnerable to both an unrepresentative sample and to stated-preference overstatement — it is a reasonable starting point for generating hypotheses, not a sufficient basis for a major investment decision.
+As covered in Lesson 8, a small number of positive conversations with self-selected, engaged users is highly vulnerable to both an unrepresentative sample and to stated-preference overstatement it is a reasonable starting point for generating hypotheses, not a sufficient basis for a major investment decision.
 
 **Mistake 2: Asking "would you use this?" and treating the answer as reliable**
 
@@ -142,7 +142,7 @@ This is the single most common instance of the stated-preference trap described 
 
 **Mistake 3: Only talking to existing power users or the most vocal customers**
 
-This produces a systematically unrepresentative sample — existing power users, almost by definition, already like the product enough to use it heavily, and their feedback tends to reflect refinements to an already-working experience rather than the concerns of the larger population of casual users, non-users, or churned users who might reveal more fundamental problems.
+This produces a systematically unrepresentative sample existing power users, almost by definition, already like the product enough to use it heavily, and their feedback tends to reflect refinements to an already-working experience rather than the concerns of the larger population of casual users, non-users, or churned users who might reveal more fundamental problems.
 
 **Mistake 4: Phrasing questions in a way that signals the "right" answer**
 
@@ -157,7 +157,7 @@ Echoing Lesson 8's related warning about discovery theater, a large number of in
 
 ## Mental Model: The Evidence Trustworthiness Ladder
 
-This lesson's mental model is the **Evidence Trustworthiness Ladder** — a way of ranking research evidence by how resistant it is to the biases described above, used whenever evaluating how much weight a given finding should carry in a real decision.
+This lesson's mental model is the **Evidence Trustworthiness Ladder** a way of ranking research evidence by how resistant it is to the biases described above, used whenever evaluating how much weight a given finding should carry in a real decision.
 
 ```mermaid
 %%{init: {
@@ -196,13 +196,13 @@ graph BT
     C --> D[Strong: Revealed Preference at Larger<br/>Scale, E.g. a Genuine A/B Experiment or<br/>Real Usage Analytics]
 ```
 
-Use this ladder as a discipline for describing evidence honestly in team discussions: instead of saying simply "users told us they want this," specify where on the ladder that evidence actually sits — was it stated or revealed preference, from a representative or self-selected sample, gathered with neutral or leading questions? Naming the rung explicitly prevents a weak piece of evidence from being unconsciously treated as though it were a strong one simply because it confirms what the team wanted to hear.
+Use this ladder as a discipline for describing evidence honestly in team discussions: instead of saying simply "users told us they want this," specify where on the ladder that evidence actually sits was it stated or revealed preference, from a representative or self-selected sample, gathered with neutral or leading questions? Naming the rung explicitly prevents a weak piece of evidence from being unconsciously treated as though it were a strong one simply because it confirms what the team wanted to hear.
 
 ---
 
 ## Real Company Example
 
-**Spotify** offers a useful illustration of relying on revealed preference (actual listening behavior) over stated preference for major product decisions. Public commentary from Spotify's product and data teams over the years has described extensive use of actual usage and listening-behavior data — skip rates, replay behavior, listening session patterns — to inform features like personalized playlists and recommendation algorithms, rather than relying primarily on survey questions asking users what kind of music or features they believe they want. This reflects a deliberate methodological choice consistent with this lesson's core argument: people's stated musical preferences and their actual, revealed listening behavior can diverge substantially, and building a personalization product around stated preference alone risks systematically misjudging what people actually listen to and enjoy.
+**Spotify** offers a useful illustration of relying on revealed preference (actual listening behavior) over stated preference for major product decisions. Public commentary from Spotify's product and data teams over the years has described extensive use of actual usage and listening-behavior data skip rates, replay behavior, listening session patterns to inform features like personalized playlists and recommendation algorithms, rather than relying primarily on survey questions asking users what kind of music or features they believe they want. This reflects a deliberate methodological choice consistent with this lesson's core argument: people's stated musical preferences and their actual, revealed listening behavior can diverge substantially, and building a personalization product around stated preference alone risks systematically misjudging what people actually listen to and enjoy.
 
 *(Assumption flagged: this reflects widely reported descriptions of Spotify's general approach to personalization rather than a claim about the company's complete internal research methodology, which this curriculum does not claim certainty about.)*
 
@@ -211,10 +211,10 @@ Use this ladder as a discipline for describing evidence honestly in team discuss
 ## Real World Perspective: User Research at Different Company Stages
 
 **At a startup:**
-Research is often necessarily lightweight and qualitative, given limited resources — direct conversations with early adopters, careful observation of how a small number of users actually behave with an early prototype, and close attention to revealed preference wherever it can be captured cheaply (a genuine sign-up, a real, if small, payment). The central risk at this stage is over-relying on an unrepresentative sample of especially enthusiastic early adopters, whose needs and tolerance for rough edges may not reflect the broader market the company eventually needs to serve.
+Research is often necessarily lightweight and qualitative, given limited resources direct conversations with early adopters, careful observation of how a small number of users actually behave with an early prototype, and close attention to revealed preference wherever it can be captured cheaply (a genuine sign-up, a real, if small, payment). The central risk at this stage is over-relying on an unrepresentative sample of especially enthusiastic early adopters, whose needs and tolerance for rough edges may not reflect the broader market the company eventually needs to serve.
 
 **At a mid-size company:**
-Research typically becomes more structured and mixed-method, combining qualitative interviews (to generate and refine hypotheses) with quantitative surveys and usage analytics (to test prevalence and scale) in an ongoing, continuous cycle — directly echoing Lesson 8's continuous discovery principle. Dedicated research functions or research-trained PMs often emerge at this stage specifically to guard against the biases described in this lesson, which become harder to self-police informally as an organization grows.
+Research typically becomes more structured and mixed-method, combining qualitative interviews (to generate and refine hypotheses) with quantitative surveys and usage analytics (to test prevalence and scale) in an ongoing, continuous cycle directly echoing Lesson 8's continuous discovery principle. Dedicated research functions or research-trained PMs often emerge at this stage specifically to guard against the biases described in this lesson, which become harder to self-police informally as an organization grows.
 
 **At Big Tech:**
 Research at scale often has access to extremely large quantitative datasets and rigorous experimentation infrastructure, which can create its own distinct risk: over-relying on quantitative signal (a statistically significant but shallow metric movement) while under-investing in the qualitative *why* behind it, since qualitative research doesn't scale as easily as automated quantitative pipelines. Mature research organizations at this scale typically maintain deliberate investment in both methods precisely to avoid this imbalance.
@@ -227,17 +227,17 @@ Consider a simplified, illustrative scenario common across consumer subscription
 
 A fitness app's product team wants to understand why free-trial users aren't converting to paid subscriptions at the expected rate. They design and send a survey to a sample of recent free-trial users, asking: "How likely are you to recommend this app to a friend?" and "Would you find a slightly cheaper subscription tier appealing?" The results are encouraging: a high average recommendation score, and strong stated interest in a cheaper tier. Leadership concludes that price is the primary barrier to conversion and directs the team to build and launch a new, lower-priced subscription tier.
 
-The lower-priced tier launches. Conversion rates barely move. A follow-up investigation — this time using actual in-app behavioral data (a revealed-preference source, examined instead of relying further on survey responses) — reveals that the overwhelming majority of non-converting trial users had stopped opening the app entirely within the first four days of the trial, well before ever reaching a point where price would have been a relevant factor in their decision.
+The lower-priced tier launches. Conversion rates barely move. A follow-up investigation this time using actual in-app behavioral data (a revealed-preference source, examined instead of relying further on survey responses) reveals that the overwhelming majority of non-converting trial users had stopped opening the app entirely within the first four days of the trial, well before ever reaching a point where price would have been a relevant factor in their decision.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
-1. **The survey measured stated preference on an unrelated hypothetical ("would a cheaper tier be appealing"), not the actual underlying behavior driving non-conversion.** Nearly anyone might say a cheaper price sounds appealing in the abstract — this is a close cousin of the "would you use this" trap, applied to pricing rather than features.
-2. **The survey was only sent to, and only answerable by, users who were still engaged enough to respond to a survey at all** — an unrepresentative sample that systematically excluded the much larger population of users who had already disengaged entirely within the first four days, which is precisely the population whose behavior most needed to be understood.
-3. **The actual underlying problem — an early-engagement drop-off, likely tied to onboarding friction or an unclear initial value demonstration — was never investigated**, because the survey's leading, price-focused framing directed attention toward a plausible-sounding but ultimately incorrect explanation.
+1. **The survey measured stated preference on an unrelated hypothetical ("would a cheaper tier be appealing"), not the actual underlying behavior driving non-conversion.** Nearly anyone might say a cheaper price sounds appealing in the abstract this is a close cousin of the "would you use this" trap, applied to pricing rather than features.
+2. **The survey was only sent to, and only answerable by, users who were still engaged enough to respond to a survey at all** an unrepresentative sample that systematically excluded the much larger population of users who had already disengaged entirely within the first four days, which is precisely the population whose behavior most needed to be understood.
+3. **The actual underlying problem an early-engagement drop-off, likely tied to onboarding friction or an unclear initial value demonstration was never investigated**, because the survey's leading, price-focused framing directed attention toward a plausible-sounding but ultimately incorrect explanation.
 
-A team applying the Evidence Trustworthiness Ladder from the outset would have recognized that a stated-preference survey, sent to a self-selected, still-engaged sample, sat near the bottom of the ladder — a reasonable starting hypothesis generator, but far too weak a basis for a costly pricing-tier launch decision. A stronger approach would have started with revealed-preference behavioral data (when, specifically, do users stop engaging, and what did they do or not do immediately before that point) to correctly diagnose the actual obstacle, before investing in a solution aimed at the wrong cause entirely.
+A team applying the Evidence Trustworthiness Ladder from the outset would have recognized that a stated-preference survey, sent to a self-selected, still-engaged sample, sat near the bottom of the ladder a reasonable starting hypothesis generator, but far too weak a basis for a costly pricing-tier launch decision. A stronger approach would have started with revealed-preference behavioral data (when, specifically, do users stop engaging, and what did they do or not do immediately before that point) to correctly diagnose the actual obstacle, before investing in a solution aimed at the wrong cause entirely.
 
 This case will be revisited in **Lesson 12 (Customer Interviews)**, where we cover techniques for uncovering the real behavioral story behind a drop-off like this one, and in **Lesson 13 (Surveys)**, where we address how to design surveys that avoid exactly this kind of leading, stated-preference-only framing.
 
@@ -267,24 +267,24 @@ The recurring discipline this table reinforces: **match the method to the specif
 *What the interviewer is actually evaluating:* Genuine openness to disconfirming evidence, and whether the candidate's research process has actual teeth (per Lesson 8's discovery theater warning) rather than reliably confirming whatever the team already believed. A candidate who cannot produce a real example may be signaling a research process contaminated by confirmation bias.
 
 **Typical question 3: "A survey shows strong interest in a proposed feature. What questions would you ask before trusting that result?"**
-*What the interviewer is actually evaluating:* Fluency with the Evidence Trustworthiness Ladder and the stated-versus-revealed-preference distinction — whether the candidate immediately probes sample representativeness, question framing, and whether the "interest" reflects any real behavioral commitment, rather than accepting a positive survey result at face value.
+*What the interviewer is actually evaluating:* Fluency with the Evidence Trustworthiness Ladder and the stated-versus-revealed-preference distinction whether the candidate immediately probes sample representativeness, question framing, and whether the "interest" reflects any real behavioral commitment, rather than accepting a positive survey result at face value.
 
 ---
 
 ## Summary
 
-User research is the disciplined, bias-aware collection of evidence about real users' behavior and needs — distinct from informal conversation, stakeholder anecdote, or market research aimed at different questions. Qualitative methods (interviews, observation) are well suited to why/how questions and hypothesis generation; quantitative methods (large-sample surveys, analytics, experiments) are well suited to how-many/how-much questions and testing prevalence at scale, and the two are complementary rather than competing. The gap between stated preference (what people say they'd do) and revealed preference (what they actually do with real stakes) is one of the most consequential issues in the field, and research that captures only stated preference — especially via questions resembling "would you use this?" — is systematically vulnerable to overstating genuine demand. Confirmation bias, leading questions, social desirability bias, and the stated-preference trap all distort findings if not deliberately controlled for, and a basic trustworthiness checklist (sample representativeness, question neutrality, stated vs. revealed preference, researcher objectivity, and method-to-claim fit) helps evaluate how much weight a given piece of evidence deserves before it drives a costly decision.
+User research is the disciplined, bias-aware collection of evidence about real users' behavior and needs distinct from informal conversation, stakeholder anecdote, or market research aimed at different questions. Qualitative methods (interviews, observation) are well suited to why/how questions and hypothesis generation; quantitative methods (large-sample surveys, analytics, experiments) are well suited to how-many/how-much questions and testing prevalence at scale, and the two are complementary rather than competing. The gap between stated preference (what people say they'd do) and revealed preference (what they actually do with real stakes) is one of the most consequential issues in the field, and research that captures only stated preference especially via questions resembling "would you use this?" is systematically vulnerable to overstating genuine demand. Confirmation bias, leading questions, social desirability bias, and the stated-preference trap all distort findings if not deliberately controlled for, and a basic trustworthiness checklist (sample representativeness, question neutrality, stated vs. revealed preference, researcher objectivity, and method-to-claim fit) helps evaluate how much weight a given piece of evidence deserves before it drives a costly decision.
 
 ---
 
 ## Key Takeaways
 
-- User research is distinct from casual conversation, stakeholder anecdote, and market research for other purposes — it requires deliberate method to control for bias.
-- Qualitative research answers why/how questions with depth but small samples; quantitative research answers how-many/how-much questions with scale but less depth — match the method to the question.
+- User research is distinct from casual conversation, stakeholder anecdote, and market research for other purposes it requires deliberate method to control for bias.
+- Qualitative research answers why/how questions with depth but small samples; quantitative research answers how-many/how-much questions with scale but less depth match the method to the question.
 - Stated preference (what people say) and revealed preference (what people actually do with real stakes) frequently diverge; research that captures only stated preference systematically overstates genuine demand.
 - Confirmation bias, leading questions, and social desirability bias all distort findings; deliberate, neutral method design is required to control for them.
 - The "would you use this" question is one of the most common and reliable ways to generate falsely confident, stated-preference-only validation.
-- The Evidence Trustworthiness Ladder ranks research evidence by resistance to bias — naming which rung a piece of evidence occupies prevents weak evidence from being unconsciously treated as strong.
+- The Evidence Trustworthiness Ladder ranks research evidence by resistance to bias naming which rung a piece of evidence occupies prevents weak evidence from being unconsciously treated as strong.
 - An unrepresentative sample (existing power users, only still-engaged respondents) can produce confident-sounding findings that miss the actual population whose behavior most needs to be understood.
 
 ---
@@ -295,8 +295,8 @@ User research is the disciplined, bias-aware collection of evidence about real u
 
 - **User research ≠ casual conversation, stakeholder anecdote, or unrelated market research.**
 - **Qualitative = why/how, small sample, deep.** **Quantitative = how many/how much, large sample, less depth.** Complementary, not competing.
-- **Stated preference (what people say) vs. revealed preference (what people actually do)** — the gap between them is huge; prioritize revealed preference wherever possible.
-- **"Would you use this?" is a trap** — no real cost to a generous, hypothetical answer.
+- **Stated preference (what people say) vs. revealed preference (what people actually do)** the gap between them is huge; prioritize revealed preference wherever possible.
+- **"Would you use this?" is a trap** no real cost to a generous, hypothetical answer.
 - **Four key biases:** confirmation bias, leading questions, social desirability bias, the stated-preference trap.
 - **Evidence Trustworthiness Ladder:** stated/unrepresentative/leading (weakest) → stated/representative/neutral → revealed/small-scale → revealed/large-scale (strongest).
 - **Trustworthiness checklist:** representative sample? neutral questions? stated or revealed? objective researcher? method fits the claim?
@@ -320,9 +320,9 @@ User research is the disciplined, bias-aware collection of evidence about real u
 
 ## Further Reading / Resources
 
-- Erika Hall, *Just Enough Research* — a widely used, practical introduction to research methods, bias awareness, and matching method to question, directly relevant to this lesson's framing.
-- Steve Portigal, *Interviewing Users* — a detailed treatment of qualitative interviewing technique, previewing Lesson 12's deeper coverage.
-- Daniel Kahneman, *Thinking, Fast and Slow* — a foundational, widely cited treatment of cognitive biases (including confirmation bias and the general unreliability of self-reported predictions about one's own future behavior) underlying this lesson's stated-versus-revealed-preference discussion.
+- Erika Hall, *Just Enough Research* a widely used, practical introduction to research methods, bias awareness, and matching method to question, directly relevant to this lesson's framing.
+- Steve Portigal, *Interviewing Users* a detailed treatment of qualitative interviewing technique, previewing Lesson 12's deeper coverage.
+- Daniel Kahneman, *Thinking, Fast and Slow* a foundational, widely cited treatment of cognitive biases (including confirmation bias and the general unreliability of self-reported predictions about one's own future behavior) underlying this lesson's stated-versus-revealed-preference discussion.
 
 ---
 
@@ -348,7 +348,7 @@ User research is the disciplined, bias-aware collection of evidence about real u
 
 **Card 4**
 - Front: Why is "would you use this?" considered a research trap?
-- Back: There is no real cost to a generous, hypothetical answer, so responses systematically overstate genuine future adoption — a classic stated-preference trap.
+- Back: There is no real cost to a generous, hypothetical answer, so responses systematically overstate genuine future adoption a classic stated-preference trap.
 - Difficulty: 2
 - Tags: would-you-use-this-trap
 
@@ -366,7 +366,7 @@ User research is the disciplined, bias-aware collection of evidence about real u
 
 **Card 7**
 - Front: In the Detailed Case Study, what was the actual underlying reason for low trial-to-paid conversion, as opposed to the survey's price-based explanation?
-- Back: The majority of non-converting users had disengaged from the app entirely within the first four days, well before price would have been relevant — likely an onboarding or early-value-demonstration problem, not a pricing problem.
+- Back: The majority of non-converting users had disengaged from the app entirely within the first four days, well before price would have been relevant likely an onboarding or early-value-demonstration problem, not a pricing problem.
 - Difficulty: 3
 - Tags: case-study, revealed-preference
 
@@ -383,7 +383,7 @@ Work through the following, in writing, before reading further:
 4. Using the Evidence Trustworthiness Ladder, describe what a "strong" (high-rung) piece of evidence about this drop-off problem would actually look like, in concrete terms specific to this app.
 5. Referencing the Detailed Case Study, name one plausible wrong conclusion your team might reach if it relied solely on a stated-preference survey of currently engaged users, without any revealed-preference behavioral data.
 
-There is no single correct answer. The purpose of this exercise is to practice designing research that avoids this lesson's core traps — unrepresentative sampling, leading questions, and reliance on stated over revealed preference — for a scenario without a pre-worked example to lean on.
+There is no single correct answer. The purpose of this exercise is to practice designing research that avoids this lesson's core traps unrepresentative sampling, leading questions, and reliance on stated over revealed preference for a scenario without a pre-worked example to lean on.
 
 ---
 
@@ -588,11 +588,11 @@ D) Include non-users, churned and casual users, and pair interviews with behavio
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 10 — Product Strategy Basics | Strategy requires an honest diagnosis; user research is the primary practical toolkit for gathering the evidence that diagnosis depends on |
-| **Current Lesson** | Lesson 11 — User Research | Qualitative vs. quantitative methods; stated vs. revealed preference; research biases; the Evidence Trustworthiness Ladder |
-| **Next Lesson** | Lesson 12 — Customer Interviews | Provides the detailed, practical technique for conducting the qualitative method introduced at a foundational level in this lesson |
+| **Previous Lesson** | Lesson 10 Product Strategy Basics | Strategy requires an honest diagnosis; user research is the primary practical toolkit for gathering the evidence that diagnosis depends on |
+| **Current Lesson** | Lesson 11 User Research | Qualitative vs. quantitative methods; stated vs. revealed preference; research biases; the Evidence Trustworthiness Ladder |
+| **Next Lesson** | Lesson 12 Customer Interviews | Provides the detailed, practical technique for conducting the qualitative method introduced at a foundational level in this lesson |
 | **Future Concepts Unlocked** | Lesson 13 (Surveys) | Extends this lesson's quantitative-method discussion into detailed survey design, directly addressing the leading-question and stated-preference traps covered here |
 | | Lesson 14 (Personas) | Uses well-conducted research, rather than assumption, as the required input for building accurate personas |
 | | Lesson 15 (User Journey Mapping) | Uses research findings (particularly revealed-preference behavioral data) to construct an accurate map of the real user experience |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "user research" or "customer feedback" assumes the stated-versus-revealed-preference distinction and the Evidence Trustworthiness Ladder as a baseline — this will not be re-explained, only re-applied with increasing method-specific depth across Module 2.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "user research" or "customer feedback" assumes the stated-versus-revealed-preference distinction and the Evidence Trustworthiness Ladder as a baseline this will not be re-explained, only re-applied with increasing method-specific depth across Module 2.

@@ -4,7 +4,7 @@
 
 Lesson 35 addressed how a roadmap's "Now" horizon connects down into actual Sprint work. This lesson addresses the final, and often most consequential, step in that chain: what actually happens when a "Now" item, having been built and tested across one or more Sprints, is ready to reach real users. This step is where a huge amount of otherwise-careful product work can be undone in a single afternoon, because the discipline required to launch something well is genuinely different from the discipline required to build it well.
 
-A large fraction of the most memorable, embarrassing product failures in software are not failures of the underlying feature at all — they are failures of the *release*: a change pushed to everyone at once instead of gradually, a rollback plan that didn't exist when it was needed, a support team blindsided by a launch nobody told them about, a features flag left in the wrong state. This lesson gives you the vocabulary and tools to avoid that category of failure entirely — treating a launch itself as something to be planned, staged, and monitored with the same rigor this curriculum has already applied to backlog grooming (Lesson 34) and roadmapping (Lesson 35).
+A large fraction of the most memorable, embarrassing product failures in software are not failures of the underlying feature at all they are failures of the *release*: a change pushed to everyone at once instead of gradually, a rollback plan that didn't exist when it was needed, a support team blindsided by a launch nobody told them about, a features flag left in the wrong state. This lesson gives you the vocabulary and tools to avoid that category of failure entirely treating a launch itself as something to be planned, staged, and monitored with the same rigor this curriculum has already applied to backlog grooming (Lesson 34) and roadmapping (Lesson 35).
 
 ---
 
@@ -12,13 +12,13 @@ A large fraction of the most memorable, embarrassing product failures in softwar
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery |
+| **Module** | 4 Execution & Agile Delivery |
 | **Current Lesson** | 36 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 32 (Scrum Framework — Increment, Definition of Done), Lesson 34 (Sprint Planning & Backlog Grooming), Lesson 35 (Roadmapping — "Now" horizon items) |
-| **Next Lesson** | Lesson 37 — Working with Engineering Teams |
-| **Future Topics Unlocked** | Lesson 37 (Working with Engineering Teams), Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation, which reuses staged-rollout logic), Lesson 49 (Go-To-Market Strategy) — all build on the launch tiers and staged-rollout mechanics introduced here |
+| **Prerequisites** | Lesson 32 (Scrum Framework Increment, Definition of Done), Lesson 34 (Sprint Planning & Backlog Grooming), Lesson 35 (Roadmapping "Now" horizon items) |
+| **Next Lesson** | Lesson 37 Working with Engineering Teams |
+| **Future Topics Unlocked** | Lesson 37 (Working with Engineering Teams), Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation, which reuses staged-rollout logic), Lesson 49 (Go-To-Market Strategy) all build on the launch tiers and staged-rollout mechanics introduced here |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes **Lesson 32's** concept of an Increment meeting a Definition of Done, since release planning begins only once work is genuinely complete by that standard — releasing something that hasn't met its Definition of Done is a distinct and more basic failure this lesson does not re-cover. It also assumes **Lesson 35's** roadmap vocabulary, particularly the "Now" horizon, since this lesson picks up exactly where a "Now" item's development work ends and its actual path to users begins.
+This lesson assumes **Lesson 32's** concept of an Increment meeting a Definition of Done, since release planning begins only once work is genuinely complete by that standard releasing something that hasn't met its Definition of Done is a distinct and more basic failure this lesson does not re-cover. It also assumes **Lesson 35's** roadmap vocabulary, particularly the "Now" horizon, since this lesson picks up exactly where a "Now" item's development work ends and its actual path to users begins.
 
 ---
 
@@ -86,13 +86,13 @@ graph LR
     C -.->|problem detected| E
 ```
 
-The core trade-off is speed versus exposure. A big-bang release reaches full impact — both the intended benefit and any unintended harm — immediately. A staged rollout reaches full impact more slowly, but any problem is discovered while it's still affecting a small fraction of users, dramatically limiting the damage a bad release can do before it's caught. For most releases carrying meaningful risk (new core functionality, changes to critical infrastructure, anything touching billing or authentication), a staged rollout is the safer default; a big-bang release is more defensible for low-risk, easily reversible, or time-sensitive changes where the cost of a slower rollout genuinely outweighs the benefit of limited exposure.
+The core trade-off is speed versus exposure. A big-bang release reaches full impact both the intended benefit and any unintended harm immediately. A staged rollout reaches full impact more slowly, but any problem is discovered while it's still affecting a small fraction of users, dramatically limiting the damage a bad release can do before it's caught. For most releases carrying meaningful risk (new core functionality, changes to critical infrastructure, anything touching billing or authentication), a staged rollout is the safer default; a big-bang release is more defensible for low-risk, easily reversible, or time-sensitive changes where the cost of a slower rollout genuinely outweighs the benefit of limited exposure.
 
 ### Feature Flags and Canary Releases
 
-A **feature flag** is a configuration switch that allows a team to turn a feature on or off (or adjust its exposure percentage) without deploying new code — the feature ships to production in a "dark" or hidden state, and its visibility is controlled independently afterward. This decouples two things that a big-bang release conflates: *deploying* code and *releasing* a feature to users. A team can deploy code continuously, with new functionality sitting behind a flag, and release it to users on a completely separate, controlled schedule.
+A **feature flag** is a configuration switch that allows a team to turn a feature on or off (or adjust its exposure percentage) without deploying new code the feature ships to production in a "dark" or hidden state, and its visibility is controlled independently afterward. This decouples two things that a big-bang release conflates: *deploying* code and *releasing* a feature to users. A team can deploy code continuously, with new functionality sitting behind a flag, and release it to users on a completely separate, controlled schedule.
 
-A **canary release** (named after the historical practice of using canaries to detect dangerous gas in mines) is the specific practice of releasing a change to a small, often randomly selected, subset of infrastructure or users first, explicitly as an early-warning mechanism — if the canary group shows a problem, the release halts before reaching everyone else. Canary releases and feature flags are complementary: a feature flag controls *who sees a feature*, while a canary release strategy controls *how the underlying infrastructure change is validated* before wider exposure — both serve this lesson's broader principle of controlling exposure deliberately, rather than accepting whatever exposure a single, undifferentiated deployment happens to produce.
+A **canary release** (named after the historical practice of using canaries to detect dangerous gas in mines) is the specific practice of releasing a change to a small, often randomly selected, subset of infrastructure or users first, explicitly as an early-warning mechanism if the canary group shows a problem, the release halts before reaching everyone else. Canary releases and feature flags are complementary: a feature flag controls *who sees a feature*, while a canary release strategy controls *how the underlying infrastructure change is validated* before wider exposure both serve this lesson's broader principle of controlling exposure deliberately, rather than accepting whatever exposure a single, undifferentiated deployment happens to produce.
 
 ### Launch Tiers
 
@@ -104,7 +104,7 @@ Not every release warrants the same level of ceremony. A small copy change and a
 | **Tier 2** (moderate impact) | A significant new feature within an existing surface, a notable UI redesign | Staged rollout recommended, relevant stakeholders (support, docs) notified in advance, lighter-weight rollback plan |
 | **Tier 3** (low impact) | Minor UI tweaks, copy changes, small bug fixes | Standard engineering release process; no special cross-functional coordination required |
 
-The specific tier boundaries vary by organization, but the underlying principle — proportional ceremony matched to actual risk — is a direct extension of Lesson 34's Confidence-and-Effort-matching logic applied to launches instead of estimation.
+The specific tier boundaries vary by organization, but the underlying principle proportional ceremony matched to actual risk is a direct extension of Lesson 34's Confidence-and-Effort-matching logic applied to launches instead of estimation.
 
 ---
 
@@ -116,19 +116,19 @@ As covered above, applying Tier 1 rigor to a minor copy change wastes organizati
 
 **Mistake 2: Conflating "code is deployed" with "feature is released."**
 
-Without a feature flag decoupling these two events, a team loses the ability to control exposure independently of deployment timing — meaning any deployment-time issue (a bad deploy window, unexpected interaction with other in-flight changes) directly and immediately affects every user, rather than being contained to a small, controlled group.
+Without a feature flag decoupling these two events, a team loses the ability to control exposure independently of deployment timing meaning any deployment-time issue (a bad deploy window, unexpected interaction with other in-flight changes) directly and immediately affects every user, rather than being contained to a small, controlled group.
 
 **Mistake 3: Believing "we'll fix it in the next release" is an acceptable rollback plan**
 
-For anything beyond the lowest-risk Tier 3 changes, this is not a rollback plan — it's an acknowledgment that no rollback plan exists. A genuine rollback plan specifies, in advance, exactly how to revert the change quickly (flag flip, feature toggle, code revert, database migration reversal) without waiting for a full new release cycle, since a live, actively-harming issue often cannot wait days for a properly tested fix.
+For anything beyond the lowest-risk Tier 3 changes, this is not a rollback plan it's an acknowledgment that no rollback plan exists. A genuine rollback plan specifies, in advance, exactly how to revert the change quickly (flag flip, feature toggle, code revert, database migration reversal) without waiting for a full new release cycle, since a live, actively-harming issue often cannot wait days for a properly tested fix.
 
 **Mistake 4: Launching without informing support, sales, or customer-facing teams in advance**
 
-A support team blindsided by a change they didn't know was launching will be unable to answer user questions, may misdiagnose the change as a bug, and will lose confidence in the product organization's coordination — entirely avoidable simply by including these teams in the launch checklist from the start.
+A support team blindsided by a change they didn't know was launching will be unable to answer user questions, may misdiagnose the change as a bug, and will lose confidence in the product organization's coordination entirely avoidable simply by including these teams in the launch checklist from the start.
 
 **Mistake 5: Treating a staged rollout's early stages as a formality rather than genuinely watching for signal**
 
-A staged rollout only provides protection if its early stages are actually monitored closely enough to catch a problem before proceeding — a team that mechanically advances from 1% to 10% to 100% on a fixed schedule, without genuinely reviewing metrics at each stage, has adopted the form of a staged rollout without its actual protective function.
+A staged rollout only provides protection if its early stages are actually monitored closely enough to catch a problem before proceeding a team that mechanically advances from 1% to 10% to 100% on a fixed schedule, without genuinely reviewing metrics at each stage, has adopted the form of a staged rollout without its actual protective function.
 
 ---
 
@@ -176,24 +176,24 @@ graph TD
     D --> F[Ship with Monitoring at Each Stage]
 ```
 
-Use the Blast Radius as your default first question for any release, before deciding on tier, rollout strategy, or rollback plan — the answer to "how big is the blast radius, and how containable is it" should drive every other decision in this lesson, rather than defaulting to habit or to whatever ceremony level the last release happened to use.
+Use the Blast Radius as your default first question for any release, before deciding on tier, rollout strategy, or rollback plan the answer to "how big is the blast radius, and how containable is it" should drive every other decision in this lesson, rather than defaulting to habit or to whatever ceremony level the last release happened to use.
 
 ---
 
 ## Real Company Example
 
-**Slack** has been publicly associated, through its own engineering blog writing, with using feature-flag-based, incremental rollout practices for shipping changes to its messaging infrastructure — releasing changes to a small percentage of workspaces first and progressively expanding exposure, specifically because Slack's core product sits in the critical path of many customers' daily work, making the cost of a widely-exposed bad release especially high.
+**Slack** has been publicly associated, through its own engineering blog writing, with using feature-flag-based, incremental rollout practices for shipping changes to its messaging infrastructure releasing changes to a small percentage of workspaces first and progressively expanding exposure, specifically because Slack's core product sits in the critical path of many customers' daily work, making the cost of a widely-exposed bad release especially high.
 
 The underlying principle connects directly to this lesson's Theory: for a product where an outage or bug has an unusually high blast radius (affecting real-time, business-critical communication for many organizations simultaneously), the discipline of staged rollout and careful exposure control becomes proportionally more important, not less.
 
-*(Assumption flagged: this reflects general, publicly available descriptions of feature-flagging and incremental deployment practices discussed in Slack's own engineering blog writing over time, not a confirmed, complete, or current account of Slack's specific internal release process today. Specific tooling and processes evolve continuously at any company; the durable lesson is the underlying principle — high blast-radius products warrant proportionally more careful exposure control — rather than a claim about Slack's exact current practice.)*
+*(Assumption flagged: this reflects general, publicly available descriptions of feature-flagging and incremental deployment practices discussed in Slack's own engineering blog writing over time, not a confirmed, complete, or current account of Slack's specific internal release process today. Specific tooling and processes evolve continuously at any company; the durable lesson is the underlying principle high blast-radius products warrant proportionally more careful exposure control rather than a claim about Slack's exact current practice.)*
 
 ---
 
 ## Real World Perspective: Release Planning & Launch Management at Different Company Stages
 
 **At a startup:**
-Release processes are often minimal — a small team may deploy directly to all users, several times a day, without formal staging, largely because the total user base is small enough that the blast radius of most changes is genuinely limited, and the team can respond to a problem within minutes of it being reported. The risk here is assuming this remains true as the user base and the product's criticality to customers grow, without deliberately revisiting the process.
+Release processes are often minimal a small team may deploy directly to all users, several times a day, without formal staging, largely because the total user base is small enough that the blast radius of most changes is genuinely limited, and the team can respond to a problem within minutes of it being reported. The risk here is assuming this remains true as the user base and the product's criticality to customers grow, without deliberately revisiting the process.
 
 **At a mid-size company:**
 Feature flags and at least lightweight staged rollouts typically become standard practice for anything beyond trivial changes, and a basic launch tiering system usually emerges, often informally at first. This is the stage where Mistake 4 (launching without informing support/sales) most commonly causes real damage, since the organization has grown large enough that engineering and customer-facing teams no longer sit in the same room and overhear each other's plans.
@@ -209,19 +209,19 @@ Consider a simplified, illustrative scenario common at growing product organizat
 
 A team at a mid-size SaaS company ships a significant redesign of its core reporting dashboard, a feature used daily by nearly all paying customers. Confident in weeks of internal QA and a successful staging-environment test, the team deploys the redesign to all users simultaneously on a Friday afternoon, without a feature flag, without informing the support team in advance, and without a specific rollback plan beyond "we can revert the deploy if needed."
 
-Within two hours, a data-formatting bug — invisible in the staging environment's smaller test dataset, but which manifests only for customers with unusually large report volumes — causes reports to display incorrect figures for roughly 15% of enterprise customers, the company's highest-value segment. Customers begin contacting support, whose team has no idea a redesign shipped at all and initially tells confused customers that "reports have always looked this way," escalating customer frustration. By the time engineering identifies the root cause and executes a code revert, nearly five hours have passed — most of it not spent diagnosing the bug itself, which took under thirty minutes, but spent locating who had deployment access on a Friday evening and confirming it was safe to revert.
+Within two hours, a data-formatting bug invisible in the staging environment's smaller test dataset, but which manifests only for customers with unusually large report volumes causes reports to display incorrect figures for roughly 15% of enterprise customers, the company's highest-value segment. Customers begin contacting support, whose team has no idea a redesign shipped at all and initially tells confused customers that "reports have always looked this way," escalating customer frustration. By the time engineering identifies the root cause and executes a code revert, nearly five hours have passed most of it not spent diagnosing the bug itself, which took under thirty minutes, but spent locating who had deployment access on a Friday evening and confirming it was safe to revert.
 
 **What went wrong?**
 
-Using the Blast Radius mental model: this was, by any reasonable classification, a Tier 1 release — a core, daily-use surface, touching the company's highest-value customer segment, with functional correctness (not just cosmetic appearance) at stake. It was treated, in practice, as though it were Tier 3. Three separate, compounding failures are visible: no staged rollout meant the data-formatting bug, which affected a specific data-volume profile invisible in smaller staging tests, hit all affected customers simultaneously rather than being caught in a small canary group first. No feature flag meant there was no fast, code-independent way to hide the redesign the moment the bug was discovered. And no advance communication to support meant the team best positioned to notice and triage the problem quickly was instead actively making it worse by confidently telling customers nothing had changed.
+Using the Blast Radius mental model: this was, by any reasonable classification, a Tier 1 release a core, daily-use surface, touching the company's highest-value customer segment, with functional correctness (not just cosmetic appearance) at stake. It was treated, in practice, as though it were Tier 3. Three separate, compounding failures are visible: no staged rollout meant the data-formatting bug, which affected a specific data-volume profile invisible in smaller staging tests, hit all affected customers simultaneously rather than being caught in a small canary group first. No feature flag meant there was no fast, code-independent way to hide the redesign the moment the bug was discovered. And no advance communication to support meant the team best positioned to notice and triage the problem quickly was instead actively making it worse by confidently telling customers nothing had changed.
 
-Each of these three failures maps to a specific tool this lesson introduces: a staged rollout would very likely have surfaced the data-volume-dependent bug in a small canary group of large customers before it reached the entire high-value segment; a feature flag would have allowed an instant, code-independent rollback in minutes rather than hours; and a basic launch checklist including support would have prevented the confused, damage-amplifying customer interactions. The deeper organizational lesson — how to actually work with engineering to build these safeguards into a team's default release process, rather than relying on individual PM vigilance every single time — is covered directly in **Lesson 37 (Working with Engineering Teams)**, and the specific question of how much rollback and monitoring infrastructure is worth investing in versus treated as acceptable technical debt is addressed in **Lesson 39 (Technical Debt & PM Trade-offs)**.
+Each of these three failures maps to a specific tool this lesson introduces: a staged rollout would very likely have surfaced the data-volume-dependent bug in a small canary group of large customers before it reached the entire high-value segment; a feature flag would have allowed an instant, code-independent rollback in minutes rather than hours; and a basic launch checklist including support would have prevented the confused, damage-amplifying customer interactions. The deeper organizational lesson how to actually work with engineering to build these safeguards into a team's default release process, rather than relying on individual PM vigilance every single time is covered directly in **Lesson 37 (Working with Engineering Teams)**, and the specific question of how much rollback and monitoring infrastructure is worth investing in versus treated as acceptable technical debt is addressed in **Lesson 39 (Technical Debt & PM Trade-offs)**.
 
 ---
 
 ## Framework Explanation: The Launch Readiness Checklist
 
-A second, more tactical tool: before any Tier 1 or Tier 2 release, confirm each of the following has an explicit, named answer — not merely an assumption that it's "probably fine."
+A second, more tactical tool: before any Tier 1 or Tier 2 release, confirm each of the following has an explicit, named answer not merely an assumption that it's "probably fine."
 
 | Stakeholder / Area | Question That Must Have an Explicit Answer |
 |---|---|
@@ -232,7 +232,7 @@ A second, more tactical tool: before any Tier 1 or Tier 2 release, confirm each 
 | Monitoring | What specific metrics will be watched during and after rollout, and who is watching them, on what schedule? |
 | Legal / Compliance (where relevant) | Has anything requiring review (data handling changes, pricing changes, terms-of-service implications) been signed off? |
 
-A release proceeding to Tier 1 or Tier 2 status with any of these left unanswered is, in effect, the same underlying failure as this lesson's Case Study — a gap that feels acceptable in the moment and becomes very expensive the moment something actually goes wrong.
+A release proceeding to Tier 1 or Tier 2 status with any of these left unanswered is, in effect, the same underlying failure as this lesson's Case Study a gap that feels acceptable in the moment and becomes very expensive the moment something actually goes wrong.
 
 ---
 
@@ -245,13 +245,13 @@ A release proceeding to Tier 1 or Tier 2 status with any of these left unanswere
 *What the interviewer is actually evaluating:* Whether the candidate can name the specific missing safeguard (staged rollout, feature flag, rollback plan, stakeholder communication) rather than describing the failure only vaguely as "bad luck" or "an edge case we didn't anticipate."
 
 **Typical question 3: "What's the difference between deploying code and releasing a feature, and why does that distinction matter?"**
-*What the interviewer is actually evaluating:* Whether the candidate understands feature flags as a tool for decoupling these two events, and can explain concretely why that decoupling reduces risk — testing basic technical release-management fluency, which is increasingly expected of PMs working closely with engineering.
+*What the interviewer is actually evaluating:* Whether the candidate understands feature flags as a tool for decoupling these two events, and can explain concretely why that decoupling reduces risk testing basic technical release-management fluency, which is increasingly expected of PMs working closely with engineering.
 
 ---
 
 ## Summary
 
-Release planning and launch management address the final, and often most consequential, step in the chain running from roadmap ("Now" horizon, Lesson 35) through Sprint execution (Lesson 34) to real users: how a completed Increment actually reaches the world. A big-bang release maximizes speed but exposes all users to any problem simultaneously; a staged rollout trades some speed for the ability to catch problems in a small, contained group before they reach everyone. Feature flags decouple code deployment from user-facing release, enabling fast, code-independent rollback; canary releases apply the same exposure-control logic to infrastructure validation. A launch tiering system matches the level of cross-functional ceremony to a release's actual potential impact, using this lesson's Blast Radius question — how bad could this be, and how containable — as the guiding test. As this lesson's Case Study demonstrates, the most damaging launch failures are rarely failures of the underlying feature itself; they are failures to apply proportional safeguards (staged rollout, feature flags, rollback plans, and cross-functional communication with support and sales) to a release whose actual risk warranted them.
+Release planning and launch management address the final, and often most consequential, step in the chain running from roadmap ("Now" horizon, Lesson 35) through Sprint execution (Lesson 34) to real users: how a completed Increment actually reaches the world. A big-bang release maximizes speed but exposes all users to any problem simultaneously; a staged rollout trades some speed for the ability to catch problems in a small, contained group before they reach everyone. Feature flags decouple code deployment from user-facing release, enabling fast, code-independent rollback; canary releases apply the same exposure-control logic to infrastructure validation. A launch tiering system matches the level of cross-functional ceremony to a release's actual potential impact, using this lesson's Blast Radius question how bad could this be, and how containable as the guiding test. As this lesson's Case Study demonstrates, the most damaging launch failures are rarely failures of the underlying feature itself; they are failures to apply proportional safeguards (staged rollout, feature flags, rollback plans, and cross-functional communication with support and sales) to a release whose actual risk warranted them.
 
 ---
 
@@ -259,9 +259,9 @@ Release planning and launch management address the final, and often most consequ
 
 - A staged rollout trades some speed for the ability to catch a problem in a small, contained group before it reaches all users; a big-bang release maximizes speed but maximizes exposure to any undiscovered issue simultaneously.
 - Feature flags decouple deploying code from releasing a feature to users, enabling fast, code-independent rollback that doesn't require a full new release cycle.
-- A launch tiering system matches cross-functional ceremony to actual risk, using potential blast radius as the deciding factor — not habit or convenience.
+- A launch tiering system matches cross-functional ceremony to actual risk, using potential blast radius as the deciding factor not habit or convenience.
 - "We'll fix it in the next release" is not a rollback plan; a genuine rollback plan specifies a fast, tested way to revert independent of the normal release cycle.
-- A launch checklist must include support, sales, and other customer-facing teams, not just engineering — omitting them risks a support team actively worsening a launch problem out of simple lack of awareness.
+- A launch checklist must include support, sales, and other customer-facing teams, not just engineering omitting them risks a support team actively worsening a launch problem out of simple lack of awareness.
 - A staged rollout only protects a team if its early stages are genuinely monitored, not mechanically advanced on a fixed schedule regardless of signal.
 - The most damaging launch failures are usually failures to apply proportional safeguards to a release whose actual risk warranted them, not failures of the underlying feature itself.
 
@@ -271,7 +271,7 @@ Release planning and launch management address the final, and often most consequ
 
 *A two-minute review of everything in this lesson.*
 
-- **Big-bang vs. staged rollout:** speed vs. contained exposure — staged wins for most meaningful-risk releases.
+- **Big-bang vs. staged rollout:** speed vs. contained exposure staged wins for most meaningful-risk releases.
 - **Feature flag:** decouples deploy from release; enables fast, code-independent rollback.
 - **Canary release:** small early-exposure group as an early-warning mechanism.
 - **Launch tiers:** match ceremony (staged rollout, rollback plan, cross-functional review) to actual blast radius.
@@ -297,9 +297,9 @@ Release planning and launch management address the final, and often most consequ
 
 ## Further Reading / Resources
 
-- *Accelerate: The Science of Lean Software and DevOps* by Nicole Forsgren, Jez Humble, and Gene Kim — research-backed treatment of deployment frequency, feature flags, and release risk management.
-- *Continuous Delivery* by Jez Humble and David Farley — the foundational text on decoupling deployment from release and building reliable, low-risk release pipelines.
-- "Feature Flags" documentation and practitioner writing by LaunchDarkly — a widely referenced practical resource on feature-flag-based release management.
+- *Accelerate: The Science of Lean Software and DevOps* by Nicole Forsgren, Jez Humble, and Gene Kim research-backed treatment of deployment frequency, feature flags, and release risk management.
+- *Continuous Delivery* by Jez Humble and David Farley the foundational text on decoupling deployment from release and building reliable, low-risk release pipelines.
+- "Feature Flags" documentation and practitioner writing by LaunchDarkly a widely referenced practical resource on feature-flag-based release management.
 
 ---
 
@@ -307,7 +307,7 @@ Release planning and launch management address the final, and often most consequ
 
 **Card 1**
 - Front: What is the core trade-off between a big-bang release and a staged rollout?
-- Back: Speed versus exposure — big-bang maximizes speed but exposes all users to any problem at once; staged rollout is slower but contains a problem to a small group first.
+- Back: Speed versus exposure big-bang maximizes speed but exposes all users to any problem at once; staged rollout is slower but contains a problem to a small group first.
 - Difficulty: 1
 - Tags: big-bang, staged-rollout
 
@@ -352,7 +352,7 @@ Release planning and launch management address the final, and often most consequ
 
 Consider the following novel scenario: You're the PM for a feature that changes how usage-based billing is calculated for a subset of enterprise customers. Engineering has completed the work, tested it thoroughly in staging, and is eager to ship it before the end of the current quarter to hit an internal deadline. There is currently no feature flag built for this specific change, and building one would take an additional two days of engineering time.
 
-There is no single correct answer to the prompts below — the goal is to practice applying this lesson's tiering and Blast Radius reasoning under real deadline pressure, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying this lesson's tiering and Blast Radius reasoning under real deadline pressure, not to reach one "right" answer.
 
 1. Using the launch tiering table, what tier would you assign this release, and why?
 2. Using the Blast Radius mental model, what is the worst plausible outcome if this specific change goes wrong, and how containable is it without a feature flag?
@@ -501,7 +501,7 @@ C) There is no weakness; some launches simply fail unpredictably
 D) It correctly avoids overexplaining a minor, low-stakes incident
 
 *Correct answer: A*
-*Explanation: A strong answer names the specific missing safeguard — staged rollout, feature flag, rollback plan, or communication — rather than describing bad luck.*
+*Explanation: A strong answer names the specific missing safeguard staged rollout, feature flag, rollback plan, or communication rather than describing bad luck.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
@@ -514,7 +514,7 @@ C) Canary releases apply only to marketing and copy changes
 D) A flag controls who sees a feature; a canary validates infrastructure separately
 
 *Correct answer: D*
-*Explanation: Each tool governs a different layer of exposure — user-facing visibility versus infrastructure validation — while sharing the same underlying principle.*
+*Explanation: Each tool governs a different layer of exposure user-facing visibility versus infrastructure validation while sharing the same underlying principle.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
@@ -540,7 +540,7 @@ C) Skipping any risk discussion for releases the team already feels confident ab
 D) Treating every release as equally risky until a lengthy legal review clears it
 
 *Correct answer: B*
-*Explanation: The Blast Radius question — scope and containability of potential harm — is meant to drive every subsequent release decision, not a fixed default.*
+*Explanation: The Blast Radius question scope and containability of potential harm is meant to drive every subsequent release decision, not a fixed default.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium-Hard*
 
@@ -563,11 +563,11 @@ D) Introduce a lightweight tiering system matching ceremony to actual blast radi
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 35 — Roadmapping | Takes a roadmap's "Now" horizon item, once built and Sprint-complete, and addresses how it actually reaches users |
-| **Current Lesson** | Lesson 36 — Release Planning & Launch Management | Big-bang vs. staged rollout; feature flags; canary releases; launch tiers; Blast Radius; Launch Readiness Checklist |
-| **Next Lesson** | Lesson 37 — Working with Engineering Teams | Addresses how to build these safeguards into a team's default process through effective PM-engineering collaboration |
+| **Previous Lesson** | Lesson 35 Roadmapping | Takes a roadmap's "Now" horizon item, once built and Sprint-complete, and addresses how it actually reaches users |
+| **Current Lesson** | Lesson 36 Release Planning & Launch Management | Big-bang vs. staged rollout; feature flags; canary releases; launch tiers; Blast Radius; Launch Readiness Checklist |
+| **Next Lesson** | Lesson 37 Working with Engineering Teams | Addresses how to build these safeguards into a team's default process through effective PM-engineering collaboration |
 | **Future Concepts Unlocked** | Lesson 39 (Technical Debt & PM Trade-offs) | Extends this lesson's rollback/monitoring investment question into the broader trade-off of what safeguard infrastructure is worth building versus deferring |
 | | Lesson 45 (A/B Testing & Experimentation) | Reuses this lesson's staged-exposure logic, applied to controlled experimentation rather than risk containment |
 | | Lesson 49 (Go-To-Market Strategy) | Builds on this lesson's cross-functional launch coordination when planning a full go-to-market launch |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Blast Radius question, launch tiers, and the feature-flag/rollback distinction with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Blast Radius question, launch tiers, and the feature-flag/rollback distinction with you they will not be re-explained, only re-applied in new contexts.

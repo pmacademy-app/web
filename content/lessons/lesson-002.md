@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 1 introduced a comparison table distinguishing a Product Manager from a Project Manager by their primary question and accountability. That distinction was necessary but incomplete — it told you *who* is accountable for what, but not *why* the underlying work itself is structurally different.
+Lesson 1 introduced a comparison table distinguishing a Product Manager from a Project Manager by their primary question and accountability. That distinction was necessary but incomplete it told you *who* is accountable for what, but not *why* the underlying work itself is structurally different.
 
-This lesson goes one level deeper: it is not just that PMs and Project Managers ask different questions. It is that **a product and a project are fundamentally different kinds of things**, and confusing the two leads to some of the most common structural mistakes in early-career product work — treating a product like something that gets "finished," or measuring a product team's success the way you'd measure a construction crew's.
+This lesson goes one level deeper: it is not just that PMs and Project Managers ask different questions. It is that **a product and a project are fundamentally different kinds of things**, and confusing the two leads to some of the most common structural mistakes in early-career product work treating a product like something that gets "finished," or measuring a product team's success the way you'd measure a construction crew's.
 
-This matters because the language of projects is everywhere in corporate life — deadlines, milestones, deliverables, "done" — and it is easy to unconsciously import that language, and the thinking behind it, into product work where it quietly does damage. A PM who thinks in projects ships a feature and moves on. A PM who thinks in products ships a feature and then asks what it did, and what to do next. This lesson exists to install the second instinct before the first one calcifies.
+This matters because the language of projects is everywhere in corporate life deadlines, milestones, deliverables, "done" and it is easy to unconsciously import that language, and the thinking behind it, into product work where it quietly does damage. A PM who thinks in projects ships a feature and moves on. A PM who thinks in products ships a feature and then asks what it did, and what to do next. This lesson exists to install the second instinct before the first one calcifies.
 
 ---
 
@@ -14,13 +14,13 @@ This matters because the language of projects is everywhere in corporate life �
 
 | Field | Detail |
 |---|---|
-| **Module** | 1 — Foundations |
+| **Module** | 1 Foundations |
 | **Current Lesson** | 2 of 90 |
 | **Difficulty** | 1 / 10 |
 | **Estimated Study Time** | 20 minutes (reading) + 10 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (What is Product Management?) |
-| **Next Lesson** | Lesson 3 — Product Thinking |
-| **Future Topics Unlocked** | Lesson 4 (Product Lifecycle), Lesson 9 (Product Vision), Lesson 41 (Roadmaps) — all depend on the finite/infinite distinction introduced here |
+| **Next Lesson** | Lesson 3 Product Thinking |
+| **Future Topics Unlocked** | Lesson 4 (Product Lifecycle), Lesson 9 (Product Vision), Lesson 41 (Roadmaps) all depend on the finite/infinite distinction introduced here |
 
 ---
 
@@ -38,7 +38,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes familiarity with Lesson 1's core definition of a Product Manager and its Accountability Triangle (desirability, feasibility, viability). If you have not completed Lesson 1, do so first — this lesson builds directly on its comparison table.
+This lesson assumes familiarity with Lesson 1's core definition of a Product Manager and its Accountability Triangle (desirability, feasibility, viability). If you have not completed Lesson 1, do so first this lesson builds directly on its comparison table.
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes familiarity with Lesson 1's core definition of a Product Man
 
 ### The Core Distinction
 
-A **project** is a temporary endeavor with a defined beginning, a defined end, and a specific deliverable. Once the deliverable is produced and accepted, the project is complete. Building a new office, migrating a database, launching a marketing campaign for a specific quarter — these are projects. They have a natural finish line.
+A **project** is a temporary endeavor with a defined beginning, a defined end, and a specific deliverable. Once the deliverable is produced and accepted, the project is complete. Building a new office, migrating a database, launching a marketing campaign for a specific quarter these are projects. They have a natural finish line.
 
 A **product** is an ongoing, evolving thing that exists to serve a continuing need for its users, for as long as that need exists and the business chooses to serve it. A product does not have a natural finish line. Spotify did not "finish" being a music streaming product in some year and stop; it continues to evolve, indefinitely, in response to changing user needs, competition, and technology.
 
@@ -54,25 +54,25 @@ This is the single most important distinction in this lesson, and it has a direc
 
 ### Products Are Delivered Through Projects
 
-This does not mean projects are irrelevant to product work — quite the opposite. A product is typically built and evolved through a *sequence* of projects: a project to ship v1, a project to ship a major redesign, a project to migrate to new infrastructure. Each of these individual projects can and should have a defined scope and end date. What has no end date is the *product itself* — the underlying commitment to serve a user need, which continues across and beyond any individual project.
+This does not mean projects are irrelevant to product work quite the opposite. A product is typically built and evolved through a *sequence* of projects: a project to ship v1, a project to ship a major redesign, a project to migrate to new infrastructure. Each of these individual projects can and should have a defined scope and end date. What has no end date is the *product itself* the underlying commitment to serve a user need, which continues across and beyond any individual project.
 
-This relationship is easy to get backward. A common mistake is to think of "the product" as one long project that simply hasn't finished yet, rather than as an ongoing entity that is *host to* many discrete projects over its life. The difference matters because it changes what "success" means. A project succeeds when it delivers its defined scope on time. A product succeeds when it continues to serve real user needs better than the available alternative — a standard that has no expiration date and is never fully and finally satisfied.
+This relationship is easy to get backward. A common mistake is to think of "the product" as one long project that simply hasn't finished yet, rather than as an ongoing entity that is *host to* many discrete projects over its life. The difference matters because it changes what "success" means. A project succeeds when it delivers its defined scope on time. A product succeeds when it continues to serve real user needs better than the available alternative a standard that has no expiration date and is never fully and finally satisfied.
 
 ### Why "Done" Is the Wrong Question for a Healthy Product
 
-If you ask, "Is this project done?" — that is a meaningful, answerable question. Scope was defined; either it was delivered or it wasn't.
+If you ask, "Is this project done?" that is a meaningful, answerable question. Scope was defined; either it was delivered or it wasn't.
 
-If you ask, "Is this product done?" — for any product still being actively served to users, the honest answer is that the question doesn't quite make sense. A product's users' needs keep evolving (new competitors emerge, new use cases arise, new technology becomes available), so a product that stops evolving is not "done" in a successful sense — it is stagnating, and stagnation typically precedes decline. Products that are truly "done," in a durable sense, are usually products the company has decided to sunset.
+If you ask, "Is this product done?" for any product still being actively served to users, the honest answer is that the question doesn't quite make sense. A product's users' needs keep evolving (new competitors emerge, new use cases arise, new technology becomes available), so a product that stops evolving is not "done" in a successful sense it is stagnating, and stagnation typically precedes decline. Products that are truly "done," in a durable sense, are usually products the company has decided to sunset.
 
-This has a subtle but important implication for how you write goals and OKRs (a topic covered later, in Module 5). "Ship feature X" is a project-shaped goal — it has a clear finish line. "Improve activation rate" is a product-shaped goal — it has no natural finish line, only a direction of continuous improvement. Mature product organizations lean toward the second kind of goal, even though the first kind feels more satisfying to check off a list.
+This has a subtle but important implication for how you write goals and OKRs (a topic covered later, in Module 5). "Ship feature X" is a project-shaped goal it has a clear finish line. "Improve activation rate" is a product-shaped goal it has no natural finish line, only a direction of continuous improvement. Mature product organizations lean toward the second kind of goal, even though the first kind feels more satisfying to check off a list.
 
 ### Funding and Evaluation Differences
 
 Projects and products are typically funded and evaluated differently inside real companies, and this shapes incentives in ways worth understanding early.
 
-A **project** is often funded with a fixed budget and evaluated primarily on delivery: did it ship on time, within budget, matching the agreed scope? This is why traditional project management places heavy emphasis on scope, schedule, and budget as the three variables to manage (sometimes called the "iron triangle" of project management — not to be confused with this curriculum's Accountability Triangle from Lesson 1, which is a different concept entirely, despite the similar name).
+A **project** is often funded with a fixed budget and evaluated primarily on delivery: did it ship on time, within budget, matching the agreed scope? This is why traditional project management places heavy emphasis on scope, schedule, and budget as the three variables to manage (sometimes called the "iron triangle" of project management not to be confused with this curriculum's Accountability Triangle from Lesson 1, which is a different concept entirely, despite the similar name).
 
-A **product** (or a product team responsible for it) is typically funded on an ongoing basis and evaluated on the outcomes it produces over time — retention, revenue, engagement, satisfaction — rather than on whether any single release shipped on schedule. This is a direct consequence of the output vs. outcome distinction from Lesson 1: a project-funded team is naturally pulled toward measuring and reporting output (did we ship it), while a product-funded team is naturally pulled toward measuring outcome (did it work). Neither orientation is inherently wrong — they are appropriate to different kinds of work — but applying project-style evaluation (pure delivery tracking) to product-style work (which requires ongoing outcome tracking) is a recurring organizational mistake, and one you are likely to encounter directly in your career.
+A **product** (or a product team responsible for it) is typically funded on an ongoing basis and evaluated on the outcomes it produces over time retention, revenue, engagement, satisfaction rather than on whether any single release shipped on schedule. This is a direct consequence of the output vs. outcome distinction from Lesson 1: a project-funded team is naturally pulled toward measuring and reporting output (did we ship it), while a product-funded team is naturally pulled toward measuring outcome (did it work). Neither orientation is inherently wrong they are appropriate to different kinds of work but applying project-style evaluation (pure delivery tracking) to product-style work (which requires ongoing outcome tracking) is a recurring organizational mistake, and one you are likely to encounter directly in your career.
 
 ---
 
@@ -80,23 +80,23 @@ A **product** (or a product team responsible for it) is typically funded on an o
 
 **Mistake 1: Treating a completed redesign project as proof the underlying product problem is solved**
 
-A new PM ships a redesign, closes out the project plan, and moves fully on to the next initiative without measuring what the redesign actually did to user behavior. The project (the redesign) is indeed done. The product's need for that redesign to actually work is not something a completed project checklist can confirm — only outcome measurement (Module 4) can.
+A new PM ships a redesign, closes out the project plan, and moves fully on to the next initiative without measuring what the redesign actually did to user behavior. The project (the redesign) is indeed done. The product's need for that redesign to actually work is not something a completed project checklist can confirm only outcome measurement (Module 4) can.
 
 **Mistake 2: Treating the roadmap like a fixed project plan**
 
-Some new PMs present their roadmap the way a project manager presents a Gantt chart: fixed dates, fixed scope, "we will deliver X by Q3." Because products are shaped by continuous learning (new user research, new data, new competitive moves), a roadmap that cannot flex when new evidence arrives will either be broken by reality or will be defended past the point where it still makes sense — both bad outcomes. We will return to this directly in Lesson 41 (Roadmaps).
+Some new PMs present their roadmap the way a project manager presents a Gantt chart: fixed dates, fixed scope, "we will deliver X by Q3." Because products are shaped by continuous learning (new user research, new data, new competitive moves), a roadmap that cannot flex when new evidence arrives will either be broken by reality or will be defended past the point where it still makes sense both bad outcomes. We will return to this directly in Lesson 41 (Roadmaps).
 
 **Mistake 3: Confusing "project complete" with "problem solved."**
 
-Because a project has a clean finish line, it is emotionally satisfying to treat its completion as evidence of success. But a project can be completed exactly as scoped and still fail to solve the underlying user problem — this is precisely the risk flagged in Lesson 1's Case Study, where four features shipped (four projects completed) without moving the product's actual outcome.
+Because a project has a clean finish line, it is emotionally satisfying to treat its completion as evidence of success. But a project can be completed exactly as scoped and still fail to solve the underlying user problem this is precisely the risk flagged in Lesson 1's Case Study, where four features shipped (four projects completed) without moving the product's actual outcome.
 
 **Mistake 4: Believing a "project mindset" is simply wrong and should be avoided entirely**
 
-This is an overcorrection. Projects remain a legitimate and necessary way to organize discrete chunks of work with real deadlines (a compliance deadline, a partner integration commitment, a conference launch). The mistake is not using project thinking at all — it's applying *project-style finality* to the *product itself*, rather than to the individual, bounded pieces of work that make up its ongoing life.
+This is an overcorrection. Projects remain a legitimate and necessary way to organize discrete chunks of work with real deadlines (a compliance deadline, a partner integration commitment, a conference launch). The mistake is not using project thinking at all it's applying *project-style finality* to the *product itself*, rather than to the individual, bounded pieces of work that make up its ongoing life.
 
 **Mistake 5: Writing goals in project-shaped language for work that is actually product-shaped**
 
-A goal like "ship feature X" has a clear finish line and feels satisfying to check off, but it describes an output, not a direction — once shipped, the goal offers no further guidance. A goal like "improve activation rate" has no natural end point; it names a continuous direction of improvement rather than a deliverable to complete. New PMs who default to project-shaped goals for ongoing product work end up optimizing for the feeling of completion rather than for the outcome the goal was actually meant to track.
+A goal like "ship feature X" has a clear finish line and feels satisfying to check off, but it describes an output, not a direction once shipped, the goal offers no further guidance. A goal like "improve activation rate" has no natural end point; it names a continuous direction of improvement rather than a deliverable to complete. New PMs who default to project-shaped goals for ongoing product work end up optimizing for the feeling of completion rather than for the outcome the goal was actually meant to track.
 
 ---
 
@@ -147,17 +147,17 @@ graph LR
     E -.-> A
 ```
 
-A river keeps flowing regardless of any single bridge. Each bridge (project) is built with a specific engineering scope, a start date, and a completion date — and once built, the bridge-building project is genuinely finished. But the river itself doesn't stop because a bridge was completed; it keeps flowing, and at some point another bridge may be needed further downstream, built with fresh understanding of the river's current conditions.
+A river keeps flowing regardless of any single bridge. Each bridge (project) is built with a specific engineering scope, a start date, and a completion date and once built, the bridge-building project is genuinely finished. But the river itself doesn't stop because a bridge was completed; it keeps flowing, and at some point another bridge may be needed further downstream, built with fresh understanding of the river's current conditions.
 
-Use this model whenever you feel the pull to declare a product "done" because a project shipped. Ask instead: *which bridge did we just finish, and what is the river doing now?* This reframes the natural next step from "move on" to "measure, then decide what's next" — the same discipline introduced as the Decision Chain in Lesson 1, now applied specifically to the product/project relationship.
+Use this model whenever you feel the pull to declare a product "done" because a project shipped. Ask instead: *which bridge did we just finish, and what is the river doing now?* This reframes the natural next step from "move on" to "measure, then decide what's next" the same discipline introduced as the Decision Chain in Lesson 1, now applied specifically to the product/project relationship.
 
 ---
 
 ## Real Company Example
 
-**Amazon** offers an instructive real-world illustration of the product/project relationship. Amazon's Prime membership program has existed as an ongoing product since 2005, continuously evolving in scope (from expedited shipping, to video streaming, to music, to grocery delivery benefits, among other additions over the years). No single year represents Prime being "finished" — it is a continuously evolving product, held together by a stable underlying value proposition (fast, convenient access to a growing bundle of benefits for a recurring fee).
+**Amazon** offers an instructive real-world illustration of the product/project relationship. Amazon's Prime membership program has existed as an ongoing product since 2005, continuously evolving in scope (from expedited shipping, to video streaming, to music, to grocery delivery benefits, among other additions over the years). No single year represents Prime being "finished" it is a continuously evolving product, held together by a stable underlying value proposition (fast, convenient access to a growing bundle of benefits for a recurring fee).
 
-Within that single ongoing product, Amazon has run countless discrete *projects*: the project to launch Prime Video as a benefit, the project to expand same-day delivery to new metro areas, the project to integrate grocery delivery after acquiring Whole Foods. Each of these had a defined scope and a launch date — a genuine finish line as a project. But Prime itself, as a product, has never had a finish line; it has only ever had a *next* version.
+Within that single ongoing product, Amazon has run countless discrete *projects*: the project to launch Prime Video as a benefit, the project to expand same-day delivery to new metro areas, the project to integrate grocery delivery after acquiring Whole Foods. Each of these had a defined scope and a launch date a genuine finish line as a project. But Prime itself, as a product, has never had a finish line; it has only ever had a *next* version.
 
 *(Assumption flagged: the specific internal project structures and timelines behind these Prime feature launches are not publicly detailed in full, and this example describes the observable pattern of ongoing product evolution through discrete launches, not confirmed internal Amazon project management practices.)*
 
@@ -165,11 +165,11 @@ Within that single ongoing product, Amazon has run countless discrete *projects*
 
 ## Real World Perspective: Product vs. Project at Different Company Stages
 
-**At a startup:** The line between "product" and "project" is often blurry by necessity, because the entire company may be organized around a single upcoming launch (a project) that effectively *is* the product's current existence. Early-stage PMs frequently operate almost entirely in project mode — ship the MVP, ship the next milestone — because the product hasn't yet reached a stage of ongoing, multi-team parallel evolution. This is appropriate at this stage, but the PM should recognize it as a temporary condition, not the permanent shape of the job.
+**At a startup:** The line between "product" and "project" is often blurry by necessity, because the entire company may be organized around a single upcoming launch (a project) that effectively *is* the product's current existence. Early-stage PMs frequently operate almost entirely in project mode ship the MVP, ship the next milestone because the product hasn't yet reached a stage of ongoing, multi-team parallel evolution. This is appropriate at this stage, but the PM should recognize it as a temporary condition, not the permanent shape of the job.
 
 **At a mid-size company:** Product and project structures typically formalize and separate. A dedicated program or project management function often emerges specifically to handle the *delivery mechanics* (schedules, dependencies, cross-team coordination) of shipping product work, freeing the PM to focus more fully on the ongoing, undefined-end product questions (what should we build next, and why) rather than delivery logistics.
 
-**At Big Tech:** The separation is usually explicit and formalized: Technical Program Managers (TPMs) or equivalent roles often own the project-shaped delivery mechanics entirely, while PMs own the product-shaped direction and outcome questions. A PM at this scale who spends most of their time managing Gantt-chart-style delivery tracking, rather than direction and outcome, is usually a signal that role boundaries have blurred in an unhealthy way — the specialized delivery function exists precisely so the PM doesn't have to default back into project-only thinking.
+**At Big Tech:** The separation is usually explicit and formalized: Technical Program Managers (TPMs) or equivalent roles often own the project-shaped delivery mechanics entirely, while PMs own the product-shaped direction and outcome questions. A PM at this scale who spends most of their time managing Gantt-chart-style delivery tracking, rather than direction and outcome, is usually a signal that role boundaries have blurred in an unhealthy way the specialized delivery function exists precisely so the PM doesn't have to default back into project-only thinking.
 
 ---
 
@@ -177,13 +177,13 @@ Within that single ongoing product, Amazon has run countless discrete *projects*
 
 Consider a business-to-business software company that builds a CRM (customer relationship management) tool. Over three years, the product goes through the following:
 
-- **Year 1:** The team ships the initial CRM as a defined project — contact management, deal tracking, a basic dashboard. Leadership declares the "CRM project" complete and reassigns most of the team to a new initiative.
-- **Year 2:** Customer churn rises. Exit interviews reveal that customers found the tool useful at first, but their needs evolved (they needed integrations with email tools, reporting for their own managers, mobile access) faster than the "finished" CRM did. A new team is assembled to "relaunch" the CRM — again treated as a discrete project with its own finish line.
+- **Year 1:** The team ships the initial CRM as a defined project contact management, deal tracking, a basic dashboard. Leadership declares the "CRM project" complete and reassigns most of the team to a new initiative.
+- **Year 2:** Customer churn rises. Exit interviews reveal that customers found the tool useful at first, but their needs evolved (they needed integrations with email tools, reporting for their own managers, mobile access) faster than the "finished" CRM did. A new team is assembled to "relaunch" the CRM again treated as a discrete project with its own finish line.
 - **Year 3:** The same pattern repeats. Each time, the team treats the CRM as a project to be completed and closed, rather than a product with a continuously evolving relationship to a changing user need.
 
 **What went wrong?**
 
-The company never had a *product* team for the CRM — it had a rotating sequence of *project* teams, each of which correctly delivered its defined scope, and each of which was then reassigned as though the underlying user need had also been "delivered." Applying the mental model from this lesson: the company kept building bridges, but no one was watching the river. Each bridge was well-engineered. But because no team held ongoing accountability for the CRM's continued fit with evolving customer needs — the actual product accountability described in Lesson 1 — the same gap reopened predictably, three times, at real cost in customer trust and churn.
+The company never had a *product* team for the CRM it had a rotating sequence of *project* teams, each of which correctly delivered its defined scope, and each of which was then reassigned as though the underlying user need had also been "delivered." Applying the mental model from this lesson: the company kept building bridges, but no one was watching the river. Each bridge was well-engineered. But because no team held ongoing accountability for the CRM's continued fit with evolving customer needs the actual product accountability described in Lesson 1 the same gap reopened predictably, three times, at real cost in customer trust and churn.
 
 A healthier structure would have staffed the CRM with a standing product team from Year 1 onward, one that treated each year's work as a *project within an ongoing product*, continuously monitoring outcomes (Lesson 1's Decision Chain) rather than declaring victory and dispersing after each release.
 
@@ -197,7 +197,7 @@ A healthier structure would have staffed the CRM with a standing product team fr
 This lesson's reusable framework draws a distinction between **finite work** and **infinite work**, adapted from a broader concept (finite and infinite games) that has become influential in product and business strategy circles.
 
 - **Finite work** has a defined endpoint and a defined win condition: ship this feature by this date, migrate this database, pass this audit. Once achieved, it is genuinely over.
-- **Infinite work** has no defined endpoint and no single win condition — only ongoing relative success or failure: "keep the product valuable to users," "keep growing revenue sustainably." There is no moment where this work is finally, permanently won.
+- **Infinite work** has no defined endpoint and no single win condition only ongoing relative success or failure: "keep the product valuable to users," "keep growing revenue sustainably." There is no moment where this work is finally, permanently won.
 
 ```mermaid
 %%{init: {
@@ -238,9 +238,9 @@ graph TD
     D -.->|feeds into| E
 ```
 
-The practical use of this framework: when a new initiative lands on your desk, ask which category it belongs to *before* deciding how to plan and evaluate it. If it's genuinely finite (a specific integration a partner requires by a contractual date), plan it like a project — fixed scope, fixed date, clear "done." If it's genuinely infinite (improving your product's core retention), do not force it into project shape; instead, treat it the way Lesson 1's Decision Chain describes — as an ongoing cycle of understanding, deciding, executing, and measuring, with no final "done" milestone, only continued or discontinued investment.
+The practical use of this framework: when a new initiative lands on your desk, ask which category it belongs to *before* deciding how to plan and evaluate it. If it's genuinely finite (a specific integration a partner requires by a contractual date), plan it like a project fixed scope, fixed date, clear "done." If it's genuinely infinite (improving your product's core retention), do not force it into project shape; instead, treat it the way Lesson 1's Decision Chain describes as an ongoing cycle of understanding, deciding, executing, and measuring, with no final "done" milestone, only continued or discontinued investment.
 
-Most real product work is a *mixture*: infinite product goals delivered through a sequence of finite projects, exactly as the River and Bridge model illustrates. The failure mode this framework guards against is treating an infinite goal (retention, revenue, engagement) as though it could be closed out with a single finite project — the exact mistake made in the CRM case study above.
+Most real product work is a *mixture*: infinite product goals delivered through a sequence of finite projects, exactly as the River and Bridge model illustrates. The failure mode this framework guards against is treating an infinite goal (retention, revenue, engagement) as though it could be closed out with a single finite project the exact mistake made in the CRM case study above.
 
 ---
 
@@ -259,7 +259,7 @@ Most real product work is a *mixture*: infinite product goals delivered through 
 
 ## Summary
 
-A project is a temporary endeavor with a defined scope and a genuine finish line; a product is an ongoing, evolving commitment to serve a continuing user need, with no natural end state. Products are built and evolved through sequences of discrete projects — but the product itself is never "done" the way a project can be, because the user needs it serves keep changing. Confusing the two leads to characteristic failures: declaring victory and moving on after a single release, treating a roadmap like a fixed project plan, or mistaking "we shipped what we scoped" for "we solved the user's actual problem." The Finite/Infinite Work framework and the River and Bridge mental model both exist to help you correctly categorize a piece of work before deciding how to plan, staff, and evaluate it.
+A project is a temporary endeavor with a defined scope and a genuine finish line; a product is an ongoing, evolving commitment to serve a continuing user need, with no natural end state. Products are built and evolved through sequences of discrete projects but the product itself is never "done" the way a project can be, because the user needs it serves keep changing. Confusing the two leads to characteristic failures: declaring victory and moving on after a single release, treating a roadmap like a fixed project plan, or mistaking "we shipped what we scoped" for "we solved the user's actual problem." The Finite/Infinite Work framework and the River and Bridge mental model both exist to help you correctly categorize a piece of work before deciding how to plan, staff, and evaluate it.
 
 ---
 
@@ -281,7 +281,7 @@ A project is a temporary endeavor with a defined scope and a genuine finish line
 - **Product:** ongoing, evolving, no natural finish line, evaluated on outcomes over time.
 - **Relationship:** a product is delivered through a sequence of projects (River and Bridge).
 - **Wrong question:** "Is the product done?" **Right question:** "What did the last project change, and what's next?"
-- **Finite/Infinite frame:** categorize new work before planning it — finite work gets project treatment; infinite work gets ongoing product treatment.
+- **Finite/Infinite frame:** categorize new work before planning it finite work gets project treatment; infinite work gets ongoing product treatment.
 - **Biggest trap:** declaring success because a project shipped on scope, without checking whether it moved a real outcome.
 
 ---
@@ -300,9 +300,9 @@ A project is a temporary endeavor with a defined scope and a genuine finish line
 
 ## Further Reading / Resources
 
-- Melissa Perri, *Escaping the Build Trap* — directly addresses the organizational risk of treating ongoing product work as a series of completed projects.
-- Marty Cagan, *Inspired* — describes the structural distinction between project-funded "feature teams" and outcome-accountable "empowered product teams."
-- Amazon's official "About Amazon" Prime timeline materials (published by Amazon) — a public reference for Prime's multi-year evolution referenced in the Real Company Example.
+- Melissa Perri, *Escaping the Build Trap* directly addresses the organizational risk of treating ongoing product work as a series of completed projects.
+- Marty Cagan, *Inspired* describes the structural distinction between project-funded "feature teams" and outcome-accountable "empowered product teams."
+- Amazon's official "About Amazon" Prime timeline materials (published by Amazon) a public reference for Prime's multi-year evolution referenced in the Real Company Example.
 
 ---
 
@@ -373,7 +373,7 @@ C) Because user needs keep evolving, so a static product is stagnating
 D) Because only the engineering team can judge when work is complete
 
 *Correct answer: C*
-*Explanation: Competitors, technology, and user needs all keep moving, so a product that stops evolving is not finished in any successful sense — it is losing ground. Products that are genuinely done are usually ones the company has chosen to sunset.*
+*Explanation: Competitors, technology, and user needs all keep moving, so a product that stops evolving is not finished in any successful sense it is losing ground. Products that are genuinely done are usually ones the company has chosen to sunset.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -412,7 +412,7 @@ C) Projects receive ongoing funding; products receive one fixed budget each
 D) Projects and products are both judged mainly on engineering throughput
 
 *Correct answer: A*
-*Explanation: Projects are usually given a fixed budget and measured on scope, schedule, and budget. Products are funded on a continuing basis and measured on retention, revenue, and engagement — a direct consequence of the output versus outcome distinction.*
+*Explanation: Projects are usually given a fixed budget and measured on scope, schedule, and budget. Products are funded on a continuing basis and measured on retention, revenue, and engagement a direct consequence of the output versus outcome distinction.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -464,7 +464,7 @@ C) Prime is evaluated purely on whether each benefit launched on its target date
 D) Prime demonstrates that large companies organize work without using projects
 
 *Correct answer: B*
-*Explanation: Prime has run since 2005 as a continuously evolving product, absorbing discrete launches — video, expanded delivery, grocery — each of which had a real finish line while the product itself never did.*
+*Explanation: Prime has run since 2005 as a continuously evolving product, absorbing discrete launches video, expanded delivery, grocery each of which had a real finish line while the product itself never did.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
@@ -477,7 +477,7 @@ C) A project success and an unresolved product question about the underlying nee
 D) A planning failure, because three months is too short to read an activation shift
 
 *Correct answer: C*
-*Explanation: By its own definition the project succeeded — on time, on scope. Whether it served the ongoing user need is a separate question that project completion cannot answer, and it stays open until the outcome is measured.*
+*Explanation: By its own definition the project succeeded on time, on scope. Whether it served the ongoing user need is a separate question that project completion cannot answer, and it stays open until the outcome is measured.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
@@ -496,7 +496,7 @@ D) An understanding that roadmaps exist mainly to coordinate across teams
 
 ---
 
-**12. (Highest Difficulty, Product Thinking) A company's leadership says: "We finished the mobile app project last year, so mobile is handled — let's focus engineering elsewhere." Using both the Finite/Infinite Work framework and the River and Bridge model, what is the strongest argument a PM could make in response?**
+**12. (Highest Difficulty, Product Thinking) A company's leadership says: "We finished the mobile app project last year, so mobile is handled let's focus engineering elsewhere." Using both the Finite/Infinite Work framework and the River and Bridge model, what is the strongest argument a PM could make in response?**
 A) Mobile is an ongoing surface; last year's work was one bridge across it
 B) Mobile work should be paused until the next contractual deadline arrives
 C) Mobile deserves permanent staffing because app stores require frequent updates
@@ -552,9 +552,9 @@ D) A sign the PM should transfer roadmap ownership to the TPM as well
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 1 — What is Product Management? | Extends the PM/Project Manager comparison table into a full structural distinction between products and projects |
-| **Current Lesson** | Lesson 2 — Product vs. Project | Finite vs. Infinite Work; River and Bridge mental model; products evaluated on outcome, projects on delivery |
-| **Next Lesson** | Lesson 3 — Product Thinking | Builds on the idea that products are ongoing and evolving to introduce the cognitive habits ("product thinking") required to manage something with no fixed end state |
+| **Previous Lesson** | Lesson 1 What is Product Management? | Extends the PM/Project Manager comparison table into a full structural distinction between products and projects |
+| **Current Lesson** | Lesson 2 Product vs. Project | Finite vs. Infinite Work; River and Bridge mental model; products evaluated on outcome, projects on delivery |
+| **Next Lesson** | Lesson 3 Product Thinking | Builds on the idea that products are ongoing and evolving to introduce the cognitive habits ("product thinking") required to manage something with no fixed end state |
 | **Future Concepts Unlocked** | Lesson 4 (Product Lifecycle) | Formalizes the stages an ongoing product moves through, building directly on "no natural end state" from this lesson |
 | | Lesson 9 (Product Vision) | A vision is what gives direction to infinite, ongoing product work in the absence of a project-style finish line |
 | | Lesson 41 (Roadmaps) | Directly resolves Common Beginner Mistake #2 with a structured approach to planning ongoing, evidence-driven work without forcing it into rigid project form |

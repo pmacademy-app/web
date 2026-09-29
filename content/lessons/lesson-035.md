@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 34 took you inside a single Sprint — how a backlog item gets groomed, estimated, and planned into a two-week (or similar) window. But a Sprint Backlog only ever shows a few weeks of a much longer story. Stakeholders, executives, sales teams, and customers routinely need a view further out than a single Sprint can offer — not because they need Sprint-level detail six months in advance, which this curriculum has already established (Lesson 31) is rarely knowable that precisely, but because they need a credible sense of *direction and sequence* that a single Sprint Backlog can't provide on its own.
+Lesson 34 took you inside a single Sprint how a backlog item gets groomed, estimated, and planned into a two-week (or similar) window. But a Sprint Backlog only ever shows a few weeks of a much longer story. Stakeholders, executives, sales teams, and customers routinely need a view further out than a single Sprint can offer not because they need Sprint-level detail six months in advance, which this curriculum has already established (Lesson 31) is rarely knowable that precisely, but because they need a credible sense of *direction and sequence* that a single Sprint Backlog can't provide on its own.
 
-This lesson addresses the tool built for exactly that gap: the **product roadmap**. It is also one of the most consistently mishandled artifacts in product management, because roadmaps sit at an uncomfortable intersection — they must satisfy a genuine organizational need for forward visibility, while resisting the temptation to promise a level of certainty about the future that Lesson 31's entire premise (short feedback loops beat long up-front plans) explicitly warns against. A roadmap built as a list of features with fixed dates routinely turns into a source of broken promises and eroded trust; a roadmap built well becomes one of a PM's most valuable tools for aligning an organization around outcomes rather than a list of commitments. This lesson teaches you to build the second kind.
+This lesson addresses the tool built for exactly that gap: the **product roadmap**. It is also one of the most consistently mishandled artifacts in product management, because roadmaps sit at an uncomfortable intersection they must satisfy a genuine organizational need for forward visibility, while resisting the temptation to promise a level of certainty about the future that Lesson 31's entire premise (short feedback loops beat long up-front plans) explicitly warns against. A roadmap built as a list of features with fixed dates routinely turns into a source of broken promises and eroded trust; a roadmap built well becomes one of a PM's most valuable tools for aligning an organization around outcomes rather than a list of commitments. This lesson teaches you to build the second kind.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson addresses the tool built for exactly that gap: the **product roadmap
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery |
+| **Module** | 4 Execution & Agile Delivery |
 | **Current Lesson** | 35 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 29 (Prioritization Basics), Lesson 31 (Agile Fundamentals — responding to change over following a plan), Lesson 34 (Sprint Planning & Backlog Grooming) |
-| **Next Lesson** | Lesson 36 — Release Planning & Launch Management |
-| **Future Topics Unlocked** | Lesson 36 (Release Planning & Launch Management), Lesson 47 (Stakeholder Management), Lesson 49 (Go-To-Market Strategy), Lesson 51 (Communicating with Executives) — all build directly on the roadmap communication patterns introduced here |
+| **Prerequisites** | Lesson 29 (Prioritization Basics), Lesson 31 (Agile Fundamentals responding to change over following a plan), Lesson 34 (Sprint Planning & Backlog Grooming) |
+| **Next Lesson** | Lesson 36 Release Planning & Launch Management |
+| **Future Topics Unlocked** | Lesson 36 (Release Planning & Launch Management), Lesson 47 (Stakeholder Management), Lesson 49 (Go-To-Market Strategy), Lesson 51 (Communicating with Executives) all build directly on the roadmap communication patterns introduced here |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes **Lesson 29's** prioritization discipline, since a roadmap is, in large part, a prioritized backlog presented at a longer time horizon and coarser grain. It also directly assumes **Lesson 31's** core Agile value — "responding to change over following a plan" — because the central tension in this lesson (how to give forward visibility without over-promising) is a direct, practical instance of that value under real organizational pressure. Finally, it assumes **Lesson 34's** Sprint-level vocabulary (Sprint Backlog, Sprint Goal), since this lesson is explicitly about the altitude one level above that one.
+This lesson assumes **Lesson 29's** prioritization discipline, since a roadmap is, in large part, a prioritized backlog presented at a longer time horizon and coarser grain. It also directly assumes **Lesson 31's** core Agile value "responding to change over following a plan" because the central tension in this lesson (how to give forward visibility without over-promising) is a direct, practical instance of that value under real organizational pressure. Finally, it assumes **Lesson 34's** Sprint-level vocabulary (Sprint Backlog, Sprint Goal), since this lesson is explicitly about the altitude one level above that one.
 
 ---
 
@@ -44,9 +44,9 @@ This lesson assumes **Lesson 29's** prioritization discipline, since a roadmap i
 
 ### The Core Failure Mode: The Date-Driven Feature Roadmap
 
-The most common, and most damaging, roadmap format is a simple table or Gantt-style chart listing specific features against specific calendar dates, often stretching six to twelve months into the future. This format feels reassuring to stakeholders in the moment it's presented — it looks precise, confident, and easy to plan around. It is also, in most real product organizations, close to fiction the moment it's published, for exactly the reasons established in Lesson 31: requirements clarify, priorities shift, and unexpected discoveries reshape plans as teams actually build and learn. A roadmap presented as a set of fixed promises will, with near certainty, be broken in some particulars — and every broken date quietly erodes trust in the PM who published it, even when the underlying reasons for the change were entirely sound.
+The most common, and most damaging, roadmap format is a simple table or Gantt-style chart listing specific features against specific calendar dates, often stretching six to twelve months into the future. This format feels reassuring to stakeholders in the moment it's presented it looks precise, confident, and easy to plan around. It is also, in most real product organizations, close to fiction the moment it's published, for exactly the reasons established in Lesson 31: requirements clarify, priorities shift, and unexpected discoveries reshape plans as teams actually build and learn. A roadmap presented as a set of fixed promises will, with near certainty, be broken in some particulars and every broken date quietly erodes trust in the PM who published it, even when the underlying reasons for the change were entirely sound.
 
-This is not an argument against forward planning — stakeholders have a legitimate need for direction, and refusing to provide any (Lesson 31's Mistake 5) is its own failure. It is an argument for choosing a roadmap *format* whose structure matches the actual level of certainty available at each time horizon, rather than a format that manufactures false precision uniformly across the whole timeline.
+This is not an argument against forward planning stakeholders have a legitimate need for direction, and refusing to provide any (Lesson 31's Mistake 5) is its own failure. It is an argument for choosing a roadmap *format* whose structure matches the actual level of certainty available at each time horizon, rather than a format that manufactures false precision uniformly across the whole timeline.
 
 ### The Now-Next-Later Format
 
@@ -88,7 +88,7 @@ graph LR
     B --> C["LATER Low Confidence,<br/>Thematic, Problem Areas Being Explored"]
 ```
 
-The critical design principle is that **specificity and confidence are meant to decrease as the horizon extends**, and this is stated openly rather than hidden. "Now" items can be described with real feature-level detail, because they're already well-groomed (Lesson 34) and actively being built. "Later" items are deliberately described as problem areas or themes ("improving new-user onboarding," not "add a five-step interactive tutorial with X, Y, Z screens"), because committing to specific solutions that far out would misrepresent how much is actually known. This structure lets a PM be simultaneously honest and useful — precise where precision is earned, and appropriately vague where it isn't, rather than uniformly vague (unhelpful) or uniformly precise (dishonest).
+The critical design principle is that **specificity and confidence are meant to decrease as the horizon extends**, and this is stated openly rather than hidden. "Now" items can be described with real feature-level detail, because they're already well-groomed (Lesson 34) and actively being built. "Later" items are deliberately described as problem areas or themes ("improving new-user onboarding," not "add a five-step interactive tutorial with X, Y, Z screens"), because committing to specific solutions that far out would misrepresent how much is actually known. This structure lets a PM be simultaneously honest and useful precise where precision is earned, and appropriately vague where it isn't, rather than uniformly vague (unhelpful) or uniformly precise (dishonest).
 
 ### Outcome-Based vs. Feature-Based Roadmaps
 
@@ -100,7 +100,7 @@ A second, related distinction concerns *what a roadmap's rows represent*. A **fe
 | **Risk** | Can lock in a specific solution before it's validated, and reads as a broken promise if that solution changes | Can feel vague or evasive to stakeholders unaccustomed to this format |
 | **Best fit** | "Now" horizon items, already well-specified through grooming | "Next" and especially "Later" horizon items |
 
-In practice, most healthy roadmaps blend the two: feature-specific in the "Now" column, progressively more outcome-oriented moving into "Next" and "Later" — which is precisely the Now-Next-Later structure's underlying logic applied to content, not just to labeled time buckets.
+In practice, most healthy roadmaps blend the two: feature-specific in the "Now" column, progressively more outcome-oriented moving into "Next" and "Later" which is precisely the Now-Next-Later structure's underlying logic applied to content, not just to labeled time buckets.
 
 ### How a Roadmap Relates to a Sprint Backlog
 
@@ -124,7 +124,7 @@ This is the mirror-image failure to Mistake 1, and was flagged already in Lesson
 
 **Mistake 4: Building a roadmap with no visible connection to current Sprint work**
 
-As covered above, a roadmap that has drifted out of sync with what the team is actually building has stopped functioning as a real planning tool and become a disconnected communication artifact — often discovered only when a stakeholder asks "so is this roadmap item happening this quarter?" and no one on the team can answer confidently.
+As covered above, a roadmap that has drifted out of sync with what the team is actually building has stopped functioning as a real planning tool and become a disconnected communication artifact often discovered only when a stakeholder asks "so is this roadmap item happening this quarter?" and no one on the team can answer confidently.
 
 **Mistake 5: Using the same roadmap format and content for every audience**
 
@@ -180,22 +180,22 @@ Use the Confidence Gradient as a standing discipline whenever you're deciding ho
 
 **Notion** has been publicly associated with maintaining a public-facing roadmap that organizes upcoming work by theme and rough time horizon rather than as a list of specific features with committed ship dates, a format broadly consistent with the outcome-and-horizon-based approach described in this lesson.
 
-The underlying principle connects directly to this lesson's Theory: a public roadmap, seen by customers, prospects, and the broader community, carries even higher reputational cost for broken specific promises than an internal one — making the discipline of matching specificity to actual confidence especially important in a customer-facing context.
+The underlying principle connects directly to this lesson's Theory: a public roadmap, seen by customers, prospects, and the broader community, carries even higher reputational cost for broken specific promises than an internal one making the discipline of matching specificity to actual confidence especially important in a customer-facing context.
 
-*(Assumption flagged: this reflects a general, publicly observable pattern in how product roadmaps are commonly presented by software companies, based on publicly available roadmap pages, not a confirmed, complete, or current account of Notion's specific internal roadmapping process or philosophy today. Public roadmap formats and practices evolve over time at any company; the durable lesson is the underlying principle — matching a roadmap's specificity to genuine confidence, especially for external audiences — rather than a claim about Notion's exact current practice.)*
+*(Assumption flagged: this reflects a general, publicly observable pattern in how product roadmaps are commonly presented by software companies, based on publicly available roadmap pages, not a confirmed, complete, or current account of Notion's specific internal roadmapping process or philosophy today. Public roadmap formats and practices evolve over time at any company; the durable lesson is the underlying principle matching a roadmap's specificity to genuine confidence, especially for external audiences rather than a claim about Notion's exact current practice.)*
 
 ---
 
 ## Real World Perspective: Roadmapping at Different Company Stages
 
 **At a startup:**
-Roadmaps are often informal — a simple document or slide reviewed periodically with the founding team — and may skip external publication altogether. The risk here is usually Mistake 3: because the team is small and things change fast, a founder-PM may avoid committing to any roadmap at all, leaving even close internal stakeholders (like a sales co-founder trying to set customer expectations) without useful directional information.
+Roadmaps are often informal a simple document or slide reviewed periodically with the founding team and may skip external publication altogether. The risk here is usually Mistake 3: because the team is small and things change fast, a founder-PM may avoid committing to any roadmap at all, leaving even close internal stakeholders (like a sales co-founder trying to set customer expectations) without useful directional information.
 
 **At a mid-size company:**
 Roadmaps typically become a more formal, recurring artifact reviewed quarterly with leadership and shared, in some form, with sales, customer success, and sometimes customers directly. This is the stage where Mistake 5 (one-size-fits-all roadmap) most commonly appears, as the same document gets stretched to serve audiences with genuinely different needs.
 
 **At Big Tech:**
-Roadmaps often exist at multiple nested altitudes simultaneously — a company-wide roadmap, an organization-level roadmap, and team-level roadmaps, each needing to stay visibly connected to the ones above and below it. The PM's job shifts toward ensuring their team's roadmap items trace clearly up into larger organizational themes and down into actual Sprint work, since disconnection at either end (an isolated team roadmap with no larger context, or a leadership roadmap with no visible grounding in real team execution) becomes increasingly likely as the number of intermediate layers grows.
+Roadmaps often exist at multiple nested altitudes simultaneously a company-wide roadmap, an organization-level roadmap, and team-level roadmaps, each needing to stay visibly connected to the ones above and below it. The PM's job shifts toward ensuring their team's roadmap items trace clearly up into larger organizational themes and down into actual Sprint work, since disconnection at either end (an isolated team roadmap with no larger context, or a leadership roadmap with no visible grounding in real team execution) becomes increasingly likely as the number of intermediate layers grows.
 
 ---
 
@@ -203,15 +203,15 @@ Roadmaps often exist at multiple nested altitudes simultaneously — a company-w
 
 Consider a simplified, illustrative scenario common at growing product organizations building their first formal roadmap.
 
-A PM at a mid-size B2B software company builds a roadmap for the upcoming year at the request of the sales team, who want something concrete to show prospective enterprise customers during the sales cycle. Eager to be helpful, the PM lists twelve specific features, each with a target quarter, stretching a full year out — including several "Later"-horizon ideas that were, at the time, barely more than early hallway conversations about possible directions.
+A PM at a mid-size B2B software company builds a roadmap for the upcoming year at the request of the sales team, who want something concrete to show prospective enterprise customers during the sales cycle. Eager to be helpful, the PM lists twelve specific features, each with a target quarter, stretching a full year out including several "Later"-horizon ideas that were, at the time, barely more than early hallway conversations about possible directions.
 
 Sales enthusiastically uses this roadmap in customer conversations throughout the year, sometimes referencing specific quarter commitments directly in contract negotiations. By year's end, four of the twelve features shipped roughly on schedule, three shipped in a substantially different form than originally described (after user research revealed the original approach wouldn't solve the underlying problem), and five were deprioritized entirely in favor of higher-value work discovered along the way. Several enterprise customers, holding a printed copy of the original roadmap, raise pointed complaints during renewal conversations about "promises that were never kept."
 
 **What went wrong?**
 
-The PM's underlying prioritization judgment may have been entirely sound — deprioritizing five items in favor of better-validated opportunities is exactly the kind of adaptive, evidence-driven behavior Lesson 31 endorses. The failure was in the roadmap's *format*, not necessarily its content: presenting a full year of specific features at specific dates manufactured a level of certainty about "Later"-horizon items that never actually existed, and handed sales a document that functioned, in practice, as a set of contractual promises rather than a directional communication tool.
+The PM's underlying prioritization judgment may have been entirely sound deprioritizing five items in favor of better-validated opportunities is exactly the kind of adaptive, evidence-driven behavior Lesson 31 endorses. The failure was in the roadmap's *format*, not necessarily its content: presenting a full year of specific features at specific dates manufactured a level of certainty about "Later"-horizon items that never actually existed, and handed sales a document that functioned, in practice, as a set of contractual promises rather than a directional communication tool.
 
-A Now-Next-Later format, applied honestly, would have prevented most of this damage. The four features that shipped roughly as planned were very likely genuine "Now" items with real confidence behind them, appropriate to describe specifically. The three that changed substantially and the five that were deprioritized were, in hindsight, "Later"-horizon ideas dressed up with false "Now"-level specificity — exactly the failure mode this lesson's Confidence Gradient is designed to prevent. The deeper organizational fix — training sales on how to use a Now-Next-Later roadmap responsibly in customer conversations, including what language is and isn't safe to use with prospects — is addressed directly in **Lesson 47 (Stakeholder Management)**, and the specific mechanics of coordinating a roadmap with an actual release calendar are covered in **Lesson 36 (Release Planning & Launch Management)**.
+A Now-Next-Later format, applied honestly, would have prevented most of this damage. The four features that shipped roughly as planned were very likely genuine "Now" items with real confidence behind them, appropriate to describe specifically. The three that changed substantially and the five that were deprioritized were, in hindsight, "Later"-horizon ideas dressed up with false "Now"-level specificity exactly the failure mode this lesson's Confidence Gradient is designed to prevent. The deeper organizational fix training sales on how to use a Now-Next-Later roadmap responsibly in customer conversations, including what language is and isn't safe to use with prospects is addressed directly in **Lesson 47 (Stakeholder Management)**, and the specific mechanics of coordinating a roadmap with an actual release calendar are covered in **Lesson 36 (Release Planning & Launch Management)**.
 
 ---
 
@@ -221,14 +221,14 @@ A second, more tactical tool: use this table to decide which roadmap format and 
 
 | Audience / Horizon | Recommended Format | Specificity Level |
 |---|---|---|
-| Engineering, "Now" horizon | Feature-level, tied directly to current Sprint Backlog items | High — specific features, real estimates |
+| Engineering, "Now" horizon | Feature-level, tied directly to current Sprint Backlog items | High specific features, real estimates |
 | Engineering, "Next"/"Later" horizon | Outcome/theme-based, with early technical considerations noted | Medium to low |
 | Internal leadership, all horizons | Outcome-based with visible traceability to strategic goals | Medium, increasing toward "Now" |
 | Sales / Customer Success, "Now" horizon | Feature-level, but explicitly labeled as "shipping soon" rather than a fixed date | High, but hedged |
-| Sales / Customer Success, "Next"/"Later" horizon | Theme-based only, explicitly framed as directional, not committed | Low — themes only, no specific dates |
+| Sales / Customer Success, "Next"/"Later" horizon | Theme-based only, explicitly framed as directional, not committed | Low themes only, no specific dates |
 | External customers/public | Now-Next-Later, themes only beyond "Now," no fixed dates beyond the current quarter | Low to medium, conservative by design |
 
-The general rule this table encodes: specificity should be earned by confidence, and confidence should be earned by proximity to actual, groomed (Lesson 34) work — never by audience pressure to sound more certain than the underlying reality supports.
+The general rule this table encodes: specificity should be earned by confidence, and confidence should be earned by proximity to actual, groomed (Lesson 34) work never by audience pressure to sound more certain than the underlying reality supports.
 
 ---
 
@@ -241,13 +241,13 @@ The general rule this table encodes: specificity should be earned by confidence,
 *What the interviewer is actually evaluating:* Whether the candidate can hold a principled line on honest specificity under real organizational pressure, offering a useful alternative (a themed, hedged commitment) rather than either caving to false precision or unhelpfully refusing to engage at all.
 
 **Typical question 3: "Tell me about a roadmap commitment that didn't work out. What happened, and what would you do differently?"**
-*What the interviewer is actually evaluating:* Whether the candidate can distinguish a sound prioritization decision (deprioritizing something for good reasons) from a format failure (having presented uncertain information with false certainty in the first place) — precisely the distinction drawn in this lesson's Case Study.
+*What the interviewer is actually evaluating:* Whether the candidate can distinguish a sound prioritization decision (deprioritizing something for good reasons) from a format failure (having presented uncertain information with false certainty in the first place) precisely the distinction drawn in this lesson's Case Study.
 
 ---
 
 ## Summary
 
-A product roadmap exists to give stakeholders a credible sense of direction and sequence beyond what a single Sprint Backlog can show, but the most common roadmap format — a list of specific features tied to fixed calendar dates, stretching many months out — manufactures a level of certainty about the future that directly contradicts Lesson 31's founding premise, reliably producing broken promises and eroded trust. The Now-Next-Later format resolves this by deliberately decreasing specificity and confidence as the time horizon extends — precise where precision is earned (the "Now" horizon, grounded in already-groomed Sprint work), thematic and outcome-oriented where it isn't (the "Later" horizon, still mostly hypothesis). This same logic extends to the choice between feature-based and outcome-based roadmap rows, and to tailoring format and specificity by audience, since a roadmap shared externally with customers carries a different, higher reputational cost for broken specifics than one shared internally with engineering. A roadmap's "Now" items should always be traceable down into actual current Sprint work, and a Sprint Goal should be explainable in terms of which roadmap theme it serves — a roadmap or Sprint Backlog that has lost this visible connection to the other has stopped functioning as a coherent planning system.
+A product roadmap exists to give stakeholders a credible sense of direction and sequence beyond what a single Sprint Backlog can show, but the most common roadmap format a list of specific features tied to fixed calendar dates, stretching many months out manufactures a level of certainty about the future that directly contradicts Lesson 31's founding premise, reliably producing broken promises and eroded trust. The Now-Next-Later format resolves this by deliberately decreasing specificity and confidence as the time horizon extends precise where precision is earned (the "Now" horizon, grounded in already-groomed Sprint work), thematic and outcome-oriented where it isn't (the "Later" horizon, still mostly hypothesis). This same logic extends to the choice between feature-based and outcome-based roadmap rows, and to tailoring format and specificity by audience, since a roadmap shared externally with customers carries a different, higher reputational cost for broken specifics than one shared internally with engineering. A roadmap's "Now" items should always be traceable down into actual current Sprint work, and a Sprint Goal should be explainable in terms of which roadmap theme it serves a roadmap or Sprint Backlog that has lost this visible connection to the other has stopped functioning as a coherent planning system.
 
 ---
 
@@ -256,10 +256,10 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 - A roadmap listing specific features against fixed, far-future dates manufactures false certainty and reliably produces broken promises, directly contradicting Lesson 31's core Agile premise.
 - The Now-Next-Later format deliberately decreases specificity and confidence as the time horizon extends, allowing a PM to be both honest and useful simultaneously.
 - Outcome-based roadmap items (problems/metrics) preserve flexibility for "Next" and "Later" horizons; feature-based items are appropriate mainly for well-groomed "Now" horizon work.
-- A roadmap's "Now" items should trace down into actual current Sprint work, and a Sprint Goal should trace up into a roadmap theme — disconnection at either end signals dysfunction.
+- A roadmap's "Now" items should trace down into actual current Sprint work, and a Sprint Goal should trace up into a roadmap theme disconnection at either end signals dysfunction.
 - Refusing to provide any forward-looking roadmap view at all, out of excessive caution, is a real and damaging mistake, not a safe default.
-- Roadmap format and specificity should be tailored by audience — external customer-facing roadmaps generally warrant more conservative specificity than internal engineering-facing ones.
-- A sound prioritization decision (deprioritizing something for good reasons) is different from a format failure (having presented uncertain information with false certainty in the first place) — a broken roadmap promise is often the latter, not the former.
+- Roadmap format and specificity should be tailored by audience external customer-facing roadmaps generally warrant more conservative specificity than internal engineering-facing ones.
+- A sound prioritization decision (deprioritizing something for good reasons) is different from a format failure (having presented uncertain information with false certainty in the first place) a broken roadmap promise is often the latter, not the former.
 
 ---
 
@@ -268,7 +268,7 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 *A two-minute review of everything in this lesson.*
 
 - **Core failure:** fixed dates + specific features, far out in time, manufacture false certainty.
-- **Now-Next-Later:** specificity and confidence decrease as horizon extends — precise Now, thematic Later.
+- **Now-Next-Later:** specificity and confidence decrease as horizon extends precise Now, thematic Later.
 - **Feature-based vs. outcome-based:** features for "Now" (earned specificity); outcomes/themes for "Next"/"Later."
 - **Roadmap ↔ Sprint link:** "Now" items trace into current Sprint work; Sprint Goals trace up into roadmap themes.
 - **Don't over-correct:** refusing any forward view at all is its own failure (Lesson 31, Mistake 5).
@@ -292,9 +292,9 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 
 ## Further Reading / Resources
 
-- *Product Roadmaps Relaunched* by C. Todd Lombardo, Bruce McCarthy, Evan Ryan, and Michael Connors — a detailed practitioner treatment of outcome-based roadmapping formats.
-- "Now-Next-Later Roadmaps" by Janna Bastow (ProdPad) — the original articulation of the Now-Next-Later format referenced in this lesson.
-- *Escaping the Build Trap* by Melissa Perri — situates roadmapping within the broader discipline of outcome-oriented product strategy.
+- *Product Roadmaps Relaunched* by C. Todd Lombardo, Bruce McCarthy, Evan Ryan, and Michael Connors a detailed practitioner treatment of outcome-based roadmapping formats.
+- "Now-Next-Later Roadmaps" by Janna Bastow (ProdPad) the original articulation of the Now-Next-Later format referenced in this lesson.
+- *Escaping the Build Trap* by Melissa Perri situates roadmapping within the broader discipline of outcome-oriented product strategy.
 
 ---
 
@@ -320,7 +320,7 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 
 **Card 4**
 - Front: How should a roadmap's "Now" items relate to a team's current Sprint Backlog?
-- Back: They should be directly traceable — "Now" roadmap items should be visible in what the team is actually sprinting on, and Sprint Goals should trace back up into a roadmap theme.
+- Back: They should be directly traceable "Now" roadmap items should be visible in what the team is actually sprinting on, and Sprint Goals should trace back up into a roadmap theme.
 - Difficulty: 2
 - Tags: traceability
 
@@ -332,7 +332,7 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 
 **Card 6**
 - Front: In the Detailed Case Study, was the PM's prioritization judgment or the roadmap's format the primary failure?
-- Back: The format — presenting a full year of specific features at specific dates manufactured false certainty, even though the underlying prioritization decisions (deprioritizing weaker ideas for better ones) were reasonable.
+- Back: The format presenting a full year of specific features at specific dates manufactured false certainty, even though the underlying prioritization decisions (deprioritizing weaker ideas for better ones) were reasonable.
 - Difficulty: 2
 - Tags: case-study
 
@@ -341,7 +341,7 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 
 Consider the following novel scenario: You're a PM at a company preparing its first-ever public roadmap page, to be linked from the marketing website. Your engineering lead wants to include ambitious, specific "Later"-horizon items to generate excitement about the product's future direction. Your head of sales wants specific dates attached to everything, to use in customer conversations. You know from experience that specifics that far out are rarely reliable.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Confidence Gradient and Roadmap Format Selector, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Confidence Gradient and Roadmap Format Selector, not to reach one "right" answer.
 
 1. Using the Roadmap Format Selector, what specificity level would you recommend for the public-facing "Later" horizon, and why?
 2. How would you respond to the engineering lead's request for ambitious, specific "Later" items, without simply refusing to include any exciting future direction at all?
@@ -425,7 +425,7 @@ C) Using an outcome-based format for every single roadmap row
 D) Declining to share any roadmap details with the sales team
 
 *Correct answer: B*
-*Explanation: The failure was in the format, not the prioritization judgment — early, uncertain ideas were dressed up with a specificity they hadn't earned.*
+*Explanation: The failure was in the format, not the prioritization judgment early, uncertain ideas were dressed up with a specificity they hadn't earned.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
@@ -503,7 +503,7 @@ C) Feature-based rows work only for teams that have abandoned Scrum
 D) Feature rows suit earned "Now" specificity; outcome rows keep later options open
 
 *Correct answer: D*
-*Explanation: Blending formats mirrors the Confidence Gradient — concrete features where certainty is earned, open-ended outcomes where it isn't yet.*
+*Explanation: Blending formats mirrors the Confidence Gradient concrete features where certainty is earned, open-ended outcomes where it isn't yet.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
@@ -552,11 +552,11 @@ D) There is no real risk; a single shared document is always most efficient
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 34 — Sprint Planning & Backlog Grooming | Roadmapping operates one altitude above Sprint Planning, and depends on the same underlying discipline of matching specificity to actual confidence |
-| **Current Lesson** | Lesson 35 — Roadmapping | Now-Next-Later format; Confidence Gradient; feature-based vs. outcome-based roadmaps; roadmap-Sprint traceability; Roadmap Format Selector |
-| **Next Lesson** | Lesson 36 — Release Planning & Launch Management | Takes roadmap "Now" items and addresses how they're actually coordinated into a live release |
+| **Previous Lesson** | Lesson 34 Sprint Planning & Backlog Grooming | Roadmapping operates one altitude above Sprint Planning, and depends on the same underlying discipline of matching specificity to actual confidence |
+| **Current Lesson** | Lesson 35 Roadmapping | Now-Next-Later format; Confidence Gradient; feature-based vs. outcome-based roadmaps; roadmap-Sprint traceability; Roadmap Format Selector |
+| **Next Lesson** | Lesson 36 Release Planning & Launch Management | Takes roadmap "Now" items and addresses how they're actually coordinated into a live release |
 | **Future Concepts Unlocked** | Lesson 47 (Stakeholder Management) | Develops in full the skill of communicating roadmap changes and hedged commitments to stakeholders under pressure |
 | | Lesson 49 (Go-To-Market Strategy) | Builds on roadmap-to-sales communication patterns raised in this lesson's Case Study |
 | | Lesson 51 (Communicating with Executives) | Extends this lesson's audience-tailoring principle to executive-level roadmap communication specifically |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Now-Next-Later format and the Confidence Gradient with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Now-Next-Later format and the Confidence Gradient with you they will not be re-explained, only re-applied in new contexts.

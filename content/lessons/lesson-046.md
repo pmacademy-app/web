@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 43 taught you to analyze a funnel: a linear sequence from awareness to activation. Lesson 44 taught you to analyze retention: whether users, once acquired, keep coming back. This lesson introduces a structurally different way of thinking about growth — one where the *output* of a cycle becomes the *input* to the next cycle, creating a self-reinforcing loop rather than a one-way path. Understanding this distinction matters because a team that only ever thinks in funnels will miss the compounding, structural growth opportunities that loops make possible, and will systematically misdiagnose why some growth channels seem to accelerate over time while others plateau no matter how much is invested in them.
+Lesson 43 taught you to analyze a funnel: a linear sequence from awareness to activation. Lesson 44 taught you to analyze retention: whether users, once acquired, keep coming back. This lesson introduces a structurally different way of thinking about growth one where the *output* of a cycle becomes the *input* to the next cycle, creating a self-reinforcing loop rather than a one-way path. Understanding this distinction matters because a team that only ever thinks in funnels will miss the compounding, structural growth opportunities that loops make possible, and will systematically misdiagnose why some growth channels seem to accelerate over time while others plateau no matter how much is invested in them.
 
-This lesson matters practically because "growth loop" has become one of the most overused, least precisely applied terms in product management — many things casually labeled "growth loops" are, on close inspection, simply linear funnels or paid acquisition channels wearing a fashionable label. This lesson gives you the precise structural test for what actually makes something a loop, and the specific metrics (loop cycle time, and the viral coefficient in particular) needed to evaluate whether a genuine loop is actually compounding or merely appearing to.
+This lesson matters practically because "growth loop" has become one of the most overused, least precisely applied terms in product management many things casually labeled "growth loops" are, on close inspection, simply linear funnels or paid acquisition channels wearing a fashionable label. This lesson gives you the precise structural test for what actually makes something a loop, and the specific metrics (loop cycle time, and the viral coefficient in particular) needed to evaluate whether a genuine loop is actually compounding or merely appearing to.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters practically because "growth loop" has become one of the most
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 46 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis), Lesson 45 (A/B Testing & Experimentation) |
-| **Next Lesson** | Lesson 47 — Stakeholder Management |
-| **Future Topics Unlocked** | Lesson 49 (Go-To-Market Strategy), Lesson 50 (Product-Led Growth, which builds extensively on loops) — both depend on the loop-versus-funnel distinction and viral coefficient math introduced here |
+| **Next Lesson** | Lesson 47 Stakeholder Management |
+| **Future Topics Unlocked** | Lesson 49 (Go-To-Market Strategy), Lesson 50 (Product-Led Growth, which builds extensively on loops) both depend on the loop-versus-funnel distinction and viral coefficient math introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 43's** funnel vocabulary, since a loop is best unde
 
 ### Loops vs. Funnels: A Structural Distinction
 
-A **funnel** (Lesson 43) is linear: users enter at the top and progress through a sequence of stages, with each stage's output simply being fewer users reaching the next stage. A **growth loop**, by contrast, is circular: the output of one cycle becomes the input to the next cycle, so that a successful cycle doesn't just convert existing users further down a path — it generates *new* entrants into the very beginning of the same process, creating the possibility of compounding growth rather than a fixed, one-time conversion.
+A **funnel** (Lesson 43) is linear: users enter at the top and progress through a sequence of stages, with each stage's output simply being fewer users reaching the next stage. A **growth loop**, by contrast, is circular: the output of one cycle becomes the input to the next cycle, so that a successful cycle doesn't just convert existing users further down a path it generates *new* entrants into the very beginning of the same process, creating the possibility of compounding growth rather than a fixed, one-time conversion.
 
 ```mermaid
 %%{init: {
@@ -85,7 +85,7 @@ graph LR
     B1[Input] --> B2[Action] --> B3[Output] --> B4[New Input] --> B1
 ```
 
-Every genuine growth loop can be described using four generic components: an **input** (a resource the loop consumes, such as existing users or content), an **action** (something users do with that input), an **output** (something the action produces), and a **reinvestment** step, where that output becomes new input to the same loop, restarting the cycle with a larger starting population than before. A mechanism missing this final reinvestment step — where output doesn't actually flow back into new input — is a funnel or a one-time conversion event, not a loop, regardless of what it's called informally.
+Every genuine growth loop can be described using four generic components: an **input** (a resource the loop consumes, such as existing users or content), an **action** (something users do with that input), an **output** (something the action produces), and a **reinvestment** step, where that output becomes new input to the same loop, restarting the cycle with a larger starting population than before. A mechanism missing this final reinvestment step where output doesn't actually flow back into new input is a funnel or a one-time conversion event, not a loop, regardless of what it's called informally.
 
 ### Common Loop Types
 
@@ -95,7 +95,7 @@ Every genuine growth loop can be described using four generic components: an **i
 | Content loop | Existing content/users | Creating or sharing content | New content indexed/discovered | New visitors who find that content and may create their own |
 | Paid loop | Revenue from existing users | Reinvesting revenue in paid acquisition | New paying users | Additional revenue reinvested in further acquisition |
 
-Note that a "paid loop" only qualifies as a genuine loop if revenue from acquired users is systematically reinvested into acquiring more users at a sustainable, positive-return rate — a company that simply spends a fixed marketing budget without this revenue-driven reinvestment relationship is running a funnel-fed acquisition channel, not a loop.
+Note that a "paid loop" only qualifies as a genuine loop if revenue from acquired users is systematically reinvested into acquiring more users at a sustainable, positive-return rate a company that simply spends a fixed marketing budget without this revenue-driven reinvestment relationship is running a funnel-fed acquisition channel, not a loop.
 
 ### The Viral Coefficient (K-factor)
 
@@ -103,7 +103,7 @@ For viral loops specifically, the standard measurement is the **viral coefficien
 
 > **K = (invites sent per user) × (conversion rate of invites into new users)**
 
-If K is greater than 1, each existing user generates, on average, more than one new user through the loop, meaning the loop is theoretically self-sustaining and would continue growing even with zero additional external acquisition — genuine, compounding virality. If K is less than 1, each cycle generates fewer new users than it started with, meaning the loop will eventually decay toward zero without continued external input — the loop still provides real value (often meaningfully supplementing other acquisition channels), but it is not, by itself, self-sustaining.
+If K is greater than 1, each existing user generates, on average, more than one new user through the loop, meaning the loop is theoretically self-sustaining and would continue growing even with zero additional external acquisition genuine, compounding virality. If K is less than 1, each cycle generates fewer new users than it started with, meaning the loop will eventually decay toward zero without continued external input the loop still provides real value (often meaningfully supplementing other acquisition channels), but it is not, by itself, self-sustaining.
 
 ```mermaid
 %%{init: {
@@ -143,7 +143,7 @@ graph LR
 
 ### Viral Cycle Time: Why Speed Matters as Much as K
 
-A second, frequently overlooked factor is **viral cycle time** — how long it takes for one full loop cycle to complete, from a user receiving an invite to that new user sending their own invites. Two loops with an identical K-factor above 1 can produce dramatically different growth trajectories if their cycle times differ significantly: a loop with a one-day cycle time compounds far faster than a mechanically identical loop with a thirty-day cycle time, simply because more cycles complete within any given period. This is why growth teams often invest specifically in *shortening* cycle time (making the invite-and-conversion process faster), not just improving K itself, since even a modest improvement in cycle time can meaningfully accelerate an already-viral loop's growth curve.
+A second, frequently overlooked factor is **viral cycle time** how long it takes for one full loop cycle to complete, from a user receiving an invite to that new user sending their own invites. Two loops with an identical K-factor above 1 can produce dramatically different growth trajectories if their cycle times differ significantly: a loop with a one-day cycle time compounds far faster than a mechanically identical loop with a thirty-day cycle time, simply because more cycles complete within any given period. This is why growth teams often invest specifically in *shortening* cycle time (making the invite-and-conversion process faster), not just improving K itself, since even a modest improvement in cycle time can meaningfully accelerate an already-viral loop's growth curve.
 
 ---
 
@@ -151,11 +151,11 @@ A second, frequently overlooked factor is **viral cycle time** — how long it t
 
 **Mistake 1: Calling any acquisition mechanism a "growth loop" regardless of whether it actually reinvests output as new input**
 
-As covered in Theory, a mechanism without a genuine reinvestment step — output flowing back into new input — is a funnel or a one-time channel, not a loop, and analyzing it with loop-specific tools like K-factor is a category error.
+As covered in Theory, a mechanism without a genuine reinvestment step output flowing back into new input is a funnel or a one-time channel, not a loop, and analyzing it with loop-specific tools like K-factor is a category error.
 
 **Mistake 2: Believing K > 1 alone guarantees successful, sustained growth**
 
-A loop with K just above 1 but a very long cycle time may compound so slowly that it's practically indistinguishable from no growth at all over any reasonable planning horizon — K and cycle time must both be considered together.
+A loop with K just above 1 but a very long cycle time may compound so slowly that it's practically indistinguishable from no growth at all over any reasonable planning horizon K and cycle time must both be considered together.
 
 **Mistake 3: Ignoring retention's effect on a loop's sustainability**
 
@@ -163,11 +163,11 @@ A viral loop's new users must themselves stick around long enough (Lesson 44) to
 
 **Mistake 4: Assuming a loop that worked well at small scale will continue to work identically at large scale**
 
-Viral loops frequently experience **saturation** — as a loop reaches an increasingly large share of the addressable population, the pool of not-yet-reached potential new users shrinks, mechanically reducing the effective conversion rate of invites over time, even if nothing about the loop's underlying design has changed.
+Viral loops frequently experience **saturation** as a loop reaches an increasingly large share of the addressable population, the pool of not-yet-reached potential new users shrinks, mechanically reducing the effective conversion rate of invites over time, even if nothing about the loop's underlying design has changed.
 
 **Mistake 5: Optimizing K-factor through low-quality, spammy invite mechanics**
 
-An invite mechanism engineered aggressively to maximize invites-sent-per-user, without regard for genuine value to the person receiving the invite, tends to produce low invite-conversion rates and can actively damage a product's reputation — echoing Lesson 41's Goodhart's Law caution, since optimizing the K-factor formula's inputs directly, without regard for the underlying user experience, can degrade the very thing the metric was meant to represent.
+An invite mechanism engineered aggressively to maximize invites-sent-per-user, without regard for genuine value to the person receiving the invite, tends to produce low invite-conversion rates and can actively damage a product's reputation echoing Lesson 41's Goodhart's Law caution, since optimizing the K-factor formula's inputs directly, without regard for the underlying user experience, can degrade the very thing the metric was meant to represent.
 
 ---
 
@@ -209,10 +209,10 @@ This lesson's core takeaway tool is a simple diagnostic question to apply to any
 }}%%
 graph TD
     A[Claimed growth mechanism] --> B{Does the output of<br/>one cycle become new<br/>input to the same cycle?}
-    B -->|No| C[This is a funnel or a<br/>one-time channel —<br/>use funnel analysis tools]
+    B -->|No| C[This is a funnel or a<br/>one-time channel <br/>use funnel analysis tools]
     B -->|Yes| D{Is the reinvestment<br/>step actually measured<br/>and verified, or assumed?}
-    D -->|Assumed| E[Verify before trusting —<br/>measure the actual<br/>reinvestment rate]
-    D -->|Measured| F[Genuine loop —<br/>calculate K-factor<br/>and cycle time]
+    D -->|Assumed| E[Verify before trusting <br/>measure the actual<br/>reinvestment rate]
+    D -->|Measured| F[Genuine loop <br/>calculate K-factor<br/>and cycle time]
 ```
 
 Use the Loop vs. Funnel Test as a standing discipline whenever a team presents a "growth loop" strategy: ask specifically whether the reinvestment step has actually been measured, not just assumed to exist because the overall shape of the mechanism sounds loop-like. A team that skips this verification risks investing significant effort optimizing what is, in reality, an ordinary funnel using tools designed for a fundamentally different structure.
@@ -221,20 +221,20 @@ Use the Loop vs. Funnel Test as a standing discipline whenever a team presents a
 
 ## Real Company Example
 
-**PayPal**'s early referral program is one of the most concretely documented viral loops in startup history, detailed extensively in Jimmy Soni's well-researched history of the company, *The Founders*. In its early days, PayPal paid $10 to a new user for signing up and $10 to the existing user who referred them — a direct cash incentive layered onto a product that only became more useful as more people used it (since PayPal's value came from being able to pay and be paid by other PayPal users). Each new user funded by that $10 bonus became, in turn, someone with their own incentive to refer the next person, and the company reportedly sustained double-digit daily growth rates during this period, despite the program being, in the founders' own later telling, expensive enough that it nearly bankrupted the company before it worked.
+**PayPal**'s early referral program is one of the most concretely documented viral loops in startup history, detailed extensively in Jimmy Soni's well-researched history of the company, *The Founders*. In its early days, PayPal paid $10 to a new user for signing up and $10 to the existing user who referred them a direct cash incentive layered onto a product that only became more useful as more people used it (since PayPal's value came from being able to pay and be paid by other PayPal users). Each new user funded by that $10 bonus became, in turn, someone with their own incentive to refer the next person, and the company reportedly sustained double-digit daily growth rates during this period, despite the program being, in the founders' own later telling, expensive enough that it nearly bankrupted the company before it worked.
 
-This is a purer illustration of a genuine growth loop than a general engagement-mechanic example, because the causal chain is explicit and directly incentivized: input (a referral) produces output (a new user) who becomes a new input (with their own referral incentive), and the loop's fuel — cash — was a deliberate, costly, and ultimately justified bet on compounding growth rather than a byproduct of an unrelated feature.
+This is a purer illustration of a genuine growth loop than a general engagement-mechanic example, because the causal chain is explicit and directly incentivized: input (a referral) produces output (a new user) who becomes a new input (with their own referral incentive), and the loop's fuel cash was a deliberate, costly, and ultimately justified bet on compounding growth rather than a byproduct of an unrelated feature.
 
 *(Source: Jimmy Soni's *The Founders* (2022), a book drawing on extensive interviews with PayPal's early team. This curriculum does not claim certainty about the program's exact quantitative growth-rate figures, since specific numbers vary somewhat across retellings.)*
 
-The underlying principle connects directly to this lesson's Theory: this is a genuine loop in the structural sense this lesson defines — the "output" of one referral (a new user) becomes a new "input" (a new potential referrer) that reinvests into the next cycle, precisely the self-reinforcing structure that distinguishes a real growth loop from a one-time acquisition tactic, whether the loop's fuel is a cash incentive, as here, or a purely product-driven mechanic in other contexts.
+The underlying principle connects directly to this lesson's Theory: this is a genuine loop in the structural sense this lesson defines the "output" of one referral (a new user) becomes a new "input" (a new potential referrer) that reinvests into the next cycle, precisely the self-reinforcing structure that distinguishes a real growth loop from a one-time acquisition tactic, whether the loop's fuel is a cash incentive, as here, or a purely product-driven mechanic in other contexts.
 
 ---
 
 ## Real World Perspective: Growth Loops & Virality at Different Company Stages
 
 **At a startup:**
-Growth loops are often aspirational rather than measured — a team may design a referral mechanism hoping it becomes viral, without yet having enough data to calculate a reliable K-factor. The risk here is Mistake 1's mirror image: treating an unproven, hoped-for loop as though its viral status were already confirmed, when in reality it may still be underperforming as a funnel-like, non-compounding channel.
+Growth loops are often aspirational rather than measured a team may design a referral mechanism hoping it becomes viral, without yet having enough data to calculate a reliable K-factor. The risk here is Mistake 1's mirror image: treating an unproven, hoped-for loop as though its viral status were already confirmed, when in reality it may still be underperforming as a funnel-like, non-compounding channel.
 
 **At a mid-size company:**
 Loop metrics (K-factor, cycle time) typically become genuinely measurable and worth tracking rigorously, since sufficient volume exists to calculate these figures with reasonable statistical confidence, and enough historical data exists to detect saturation effects (Mistake 4) as they begin to emerge.
@@ -250,13 +250,13 @@ Consider a simplified, illustrative scenario common at teams eager to claim vira
 
 A team launches a referral program offering both the referrer and the referred friend a discount, and celebrates it internally as "our new growth loop." Over several months, the referral program generates a meaningful, steady stream of new signups, and leadership treats it as a successful viral growth engine, allocating additional marketing budget to promote the referral program more prominently.
 
-A growth analyst, asked to calculate the referral loop's K-factor for a quarterly review, discovers a critical gap in the data: the company has never actually measured what fraction of *referred* users go on to refer additional users themselves — the analysis has only ever tracked the first-generation conversion (existing users referring new users), never verifying whether the reinvestment step (new users becoming a source of further referrals) was actually happening at any meaningful rate. Digging into the data reveals that referred users refer new users at barely a quarter of the rate of the original, organically-acquired user base, meaning the mechanism's true, multi-generational K-factor is well below 1 — it has been generating a genuine, valuable one-time boost to acquisition, but it was never actually compounding as a self-sustaining loop, and the additional marketing budget spent "amplifying the loop" was, in reality, simply funding an ordinary paid-adjacent acquisition channel with a referral-shaped incentive structure.
+A growth analyst, asked to calculate the referral loop's K-factor for a quarterly review, discovers a critical gap in the data: the company has never actually measured what fraction of *referred* users go on to refer additional users themselves the analysis has only ever tracked the first-generation conversion (existing users referring new users), never verifying whether the reinvestment step (new users becoming a source of further referrals) was actually happening at any meaningful rate. Digging into the data reveals that referred users refer new users at barely a quarter of the rate of the original, organically-acquired user base, meaning the mechanism's true, multi-generational K-factor is well below 1 it has been generating a genuine, valuable one-time boost to acquisition, but it was never actually compounding as a self-sustaining loop, and the additional marketing budget spent "amplifying the loop" was, in reality, simply funding an ordinary paid-adjacent acquisition channel with a referral-shaped incentive structure.
 
 **What went wrong?**
 
-Using the Loop vs. Funnel Test: the team had assumed the reinvestment step existed and was compounding, based on the mechanism's loop-like *shape* (a referral program certainly looks like a loop), without ever actually measuring whether referred users completed the loop by referring others themselves at a similar rate to the original population. This is a direct instance of Mistake 1 — treating a plausible-looking mechanism as a genuine loop without the specific verification this lesson's Mental Model requires.
+Using the Loop vs. Funnel Test: the team had assumed the reinvestment step existed and was compounding, based on the mechanism's loop-like *shape* (a referral program certainly looks like a loop), without ever actually measuring whether referred users completed the loop by referring others themselves at a similar rate to the original population. This is a direct instance of Mistake 1 treating a plausible-looking mechanism as a genuine loop without the specific verification this lesson's Mental Model requires.
 
-The corrective step was straightforward once diagnosed: recalculate the program's value using accurate, verified metrics — treating it honestly as a valuable one-time acquisition boost (which it genuinely was) rather than a compounding growth loop (which it was not), and redirecting the marketing budget that had been allocated on the mistaken assumption of self-sustaining virality toward channels more appropriate for its actual, non-compounding structure. Rigorously testing any proposed intervention to actually increase the second-generation referral rate — rather than assuming a change would help — would require exactly the controlled experimentation discipline covered in **Lesson 45**, applied here specifically to loop mechanics.
+The corrective step was straightforward once diagnosed: recalculate the program's value using accurate, verified metrics treating it honestly as a valuable one-time acquisition boost (which it genuinely was) rather than a compounding growth loop (which it was not), and redirecting the marketing budget that had been allocated on the mistaken assumption of self-sustaining virality toward channels more appropriate for its actual, non-compounding structure. Rigorously testing any proposed intervention to actually increase the second-generation referral rate rather than assuming a change would help would require exactly the controlled experimentation discipline covered in **Lesson 45**, applied here specifically to loop mechanics.
 
 ---
 
@@ -269,7 +269,7 @@ A second, more tactical tool: use this table to diagnose which specific componen
 | Input | How many existing users are eligible to take the loop's action? | Low eligible population limits total loop volume regardless of conversion rates |
 | Action rate | What fraction of eligible users actually take the action (e.g., send an invite)? | A low action rate suggests the action itself isn't sufficiently incentivized or visible |
 | Output quality | Of the outputs generated (invites sent), what fraction are received by genuinely interested, well-targeted recipients? | Poor targeting can depress downstream conversion regardless of action volume |
-| Reinvestment conversion | What fraction of outputs actually convert into new input (new users who themselves become eligible loop participants)? | This is the step most often unmeasured, as illustrated in this lesson's Case Study — verify it explicitly |
+| Reinvestment conversion | What fraction of outputs actually convert into new input (new users who themselves become eligible loop participants)? | This is the step most often unmeasured, as illustrated in this lesson's Case Study verify it explicitly |
 
 A team investing effort to improve a loop without first identifying which specific component is the actual bottleneck risks optimizing a part of the loop that was never the limiting factor to begin with.
 
@@ -278,7 +278,7 @@ A team investing effort to improve a loop without first identifying which specif
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "What's the difference between a growth loop and a funnel?"**
-*What the interviewer is actually evaluating:* Whether the candidate can articulate the structural distinction precisely — reinvestment of output as new input — rather than using the terms loosely or interchangeably.
+*What the interviewer is actually evaluating:* Whether the candidate can articulate the structural distinction precisely reinvestment of output as new input rather than using the terms loosely or interchangeably.
 
 **Typical question 2: "How would you calculate whether a referral program is genuinely viral?"**
 *What the interviewer is actually evaluating:* Whether the candidate knows to calculate a multi-generational K-factor, specifically verifying whether referred users themselves generate further referrals, rather than only measuring first-generation conversion, directly testing awareness of this lesson's Case Study failure mode.
@@ -290,19 +290,19 @@ A team investing effort to improve a loop without first identifying which specif
 
 ## Summary
 
-A growth loop is structurally distinct from a funnel: where a funnel is linear, a loop reinvests the output of one cycle as new input to the same cycle, creating the possibility of compounding growth. Every genuine loop can be described through four components — input, action, output, and reinvestment — and the reinvestment step specifically must be measured and verified, not merely assumed, as this lesson's Case Study demonstrates through a referral program that generated real value but was never actually compounding, because referred users were never verified to refer others at a meaningful rate themselves. The viral coefficient (K-factor) quantifies a viral loop's compounding potential — K greater than 1 indicates genuine self-sustaining growth — but must be considered alongside viral cycle time, since two loops with identical K-factors can produce dramatically different growth trajectories depending on how quickly each cycle completes. Diagnosing a struggling loop requires identifying which of its four components (input, action rate, output quality, or reinvestment conversion) is the actual bottleneck, rather than assuming the loop as a whole has simply failed, and any proposed intervention to improve a loop's performance should be validated through the controlled experimentation discipline from Lesson 45 rather than assumed to work.
+A growth loop is structurally distinct from a funnel: where a funnel is linear, a loop reinvests the output of one cycle as new input to the same cycle, creating the possibility of compounding growth. Every genuine loop can be described through four components input, action, output, and reinvestment and the reinvestment step specifically must be measured and verified, not merely assumed, as this lesson's Case Study demonstrates through a referral program that generated real value but was never actually compounding, because referred users were never verified to refer others at a meaningful rate themselves. The viral coefficient (K-factor) quantifies a viral loop's compounding potential K greater than 1 indicates genuine self-sustaining growth but must be considered alongside viral cycle time, since two loops with identical K-factors can produce dramatically different growth trajectories depending on how quickly each cycle completes. Diagnosing a struggling loop requires identifying which of its four components (input, action rate, output quality, or reinvestment conversion) is the actual bottleneck, rather than assuming the loop as a whole has simply failed, and any proposed intervention to improve a loop's performance should be validated through the controlled experimentation discipline from Lesson 45 rather than assumed to work.
 
 ---
 
 ## Key Takeaways
 
 - A growth loop reinvests the output of one cycle as new input to the same cycle, creating compounding potential; a funnel is linear and lacks this reinvestment step.
-- Every genuine loop has four components: input, action, output, and reinvestment — the reinvestment step must be measured and verified, not assumed.
+- Every genuine loop has four components: input, action, output, and reinvestment the reinvestment step must be measured and verified, not assumed.
 - The viral coefficient (K-factor) equals invites sent per user times the conversion rate of those invites; K greater than 1 indicates a self-sustaining, compounding loop.
-- Viral cycle time — how long a full loop cycle takes to complete — matters as much as K-factor itself, since faster cycles compound more quickly even at an identical K.
+- Viral cycle time how long a full loop cycle takes to complete matters as much as K-factor itself, since faster cycles compound more quickly even at an identical K.
 - A loop's sustainability depends on retention (Lesson 44), since new users must stick around long enough to complete another cycle themselves.
 - Loops frequently experience saturation as they reach an increasingly large share of the addressable population, mechanically reducing effective conversion rates over time.
-- A mechanism that looks loop-shaped but has never had its reinvestment step actually measured should be treated with caution — it may be a valuable but non-compounding channel, not a genuine growth loop.
+- A mechanism that looks loop-shaped but has never had its reinvestment step actually measured should be treated with caution it may be a valuable but non-compounding channel, not a genuine growth loop.
 
 ---
 
@@ -311,12 +311,12 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 *A two-minute review of everything in this lesson.*
 
 - **Loop vs. funnel:** loops reinvest output as new input; funnels are linear, one-way paths.
-- **Four loop components:** input, action, output, reinvestment (verify reinvestment — don't assume it).
+- **Four loop components:** input, action, output, reinvestment (verify reinvestment don't assume it).
 - **K-factor:** invites per user × conversion rate of invites; K > 1 = self-sustaining compounding growth.
 - **Cycle time matters too:** faster loops compound faster even at identical K.
 - **Retention affects loops:** new users must stick around long enough to complete another cycle.
 - **Saturation:** loops often slow down as they exhaust the addressable population, even with unchanged design.
-- **Diagnose the bottleneck:** input, action rate, output quality, or reinvestment conversion — identify which before optimizing.
+- **Diagnose the bottleneck:** input, action rate, output quality, or reinvestment conversion identify which before optimizing.
 
 ---
 
@@ -334,9 +334,9 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 
 ## Further Reading / Resources
 
-- *Reforge Growth Series* materials and writing by Brian Balfour — a widely referenced practitioner treatment of growth loops versus funnels.
-- "The Myth of the Silver Bullet Growth Hack" and related growth-loop practitioner writing by Casey Winters — background on distinguishing genuine loops from funnel-shaped acquisition channels.
-- *Hooked: How to Build Habit-Forming Products* by Nir Eyal — relevant background on the engagement-loop mechanics illustrated in this lesson's Duolingo example.
+- *Reforge Growth Series* materials and writing by Brian Balfour a widely referenced practitioner treatment of growth loops versus funnels.
+- "The Myth of the Silver Bullet Growth Hack" and related growth-loop practitioner writing by Casey Winters background on distinguishing genuine loops from funnel-shaped acquisition channels.
+- *Hooked: How to Build Habit-Forming Products* by Nir Eyal relevant background on the engagement-loop mechanics illustrated in this lesson's Duolingo example.
 
 ---
 
@@ -368,13 +368,13 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 
 **Card 5**
 - Front: Why can two loops with identical K-factors produce very different growth outcomes?
-- Back: Viral cycle time (how long one full cycle takes) also matters — a faster cycle time compounds more quickly than a slower one, even at the same K.
+- Back: Viral cycle time (how long one full cycle takes) also matters a faster cycle time compounds more quickly than a slower one, even at the same K.
 - Difficulty: 2
 - Tags: cycle-time
 
 **Card 6**
 - Front: In the Detailed Case Study, what critical verification had the team skipped?
-- Back: They had never measured whether referred users themselves went on to refer additional users at a meaningful rate — the reinvestment step was assumed, not verified, revealing the true multi-generational K-factor was below 1.
+- Back: They had never measured whether referred users themselves went on to refer additional users at a meaningful rate the reinvestment step was assumed, not verified, revealing the true multi-generational K-factor was below 1.
 - Difficulty: 2
 - Tags: case-study
 
@@ -389,7 +389,7 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 
 Consider the following novel scenario: Your team runs a content-sharing feature where users can share their created content to social media, and some fraction of viewers click through and sign up. Leadership has started calling this the company's "growth loop" in board presentations, based on strong early signup numbers from shared content.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Loop vs. Funnel Test, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Loop vs. Funnel Test, not to reach one "right" answer.
 
 1. Using the Loop vs. Funnel Test, what specific data would you need to verify before confirming this is a genuine loop rather than a one-time acquisition channel?
 2. If new users acquired through shared content create and share their own content at a much lower rate than the original user base, what would that suggest about the mechanism's true K-factor?
@@ -564,7 +564,7 @@ C) Raise the discount for top-spending customers alone
 D) Set the proposal aside without further analysis
 
 *Correct answer: B*
-*Explanation: The proposal assumes a cause without checking it — the right order is finding which component is actually limiting the loop, then validating the fix with an experiment.*
+*Explanation: The proposal assumes a cause without checking it the right order is finding which component is actually limiting the loop, then validating the fix with an experiment.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
@@ -600,10 +600,10 @@ D) The loop should be shut down at any sign of slowdown
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 45 — A/B Testing & Experimentation | Loop interventions should be validated using the same experimental rigor established in Lesson 45, not assumed to work |
-| **Current Lesson** | Lesson 46 — Growth Loops & Virality | Loop vs. funnel structural test; four loop components; viral coefficient (K-factor); viral cycle time; saturation |
-| **Next Lesson** | Lesson 47 — Stakeholder Management | Shifts from quantitative growth mechanics to the interpersonal discipline of managing stakeholder expectations and communication |
+| **Previous Lesson** | Lesson 45 A/B Testing & Experimentation | Loop interventions should be validated using the same experimental rigor established in Lesson 45, not assumed to work |
+| **Current Lesson** | Lesson 46 Growth Loops & Virality | Loop vs. funnel structural test; four loop components; viral coefficient (K-factor); viral cycle time; saturation |
+| **Next Lesson** | Lesson 47 Stakeholder Management | Shifts from quantitative growth mechanics to the interpersonal discipline of managing stakeholder expectations and communication |
 | **Future Concepts Unlocked** | Lesson 49 (Go-To-Market Strategy) | Builds on loop-versus-channel distinctions when planning acquisition strategy for a launch |
 | | Lesson 50 (Product-Led Growth) | Depends extensively on genuine, verified growth loops as a core mechanism |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the loop-versus-funnel distinction and the K-factor/cycle-time framework with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the loop-versus-funnel distinction and the K-factor/cycle-time framework with you they will not be re-explained, only re-applied in new contexts.

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 43 taught you to decompose a single journey into a funnel and to distrust aggregate numbers that might be hiding segment-specific stories, using Simpson's Paradox as the cautionary principle. This lesson applies a closely related discipline to a different, equally important question: not just whether users convert once, but whether they keep coming back over time — and whether an aggregate trend line showing steady or growing usage might be hiding a much more concerning underlying reality, in exactly the way Lesson 43 warned aggregate funnel numbers could.
+Lesson 43 taught you to decompose a single journey into a funnel and to distrust aggregate numbers that might be hiding segment-specific stories, using Simpson's Paradox as the cautionary principle. This lesson applies a closely related discipline to a different, equally important question: not just whether users convert once, but whether they keep coming back over time and whether an aggregate trend line showing steady or growing usage might be hiding a much more concerning underlying reality, in exactly the way Lesson 43 warned aggregate funnel numbers could.
 
-This lesson matters because total active users, tracked as a simple trend line over time, is one of the most seductive and most misleading metrics a product organization can rely on, for a specific structural reason: it can grow steadily even while the product is actually losing its existing users at an alarming rate, as long as new user acquisition outpaces that loss. Cohort and retention analysis is the specific technique that unmasks this dynamic, by tracking not "how many total users were active this month" but "of the users who joined in a specific period, what fraction are still active N periods later" — a question that acquisition volume cannot hide the answer to.
+This lesson matters because total active users, tracked as a simple trend line over time, is one of the most seductive and most misleading metrics a product organization can rely on, for a specific structural reason: it can grow steadily even while the product is actually losing its existing users at an alarming rate, as long as new user acquisition outpaces that loss. Cohort and retention analysis is the specific technique that unmasks this dynamic, by tracking not "how many total users were active this month" but "of the users who joined in a specific period, what fraction are still active N periods later" a question that acquisition volume cannot hide the answer to.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because total active users, tracked as a simple trend line o
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 44 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 41 (Product Metrics Fundamentals — precise time windows), Lesson 43 (Funnel Analysis — Simpson's Paradox, segmentation) |
-| **Next Lesson** | Lesson 45 — A/B Testing & Experimentation |
-| **Future Topics Unlocked** | Lesson 45 (A/B Testing & Experimentation), Lesson 46 (Growth Loops & Virality), Lesson 50 (Product-Led Growth) — all build on the cohort-based measurement discipline introduced here |
+| **Prerequisites** | Lesson 41 (Product Metrics Fundamentals precise time windows), Lesson 43 (Funnel Analysis Simpson's Paradox, segmentation) |
+| **Next Lesson** | Lesson 45 A/B Testing & Experimentation |
+| **Future Topics Unlocked** | Lesson 45 (A/B Testing & Experimentation), Lesson 46 (Growth Loops & Virality), Lesson 50 (Product-Led Growth) all build on the cohort-based measurement discipline introduced here |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes **Lesson 41's** precise time-window definitional discipline, since every retention definition in this lesson depends on specifying an exact time window (7-day, 30-day, or otherwise) with the same rigor any other metric requires. It also directly assumes **Lesson 43's** Simpson's Paradox and Leaky Bucket concepts, since this lesson's central caution — that aggregate active-user trends can hide deteriorating retention — is a close cousin of Lesson 43's warning that aggregate funnel conversion rates can hide segment-specific problems.
+This lesson assumes **Lesson 41's** precise time-window definitional discipline, since every retention definition in this lesson depends on specifying an exact time window (7-day, 30-day, or otherwise) with the same rigor any other metric requires. It also directly assumes **Lesson 43's** Simpson's Paradox and Leaky Bucket concepts, since this lesson's central caution that aggregate active-user trends can hide deteriorating retention is a close cousin of Lesson 43's warning that aggregate funnel conversion rates can hide segment-specific problems.
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 41's** precise time-window definitional discipline,
 
 ### What a Cohort Is
 
-A **cohort** is a group of users who share a defining starting characteristic, most commonly the time period in which they first joined or signed up — the "January cohort," the "week of March 3rd cohort." Cohort analysis tracks each such group *separately* over time, rather than pooling all users together into a single, undifferentiated aggregate — precisely the segmentation discipline Lesson 43 recommended for funnel data, applied here across the dimension of time-since-joining rather than acquisition channel or device.
+A **cohort** is a group of users who share a defining starting characteristic, most commonly the time period in which they first joined or signed up the "January cohort," the "week of March 3rd cohort." Cohort analysis tracks each such group *separately* over time, rather than pooling all users together into a single, undifferentiated aggregate precisely the segmentation discipline Lesson 43 recommended for funnel data, applied here across the dimension of time-since-joining rather than acquisition channel or device.
 
 ### The Cohort Retention Triangle
 
@@ -54,10 +54,10 @@ The standard way to visualize cohort retention data is a **retention triangle** 
 |---|---|---|---|---|---|
 | Jan Week 1 | 100% | 45% | 38% | 35% | 34% |
 | Jan Week 2 | 100% | 48% | 40% | 37% | 36% |
-| Jan Week 3 | 100% | 52% | 44% | 41% | — |
-| Jan Week 4 | 100% | 55% | 47% | — | — |
+| Jan Week 3 | 100% | 52% | 44% | 41% | |
+| Jan Week 4 | 100% | 55% | 47% | | |
 
-Reading down a column (comparing the same "weeks since joining" across different cohorts) reveals whether retention is improving or worsening for newer cohorts compared to older ones — in this example, Week 1 retention has climbed from 45% to 55% across successive cohorts, a genuinely encouraging trend that a simple aggregate "active users this week" number would not directly reveal. Reading across a row reveals how a single cohort's retention decays (or stabilizes) over its own lifetime — the subject of the next section.
+Reading down a column (comparing the same "weeks since joining" across different cohorts) reveals whether retention is improving or worsening for newer cohorts compared to older ones in this example, Week 1 retention has climbed from 45% to 55% across successive cohorts, a genuinely encouraging trend that a simple aggregate "active users this week" number would not directly reveal. Reading across a row reveals how a single cohort's retention decays (or stabilizes) over its own lifetime the subject of the next section.
 
 ### Classic, Rolling, and Bracketed Retention
 
@@ -67,11 +67,11 @@ Precisely defining "retained," per Lesson 41's discipline, requires choosing amo
 - **Rolling retention**: did the user perform a qualifying action on day N *or any day after*? This is more forgiving and tends to produce smoother, higher-looking numbers, since it credits any later return, not just activity on the exact target day.
 - **Bracketed retention**: did the user perform a qualifying action at any point *within a window* around day N (for example, days N-3 through N+3)? This balances the strictness of classic retention with rolling retention's tolerance for natural variation in exactly which day a user happens to return.
 
-The choice matters because these three definitions can produce meaningfully different numbers from the identical underlying data — reporting a "40% Day-30 retention rate" without specifying which of these three conventions was used is exactly the kind of imprecision Lesson 41 warns against, and can make retention figures reported by different teams, or even the same team at different times, silently incomparable.
+The choice matters because these three definitions can produce meaningfully different numbers from the identical underlying data reporting a "40% Day-30 retention rate" without specifying which of these three conventions was used is exactly the kind of imprecision Lesson 41 warns against, and can make retention figures reported by different teams, or even the same team at different times, silently incomparable.
 
 ### The Smile Curve: Reading Retention Shape
 
-A single cohort's retention, plotted over time since joining, typically declines — this is normal and expected, since some fraction of any cohort will always churn. The critical question is not whether the curve declines, but *whether it eventually flattens*:
+A single cohort's retention, plotted over time since joining, typically declines this is normal and expected, since some fraction of any cohort will always churn. The critical question is not whether the curve declines, but *whether it eventually flattens*:
 
 ```mermaid
 %%{init: {
@@ -106,15 +106,15 @@ A single cohort's retention, plotted over time since joining, typically declines
 }}%%
 graph LR
     A["Steep Initial<br/>Decline (normal, Expected)"] --> B{"Does the Curve Flatten to a Stable<br/>Plateau, or Continue Decaying Toward<br/>Zero?"}
-    B -->|Flattens: 'smile' shape| C["Signal of Genuine Product-market Fit —<br/>a Durable Core User Base"]
+    B -->|Flattens: 'smile' shape| C["Signal of Genuine Product-market Fit <br/>a Durable Core User Base"]
     B -->|Continues decaying| D["Warning Sign: No Stable<br/>Core User Base Has yet Formed"]
 ```
 
-A retention curve that flattens into a stable plateau after its initial decline — sometimes visually resembling the upward curve of a smile when plotted, hence the "smile curve" or "smile test" — indicates that some meaningful fraction of users have found durable, ongoing value and are settling into a stable usage pattern, widely regarded as one of the strongest available quantitative signals of genuine product-market fit. A curve that never flattens, continuing to decay toward zero indefinitely, suggests the product has not yet found the durable core of users who genuinely need it, regardless of how strong its short-term acquisition numbers might look.
+A retention curve that flattens into a stable plateau after its initial decline sometimes visually resembling the upward curve of a smile when plotted, hence the "smile curve" or "smile test" indicates that some meaningful fraction of users have found durable, ongoing value and are settling into a stable usage pattern, widely regarded as one of the strongest available quantitative signals of genuine product-market fit. A curve that never flattens, continuing to decay toward zero indefinitely, suggests the product has not yet found the durable core of users who genuinely need it, regardless of how strong its short-term acquisition numbers might look.
 
 ### Why Aggregate Active-User Trends Can Mislead
 
-This lesson's central caution, directly extending Lesson 43's Leaky Bucket concept: a company can grow its total active users steadily every month while its underlying, cohort-level retention is actually worsening, as long as new user acquisition volume outpaces the accelerating churn. In this scenario, the aggregate trend line looks healthy and reassuring, while the retention triangle underneath it — reading down the columns — would reveal each successive cohort retaining worse than the one before it. This is precisely why cohort analysis, not aggregate trend-watching, is the appropriate tool for genuinely assessing whether a product is building a durable, sticky user base or merely running faster to fill an increasingly leaky bucket.
+This lesson's central caution, directly extending Lesson 43's Leaky Bucket concept: a company can grow its total active users steadily every month while its underlying, cohort-level retention is actually worsening, as long as new user acquisition volume outpaces the accelerating churn. In this scenario, the aggregate trend line looks healthy and reassuring, while the retention triangle underneath it reading down the columns would reveal each successive cohort retaining worse than the one before it. This is precisely why cohort analysis, not aggregate trend-watching, is the appropriate tool for genuinely assessing whether a product is building a durable, sticky user base or merely running faster to fill an increasingly leaky bucket.
 
 ---
 
@@ -122,7 +122,7 @@ This lesson's central caution, directly extending Lesson 43's Leaky Bucket conce
 
 **Mistake 1: Relying on a total active-user trend line as the primary signal of product health**
 
-As covered in Theory, this metric can mask deteriorating cohort-level retention entirely, as long as acquisition volume compensates — precisely the failure this lesson's Case Study illustrates in detail.
+As covered in Theory, this metric can mask deteriorating cohort-level retention entirely, as long as acquisition volume compensates precisely the failure this lesson's Case Study illustrates in detail.
 
 **Mistake 2: Reporting a retention percentage without specifying which convention (classic, rolling, bracketed) was used**
 
@@ -134,11 +134,11 @@ A cohort of 50 early beta users retaining at 60% and a cohort of 50,000 users re
 
 **Mistake 4: Interpreting any declining retention curve as inherently bad, without checking whether it eventually flattens**
 
-Since some decline is normal and expected for any cohort, the meaningful question is whether a stable plateau eventually emerges — a curve that's still declining at the point of measurement isn't necessarily concerning if it hasn't yet had enough time to reveal whether a plateau will form.
+Since some decline is normal and expected for any cohort, the meaningful question is whether a stable plateau eventually emerges a curve that's still declining at the point of measurement isn't necessarily concerning if it hasn't yet had enough time to reveal whether a plateau will form.
 
 **Mistake 5: Comparing retention curves across cohorts affected by different product changes without accounting for the change**
 
-If a significant feature launched between two cohorts' start dates, comparing their retention curves directly conflates the launch's effect with ordinary cohort-to-cohort variation, unless the comparison explicitly accounts for and isolates that specific change — a concern directly addressed by the controlled experimentation methods in Lesson 45.
+If a significant feature launched between two cohorts' start dates, comparing their retention curves directly conflates the launch's effect with ordinary cohort-to-cohort variation, unless the comparison explicitly accounts for and isolates that specific change a concern directly addressed by the controlled experimentation methods in Lesson 45.
 
 ---
 
@@ -185,15 +185,15 @@ graph LR
     C -->|No, keeps declining| E["No Plateau Yet:<br/>Product-market Fit Not yet Established"]
 ```
 
-Use the Smile Curve as a standing discipline whenever reviewing a retention chart: don't just ask "is retention declining" (it almost always is, at least initially) — ask specifically "has it flattened yet, and if not, has enough time passed to know whether it will?" A product team chasing acquisition growth while its retention curve has never once flattened is very likely building on an unstable foundation, regardless of how encouraging its total user count looks.
+Use the Smile Curve as a standing discipline whenever reviewing a retention chart: don't just ask "is retention declining" (it almost always is, at least initially) ask specifically "has it flattened yet, and if not, has enough time passed to know whether it will?" A product team chasing acquisition growth while its retention curve has never once flattened is very likely building on an unstable foundation, regardless of how encouraging its total user count looks.
 
 ---
 
 ## Real Company Example
 
-**Adobe**'s 2013 transition from perpetual-license software (Creative Suite, a one-time purchase) to Creative Cloud (a monthly subscription) is a specific, well-documented business event that makes cohort-based retention analysis existentially necessary rather than merely useful. Announced in May 2013 and covered contemporaneously by outlets including TechCrunch, the shift was met with significant public backlash from existing customers, but it fundamentally changed what "business health" meant for Adobe: under the old perpetual-license model, a single purchase counted as success regardless of whether the customer ever opened the software again; under the subscription model, revenue depends entirely on whether cohorts of subscribers keep renewing month after month. Creative Cloud grew from zero subscribers in 2013 to tens of millions of paying subscribers within a decade — but that growth number alone reveals nothing about whether any given monthly cohort was actually sticking around, which is precisely this lesson's core caution about aggregate totals masking retention health.
+**Adobe**'s 2013 transition from perpetual-license software (Creative Suite, a one-time purchase) to Creative Cloud (a monthly subscription) is a specific, well-documented business event that makes cohort-based retention analysis existentially necessary rather than merely useful. Announced in May 2013 and covered contemporaneously by outlets including TechCrunch, the shift was met with significant public backlash from existing customers, but it fundamentally changed what "business health" meant for Adobe: under the old perpetual-license model, a single purchase counted as success regardless of whether the customer ever opened the software again; under the subscription model, revenue depends entirely on whether cohorts of subscribers keep renewing month after month. Creative Cloud grew from zero subscribers in 2013 to tens of millions of paying subscribers within a decade but that growth number alone reveals nothing about whether any given monthly cohort was actually sticking around, which is precisely this lesson's core caution about aggregate totals masking retention health.
 
-This is a sharper illustration than a generic "Netflix cares about retention" claim because it's a company observably built two different businesses — one where retention barely mattered to the metric that counted as success, and one where it became the central determinant of revenue — and the transition between them is exactly when cohort-based analysis stops being optional.
+This is a sharper illustration than a generic "Netflix cares about retention" claim because it's a company observably built two different businesses one where retention barely mattered to the metric that counted as success, and one where it became the central determinant of revenue and the transition between them is exactly when cohort-based analysis stops being optional.
 
 *(Source: TechCrunch's May 2013 contemporaneous coverage of Adobe's announcement, and Adobe's own reported subscriber figures in subsequent years.)*
 
@@ -204,10 +204,10 @@ The underlying principle connects directly to this lesson's Theory: for a subscr
 ## Real World Perspective: Cohort & Retention Analysis at Different Company Stages
 
 **At a startup:**
-Cohort sizes are often small, making retention curves noisy and hard to interpret with confidence (Mistake 3) — a startup should be cautious about over-interpreting small-sample retention data, while still tracking it, since it's often the earliest genuine signal of product-market fit available, well before revenue or growth metrics would reveal anything meaningful.
+Cohort sizes are often small, making retention curves noisy and hard to interpret with confidence (Mistake 3) a startup should be cautious about over-interpreting small-sample retention data, while still tracking it, since it's often the earliest genuine signal of product-market fit available, well before revenue or growth metrics would reveal anything meaningful.
 
 **At a mid-size company:**
-Cohort retention analysis typically becomes a standard, recurring practice, often reviewed alongside the aggregate active-user trend specifically to catch the divergence this lesson warns about — a healthy-looking aggregate trend paired with worsening cohort retention is a pattern experienced product organizations learn to actively watch for at this stage.
+Cohort retention analysis typically becomes a standard, recurring practice, often reviewed alongside the aggregate active-user trend specifically to catch the divergence this lesson warns about a healthy-looking aggregate trend paired with worsening cohort retention is a pattern experienced product organizations learn to actively watch for at this stage.
 
 **At Big Tech:**
 Retention analysis is often highly sophisticated, with cohorts segmented across many dimensions simultaneously (acquisition channel, geography, platform, feature adoption) and dedicated data science support for statistically rigorous comparison across cohorts, including proper handling of the product-change confounding described in Mistake 5. The PM's job shifts toward correctly interpreting complex, multi-dimensional retention data and prioritizing which segment's retention trend deserves the most urgent attention.
@@ -220,13 +220,13 @@ Consider a simplified, illustrative scenario that extends this lesson's central 
 
 A consumer app's leadership reviews a monthly active user chart showing confident, steady growth for six consecutive quarters, and treats this as clear evidence the product is succeeding. Marketing spend is increased accordingly to accelerate acquisition further, based on the assumption that the growing user count reflects a genuinely healthy, improving product.
 
-A newly hired data analyst, building a cohort retention triangle for the first time, discovers a very different underlying story: reading down the columns of the triangle, Week-4 retention has been declining steadily, cohort over cohort, for the same six quarters — from roughly 38% for the earliest cohort to just 19% for the most recent one. The aggregate active-user growth had been masking this entirely, because each successive cohort, while retaining progressively worse, was also larger than the one before it (due to increased marketing spend), so the sheer volume of new users continued to outpace the accelerating rate of loss.
+A newly hired data analyst, building a cohort retention triangle for the first time, discovers a very different underlying story: reading down the columns of the triangle, Week-4 retention has been declining steadily, cohort over cohort, for the same six quarters from roughly 38% for the earliest cohort to just 19% for the most recent one. The aggregate active-user growth had been masking this entirely, because each successive cohort, while retaining progressively worse, was also larger than the one before it (due to increased marketing spend), so the sheer volume of new users continued to outpace the accelerating rate of loss.
 
 **What went wrong?**
 
-This is a direct, worked illustration of this lesson's central caution and Lesson 43's Leaky Bucket concept combined: the "bucket" (the product's ability to retain users) was leaking progressively faster with each successive cohort, while the "water poured in" (new user acquisition) was simultaneously increasing even faster, producing a rising water level (aggregate active users) that visually suggested health despite the accelerating leak underneath. Leadership's decision to increase marketing spend based on the aggregate trend alone was, in retrospect, actively counterproductive — it was pouring more water into an increasingly leaky bucket rather than addressing the leak itself, and every dollar of that increased spend was acquiring users at a retention rate that made each new cohort a progressively worse long-term investment than the one before it.
+This is a direct, worked illustration of this lesson's central caution and Lesson 43's Leaky Bucket concept combined: the "bucket" (the product's ability to retain users) was leaking progressively faster with each successive cohort, while the "water poured in" (new user acquisition) was simultaneously increasing even faster, producing a rising water level (aggregate active users) that visually suggested health despite the accelerating leak underneath. Leadership's decision to increase marketing spend based on the aggregate trend alone was, in retrospect, actively counterproductive it was pouring more water into an increasingly leaky bucket rather than addressing the leak itself, and every dollar of that increased spend was acquiring users at a retention rate that made each new cohort a progressively worse long-term investment than the one before it.
 
-The corrective response required treating the declining Week-4 retention trend, not the aggregate active-user count, as the organization's primary health signal going forward — pausing further acquisition spend increases until the underlying retention decline was diagnosed and addressed. Diagnosing the specific cause of the declining retention (a product change, a shift in acquisition channel mix, or something else) requires exactly the segmentation techniques from **Lesson 43**, applied here across cohorts rather than funnel steps, and validating any proposed fix rigorously, rather than assuming it will work, is the subject of **Lesson 45 (A/B Testing & Experimentation)**, immediately following this lesson.
+The corrective response required treating the declining Week-4 retention trend, not the aggregate active-user count, as the organization's primary health signal going forward pausing further acquisition spend increases until the underlying retention decline was diagnosed and addressed. Diagnosing the specific cause of the declining retention (a product change, a shift in acquisition channel mix, or something else) requires exactly the segmentation techniques from **Lesson 43**, applied here across cohorts rather than funnel steps, and validating any proposed fix rigorously, rather than assuming it will work, is the subject of **Lesson 45 (A/B Testing & Experimentation)**, immediately following this lesson.
 
 ---
 
@@ -251,7 +251,7 @@ An organization whose growth reviews check only the aggregate trend, without eve
 *What the interviewer is actually evaluating:* Whether the candidate immediately reaches for cohort-based retention analysis rather than trusting an aggregate active-user trend alone, directly testing this lesson's central caution.
 
 **Typical question 2: "What does it mean for a retention curve to 'flatten,' and why does that matter?"**
-*What the interviewer is actually evaluating:* Whether the candidate understands the Smile Curve concept specifically — that a flattening plateau, not simply the presence of any retained users, is the meaningful signal of durable product-market fit.
+*What the interviewer is actually evaluating:* Whether the candidate understands the Smile Curve concept specifically that a flattening plateau, not simply the presence of any retained users, is the meaningful signal of durable product-market fit.
 
 **Typical question 3: "A retention metric looks good this quarter compared to last. What would you want to verify before trusting that comparison?"**
 *What the interviewer is actually evaluating:* Whether the candidate checks for definitional consistency (classic vs. rolling vs. bracketed, same time window) and potential confounding product changes between the compared periods, rather than accepting the comparison at face value.
@@ -260,7 +260,7 @@ An organization whose growth reviews check only the aggregate trend, without eve
 
 ## Summary
 
-Cohort analysis groups users by shared starting period and tracks each group's behavior separately over time, using a retention triangle to reveal both how retention changes across successive cohorts (reading down columns) and how a single cohort's engagement decays or stabilizes over its own lifetime (reading across rows) — a discipline that closely extends Lesson 43's segmentation principle across the dimension of time-since-joining. Retention must be precisely defined using one of three common conventions (classic N-day, rolling, or bracketed), since these can produce meaningfully different numbers from identical underlying data. The Smile Curve mental model captures this lesson's central interpretive insight: a retention curve's decline is normal and expected, but whether it eventually flattens into a stable plateau — rather than continuing to decay toward zero — is the meaningful signal of genuine, durable product-market fit. This lesson's central caution, illustrated in its Case Study, is that an aggregate active-user trend can look healthy and growing while cohort-level retention is actually worsening steadily, as long as increasing acquisition volume outpaces the accelerating churn — directly extending Lesson 43's Leaky Bucket concept, since a growing "water level" can mask an increasingly severe underlying leak.
+Cohort analysis groups users by shared starting period and tracks each group's behavior separately over time, using a retention triangle to reveal both how retention changes across successive cohorts (reading down columns) and how a single cohort's engagement decays or stabilizes over its own lifetime (reading across rows) a discipline that closely extends Lesson 43's segmentation principle across the dimension of time-since-joining. Retention must be precisely defined using one of three common conventions (classic N-day, rolling, or bracketed), since these can produce meaningfully different numbers from identical underlying data. The Smile Curve mental model captures this lesson's central interpretive insight: a retention curve's decline is normal and expected, but whether it eventually flattens into a stable plateau rather than continuing to decay toward zero is the meaningful signal of genuine, durable product-market fit. This lesson's central caution, illustrated in its Case Study, is that an aggregate active-user trend can look healthy and growing while cohort-level retention is actually worsening steadily, as long as increasing acquisition volume outpaces the accelerating churn directly extending Lesson 43's Leaky Bucket concept, since a growing "water level" can mask an increasingly severe underlying leak.
 
 ---
 
@@ -268,9 +268,9 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 - A cohort groups users by shared starting period and tracks that group's behavior separately over time, rather than pooling all users into a single aggregate trend.
 - A cohort retention triangle reveals two distinct things: whether successive cohorts are retaining better or worse (reading down columns) and how a single cohort decays or stabilizes over its own lifetime (reading across rows).
-- Retention must be defined precisely as classic (N-day), rolling, or bracketed — these conventions can produce meaningfully different numbers from identical data, and must be specified to avoid silent incomparability.
+- Retention must be defined precisely as classic (N-day), rolling, or bracketed these conventions can produce meaningfully different numbers from identical data, and must be specified to avoid silent incomparability.
 - A retention curve that flattens into a stable plateau after its initial decline (the "smile" shape) signals genuine, durable product-market fit; a curve that never flattens suggests that fit hasn't yet been established.
-- An aggregate active-user trend can grow steadily while cohort-level retention worsens, as long as acquisition volume outpaces accelerating churn — this is this lesson's central, most consequential caution.
+- An aggregate active-user trend can grow steadily while cohort-level retention worsens, as long as acquisition volume outpaces accelerating churn this is this lesson's central, most consequential caution.
 - Small early cohorts produce noisy retention data that shouldn't be over-interpreted with the same confidence as large, mature cohorts.
 - Comparing retention curves across cohorts affected by different product changes requires accounting for those changes explicitly, or risks conflating the change's effect with ordinary cohort variation.
 
@@ -282,7 +282,7 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 - **Cohort:** users grouped by shared start period, tracked separately over time.
 - **Retention triangle:** rows = cohorts, columns = time since start; read down for cohort-over-cohort trend, across for single-cohort decay.
-- **Three retention conventions:** classic (exact day N), rolling (day N or later), bracketed (window around day N) — specify which one.
+- **Three retention conventions:** classic (exact day N), rolling (day N or later), bracketed (window around day N) specify which one.
 - **Smile Curve:** decline is normal; the meaningful question is whether it flattens into a stable plateau.
 - **Central caution:** aggregate active-user growth can mask worsening cohort-level retention if acquisition outpaces churn.
 - **Retention Health Check:** cohort trend direction, curve shape, definition consistency, acquisition-retention relationship.
@@ -305,9 +305,9 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 ## Further Reading / Resources
 
-- *Lean Analytics* by Alistair Croll and Benjamin Yoskovitz — revisited here for its treatment of cohort analysis and retention curve interpretation.
+- *Lean Analytics* by Alistair Croll and Benjamin Yoskovitz revisited here for its treatment of cohort analysis and retention curve interpretation.
 - "The Case for Cohort Analysis" and related practitioner writing on retention triangles, widely referenced across growth and analytics literature.
-- *Hooked: How to Build Habit-Forming Products* by Nir Eyal — relevant background on the behavioral dynamics underlying retention curve shape and habit formation.
+- *Hooked: How to Build Habit-Forming Products* by Nir Eyal relevant background on the behavioral dynamics underlying retention curve shape and habit formation.
 
 ---
 
@@ -333,7 +333,7 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 **Card 4**
 - Front: What does a "smile" shaped retention curve indicate?
-- Back: The curve flattens into a stable plateau after its initial decline, signaling that a meaningful fraction of users have found durable value — a strong signal of genuine product-market fit.
+- Back: The curve flattens into a stable plateau after its initial decline, signaling that a meaningful fraction of users have found durable value a strong signal of genuine product-market fit.
 - Difficulty: 1
 - Tags: smile-curve
 
@@ -352,9 +352,9 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 ## Reflection Exercise
 
-Consider the following novel scenario: You're a PM reviewing your product's monthly active user chart, which has grown 8% month-over-month for the past year — a trend leadership has celebrated repeatedly. You've never built a cohort retention triangle for this product before.
+Consider the following novel scenario: You're a PM reviewing your product's monthly active user chart, which has grown 8% month-over-month for the past year a trend leadership has celebrated repeatedly. You've never built a cohort retention triangle for this product before.
 
-There is no single correct answer to the prompts below — the goal is to practice applying this lesson's frameworks, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying this lesson's frameworks, not to reach one "right" answer.
 
 1. Using the Retention Health Check, what specific data would you need to gather to determine whether this growth trend might be masking a retention problem?
 2. If you build a retention triangle and find that Week-4 retention has been flat across all cohorts, what would that suggest about the growth trend's health, compared to if retention were declining?
@@ -565,10 +565,10 @@ D) Wait a further year before drawing any conclusion
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 43 — Funnel Analysis | Extends Lesson 43's segmentation and Simpson's Paradox/Leaky Bucket concepts across the dimension of time-since-joining, via cohorts |
-| **Current Lesson** | Lesson 44 — Cohort & Retention Analysis | Retention triangle; classic/rolling/bracketed retention; Smile Curve; the aggregate-vs-cohort masking caution |
-| **Next Lesson** | Lesson 45 — A/B Testing & Experimentation | Provides the rigorous method for validating whether a proposed fix to a retention or funnel problem actually causes improvement |
+| **Previous Lesson** | Lesson 43 Funnel Analysis | Extends Lesson 43's segmentation and Simpson's Paradox/Leaky Bucket concepts across the dimension of time-since-joining, via cohorts |
+| **Current Lesson** | Lesson 44 Cohort & Retention Analysis | Retention triangle; classic/rolling/bracketed retention; Smile Curve; the aggregate-vs-cohort masking caution |
+| **Next Lesson** | Lesson 45 A/B Testing & Experimentation | Provides the rigorous method for validating whether a proposed fix to a retention or funnel problem actually causes improvement |
 | **Future Concepts Unlocked** | Lesson 46 (Growth Loops & Virality) | Builds growth loop analysis on top of the retention foundation established here |
 | | Lesson 50 (Product-Led Growth) | Depends on cohort-level retention as a core health signal for growth strategy |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry cohort analysis, the retention triangle, and the Smile Curve with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry cohort analysis, the retention triangle, and the Smile Curve with you they will not be re-explained, only re-applied in new contexts.

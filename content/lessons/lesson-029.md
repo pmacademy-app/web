@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Across 24 lessons, this curriculum has repeatedly bumped into the same underlying question without ever naming it directly: when multiple genuinely valid things compete for the same limited time and resources, how do you actually decide? Lesson 16 built a Severity/Frequency Grid for pain points. Lesson 19 built an Opportunity Comparison Grid for opportunities. Lesson 10 insisted a real strategy must say no to something. Lesson 21 insisted an MVP must cut anything not necessary for its specific test. Each of these was, in effect, a scoped, local prioritization framework. This lesson generalizes the underlying discipline: **prioritization** is the practice of deciding what to work on next, using an explicit, defensible method rather than intuition, seniority, or recency alone — and it is, in a real sense, the skill this entire curriculum has been building toward from Lesson 1 onward.
+Across 24 lessons, this curriculum has repeatedly bumped into the same underlying question without ever naming it directly: when multiple genuinely valid things compete for the same limited time and resources, how do you actually decide? Lesson 16 built a Severity/Frequency Grid for pain points. Lesson 19 built an Opportunity Comparison Grid for opportunities. Lesson 10 insisted a real strategy must say no to something. Lesson 21 insisted an MVP must cut anything not necessary for its specific test. Each of these was, in effect, a scoped, local prioritization framework. This lesson generalizes the underlying discipline: **prioritization** is the practice of deciding what to work on next, using an explicit, defensible method rather than intuition, seniority, or recency alone and it is, in a real sense, the skill this entire curriculum has been building toward from Lesson 1 onward.
 
-This lesson matters because prioritization is where every other discipline in this curriculum — validated research, laddered pain points, sized opportunities, a real strategy, a scoped MVP — ultimately has to cash out into an actual, defensible decision about sequence: what gets built first, second, and not at all, at least for now. A team can do everything else in this curriculum correctly and still fail here, by falling back on whichever voice is loudest (Lesson 5, Lesson 16) or whichever idea was most recently discussed (Lesson 16, Lesson 19), precisely the failure patterns this curriculum has repeatedly named. This lesson closes that gap with formal, named prioritization frameworks.
+This lesson matters because prioritization is where every other discipline in this curriculum validated research, laddered pain points, sized opportunities, a real strategy, a scoped MVP ultimately has to cash out into an actual, defensible decision about sequence: what gets built first, second, and not at all, at least for now. A team can do everything else in this curriculum correctly and still fail here, by falling back on whichever voice is loudest (Lesson 5, Lesson 16) or whichever idea was most recently discussed (Lesson 16, Lesson 19), precisely the failure patterns this curriculum has repeatedly named. This lesson closes that gap with formal, named prioritization frameworks.
 
 ---
 
@@ -12,12 +12,12 @@ This lesson matters because prioritization is where every other discipline in th
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design |
+| **Module** | 3 Product Design |
 | **Current Lesson** | 29 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 10 (Product Strategy Basics), Lesson 16 (Pain Points), Lesson 19 (Opportunity Identification) |
-| **Next Lesson** | Lesson 30 — Design Thinking (closing Module 3) |
+| **Next Lesson** | Lesson 30 Design Thinking (closing Module 3) |
 | **Future Topics Unlocked** | Lesson 30 (Design Thinking), Module 4 (Execution & Agile Delivery), Lesson 34 (Sprint Planning & Backlog Grooming) |
 
 ---
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 10 (Product Strategy Basics), Lesson 16 (Pain Points), and Lesson 19 (Opportunity Identification). This lesson assumes fluency with severity/frequency scoring, opportunity sizing via importance-satisfaction and prevalence, and the discipline of genuine strategic exclusion — this lesson generalizes and formalizes these prior, narrower tools into explicit, named prioritization frameworks applicable across a full backlog of dissimilar candidates.
+Lesson 10 (Product Strategy Basics), Lesson 16 (Pain Points), and Lesson 19 (Opportunity Identification). This lesson assumes fluency with severity/frequency scoring, opportunity sizing via importance-satisfaction and prevalence, and the discipline of genuine strategic exclusion this lesson generalizes and formalizes these prior, narrower tools into explicit, named prioritization frameworks applicable across a full backlog of dissimilar candidates.
 
 ---
 
@@ -47,8 +47,8 @@ Lesson 10 (Product Strategy Basics), Lesson 16 (Pain Points), and Lesson 19 (Opp
 **RICE** is a widely used scoring framework for comparing dissimilar candidate initiatives on a common numeric scale, using four factors:
 
 - **Reach**: how many people (or what fraction of a validated segment, per Lesson 18) will this initiative affect within a given time period?
-- **Impact**: how much will this initiative affect each person it reaches — typically scored on a simple scale (e.g., massive, high, medium, low, minimal), often assigned a corresponding numeric value?
-- **Confidence**: how confident is the team in the reach and impact estimates, given the strength of the underlying evidence (directly connecting to Lesson 11's Evidence Trustworthiness Ladder) — typically expressed as a percentage?
+- **Impact**: how much will this initiative affect each person it reaches typically scored on a simple scale (e.g., massive, high, medium, low, minimal), often assigned a corresponding numeric value?
+- **Confidence**: how confident is the team in the reach and impact estimates, given the strength of the underlying evidence (directly connecting to Lesson 11's Evidence Trustworthiness Ladder) typically expressed as a percentage?
 - **Effort**: how much time and resource investment will this initiative require, typically expressed in person-time (e.g., person-months)?
 
 The RICE score is calculated as:
@@ -94,11 +94,11 @@ graph TD
     E --> F[Higher Score = Higher Relative Priority]
 ```
 
-RICE's genuine value is forcing explicit numbers onto each factor, rather than allowing a comparison to remain vague — a candidate initiative that "feels important" must be translated into an actual reach estimate, an actual impact estimate, an honest confidence level, and an actual effort estimate, all of which can be questioned and debated on their specific merits, rather than accepting or rejecting the initiative based on an unstated, holistic impression.
+RICE's genuine value is forcing explicit numbers onto each factor, rather than allowing a comparison to remain vague a candidate initiative that "feels important" must be translated into an actual reach estimate, an actual impact estimate, an honest confidence level, and an actual effort estimate, all of which can be questioned and debated on their specific merits, rather than accepting or rejecting the initiative based on an unstated, holistic impression.
 
 ### Confidence as the Discipline-Enforcing Factor
 
-The **Confidence** factor deserves particular attention, since it is the mechanism that connects RICE directly back to this curriculum's research rigor (Lessons 11–13, 19). A candidate initiative based on a vivid anecdote or an unvalidated assumption (echoing Lesson 16's "vivid but rare" warning) should receive a low confidence score, appropriately discounting its overall RICE score relative to a candidate backed by genuine, validated evidence — even if the vivid anecdote's raw reach and impact estimates look impressive on paper. This is precisely the mechanism that prevents RICE from simply reproducing Lesson 16's "loudest voice" or "vivid but rare" failure patterns under a different, more formal-looking name: a low-confidence estimate should genuinely lower the score, not be treated as a formality to move past quickly.
+The **Confidence** factor deserves particular attention, since it is the mechanism that connects RICE directly back to this curriculum's research rigor (Lessons 11–13, 19). A candidate initiative based on a vivid anecdote or an unvalidated assumption (echoing Lesson 16's "vivid but rare" warning) should receive a low confidence score, appropriately discounting its overall RICE score relative to a candidate backed by genuine, validated evidence even if the vivid anecdote's raw reach and impact estimates look impressive on paper. This is precisely the mechanism that prevents RICE from simply reproducing Lesson 16's "loudest voice" or "vivid but rare" failure patterns under a different, more formal-looking name: a low-confidence estimate should genuinely lower the score, not be treated as a formality to move past quickly.
 
 ### MoSCoW: A Qualitative, Stakeholder-Facing Method
 
@@ -147,13 +147,13 @@ graph TD
     A --> E["Won't Have"<br/>Explicitly Excluded This Time]
 ```
 
-MoSCoW is often more appropriate than RICE when a team needs to communicate priority quickly and clearly to a broad set of stakeholders (particularly non-specialist stakeholders less familiar with a quantitative scoring model), or when the goal is defining the boundary of a specific release rather than ranking a large, diverse backlog against each other on a single numeric scale. Its explicit "Won't have" category is a particularly valuable discipline, directly enforcing Lesson 10's argument that a real strategic choice requires explicit exclusion — MoSCoW makes that exclusion a visible, named category rather than an implicit, unstated omission.
+MoSCoW is often more appropriate than RICE when a team needs to communicate priority quickly and clearly to a broad set of stakeholders (particularly non-specialist stakeholders less familiar with a quantitative scoring model), or when the goal is defining the boundary of a specific release rather than ranking a large, diverse backlog against each other on a single numeric scale. Its explicit "Won't have" category is a particularly valuable discipline, directly enforcing Lesson 10's argument that a real strategic choice requires explicit exclusion MoSCoW makes that exclusion a visible, named category rather than an implicit, unstated omission.
 
 ### "Eating the Frog" vs. Artificially Easy Sequencing
 
 A specific, practical sequencing question, once priorities are established, is: within a set of similarly prioritized items, should a team tackle the hardest, highest-value item first, or build momentum with easier wins first? **"Eating the frog"** (a phrase associated with productivity writing, referring to tackling the most difficult, most important task first) argues for confronting the highest-value hard work early, since delaying it often means it never actually gets done, or gets rushed under worse conditions later.
 
-The countervailing consideration is that **artificially easy sequencing** — deliberately front-loading a series of easy wins — can build genuine team and stakeholder confidence, demonstrate visible progress, and (particularly relevant to this curriculum's discovery discipline) surface early, cheap learning that might usefully inform how the harder, more important work is eventually approached. Neither approach is universally correct; the choice depends on specific context — how urgent the hard problem actually is, whether early wins would genuinely inform the harder work or merely delay it, and how much organizational patience and trust currently exists for a team to spend significant time on a single, high-value, high-difficulty initiative without visible interim progress.
+The countervailing consideration is that **artificially easy sequencing** deliberately front-loading a series of easy wins can build genuine team and stakeholder confidence, demonstrate visible progress, and (particularly relevant to this curriculum's discovery discipline) surface early, cheap learning that might usefully inform how the harder, more important work is eventually approached. Neither approach is universally correct; the choice depends on specific context how urgent the hard problem actually is, whether early wins would genuinely inform the harder work or merely delay it, and how much organizational patience and trust currently exists for a team to spend significant time on a single, high-value, high-difficulty initiative without visible interim progress.
 
 ```mermaid
 %%{init: {
@@ -195,9 +195,9 @@ graph LR
 
 ### The "Prioritization Theater" Failure Pattern
 
-A specific, important failure pattern — directly extending Lesson 8's discovery theater concept — is **prioritization theater**: applying a formal-looking scoring framework (RICE, MoSCoW, or any other named method) to a set of candidates whose actual priority order has already been decided for other reasons (executive preference, sunk cost, internal politics), with the scoring exercise conducted after the fact specifically to produce numbers that justify the already-determined outcome. This directly parallels Lesson 24's warning about acceptance criteria written after the fact: a scoring framework applied retroactively, to rationalize a decision rather than genuinely inform it, provides the appearance of rigor without any of its substance.
+A specific, important failure pattern directly extending Lesson 8's discovery theater concept is **prioritization theater**: applying a formal-looking scoring framework (RICE, MoSCoW, or any other named method) to a set of candidates whose actual priority order has already been decided for other reasons (executive preference, sunk cost, internal politics), with the scoring exercise conducted after the fact specifically to produce numbers that justify the already-determined outcome. This directly parallels Lesson 24's warning about acceptance criteria written after the fact: a scoring framework applied retroactively, to rationalize a decision rather than genuinely inform it, provides the appearance of rigor without any of its substance.
 
-The corrective discipline is the same one this curriculum has applied repeatedly: a genuine prioritization exercise must be capable, in principle, of producing a result that contradicts the team's initial expectation or preference — if a RICE or MoSCoW exercise never once produces a surprising or uncomfortable ranking, that is itself a warning sign worth taking seriously, echoing Lesson 8's core discovery-theater diagnostic applied directly to the practice of prioritization.
+The corrective discipline is the same one this curriculum has applied repeatedly: a genuine prioritization exercise must be capable, in principle, of producing a result that contradicts the team's initial expectation or preference if a RICE or MoSCoW exercise never once produces a surprising or uncomfortable ranking, that is itself a warning sign worth taking seriously, echoing Lesson 8's core discovery-theater diagnostic applied directly to the practice of prioritization.
 
 ---
 
@@ -205,15 +205,15 @@ The corrective discipline is the same one this curriculum has applied repeatedly
 
 **Mistake 1: Treating RICE scores as precise, objective numbers rather than structured estimates**
 
-RICE scores are only as good as the underlying reach, impact, and confidence estimates feeding into them — treating the resulting number as objectively precise, rather than as a structured, debatable estimate, overstates the framework's actual certainty.
+RICE scores are only as good as the underlying reach, impact, and confidence estimates feeding into them treating the resulting number as objectively precise, rather than as a structured, debatable estimate, overstates the framework's actual certainty.
 
 **Mistake 2: Assigning high confidence scores to vivid anecdotes or unvalidated assumptions**
 
-This directly reintroduces Lesson 16's "vivid but rare" and "loudest voice" failure patterns under RICE's formal-looking numeric structure — confidence should genuinely reflect the strength of underlying evidence, not the persuasiveness or memorability of how a candidate was pitched.
+This directly reintroduces Lesson 16's "vivid but rare" and "loudest voice" failure patterns under RICE's formal-looking numeric structure confidence should genuinely reflect the strength of underlying evidence, not the persuasiveness or memorability of how a candidate was pitched.
 
 **Mistake 3: Using RICE when MoSCoW would communicate priority more clearly to a broad stakeholder audience, or vice versa**
 
-These frameworks serve different purposes — RICE for ranking dissimilar candidates on a common numeric scale, MoSCoW for defining release scope and communicating clearly with less quantitatively focused stakeholders — and using the wrong one for the specific situation reduces the exercise's practical value.
+These frameworks serve different purposes RICE for ranking dissimilar candidates on a common numeric scale, MoSCoW for defining release scope and communicating clearly with less quantitatively focused stakeholders and using the wrong one for the specific situation reduces the exercise's practical value.
 
 **Mistake 4: Defaulting to "easy wins first" purely to avoid difficult work, rather than as a deliberate, justified sequencing choice**
 
@@ -221,7 +221,7 @@ Artificially easy sequencing can be a legitimate strategy in the right context, 
 
 **Mistake 5: Running a prioritization exercise after a decision has already effectively been made, to produce justifying numbers rather than genuine input**
 
-This is prioritization theater — a formal-looking exercise that could not, even in principle, have changed the outcome is not really prioritizing anything.
+This is prioritization theater a formal-looking exercise that could not, even in principle, have changed the outcome is not really prioritizing anything.
 
 ---
 
@@ -269,13 +269,13 @@ graph TD
     E --> F[Explicit, Defensible<br/>Prioritization Decision]
 ```
 
-Use this funnel as a synthesis discipline: when scoring a candidate's Impact for RICE, or deciding whether it's a "Must have" for MoSCoW, explicitly draw on the specific evidence this curriculum's earlier tools have already produced — a pain point's established severity and frequency, an opportunity's importance-satisfaction gap and segment prevalence, and whether the initiative follows from the company's actual guiding policy — rather than re-deriving a fresh, unmoored judgment from scratch for each new prioritization exercise.
+Use this funnel as a synthesis discipline: when scoring a candidate's Impact for RICE, or deciding whether it's a "Must have" for MoSCoW, explicitly draw on the specific evidence this curriculum's earlier tools have already produced a pain point's established severity and frequency, an opportunity's importance-satisfaction gap and segment prevalence, and whether the initiative follows from the company's actual guiding policy rather than re-deriving a fresh, unmoored judgment from scratch for each new prioritization exercise.
 
 ---
 
 ## Real Company Example
 
-**Intercom** is the actual origin of RICE, not just a well-documented user of it: the framework was developed by Sean McBride while he was a PM on Intercom's growth team, specifically because his team needed a consistent way to compare dissimilar candidate initiatives — a small bug fix against a substantial new feature — on a single, defensible scale, rather than relying on ad hoc comparisons or whichever idea had the most vocal internal advocate at a given planning meeting. McBride has written and spoken publicly about the framework's origin, and RICE has since become one of the most widely adopted scoring frameworks in the industry.
+**Intercom** is the actual origin of RICE, not just a well-documented user of it: the framework was developed by Sean McBride while he was a PM on Intercom's growth team, specifically because his team needed a consistent way to compare dissimilar candidate initiatives a small bug fix against a substantial new feature on a single, defensible scale, rather than relying on ad hoc comparisons or whichever idea had the most vocal internal advocate at a given planning meeting. McBride has written and spoken publicly about the framework's origin, and RICE has since become one of the most widely adopted scoring frameworks in the industry.
 
 *(Assumption flagged: this reflects Intercom's own publicly shared account of developing and using RICE rather than a claim about the framework's universal applicability or Intercom's complete, current internal prioritization process, which this curriculum does not claim certainty about.)*
 
@@ -284,10 +284,10 @@ Use this funnel as a synthesis discipline: when scoring a candidate's Impact for
 ## Real World Perspective: Prioritization Fundamentals at Different Company Stages
 
 **At a startup:**
-Prioritization is often concentrated on an extremely small number of genuinely make-or-break decisions, and lightweight, qualitative methods (a simple ranked list, informal MoSCoW-style categorization) frequently suffice given the smaller volume of candidates and closer, more informal team collaboration — the underlying discipline (explicit criteria, genuine willingness to exclude, confidence honestly reflecting evidence quality) matters as much as at any other stage, even without a fully formalized RICE process.
+Prioritization is often concentrated on an extremely small number of genuinely make-or-break decisions, and lightweight, qualitative methods (a simple ranked list, informal MoSCoW-style categorization) frequently suffice given the smaller volume of candidates and closer, more informal team collaboration the underlying discipline (explicit criteria, genuine willingness to exclude, confidence honestly reflecting evidence quality) matters as much as at any other stage, even without a fully formalized RICE process.
 
 **At a mid-size company:**
-Formal frameworks like RICE often become genuinely valuable as backlog size and organizational complexity grow beyond what informal, ad hoc comparison can handle consistently, and this is frequently the stage where prioritization theater risk increases, as more stakeholders with more varied interests attempt to influence outcomes, making a genuinely defensible, evidence-grounded scoring exercise more valuable — and more likely to be circumvented informally if not actively protected.
+Formal frameworks like RICE often become genuinely valuable as backlog size and organizational complexity grow beyond what informal, ad hoc comparison can handle consistently, and this is frequently the stage where prioritization theater risk increases, as more stakeholders with more varied interests attempt to influence outcomes, making a genuinely defensible, evidence-grounded scoring exercise more valuable and more likely to be circumvented informally if not actively protected.
 
 **At Big Tech:**
 Prioritization at scale often requires reconciling multiple, semi-independent teams' RICE or similar scores against a shared, company-wide strategic framework (echoing Lesson 10), and a significant part of senior product leadership's role involves ensuring that formal scoring frameworks remain genuine inputs to real decisions across the organization, rather than degenerating into prioritization theater performed independently by each team to justify their own pre-existing preferences.
@@ -298,21 +298,21 @@ Prioritization at scale often requires reconciling multiple, semi-independent te
 
 Consider a simplified, illustrative scenario common across mid-size B2B SaaS product teams.
 
-A product team is asked by a senior executive to prioritize a specific feature the executive has personally championed for several months, ahead of several other candidate initiatives the team's own research (following this curriculum's Modules 1 and 2) had identified as more strongly validated and higher-value. Wanting to appear rigorous and data-driven, the team runs a formal RICE scoring exercise across all candidates — but, consciously or not, assigns unusually high Reach and Impact estimates to the executive's preferred feature, and an unusually high Confidence score despite the feature having no supporting research beyond the executive's personal conviction, while applying stricter, more skeptical scrutiny to the reach, impact, and confidence estimates for the team's own, better-validated candidates.
+A product team is asked by a senior executive to prioritize a specific feature the executive has personally championed for several months, ahead of several other candidate initiatives the team's own research (following this curriculum's Modules 1 and 2) had identified as more strongly validated and higher-value. Wanting to appear rigorous and data-driven, the team runs a formal RICE scoring exercise across all candidates but, consciously or not, assigns unusually high Reach and Impact estimates to the executive's preferred feature, and an unusually high Confidence score despite the feature having no supporting research beyond the executive's personal conviction, while applying stricter, more skeptical scrutiny to the reach, impact, and confidence estimates for the team's own, better-validated candidates.
 
-The resulting RICE scores rank the executive's preferred feature at the top, and the team proceeds to build it. Nine months later, the feature sees minimal adoption, while a lower-ranked candidate from the same exercise — one the team's own prior research (per Lesson 19's opportunity sizing) had actually identified as significantly higher-value — remains unaddressed, its genuine potential value still sitting unrealized in the team's backlog.
+The resulting RICE scores rank the executive's preferred feature at the top, and the team proceeds to build it. Nine months later, the feature sees minimal adoption, while a lower-ranked candidate from the same exercise one the team's own prior research (per Lesson 19's opportunity sizing) had actually identified as significantly higher-value remains unaddressed, its genuine potential value still sitting unrealized in the team's backlog.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
 1. **The RICE exercise was prioritization theater, not genuine prioritization.** The scoring inputs were adjusted, consciously or not, to produce a predetermined outcome (validating the executive's preference) rather than genuinely reflecting the team's actual evidence and confidence levels.
-2. **The Confidence factor was specifically misapplied** — a feature with no supporting research beyond personal conviction should have received a low confidence score, appropriately discounting its overall RICE score, rather than an inflated confidence score that obscured the actual weakness of its underlying evidence.
-3. **The genuinely well-validated candidate, backed by this curriculum's Module 2 research discipline, was held to a higher evidentiary bar than the executive's preferred feature** — an inconsistent standard applied specifically to produce the desired ranking, rather than a uniform, honest standard applied to all candidates equally.
+2. **The Confidence factor was specifically misapplied** a feature with no supporting research beyond personal conviction should have received a low confidence score, appropriately discounting its overall RICE score, rather than an inflated confidence score that obscured the actual weakness of its underlying evidence.
+3. **The genuinely well-validated candidate, backed by this curriculum's Module 2 research discipline, was held to a higher evidentiary bar than the executive's preferred feature** an inconsistent standard applied specifically to produce the desired ranking, rather than a uniform, honest standard applied to all candidates equally.
 
-A team applying this lesson's discipline rigorously would have scored all candidates using the same honest, evidence-grounded standard — assigning the executive's preferred feature a genuinely low confidence score given its lack of supporting research, and the team's own validated candidate a correspondingly higher confidence score given its grounding in Lesson 19's opportunity-sizing evidence — very likely producing a RICE ranking that would have required the team to have an honest, evidence-based conversation with the executive about the relative merits of the two candidates, rather than using a superficially rigorous exercise to avoid that conversation entirely.
+A team applying this lesson's discipline rigorously would have scored all candidates using the same honest, evidence-grounded standard assigning the executive's preferred feature a genuinely low confidence score given its lack of supporting research, and the team's own validated candidate a correspondingly higher confidence score given its grounding in Lesson 19's opportunity-sizing evidence very likely producing a RICE ranking that would have required the team to have an honest, evidence-based conversation with the executive about the relative merits of the two candidates, rather than using a superficially rigorous exercise to avoid that conversation entirely.
 
-This case connects directly back to **Lesson 8's discovery theater concept**: a scoring exercise that could not, even in principle, have produced a result different from the predetermined outcome was never actually prioritizing anything — it was providing a formal-looking justification for a decision made through other means entirely.
+This case connects directly back to **Lesson 8's discovery theater concept**: a scoring exercise that could not, even in principle, have produced a result different from the predetermined outcome was never actually prioritizing anything it was providing a formal-looking justification for a decision made through other means entirely.
 
 ---
 
@@ -327,7 +327,7 @@ A practical checklist for evaluating whether a prioritization exercise is genuin
 | Could this exercise, in principle, have produced a result contradicting the team's initial expectation or a stakeholder's preference? | Directly tests for prioritization theater, echoing Lesson 8's genuine-test criterion |
 | Were the earlier, narrower prioritization tools from this curriculum (severity/frequency, opportunity sizing, strategic fit) actually drawn upon as inputs, or was this exercise conducted in isolation from that prior evidence? | Ensures genuine synthesis rather than a fresh, unmoored scoring exercise |
 
-A prioritization exercise failing several of these checks risks the exact outcome shown in this lesson's Detailed Case Study — a formally rigorous-looking process that nonetheless produced a predetermined, ultimately costly result.
+A prioritization exercise failing several of these checks risks the exact outcome shown in this lesson's Detailed Case Study a formally rigorous-looking process that nonetheless produced a predetermined, ultimately costly result.
 
 ---
 
@@ -340,13 +340,13 @@ A prioritization exercise failing several of these checks risks the exact outcom
 *What the interviewer is actually evaluating:* Direct experience navigating the exact tension shown in this lesson's Detailed Case Study, and whether the candidate can describe an honest, evidence-grounded resolution rather than either capitulating uncritically or dismissing the stakeholder's input without genuine engagement.
 
 **Typical question 3: "How do you know if a prioritization process is genuine, rather than just justifying a decision that's already been made?"**
-*What the interviewer is actually evaluating:* Fluency with the prioritization theater concept — whether the candidate can articulate the specific diagnostic (could this exercise have produced a contradicting result?) rather than treating the mere existence of a formal framework as sufficient evidence of genuine rigor.
+*What the interviewer is actually evaluating:* Fluency with the prioritization theater concept whether the candidate can articulate the specific diagnostic (could this exercise have produced a contradicting result?) rather than treating the mere existence of a formal framework as sufficient evidence of genuine rigor.
 
 ---
 
 ## Summary
 
-Prioritization is the practice of deciding what to work on next using an explicit, defensible method, generalizing this curriculum's earlier, narrower scoring tools (severity/frequency, opportunity sizing, strategic fit) into formal, named frameworks. RICE (Reach × Impact × Confidence / Effort) provides a quantitative scoring method for comparing dissimilar candidates on a common scale, with Confidence serving as the critical discipline-enforcing factor that should genuinely reflect underlying evidence quality (per Lesson 11's Evidence Trustworthiness Ladder), preventing vivid but weakly evidenced candidates from scoring artificially high. MoSCoW (Must/Should/Could/Won't have) provides a simpler, qualitative categorization better suited to communicating release scope clearly to broad stakeholder audiences, with its explicit "Won't have" category directly enforcing Lesson 10's exclusion discipline. Sequencing choices — "eating the frog" versus building momentum with easier wins first — depend on specific context rather than a universally correct answer. Finally, "prioritization theater" — applying a formal-looking framework to justify a decision already made for other reasons — is a critical failure pattern to guard against, diagnosable by asking whether the exercise could, in principle, have produced a contradicting result, as this lesson's Detailed Case Study makes concrete.
+Prioritization is the practice of deciding what to work on next using an explicit, defensible method, generalizing this curriculum's earlier, narrower scoring tools (severity/frequency, opportunity sizing, strategic fit) into formal, named frameworks. RICE (Reach × Impact × Confidence / Effort) provides a quantitative scoring method for comparing dissimilar candidates on a common scale, with Confidence serving as the critical discipline-enforcing factor that should genuinely reflect underlying evidence quality (per Lesson 11's Evidence Trustworthiness Ladder), preventing vivid but weakly evidenced candidates from scoring artificially high. MoSCoW (Must/Should/Could/Won't have) provides a simpler, qualitative categorization better suited to communicating release scope clearly to broad stakeholder audiences, with its explicit "Won't have" category directly enforcing Lesson 10's exclusion discipline. Sequencing choices "eating the frog" versus building momentum with easier wins first depend on specific context rather than a universally correct answer. Finally, "prioritization theater" applying a formal-looking framework to justify a decision already made for other reasons is a critical failure pattern to guard against, diagnosable by asking whether the exercise could, in principle, have produced a contradicting result, as this lesson's Detailed Case Study makes concrete.
 
 ---
 
@@ -356,7 +356,7 @@ Prioritization is the practice of deciding what to work on next using an explici
 - The Confidence factor should genuinely reflect underlying evidence quality (per Lesson 11's Evidence Trustworthiness Ladder), preventing vivid but weakly evidenced candidates from scoring artificially high.
 - MoSCoW (Must/Should/Could/Won't have) is a simpler, qualitative method better suited to communicating release scope to broad stakeholder audiences; its "Won't have" category enforces genuine strategic exclusion.
 - "Eating the frog" (tackling the highest-value hard thing first) and easy-wins-first sequencing both have legitimate uses depending on context; neither is universally correct.
-- "Prioritization theater" — using a formal framework to justify a predetermined decision — is diagnosable by asking whether the exercise could, in principle, have produced a contradicting result.
+- "Prioritization theater" using a formal framework to justify a predetermined decision is diagnosable by asking whether the exercise could, in principle, have produced a contradicting result.
 - Genuine prioritization synthesizes this curriculum's earlier, narrower tools (severity/frequency, opportunity sizing, strategic fit) as actual inputs, rather than re-deriving fresh judgments in isolation.
 - Consistent, honest scoring standards must be applied to every candidate regardless of who championed it, or the exercise risks reintroducing exactly the "loudest voice" and "vivid but rare" failure patterns it's meant to prevent.
 
@@ -368,10 +368,10 @@ Prioritization is the practice of deciding what to work on next using an explici
 
 - **RICE = (Reach × Impact × Confidence) / Effort.** Confidence should reflect real evidence quality, not persuasiveness.
 - **MoSCoW = Must/Should/Could/Won't have.** Better for broad stakeholder communication and defining release scope; "Won't have" enforces real exclusion.
-- **Eat the frog vs. easy wins first** — context-dependent, not universally correct either way.
+- **Eat the frog vs. easy wins first** context-dependent, not universally correct either way.
 - **Prioritization theater test:** could this exercise, in principle, have produced a result contradicting the predetermined preference? If not, it's theater.
-- **Synthesize, don't re-derive** — draw on severity/frequency, opportunity sizing, and strategic fit as actual scoring inputs.
-- **Same honest standard for every candidate** — regardless of who's championing it.
+- **Synthesize, don't re-derive** draw on severity/frequency, opportunity sizing, and strategic fit as actual scoring inputs.
+- **Same honest standard for every candidate** regardless of who's championing it.
 
 ---
 
@@ -389,8 +389,8 @@ Prioritization is the practice of deciding what to work on next using an explici
 ## Further Reading / Resources
 
 - Intercom's publicly shared writing introducing and explaining the RICE scoring framework, the direct origin of this lesson's core quantitative technique.
-- Karl Wiegers, *Software Requirements* — includes detailed treatment of prioritization methods including MoSCoW in a requirements-engineering context.
-- Melissa Perri, *Escaping the Build Trap* — discusses the organizational and strategic dimensions of genuine, evidence-grounded prioritization versus decisions driven by internal politics or seniority.
+- Karl Wiegers, *Software Requirements* includes detailed treatment of prioritization methods including MoSCoW in a requirements-engineering context.
+- Melissa Perri, *Escaping the Build Trap* discusses the organizational and strategic dimensions of genuine, evidence-grounded prioritization versus decisions driven by internal politics or seniority.
 
 ---
 
@@ -404,7 +404,7 @@ Prioritization is the practice of deciding what to work on next using an explici
 
 **Card 2**
 - Front: Why is the Confidence factor in RICE described as "discipline-enforcing"?
-- Back: It should genuinely reflect the strength of underlying evidence — a vivid anecdote or unvalidated assumption should receive a low confidence score, preventing Lesson 16's "vivid but rare" and "loudest voice" patterns from reappearing under a formal numeric disguise.
+- Back: It should genuinely reflect the strength of underlying evidence a vivid anecdote or unvalidated assumption should receive a low confidence score, preventing Lesson 16's "vivid but rare" and "loudest voice" patterns from reappearing under a formal numeric disguise.
 - Difficulty: 3
 - Tags: confidence-factor
 
@@ -416,7 +416,7 @@ Prioritization is the practice of deciding what to work on next using an explici
 
 **Card 4**
 - Front: What is "eating the frog," and what is the trade-off against easy-wins-first sequencing?
-- Back: Tackling the highest-value, hardest task first, rather than deferring it; the trade-off against easy wins is urgency and avoiding perpetual deferral versus building momentum and gathering cheap early learning — context-dependent, not universally correct either way.
+- Back: Tackling the highest-value, hardest task first, rather than deferring it; the trade-off against easy wins is urgency and avoiding perpetual deferral versus building momentum and gathering cheap early learning context-dependent, not universally correct either way.
 - Difficulty: 2
 - Tags: eating-the-frog
 
@@ -428,13 +428,13 @@ Prioritization is the practice of deciding what to work on next using an explici
 
 **Card 6**
 - Front: In the Detailed Case Study, how was the RICE exercise manipulated to favor the executive's preferred feature?
-- Back: Unusually high Reach, Impact, and Confidence scores were assigned to the executive's feature despite no supporting research, while the team's own better-validated candidate was held to stricter scrutiny — an inconsistent standard applied to produce a predetermined ranking.
+- Back: Unusually high Reach, Impact, and Confidence scores were assigned to the executive's feature despite no supporting research, while the team's own better-validated candidate was held to stricter scrutiny an inconsistent standard applied to produce a predetermined ranking.
 - Difficulty: 3
 - Tags: case-study
 
 **Card 7**
 - Front: What should a prioritization exercise draw on, according to the Prioritization Synthesis Funnel?
-- Back: This curriculum's earlier, narrower prioritization tools — severity/frequency scoring, opportunity sizing, and strategic fit — as actual inputs, rather than re-deriving fresh judgments in isolation for each new exercise.
+- Back: This curriculum's earlier, narrower prioritization tools severity/frequency scoring, opportunity sizing, and strategic fit as actual inputs, rather than re-deriving fresh judgments in isolation for each new exercise.
 - Difficulty: 2
 - Tags: synthesis-funnel
 
@@ -447,7 +447,7 @@ Work through the following, in writing, before reading further:
 
 1. Assign rough RICE scores (Reach, Impact, Confidence, Effort) to all four candidates, being explicit and honest about confidence levels given the evidence described for each.
 2. Using the Prioritization Integrity Checklist, identify which candidate is most at risk of receiving an inflated confidence score if scored dishonestly, and explain why.
-3. Apply MoSCoW instead of RICE to these same four candidates, and compare the resulting categorization to your RICE ranking — do the two methods suggest the same priorities, or do they diverge?
+3. Apply MoSCoW instead of RICE to these same four candidates, and compare the resulting categorization to your RICE ranking do the two methods suggest the same priorities, or do they diverge?
 4. Consider the "eating the frog" question specifically for candidate #4 (the recommendation algorithm redesign): what context-specific factors would make tackling it first versus deferring it the more defensible choice?
 5. Using the Prioritization Synthesis Funnel, explicitly name which of this curriculum's earlier tools (severity/frequency, opportunity sizing, strategic fit) you drew on for each of your four scoring decisions.
 
@@ -561,7 +561,7 @@ D) Completing every Must have item before any single Should have item begins
 
 ---
 
-**9. (Scenario) A team scores four candidates using RICE, and one candidate — backed only by a single, vivid customer story with no further validation — receives a high Confidence score simply because the story was compelling. What is the issue with this scoring decision, according to this lesson?**
+**9. (Scenario) A team scores four candidates using RICE, and one candidate backed only by a single, vivid customer story with no further validation receives a high Confidence score simply because the story was compelling. What is the issue with this scoring decision, according to this lesson?**
 A) No issue; a compelling story warrants a high confidence score
 B) Confidence should sit at exactly 50% whatever the evidence base
 C) It reintroduces the vivid-but-rare pattern under a numeric disguise
@@ -656,9 +656,9 @@ D) Present the results, ladder the new context, reassess
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 28 — Information Architecture | Closes out the design-specific lessons that this formal prioritization framework must now weigh alongside research and strategic considerations |
-| **Current Lesson** | Lesson 29 — Prioritization Fundamentals | RICE; MoSCoW; eating the frog vs. easy wins; prioritization theater; synthesis of earlier scoped tools |
-| **Next Lesson** | Lesson 30 — Design Thinking (closing Module 3) | Provides a broader, human-centered design methodology that this lesson's prioritization discipline operates within |
+| **Previous Lesson** | Lesson 28 Information Architecture | Closes out the design-specific lessons that this formal prioritization framework must now weigh alongside research and strategic considerations |
+| **Current Lesson** | Lesson 29 Prioritization Fundamentals | RICE; MoSCoW; eating the frog vs. easy wins; prioritization theater; synthesis of earlier scoped tools |
+| **Next Lesson** | Lesson 30 Design Thinking (closing Module 3) | Provides a broader, human-centered design methodology that this lesson's prioritization discipline operates within |
 | **Future Concepts Unlocked** | Lesson 34 (Sprint Planning & Backlog Grooming) | Uses RICE/MoSCoW-scored priorities as direct input into sprint-level planning and commitment |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "prioritizing the backlog" assumes the Prioritization Integrity Checklist and honest, consistent scoring discipline covered here — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "prioritizing the backlog" assumes the Prioritization Integrity Checklist and honest, consistent scoring discipline covered here this will not be re-explained, only re-applied.

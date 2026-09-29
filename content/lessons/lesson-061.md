@@ -4,11 +4,11 @@
 
 Lesson 60 closed the foundational arc of this curriculum by asking you to consolidate everything into a personal product philosophy. That philosophy was built almost entirely around a single mental image: one team, one product, one set of users. Module 7 breaks that image apart.
 
-Most PMs spend their first several years working on what this lesson will call a **feature product** — a bounded set of capabilities serving a definable user, shipped by a single team you can name. But as products succeed, they tend to stop being feature products and start becoming **platforms**: systems whose value comes not from what the core team builds directly, but from what *other* teams, companies, and developers build on top of them. Amazon's retail storefront is a feature product. Amazon Web Services is a platform. Slack's messaging interface is a feature product. The Slack App Directory, built by thousands of external developers, is a platform layered on top of it.
+Most PMs spend their first several years working on what this lesson will call a **feature product** a bounded set of capabilities serving a definable user, shipped by a single team you can name. But as products succeed, they tend to stop being feature products and start becoming **platforms**: systems whose value comes not from what the core team builds directly, but from what *other* teams, companies, and developers build on top of them. Amazon's retail storefront is a feature product. Amazon Web Services is a platform. Slack's messaging interface is a feature product. The Slack App Directory, built by thousands of external developers, is a platform layered on top of it.
 
-This distinction matters because platform PMs are evaluated on a different axis than feature PMs. A feature PM asks, "did our product make the right decision for our users?" A platform PM must ask a second, harder question: "did our product make it possible — and worthwhile — for *someone else* to make good decisions on top of us?" Get this wrong, and you can ship a technically excellent platform that no one builds on, which is a failure mode invisible to every metric you learned about in Module 5, because usage of the platform by external builders doesn't show up in your own product's engagement dashboards at all.
+This distinction matters because platform PMs are evaluated on a different axis than feature PMs. A feature PM asks, "did our product make the right decision for our users?" A platform PM must ask a second, harder question: "did our product make it possible and worthwhile for *someone else* to make good decisions on top of us?" Get this wrong, and you can ship a technically excellent platform that no one builds on, which is a failure mode invisible to every metric you learned about in Module 5, because usage of the platform by external builders doesn't show up in your own product's engagement dashboards at all.
 
-This lesson introduces the vocabulary, diagnostic questions, and a new mental model — the Leverage Stack — that you will use throughout Module 7 to reason about products that succeed by empowering others rather than by directly serving an end user.
+This lesson introduces the vocabulary, diagnostic questions, and a new mental model the Leverage Stack that you will use throughout Module 7 to reason about products that succeed by empowering others rather than by directly serving an end user.
 
 ---
 
@@ -16,13 +16,13 @@ This lesson introduces the vocabulary, diagnostic questions, and a new mental mo
 
 | Field | Detail |
 |---|---|
-| **Module** | 7 — Platform, Technical & Data-Intensive Product Management |
+| **Module** | 7 Platform, Technical & Data-Intensive Product Management |
 | **Current Lesson** | 61 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (Accountability Triangle, Output vs. Outcome), Lesson 46 (Growth Loops and K-factor), Lesson 60 (Product Philosophy synthesis) |
-| **Next Lesson** | Lesson 62 — APIs as Products: Designing for Developers |
-| **Future Topics Unlocked** | Lesson 62 (APIs as Products), Lesson 63 (Two-Sided Marketplaces), Lesson 67 (Platform Governance), Lesson 78 (Build, Buy, or Partner) — all depend on the feature-product/platform distinction and the Leverage Stack introduced here |
+| **Next Lesson** | Lesson 62 APIs as Products: Designing for Developers |
+| **Future Topics Unlocked** | Lesson 62 (APIs as Products), Lesson 63 (Two-Sided Marketplaces), Lesson 67 (Platform Governance), Lesson 78 (Build, Buy, or Partner) all depend on the feature-product/platform distinction and the Leverage Stack introduced here |
 
 ---
 
@@ -40,7 +40,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes you carry forward the Accountability Triangle and Output vs. Outcome distinction from Lesson 1, and the growth loop vocabulary (in particular, the K-factor and the idea that growth can be structurally embedded in a product rather than bolted on) from Lesson 46. It also assumes the closing synthesis from Lesson 60 — that you have already articulated your own view of what a PM is accountable for — since this lesson is going to complicate that view by adding a second class of "user" you are accountable to: the builder.
+This lesson assumes you carry forward the Accountability Triangle and Output vs. Outcome distinction from Lesson 1, and the growth loop vocabulary (in particular, the K-factor and the idea that growth can be structurally embedded in a product rather than bolted on) from Lesson 46. It also assumes the closing synthesis from Lesson 60 that you have already articulated your own view of what a PM is accountable for since this lesson is going to complicate that view by adding a second class of "user" you are accountable to: the builder.
 
 ---
 
@@ -53,7 +53,7 @@ A useful diagnostic, sometimes called the **"who creates the value" test**: when
 - If the answer is almost always "our own team," you are managing a **feature product**.
 - If the answer is increasingly "a third party we don't employ, using tools we built," you are managing a **platform**.
 
-Most successful products migrate from the first category toward the second over time, not because platforms are inherently superior, but because a platform's value can scale without the core team's headcount scaling in proportion. A feature team of thirty engineers can ship a great note-taking app. It cannot, by itself, build ten thousand integrations connecting that note-taking app to every calendar, CRM, and messaging tool on earth. A platform can — by making those ten thousand integrations worthwhile for people who don't work for the company to build.
+Most successful products migrate from the first category toward the second over time, not because platforms are inherently superior, but because a platform's value can scale without the core team's headcount scaling in proportion. A feature team of thirty engineers can ship a great note-taking app. It cannot, by itself, build ten thousand integrations connecting that note-taking app to every calendar, CRM, and messaging tool on earth. A platform can by making those ten thousand integrations worthwhile for people who don't work for the company to build.
 
 ### The Leverage Stack
 
@@ -96,13 +96,13 @@ graph TD
     C --> D[Layer 1: Core Product<br/>The thing your own team ships directly]
 ```
 
-Each layer depends on the one below it, and a weakness at a lower layer caps everything above it. If your Developer Surface (Layer 2) is unreliable — APIs that change without notice, documentation that lags behind reality — no amount of investment in Marketplace discovery (Layer 3) will produce a thriving Ecosystem (Layer 4), because builders will not invest their own time and reputation on a foundation they don't trust.
+Each layer depends on the one below it, and a weakness at a lower layer caps everything above it. If your Developer Surface (Layer 2) is unreliable APIs that change without notice, documentation that lags behind reality no amount of investment in Marketplace discovery (Layer 3) will produce a thriving Ecosystem (Layer 4), because builders will not invest their own time and reputation on a foundation they don't trust.
 
-The Leverage Stack is useful precisely because it forces you to locate a proposed initiative. "Should we build a plugin marketplace?" is a Layer 3 question that presupposes a healthy Layer 2. Teams frequently skip straight to Layer 3 or 4 investments — public marketplaces, developer conferences, partner co-marketing — while Layer 2 is still brittle, and then wonder why adoption stalls. We will return to this exact failure pattern in the Case Study below.
+The Leverage Stack is useful precisely because it forces you to locate a proposed initiative. "Should we build a plugin marketplace?" is a Layer 3 question that presupposes a healthy Layer 2. Teams frequently skip straight to Layer 3 or 4 investments public marketplaces, developer conferences, partner co-marketing while Layer 2 is still brittle, and then wonder why adoption stalls. We will return to this exact failure pattern in the Case Study below.
 
 ### Direct, Indirect, and Platform Network Effects
 
-Lesson 46 introduced growth loops and the K-factor for user-to-user virality. Platforms introduce a related but distinct phenomenon: **network effects across two different populations** — builders and end users — where growth in one population increases the value of the platform for the other.
+Lesson 46 introduced growth loops and the K-factor for user-to-user virality. Platforms introduce a related but distinct phenomenon: **network effects across two different populations** builders and end users where growth in one population increases the value of the platform for the other.
 
 ```mermaid
 %%{init: {
@@ -140,11 +140,11 @@ graph LR
     B -->|more integrations, apps, content| U
 ```
 
-This loop, sometimes called a **cross-side network effect**, is the structural engine behind platforms like app stores, marketplaces, and developer ecosystems: more shoppers attract more sellers, and more sellers (with more selection) attract more shoppers. Note that this loop can also run in reverse and collapse just as powerfully — a platform that loses end users gives builders a reason to leave, which then gives remaining users a reason to leave too. Platform PMs must monitor both sides of this loop, not just the side closest to their own team's traditional metrics.
+This loop, sometimes called a **cross-side network effect**, is the structural engine behind platforms like app stores, marketplaces, and developer ecosystems: more shoppers attract more sellers, and more sellers (with more selection) attract more shoppers. Note that this loop can also run in reverse and collapse just as powerfully a platform that loses end users gives builders a reason to leave, which then gives remaining users a reason to leave too. Platform PMs must monitor both sides of this loop, not just the side closest to their own team's traditional metrics.
 
 ### Platform Value Capture: The Take-Rate Question
 
-A platform must eventually answer how it captures value from the ecosystem it enables — typically through a **take rate** (a percentage of transactions, as with app store commissions or marketplace fees), a **subscription or usage fee** for developer access (as with many API-first companies), or an **indirect capture** strategy where the platform is monetized elsewhere and the developer surface is offered as a retention or distribution mechanism rather than a direct revenue line. Choosing the wrong capture mechanism, or setting a take rate that developers perceive as extractive relative to the value they receive, is one of the most common causes of ecosystem stagnation, and is a topic this curriculum returns to in Lesson 79 (Pricing Strategy at Scale).
+A platform must eventually answer how it captures value from the ecosystem it enables typically through a **take rate** (a percentage of transactions, as with app store commissions or marketplace fees), a **subscription or usage fee** for developer access (as with many API-first companies), or an **indirect capture** strategy where the platform is monetized elsewhere and the developer surface is offered as a retention or distribution mechanism rather than a direct revenue line. Choosing the wrong capture mechanism, or setting a take rate that developers perceive as extractive relative to the value they receive, is one of the most common causes of ecosystem stagnation, and is a topic this curriculum returns to in Lesson 79 (Pricing Strategy at Scale).
 
 ---
 
@@ -164,11 +164,11 @@ A platform can show healthy end-user engagement metrics for a long time after it
 
 **Mistake 4: Underestimating the cost of a breaking API change**
 
-A change that costs the internal team one sprint to make can cost the entire external developer ecosystem months of collective work to adapt to, multiplied across every integration — a cost that does not appear on the internal team's own roadmap.
+A change that costs the internal team one sprint to make can cost the entire external developer ecosystem months of collective work to adapt to, multiplied across every integration a cost that does not appear on the internal team's own roadmap.
 
 **Mistake 5: Assuming platform success is a scaled-up version of feature success**
 
-The skills that make someone excellent at shipping features that delight end users directly (fast iteration, frequent visible change, tight internal feedback loops) are not the same skills that make a platform trustworthy to build upon (stability, advance notice, backward compatibility) — and a team can be excellent at one while actively undermining the other.
+The skills that make someone excellent at shipping features that delight end users directly (fast iteration, frequent visible change, tight internal feedback loops) are not the same skills that make a platform trustworthy to build upon (stability, advance notice, backward compatibility) and a team can be excellent at one while actively undermining the other.
 
 ---
 
@@ -177,7 +177,7 @@ The skills that make someone excellent at shipping features that delight end use
 
 The Leverage Stack introduced in the Theory section above is this lesson's core takeaway tool. Use it any time you evaluate a platform initiative, by asking three questions in order:
 
-1. **Which layer does this initiative actually target** — Core Product, Developer Surface, Marketplace, or Ecosystem?
+1. **Which layer does this initiative actually target** Core Product, Developer Surface, Marketplace, or Ecosystem?
 2. **Is the layer immediately below it healthy enough to support it?** An initiative targeting Layer 3 or 4 with a shaky Layer 2 underneath is premature, regardless of how compelling it looks in isolation.
 3. **What does this initiative do to the cross-side network effect?** Does it make the platform more attractive to builders (which should, in turn, make it more attractive to end users), or does it only address end users directly, leaving the builder side untouched?
 
@@ -187,9 +187,9 @@ A team that can answer all three questions before greenlighting a platform initi
 
 ## Real Company Example
 
-Shopify's evolution from an online storefront builder into a commerce platform illustrates the Leverage Stack clearly. Shopify's Core Product (Layer 1) is the storefront and checkout experience a merchant uses directly. Its Developer Surface (Layer 2) — the Shopify APIs, the Liquid templating language, and the App Bridge SDK — allows outside developers to extend that storefront. Its Marketplace (Layer 3), the Shopify App Store, gives those developers discovery and monetization. Its Ecosystem (Layer 4) is the resulting universe of independent app-development businesses, theme designers, and agencies that now make a living entirely on top of Shopify's platform, in many cases without Shopify itself ever directly employing or directing them.
+Shopify's evolution from an online storefront builder into a commerce platform illustrates the Leverage Stack clearly. Shopify's Core Product (Layer 1) is the storefront and checkout experience a merchant uses directly. Its Developer Surface (Layer 2) the Shopify APIs, the Liquid templating language, and the App Bridge SDK allows outside developers to extend that storefront. Its Marketplace (Layer 3), the Shopify App Store, gives those developers discovery and monetization. Its Ecosystem (Layer 4) is the resulting universe of independent app-development businesses, theme designers, and agencies that now make a living entirely on top of Shopify's platform, in many cases without Shopify itself ever directly employing or directing them.
 
-Public reporting on Shopify's app ecosystem suggests the company has invested heavily in developer-facing stability commitments — versioned APIs with defined deprecation timelines — specifically because merchants' trust in their storefronts depends on third-party apps continuing to function reliably over time. This is a direct illustration of the Layer 2 dependency point above: Shopify's Layer 3 marketplace could not thrive if Layer 2 were unstable, because every app in that marketplace is a promise made to a merchant on Shopify's behalf.
+Public reporting on Shopify's app ecosystem suggests the company has invested heavily in developer-facing stability commitments versioned APIs with defined deprecation timelines specifically because merchants' trust in their storefronts depends on third-party apps continuing to function reliably over time. This is a direct illustration of the Layer 2 dependency point above: Shopify's Layer 3 marketplace could not thrive if Layer 2 were unstable, because every app in that marketplace is a promise made to a merchant on Shopify's behalf.
 
 **Assumption flagged:** the specifics of Shopify's internal API governance and developer-relations strategy described here are inferred from public developer documentation and industry reporting, not confirmed internal company statements, and should be treated as illustrative rather than verified fact.
 
@@ -197,25 +197,25 @@ Public reporting on Shopify's app ecosystem suggests the company has invested he
 
 ## Real World Perspective: Platform Thinking: Products, Platforms, and Ecosystems at Different Company Stages
 
-**Startup:** Most startups never need to think about the Leverage Stack, because they are, correctly, entirely focused on Layer 1 — proving a feature product works for a well-defined set of end users. Premature platform thinking at this stage (building a public API before product-market fit) is a common and expensive form of scope creep; the Build Trap referenced in Lesson 1 has a platform-specific variant where "let's make it extensible" substitutes for the harder work of nailing the core experience first.
+**Startup:** Most startups never need to think about the Leverage Stack, because they are, correctly, entirely focused on Layer 1 proving a feature product works for a well-defined set of end users. Premature platform thinking at this stage (building a public API before product-market fit) is a common and expensive form of scope creep; the Build Trap referenced in Lesson 1 has a platform-specific variant where "let's make it extensible" substitutes for the harder work of nailing the core experience first.
 
-**Mid-size company:** This is typically where the feature-to-platform transition actually happens, often driven by a handful of large customers or partners requesting integrations the core team can't build individually. The PM's job at this stage is to resist building one-off custom integrations for each requester (which does not scale) and instead invest in a general-purpose Layer 2 developer surface that could serve all of them — a decision that trades short-term speed for long-term leverage.
+**Mid-size company:** This is typically where the feature-to-platform transition actually happens, often driven by a handful of large customers or partners requesting integrations the core team can't build individually. The PM's job at this stage is to resist building one-off custom integrations for each requester (which does not scale) and instead invest in a general-purpose Layer 2 developer surface that could serve all of them a decision that trades short-term speed for long-term leverage.
 
-**Big Tech:** Large, mature platforms (app stores, cloud infrastructure providers, major API ecosystems) operate with dedicated platform PM organizations whose primary customer is the external developer, not the end user. These PMs are frequently measured on metrics like third-party integration counts, developer satisfaction surveys, and API reliability SLAs rather than the end-user engagement metrics that dominate Module 5 — a genuinely different accountability structure from the one most PMs are trained on.
+**Big Tech:** Large, mature platforms (app stores, cloud infrastructure providers, major API ecosystems) operate with dedicated platform PM organizations whose primary customer is the external developer, not the end user. These PMs are frequently measured on metrics like third-party integration counts, developer satisfaction surveys, and API reliability SLAs rather than the end-user engagement metrics that dominate Module 5 a genuinely different accountability structure from the one most PMs are trained on.
 
 ---
 
 ## Detailed Case Study: The Premature Marketplace
 
-A mid-size project-management SaaS company, having grown to several thousand business customers, noticed that its largest customers kept requesting custom integrations with their internal tools. Leadership, eager to reduce this one-off integration burden and to signal ambition to investors, greenlit a public "App Marketplace" initiative — a Layer 3 investment, complete with a public directory, revenue-sharing terms for third-party developers, and a splashy launch event.
+A mid-size project-management SaaS company, having grown to several thousand business customers, noticed that its largest customers kept requesting custom integrations with their internal tools. Leadership, eager to reduce this one-off integration burden and to signal ambition to investors, greenlit a public "App Marketplace" initiative a Layer 3 investment, complete with a public directory, revenue-sharing terms for third-party developers, and a splashy launch event.
 
 The problem: the company's underlying API (Layer 2) had been built organically over several years, without a formal versioning policy, and was already changing in breaking ways roughly every quarter as the core product evolved. The handful of internal engineers who understood the API's undocumented quirks had, until then, been the only people building against it, and they simply adapted their own code whenever something broke.
 
-Within two quarters of the Marketplace launch, several of the earliest third-party developers who had built apps for the new directory found their integrations breaking without warning, with no changelog or deprecation notice to explain why. Two vocal early partners published public complaints about the experience. New developer sign-ups for the Marketplace slowed sharply, and — most damaging — the cross-side network effect began running in reverse: fewer working apps in the directory made the Marketplace less useful to end customers, which reduced the incentive for any *new* developer to invest the time to build there.
+Within two quarters of the Marketplace launch, several of the earliest third-party developers who had built apps for the new directory found their integrations breaking without warning, with no changelog or deprecation notice to explain why. Two vocal early partners published public complaints about the experience. New developer sign-ups for the Marketplace slowed sharply, and most damaging the cross-side network effect began running in reverse: fewer working apps in the directory made the Marketplace less useful to end customers, which reduced the incentive for any *new* developer to invest the time to build there.
 
-**What went wrong?** Using the Leverage Stack, the failure is precise: leadership invested directly in Layer 3 (the public Marketplace) while Layer 2 (the Developer Surface) was still unstable and undocumented. No amount of Marketplace polish — the directory design, the revenue-sharing terms, the launch event — could compensate for an API that broke trust every quarter. The company had, in effect, built a storefront on top of a foundation it hadn't finished pouring.
+**What went wrong?** Using the Leverage Stack, the failure is precise: leadership invested directly in Layer 3 (the public Marketplace) while Layer 2 (the Developer Surface) was still unstable and undocumented. No amount of Marketplace polish the directory design, the revenue-sharing terms, the launch event could compensate for an API that broke trust every quarter. The company had, in effect, built a storefront on top of a foundation it hadn't finished pouring.
 
-The company's eventual recovery involved freezing the public Marketplace, investing six months in Layer 2 fundamentals (a formal versioning scheme, a published deprecation policy, and a stable API gateway), and only then relaunching Marketplace recruitment — a sequencing lesson directly foreshadowing the API-design discipline covered in Lesson 62.
+The company's eventual recovery involved freezing the public Marketplace, investing six months in Layer 2 fundamentals (a formal versioning scheme, a published deprecation policy, and a stable API gateway), and only then relaunching Marketplace recruitment a sequencing lesson directly foreshadowing the API-design discipline covered in Lesson 62.
 
 ---
 
@@ -239,7 +239,7 @@ A "no" on more than one or two of these criteria is a strong signal that Layer 3
 
 **"Tell me about a product you'd consider a platform, and explain why."** The interviewer is evaluating whether you can apply the "who creates the value" test correctly, rather than simply labeling any large or successful product a "platform" without justification.
 
-**"How would you decide whether to invest in a public API for our product?"** The interviewer is testing whether you reach for the Leverage Stack's sequencing logic — assessing Layer 2 readiness before recommending Layer 3 or 4 investment — rather than jumping straight to enthusiasm about ecosystem potential.
+**"How would you decide whether to invest in a public API for our product?"** The interviewer is testing whether you reach for the Leverage Stack's sequencing logic assessing Layer 2 readiness before recommending Layer 3 or 4 investment rather than jumping straight to enthusiasm about ecosystem potential.
 
 **"A major partner is threatening to abandon their integration with our platform because of an unannounced breaking change. How do you respond?"** The interviewer is looking for recognition that the underlying issue is a Layer 2 trust failure, and that the appropriate response addresses the systemic cause (missing versioning and deprecation discipline) rather than only patching the individual relationship.
 
@@ -247,7 +247,7 @@ A "no" on more than one or two of these criteria is a strong signal that Layer 3
 
 ## Summary
 
-Platform products differ from feature products in a fundamental way: their value increasingly comes from what third-party builders create, not from what the core team ships directly, which means platform PMs are accountable to a second population — developers and partners — whose needs (stability, predictability, advance notice) are frequently in tension with the needs of end users (novelty, frequent visible change). The Leverage Stack organizes platform investment into four layers — Core Product, Developer Surface, Marketplace, and Ecosystem — each dependent on the one beneath it, meaning that visible, ecosystem-facing investments will fail if the underlying Developer Surface is not yet trustworthy. Cross-side network effects, where growth in the builder population and the end-user population reinforce each other, are the structural engine of successful platforms, but this same loop can collapse in reverse with surprising speed once trust is broken. A platform PM's first responsibility, before any marketplace or ecosystem ambition, is to ensure the layer directly beneath any new initiative is genuinely ready to support it.
+Platform products differ from feature products in a fundamental way: their value increasingly comes from what third-party builders create, not from what the core team ships directly, which means platform PMs are accountable to a second population developers and partners whose needs (stability, predictability, advance notice) are frequently in tension with the needs of end users (novelty, frequent visible change). The Leverage Stack organizes platform investment into four layers Core Product, Developer Surface, Marketplace, and Ecosystem each dependent on the one beneath it, meaning that visible, ecosystem-facing investments will fail if the underlying Developer Surface is not yet trustworthy. Cross-side network effects, where growth in the builder population and the end-user population reinforce each other, are the structural engine of successful platforms, but this same loop can collapse in reverse with surprising speed once trust is broken. A platform PM's first responsibility, before any marketplace or ecosystem ambition, is to ensure the layer directly beneath any new initiative is genuinely ready to support it.
 
 ---
 
@@ -270,7 +270,7 @@ Platform products differ from feature products in a fundamental way: their value
 - Feature product: value from your team. Platform: value from others building on you.
 - Leverage Stack order: Core Product → Developer Surface → Marketplace → Ecosystem.
 - Never invest heavily in Layer 3/4 until Layer 2 passes the Platform Readiness Checklist.
-- Watch both sides of the cross-side network effect — builders and end users — not just end-user metrics.
+- Watch both sides of the cross-side network effect builders and end users not just end-user metrics.
 - A broken API change costs the ecosystem far more than it costs your own sprint.
 
 ---
@@ -301,7 +301,7 @@ Platform products differ from feature products in a fundamental way: their value
 
 **Card 1**
 - Front: What is the "who creates the value" test?
-- Back: Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).
+- Back: Ask who built the thing that made a user's experience good your own team (feature product) or a third party using your tools (platform).
 - Difficulty: 2
 - Tags: platform-thinking, diagnostic
 
@@ -346,7 +346,7 @@ Platform products differ from feature products in a fundamental way: their value
 
 You are the PM for a well-established consumer photo-editing app with a loyal user base. Your VP of Business Development has just signed a partnership with three well-known third-party developers who want to build plugins on top of your product, and has promised them API access within one quarter. Your engineering team tells you the current internal API was never designed for external use, has no versioning, and changes almost every release cycle to support the core product's own roadmap.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Leverage Stack and the Platform Readiness Checklist under real business pressure.
+There is no single correct answer to the prompts below the goal is to practice applying the Leverage Stack and the Platform Readiness Checklist under real business pressure.
 
 1. Using the Leverage Stack, identify exactly which layer the VP's commitment targets, and which layer(s) beneath it need to be assessed first.
 2. Run the situation through the Platform Readiness Checklist. Which criteria are most likely to fail, given what engineering has told you?
@@ -365,7 +365,7 @@ C) Whether a product qualifies for open-source licensing
 D) Whether a product is a feature product or a platform
 
 *Correct answer: D*
-*Explanation: The test asks who built the thing responsible for a good user experience — your own team, or a third party — to classify the product.*
+*Explanation: The test asks who built the thing responsible for a good user experience your own team, or a third party to classify the product.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -456,7 +456,7 @@ C) Whether a company is financially ready to pursue an IPO
 D) Whether a specific end-user feature deserves roadmap priority
 
 *Correct answer: B*
-*Explanation: The checklist evaluates versioning, deprecation notice, documentation currency, reliability SLA, and support channels — all Layer 2 concerns.*
+*Explanation: The checklist evaluates versioning, deprecation notice, documentation currency, reliability SLA, and support channels all Layer 2 concerns.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
@@ -534,7 +534,7 @@ C) That the candidate should, on this answer alone, be hired immediately
 D) Nothing meaningful; ecosystem vision is the only relevant factor
 
 *Correct answer: A*
-*Explanation: The Interview Perspective section identifies this exact gap — enthusiasm about ecosystem potential without Layer 2 readiness assessment — as a weak signal.*
+*Explanation: The Interview Perspective section identifies this exact gap enthusiasm about ecosystem potential without Layer 2 readiness assessment as a weak signal.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
@@ -557,9 +557,9 @@ D) Immediately launch a public Marketplace to satisfy the partners' urgency
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 60 — Capstone: Building Your Own Product Philosophy | Extends your personal PM accountability model to include a second population: external builders |
-| **Current Lesson** | Lesson 61 — Platform Thinking: Products, Platforms, and Ecosystems | Feature product vs. platform; the Leverage Stack; cross-side network effects; Platform Readiness Checklist |
-| **Next Lesson** | Lesson 62 — APIs as Products: Designing for Developers | Deep-dives into Layer 2 of the Leverage Stack, formalizing what "API stability" concretely requires |
+| **Previous Lesson** | Lesson 60 Capstone: Building Your Own Product Philosophy | Extends your personal PM accountability model to include a second population: external builders |
+| **Current Lesson** | Lesson 61 Platform Thinking: Products, Platforms, and Ecosystems | Feature product vs. platform; the Leverage Stack; cross-side network effects; Platform Readiness Checklist |
+| **Next Lesson** | Lesson 62 APIs as Products: Designing for Developers | Deep-dives into Layer 2 of the Leverage Stack, formalizing what "API stability" concretely requires |
 | **Future Concepts Unlocked** | Lesson 63 (Two-Sided Marketplaces) | Extends cross-side network effects into a full marketplace-design framework |
 | | Lesson 67 (Platform Governance) | Addresses what happens when Ecosystem-layer activity (Layer 4) requires trust and safety enforcement |
 | | Lesson 78 (Build, Buy, or Partner) | Revisits the Leverage Stack when deciding whether to build platform capability internally or rely on external partners |

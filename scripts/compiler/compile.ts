@@ -41,7 +41,7 @@ const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '14';
+const CACHE_VERSION = '15';
 
 interface CacheManifest {
   version: string;
@@ -453,10 +453,10 @@ export async function compileLesson(
       if (listNode) {
         for (const item of listNode.children || []) {
           const rawText = toMarkdown(item).trim();
-          // Resource link matches: - [Title](URL) — note
+          // Resource link matches: - [Title](URL) - note
           const parts = rawText.split(/\s*[-—]\s*/);
           const citation = parts[0].trim();
-          const note = parts.slice(1).join(' — ').trim();
+          const note = parts.slice(1).join(' - ').trim();
           items.push({
             citation,
             note: note.length > 0 ? note : undefined,
