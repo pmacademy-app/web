@@ -56,6 +56,7 @@ export async function sendEmail({
   preferProvider,
   isCritical,
   checkSuppression,
+  idempotencyKey,
 }: {
   to: string
   subject: string
@@ -84,6 +85,12 @@ export async function sendEmail({
    * Optional flag to enforce suppression check directly on raw transport.
    */
   checkSuppression?: boolean
+  /**
+   * Stable logical identity of the message. Forwarded to the provider transport for
+   * idempotent same-provider retries, and — together with `isCritical` — it drives the
+   * ambiguous-timeout failover policy in `sendEmailWithFailover`.
+   */
+  idempotencyKey?: string
 }): Promise<SendEmailResult> {
   const fromEmail = customFromEmail || getFromEmail()
 
@@ -164,6 +171,10 @@ export async function sendEmail({
         replyTo,
       },
       operation: 'email.direct_send',
+      // A direct send flagged critical (auth mail via the governed gateway) prefers
+      // delivery over avoiding a rare duplicate on an ambiguous timeout.
+      criticality: isCritical ? 'critical' : 'standard',
+      idempotencyKey,
     },
     globalProviderRegistry,
     preferProvider

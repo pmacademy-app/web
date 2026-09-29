@@ -45,8 +45,29 @@ export interface ClassifiedAuthError {
   requiresAction?: 'verify_email' | 'login' | 'reset_password' | 'wait'
   /** Sanitized error name or original code for internal diagnostic logging (never rendered to UI). */
   rawCode?: string
+  /**
+   * Masked, length-capped snippet of the underlying error message, set ONLY for the
+   * unclassified `AUTH_UNKNOWN_ERROR` fallback. Historic telemetry stored just
+   * `rawCode: 'unknown_error'`, so those incidents could never be root-caused. Emails
+   * are masked here; the telemetry endpoint redacts it again before persistence. Never
+   * rendered to the UI.
+   */
+  rawMessage?: string
   /** Support correlation id returned by the API for an unexpected server failure. */
   errorId?: string
+}
+
+/**
+ * Client-safe pre-mask for a diagnostic message snippet: strips email addresses and
+ * long digit runs before it leaves the browser, and caps the length. The server
+ * applies the full redaction pass on top of this.
+ */
+function maskDiagnosticMessage(raw: string): string {
+  return raw
+    .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, '{email}')
+    .replace(/\b\d{5,}\b/g, '{n}')
+    .slice(0, 300)
+    .trim()
 }
 
 /**
@@ -345,12 +366,19 @@ export function classifyAuthError(
   }
 
   // 11. Unknown / Unclassified error fallback
+  //
+  // This is the branch that produced every historic `AUTH_UNKNOWN_ERROR` with an
+  // opaque `rawCode: 'unknown_error'` and nothing else to go on. Capture a masked
+  // snippet of the actual message so the NEXT occurrence is diagnosable instead of
+  // being another anonymous "unknown".
+  const unknownRawMessage = maskDiagnosticMessage(extractErrorMessage(error))
   return {
     code: 'AUTH_UNKNOWN_ERROR',
     message: 'An unexpected authentication error occurred. Please try again.',
     retryable: true,
     isNetworkError: false,
     rawCode: rawCode || 'unknown_error',
+    rawMessage: unknownRawMessage || undefined,
   }
 }
 

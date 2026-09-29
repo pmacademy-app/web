@@ -86,12 +86,21 @@ export class ResendProvider implements NotificationProvider {
         bodyPayload.reply_to = payload.variables.replyTo
       }
 
+      const requestHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      }
+      // Resend supports an idempotency key: a retry carrying the same key returns the
+      // original result instead of sending again. This makes a SAME-provider retry
+      // (e.g. the queue re-dispatching an item, or a failover that started on Resend)
+      // safe against duplicates. It does NOT dedup across providers.
+      if (payload.idempotencyKey) {
+        requestHeaders['Idempotency-Key'] = payload.idempotencyKey
+      }
+
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: requestHeaders,
         body: JSON.stringify(bodyPayload),
         signal: AbortSignal.timeout(EMAIL_HTTP_TIMEOUT_MS),
       })
@@ -198,6 +207,9 @@ export class ResendProvider implements NotificationProvider {
         // No HTTP response was produced. Timeout -> 504, other network faults -> 503,
         // matching the convention in `lib/email.ts` so both stacks classify alike.
         statusCode: isTimeout ? 504 : 503,
+        // A timeout may have been accepted by Resend before the client aborted; a
+        // DNS/refused failure never reached it. Only the timeout is ambiguous.
+        deliveryUncertain: isTimeout,
         timestamp: new Date().toISOString(),
       }
     }

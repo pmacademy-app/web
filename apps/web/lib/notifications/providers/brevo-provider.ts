@@ -193,6 +193,10 @@ export class BrevoProvider implements NotificationProvider {
         providerName: this.name,
         error: friendlyMsg,
         statusCode: isTimeout ? 504 : 503,
+        // A timeout means the POST was sent but no response came back — Brevo may have
+        // accepted the message. A DNS/refused failure means the request never left, so
+        // it is safe to fail over. Only the timeout is genuinely ambiguous.
+        deliveryUncertain: isTimeout,
         timestamp: new Date().toISOString(),
       }
     }

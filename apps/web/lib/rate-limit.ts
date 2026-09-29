@@ -2,6 +2,8 @@
  * Memory-efficient, sliding-window rate limiter utility for Next.js API Routes.
  */
 
+import { describeDbError } from '@/lib/monitoring/db-error'
+
 interface RateLimitEntry {
   count: number
   resetAt: number
@@ -23,6 +25,15 @@ if (typeof setInterval !== 'undefined') {
     gc.unref()
   }
 }
+
+/**
+ * One quick in-process retry before a fail-closed path gives up. A persistent-limiter
+ * outage is usually a sub-second Supabase blip; retrying once (rather than immediately
+ * rejecting) recovers the common transient case without weakening the security posture
+ * — a genuine outage still ends in a fail-closed rejection. Kept tiny on purpose so it
+ * never adds meaningful latency to a request that is going to be rejected anyway.
+ */
+const FAIL_CLOSED_RETRY_DELAY_MS = 120
 
 export interface RateLimitOptions {
   limit?: number
@@ -112,7 +123,10 @@ export async function evaluatePersistentRateLimit(
     return evaluateInMemoryRateLimit(key, { limit, windowMs })
   }
 
-  try {
+  // One evaluation against the persistent limiter. Throws on any outage (DB error,
+  // missing migration, misshaped result) so the caller can decide fail-open vs
+  // fail-closed uniformly.
+  const attempt = async (): Promise<{ success: boolean; remaining: number; resetInMs: number }> => {
     const { createServiceRoleClient } = await import('@/lib/supabase')
     const supabase = createServiceRoleClient()
 
@@ -144,30 +158,44 @@ export async function evaluatePersistentRateLimit(
       remaining: Math.max(0, Number(row.remaining ?? 0)),
       resetInMs: Math.max(0, Number(row.reset_in_ms ?? windowMs)),
     }
-  } catch (err) {
+  }
+
+  try {
+    return await attempt()
+  } catch (firstErr) {
     if (options.failClosed) {
-      // Deliberately NOT falling back to the in-memory counter. On serverless that
-      // counter is per-instance and empty on every cold start, so for a path that can
-      // spend provider credit it is indistinguishable from having no limit.
-      console.error('[rate-limit] Persistent limiter unavailable on a fail-closed path — rejecting:', err)
+      // Security decision, unchanged: do NOT fall back to the in-memory counter. On
+      // serverless that counter is per-instance and empty on every cold start, so for a
+      // path that can spend provider credit it is indistinguishable from having no
+      // limit. Resilience is added WITHOUT weakening that: one quick retry absorbs a
+      // sub-second Supabase blip; a real outage still ends in a fail-closed rejection.
       try {
-        const { logErrorReport } = await import('@/lib/monitoring/logger')
-        void logErrorReport({
-          domain: 'db',
-          kind: 'db_unavailable',
-          operation: 'rate_limit.unavailable',
-          summary: 'Persistent rate limiter unavailable; fail-closed path rejected the request',
-          nextAction:
-            'Requests that can send email are being refused until the rate_limits table and consume_rate_limit RPC are reachable. Check Supabase availability and that the latest migration is applied.',
-          details: { detail: err instanceof Error ? err.message : String(err) },
-        })
-      } catch {
-        // Never let instrumentation change the limiter decision.
+        await new Promise((resolve) => setTimeout(resolve, FAIL_CLOSED_RETRY_DELAY_MS))
+        return await attempt()
+      } catch (retryErr) {
+        const described = describeDbError(retryErr)
+        console.error('[rate-limit] Persistent limiter unavailable on a fail-closed path — rejecting:', described.message)
+        try {
+          const { logErrorReport } = await import('@/lib/monitoring/logger')
+          void logErrorReport({
+            domain: 'db',
+            kind: 'db_unavailable',
+            operation: 'rate_limit.unavailable',
+            summary: 'Persistent rate limiter unavailable; fail-closed path rejected the request',
+            nextAction:
+              'Requests that can send email are being refused until the rate_limits table and consume_rate_limit RPC are reachable. Check Supabase availability and that the latest migration is applied.',
+            // Structured, redacted fields — never the bare "[object Object]" that a
+            // PostgREST rejection used to serialize to here.
+            details: { ...described, retriedOnce: true },
+          })
+        } catch {
+          // Never let instrumentation change the limiter decision.
+        }
+        return { success: false, remaining: 0, resetInMs: windowMs }
       }
-      return { success: false, remaining: 0, resetInMs: windowMs }
     }
 
-    console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', err)
+    console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', describeDbError(firstErr).message)
     return evaluateInMemoryRateLimit(key, { limit, windowMs })
   }
 }

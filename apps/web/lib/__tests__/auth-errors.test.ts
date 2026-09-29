@@ -223,4 +223,31 @@ describe('Phase 4 — Authentication Error Classification & Safety', () => {
       }
     })
   })
+
+  describe('AUTH_UNKNOWN_ERROR diagnosability (rawMessage capture)', () => {
+    it('captures a masked snippet of the underlying message for an unclassified error', () => {
+      const classified = classifyAuthError(new Error('Totally novel provider glitch #7788899'))
+
+      expect(classified.code).toBe('AUTH_UNKNOWN_ERROR')
+      expect(classified.rawMessage).toBeDefined()
+      expect(classified.rawMessage).toContain('Totally novel provider glitch')
+      // Long digit runs are masked before the snippet leaves the browser.
+      expect(classified.rawMessage).not.toContain('7788899')
+    })
+
+    it('masks email addresses out of the captured snippet', () => {
+      const classified = classifyAuthError(new Error('weird failure for learner@example.com'))
+
+      expect(classified.code).toBe('AUTH_UNKNOWN_ERROR')
+      expect(classified.rawMessage).toContain('{email}')
+      expect(classified.rawMessage).not.toContain('learner@example.com')
+    })
+
+    it('does NOT attach rawMessage to a well-classified error', () => {
+      const classified = classifyAuthError(new Error('Invalid login credentials'))
+
+      expect(classified.code).toBe('AUTH_INVALID_CREDENTIALS')
+      expect(classified.rawMessage).toBeUndefined()
+    })
+  })
 })

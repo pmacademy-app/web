@@ -209,10 +209,13 @@ describe('processEmailQueue — Brevo/Resend provider failover', () => {
   })
 
   /** Runs one queue item against the given provider responses and returns what happened. */
-  async function runOneItem(responses: { brevo?: ProviderResponse; resend?: ProviderResponse }) {
+  async function runOneItem(
+    responses: { brevo?: ProviderResponse; resend?: ProviderResponse },
+    rowOverrides: Partial<Record<string, unknown>> = {}
+  ) {
     const updates: Record<string, unknown>[] = []
     const fake = buildFakeSupabase({
-      claimedRows: [makeQueueRow()],
+      claimedRows: [makeQueueRow(rowOverrides)],
       onQueueUpdate: (p) => updates.push(p),
     })
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(fake)
@@ -255,10 +258,25 @@ describe('processEmailQueue — Brevo/Resend provider failover', () => {
       expect(result.delivered).toBe(1)
     })
 
-    it('Brevo timeout -> falls back to Resend and delivers', async () => {
-      const { result, calls } = await runOneItem({
+    // Ambiguous-timeout policy (split by criticality). Brevo may have accepted the
+    // message before the client timed out, and it has no idempotency key, so a standard
+    // queued message must NOT cross-fail-over on a timeout (the queue retries the same
+    // item instead). Critical auth mail prefers delivery and does fail over.
+    it('Brevo timeout on a STANDARD queued message -> does NOT fall back (retried, no duplicate)', async () => {
+      const { result, updates, calls } = await runOneItem({
         brevo: { ok: false, status: 0, throws: timeoutError() },
       })
+
+      expect(calls).toEqual(['brevo'])
+      expect(result.delivered).toBe(0)
+      expect(updates.some((u) => u.status === 'delivered')).toBe(false)
+    })
+
+    it('Brevo timeout on a CRITICAL queued message -> falls back to Resend and delivers', async () => {
+      const { result, calls } = await runOneItem(
+        { brevo: { ok: false, status: 0, throws: timeoutError() } },
+        { template_key: 'auth.password_reset' }
+      )
 
       expect(calls).toEqual(['brevo', 'resend'])
       expect(result.delivered).toBe(1)

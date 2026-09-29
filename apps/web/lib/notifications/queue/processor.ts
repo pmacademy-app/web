@@ -655,6 +655,14 @@ async function processSingleBatch(
       }
 
       // E. Dispatch through failover helper
+      //
+      // Criticality drives the ambiguous-timeout failover policy: auth verification and
+      // password-reset block the learner without the mail, so they prefer delivery and
+      // fail over even on a timeout. Every other queued template (welcome, achievement,
+      // recap, broadcast) prefers avoiding a duplicate — the queue retries the same
+      // item later instead. The idempotency key is stable across those retries so a
+      // Resend attempt cannot duplicate on retry.
+      const isCriticalTemplate = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
       const sendResult = await sendEmailWithFailover(
         {
           recipient: { userId, email: toEmail, name: toName },
@@ -667,6 +675,8 @@ async function processSingleBatch(
             html: renderedHtml,
             text: renderedText,
           },
+          criticality: isCriticalTemplate ? 'critical' : 'standard',
+          idempotencyKey: `queue:${queueId}`,
         },
         globalProviderRegistry
       )

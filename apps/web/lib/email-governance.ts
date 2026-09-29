@@ -419,6 +419,10 @@ export async function sendGovernedEmail(request: GovernedEmailRequest): Promise<
     fromEmail: request.fromEmail,
     replyTo: request.replyTo,
     preferProvider,
+    // Critical auth mail prefers delivery over avoiding a rare duplicate when a
+    // provider times out; the idempotency key keeps same-provider retries safe.
+    isCritical,
+    idempotencyKey,
   })
 
   if (!result.success) {

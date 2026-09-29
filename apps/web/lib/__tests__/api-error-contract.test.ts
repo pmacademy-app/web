@@ -12,6 +12,18 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Incident 2026-09-08/09: this suite feeds `apiInternalError` a synthetic Brevo
+// "Plan sending limit reached" cause to prove the message never leaks to the client.
+// `apiInternalError` also forwards that cause to `logErrorReport`, and when the suite
+// was run with the live-DB test flags set, two of those synthetic causes were written
+// into the production `system_errors` table and read back later as a real Brevo quota
+// alert. Mocking the logger here keeps this contract test hermetic: it can never reach
+// the real incident sink, whatever env flags a runner happens to carry.
+vi.mock('@/lib/monitoring/logger', () => ({
+  logErrorReport: vi.fn().mockResolvedValue('err_mocked'),
+  logSystemError: vi.fn().mockResolvedValue('err_mocked'),
+}))
+
 import {
   apiError,
   apiInternalError,
@@ -20,6 +32,7 @@ import {
   GENERIC_SERVER_ERROR_MESSAGE,
 } from '../errors/api-response'
 import { classifyAuthError } from '../auth/errors'
+import { logErrorReport } from '@/lib/monitoring/logger'
 
 describe('API error contract — shape', () => {
   it('returns success:false, a string error and a top-level code', async () => {
@@ -105,11 +118,9 @@ describe('API error contract — unexpected exceptions never leak', () => {
   })
 
   it('still returns a well-formed response when incident logging throws', async () => {
-    vi.doMock('../monitoring/logger', () => ({
-      logErrorReport: () => {
-        throw new Error('logger exploded')
-      },
-    }))
+    vi.mocked(logErrorReport).mockImplementationOnce(() => {
+      throw new Error('logger exploded')
+    })
 
     const res = await apiInternalError({
       cause: new Error('original'), domain: 'api', operation: 'x.y', summary: 'Unexpected failure',
@@ -120,8 +131,6 @@ describe('API error contract — unexpected exceptions never leak', () => {
     expect(body.success).toBe(false)
     expect(body.error).not.toContain('logger exploded')
     expect(body.error).not.toContain('original')
-
-    vi.doUnmock('../monitoring/logger')
   })
 })
 
