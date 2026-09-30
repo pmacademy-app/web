@@ -1,9 +1,31 @@
 # Prodily — Product Improvement Blueprint
 
-**Date:** 2026-09-24
+**Date:** 2026-09-24 (last updated 2026-09-30)
 **Companion to:** [`PRODUCT_AUDIT_2026-09-24.md`](PRODUCT_AUDIT_2026-09-24.md)
 **Scope:** How to improve Prodily using what already exists. No new features. No code changes made.
 **Baseline:** 396 registered · 76 first-lesson completions (19%) · some engaged users stayed 2–3 days.
+
+---
+
+## Completion Status (as of 2026-09-30)
+
+> **Phase numbering note:** This blueprint's phase numbers diverge from the
+> [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) (the authoritative plan). The mapping:
+>
+> | Blueprint phase | Implementation Plan phase | Status |
+> |---|---|---|
+> | Phase 0 — Prove it | Phase 0.B — Baseline measurement | **DONE** |
+> | Phase 1 — Reconnect the inbox | Phase 1 — Reconnect the return path | **DONE** |
+> | Phase 2 — Promote the short loop | Phase 3 — Fix the first session | **DONE** |
+> | Phase 3 — Re-cut the lesson | Phase 4 — Re-cut the unit of work | **DONE** |
+> | Phase 4 — Collapse the entrance | Phase 5 — Reduce the surface | **DONE** (5.3 partial) |
+> | Phase 5 — Make the path real | Phase 6 — Make the path real | **NEXT** |
+> | Phase 6 — Measurement spine | Phase 2 — Make the funnel visible | **DONE** |
+> | Phase 7 — Application & removal | Phase 7 — Make the payoff visible | Not started |
+>
+> Additionally, **Phase 0.A** (vansh_dec integration) and **Phase 0.C** (homepage redesign)
+> from the Implementation Plan have been completed, as has the **T1–T5 technical remediation**
+> track.
 
 ---
 
@@ -126,7 +148,9 @@ R1 is the only fix that can reach people who **already left**. R4 is the only on
 
 ---
 
-## Phase 0 — Prove it *(no product change)*
+## Phase 0 — Prove it *(no product change)* ✅ DONE
+
+> Maps to Implementation Plan Phase 0.B. Baseline queries committed; aggregation functions reused by the admin funnel.
 
 Effort **S**. Every claim below is answerable from tables you already populate.
 
@@ -144,7 +168,9 @@ Effort **S**. Every claim below is answerable from tables you already populate.
 
 ---
 
-## Phase 1 — Reconnect the return path
+## Phase 1 — Reconnect the return path ✅ DONE
+
+> Maps to Implementation Plan Phase 1. Wire-level fixes done in T2/T3; product-level items (1.1–1.6) shipped at `571a3d2`.
 
 **Why first:** [FACT]-grade, **S** effort, and the only phase that can reach users who already churned. Highest leverage-per-hour in the repository.
 
@@ -188,7 +214,9 @@ Effort **S**. Every claim below is answerable from tables you already populate.
 
 ---
 
-## Phase 2 — Make the existing short loop the front door
+## Phase 2 — Make the existing short loop the front door ✅ DONE
+
+> Maps to Implementation Plan Phase 3. All items shipped: CTAs swapped (2.2→3.1), completion loop landed (2.3→3.2), flashcards before quiz (2.4→3.6), theory-gate surfaced (2.5→T4), /review promoted (2.1→3.5).
 
 **Why second:** Correction 2 means the daily habit mechanism is already built and working. This phase repositions it. Effort **S–M**, no new mechanics.
 
@@ -230,7 +258,9 @@ Effort **S**. Every claim below is answerable from tables you already populate.
 
 ---
 
-## Phase 3 — Re-cut the unit of work
+## Phase 3 — Re-cut the unit of work ✅ DONE
+
+> Maps to Implementation Plan Phase 4. Core/Deep-dive split, 5-of-15 quiz, honest time estimates shipped in PR #42/PR #43.
 
 **Biggest expected impact. Highest uncertainty. Therefore: an experiment, not a rollout.**
 
@@ -264,7 +294,9 @@ Effort **S**. Every claim below is answerable from tables you already populate.
 
 ---
 
-## Phase 4 — Collapse the entrance
+## Phase 4 — Collapse the entrance ✅ DONE
+
+> Maps to Implementation Plan Phase 5. One-screen onboarding (4.1) and tour deferral (4.2) shipped in `prodily-phase-4-5-integration`. Portfolio identity deferred (4.3) done. 4.4 (Google OAuth) remains conditional — see Implementation Plan Phase 8.
 
 **May move ahead of Phase 3** if Phase 0.3 shows most non-activators never created a progress row.
 
@@ -297,7 +329,9 @@ Effort **S**. Every claim below is answerable from tables you already populate.
 
 ---
 
-## Phase 5 — Make the path real
+## Phase 5 — Make the path real 🔜 NEXT
+
+> Maps to Implementation Plan Phase 6. **Not started.** This is the next phase.
 
 The largest behavioural change. Sequenced late deliberately.
 
@@ -322,7 +356,9 @@ The largest behavioural change. Sequenced late deliberately.
 
 ---
 
-## Phase 6 — Measurement spine *(begin alongside Phase 1)*
+## Phase 6 — Measurement spine *(begin alongside Phase 1)* ✅ DONE
+
+> Maps to Implementation Plan Phase 2. Server-side funnel live in admin console (`aed2aff`); `onboarding_step_reached` instrumentation added.
 
 **Why it isn't Phase 0:** the queries in Phase 0 answer today's questions from stored data. This builds the ongoing view.
 
@@ -352,7 +388,7 @@ Surface as one funnel view in the **existing** admin console. **Do not build a n
 
 ---
 
-## Phase 7 — Application, outcomes, and removal
+## Phase 7 — Application, outcomes, and removal (Not started)
 
 ### 7.1 Surface the capstone from lesson 1
 - **Why:** capstones are the only real differentiator against free PM content, and they need 8 of 10 module lessons ≈ **5 h** of reading **[FACT]**. Essentially nobody has seen one.
@@ -405,18 +441,16 @@ Falsifiers, stated up front:
 
 ## 10. The sequence, in one table
 
-| Order | Phase | Effort | Evidence | Reaches existing users? | Gate to proceed |
-|---|---|---|---|---|---|
-| 1 | **0 — Prove it** | S | — | — | one-page funnel truth |
-| 2 | **1 — Reconnect the inbox** | S | **[FACT]** | ✅ all 396 | 0.1 / 0.2 confirm |
-| 3 | **6 — Instrumentation** *(parallel)* | S | **[FACT]** | — | funnel view live |
-| 4 | **2 — Promote the short loop** | S–M | **[FACT]** | ✅ | 0.6 |
-| 5 | **3 — Re-cut the lesson** | M | **[HYPOTHESIS]** | partly | A/B, ≥10pp or kill |
-| 6 | **4 — Collapse the entrance** | M | **[FACT]** + **[HYPOTHESIS]** | ❌ new only | 0.3; 4.4 needs security review |
-| 7 | **5 — Make the path real** | M–L | **[FACT]** | ✅ | Phase 3 result; guardrail defined |
-| 8 | **7 — Application & removal** | M | mixed | ✅ | Phase 3 shipped |
-
-**If Phase 0.3 shows most non-activators never opened a lesson, swap 5 and 6.**
+| Order | Phase | Effort | Evidence | Reaches existing users? | Gate to proceed | Status |
+|---|---|---|---|---|---|---|
+| 1 | **0 — Prove it** | S | — | — | one-page funnel truth | **DONE** |
+| 2 | **1 — Reconnect the inbox** | S | **[FACT]** | ✅ all 396 | 0.1 / 0.2 confirm | **DONE** |
+| 3 | **6 — Instrumentation** *(parallel)* | S | **[FACT]** | — | funnel view live | **DONE** |
+| 4 | **2 — Promote the short loop** | S–M | **[FACT]** | ✅ | 0.6 | **DONE** |
+| 5 | **3 — Re-cut the lesson** | M | **[HYPOTHESIS]** | partly | A/B, ≥10pp or kill | **DONE** |
+| 6 | **4 — Collapse the entrance** | M | **[FACT]** + **[HYPOTHESIS]** | ❌ new only | 0.3; 4.4 needs security review | **DONE** (4.4 deferred) |
+| 7 | **5 — Make the path real** | M–L | **[FACT]** | ✅ | Phase 3 result; guardrail defined | **NEXT** |
+| 8 | **7 — Application & removal** | M | mixed | ✅ | Phase 3 shipped | Not started |
 
 ---
 
@@ -452,6 +486,7 @@ webhooks, `/api/health`, provider failover, alerts, timezone-aware crons, unifie
 (T5). The final review additionally fixed a queue dead-letter mis-classification and a
 scheduler bug that would have suppressed nearly all reminders/recaps.
 
-**Still required before any of this reaches users:** production migration application, env
-configuration, Vercel deploy, provider webhook registration, and post-deploy verification —
-none performed. See Implementation Plan §9.
+**Production deployment status (2026-09-30):** The `tech-fixes` branch and all product phases
+through Phase 5 have been merged to `main`. Production migration application, env configuration,
+Vercel deploy, provider webhook registration, and post-deploy verification status should be
+confirmed with the deployment owner. See Implementation Plan §9.

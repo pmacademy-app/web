@@ -9,6 +9,25 @@
 
 ---
 
+## Remediation Progress (as of 2026-09-30)
+
+All product improvement phases through Phase 5 of the [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
+have been merged to `main`. The root causes identified below have been addressed as follows:
+
+| Root Cause | Status | How |
+|---|---|---|
+| **RC1** — 12 screens before first idea | **Fixed** | Onboarding collapsed to 1 screen (Phase 5); tour deferred; CTAs swapped (Phase 3) |
+| **RC2** — 40-minute unit of work | **Fixed** | Core/Deep-dive split; 5-of-15 quiz; ~7 min Core path (Phase 4). A/B flag in place |
+| **RC3** — Personalization is theater | **Partially addressed** | Recommendation persisted; onboarding inputs reduced to goal+experience. Module-entry unlock (the key remaining piece) is **Phase 6 — NEXT** |
+| **RC4** — Retention channel disconnected | **Fixed** | Wire-level: preference resolution (T2), pagination (T3), timezone-aware crons (T5). Product-level: defaults flipped, audience inverted, lifecycle sequences (Phase 1) |
+| **RC5** — Learning loop never closes | **Fixed** | Completion screen on quiz (Phase 3), flashcards before quiz (Phase 3), theory-gate errors surfaced (T4) |
+| **Funnel invisible** | **Fixed** | Server-side funnel in admin console (Phase 2); onboarding step instrumentation |
+| **Homepage** | **Fixed** | Redesigned with authentic content, responsive mobile (Phase 0.C) |
+
+**Remaining work:** Phase 6 (unlock model + lock affordances + recommendation routing), Phase 7 (capstone visibility), Phase 8 (conditional OAuth).
+
+---
+
 ## The one-sentence diagnosis
 
 **Prodily is engineered as a 600,000-word textbook with a gamification layer on top, but it is marketed, instrumented, and measured as a habit product — and the machinery that would connect the two (personalization, reminders, the completion loop) is built but not wired up.**
@@ -201,17 +220,21 @@ Meanwhile `weekly-recap` targets *all* users, so a fixed version would send inac
 
 Ordered by leverage per unit of effort. **No new features.**
 
-### A. Fix the wire — days, not weeks (P0)
+### A. Fix the wire — days, not weeks (P0) ✅ DONE
 
-- Load the stored preference row in `enqueueNotificationItem` instead of `createDefaultNotificationPreferences`.
-- Flip `learning` and `achievements` email defaults to `true` for milestone + reminder templates (the docs already say they should be).
-- **Invert the daily-reminder audience:** target `last_activity_date < today`, not `current_streak > 0`. Remove `limit(100)`; paginate.
-- Suppress the weekly recap when the week had zero activity — or swap it for a restart nudge.
-- Build three lifecycle sequences from templates and broadcast machinery already owned: **D+1 signed-up-never-started**, **D+3 started-never-finished**, **streak-broken comeback**.
+> Wire-level fixes in T2/T3; product-level items (defaults, audience inversion, lifecycle sequences) shipped in Phase 1 (`571a3d2`).
+
+- ~~Load the stored preference row in `enqueueNotificationItem` instead of `createDefaultNotificationPreferences`.~~ Done (T2).
+- ~~Flip `learning` and `achievements` email defaults to `true` for milestone + reminder templates.~~ Done (Phase 1).
+- ~~**Invert the daily-reminder audience.** Remove `limit(100)`; paginate.~~ Done (T3 + Phase 1).
+- ~~Suppress the weekly recap when the week had zero activity.~~ Done (Phase 1).
+- ~~Build three lifecycle sequences: **D+1 signed-up-never-started**, **D+3 started-never-finished**, **streak-broken comeback**.~~ Done (Phase 1).
 
 This alone plausibly moves both numbers more than anything else on this list.
 
-### B. Re-cut the unit of work without rewriting a word (P1)
+### B. Re-cut the unit of work without rewriting a word (P1) ✅ DONE
+
+> Shipped in Phase 4 (PR #42, PR #43). Core/Deep-dive block classification, 5-of-15 quiz, A/B experiment flag.
 
 The blocks are already typed and separable. Split every lesson in `getBlocksForTab`:
 
@@ -220,30 +243,39 @@ The blocks are already typed and separable. Split every lesson in `getBlocksForT
 
 **Completion = Core.** Same markdown, same compiler, same content, different grouping. This turns a 40-minute obligation into a 7-minute one, makes the streak physically achievable, and makes the depth a reward for engaged users instead of a tax on new ones. Highest-impact change available; touches almost no content.
 
-### C. Land the loop (P1)
+### C. Land the loop (P1) ✅ DONE
 
-- Render "Lesson Completed" on **quiz** completion, not reflection.
-- Post-quiz primary CTA = **"Next lesson: {title}"** with module progress; flashcards and reflection secondary.
-- Move flashcards to **after theory, before quiz** — retrieval practice where it belongs.
-- Surface the theory engagement failure instead of swallowing it.
+> Shipped in Phase 3 (PR #35, `6b6beb1`). Theory-gate errors surfaced in T4.
 
-### D. Make personalization real (P2)
+- ~~Render "Lesson Completed" on **quiz** completion, not reflection.~~ Done (Phase 3).
+- ~~Post-quiz primary CTA = **"Next lesson: {title}"**.~~ Done (Phase 3).
+- ~~Move flashcards to **after theory, before quiz**.~~ Done (Phase 3).
+- ~~Surface the theory engagement failure instead of swallowing it.~~ Done (T4).
+
+### D. Make personalization real (P2) 🔜 NEXT (Implementation Plan Phase 6)
+
+> Recommendation persistence and CTA routing are partially addressed by Phase 3/5.
+> The core item — **module-entry unlock model** — is the next phase to implement.
 
 - Persist `recommendedModuleSlug` at onboarding.
 - Route **"Start Learning"** to the first lesson of the recommended module — not to a collapsed `/academy`.
 - Replace global sequential locking with **"any module's entry lesson is open; sequence within a module."** Search stops being a trap, and the practicing-PM persona becomes real for the first time.
 
-### E. Collapse the entrance (P2)
+### E. Collapse the entrance (P2) ✅ DONE (except OAuth)
 
-- Wizard → **one screen**: goal + experience. Defer username/avatar/bio/socials to the moment the portfolio first matters (first capstone).
-- Delete the 8-step tour, or fire it **after** lesson 1 when the features mean something.
-- Add Google OAuth. If verification must stay, let unverified users complete lesson 1 and gate at lesson 2 — verify the email *after* they have felt value.
+> Onboarding collapsed and tour deferred in Phase 5 (`d59f401`). OAuth remains conditional (Implementation Plan Phase 8).
 
-### F. Instrument (P0, alongside A)
+- ~~Wizard → **one screen**: goal + experience. Defer username/avatar/bio/socials.~~ Done (Phase 5).
+- ~~Delete the 8-step tour, or fire it **after** lesson 1.~~ Done (Phase 5).
+- Add Google OAuth. — **Conditional, not started.** See Implementation Plan Phase 8.
+
+### F. Instrument (P0, alongside A) ✅ DONE
+
+> Server-side funnel live in admin console (Phase 2, `aed2aff`). `onboarding_step_reached` instrumentation added.
 
 `signup_started`, `signup_completed`, `email_verified`, `onboarding_step_viewed`, `onboarding_completed`, `tour_skipped`, `first_lesson_opened`, `theory_scroll_depth`, `first_quiz_submitted`, `day_2_return`. Surface as one funnel view in the existing admin console.
 
-### G. Clean the IA (P3)
+### G. Clean the IA (P3) — Partially done
 
 Collapse `/badges` + `/progress/badges` and `/capstones` + `/progress/capstones`. Add lock affordances to the academy lesson list. Add a "too long" tag and a one-question exit survey to the feedback widget.
 
@@ -297,5 +329,7 @@ rewriting the diagnosis.
   it would have **silently suppressed** almost all reminders — fixed to hourly.
 - Two committed tests had shipped red on `tech-fixes` — reconciled.
 
-**Not started:** production migration application, env/secret configuration, Vercel deploy,
-provider webhook registration, and post-deploy verification. See the Implementation Plan §9.
+**Code merged (2026-09-30):** The `tech-fixes` branch and all product phases through Phase 5
+have been merged to `main`. Production migration application, env/secret configuration,
+Vercel deploy, provider webhook registration, and post-deploy verification status should be
+confirmed with the deployment owner. See the Implementation Plan §9.
