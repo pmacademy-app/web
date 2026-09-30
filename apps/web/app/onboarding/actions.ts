@@ -2,7 +2,15 @@
 
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
-import { createServiceRoleClient } from '@/lib/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { createServiceRoleClient, type Database } from '@/lib/supabase'
+import { fetchCurriculumData } from '@/lib/lesson-loader'
+import {
+  resolvePersonalizedPath,
+  resolveStartLearningTarget,
+  academyLessonPath,
+} from '@/lib/personalization/path-resolver'
+import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -112,6 +120,61 @@ export async function recordOnboardingStep(step: number): Promise<void> {
       .eq('id', user.id)
   } catch (err) {
     console.error('[onboarding/actions] recordOnboardingStep failed (non-blocking):', err)
+  }
+}
+
+/**
+ * Phase 6 — resolves the Academy path "Start Learning" should open, from the learner's saved
+ * onboarding fields. Derives the recommendation (no persisted column) and honours the
+ * module-entry unlock model + grandfathering, so under treatment it lands on the recommended
+ * module's unlocked entry lesson and otherwise falls back safely to the first actionable
+ * lesson. Best-effort: any failure returns null and the caller uses a static fallback.
+ */
+async function resolveRecommendedLessonPath(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  goal: string,
+  careerRole: string,
+  topics: string[] | undefined
+): Promise<string | null> {
+  try {
+    const curriculum = await fetchCurriculumData()
+    if (!curriculum?.lessons?.length) return null
+
+    const [{ data: userRow }, { data: progressRows }] = await Promise.all([
+      supabase.from('users').select('created_at, curriculum_access_override').eq('id', userId).maybeSingle(),
+      supabase.from('user_lesson_progress').select('lesson_id, status').eq('user_id', userId),
+    ])
+
+    const treatment = isModuleEntryUnlockTreatment({
+      id: userId,
+      createdAt: (userRow as { created_at?: string } | null)?.created_at,
+    })
+
+    const completedIds = new Set<string>()
+    const openedIds = new Set<string>()
+    for (const r of (progressRows ?? []) as { lesson_id: string; status: string }[]) {
+      openedIds.add(r.lesson_id)
+      if (r.status === 'completed') completedIds.add(r.lesson_id)
+    }
+
+    const path = resolvePersonalizedPath({
+      goal,
+      career_role: careerRole,
+      onboarding_topics: topics ?? null,
+    })
+
+    const target = resolveStartLearningTarget(path, curriculum.lessons, {
+      completedIds,
+      openedIds,
+      treatment,
+      override: Boolean((userRow as { curriculum_access_override?: boolean } | null)?.curriculum_access_override),
+    })
+
+    return target ? academyLessonPath(target.lesson) : null
+  } catch (err) {
+    console.error('[onboarding/actions] resolveRecommendedLessonPath failed (non-blocking):', err)
+    return null
   }
 }
 
@@ -274,7 +337,18 @@ export async function submitOnboarding(data: OnboardingData) {
       }
     }
 
-    return { success: true }
+    // Phase 6: resolve where "Start Learning" should land the learner. Computed after the
+    // profile write so it reads the just-saved goal/experience. Best-effort — a null path
+    // makes the client fall back to its static primary destination.
+    const recommendedLessonPath = await resolveRecommendedLessonPath(
+      dbSupabase,
+      userId,
+      goal,
+      careerRole,
+      data.topics
+    )
+
+    return { success: true, recommendedLessonPath }
   } catch (err) {
     console.error('[onboarding/actions] Unexpected error:', err)
     return { error: 'An unexpected error occurred. Please try again.' }

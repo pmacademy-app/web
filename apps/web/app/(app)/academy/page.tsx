@@ -14,12 +14,19 @@ import {
   Play,
   ArrowRight,
   Check,
+  Lock,
 } from 'lucide-react'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
-import { resolveModuleCtaTarget } from '@/lib/curriculum-access'
+import {
+  buildCurriculumModuleIndex,
+  resolveLessonAccess,
+  getFirstActionableLessonIndex,
+  type LessonAccessInfo,
+} from '@/lib/curriculum-access'
+import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
@@ -54,25 +61,52 @@ export default async function AcademyPage() {
 
   // Fetch completed lessons and personalization profile for current user
   let completedSet = new Set<string>()
+  let openedSet = new Set<string>()
   let personalizedPath = resolvePersonalizedPath(null)
+  // Phase 6: module-entry unlock inputs. `treatment`/`override` default to control/false for
+  // anonymous or existing-cohort learners, so the list renders the pre-Phase-6 access state.
+  let treatment = false
+  let override = false
   if (user) {
     const supabase = createServiceRoleClient()
     // dbUser reuses the layout's memoized users SELECT rather than re-querying it.
     const [{ data: rows }, dbUser] = await Promise.all([
       supabase
         .from('user_lesson_progress')
-        .select('lesson_id')
-        .eq('user_id', user.id)
-        .eq('status', 'completed'),
+        .select('lesson_id, status')
+        .eq('user_id', user.id),
       getCurrentUserProfile(),
     ])
     if (rows) {
-      completedSet = new Set((rows as { lesson_id: string }[]).map((r) => r.lesson_id))
+      const progressRows = rows as { lesson_id: string; status: string }[]
+      completedSet = new Set(progressRows.filter((r) => r.status === 'completed').map((r) => r.lesson_id))
+      openedSet = new Set(progressRows.map((r) => r.lesson_id))
     }
     if (dbUser) {
       personalizedPath = resolvePersonalizedPath(dbUser)
+      override = Boolean(dbUser.curriculum_access_override)
+      treatment = isModuleEntryUnlockTreatment({ id: user.id, createdAt: dbUser.created_at })
     }
   }
+
+  // Phase 6: precompute the module index once, plus a resolver bound to this learner's state.
+  const moduleIndex = buildCurriculumModuleIndex(lessons)
+  const accessOf = (lessonId: string): LessonAccessInfo =>
+    resolveLessonAccess(lessonId, {
+      index: moduleIndex,
+      completedIds: completedSet,
+      openedIds: openedSet,
+      treatment,
+      override,
+    })
+  // The learner's first actionable lesson globally — the safe fallback CTA when a module's
+  // target is not yet reachable (Lesson 1 for a brand-new learner).
+  const globalFirstActionableIdx = getFirstActionableLessonIndex(
+    completedSet,
+    lessons.map((l) => l.id)
+  )
+  const globalFirstActionable =
+    globalFirstActionableIdx >= 0 ? lessons[globalFirstActionableIdx] : null
 
   const orderedModules = [...byModule.entries()].sort(
     ([, a], [, b]) => (a[0]?.order ?? 0) - (b[0]?.order ?? 0)
@@ -236,8 +270,21 @@ export default async function AcademyPage() {
           {orderedModules.map(([moduleSlug, moduleLessons], idx) => {
             const meta = CURRICULUM_MODULE_META[moduleSlug]
             const moduleNumber = idx + 1
-            const ctaTarget = resolveModuleCtaTarget(moduleLessons, lessons, completedSet)
-            const targetLesson = ctaTarget.lesson
+
+            // Phase 6: per-lesson access under the active model (treatment/control + grandfathering).
+            const accessByLesson = new Map(moduleLessons.map((l) => [l.id, accessOf(l.id)]))
+            // The module CTA target: the first incomplete lesson the learner can actually open;
+            // if none is reachable yet (e.g. a locked later module under control) fall back to the
+            // first incomplete lesson so the label can explain the prerequisite.
+            const firstAccessibleIncomplete = moduleLessons.find((l) => {
+              const a = accessByLesson.get(l.id)!
+              return a.isAccessible && a.state !== 'completed'
+            })
+            const firstIncompleteInModule = moduleLessons.find((l) => !completedSet.has(l.id))
+            const targetLesson = firstAccessibleIncomplete ?? firstIncompleteInModule ?? moduleLessons[0] ?? null
+            const targetAccessible = targetLesson
+              ? accessByLesson.get(targetLesson.id)?.isAccessible ?? false
+              : false
             const completedInModule = moduleLessons.filter((l) => completedSet.has(l.id)).length
             const isModuleFullyCompleted =
               moduleLessons.length > 0 && completedInModule === moduleLessons.length
@@ -354,50 +401,128 @@ export default async function AcademyPage() {
                   {/* 10 Lessons Playlist Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                     {moduleLessons.map((lesson, lessonIdx) => {
-                      const isDone = completedSet.has(lesson.id)
-                      const isTargetLesson = targetLesson?.id === lesson.id && !isModuleFullyCompleted
+                      const access = accessByLesson.get(lesson.id)!
+                      const isDone = access.state === 'completed'
+                      const isInProgress = access.state === 'in_progress'
+                      const isLocked = access.state === 'locked'
+                      const isTargetLesson =
+                        targetLesson?.id === lesson.id && !isModuleFullyCompleted && access.isAccessible
 
-                      return (
-                        <Link
-                          key={lesson.id}
-                          href={`/academy/${lesson.module}/${lesson.id}`}
-                          id={`lesson-link-${lesson.id}`}
-                          className={`flex items-center justify-between p-3.5 rounded-xl border transition-all text-xs md:text-sm group/item ${isTargetLesson
-                              ? 'border-primary/50 bg-primary/5 shadow-xs'
-                              : 'border-border/70 bg-card hover:bg-muted/40 hover:border-primary/30'
-                            }`}
-                        >
+                      // Prerequisite lesson for a locked row (module-scoped under treatment,
+                      // first incomplete global lesson under control).
+                      const prereq = isLocked && access.prerequisiteLessonId
+                        ? lessons.find((l) => l.id === access.prerequisiteLessonId) ?? null
+                        : null
+                      const prereqOrder = prereq
+                        ? lessons.findIndex((l) => l.id === prereq.id) + 1
+                        : null
+
+                      // A concise, screen-reader-friendly status that never relies on colour alone.
+                      const statusLabel = isDone
+                        ? 'Completed'
+                        : isInProgress
+                          ? 'In progress'
+                          : isLocked
+                            ? prereqOrder
+                              ? `Locked — complete Lesson ${prereqOrder} first`
+                              : 'Locked'
+                            : isTargetLesson
+                              ? 'Available — start here'
+                              : 'Available'
+
+                      const rowClass = `flex items-center justify-between p-3.5 rounded-xl border transition-all text-xs md:text-sm group/item ${
+                        isLocked
+                          ? 'border-border/60 bg-muted/20 opacity-70'
+                          : isTargetLesson
+                            ? 'border-primary/50 bg-primary/5 shadow-xs'
+                            : 'border-border/70 bg-card hover:bg-muted/40 hover:border-primary/30'
+                      }`
+
+                      const iconEl = isDone ? (
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5" />
+                        </div>
+                      ) : isLocked ? (
+                        <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground border border-border flex items-center justify-center shrink-0">
+                          <Lock className="w-3 h-3" />
+                        </div>
+                      ) : isTargetLesson || isInProgress ? (
+                        <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs">
+                          <PlayCircle className="w-3.5 h-3.5" />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
+                          {String(lessonIdx + 1).padStart(2, '0')}
+                        </div>
+                      )
+
+                      const titleClass = `truncate font-medium transition-colors ${
+                        isDone
+                          ? 'text-muted-foreground line-through decoration-muted-foreground/40'
+                          : isLocked
+                            ? 'text-muted-foreground'
+                            : isTargetLesson
+                              ? 'text-foreground font-semibold group-hover/item:text-primary'
+                              : 'text-foreground group-hover/item:text-primary'
+                      }`
+
+                      const innerBody = (
+                        <>
                           <div className="flex items-center gap-3 min-w-0 pr-2">
-                            {isDone ? (
-                              <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                                <Check className="w-3.5 h-3.5" />
-                              </div>
-                            ) : isTargetLesson ? (
-                              <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs">
-                                <PlayCircle className="w-3.5 h-3.5" />
-                              </div>
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
-                                {String(lessonIdx + 1).padStart(2, '0')}
-                              </div>
-                            )}
-
-                            <span
-                              className={`truncate font-medium transition-colors ${isDone
-                                  ? 'text-muted-foreground line-through decoration-muted-foreground/40'
-                                  : isTargetLesson
-                                    ? 'text-foreground font-semibold group-hover/item:text-primary'
-                                    : 'text-foreground group-hover/item:text-primary'
-                                }`}
-                            >
-                              {lesson.title}
-                            </span>
+                            {iconEl}
+                            <div className="min-w-0">
+                              <span className={titleClass}>{lesson.title}</span>
+                              {/* Visible (not colour-only) lock/prerequisite affordance */}
+                              {isLocked && (
+                                <span className="block text-[10px] font-medium text-muted-foreground mt-0.5">
+                                  {prereqOrder
+                                    ? `Locked · complete Lesson ${prereqOrder} first`
+                                    : 'Locked'}
+                                </span>
+                              )}
+                              {isInProgress && (
+                                <span className="block text-[10px] font-medium text-primary mt-0.5">
+                                  In progress
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0 text-xs text-muted-foreground font-mono">
                             <span>{lesson.estimatedReadingTime || 20}m</span>
-                            <ArrowRight className="w-3.5 h-3.5 text-primary opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-all" />
+                            {isLocked ? (
+                              <span className="sr-only">{statusLabel}</span>
+                            ) : (
+                              <ArrowRight className="w-3.5 h-3.5 text-primary opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-all" />
+                            )}
                           </div>
+                        </>
+                      )
+
+                      // Locked lessons render as a non-navigating element so a click never leads
+                      // to a confusing dead-end lock screen; their state is conveyed by text +
+                      // aria. Accessible lessons remain ordinary links.
+                      return isLocked ? (
+                        <div
+                          key={lesson.id}
+                          id={`lesson-link-${lesson.id}`}
+                          data-locked="true"
+                          className={`${rowClass} cursor-not-allowed`}
+                        >
+                          {/* Non-interactive: state is conveyed by the visible "Locked · complete
+                              Lesson N first" text (announced in reading order), not colour alone. */}
+                          {innerBody}
+                        </div>
+                      ) : (
+                        <Link
+                          key={lesson.id}
+                          href={`/academy/${lesson.module}/${lesson.id}`}
+                          id={`lesson-link-${lesson.id}`}
+                          data-locked="false"
+                          aria-label={`Lesson ${lessonIdx + 1}: ${lesson.title}. ${statusLabel}.`}
+                          className={rowClass}
+                        >
+                          {innerBody}
                         </Link>
                       )
                     })}
@@ -406,18 +531,18 @@ export default async function AcademyPage() {
                   {/* Module Footer Action */}
                   {targetLesson && (
                     <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                      {isRecommended && !ctaTarget.isAccessible && ctaTarget.firstActionableLesson && (
+                      {!targetAccessible && !isModuleFullyCompleted && globalFirstActionable && (
                         <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 leading-relaxed font-medium">
-                          Prerequisites needed: Complete earlier modules in sequence first.
+                          Prerequisites needed: finish Lesson {globalFirstActionable.order} to keep progressing in order.
                         </div>
                       )}
 
                       <Link
                         href={
-                          ctaTarget.isAccessible || isModuleFullyCompleted
+                          targetAccessible || isModuleFullyCompleted
                             ? `/academy/${targetLesson.module}/${targetLesson.id}`
-                            : ctaTarget.firstActionableLesson
-                              ? `/academy/${ctaTarget.firstActionableLesson.module}/${ctaTarget.firstActionableLesson.id}`
+                            : globalFirstActionable
+                              ? `/academy/${globalFirstActionable.module}/${globalFirstActionable.id}`
                               : `/academy/${targetLesson.module}/${targetLesson.id}`
                         }
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 shadow-xs active:scale-[0.98] transition-all sm:ml-auto"
@@ -425,10 +550,10 @@ export default async function AcademyPage() {
                         <span>
                           {isModuleFullyCompleted
                             ? `Review Module ${moduleNumber}`
-                            : ctaTarget.isAccessible
+                            : targetAccessible
                               ? `Continue Module ${moduleNumber}: Lesson ${targetLesson.order}`
-                              : ctaTarget.firstActionableLesson
-                                ? `Start from Lesson ${ctaTarget.firstActionableLesson.order} first`
+                              : globalFirstActionable
+                                ? `Start from Lesson ${globalFirstActionable.order} first`
                                 : `Continue Module ${moduleNumber}: Lesson ${targetLesson.order}`}
                         </span>
                         <ArrowRight className="h-3.5 w-3.5" />

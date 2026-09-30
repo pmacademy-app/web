@@ -1,5 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+import {
+  resolveLessonAccess,
+  type CurriculumModuleIndex,
+  type LessonAccessInfo,
+} from '@/lib/curriculum-access'
+import type { CurriculumEntry } from '@/types'
 
 
 /**
@@ -134,6 +140,57 @@ export async function isLessonUnlockedByOrderNumber(
     .maybeSingle()
 
   return !!prevProgress && prevProgress.status === 'completed'
+}
+
+/**
+ * Phase 6 — authoritative server-side access decision under the module-entry unlock model.
+ *
+ * Loads the learner's override flag and their full progress set once, splits it into
+ * completed vs opened (any progress row), and delegates to the pure `resolveLessonAccess`.
+ * `treatment` is decided by the caller from the experiment flag + cohort; passing `false`
+ * yields the exact pre-Phase-6 global-sequential behaviour. Grandfathering (opened lessons
+ * stay accessible) is applied for BOTH arms, so a treatment learner who opened a module-entry
+ * lesson keeps it if the flag is later disabled.
+ *
+ * Read-only: like `isLessonUnlocked`, this never writes progress, XP, or any completion state.
+ *
+ * @param curriculum  Canonical curriculum in global order (id + module suffice).
+ * @param index       Optional prebuilt module index (pass when checking many lessons at once).
+ */
+export async function resolveLessonAccessForUser(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  opts: {
+    curriculum: Pick<CurriculumEntry, 'id' | 'module'>[]
+    treatment: boolean
+    index?: CurriculumModuleIndex
+  }
+): Promise<LessonAccessInfo> {
+  const [{ data: user }, { data: progressRows }] = await Promise.all([
+    supabase.from('users').select('curriculum_access_override').eq('id', userId).maybeSingle(),
+    supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, status')
+      .eq('user_id', userId),
+  ])
+
+  const rows = (progressRows ?? []) as { lesson_id: string; status: string }[]
+  const completedIds = new Set<string>()
+  const openedIds = new Set<string>()
+  for (const r of rows) {
+    openedIds.add(r.lesson_id) // any row means the learner has opened/started this lesson
+    if (r.status === 'completed') completedIds.add(r.lesson_id)
+  }
+
+  return resolveLessonAccess(lessonId, {
+    curriculum: opts.curriculum,
+    index: opts.index,
+    completedIds,
+    openedIds,
+    treatment: opts.treatment,
+    override: Boolean(user?.curriculum_access_override),
+  })
 }
 
 /**

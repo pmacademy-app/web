@@ -208,7 +208,18 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
         // Storage unavailable
       }
 
-      router.push(targetDestination)
+      // Phase 6: "Start Learning" (primary CTA) lands on the recommended module's entry lesson
+      // resolved server-side — meaningful under the module-entry unlock treatment, and safely
+      // falling back to the first actionable lesson otherwise. "Explore Curriculum" (secondary)
+      // still opens the full /academy list.
+      const recommendedLessonPath =
+        'recommendedLessonPath' in result ? result.recommendedLessonPath : null
+      const destination =
+        targetDestination === ONBOARDING_PRIMARY_DESTINATION && recommendedLessonPath
+          ? recommendedLessonPath
+          : targetDestination
+
+      router.push(destination)
       router.refresh()
     })
   }

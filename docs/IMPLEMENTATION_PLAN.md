@@ -1,9 +1,30 @@
 # Prodily Product Improvement — Implementation Plan
 
 **Status:** Source of truth for implementing the improvements identified in [`PRODUCT_AUDIT_2026-09-24.md`](PRODUCT_AUDIT_2026-09-24.md) and [`PRODUCT_IMPROVEMENT_BLUEPRINT.md`](PRODUCT_IMPROVEMENT_BLUEPRINT.md).
-**Date:** 2026-09-24
+**Date:** 2026-09-24 (last updated 2026-09-30)
 **Repository state at authoring:** `main` @ `origin/main`; `vansh_dec` 6 commits ahead, 0 behind **[FACT]**
-**No code has been written for this plan.**
+
+---
+
+## Completion Status (as of 2026-09-30)
+
+| Phase | Status | Merged to `main` | Notes |
+|---|---|---|---|
+| **0.A** — Integrate `vansh_dec` | **DONE** | `ba034f1` | vansh_dec merged; tech-fixes (T1–T5) merged via PR #34 |
+| **0.B** — Baseline measurement | **DONE** | `986efb1` | Server-side baseline queries committed; aggregation functions reused by Phase 2 |
+| **0.C** — Homepage redesign | **DONE** | `986efb1`, `b290acd` | Homepage reworked, marketing polish, responsive mobile; sample lessons surfaced |
+| **T1–T5** — Technical remediation | **DONE** | PR #34 (`5b41f11`) | Security, reliability, performance, UX-state, operational resilience |
+| **Phase 1** — Reconnect the return path | **DONE** | `571a3d2` | 1.1–1.6 all shipped: defaults flipped, audience inverted, zero-due suppression, lifecycle sequences |
+| **Phase 2** — Make the funnel visible | **DONE** | `aed2aff` | Server-side funnel in admin console; `onboarding_step_reached` instrumentation |
+| **Phase 3** — Fix the first session | **DONE** | `6b6beb1` (PR #35) | 3.1–3.3, 3.5–3.6 shipped; 3.4 was already done in T4 |
+| **Phase 3.5** — Cleanup & performance | **DONE** | `0d42863` (PR #36) | Post-Phase 3 optimization pass |
+| **Phase 4** — Re-cut the unit of work | **DONE** | PR #42, PR #43 (`18dd100`) | Core/Deep-dive split, 5-of-15 quiz, honest time estimates, A/B flag |
+| **Phase 5** — Reduce the surface | **DONE** | PR #42, PR #43 (`18dd100`) | 5.1 one-screen onboarding, 5.2 tour deferred, 5.3 shipped with Phase 4 integration |
+| **Phase 6** — Make the path real | **IMPLEMENTED (flag off; not deployed)** | branch `prodily-phase-6-module-entry-unlock` | Code + tests + ADR-008 complete; module-entry unlock behind `MODULE_ENTRY_UNLOCK_ENABLED` (defaults control); cohort experiment not yet run |
+| **Phase 7** — Make the payoff visible | **NOT STARTED** | — | Depends on Phase 6 |
+| **Phase 8** — Reduce auth friction | **NOT STARTED** | — | Conditional; requires Phase 2 data gate |
+
+**Current position: Phases 0–5 complete. Phase 6 is next.**
 
 ---
 
@@ -77,6 +98,10 @@ Corrections already made in the blueprint and retained: corpus is 548,536 words 
 
 ## 1.4 Current `main` and `vansh_dec`
 
+> **Status (2026-09-30):** `vansh_dec` has been merged to `main` (commit `ba034f1`).
+> The technical remediation track (T1–T5) was merged via PR #34 (`5b41f11`).
+> This section is preserved for historical context.
+
 **`main`** — `origin/main`. `b10a-b14b/error-boundaries-logout-ci-security` is **0 commits ahead of main**, i.e. already merged **[FACT]**; the note in `docs/INDEX.md` calling it unmerged is stale and should be corrected in Phase 0.A.
 
 **`vansh_dec`** — 6 commits, **146 files, +4,220 / −1,149**, 0 behind `main`, local and `origin/vansh_dec` identical **[FACT]**. A fast-forward merge is available.
@@ -100,19 +125,19 @@ Contents **[FACT, from `git diff --stat main..vansh_dec`]**:
 
 # 2. Overall Phase Map
 
-| Phase | Objective | Major work | Expected outcome | Depends on | Changes user-facing behaviour? |
-|---|---|---|---|---|---|
-| **0.A** | Land existing work cleanly | Merge `vansh_dec`; apply its migration; correct stale docs | `main` contains legal/consent, curriculum UX, progress IA | — | Yes (already-built work goes live) |
-| **0.B** | Replace assumptions with data | Read-only baseline queries; one-page funnel truth | Every "unknown" in §1.3 resolved; phase order confirmed | 0.A | **No** |
-| **0.C** | Sell the product that exists | Homepage redesign — minimal, modern, high-clarity | Higher visit → signup rate | 0.A | Yes (marketing only) |
-| **1** | Reconnect the return path | Read stored prefs; enable learning/achievement email; invert reminder audience; suppress zero-activity recap and zero-due-card reminders; three lifecycle sequences | Lapsed users are contacted at all — including the ~320 already churned | 0.A, 0.B | Yes (email) |
-| **2** | Make the funnel visible | Server-side funnel view in the existing admin console | Every later decision measurable despite consent gating | 0.A, 0.B | **No** (admin-only) |
-| **3** | Fix the first session and close the loop | Swap onboarding CTAs; render completion on quiz; flashcards before quiz; surface theory-gate failure; promote `/review` | Lesson-1 → lesson-2 rate rises; the 3-min loop becomes reachable | 2 | Yes |
-| **4** | Re-cut the unit of work | Core (~7 min) / Deep-dive split via `getBlocksForTab`; 5-of-15 quiz; honest time estimates | Time-to-first-completion 40 min → <10 min | 2, 3 | Yes — **A/B** |
-| **5** | Reduce the surface before value | One-screen onboarding; defer the 8-step tour; finish the progress IA consolidation | Fewer screens and destinations before first value | 2, 4 | Yes |
-| **6** | Make the path real | Persist the recommendation; module-entry unlock model; lock affordances in academy + search | Search works; practising-PM persona becomes servable | 4, 5 | Yes — **cohort test** |
-| **7** | Make the payoff visible | Capstone visible from lesson 1; review SLA; removals | Application becomes a destination, not a rumour | 4 | Yes |
-| **8** *(conditional)* | Reduce auth friction | Google OAuth — **only if** Phase 2 proves verification is a major drop point | Lower signup abandonment without weakening abuse controls | 2 + security review | Yes |
+| Phase | Objective | Major work | Expected outcome | Depends on | Changes user-facing behaviour? | Status |
+|---|---|---|---|---|---|---|
+| **0.A** | Land existing work cleanly | Merge `vansh_dec`; apply its migration; correct stale docs | `main` contains legal/consent, curriculum UX, progress IA | — | Yes (already-built work goes live) | **DONE** |
+| **0.B** | Replace assumptions with data | Read-only baseline queries; one-page funnel truth | Every "unknown" in §1.3 resolved; phase order confirmed | 0.A | **No** | **DONE** |
+| **0.C** | Sell the product that exists | Homepage redesign — minimal, modern, high-clarity | Higher visit → signup rate | 0.A | Yes (marketing only) | **DONE** |
+| **1** | Reconnect the return path | Read stored prefs; enable learning/achievement email; invert reminder audience; suppress zero-activity recap and zero-due-card reminders; three lifecycle sequences | Lapsed users are contacted at all — including the ~320 already churned | 0.A, 0.B | Yes (email) | **DONE** |
+| **2** | Make the funnel visible | Server-side funnel view in the existing admin console | Every later decision measurable despite consent gating | 0.A, 0.B | **No** (admin-only) | **DONE** |
+| **3** | Fix the first session and close the loop | Swap onboarding CTAs; render completion on quiz; flashcards before quiz; surface theory-gate failure; promote `/review` | Lesson-1 → lesson-2 rate rises; the 3-min loop becomes reachable | 2 | Yes | **DONE** |
+| **4** | Re-cut the unit of work | Core (~7 min) / Deep-dive split via `getBlocksForTab`; 5-of-15 quiz; honest time estimates | Time-to-first-completion 40 min → <10 min | 2, 3 | Yes — **A/B** | **DONE** |
+| **5** | Reduce the surface before value | One-screen onboarding; defer the 8-step tour; finish the progress IA consolidation | Fewer screens and destinations before first value | 2, 4 | Yes | **DONE** |
+| **6** | Make the path real | Recommendation routing (derived, no column); module-entry unlock model; lock affordances in academy + search | Search works; practising-PM persona becomes servable | 4, 5 | Yes — **cohort test** | **IMPLEMENTED (flag off)** |
+| **7** | Make the payoff visible | Capstone visible from lesson 1; review SLA; removals | Application becomes a destination, not a rumour | 4 | Yes | Not started |
+| **8** *(conditional)* | Reduce auth friction | Google OAuth — **only if** Phase 2 proves verification is a major drop point | Lower signup abandonment without weakening abuse controls | 2 + security review | Yes | Not started |
 
 **Sequencing rationale.** 0.A first because six later work items edit files it touches. 0.B before every behavioural phase because three of its queries can reorder the plan. Phase 1 before Phase 2 because its effect is measurable from `email_queue` and `notification_events` without new instrumentation, and it is the only phase that reaches users who have already left. Phase 2 before 3–7 because those are behavioural and unmeasurable without it. Phase 4 before 5 and 6 because both may become unnecessary if shortening the lesson alone fixes activation. Phase 8 last, conditional, and gated on a security review.
 
@@ -122,7 +147,9 @@ Contents **[FACT, from `git diff --stat main..vansh_dec`]**:
 
 ---
 
-## Phase 0.A — Integrate `vansh_dec` into `main`
+## Phase 0.A — Integrate `vansh_dec` into `main` ✅ DONE
+
+> **Completed:** `vansh_dec` merged at `ba034f1`; tech-fixes (T1–T5) merged via PR #34 at `5b41f11`.
 
 ### Objective
 Land the six existing `vansh_dec` commits on `main`, deployed and verified, so every subsequent phase branches from a single current baseline.
@@ -199,7 +226,9 @@ Full CI green including `e2e`; migration applied to production **and** verified 
 
 ---
 
-## Phase 0.B — Baseline: replace assumptions with data
+## Phase 0.B — Baseline: replace assumptions with data ✅ DONE
+
+> **Completed:** Baseline queries committed as `docs/BASELINE_QUERIES.md`; aggregation functions reused by Phase 2 funnel (`986efb1`).
 
 ### Objective
 Resolve every "unknown" in §1.3 and confirm or kill the plan's central claims **before** any behavioural change ships.
@@ -266,7 +295,9 @@ Not applicable.
 
 ---
 
-## Phase 0.C — Homepage redesign
+## Phase 0.C — Homepage redesign ✅ DONE
+
+> **Completed:** Homepage reworked with authentic lesson-backed content, responsive mobile experience, marketing polish (`986efb1`, `b290acd`, `1d82342`).
 
 ### Objective
 Turn the existing homepage into a minimal, modern, high-clarity landing experience that communicates what Prodily is, who it is for, the outcome, what makes the learning different, the capabilities that already exist, and why to start — with one primary and one sensible secondary CTA, and credible proof that is **real**.
@@ -380,7 +411,9 @@ Full CI including `test:a11y` and brand hardening; claims checklist signed by a 
 
 ---
 
-## Phase 1 — Reconnect the return path
+## Phase 1 — Reconnect the return path ✅ DONE
+
+> **Completed:** All sub-items (1.1–1.6) shipped at `571a3d2`. Email defaults flipped, audience inverted, zero-due suppression, zero-activity recap suppression, three lifecycle sequences. Wire-level fixes (F1 preference resolution, F2 pagination) were already done in T2/T3.
 
 ### Objective
 Make the notification platform actually deliver to learners' inboxes, and target the people who need contacting.
@@ -479,7 +512,9 @@ Daily for 7 days: unsubscribe rate, complaint rate, provider quota, queue dead-l
 
 ---
 
-## Phase 2 — Make the funnel visible
+## Phase 2 — Make the funnel visible ✅ DONE
+
+> **Completed:** Server-side activation funnel live in admin console at `aed2aff`. Reuses Phase 0.B aggregation functions. `onboarding_step_reached` instrumentation added (migration `20260927000001`).
 
 ### Objective
 Build a **server-side** funnel from signup to continued learning, surfaced in the existing admin console.
@@ -562,7 +597,9 @@ Compare a week of funnel output against 0.B before Phase 3 relies on it.
 
 ---
 
-## Phase 3 — Fix the first session and close the loop
+## Phase 3 — Fix the first session and close the loop ✅ DONE
+
+> **Completed:** PR #35 (`6b6beb1`). 3.1 CTAs swapped, 3.2 completion screen on quiz, 3.3 next-lesson CTA, 3.5 /review promoted, 3.6 flashcard unlock aligned. 3.4 (theory-gate error surfacing) was already done in T4.
 
 ### Objective
 Make the first session end somewhere, and make the existing 3-minute daily loop reachable.
@@ -644,7 +681,9 @@ CI green including `test:a11y`; the F5 regression test present; existing-user QA
 
 ---
 
-## Phase 4 — Re-cut the unit of work
+## Phase 4 — Re-cut the unit of work ✅ DONE
+
+> **Completed:** PR #42 and PR #43 (`18dd100`). Core/Deep-dive block classification, 5-of-15 deterministic quiz sampling, honest computed time estimates, deep-dive engagement guardrail, A/B experiment flag (defaults to control). Content rebalanced. Shipped alongside Phase 5 in the `prodily-phase-4-5-integration` branch.
 
 ### Objective
 Reduce time-to-first-completion from ~40 minutes to under 10, without rewriting or deleting a single word of curriculum.
@@ -732,7 +771,9 @@ Weekly experiment readout for 3 weeks; decision gate.
 
 ---
 
-## Phase 5 — Reduce the surface before value
+## Phase 5 — Reduce the surface before value ✅ DONE
+
+> **Completed:** Shipped with Phase 4 in `prodily-phase-4-5-integration` (PR #42, PR #43). 5.1 one-screen onboarding (goal + experience only, portfolio identity deferred), 5.2 tour deferred. NULL-username safety audited. Admin aligned at `78387cf`. Note: 5.3 (progress IA consolidation / duplicate route removal) was **not explicitly addressed** in the Phase 4/5 integration — the duplicate `/badges` vs `/progress/badges` routes may still exist. Verify before marking 5.3 complete.
 
 ### Objective
 Cut the number of screens and destinations a learner traverses before and around first value.
@@ -812,7 +853,24 @@ CI green; NULL-username audit documented with every consumer listed; redirect te
 
 ---
 
-## Phase 6 — Make the path real
+## Phase 6 — Make the path real ✅ IMPLEMENTED (code + tests + ADR; flag defaults to control — experiment not yet run)
+
+> **Implementation status (branch `prodily-phase-6-module-entry-unlock`):** code complete and
+> verified by typecheck, full lint, and the full 2577-test suite (185 files) — all green. Production
+> build deferred to CI (known-slow locally). No migration required. Feature flag
+> `MODULE_ENTRY_UNLOCK_ENABLED` defaults to **control (off)**; cohort = new signups via
+> `MODULE_ENTRY_UNLOCK_COHORT_START`. Decision record: `docs/decisions/ADR-008-phase-6-module-entry-unlock.md`.
+> Not yet deployed and the cohort experiment has not been run.
+>
+> **What shipped vs. the plan below:**
+> - 6.1 Recommendation routing — **derived at read time** (`resolvePersonalizedPath` +
+>   `resolveStartLearningTarget`); **no `recommendedModuleSlug` column** (the preferred option).
+> - 6.2 Unlock rule — new pure `resolveLessonAccess`; treatment = module-entry unlock, control =
+>   unchanged global-sequential; grandfathering via existing progress rows (no new state).
+> - 6.3 Lock affordances — Academy list + Search overlay (accessible, non-colour-only).
+> - 6.4 Public-lesson paradox — proxy now redirects to the interactive lesson only when accessible.
+> - Experiment mechanism — env-based deterministic split (`lib/academy/module-entry-unlock.ts`),
+>   mirroring the Phase 4 recut pattern. Measurement: `lib/admin/module-entry-experiment.ts`.
 
 ### Objective
 Make the personalization Prodily already promises actually affect where a learner goes, and stop the lock screen being the most-seen page for new users.

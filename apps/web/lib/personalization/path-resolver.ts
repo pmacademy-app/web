@@ -4,6 +4,11 @@ import {
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
 } from '@/lib/admin/settings-service'
+import {
+  getFirstActionableLessonIndex,
+  resolveLessonAccess,
+  type LessonAccessContext,
+} from '@/lib/curriculum-access'
 import type { CurriculumEntry } from '@/types'
 
 export interface LearnerPersonalizationInput {
@@ -146,10 +151,16 @@ export function resolvePersonalizedPath(
 /**
  * Resolves the next recommended milestone lesson for the learner.
  *
- * HARD ARCHITECTURAL INVARIANT:
+ * HARD ARCHITECTURAL INVARIANT (unchanged):
  * This function NEVER skips, reorders, or bypasses any lesson in the 90-lesson curriculum.
  * The lesson returned is ALWAYS the canonical lowest uncompleted lesson (activeNextIndex).
  * Only the explanatory milestoneReason is personalized.
+ *
+ * PHASE 6 AMENDMENT (scoped to ACCESS, not this function): the module-entry unlock treatment
+ * may make a later module's ENTRY lesson openable ahead of earlier modules — see
+ * `resolveLessonAccess` and `resolveStartLearningTarget` below, and docs/decisions/
+ * ADR-008-phase-6-module-entry-unlock.md. That amendment governs which lessons are *accessible*;
+ * this milestone helper still only ever returns the canonical next uncompleted lesson.
  */
 export function resolveNextRecommendedMilestone(
   personalizedPath: PersonalizedPath,
@@ -197,4 +208,87 @@ export function resolveNextRecommendedMilestone(
     milestoneReason,
     isTargetModuleLesson,
   }
+}
+
+// ─── Phase 6: Recommendation Routing ─────────────────────────────────────────────
+//
+// Phase 6 makes the onboarding recommendation actually determine where "Start Learning"
+// goes, instead of merely showing a badge. These helpers are pure so onboarding, the
+// dashboard and any router share one deterministic result.
+
+/**
+ * The entry (first) lesson of the learner's recommended module, in global curriculum order.
+ * Falls back to the foundations entry lesson, then to the very first lesson, so it ALWAYS
+ * resolves to a real existing lesson for any recommendation (valid, missing or unknown).
+ */
+export function resolveRecommendedEntryLesson(
+  personalizedPath: Pick<PersonalizedPath, 'recommendedModuleSlug'>,
+  curriculumLessons: CurriculumEntry[]
+): CurriculumEntry | null {
+  if (!curriculumLessons || curriculumLessons.length === 0) return null
+
+  const entryOf = (moduleSlug: string): CurriculumEntry | null => {
+    const inModule = curriculumLessons
+      .filter((l) => l.module === moduleSlug)
+      .sort((a, b) => a.order - b.order)
+    return inModule[0] ?? null
+  }
+
+  return (
+    entryOf(personalizedPath.recommendedModuleSlug) ??
+    entryOf('foundations') ??
+    curriculumLessons[0] ??
+    null
+  )
+}
+
+export interface StartLearningTarget {
+  /** The lesson "Start Learning" should open. Always a real, currently-accessible lesson. */
+  lesson: CurriculumEntry
+  /** True when we could honour the recommendation (its entry lesson is accessible now). */
+  isRecommended: boolean
+}
+
+/**
+ * Resolves where "Start Learning" should land the learner after onboarding.
+ *
+ * The recommended module's entry lesson is used when the learner can actually open it —
+ * which, under the Phase 6 module-entry unlock treatment, is true for every module entry, so
+ * the recommendation becomes meaningful. When it is NOT accessible (e.g. the control arm, or a
+ * mid-module recommendation the learner has not reached), we fall back deterministically to
+ * the learner's first actionable lesson (Lesson 1 for a brand-new learner), so the CTA never
+ * dumps the learner onto a lock wall or the collapsed /academy list.
+ *
+ * Returns null only when the curriculum itself is empty (caller then uses a static fallback).
+ */
+export function resolveStartLearningTarget(
+  personalizedPath: Pick<PersonalizedPath, 'recommendedModuleSlug'>,
+  curriculumLessons: CurriculumEntry[],
+  access: Omit<LessonAccessContext, 'curriculum' | 'index'>
+): StartLearningTarget | null {
+  if (!curriculumLessons || curriculumLessons.length === 0) return null
+
+  const recommendedEntry = resolveRecommendedEntryLesson(personalizedPath, curriculumLessons)
+  if (recommendedEntry) {
+    const info = resolveLessonAccess(recommendedEntry.id, {
+      curriculum: curriculumLessons,
+      ...access,
+    })
+    if (info.isAccessible) {
+      return { lesson: recommendedEntry, isRecommended: true }
+    }
+  }
+
+  // Fallback: the learner's first actionable lesson in the global sequence (always accessible).
+  const curriculumIds = curriculumLessons.map((l) => l.id)
+  const firstActionableIdx = getFirstActionableLessonIndex(access.completedIds, curriculumIds)
+  const fallbackLesson =
+    firstActionableIdx >= 0 ? curriculumLessons[firstActionableIdx] : curriculumLessons[0]
+
+  return fallbackLesson ? { lesson: fallbackLesson, isRecommended: false } : null
+}
+
+/** Builds the canonical Academy URL for a lesson. */
+export function academyLessonPath(lesson: Pick<CurriculumEntry, 'id' | 'module'>): string {
+  return `/academy/${lesson.module}/${lesson.id}`
 }

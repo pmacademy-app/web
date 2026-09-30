@@ -5,6 +5,8 @@ import { isAdminEmail } from '@/lib/admin/authorization'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
+// Phase 6: pure, dependency-light access resolver (types only — safe in the edge proxy bundle).
+import { resolveLessonAccess } from '@/lib/curriculum-access'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
 // mapping, to send an authenticated learner from a public /lessons/<slug> URL to
 // their interactive copy of that lesson.
@@ -181,23 +183,91 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
   }
 
-  // Authenticated learners navigating to public /lessons/[slug] are routed to their interactive lesson
+  // Authenticated learners navigating to public /lessons/[slug].
+  //
+  // Phase 6 (public-lesson access paradox): the public /lessons/<slug> page is a read-only,
+  // statically-cached PREVIEW. Previously every authenticated visitor was redirected to the
+  // interactive /academy lesson, where the curriculum gate could then drop them onto a lock
+  // wall — content they could already read publicly. We now upgrade them to the interactive
+  // lesson ONLY when it is actually accessible, computed with the CONTROL (global-sequential)
+  // model plus grandfathering/override. Control access is a strict subset of the module-entry
+  // treatment access, so a redirect can never land the learner on a lock wall under either arm.
+  // When the interactive lesson is not yet accessible, the learner simply keeps reading the
+  // public preview (no lock wall, and the preview exposes no progress/quiz/XP mutation).
   if (path.startsWith('/lessons/')) {
-    const hasAuthToken = Boolean(
-      request.cookies.get('sb-access-token')?.value || request.cookies.get('sb-refresh-token')?.value
-    )
-    if (hasAuthToken) {
+    const accessToken = request.cookies.get('sb-access-token')?.value
+    const refreshToken = request.cookies.get('sb-refresh-token')?.value
+    if (accessToken || refreshToken) {
       const slug = path.replace(/^\/lessons\//, '').replace(/\/.*$/, '')
-      if (slug) {
-        const match = curriculum.lessons.find((l) => l.slug === slug)
-        if (match) {
-          return withReferralCookie(
-            NextResponse.redirect(new URL(`/academy/${match.module}/${match.id}`, request.url)),
-            refParam
-          )
+      const match = slug ? curriculum.lessons.find((l) => l.slug === slug) : null
+      const academyUrl = match
+        ? new URL(`/academy/${match.module}/${match.id}`, request.url)
+        : new URL('/academy', request.url)
+
+      if (match) {
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+          auth: { persistSession: false },
+        })
+
+        // Verify the learner from the access token only, so the access check reflects their
+        // real completion state rather than mere cookie presence. We deliberately do NOT call
+        // refreshSession here: GoTrue rotates (revokes) the refresh token on use, and this
+        // branch does not write cookies back, so refreshing would leave the browser holding a
+        // revoked token and log the learner out. When the access token is missing/expired,
+        // verifiedUserId stays null and we fall through to the redirect-to-academy path below,
+        // where the main proxy flow refreshes AND persists the session correctly.
+        const bearer: string | undefined = accessToken
+        let verifiedUserId: string | null = null
+        try {
+          if (accessToken) {
+            const { data } = await supabase.auth.getUser(accessToken)
+            if (data?.user) verifiedUserId = data.user.id
+          }
+        } catch (err) {
+          console.error('[proxy] /lessons access-check auth error:', err)
         }
+
+        if (verifiedUserId) {
+          let accessible = false
+          try {
+            const authed = createClient(supabaseUrl, supabaseAnonKey, {
+              global: { headers: bearer ? { Authorization: `Bearer ${bearer}` } : {} },
+              auth: { persistSession: false },
+            })
+            const [{ data: rows }, { data: urow }] = await Promise.all([
+              authed.from('user_lesson_progress').select('lesson_id, status').eq('user_id', verifiedUserId),
+              authed.from('users').select('curriculum_access_override').eq('id', verifiedUserId).maybeSingle(),
+            ])
+            const completedIds = new Set<string>()
+            const openedIds = new Set<string>()
+            for (const r of (rows ?? []) as { lesson_id: string; status: string }[]) {
+              openedIds.add(r.lesson_id)
+              if (r.status === 'completed') completedIds.add(r.lesson_id)
+            }
+            const info = resolveLessonAccess(match.id, {
+              curriculum: curriculum.lessons,
+              completedIds,
+              openedIds,
+              treatment: false, // control model = strict subset of treatment access
+              override: Boolean((urow as { curriculum_access_override?: boolean } | null)?.curriculum_access_override),
+            })
+            accessible = info.isAccessible
+          } catch (err) {
+            console.error('[proxy] /lessons access-check query error:', err)
+          }
+
+          // Accessible → upgrade to the interactive lesson; otherwise keep the public preview.
+          return accessible
+            ? withReferralCookie(NextResponse.redirect(academyUrl), refParam)
+            : withReferralCookie(passThrough(request, requestId), refParam)
+        }
+        // Verification failed (transient) — preserve the prior convenience: route to academy,
+        // where the lesson page's own gate/lock screen handles access safely.
+        return withReferralCookie(NextResponse.redirect(academyUrl), refParam)
       }
-      return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
+
+      // Unknown slug with a session — preserve prior behaviour (send to the curriculum).
+      return withReferralCookie(NextResponse.redirect(academyUrl), refParam)
     }
   }
 
