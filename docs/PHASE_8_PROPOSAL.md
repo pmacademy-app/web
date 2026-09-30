@@ -1,9 +1,24 @@
-# Phase 8 — Proposal & Specification (draft, not started)
+# Phase 8 — Proposal & Specification
 
-**Date:** 2026-09-30
+**Date:** 2026-09-30 (proposal) · 2026-10-01 (implemented)
 **Author:** prepared after Phase 7 implementation (branch `prodily-phase-7-payoff`)
-**Status:** PROPOSED — not implemented, not scheduled. This is a specification to be turned into an implementation prompt later.
-**Companion docs:** [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md), [`PRODUCT_IMPROVEMENT_BLUEPRINT.md`](PRODUCT_IMPROVEMENT_BLUEPRINT.md), [`PRODUCT_AUDIT_2026-09-24.md`](PRODUCT_AUDIT_2026-09-24.md), [`decisions/ADR-009-phase-7-make-payoff-visible.md`](decisions/ADR-009-phase-7-make-payoff-visible.md)
+**Status:** IMPLEMENTED — 8.1 + 8.2 built and validated on branch `prodily-phase-8-close-the-loop` (from Phase 7 HEAD `e27a701`). 8.3 (SLA) intentionally deferred. Not deployed, not merged. See [`decisions/ADR-010-phase-8-close-the-loop.md`](decisions/ADR-010-phase-8-close-the-loop.md).
+**Companion docs:** [`PHASE_HISTORY.md`](PHASE_HISTORY.md), [`DEPLOYMENT.md`](DEPLOYMENT.md), [`decisions/ADR-009-phase-7-make-payoff-visible.md`](decisions/ADR-009-phase-7-make-payoff-visible.md), [`decisions/ADR-010-phase-8-close-the-loop.md`](decisions/ADR-010-phase-8-close-the-loop.md)
+
+> **Note (2026-10-01):** the original planning/source files this proposal cites — `IMPLEMENTATION_PLAN.md`, `PRODUCT_IMPROVEMENT_BLUEPRINT.md`, `PRODUCT_AUDIT_2026-09-24.md` — were retired once Phase 8 was implemented. Their durable content now lives in [`PHASE_HISTORY.md`](PHASE_HISTORY.md) and the ADRs; prose references to them below are historical.
+
+---
+
+## Implementation status (2026-10-01)
+
+Implemented on `prodily-phase-8-close-the-loop`, branched from Phase 7 HEAD (`e27a701`); flag-off, undeployed, unmerged.
+
+- **8.1 Experiment readout — DONE.** New recut aggregator (`lib/admin/recut-experiment.ts`); `ExperimentReadoutService` (`lib/admin/experiment-readout-service.ts`) assembles per-learner rows and calls all three aggregators; admin page `/admin/(console)/analytics/experiments` + `ExperimentReadoutView`; nav entry added. No schema change. Admin-only; no API route.
+- **8.2 Capstone review loop — DONE.** Additive migration adds `reviewed_at` + `reviewed_by` (nullable, no backfill); `ModerationService.reviewCapstone` stamps the first review idempotently and dispatches the new **in-app** `capstone.reviewed` notification to the learner; admin queue shows review aging (oldest-first, real elapsed time). Email deliberately **not** added.
+- **8.3 Review SLA — DEFERRED (by design).** `CAPSTONE_REVIEW_EXPECTATION` copy unchanged; no SLA promised. A real SLA is deferred until enough `reviewed_at` turnaround data exists.
+- **Phase 9 (OAuth) — still deferred/gated.**
+
+Validated: focused Phase 8 tests + full `lib/__tests__` suite (2627 tests) green, typecheck clean, lint 0 errors, production build green.
 
 ---
 
@@ -110,8 +125,8 @@ To honor the "connect existing value, don't build unnecessary features" principl
 **Unresolved / open:**
 
 1. **Deployment & experiment runs.** Phases 6 and 7 are implemented, flag-off, **not deployed**; neither cohort experiment has been run, so their hypotheses (unlock → more D30 learning; 8→4 → more artifacts) are **unvalidated**. (Verified: flags default off; branches undeployed.)
-2. **Experiment readouts missing** (→ Phase 8.1). Recut has no aggregator; module-entry and capstone-threshold aggregators are unwired. (Verified.)
-3. **Capstone review loop open** (→ Phase 8.2). No `reviewed_at`, no `capstone.reviewed` notification, no aging. (Verified.)
+2. ~~**Experiment readouts missing** (→ Phase 8.1).~~ **RESOLVED (Phase 8.1).** Recut aggregator added; all three aggregators wired into `ExperimentReadoutService` and the `/admin/analytics/experiments` surface.
+3. ~~**Capstone review loop open** (→ Phase 8.2).~~ **RESOLVED (Phase 8.2).** `reviewed_at`/`reviewed_by` added (additive); `capstone.reviewed` in-app notification dispatched on first review; admin review aging visible.
 4. **OAuth (plan Phase 8) not startable** — data gate unmet until a deployed funnel exists. (Verified: gate text in plan §Phase 8.)
 5. **`ActivationFunnelView` label "Requires 8 of 10"** is a static control-baseline descriptor; under a live threshold treatment it would understate eligibility for treated users. Minor; only matters if the Phase 7 flag is enabled. (Verified in `components/admin/ActivationFunnelView.tsx`.)
 6. **`lib/admin/template-variables.ts` `dueCount: 5`** remains as an explicit preview *sample* for the template editor (not reminder messaging). Intentional; noted for completeness. (Verified.)

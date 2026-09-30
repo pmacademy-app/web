@@ -11,10 +11,10 @@ Capstones are Prodily's strongest differentiator against free PM content — nin
 
 ### Source-document divergence (important)
 
-The two source docs disagree on Phase 7's scope, and this ADR records how it was resolved:
+The two source docs disagreed on Phase 7's scope, and this ADR records how it was resolved. (Both source files — the implementation plan and the product-improvement blueprint — were retired on 2026-10-01; their durable content now lives in [`../PHASE_HISTORY.md`](../PHASE_HISTORY.md). The quotes below are preserved verbatim as the record of the divergence.)
 
-- **`IMPLEMENTATION_PLAN.md` (authoritative plan), Phase 7** lists: 7.1 surface the capstone, 7.2 **review SLA**, 7.3 removals (`dueCount`, dead nav), 7.4 fix the feedback instrument. Its Definition-of-Done says *"submission gating unchanged (still 8 of 10)."* It contains **no** threshold experiment.
-- **`PRODUCT_IMPROVEMENT_BLUEPRINT.md` §7.2 ("Reconsider the 8-of-10 threshold")** explicitly calls for an experiment: *"Test a lower threshold (e.g. 4 lessons) for one module with a cohort."*
+- **The implementation plan (authoritative), Phase 7** listed: 7.1 surface the capstone, 7.2 **review SLA**, 7.3 removals (`dueCount`, dead nav), 7.4 fix the feedback instrument. Its Definition-of-Done said *"submission gating unchanged (still 8 of 10)."* It contained **no** threshold experiment.
+- **The blueprint, §7.2 ("Reconsider the 8-of-10 threshold")** explicitly called for an experiment: *"Test a lower threshold (e.g. 4 lessons) for one module with a cohort."*
 
 The Phase 7 task combines both: surface the capstone (7.1), **run the threshold experiment** (blueprint 7.2), make the review expectation explicit (plan 7.2), and consolidate surface (plan 7.3 / blueprint 7.4). We implemented all four. The threshold experiment therefore ships **defaulting to control (8 of 10)** — the plan's authoritative behaviour is the baseline, and the experiment is an opt-in overlay. **This divergence needs a product owner's sign-off before the flag is enabled in production** (see Risks).
 

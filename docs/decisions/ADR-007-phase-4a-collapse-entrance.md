@@ -9,10 +9,10 @@ Accepted (main-app / Phase 4A scope only)
 ## Context
 
 Phase 4 of the product improvement plan ("Collapse the entrance") aims to shorten the distance
-between *"I signed up"* and *"I can start learning"*. In [`PRODUCT_IMPROVEMENT_BLUEPRINT.md`](../PRODUCT_IMPROVEMENT_BLUEPRINT.md)
-this is Phase 4 (4.1–4.4); [`IMPLEMENTATION_PLAN.md`](../IMPLEMENTATION_PLAN.md) re-sequences the
-same work as **Phase 5** (one-screen onboarding, tour deferral, IA consolidation) and **Phase 8**
-(auth friction / Google OAuth, conditional). This ADR records the decisions made for the **main-app
+between *"I signed up"* and *"I can start learning"*. In the (now-retired) product improvement blueprint
+this was Phase 4 (4.1–4.4); the implementation plan re-sequenced the
+same work as **Phase 5** (one-screen onboarding, tour deferral, IA consolidation) and the auth-friction /
+Google OAuth work (conditional). This ADR records the decisions made for the **main-app
 Phase 4A** slice only. Admin (4B), UI-polish (4C) and the `/progress` IA consolidation (plan 5.3)
 are out of this slice.
 
@@ -86,8 +86,9 @@ funnel data exists.
 
 ### 4.4 — Google OAuth: reviewed and deferred
 
-Google OAuth is **not implemented in Phase 4A.** Per `IMPLEMENTATION_PLAN.md` it is Phase 8, explicitly
-**conditional**, and none of its three entry-gate conditions are met:
+Google OAuth is **not implemented in Phase 4A.** It is now the deferred **Phase 9** (see
+[`../PHASE_HISTORY.md`](../PHASE_HISTORY.md)), explicitly **conditional**, and none of its three
+entry-gate conditions are met:
 
 1. Phase 2's server-side funnel is not yet providing a measured signup→verified drop rate (>25% is the
    trigger).
