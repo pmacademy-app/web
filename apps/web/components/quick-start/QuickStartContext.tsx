@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { apiPost } from '@/lib/api/client'
-import { QUICK_START_STEPS, QuickStartStep } from './quick-start-steps'
+import { QUICK_START_STEPS, QUICK_START_AUTO_LAUNCH_ENABLED, QuickStartStep } from './quick-start-steps'
 import {
   trackQuickStartOpened,
   trackQuickStartStepViewed,
@@ -42,8 +42,12 @@ export function QuickStartProvider({
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [isManualReopen, setIsManualReopen] = useState(false)
 
-  // Auto-launch trigger on mount
+  // Auto-launch trigger on mount.
+  // Phase 4.2: gated off — the tour is no longer pushed at the entrance. It stays reachable
+  // manually (see `openQuickStart('manual')`, wired to the Topbar control). Kept as a guarded
+  // effect rather than deleted so the behaviour is a one-line flag flip to restore.
   useEffect(() => {
+    if (!QUICK_START_AUTO_LAUNCH_ENABLED) return
     if (initialOnboardingComplete && !initialQuickStartCompleted) {
       const raf = requestAnimationFrame(() => {
         setIsOpen(true)

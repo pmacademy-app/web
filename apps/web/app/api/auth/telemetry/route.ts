@@ -36,6 +36,7 @@ interface ValidatedTelemetryPayload {
   browserFamily?: 'chrome' | 'firefox' | 'safari' | 'edge' | 'other'
   onlineState?: boolean
   rawCode?: string
+  rawMessage?: string
 }
 
 function validateTelemetryPayload(data: unknown): ValidatedTelemetryPayload | null {
@@ -62,6 +63,14 @@ function validateTelemetryPayload(data: unknown): ValidatedTelemetryPayload | nu
       ? obj.rawCode.replace(/[^\w\-\.:]/g, '')
       : undefined
 
+  // Only recorded for the opaque AUTH_UNKNOWN_ERROR fallback, so unknowns become
+  // diagnosable. Capped here; the logger's sanitizeDetails pass redacts any token or
+  // address before persistence (defense in depth on top of the client-side mask).
+  const rawMessage =
+    typeof obj.rawMessage === 'string' && obj.rawMessage.length > 0
+      ? obj.rawMessage.slice(0, 300)
+      : undefined
+
   return {
     errorCode: obj.errorCode as AuthErrorCode,
     authAction: obj.authAction,
@@ -69,6 +78,7 @@ function validateTelemetryPayload(data: unknown): ValidatedTelemetryPayload | nu
     browserFamily,
     onlineState: typeof obj.onlineState === 'boolean' ? obj.onlineState : undefined,
     rawCode,
+    rawMessage,
   }
 }
 
@@ -163,7 +173,7 @@ export const POST = withRoute(
       return Response.json({ error: 'Invalid telemetry payload schema' }, { status: 400 })
     }
 
-    const { errorCode, authAction, isNetworkError, browserFamily, onlineState, rawCode } = payload
+    const { errorCode, authAction, isNetworkError, browserFamily, onlineState, rawCode, rawMessage } = payload
     const severity = deriveSeverity(errorCode)
 
     // 3. Log to system_errors infrastructure with safe sanitized metadata
@@ -177,6 +187,7 @@ export const POST = withRoute(
           errorCode,
           authAction,
           rawCode: rawCode || undefined,
+          rawMessage: rawMessage || undefined,
           isNetworkError: Boolean(isNetworkError),
           browserFamily: browserFamily || 'other',
           onlineState: onlineState ?? true,

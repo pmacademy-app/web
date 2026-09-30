@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Every lesson so far in this module has addressed how to build, measure, and grow a product — but growth and usage only translate into a sustainable business if the product is priced and packaged in a way that captures a fair share of the value it creates. Pricing is unusual among the topics in this curriculum because, unlike most product decisions, it is highly visible, directly and immediately felt by every customer, and extremely difficult to reverse once set — a pricing change that goes wrong can alienate an entire existing customer base in a way a delayed feature never could.
+Every lesson so far in this module has addressed how to build, measure, and grow a product but growth and usage only translate into a sustainable business if the product is priced and packaged in a way that captures a fair share of the value it creates. Pricing is unusual among the topics in this curriculum because, unlike most product decisions, it is highly visible, directly and immediately felt by every customer, and extremely difficult to reverse once set a pricing change that goes wrong can alienate an entire existing customer base in a way a delayed feature never could.
 
-This lesson matters because pricing is frequently treated as a finance or sales problem rather than a product one, when in reality a PM's product judgment — understanding what customers actually value, how usage patterns vary, and how packaging shapes perceived value — is essential to getting pricing right. Underpricing leaves value on the table and can starve a company of resources needed to keep building; overpricing, or pricing structured around the wrong dimension of value, can suppress adoption or create a mismatch between what customers pay and what they actually use, generating exactly the kind of resentment that erodes the trust this curriculum's stakeholder and design lessons have worked to build.
+This lesson matters because pricing is frequently treated as a finance or sales problem rather than a product one, when in reality a PM's product judgment understanding what customers actually value, how usage patterns vary, and how packaging shapes perceived value is essential to getting pricing right. Underpricing leaves value on the table and can starve a company of resources needed to keep building; overpricing, or pricing structured around the wrong dimension of value, can suppress adoption or create a mismatch between what customers pay and what they actually use, generating exactly the kind of resentment that erodes the trust this curriculum's stakeholder and design lessons have worked to build.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because pricing is frequently treated as a finance or sales 
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 48 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 42 (North Star Metrics — value-vs-exposure distinction), Lesson 44 (Cohort & Retention Analysis) |
-| **Next Lesson** | Lesson 49 — Go-To-Market Strategy |
-| **Future Topics Unlocked** | Lesson 49 (Go-To-Market Strategy), Lesson 50 (Product-Led Growth) — both build directly on the pricing model and value-capture concepts introduced here |
+| **Prerequisites** | Lesson 42 (North Star Metrics value-vs-exposure distinction), Lesson 44 (Cohort & Retention Analysis) |
+| **Next Lesson** | Lesson 49 Go-To-Market Strategy |
+| **Future Topics Unlocked** | Lesson 49 (Go-To-Market Strategy), Lesson 50 (Product-Led Growth) both build directly on the pricing model and value-capture concepts introduced here |
 
 ---
 
@@ -27,7 +27,7 @@ This lesson matters because pricing is frequently treated as a finance or sales 
 By the end of this lesson, you will be able to:
 
 1. Distinguish value-based pricing from cost-plus pricing, and explain why value-based pricing is generally the more defensible starting point for a differentiated product.
-2. Compare common pricing models — flat-rate, tiered, usage-based, per-seat, and freemium — and identify which best fits a given usage pattern.
+2. Compare common pricing models flat-rate, tiered, usage-based, per-seat, and freemium and identify which best fits a given usage pattern.
 3. Distinguish pricing (how much) from packaging (what's included at each level), and explain why conflating the two produces poor monetization decisions.
 4. Apply the Van Westendorp price sensitivity approach to estimate an acceptable price range directly from customer input.
 5. Diagnose a pricing model that is misaligned with actual usage patterns, and explain the business risk this misalignment creates.
@@ -44,9 +44,9 @@ This lesson assumes **Lesson 42's** distinction between metrics that reflect gen
 
 ### Value-Based vs. Cost-Plus Pricing
 
-**Cost-plus pricing** sets price by calculating the cost to produce and deliver a product, then adding a margin. This approach is common in commoditized goods but is generally a poor starting point for a differentiated software product, because it anchors price to the seller's internal cost structure rather than to what the product is actually worth to the customer — two customers might derive wildly different value from the identical product, and cost-plus pricing has no mechanism for capturing that difference.
+**Cost-plus pricing** sets price by calculating the cost to produce and deliver a product, then adding a margin. This approach is common in commoditized goods but is generally a poor starting point for a differentiated software product, because it anchors price to the seller's internal cost structure rather than to what the product is actually worth to the customer two customers might derive wildly different value from the identical product, and cost-plus pricing has no mechanism for capturing that difference.
 
-**Value-based pricing** instead sets price according to the value the product creates for the customer — the money saved, the revenue enabled, the time recovered, or the risk reduced. This requires genuinely understanding what a customer values (echoing this curriculum's discovery discipline from Lesson 8) and is harder to execute than cost-plus pricing, but it is generally the more defensible approach for a genuinely differentiated product, since it aligns price with the actual reason a customer is willing to pay at all, rather than with an internal cost figure the customer never sees and has no reason to care about.
+**Value-based pricing** instead sets price according to the value the product creates for the customer the money saved, the revenue enabled, the time recovered, or the risk reduced. This requires genuinely understanding what a customer values (echoing this curriculum's discovery discipline from Lesson 8) and is harder to execute than cost-plus pricing, but it is generally the more defensible approach for a genuinely differentiated product, since it aligns price with the actual reason a customer is willing to pay at all, rather than with an internal cost figure the customer never sees and has no reason to care about.
 
 ### Common Pricing Models
 
@@ -58,11 +58,11 @@ This lesson assumes **Lesson 42's** distinction between metrics that reflect gen
 | Per-seat | Price scales with the number of individual users/accounts | Value is delivered per individual user, and usage per seat is relatively consistent |
 | Freemium | A free tier with core functionality, paid tiers unlocking additional value | The product benefits from network effects or has a low marginal cost to serve free users, and a credible upgrade path to paid value exists |
 
-Choosing the wrong model for a given usage pattern is one of the most common and costly pricing mistakes: a flat-rate model applied to a product with wildly varying usage across customers means light users effectively subsidize heavy users (risking light-user churn) while heavy users may be undercharged relative to the cost of serving them (risking margin erosion) — precisely the failure illustrated in this lesson's Case Study.
+Choosing the wrong model for a given usage pattern is one of the most common and costly pricing mistakes: a flat-rate model applied to a product with wildly varying usage across customers means light users effectively subsidize heavy users (risking light-user churn) while heavy users may be undercharged relative to the cost of serving them (risking margin erosion) precisely the failure illustrated in this lesson's Case Study.
 
 ### Pricing vs. Packaging
 
-A critical, frequently conflated distinction: **pricing** is how much a customer pays; **packaging** is what they get at each price point (which features, usage limits, or support levels are bundled together). A company can have an excellent pricing model (correctly aligned with usage and value) undermined by poor packaging (bundling features in a way that forces customers to pay for a much higher tier than they need just to access one feature they genuinely value), or vice versa. Getting both right requires treating them as related but genuinely separate design decisions — packaging should group value coherently around distinct customer needs and willingness to pay, while pricing should reflect the value of each resulting package.
+A critical, frequently conflated distinction: **pricing** is how much a customer pays; **packaging** is what they get at each price point (which features, usage limits, or support levels are bundled together). A company can have an excellent pricing model (correctly aligned with usage and value) undermined by poor packaging (bundling features in a way that forces customers to pay for a much higher tier than they need just to access one feature they genuinely value), or vice versa. Getting both right requires treating them as related but genuinely separate design decisions packaging should group value coherently around distinct customer needs and willingness to pay, while pricing should reflect the value of each resulting package.
 
 ### The Van Westendorp Price Sensitivity Meter
 
@@ -115,7 +115,7 @@ As covered in Theory, this anchors price to an internal figure customers never s
 
 **Mistake 2: Choosing a pricing model that doesn't match the actual variance in customer usage**
 
-A flat-rate model applied to widely varying usage patterns creates the specific cross-subsidization problem covered in Theory and illustrated in this lesson's Case Study — light users overpay relative to their usage, heavy users may be undercharged relative to cost to serve.
+A flat-rate model applied to widely varying usage patterns creates the specific cross-subsidization problem covered in Theory and illustrated in this lesson's Case Study light users overpay relative to their usage, heavy users may be undercharged relative to cost to serve.
 
 **Mistake 3: Conflating pricing and packaging decisions**
 
@@ -127,7 +127,7 @@ Without a technique like the Van Westendorp approach or direct value-based resea
 
 **Mistake 5: Treating a pricing change as a purely internal, low-risk decision**
 
-Pricing is unusually visible and difficult to reverse compared to most product decisions — a poorly communicated or poorly designed pricing change can generate immediate, vocal backlash from an existing customer base, making the stakeholder communication discipline from Lesson 47 especially relevant when planning any pricing change.
+Pricing is unusually visible and difficult to reverse compared to most product decisions a poorly communicated or poorly designed pricing change can generate immediate, vocal backlash from an existing customer base, making the stakeholder communication discipline from Lesson 47 especially relevant when planning any pricing change.
 
 ---
 
@@ -169,21 +169,21 @@ This lesson's core takeaway tool is a simple diagnostic for evaluating whether a
 }}%%
 graph TD
     A[Proposed pricing model] --> B{Does the pricing<br/>dimension scale with<br/>actual customer usage<br/>and derived value?}
-    B -->|Yes, closely aligned| C[Model likely sustainable —<br/>light and heavy users<br/>pay proportionally]
+    B -->|Yes, closely aligned| C[Model likely sustainable <br/>light and heavy users<br/>pay proportionally]
     B -->|No, poorly aligned| D[Risk of cross-subsidization:<br/>light users overpay,<br/>heavy users may be<br/>undercharged relative to cost]
 ```
 
-Use the Value-Price Alignment Check whenever evaluating an existing or proposed pricing model: identify the specific dimension being charged for (seats, usage volume, flat access) and ask honestly whether that dimension actually tracks how customers derive value and how much it costs to serve them — a mismatch here is one of the most common, and most fixable, sources of pricing dysfunction.
+Use the Value-Price Alignment Check whenever evaluating an existing or proposed pricing model: identify the specific dimension being charged for (seats, usage volume, flat access) and ask honestly whether that dimension actually tracks how customers derive value and how much it costs to serve them a mismatch here is one of the most common, and most fixable, sources of pricing dysfunction.
 
 ---
 
 ## Real Company Example
 
-**Salesforce** has been publicly associated with a long-standing tiered "editions" pricing model (historically including tiers such as Essentials, Professional, Enterprise, and Unlimited), combining per-seat pricing within each tier with meaningfully differentiated feature packaging across tiers — allowing smaller organizations to access core CRM functionality at a lower price point while larger, more sophisticated organizations pay more for advanced customization, automation, and support capabilities genuinely relevant to their scale and complexity.
+**Salesforce** has been publicly associated with a long-standing tiered "editions" pricing model (historically including tiers such as Essentials, Professional, Enterprise, and Unlimited), combining per-seat pricing within each tier with meaningfully differentiated feature packaging across tiers allowing smaller organizations to access core CRM functionality at a lower price point while larger, more sophisticated organizations pay more for advanced customization, automation, and support capabilities genuinely relevant to their scale and complexity.
 
 The underlying principle connects directly to this lesson's Theory: this structure reflects both value-based reasoning (larger, more sophisticated customers derive more value from advanced features and are charged accordingly) and a deliberate separation of packaging (what's included at each tier) from pricing (the per-seat cost within each tier), rather than a single undifferentiated price applied uniformly regardless of customer size or need.
 
-*(Assumption flagged: this reflects general, publicly available descriptions of Salesforce's tiered edition pricing structure over time, not a confirmed, complete, or current account of Salesforce's specific current pricing, which may have changed since this description. Specific pricing tiers, features, and amounts evolve continuously at any company; the durable lesson is the underlying principle — tiered, value-aligned packaging serves meaningfully different customer segments better than a single undifferentiated price — rather than a claim about Salesforce's exact current pricing structure.)*
+*(Assumption flagged: this reflects general, publicly available descriptions of Salesforce's tiered edition pricing structure over time, not a confirmed, complete, or current account of Salesforce's specific current pricing, which may have changed since this description. Specific pricing tiers, features, and amounts evolve continuously at any company; the durable lesson is the underlying principle tiered, value-aligned packaging serves meaningfully different customer segments better than a single undifferentiated price rather than a claim about Salesforce's exact current pricing structure.)*
 
 ---
 
@@ -193,7 +193,7 @@ The underlying principle connects directly to this lesson's Theory: this structu
 Pricing is often set with limited data, sometimes based on rough competitor benchmarking or founder intuition, and is frequently a flat-rate or simple tiered structure chosen more for implementation simplicity than rigorous value alignment. This is often reasonable at very early stages, when the priority is validating whether customers will pay anything at all, but the specific model chosen should still be revisited deliberately as usage data accumulates, rather than left unexamined by default.
 
 **At a mid-size company:**
-Pricing decisions typically warrant more structured research — Van Westendorp-style customer input, usage-pattern analysis to check the Value-Price Alignment Check, and closer collaboration between product, sales, and finance. This is the stage where the mismatch between a simple, early-stage pricing model and actual, now-more-varied usage patterns often first becomes visible and costly, as illustrated in this lesson's Case Study.
+Pricing decisions typically warrant more structured research Van Westendorp-style customer input, usage-pattern analysis to check the Value-Price Alignment Check, and closer collaboration between product, sales, and finance. This is the stage where the mismatch between a simple, early-stage pricing model and actual, now-more-varied usage patterns often first becomes visible and costly, as illustrated in this lesson's Case Study.
 
 **At Big Tech:**
 Pricing and packaging decisions are often deeply sophisticated, supported by dedicated pricing/monetization teams, extensive experimentation (echoing Lesson 45's rigor, since pricing changes can and should be tested where feasible), and careful attention to price discrimination across customer segments (charging different amounts to different segments based on differing value and willingness to pay, within legal and ethical bounds). The PM's job shifts toward partnering effectively with these specialized teams while ensuring pricing and packaging decisions remain grounded in genuine product value rather than becoming a purely financial optimization exercise disconnected from customer experience.
@@ -204,15 +204,15 @@ Pricing and packaging decisions are often deeply sophisticated, supported by ded
 
 Consider a simplified, illustrative scenario common at SaaS companies whose usage patterns diversify faster than their pricing model evolves.
 
-A company launches with a single flat-rate monthly price, reasoning that simplicity would ease adoption during its early growth phase. As the customer base grows, usage patterns diverge dramatically: some customers use the product lightly, for a narrow use case, while others — often the company's most successful, most engaged customers — use it intensively, generating usage volumes many times higher than the typical customer, at meaningfully higher infrastructure cost to serve.
+A company launches with a single flat-rate monthly price, reasoning that simplicity would ease adoption during its early growth phase. As the customer base grows, usage patterns diverge dramatically: some customers use the product lightly, for a narrow use case, while others often the company's most successful, most engaged customers use it intensively, generating usage volumes many times higher than the typical customer, at meaningfully higher infrastructure cost to serve.
 
-Over time, two problems emerge simultaneously. Light users increasingly perceive the flat rate as poor value relative to their actual usage and begin churning at a higher rate than heavy users, since they're effectively subsidizing the platform's heaviest users without deriving proportional benefit themselves. Meanwhile, the company's gross margin on its heaviest-usage accounts — paradoxically, its most successful and most product-engaged customers — steadily erodes, since the flat rate was calibrated to a "typical" usage level that these customers far exceed, meaning the company is losing money, at the margin, on serving its own best customers more they use the product.
+Over time, two problems emerge simultaneously. Light users increasingly perceive the flat rate as poor value relative to their actual usage and begin churning at a higher rate than heavy users, since they're effectively subsidizing the platform's heaviest users without deriving proportional benefit themselves. Meanwhile, the company's gross margin on its heaviest-usage accounts paradoxically, its most successful and most product-engaged customers steadily erodes, since the flat rate was calibrated to a "typical" usage level that these customers far exceed, meaning the company is losing money, at the margin, on serving its own best customers more they use the product.
 
 **What went wrong?**
 
-Using the Value-Price Alignment Check: the flat-rate model's pricing dimension (a single fixed monthly fee) never scaled with the dimension along which usage and cost actually varied (usage volume), producing exactly the cross-subsidization risk this lesson's Theory predicts. Light users were, in effect, being asked to pay for capacity they didn't use, while heavy users were being served at a cost the flat fee no longer covered — a dynamic invisible in the company's aggregate revenue figures (which continued growing as the customer base grew) but clearly visible once usage-segmented margin analysis was performed, echoing Lesson 43's Simpson's Paradox caution about aggregate numbers hiding segment-specific problems.
+Using the Value-Price Alignment Check: the flat-rate model's pricing dimension (a single fixed monthly fee) never scaled with the dimension along which usage and cost actually varied (usage volume), producing exactly the cross-subsidization risk this lesson's Theory predicts. Light users were, in effect, being asked to pay for capacity they didn't use, while heavy users were being served at a cost the flat fee no longer covered a dynamic invisible in the company's aggregate revenue figures (which continued growing as the customer base grew) but clearly visible once usage-segmented margin analysis was performed, echoing Lesson 43's Simpson's Paradox caution about aggregate numbers hiding segment-specific problems.
 
-The corrective response required transitioning to a hybrid model — a lower base flat fee covering typical light usage, with usage-based charges for consumption beyond a defined threshold — deliberately designed to realign pricing with the dimension driving both value and cost. This transition itself required careful stakeholder communication (Lesson 47) to existing customers, since any pricing change to an installed base carries the specific trust and communication risks this lesson's Mistake 5 describes, and ideally would be validated through structured customer input (the Van Westendorp technique, or direct research into willingness to pay at different usage levels) rather than assumed to be correct without customer-grounded evidence.
+The corrective response required transitioning to a hybrid model a lower base flat fee covering typical light usage, with usage-based charges for consumption beyond a defined threshold deliberately designed to realign pricing with the dimension driving both value and cost. This transition itself required careful stakeholder communication (Lesson 47) to existing customers, since any pricing change to an installed base carries the specific trust and communication risks this lesson's Mistake 5 describes, and ideally would be validated through structured customer input (the Van Westendorp technique, or direct research into willingness to pay at different usage levels) rather than assumed to be correct without customer-grounded evidence.
 
 ---
 
@@ -247,18 +247,18 @@ A pricing model chosen without reference to this kind of usage-pattern analysis 
 
 ## Summary
 
-Pricing should generally be anchored to value-based reasoning — what a product is genuinely worth to a customer — rather than cost-plus reasoning anchored to internal cost structures the customer never sees. Choosing among common pricing models (flat-rate, tiered, usage-based, per-seat, freemium) requires matching the pricing dimension to how customer usage and derived value actually vary, since a mismatch produces cross-subsidization risk: light users overpaying relative to their usage, heavy users potentially undercharged relative to the cost of serving them, exactly the dynamic illustrated in this lesson's Case Study of a flat-rate model that quietly eroded margin on a company's best, most engaged customers while driving away its lightest ones. Pricing and packaging are related but genuinely distinct decisions — how much a customer pays versus what they receive at each price point — and conflating them risks producing packages that don't map cleanly to real customer segments. The Van Westendorp price sensitivity technique offers a structured, customer-grounded way to estimate an acceptable price range directly from customer input, rather than relying purely on internal intuition. Finally, because pricing changes are unusually visible and difficult to reverse compared to most product decisions, they warrant the same careful stakeholder communication discipline established in Lesson 47, since a poorly communicated pricing change can generate immediate, vocal backlash from an existing, trust-dependent customer base.
+Pricing should generally be anchored to value-based reasoning what a product is genuinely worth to a customer rather than cost-plus reasoning anchored to internal cost structures the customer never sees. Choosing among common pricing models (flat-rate, tiered, usage-based, per-seat, freemium) requires matching the pricing dimension to how customer usage and derived value actually vary, since a mismatch produces cross-subsidization risk: light users overpaying relative to their usage, heavy users potentially undercharged relative to the cost of serving them, exactly the dynamic illustrated in this lesson's Case Study of a flat-rate model that quietly eroded margin on a company's best, most engaged customers while driving away its lightest ones. Pricing and packaging are related but genuinely distinct decisions how much a customer pays versus what they receive at each price point and conflating them risks producing packages that don't map cleanly to real customer segments. The Van Westendorp price sensitivity technique offers a structured, customer-grounded way to estimate an acceptable price range directly from customer input, rather than relying purely on internal intuition. Finally, because pricing changes are unusually visible and difficult to reverse compared to most product decisions, they warrant the same careful stakeholder communication discipline established in Lesson 47, since a poorly communicated pricing change can generate immediate, vocal backlash from an existing, trust-dependent customer base.
 
 ---
 
 ## Key Takeaways
 
 - Value-based pricing anchors price to what a product is genuinely worth to the customer; cost-plus pricing anchors it to internal cost structures the customer never sees, and is generally a weaker starting point for a differentiated product.
-- Choosing a pricing model (flat-rate, tiered, usage-based, per-seat, freemium) requires matching the pricing dimension to how customer usage and value actually vary — a mismatch creates cross-subsidization risk.
+- Choosing a pricing model (flat-rate, tiered, usage-based, per-seat, freemium) requires matching the pricing dimension to how customer usage and value actually vary a mismatch creates cross-subsidization risk.
 - Pricing (how much) and packaging (what's included) are related but distinct decisions; conflating them risks producing packages that don't map cleanly to real customer segments.
 - The Van Westendorp price sensitivity technique provides a structured, customer-grounded way to estimate an acceptable price range directly from customer input.
 - A flat-rate model applied to widely varying usage patterns can quietly erode margin on the heaviest-usage, often most engaged and successful, customers while simultaneously driving away lighter users who feel they're overpaying.
-- Aggregate revenue growth can mask a usage-segmented margin problem, echoing Lesson 43's Simpson's Paradox caution — segmented analysis is necessary to detect this kind of pricing misalignment.
+- Aggregate revenue growth can mask a usage-segmented margin problem, echoing Lesson 43's Simpson's Paradox caution segmented analysis is necessary to detect this kind of pricing misalignment.
 - Pricing changes are unusually visible and difficult to reverse, and warrant careful stakeholder communication (Lesson 47) given their potential to generate immediate backlash from an existing customer base.
 
 ---
@@ -269,7 +269,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 - **Value-based, not cost-plus:** anchor price to what customers value, not internal cost structure.
 - **Match model to usage variance:** flat-rate (uniform usage), tiered (segments), usage-based (wide variance), per-seat (value scales with users), freemium (low-cost-to-serve + upgrade path).
-- **Pricing ≠ packaging:** how much vs. what's included — treat as related but separate decisions.
+- **Pricing ≠ packaging:** how much vs. what's included treat as related but separate decisions.
 - **Van Westendorp:** four customer-input questions revealing an acceptable price range and optimal point.
 - **Value-Price Alignment Check:** does the pricing dimension actually track usage and derived value?
 - **Watch for cross-subsidization:** flat-rate models risk light users overpaying, heavy users undercharged relative to cost.
@@ -284,7 +284,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 | Value-based pricing | Setting price according to the value a product creates for the customer | Cost-plus pricing | 1 |
 | Cost-plus pricing | Setting price by calculating production/delivery cost and adding a margin | Value-based pricing | 1 |
 | Packaging | What is included at each price point (features, usage limits, support level) | Pricing | 2 |
-| Van Westendorp price sensitivity meter | A four-question customer research technique estimating an acceptable price range | — | 2 |
+| Van Westendorp price sensitivity meter | A four-question customer research technique estimating an acceptable price range | | 2 |
 | Cross-subsidization | A pricing mismatch where light users effectively subsidize heavy users under a poorly-aligned model | Value-Price Alignment Check | 2 |
 | Value-Price Alignment Check | This lesson's mental model: verifying that a pricing dimension actually scales with usage and derived value | Cross-subsidization | 2 |
 
@@ -292,9 +292,9 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 ## Further Reading / Resources
 
-- *Monetizing Innovation* by Madhavan Ramanujam and Georg Tacke — a detailed treatment of value-based pricing and common monetization pitfalls.
-- "Price Sensitivity Measurement" by Peter van Westendorp — the original articulation of the price sensitivity meter technique referenced in this lesson.
-- *Pricing Strategy: Setting Price Levels, Managing Price Discounts, and Establishing Price Structures* by Tim J. Smith — a comprehensive practitioner reference on pricing model selection and structure.
+- *Monetizing Innovation* by Madhavan Ramanujam and Georg Tacke a detailed treatment of value-based pricing and common monetization pitfalls.
+- "Price Sensitivity Measurement" by Peter van Westendorp the original articulation of the price sensitivity meter technique referenced in this lesson.
+- *Pricing Strategy: Setting Price Levels, Managing Price Discounts, and Establishing Price Structures* by Tim J. Smith a comprehensive practitioner reference on pricing model selection and structure.
 
 ---
 
@@ -302,7 +302,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 **Card 1**
 - Front: What's the difference between value-based and cost-plus pricing?
-- Back: Value-based pricing sets price according to what a product is worth to the customer; cost-plus pricing sets price by calculating production cost and adding a margin — value-based is generally the stronger starting point for a differentiated product.
+- Back: Value-based pricing sets price according to what a product is worth to the customer; cost-plus pricing sets price by calculating production cost and adding a margin value-based is generally the stronger starting point for a differentiated product.
 - Difficulty: 1
 - Tags: value-based-vs-cost-plus
 
@@ -314,7 +314,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 **Card 3**
 - Front: What's the difference between pricing and packaging?
-- Back: Pricing is how much a customer pays; packaging is what they receive at each price point (features, limits, support) — related but distinct decisions.
+- Back: Pricing is how much a customer pays; packaging is what they receive at each price point (features, limits, support) related but distinct decisions.
 - Difficulty: 1
 - Tags: pricing-vs-packaging
 
@@ -341,7 +341,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 Consider the following novel scenario: You're a PM at a company considering moving from a simple per-seat pricing model to a usage-based model, since you've noticed that some customers with very few seats generate enormous usage volume, while other customers with many seats use the product lightly.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Value-Price Alignment Check and Pricing Model Selection Table, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Value-Price Alignment Check and Pricing Model Selection Table, not to reach one "right" answer.
 
 1. Using the Value-Price Alignment Check, what specific evidence would confirm that per-seat pricing is currently misaligned with how value and cost actually vary for this product?
 2. Using the Pricing Model Selection Table, what usage pattern would justify moving toward a usage-based or hybrid model instead of per-seat pricing?
@@ -516,7 +516,7 @@ C) This pattern is irrelevant, a marketing matter
 D) The company should switch to flat rate at once
 
 *Correct answer: A*
-*Explanation: Seats and usage have come apart here — the bill tracks headcount while the cost and the value both track volume, the same gap the Alignment Check exists to surface.*
+*Explanation: Seats and usage have come apart here the bill tracks headcount while the cost and the value both track volume, the same gap the Alignment Check exists to surface.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
@@ -552,9 +552,9 @@ D) Validate the structure, then communicate with real care
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 47 — Stakeholder Management | Pricing changes require the same careful, trust-preserving stakeholder communication discipline established in Lesson 47 |
-| **Current Lesson** | Lesson 48 — Pricing & Monetization Strategy | Value-based vs. cost-plus pricing; pricing model selection; pricing vs. packaging; Van Westendorp technique; Value-Price Alignment Check |
-| **Next Lesson** | Lesson 49 — Go-To-Market Strategy | Builds on pricing and packaging decisions when planning how a product is positioned and launched to market |
+| **Previous Lesson** | Lesson 47 Stakeholder Management | Pricing changes require the same careful, trust-preserving stakeholder communication discipline established in Lesson 47 |
+| **Current Lesson** | Lesson 48 Pricing & Monetization Strategy | Value-based vs. cost-plus pricing; pricing model selection; pricing vs. packaging; Van Westendorp technique; Value-Price Alignment Check |
+| **Next Lesson** | Lesson 49 Go-To-Market Strategy | Builds on pricing and packaging decisions when planning how a product is positioned and launched to market |
 | **Future Concepts Unlocked** | Lesson 50 (Product-Led Growth) | Depends on freemium and usage-based pricing concepts when designing self-serve growth mechanics |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry value-based pricing reasoning and the Value-Price Alignment Check with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry value-based pricing reasoning and the Value-Price Alignment Check with you they will not be re-explained, only re-applied in new contexts.

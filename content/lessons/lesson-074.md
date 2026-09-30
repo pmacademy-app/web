@@ -4,7 +4,7 @@
 
 Lessons 72 and 73 established that enterprise adoption moves through distinct rungs, each requiring engagement with a different stakeholder, and that a product can stall indefinitely at any given rung if the right capability or the right person hasn't been engaged. This lesson addresses a related but distinct question: how should a product's packaging and pricing structure itself be designed so that climbing the Enterprise Adoption Ladder is the natural, low-friction path, rather than a series of separate, high-effort renegotiations at every stage?
 
-**Land-and-expand** is the go-to-market motion where a vendor deliberately enters an account with a small, low-friction initial purchase — a single team, a limited feature set, a small number of seats — and then grows that initial foothold into a much larger account over time, rather than attempting to sell the full, final scope of the relationship in one large, high-risk initial transaction. This motion is not merely a sales tactic bolted onto an otherwise unrelated product; it requires the product's actual packaging structure — what's included at each tier, what usage patterns naturally trigger an upgrade conversation — to be deliberately designed to support expansion, or the land-and-expand motion will stall regardless of how good the underlying sales strategy is.
+**Land-and-expand** is the go-to-market motion where a vendor deliberately enters an account with a small, low-friction initial purchase a single team, a limited feature set, a small number of seats and then grows that initial foothold into a much larger account over time, rather than attempting to sell the full, final scope of the relationship in one large, high-risk initial transaction. This motion is not merely a sales tactic bolted onto an otherwise unrelated product; it requires the product's actual packaging structure what's included at each tier, what usage patterns naturally trigger an upgrade conversation to be deliberately designed to support expansion, or the land-and-expand motion will stall regardless of how good the underlying sales strategy is.
 
 This lesson introduces the Expansion Wedge, this lesson's core mental model, to give you a structured way to design packaging that creates natural, low-friction expansion triggers at each stage of the Enterprise Adoption Ladder, rather than packaging that either gives away too much value at the initial "land" stage to ever justify an upgrade, or that gates so much value behind higher tiers that the initial land never happens at all.
 
@@ -14,13 +14,13 @@ This lesson introduces the Expansion Wedge, this lesson's core mental model, to 
 
 | Field | Detail |
 |---|---|
-| **Module** | 8 — Advanced Strategy, Innovation & Enterprise/B2B Product Management |
+| **Module** | 8 Advanced Strategy, Innovation & Enterprise/B2B Product Management |
 | **Current Lesson** | 74 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 72 (Enterprise Adoption Ladder), Lesson 73 (Stakeholder Compass), Lesson 48 (value-based pricing and packaging) |
-| **Next Lesson** | Lesson 75 — Competitive Strategy and Moats |
-| **Future Topics Unlocked** | Lesson 75 (Competitive Strategy), Lesson 79 (Pricing Strategy at Scale), Lesson 80 (Module Synthesis) — all depend on the Expansion Wedge introduced here |
+| **Next Lesson** | Lesson 75 Competitive Strategy and Moats |
+| **Future Topics Unlocked** | Lesson 75 (Competitive Strategy), Lesson 79 (Pricing Strategy at Scale), Lesson 80 (Module Synthesis) all depend on the Expansion Wedge introduced here |
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes the Enterprise Adoption Ladder from Lesson 72 and the Stakeh
 
 ### Why Land-and-Expand Requires Deliberate Packaging Design
 
-A land-and-expand motion depends on an account's initial purchase being genuinely low-friction and low-risk, so that a Champion (per Lesson 73) can secure approval without needing to engage the full Stakeholder Compass immediately. This means the "land" tier must be scoped narrowly enough to avoid triggering full enterprise procurement, security review, or significant budget scrutiny — while still delivering enough genuine value that the initial user or team becomes a durable foothold rather than a one-time trial. Simultaneously, the packaging must include natural, well-defined points at which continued growth in usage, team size, or need for enterprise-specific capability creates a compelling, low-friction reason to expand the relationship — pushing the account up the Enterprise Adoption Ladder toward Rungs 2, 3, and 4. If either half of this design is wrong — the land tier too generous, or the expansion triggers too vague or too aggressive — the entire motion breaks down.
+A land-and-expand motion depends on an account's initial purchase being genuinely low-friction and low-risk, so that a Champion (per Lesson 73) can secure approval without needing to engage the full Stakeholder Compass immediately. This means the "land" tier must be scoped narrowly enough to avoid triggering full enterprise procurement, security review, or significant budget scrutiny while still delivering enough genuine value that the initial user or team becomes a durable foothold rather than a one-time trial. Simultaneously, the packaging must include natural, well-defined points at which continued growth in usage, team size, or need for enterprise-specific capability creates a compelling, low-friction reason to expand the relationship pushing the account up the Enterprise Adoption Ladder toward Rungs 2, 3, and 4. If either half of this design is wrong the land tier too generous, or the expansion triggers too vague or too aggressive the entire motion breaks down.
 
 ### The Expansion Wedge
 
@@ -89,15 +89,15 @@ graph LR
     C --> D["Enterprise Tier<br/>(full Rung 3/4 capability,<br/>matched to Adoption Ladder)"]
 ```
 
-The Expansion Wedge's discipline is designing each trigger point deliberately, so that the reason to upgrade is a natural consequence of the account's own growing usage or organizational need, rather than an arbitrary, sales-imposed upsell unconnected to anything the customer is actually experiencing. A well-designed Expansion Trigger corresponds directly to a genuine constraint the customer runs into on their own — running out of seats, needing the administrative controls that become necessary at Rung 3 per Lesson 72, or requiring a security certification their own procurement process now demands — rather than a feature withheld somewhat arbitrarily simply to create upsell pressure.
+The Expansion Wedge's discipline is designing each trigger point deliberately, so that the reason to upgrade is a natural consequence of the account's own growing usage or organizational need, rather than an arbitrary, sales-imposed upsell unconnected to anything the customer is actually experiencing. A well-designed Expansion Trigger corresponds directly to a genuine constraint the customer runs into on their own running out of seats, needing the administrative controls that become necessary at Rung 3 per Lesson 72, or requiring a security certification their own procurement process now demands rather than a feature withheld somewhat arbitrarily simply to create upsell pressure.
 
 ### Seat-Based, Usage-Based, and Feature-Gated Triggers
 
-Expansion triggers generally take one of three forms, each with different trade-offs. **Seat-based triggers** expand pricing as more individual users are added, aligning naturally with organic team growth but potentially creating friction if a customer feels penalized for broader internal adoption they'd otherwise want to encourage. **Usage-based triggers** expand pricing as consumption (API calls, data volume, transaction count) grows, aligning cost directly with value delivered but potentially creating unpredictable budgeting friction for the Economic Buyer role from Lesson 73. **Feature-gated triggers** reserve specific capabilities — often exactly the Rung 3 and 4 enterprise-readiness capabilities from Lesson 72, such as single sign-on, audit logging, or dedicated support SLAs — for higher tiers, creating a natural upgrade path precisely at the point an account's organizational maturity actually requires those capabilities. Most mature land-and-expand packaging structures combine more than one trigger type, since relying on a single trigger type alone can create either overly linear, predictable expansion (easy for a competitor to model and undercut) or overly unpredictable expansion (frustrating for the Economic Buyer to budget around).
+Expansion triggers generally take one of three forms, each with different trade-offs. **Seat-based triggers** expand pricing as more individual users are added, aligning naturally with organic team growth but potentially creating friction if a customer feels penalized for broader internal adoption they'd otherwise want to encourage. **Usage-based triggers** expand pricing as consumption (API calls, data volume, transaction count) grows, aligning cost directly with value delivered but potentially creating unpredictable budgeting friction for the Economic Buyer role from Lesson 73. **Feature-gated triggers** reserve specific capabilities often exactly the Rung 3 and 4 enterprise-readiness capabilities from Lesson 72, such as single sign-on, audit logging, or dedicated support SLAs for higher tiers, creating a natural upgrade path precisely at the point an account's organizational maturity actually requires those capabilities. Most mature land-and-expand packaging structures combine more than one trigger type, since relying on a single trigger type alone can create either overly linear, predictable expansion (easy for a competitor to model and undercut) or overly unpredictable expansion (frustrating for the Economic Buyer to budget around).
 
 ### The Risk of Miscalibrated Land Tiers
 
-A land tier that is **too generous** — including capabilities properly belonging to a higher tier, or allowing unlimited usage that should reasonably trigger an upgrade — gives away the very value that should justify expansion, leaving the vendor with a durable but permanently small foothold that never naturally grows. A land tier that is **too restrictive** — omitting capability genuinely needed even for basic initial adoption, or gating usage limits so aggressively that a Champion's own team can't get meaningful value during the trial or pilot phase — prevents the initial land from ever succeeding at all, since Lesson 72's Rung 1 requires the core product to deliver genuine standalone value before any expansion conversation becomes relevant.
+A land tier that is **too generous** including capabilities properly belonging to a higher tier, or allowing unlimited usage that should reasonably trigger an upgrade gives away the very value that should justify expansion, leaving the vendor with a durable but permanently small foothold that never naturally grows. A land tier that is **too restrictive** omitting capability genuinely needed even for basic initial adoption, or gating usage limits so aggressively that a Champion's own team can't get meaningful value during the trial or pilot phase prevents the initial land from ever succeeding at all, since Lesson 72's Rung 1 requires the core product to deliver genuine standalone value before any expansion conversation becomes relevant.
 
 ---
 
@@ -131,8 +131,8 @@ As accounts grow and organizational needs shift, previously well-calibrated expa
 The Expansion Wedge introduced above is this lesson's core takeaway tool. When designing or evaluating packaging for land-and-expand growth, ask:
 
 1. **Does the Land Tier deliver enough genuine standalone value** to succeed at Rung 1 of the Enterprise Adoption Ladder, without requiring capability that properly belongs to a higher tier?
-2. **Are the Expansion Triggers tied to a genuine constraint the customer will naturally encounter** — seat growth, usage growth, or a specific enterprise-readiness need — rather than an arbitrary, sales-imposed withholding of value?
-3. **Does the Enterprise Tier's included capability actually match what Rung 3 and 4 of the Adoption Ladder require** — security, administrative control, reliability, and integration, per Lesson 72 — rather than an arbitrary bundle of "premium" features unrelated to genuine organizational needs?
+2. **Are the Expansion Triggers tied to a genuine constraint the customer will naturally encounter** seat growth, usage growth, or a specific enterprise-readiness need rather than an arbitrary, sales-imposed withholding of value?
+3. **Does the Enterprise Tier's included capability actually match what Rung 3 and 4 of the Adoption Ladder require** security, administrative control, reliability, and integration, per Lesson 72 rather than an arbitrary bundle of "premium" features unrelated to genuine organizational needs?
 4. **Is the overall packaging combining more than one trigger type appropriately**, balancing predictability for the Economic Buyer against alignment with actual value delivered?
 
 A packaging structure that can answer all four questions affirmatively is far more likely to support a genuine, low-friction land-and-expand motion than one designed primarily around internal cost considerations or an arbitrary sense of what "premium" should include.
@@ -141,7 +141,7 @@ A packaging structure that can answer all four questions affirmatively is far mo
 
 ## Real Company Example
 
-**Atlassian's own published Jira pricing page** makes the Expansion Wedge concretely visible rather than merely inferable. The Free tier (capped at 10 users) includes core project-management functionality but caps automation at 100 rule-runs per month and offers only community support. The Standard tier removes most of those caps and adds business-hours support. Premium adds unlimited storage, 24/7 support, and a 99.9% uptime SLA. Enterprise adds the capabilities that specifically matter to a buying committee, not an individual team — multi-instance licensing (up to 150 separate sites, letting large organizations isolate data by region or department), centralized user subscriptions across those instances, SSO and SCIM identity-provider integration bundled in by default, and a higher 99.95% uptime SLA. The features gating each tier transition are a direct, inspectable map of exactly what this lesson's Expansion Wedge model predicts: the features that unlock expansion aren't more of the same core functionality — they're the specific administrative, security, and compliance capabilities that only become relevant once an account has grown past individual-team use into something an IT or security function needs to govern.
+**Atlassian's own published Jira pricing page** makes the Expansion Wedge concretely visible rather than merely inferable. The Free tier (capped at 10 users) includes core project-management functionality but caps automation at 100 rule-runs per month and offers only community support. The Standard tier removes most of those caps and adds business-hours support. Premium adds unlimited storage, 24/7 support, and a 99.9% uptime SLA. Enterprise adds the capabilities that specifically matter to a buying committee, not an individual team multi-instance licensing (up to 150 separate sites, letting large organizations isolate data by region or department), centralized user subscriptions across those instances, SSO and SCIM identity-provider integration bundled in by default, and a higher 99.95% uptime SLA. The features gating each tier transition are a direct, inspectable map of exactly what this lesson's Expansion Wedge model predicts: the features that unlock expansion aren't more of the same core functionality they're the specific administrative, security, and compliance capabilities that only become relevant once an account has grown past individual-team use into something an IT or security function needs to govern.
 
 *(Source: Atlassian's own official Jira pricing and feature-comparison page.)*
 
@@ -159,13 +159,13 @@ A packaging structure that can answer all four questions affirmatively is far mo
 
 ## Detailed Case Study: The Land That Never Expanded
 
-A B2B project collaboration startup launched with a single, generously-scoped free tier: unlimited team members, unlimited projects, and nearly the entire feature set the company had built, with the stated rationale that broad, frictionless adoption would build a large user base the company could later monetize. Adoption was, indeed, strong — the free tier spread organically across many teams within numerous companies, generating exactly the kind of grassroots Rung 1 and 2 traction described in Lesson 72.
+A B2B project collaboration startup launched with a single, generously-scoped free tier: unlimited team members, unlimited projects, and nearly the entire feature set the company had built, with the stated rationale that broad, frictionless adoption would build a large user base the company could later monetize. Adoption was, indeed, strong the free tier spread organically across many teams within numerous companies, generating exactly the kind of grassroots Rung 1 and 2 traction described in Lesson 72.
 
-The problem became apparent roughly eighteen months later: despite widespread usage, the company's paid conversion rate remained extremely low, and analysis of usage patterns revealed why. The free tier had never actually created a natural constraint that any meaningful fraction of users encountered — unlimited seats meant teams never ran into a seat-based trigger, and the nearly-complete feature set meant there was no compelling functional reason to upgrade even as teams grew larger and more organizationally established. The very features that would typically define an enterprise tier — administrative controls, security certifications, audit logging — had never been built at all, since the company had never designed an Expansion Wedge that anticipated needing them, having assumed broad free adoption alone would eventually convert to revenue through some mechanism the original packaging design never actually specified.
+The problem became apparent roughly eighteen months later: despite widespread usage, the company's paid conversion rate remained extremely low, and analysis of usage patterns revealed why. The free tier had never actually created a natural constraint that any meaningful fraction of users encountered unlimited seats meant teams never ran into a seat-based trigger, and the nearly-complete feature set meant there was no compelling functional reason to upgrade even as teams grew larger and more organizationally established. The very features that would typically define an enterprise tier administrative controls, security certifications, audit logging had never been built at all, since the company had never designed an Expansion Wedge that anticipated needing them, having assumed broad free adoption alone would eventually convert to revenue through some mechanism the original packaging design never actually specified.
 
 **What went wrong?** Using the Expansion Wedge, the failure is precise: the Land Tier was calibrated so generously that it eliminated every natural expansion trigger before it could form, and no genuine Enterprise Tier had ever been designed to correspond to Rung 3 and 4 needs. The company had achieved genuinely strong Rung 1 and 2 adoption, mistaking that adoption itself for evidence of a working business model, without ever building the packaging structure or the enterprise-readiness capabilities that Rung 3 progression, per Lesson 72, actually requires.
 
-The company's recovery involved a difficult, customer-relations-sensitive process of introducing seat limits and gating select administrative features behind a new paid tier for existing free users — a significantly harder transition than designing appropriate triggers from the outset would have been — while simultaneously building out the security and administrative capabilities an Enterprise Tier genuinely required, a sequencing lesson this curriculum will connect to the broader pricing negotiation dynamics formalized in Lesson 79.
+The company's recovery involved a difficult, customer-relations-sensitive process of introducing seat limits and gating select administrative features behind a new paid tier for existing free users a significantly harder transition than designing appropriate triggers from the outset would have been while simultaneously building out the security and administrative capabilities an Enterprise Tier genuinely required, a sequencing lesson this curriculum will connect to the broader pricing negotiation dynamics formalized in Lesson 79.
 
 ---
 
@@ -181,13 +181,13 @@ Before finalizing a land-and-expand packaging structure, a PM can use the follow
 | Enterprise Tier Fit | Does the top tier's included capability actually match Rung 3/4 enterprise-readiness needs from Lesson 72? | The enterprise tier fails to satisfy the Technical Evaluator and Economic Buyer roles from Lesson 73 |
 | Trigger Type Balance | Does the packaging combine seat-based, usage-based, and feature-gated triggers appropriately? | Reliance on a single trigger type creates either easily-undercut or budget-unfriendly pricing |
 
-A "no" on Land Tier Restraint should be treated with particular concern given the Case Study — a packaging structure that seems successful by adoption metrics alone can still be failing at its actual business purpose if it never creates a path to expansion.
+A "no" on Land Tier Restraint should be treated with particular concern given the Case Study a packaging structure that seems successful by adoption metrics alone can still be failing at its actual business purpose if it never creates a path to expansion.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
-**"How would you design a pricing and packaging structure to support a land-and-expand go-to-market motion?"** The interviewer is evaluating whether you propose something resembling the Expansion Wedge — a deliberately scoped land tier with genuine expansion triggers tied to natural customer growth — rather than an arbitrary set of tiers organized around internal cost or a generic sense of "premium."
+**"How would you design a pricing and packaging structure to support a land-and-expand go-to-market motion?"** The interviewer is evaluating whether you propose something resembling the Expansion Wedge a deliberately scoped land tier with genuine expansion triggers tied to natural customer growth rather than an arbitrary set of tiers organized around internal cost or a generic sense of "premium."
 
 **"What's the risk of making a free or entry-level tier too generous?"** The interviewer is testing whether you recognize the Land That Never Expanded failure mode: strong adoption metrics that mask the absence of any genuine path to monetization.
 
@@ -197,7 +197,7 @@ A "no" on Land Tier Restraint should be treated with particular concern given th
 
 ## Summary
 
-Land-and-expand is not simply a sales strategy layered on top of arbitrary packaging tiers; it requires the packaging structure itself to be deliberately designed so that an initial, low-friction land succeeds on its own merits while creating genuine, natural triggers for expansion as an account's usage and organizational needs grow. The Expansion Wedge — Land Tier, sequential Expansion Triggers, and an Enterprise Tier matched to Rungs 3 and 4 of the Enterprise Adoption Ladder from Lesson 72 — provides a structured way to design this progression, with expansion triggers ideally combining seat-based, usage-based, and feature-gated mechanisms tied to genuine customer constraints rather than arbitrary upsell pressure. A packaging structure that miscalibrates the Land Tier in either direction — too generous, eliminating any reason to expand, or too restrictive, preventing the initial land from succeeding at all — undermines the entire motion regardless of sales execution quality, and a Land Tier that is too generous can produce the particularly deceptive failure mode illustrated in this lesson's Case Study: genuinely strong adoption metrics that mask the complete absence of a working path to revenue expansion.
+Land-and-expand is not simply a sales strategy layered on top of arbitrary packaging tiers; it requires the packaging structure itself to be deliberately designed so that an initial, low-friction land succeeds on its own merits while creating genuine, natural triggers for expansion as an account's usage and organizational needs grow. The Expansion Wedge Land Tier, sequential Expansion Triggers, and an Enterprise Tier matched to Rungs 3 and 4 of the Enterprise Adoption Ladder from Lesson 72 provides a structured way to design this progression, with expansion triggers ideally combining seat-based, usage-based, and feature-gated mechanisms tied to genuine customer constraints rather than arbitrary upsell pressure. A packaging structure that miscalibrates the Land Tier in either direction too generous, eliminating any reason to expand, or too restrictive, preventing the initial land from succeeding at all undermines the entire motion regardless of sales execution quality, and a Land Tier that is too generous can produce the particularly deceptive failure mode illustrated in this lesson's Case Study: genuinely strong adoption metrics that mask the complete absence of a working path to revenue expansion.
 
 ---
 
@@ -205,7 +205,7 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 
 - Land-and-expand requires deliberate packaging design, not merely a sales strategy applied to arbitrary tiers.
 - The Expansion Wedge structures packaging as a Land Tier, sequential Expansion Triggers, and an Enterprise Tier matched to the Enterprise Adoption Ladder's Rungs 3 and 4.
-- Expansion triggers should be tied to genuine customer constraints — seat growth, usage growth, or specific enterprise-readiness needs — rather than arbitrary withholding of value.
+- Expansion triggers should be tied to genuine customer constraints seat growth, usage growth, or specific enterprise-readiness needs rather than arbitrary withholding of value.
 - Seat-based, usage-based, and feature-gated triggers each carry distinct trade-offs, and mature packaging typically combines more than one type.
 - A Land Tier that is too generous eliminates the natural pressure to expand, producing strong adoption metrics that mask a failing business model.
 - A Land Tier that is too restrictive prevents the initial land motion from succeeding at all, since Rung 1 requires genuine standalone value.
@@ -220,7 +220,7 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 - Land-and-expand needs deliberate packaging design, not just a sales script.
 - Expansion Wedge: Land Tier → Expansion Triggers → Enterprise Tier (matched to Adoption Ladder Rungs 3/4).
 - Triggers should reflect genuine customer constraints, not arbitrary withholding.
-- Combine seat-based, usage-based, and feature-gated triggers — don't rely on just one.
+- Combine seat-based, usage-based, and feature-gated triggers don't rely on just one.
 - Watch for the Land That Never Expanded trap: strong adoption ≠ a working expansion path.
 
 ---
@@ -250,7 +250,7 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 
 **Card 1**
 - Front: Why does land-and-expand require deliberate packaging design, not just a sales strategy?
-- Back: The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers — both require intentional structure, not just sales execution.
+- Back: The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers both require intentional structure, not just sales execution.
 - Difficulty: 2
 - Tags: land-and-expand, core-concept
 
@@ -295,7 +295,7 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 
 You are the PM for a B2B customer support software company currently offering a single, all-inclusive paid tier with per-seat pricing. Growth has plateaued, and sales feedback suggests prospective customers find the current single tier's price point too high for smaller teams to justify, while existing large customers have expressed interest in more advanced administrative and security features the current tier doesn't offer.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Expansion Wedge and the Packaging Design Checklist to redesign a stalled packaging structure.
+There is no single correct answer to the prompts below the goal is to practice applying the Expansion Wedge and the Packaging Design Checklist to redesign a stalled packaging structure.
 
 1. Using the Expansion Wedge, how might you restructure the current single tier into a Land Tier, Expansion Triggers, and an Enterprise Tier?
 2. What specific capability, currently included in the single tier, might reasonably be reserved for a higher tier to serve as a genuine expansion trigger?
@@ -506,9 +506,9 @@ D) Build a Land Tier for smaller teams, triggers, and a needs-aligned Enterprise
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 73 — Selling to Committees: Buyer vs. User in B2B | Uses the Stakeholder Compass to inform which packaging tier must satisfy which stakeholder role's success criteria |
-| **Current Lesson** | Lesson 74 — Land-and-Expand: Packaging for Enterprise Growth | Expansion Wedge; Land Tier calibration; expansion trigger types; Packaging Design Checklist |
-| **Next Lesson** | Lesson 75 — Competitive Strategy and Moats | Shifts from internal packaging design to external competitive positioning and defensibility |
+| **Previous Lesson** | Lesson 73 Selling to Committees: Buyer vs. User in B2B | Uses the Stakeholder Compass to inform which packaging tier must satisfy which stakeholder role's success criteria |
+| **Current Lesson** | Lesson 74 Land-and-Expand: Packaging for Enterprise Growth | Expansion Wedge; Land Tier calibration; expansion trigger types; Packaging Design Checklist |
+| **Next Lesson** | Lesson 75 Competitive Strategy and Moats | Shifts from internal packaging design to external competitive positioning and defensibility |
 | **Future Concepts Unlocked** | Lesson 79 (Pricing Strategy at Scale) | Extends packaging trigger design into full enterprise pricing negotiation and contract structuring |
 | | Lesson 80 (Module Synthesis) | Treats the Expansion Wedge as established canon alongside the Enterprise Adoption Ladder and Stakeholder Compass for Module 8's closing synthesis |
 

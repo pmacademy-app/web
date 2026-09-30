@@ -9,36 +9,5 @@
     "for an advisory whose vulnerable code path is reachable in production.",
     "Policy and triage procedure: docs/SECURITY.md section 6."
   ],
-  "advisories": [
-    {
-      "id": "GHSA-5jgf-p345-68v8",
-      "package": "fast-uri",
-      "reason": "Transitive through ajv via @hookform/resolvers, used for JSON Schema $ref resolution during client-side form validation. The IDN canonicalization confusion needs fast-uri to resolve an attacker-supplied URI; the only URIs it sees are schema identifiers written in this repository. No server-side fetch uses it.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-f65p-4m7j-42xc",
-      "package": "fast-uri",
-      "reason": "SSRF via malformed IPv6 normalization. Same path as GHSA-5jgf-p345-68v8 — ajv schema resolution only. Prodily performs no server-side fetch of a user-supplied URL through this dependency.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-fph4-wmhf-6fwf",
-      "package": "fast-uri",
-      "reason": "SSRF via repeated hostname percent-decoding. Same ajv-only reachability as the other fast-uri entries.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-jqff-g426-hqxp",
-      "package": "fast-uri",
-      "reason": "Host confusion via percent-encoded scheme normalization. Same ajv-only reachability as the other fast-uri entries.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-2883-xcg3-v3hh",
-      "package": "js-yaml",
-      "reason": "CPU exhaustion parsing crafted YAML merge keys. Development-only: js-yaml is reached through eslint's @eslint/eslintrc and shadcn's cosmiconfig, neither of which ships in the production bundle, and both parse configuration files from this repository. Confirmed absent from the production tree by npm audit --omit=dev on 2026-09-14.",
-      "reviewBy": "2026-10-15"
-    }
-  ]
+  "advisories": []
 }

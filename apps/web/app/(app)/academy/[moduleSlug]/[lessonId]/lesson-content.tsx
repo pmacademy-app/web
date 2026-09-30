@@ -44,9 +44,21 @@ import {
   trackQuizCompleted,
   trackLessonCompleted,
   trackFirstLessonCompleted,
+  trackRecutExperimentExposed,
+  trackCoreViewed,
+  trackQuizStarted,
+  trackDeepDiveOpened,
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
+import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
+import {
+  getCoreBlocks,
+  getDeepDiveBlocks,
+  getCoreReadingMinutes,
+  getDeepDiveReadingMinutes,
+} from '@/lib/academy/lesson-structure'
+import type { RecutVariant } from '@/lib/academy/experiment'
 
 
 
@@ -63,16 +75,33 @@ interface LessonPageContentProps {
   moduleNumber: number      // 1-indexed module number (1..9)
   moduleName: string        // formatted module display name
   initialProgress?: LessonProgressV2 | null
+  /**
+   * Phase 4 A/B variant, resolved server-side (deterministic per user). `treatment` renders
+   * the Core / Deep-dive split + sampled quiz; `control` renders the unchanged full lesson.
+   * Defaults to `control` so the split is off unless the experiment is enabled.
+   */
+  recutVariant?: RecutVariant
 }
 
 type TabType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
 
 // ─── Helper: extract blocks by type ─────────────────────────────────────────
+//
+// Phase 4 (§4.1): under the `treatment` variant the theory surface renders only the Core
+// blocks; the Deep-dive is rendered separately (and lazily) by <DeepDiveSection>. Under
+// `control` the theory surface renders every non-tab block exactly as before, so the
+// experiment's control arm is a faithful reproduction of the pre-Phase-4 lesson.
 
-function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[] {
+export function getBlocksForTab(
+  blocks: CompiledBlock[],
+  tab: TabType,
+  variant: RecutVariant = 'control'
+): CompiledBlock[] {
   if (tab === 'theory') {
-    // Theory tab: everything except quiz, flashcardDeck, reflection
-    // (connections is authored lesson content — rendered at the end of the theory tab)
+    if (variant === 'treatment') {
+      return getCoreBlocks(blocks)
+    }
+    // Control: everything except quiz, flashcardDeck, reflection (legacy behaviour).
     const EXCLUDED = new Set(['quiz', 'flashcardDeck', 'reflection'])
     return blocks.filter((b) => !EXCLUDED.has(b.type))
   }
@@ -390,6 +419,61 @@ function TheoryReadButton({
   )
 }
 
+// ─── Core reading progress (Phase 4 revised, Step 7) ─────────────────────────
+//
+// A quiet reading-progress affordance for the Core surface. The revised direction keeps a
+// fuller (honest 10–15 min) Core, so the UX job is to lower PERCEIVED effort: a thin sticky
+// bar plus a "Core · ~N min" label gives the learner "you are here / this is finite" context
+// without gamification. Purely presentational; it reads window scroll and never gates anything.
+// Honours reduced-motion (the width transition is the only motion and is disabled below).
+
+function CoreReadingProgress({ estimatedMinutes }: { estimatedMinutes: number }) {
+  const [percent, setPercent] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement
+      const max = doc.scrollHeight - window.innerHeight
+      setPercent(max <= 0 ? 100 : Math.min(100, Math.max(0, Math.round((window.scrollY / max) * 100))))
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <div className="sticky top-0 z-10 -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-6 px-6 md:px-8 pt-4 pb-3 bg-card/95 backdrop-blur-sm border-b border-border">
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="inline-flex items-center gap-2 font-bold uppercase tracking-wider text-primary">
+          <BookOpen className="h-3.5 w-3.5" />
+          Core
+          {estimatedMinutes > 0 && (
+            <span className="font-medium normal-case tracking-normal text-muted-foreground">
+              · ~{estimatedMinutes} min · the complete concept
+            </span>
+          )}
+        </span>
+        <span className="font-semibold text-muted-foreground tabular-nums" aria-hidden="true">
+          {percent}%
+        </span>
+      </div>
+      <div
+        className="h-1 w-full rounded-full bg-muted overflow-hidden"
+        role="progressbar"
+        aria-label="Core reading progress"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full bg-primary transition-[width] duration-300 motion-reduce:transition-none"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function LessonPageContent({
@@ -401,6 +485,7 @@ export default function LessonPageContent({
   moduleNumber,
   moduleName,
   initialProgress,
+  recutVariant = 'control',
 }: LessonPageContentProps) {
   const {
     progress,
@@ -409,7 +494,19 @@ export default function LessonPageContent({
     markInProgress,
     recordTheoryRead,
     recordQuizAttempt,
+    recordDeepDiveOpened,
   } = useLessonProgressV2(lesson.id, initialProgress)
+
+  // Phase 4: Core / Deep-dive derived once per lesson. Under control these are unused (the
+  // theory surface renders the full block set) but computing them is cheap and pure.
+  const deepDiveBlocks = React.useMemo(() => getDeepDiveBlocks(lesson.blocks), [lesson.blocks])
+  const coreReadingMinutes = React.useMemo(() => getCoreReadingMinutes(lesson), [lesson])
+  const deepDiveReadingMinutes = React.useMemo(
+    () => getDeepDiveReadingMinutes(lesson),
+    [lesson]
+  )
+  const isTreatment = recutVariant === 'treatment'
+  const headerReadingMinutes = isTreatment ? coreReadingMinutes : lesson.estimatedReadingTime
 
   const searchParams = useSearchParams()
   const initialTabParam = searchParams.get('tab') as TabType | null
@@ -432,13 +529,29 @@ export default function LessonPageContent({
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
 
-  // Track lesson start once per lesson mount
+  const hasTrackedQuizStartRef = useRef(false)
+
+  // Track lesson start once per lesson mount. Phase 4: also emit the experiment exposure and
+  // the first Core view here (the theory surface is the default tab), so the consenting-
+  // visitor GA4 stream mirrors the server-side funnel's opened → core → quiz → complete path.
   useEffect(() => {
     if (!hasTrackedStartRef.current && lesson?.id) {
       hasTrackedStartRef.current = true
       trackLessonStarted(lesson.id, lesson.module)
+      trackRecutExperimentExposed(lesson.id, recutVariant)
+      trackCoreViewed(lesson.id, recutVariant)
     }
-  }, [lesson.id, lesson.module])
+  }, [lesson.id, lesson.module, recutVariant])
+
+  // Track the first time the quiz tab is opened, with the number of questions presented
+  // (5 under treatment, 15 under control) — the "quiz started" funnel step.
+  useEffect(() => {
+    if (activeTab === 'quiz' && !hasTrackedQuizStartRef.current) {
+      hasTrackedQuizStartRef.current = true
+      const quizBlock = lesson.blocks.find((b) => b.type === 'quiz')
+      trackQuizStarted(lesson.id, quizBlock?.questions?.length ?? 0)
+    }
+  }, [activeTab, lesson.id, lesson.blocks])
 
   const handleTabChange = useCallback((tab: TabType) => {
     setActiveTab(tab)
@@ -790,7 +903,11 @@ export default function LessonPageContent({
             <span className="text-muted-foreground/40">•</span>
             <span>Lesson {globalOrder}</span>
             <span className="text-muted-foreground/40">•</span>
-            <span>{lesson.estimatedReadingTime} min read</span>
+            {/* Phase 4 (§4.3, Step 6): honest estimate. Treatment shows the computed Core
+                reading time and labels it as Core; control keeps the authored figure. */}
+            <span>
+              {headerReadingMinutes} min {isTreatment ? 'Core read' : 'read'}
+            </span>
             <span className="text-muted-foreground/40">•</span>
             <span className="flex items-center gap-1">
               Difficulty:{' '}
@@ -810,13 +927,18 @@ export default function LessonPageContent({
         {/* Theory Panel */}
         {activeTab === 'theory' && (
           <div id="panel-theory" role="tabpanel" aria-labelledby="tab-theory">
+            {/* Phase 4 (revised, Step 7): quiet Core progress affordance — lowers perceived
+                effort for a fuller Core without gamification. Treatment only. */}
+            {isTreatment && (
+              <CoreReadingProgress estimatedMinutes={coreReadingMinutes} />
+            )}
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}
               onAdvanceTab={(tab) => handleTabChange(tab)}
             >
               <BlockTreeRenderer
-                blocks={getBlocksForTab(lesson.blocks, 'theory')}
+                blocks={getBlocksForTab(lesson.blocks, 'theory', recutVariant)}
                 lessonId={lesson.id}
               />
             </LessonContextProvider>
@@ -826,6 +948,21 @@ export default function LessonPageContent({
               isLoading={theorySubmitting}
               error={theoryError}
             />
+            {/* Phase 4 (§4.1): Deep-dive is visible, labelled and reachable — rendered below
+                the Core so it is never required to unlock the quiz, and mounted lazily so it
+                does not enlarge the Core payload or the theory-gate scroll surface. Only under
+                the treatment variant; control renders the full lesson inline above. */}
+            {isTreatment && deepDiveBlocks.length > 0 && (
+              <DeepDiveSection
+                blocks={deepDiveBlocks}
+                lessonId={lesson.id}
+                estimatedMinutes={deepDiveReadingMinutes}
+                onOpen={() => {
+                  trackDeepDiveOpened(lesson.id)
+                  void recordDeepDiveOpened()
+                }}
+              />
+            )}
           </div>
         )}
 

@@ -1592,6 +1592,7 @@ export type Database = {
       user_lesson_progress: {
         Row: {
           completed_at: string | null
+          deep_dive_opened_at: string | null
           lesson_id: string
           quiz_attempts: number
           quiz_score: number | null
@@ -1602,6 +1603,7 @@ export type Database = {
         }
         Insert: {
           completed_at?: string | null
+          deep_dive_opened_at?: string | null
           lesson_id: string
           quiz_attempts?: number
           quiz_score?: number | null
@@ -1612,6 +1614,7 @@ export type Database = {
         }
         Update: {
           completed_at?: string | null
+          deep_dive_opened_at?: string | null
           lesson_id?: string
           quiz_attempts?: number
           quiz_score?: number | null

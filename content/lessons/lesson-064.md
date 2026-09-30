@@ -4,9 +4,9 @@
 
 Lesson 63 closed with a marketplace whose leading indicators, read separately by side, revealed a constraint that a single blended metric would have hidden. That was a lesson about which metrics to look at. This lesson is about a harder and more organizational question: how do you make sure the metrics you're looking at, across an entire company, actually mean what everyone assumes they mean?
 
-By this point in the curriculum you have already met Goodhart's Law (Lesson 41), North Star Metrics (Lesson 42), funnel and cohort analysis (Lessons 43–44), and A/B testing rigor (Lesson 45). Those lessons taught you how to reason about metrics as an individual analytical skill. This lesson addresses what happens when that skill has to operate at organizational scale — when dozens of teams are each defining, computing, and reporting metrics somewhat differently, and a single number like "active users" or "conversion rate" can mean three subtly different things depending on which dashboard produced it.
+By this point in the curriculum you have already met Goodhart's Law (Lesson 41), North Star Metrics (Lesson 42), funnel and cohort analysis (Lessons 43–44), and A/B testing rigor (Lesson 45). Those lessons taught you how to reason about metrics as an individual analytical skill. This lesson addresses what happens when that skill has to operate at organizational scale when dozens of teams are each defining, computing, and reporting metrics somewhat differently, and a single number like "active users" or "conversion rate" can mean three subtly different things depending on which dashboard produced it.
 
-This is not a hypothetical problem. It is one of the most common, expensive, and quietly corrosive failure modes in any data-informed company: not a lack of data, but a lack of trust in the data, born from inconsistent definitions, undocumented assumptions, and metrics that drift out of sync with the events they were originally meant to represent. This lesson introduces the Metric Provenance Chain, this lesson's core mental model, to give you a systematic way to build — and diagnose the absence of — genuine metrics trust across an organization.
+This is not a hypothetical problem. It is one of the most common, expensive, and quietly corrosive failure modes in any data-informed company: not a lack of data, but a lack of trust in the data, born from inconsistent definitions, undocumented assumptions, and metrics that drift out of sync with the events they were originally meant to represent. This lesson introduces the Metric Provenance Chain, this lesson's core mental model, to give you a systematic way to build and diagnose the absence of genuine metrics trust across an organization.
 
 ---
 
@@ -14,13 +14,13 @@ This is not a hypothetical problem. It is one of the most common, expensive, and
 
 | Field | Detail |
 |---|---|
-| **Module** | 7 — Platform, Technical & Data-Intensive Product Management |
+| **Module** | 7 Platform, Technical & Data-Intensive Product Management |
 | **Current Lesson** | 64 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 41 (metric definitions, Goodhart's Law), Lesson 42 (North Star Metrics), Lesson 45 (A/B testing rigor) |
-| **Next Lesson** | Lesson 65 — Working with Data Science & ML Teams |
-| **Future Topics Unlocked** | Lesson 65 (Data Science collaboration), Lesson 66 (Recommender Systems), Lesson 84 (PM in AI-Native Companies) — all depend on the Metric Provenance Chain and metric trust discipline introduced here |
+| **Next Lesson** | Lesson 65 Working with Data Science & ML Teams |
+| **Future Topics Unlocked** | Lesson 65 (Data Science collaboration), Lesson 66 (Recommender Systems), Lesson 84 (PM in AI-Native Companies) all depend on the Metric Provenance Chain and metric trust discipline introduced here |
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes the metric-definition discipline and Goodhart's Law from Les
 
 ### Why Metric Trust, Not Data Volume, Is the Real Constraint
 
-Most companies past a certain size do not suffer from a lack of data. They suffer from too many, slightly different versions of what should be the same number. A classic and near-universal symptom: two people in the same meeting cite "our conversion rate" and arrive at different figures, because one person's dashboard computes conversion over sessions and the other's computes it over unique users, and neither dashboard documents which. Multiply this ambiguity across dozens of metrics and teams, and the organization ends up making decisions on numbers that no one fully trusts, verifies, or agrees on — which quietly reintroduces the exact solution-first, evidence-free decision-making this curriculum has argued against since Lesson 1.
+Most companies past a certain size do not suffer from a lack of data. They suffer from too many, slightly different versions of what should be the same number. A classic and near-universal symptom: two people in the same meeting cite "our conversion rate" and arrive at different figures, because one person's dashboard computes conversion over sessions and the other's computes it over unique users, and neither dashboard documents which. Multiply this ambiguity across dozens of metrics and teams, and the organization ends up making decisions on numbers that no one fully trusts, verifies, or agrees on which quietly reintroduces the exact solution-first, evidence-free decision-making this curriculum has argued against since Lesson 1.
 
 ### The Metric Provenance Chain
 
@@ -90,15 +90,15 @@ graph LR
     D --> E[Decision<br/>Metric used to inform a real choice]
 ```
 
-A metric earns the right to influence a real decision (Stage 5) only after passing through the first four stages. **Instrumentation** is the raw technical act of logging an event (a button click, a completed purchase). **Validation** confirms that what's logged actually corresponds to the real-world event it claims to represent — a shockingly common failure is an event that fires on page load rather than genuine user action, silently inflating a metric from day one. **Definition Consensus** means the formula for turning raw events into a named metric (what counts as an "active user"? over what window? which platforms included?) has been explicitly agreed upon and documented, not left to each team's private assumption. **Trusted Metric** status means there is one authoritative, owned source for that number, rather than multiple dashboards independently computing "the same" metric with silently divergent logic. Only once all four stages are solid does a number deserve to actually inform a **Decision** — and any metric skipping a stage should be treated with proportional skepticism, regardless of how confidently it's presented in a meeting.
+A metric earns the right to influence a real decision (Stage 5) only after passing through the first four stages. **Instrumentation** is the raw technical act of logging an event (a button click, a completed purchase). **Validation** confirms that what's logged actually corresponds to the real-world event it claims to represent a shockingly common failure is an event that fires on page load rather than genuine user action, silently inflating a metric from day one. **Definition Consensus** means the formula for turning raw events into a named metric (what counts as an "active user"? over what window? which platforms included?) has been explicitly agreed upon and documented, not left to each team's private assumption. **Trusted Metric** status means there is one authoritative, owned source for that number, rather than multiple dashboards independently computing "the same" metric with silently divergent logic. Only once all four stages are solid does a number deserve to actually inform a **Decision** and any metric skipping a stage should be treated with proportional skepticism, regardless of how confidently it's presented in a meeting.
 
 ### Metric Definition Drift
 
-Even a well-defined metric decays over time through **metric definition drift** — the gradual divergence between a metric's original intended meaning and what it has come to actually measure. Common causes include: a new feature launch changing what "engagement" practically consists of without the metric's definition being revisited; a team quietly adjusting a query for local convenience without updating shared documentation; or a metric surviving a platform migration with subtly different underlying event logic, producing a discontinuity that looks like a real trend change but is actually a measurement artifact. Drift is dangerous precisely because it is silent — the metric keeps producing numbers, and nothing about the dashboard itself signals that its meaning has quietly shifted underneath the label.
+Even a well-defined metric decays over time through **metric definition drift** the gradual divergence between a metric's original intended meaning and what it has come to actually measure. Common causes include: a new feature launch changing what "engagement" practically consists of without the metric's definition being revisited; a team quietly adjusting a query for local convenience without updating shared documentation; or a metric surviving a platform migration with subtly different underlying event logic, producing a discontinuity that looks like a real trend change but is actually a measurement artifact. Drift is dangerous precisely because it is silent the metric keeps producing numbers, and nothing about the dashboard itself signals that its meaning has quietly shifted underneath the label.
 
 ### Dashboard Fragmentation as a Symptom
 
-A useful diagnostic for organizational metric health: count how many different dashboards, in a company, claim to show the same named metric (for example, "monthly active users"), and check whether they agree. Widespread disagreement across supposedly identical metrics is not a minor cosmetic issue — it is direct evidence that the organization's Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status, and that decisions across different teams may currently be resting on incompatible numbers without anyone realizing it.
+A useful diagnostic for organizational metric health: count how many different dashboards, in a company, claim to show the same named metric (for example, "monthly active users"), and check whether they agree. Widespread disagreement across supposedly identical metrics is not a minor cosmetic issue it is direct evidence that the organization's Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status, and that decisions across different teams may currently be resting on incompatible numbers without anyone realizing it.
 
 ---
 
@@ -122,7 +122,7 @@ Organizational seniority is not a substitute for provenance; an executive's pers
 
 **Mistake 5: Building elaborate analysis on top of an unvalidated event**
 
-If Stage 2 (Validation) was skipped — if no one confirmed the underlying event actually represents the real-world action it claims to — everything built on top of it, however sophisticated, inherits that foundational error.
+If Stage 2 (Validation) was skipped if no one confirmed the underlying event actually represents the real-world action it claims to everything built on top of it, however sophisticated, inherits that foundational error.
 
 ---
 
@@ -132,7 +132,7 @@ If Stage 2 (Validation) was skipped — if no one confirmed the underlying event
 The Metric Provenance Chain introduced above is this lesson's core takeaway tool. Any time a metric is about to inform a real decision, ask:
 
 1. **Has this metric's underlying event been validated** against the real-world action it's supposed to represent?
-2. **Is there documented Definition Consensus** — an agreed, written formula — or is everyone relying on an informal shared assumption that may not actually be shared?
+2. **Is there documented Definition Consensus** an agreed, written formula or is everyone relying on an informal shared assumption that may not actually be shared?
 3. **Is there a single, owned, Trusted Metric source**, or are multiple dashboards independently computing a version of "the same" number?
 
 A metric that fails any of these three checks should be treated as provisional, regardless of how confidently it is presented, and should not yet be allowed to anchor a significant decision.
@@ -141,9 +141,9 @@ A metric that fails any of these three checks should be treated as provisional, 
 
 ## Real Company Example
 
-**Etsy**'s own engineering blog, "Code as Craft," runs a dedicated, ongoing "Experimentation" publication series that makes the company's statistical rigor directly inspectable rather than merely inferred. A representative post, "Mitigating the Winner's Curse in Online Experiments" (2022), addresses a specific, technical version of the Peeking Trap this lesson connects back to Lesson 45: when a team runs many experiments and reports results only for the ones that appear to win, the reported effect sizes are systematically inflated — a statistical bias, not a one-off mistake — and the post walks through Etsy's own methodology for correcting for it before trusting a result enough to ship on it. A companion post on "control variates" describes a separate technique the team adopted specifically to increase experiment accuracy and reduce the sample size (and therefore time) needed to reach a trustworthy result.
+**Etsy**'s own engineering blog, "Code as Craft," runs a dedicated, ongoing "Experimentation" publication series that makes the company's statistical rigor directly inspectable rather than merely inferred. A representative post, "Mitigating the Winner's Curse in Online Experiments" (2022), addresses a specific, technical version of the Peeking Trap this lesson connects back to Lesson 45: when a team runs many experiments and reports results only for the ones that appear to win, the reported effect sizes are systematically inflated a statistical bias, not a one-off mistake and the post walks through Etsy's own methodology for correcting for it before trusting a result enough to ship on it. A companion post on "control variates" describes a separate technique the team adopted specifically to increase experiment accuracy and reduce the sample size (and therefore time) needed to reach a trustworthy result.
 
-This is a sharper illustration of "Trusted Metric status must be earned through process" (Stage 4 of this lesson's Provenance Chain) than a generic "rigorous culture" claim, because it shows the actual statistical machinery involved — correcting for winner's-curse bias, using variance-reduction techniques — rather than just asserting that rigor exists. A metrics culture, in other words, isn't a cultural attitude alone; it's implemented as specific, inspectable statistical practice.
+This is a sharper illustration of "Trusted Metric status must be earned through process" (Stage 4 of this lesson's Provenance Chain) than a generic "rigorous culture" claim, because it shows the actual statistical machinery involved correcting for winner's-curse bias, using variance-reduction techniques rather than just asserting that rigor exists. A metrics culture, in other words, isn't a cultural attitude alone; it's implemented as specific, inspectable statistical practice.
 
 *(Source: Etsy's own public engineering blog, Code as Craft, specifically its ongoing Experimentation series.)*
 
@@ -151,23 +151,23 @@ This is a sharper illustration of "Trusted Metric status must be earned through 
 
 ## Real World Perspective: Data-Informed Product Management: Building a Metrics Culture at Different Company Stages
 
-**Startup:** Early-stage companies typically have very few metrics and very few people looking at them, which makes informal, undocumented definitions tolerable in the short term simply because the same one or two people who instrumented the event are also the only ones interpreting it — a luxury that disappears the moment the team, and the number of dashboards, starts to grow.
+**Startup:** Early-stage companies typically have very few metrics and very few people looking at them, which makes informal, undocumented definitions tolerable in the short term simply because the same one or two people who instrumented the event are also the only ones interpreting it a luxury that disappears the moment the team, and the number of dashboards, starts to grow.
 
 **Mid-size company:** This is typically where metric definition drift and dashboard fragmentation first become genuinely costly, as more teams independently build their own reporting on shared underlying data without a central governance process, and the resulting inconsistencies start surfacing painfully in cross-functional meetings where numbers visibly disagree.
 
-**Big Tech:** Mature organizations typically invest in dedicated data-governance or metrics-platform teams whose explicit job is maintaining Trusted Metric status for key company-wide numbers — owning definitions, validating instrumentation, and serving as the single source of truth other teams are expected to build on rather than recompute independently.
+**Big Tech:** Mature organizations typically invest in dedicated data-governance or metrics-platform teams whose explicit job is maintaining Trusted Metric status for key company-wide numbers owning definitions, validating instrumentation, and serving as the single source of truth other teams are expected to build on rather than recompute independently.
 
 ---
 
 ## Detailed Case Study: The Conflicting Retention Numbers
 
-A subscription software company held a quarterly business review where the VP of Product presented a retention chart showing a concerning three-point decline, while the Head of Data, using a different internal dashboard, presented a chart for the same period and the same nominal metric — "90-day retention" — showing a slight improvement. Both charts were labeled identically. The discrepancy was not caught until well into the meeting, when a data analyst in the room noticed the two charts didn't share the same shape at all, despite claiming to measure the same thing.
+A subscription software company held a quarterly business review where the VP of Product presented a retention chart showing a concerning three-point decline, while the Head of Data, using a different internal dashboard, presented a chart for the same period and the same nominal metric "90-day retention" showing a slight improvement. Both charts were labeled identically. The discrepancy was not caught until well into the meeting, when a data analyst in the room noticed the two charts didn't share the same shape at all, despite claiming to measure the same thing.
 
-Investigation afterward revealed the root cause: the two dashboards had been built by different teams eighteen months apart, computing "90-day retention" with different underlying definitions — one measured retention from account creation date, the other from first meaningful product action (a distinction that had been a deliberate, documented choice when the second dashboard was built, but that documentation had never been linked to or referenced by the original dashboard's owners, who were unaware a second definition existed at all). Neither dashboard was technically wrong. Neither had been formally designated the company's single source of truth. The organization had, in effect, allowed two independently valid Metric Provenance Chains to develop in parallel, without ever reaching company-wide Definition Consensus.
+Investigation afterward revealed the root cause: the two dashboards had been built by different teams eighteen months apart, computing "90-day retention" with different underlying definitions one measured retention from account creation date, the other from first meaningful product action (a distinction that had been a deliberate, documented choice when the second dashboard was built, but that documentation had never been linked to or referenced by the original dashboard's owners, who were unaware a second definition existed at all). Neither dashboard was technically wrong. Neither had been formally designated the company's single source of truth. The organization had, in effect, allowed two independently valid Metric Provenance Chains to develop in parallel, without ever reaching company-wide Definition Consensus.
 
 **What went wrong?** Using the Metric Provenance Chain, the failure sits precisely between Stage 3 (Definition Consensus) and Stage 4 (Trusted Metric): two teams had each internally passed through validation and definition for their own version of the metric, but no company-wide consensus process had ever forced a single, authoritative definition to emerge, and no single dashboard had been designated the trusted source others should defer to. The result was months of decisions across different teams potentially resting on two incompatible numbers, discovered only by chance in a high-visibility meeting.
 
-The company's recovery involved a formal metrics governance initiative: designating a single owned definition and dashboard for retention going forward, deprecating the second dashboard with a documented migration note, and instituting a lightweight review process for any new company-wide metric — a governance discipline this curriculum will connect directly to data science collaboration norms in Lesson 65.
+The company's recovery involved a formal metrics governance initiative: designating a single owned definition and dashboard for retention going forward, deprecating the second dashboard with a documented migration note, and instituting a lightweight review process for any new company-wide metric a governance discipline this curriculum will connect directly to data science collaboration norms in Lesson 65.
 
 ---
 
@@ -183,35 +183,35 @@ Before treating any metric as trustworthy enough to anchor a real decision, a PM
 | Ownership Assigned | Is there a named person or team accountable for this metric's accuracy? | No one would know who to ask if the number looked wrong |
 | Drift Monitoring | Is there a process for re-validating the metric after major product or instrumentation changes? | The metric has never been re-checked since a major platform migration |
 
-A "no" on Single Source of Truth in particular should be treated as an active organizational risk, not a minor inconvenience — it means the company may currently be making different decisions on the same nominal number without realizing it.
+A "no" on Single Source of Truth in particular should be treated as an active organizational risk, not a minor inconvenience it means the company may currently be making different decisions on the same nominal number without realizing it.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
-**"Tell me about a time data from two sources disagreed, and how you resolved it."** The interviewer is evaluating whether you can diagnose the disagreement using something like the Metric Provenance Chain — tracing back to a missing Definition Consensus or Single Source of Truth — rather than simply picking whichever number was more convenient.
+**"Tell me about a time data from two sources disagreed, and how you resolved it."** The interviewer is evaluating whether you can diagnose the disagreement using something like the Metric Provenance Chain tracing back to a missing Definition Consensus or Single Source of Truth rather than simply picking whichever number was more convenient.
 
 **"How would you build trust in a company's metrics if teams currently don't agree on basic numbers?**" The interviewer is testing whether you propose a governance process (documented definitions, designated ownership, a single source of truth) rather than a purely technical fix, since the root problem is usually organizational, not computational.
 
-**"What's the danger of adding more dashboards to a company with existing data trust issues?"** The interviewer is listening for recognition that more dashboards, without governance, typically worsens fragmentation rather than improving visibility — a direct application of the dashboard fragmentation diagnostic from this lesson.
+**"What's the danger of adding more dashboards to a company with existing data trust issues?"** The interviewer is listening for recognition that more dashboards, without governance, typically worsens fragmentation rather than improving visibility a direct application of the dashboard fragmentation diagnostic from this lesson.
 
 ---
 
 ## Summary
 
-Organizational metric trust, not the sheer volume of available data, is the true constraint on data-informed decision-making at scale, because a company with abundant but inconsistently-defined metrics is functionally no better off than one with no data at all, and often worse off, since decisions get made confidently on numbers that quietly disagree. The Metric Provenance Chain — Instrumentation, Validation, Definition Consensus, Trusted Metric, and Decision — traces the path any metric must earn before it should be allowed to inform a real choice, and skipping any stage introduces risk that compounds in everything built on top of it. Metric definition drift, dashboard fragmentation, and the quiet proliferation of independently-valid but incompatible metric definitions are the most common organizational symptoms of a broken Provenance Chain, and they are dangerous precisely because they are silent — the numbers keep flowing, looking authoritative, even after their underlying meaning has shifted or diverged from a nominally identical metric elsewhere in the company. Building a genuine metrics culture requires deliberate governance: documented definitions, validated instrumentation, designated single sources of truth, and assigned ownership, not simply more dashboards or more raw data.
+Organizational metric trust, not the sheer volume of available data, is the true constraint on data-informed decision-making at scale, because a company with abundant but inconsistently-defined metrics is functionally no better off than one with no data at all, and often worse off, since decisions get made confidently on numbers that quietly disagree. The Metric Provenance Chain Instrumentation, Validation, Definition Consensus, Trusted Metric, and Decision traces the path any metric must earn before it should be allowed to inform a real choice, and skipping any stage introduces risk that compounds in everything built on top of it. Metric definition drift, dashboard fragmentation, and the quiet proliferation of independently-valid but incompatible metric definitions are the most common organizational symptoms of a broken Provenance Chain, and they are dangerous precisely because they are silent the numbers keep flowing, looking authoritative, even after their underlying meaning has shifted or diverged from a nominally identical metric elsewhere in the company. Building a genuine metrics culture requires deliberate governance: documented definitions, validated instrumentation, designated single sources of truth, and assigned ownership, not simply more dashboards or more raw data.
 
 ---
 
 ## Key Takeaways
 
 - Organizational metric trust, not data volume, is the actual constraint on data-informed decision-making at scale.
-- The Metric Provenance Chain traces a metric through Instrumentation, Validation, Definition Consensus, Trusted Metric, and Decision — skipping any stage introduces compounding risk.
+- The Metric Provenance Chain traces a metric through Instrumentation, Validation, Definition Consensus, Trusted Metric, and Decision skipping any stage introduces compounding risk.
 - Metric definition drift is the silent divergence between a metric's original meaning and what it currently measures, often triggered by feature launches or instrumentation migrations.
-- Dashboard fragmentation — multiple dashboards claiming to show the same metric and disagreeing — is direct evidence of a broken Provenance Chain, not a minor cosmetic issue.
+- Dashboard fragmentation multiple dashboards claiming to show the same metric and disagreeing is direct evidence of a broken Provenance Chain, not a minor cosmetic issue.
 - A metric's name is not documentation; an undocumented formula invites every viewer to silently assume their own definition.
 - Organizational seniority is not a substitute for provenance; any metric, regardless of its source, must earn Trusted Metric status through process.
-- Building metrics culture requires deliberate governance — documented definitions, validated instrumentation, single sources of truth, and assigned ownership — not simply more dashboards.
+- Building metrics culture requires deliberate governance documented definitions, validated instrumentation, single sources of truth, and assigned ownership not simply more dashboards.
 
 ---
 
@@ -276,28 +276,28 @@ Organizational metric trust, not the sheer volume of available data, is the true
 
 **Card 5**
 - Front: In the Case Study, why didn't either retention dashboard get flagged as "wrong"?
-- Back: Both were internally valid and consistently computed — the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
+- Back: Both were internally valid and consistently computed the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
 - Difficulty: 2
 - Tags: case-study, provenance-chain
 
 **Card 6**
 - Front: Why is an executive's personal dashboard not automatically a Trusted Metric?
-- Back: Organizational seniority is not a substitute for provenance — any metric must pass through Validation and Definition Consensus regardless of its source.
+- Back: Organizational seniority is not a substitute for provenance any metric must pass through Validation and Definition Consensus regardless of its source.
 - Difficulty: 2
 - Tags: metric-health
 
 **Card 7**
 - Front: What should a PM do if a metric fails the Single Source of Truth check?
-- Back: Treat it as an active organizational risk — decisions may currently be resting on incompatible versions of the same nominal number.
+- Back: Treat it as an active organizational risk decisions may currently be resting on incompatible versions of the same nominal number.
 - Difficulty: 2
 - Tags: metric-health-checklist
 
 
 ## Reflection Exercise
 
-You are the PM for a growing B2B software company. You've just discovered that three separate teams — Product, Marketing, and Customer Success — each maintain their own dashboard for "customer engagement," and the three dashboards, checked side by side for the same month, show meaningfully different trends.
+You are the PM for a growing B2B software company. You've just discovered that three separate teams Product, Marketing, and Customer Success each maintain their own dashboard for "customer engagement," and the three dashboards, checked side by side for the same month, show meaningfully different trends.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Metric Provenance Chain and the Metric Health Checklist to a real governance problem.
+There is no single correct answer to the prompts below the goal is to practice applying the Metric Provenance Chain and the Metric Health Checklist to a real governance problem.
 
 1. Using the Metric Provenance Chain, at which stage do you suspect this discrepancy most likely originated, and why?
 2. What questions would you ask each of the three teams to trace their version of "engagement" back through the Provenance Chain?
@@ -394,7 +394,7 @@ C) Both teams had valid definitions, but no company-wide consensus existed
 D) The VP of Product had deliberately misrepresented the retention data
 
 *Correct answer: C*
-*Explanation: Both dashboards were internally valid; the failure was organizational — no consensus process ever reconciled the two independently developed definitions.*
+*Explanation: Both dashboards were internally valid; the failure was organizational no consensus process ever reconciled the two independently developed definitions.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
@@ -508,9 +508,9 @@ D) Let each team keep its own definition indefinitely, since consensus is hard
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 63 — Two-Sided Marketplaces and Network Effects | Extends the discipline of separating and trusting side-specific signals into a company-wide metrics governance model |
-| **Current Lesson** | Lesson 64 — Data-Informed Product Management: Building a Metrics Culture | Metric Provenance Chain; metric definition drift; dashboard fragmentation; Metric Health Checklist |
-| **Next Lesson** | Lesson 65 — Working with Data Science & ML Teams | Builds on Trusted Metric status here as the foundation data science teams need before building models on top of company metrics |
+| **Previous Lesson** | Lesson 63 Two-Sided Marketplaces and Network Effects | Extends the discipline of separating and trusting side-specific signals into a company-wide metrics governance model |
+| **Current Lesson** | Lesson 64 Data-Informed Product Management: Building a Metrics Culture | Metric Provenance Chain; metric definition drift; dashboard fragmentation; Metric Health Checklist |
+| **Next Lesson** | Lesson 65 Working with Data Science & ML Teams | Builds on Trusted Metric status here as the foundation data science teams need before building models on top of company metrics |
 | **Future Concepts Unlocked** | Lesson 66 (Recommender Systems) | Assumes the reader can already evaluate whether input metrics feeding a recommender system are trustworthy |
 | | Lesson 84 (PM in AI-Native Companies) | Extends metric provenance discipline into the added complexity of AI model outputs as a new category of "metric" requiring validation |
 

@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 64 established that metric trust, not data volume, is the actual constraint on data-informed decision-making — and introduced the Metric Provenance Chain as a way to verify that a number deserves to inform a decision. This lesson extends that discipline into a specific and increasingly common working relationship: the one between a PM and a data science or machine learning team building a model whose output will itself become an input to product decisions.
+Lesson 64 established that metric trust, not data volume, is the actual constraint on data-informed decision-making and introduced the Metric Provenance Chain as a way to verify that a number deserves to inform a decision. This lesson extends that discipline into a specific and increasingly common working relationship: the one between a PM and a data science or machine learning team building a model whose output will itself become an input to product decisions.
 
-This relationship fails in a very particular and recurring way. A PM, trained to think in terms of user problems and business outcomes, hands a data scientist a goal like "predict which customers will churn" and treats the resulting model as a black box that will simply be correct. A data scientist, trained to optimize a technical objective, builds a model that scores well against a chosen metric — precision, recall, AUC — without necessarily understanding, or being told, what the *cost* of a wrong prediction actually is in the product experience the PM is responsible for. Both sides can do excellent, technically sound work, and the collaboration can still fail, because no one made explicit who owns which part of the decision chain from raw prediction to shipped product behavior.
+This relationship fails in a very particular and recurring way. A PM, trained to think in terms of user problems and business outcomes, hands a data scientist a goal like "predict which customers will churn" and treats the resulting model as a black box that will simply be correct. A data scientist, trained to optimize a technical objective, builds a model that scores well against a chosen metric precision, recall, AUC without necessarily understanding, or being told, what the *cost* of a wrong prediction actually is in the product experience the PM is responsible for. Both sides can do excellent, technically sound work, and the collaboration can still fail, because no one made explicit who owns which part of the decision chain from raw prediction to shipped product behavior.
 
-This lesson introduces the Ownership Zones Model, a way of dividing the PM/data-science relationship into distinct zones of responsibility, so that the most common and expensive failure in this collaboration — a model that is technically excellent but wrong for the product's actual needs — becomes visible and preventable before it ships.
+This lesson introduces the Ownership Zones Model, a way of dividing the PM/data-science relationship into distinct zones of responsibility, so that the most common and expensive failure in this collaboration a model that is technically excellent but wrong for the product's actual needs becomes visible and preventable before it ships.
 
 ---
 
@@ -14,13 +14,13 @@ This lesson introduces the Ownership Zones Model, a way of dividing the PM/data-
 
 | Field | Detail |
 |---|---|
-| **Module** | 7 — Platform, Technical & Data-Intensive Product Management |
+| **Module** | 7 Platform, Technical & Data-Intensive Product Management |
 | **Current Lesson** | 65 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 64 (Metric Provenance Chain, Trusted Metric), Lesson 45 (A/B testing rigor) |
-| **Next Lesson** | Lesson 66 — Recommender Systems and Personalization for PMs |
-| **Future Topics Unlocked** | Lesson 66 (Recommender Systems), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management) — all depend on the Ownership Zones Model and error-cost framing introduced here |
+| **Next Lesson** | Lesson 66 Recommender Systems and Personalization for PMs |
+| **Future Topics Unlocked** | Lesson 66 (Recommender Systems), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management) all depend on the Ownership Zones Model and error-cost framing introduced here |
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes the Metric Provenance Chain and Trusted Metric concepts from
 
 ### Why a Technically Excellent Model Can Still Be Wrong
 
-A model can score well against the metric it was optimized for and still fail the product it's meant to serve, because the technical metric a data scientist optimizes (accuracy, precision, recall, AUC) is a proxy for a business outcome the PM actually cares about, and proxies can diverge from the real target in ways invisible to the model-building process itself. A churn-prediction model with 90% accuracy sounds impressive until you learn that only 5% of customers actually churn in a given period, meaning a model that simply predicts "no one churns" would already be 95% accurate — a direct echo of Goodhart's Law from Lesson 41, now applied to a model's own training objective rather than a company's dashboard metric.
+A model can score well against the metric it was optimized for and still fail the product it's meant to serve, because the technical metric a data scientist optimizes (accuracy, precision, recall, AUC) is a proxy for a business outcome the PM actually cares about, and proxies can diverge from the real target in ways invisible to the model-building process itself. A churn-prediction model with 90% accuracy sounds impressive until you learn that only 5% of customers actually churn in a given period, meaning a model that simply predicts "no one churns" would already be 95% accurate a direct echo of Goodhart's Law from Lesson 41, now applied to a model's own training objective rather than a company's dashboard metric.
 
 ### The Ownership Zones Model
 
@@ -89,7 +89,7 @@ graph LR
     C --> D["Zone 4: Product Decision & Deployment<br/>(PM owns)"]
 ```
 
-**Zone 1, Problem Framing**, is owned by the PM: defining what business outcome the model should serve, what a correct versus incorrect prediction actually costs in the product experience, and what threshold of performance would make the model worth deploying at all. **Zone 2, Model Development**, is owned by data science: choosing the modeling approach, features, and technical optimization target, informed by the framing PM supplied in Zone 1. **Zone 3, Output Interpretation**, is genuinely shared: understanding what the model's output actually means in practice (a "churn probability of 0.7" is not the same as "this customer will churn," and translating between the two requires both statistical literacy and product judgment). **Zone 4, Product Decision and Deployment**, returns to the PM: deciding what the product actually does with a given model output — does a high churn-risk score trigger an automated retention email, a customer-success outreach, a discount offer, or nothing at all — a decision that depends on business context data science does not own.
+**Zone 1, Problem Framing**, is owned by the PM: defining what business outcome the model should serve, what a correct versus incorrect prediction actually costs in the product experience, and what threshold of performance would make the model worth deploying at all. **Zone 2, Model Development**, is owned by data science: choosing the modeling approach, features, and technical optimization target, informed by the framing PM supplied in Zone 1. **Zone 3, Output Interpretation**, is genuinely shared: understanding what the model's output actually means in practice (a "churn probability of 0.7" is not the same as "this customer will churn," and translating between the two requires both statistical literacy and product judgment). **Zone 4, Product Decision and Deployment**, returns to the PM: deciding what the product actually does with a given model output does a high churn-risk score trigger an automated retention email, a customer-success outreach, a discount offer, or nothing at all a decision that depends on business context data science does not own.
 
 The most common and costly failure in PM/data-science collaboration is a breakdown at the Zone 1/Zone 2 boundary: a PM who hands over a vague goal without specifying error costs, and a data scientist who, in the absence of that specification, optimizes for a generic technical metric that may not reflect what the product actually needs.
 
@@ -133,7 +133,7 @@ graph TD
     F["False Negative<br/>(model misses an actual churn risk)"] -->|"Cost: lost customer,<br/>no intervention attempted"| Cost2[Business Cost]
 ```
 
-If the cost of a false positive is low (a slightly unnecessary retention email) and the cost of a false negative is high (losing a valuable customer with no intervention attempted), the PM should direct data science toward a recall-oriented model, accepting more false positives to catch more true churners. If the reverse is true — false positives are expensive (an aggressive, unwanted discount offer that trains customers to expect discounts) and false negatives are comparatively cheap — a precision-oriented model is the better fit. Data science cannot make this trade-off correctly without the PM supplying the business cost information that only the PM, as the owner of Zone 1, actually has.
+If the cost of a false positive is low (a slightly unnecessary retention email) and the cost of a false negative is high (losing a valuable customer with no intervention attempted), the PM should direct data science toward a recall-oriented model, accepting more false positives to catch more true churners. If the reverse is true false positives are expensive (an aggressive, unwanted discount offer that trains customers to expect discounts) and false negatives are comparatively cheap a precision-oriented model is the better fit. Data science cannot make this trade-off correctly without the PM supplying the business cost information that only the PM, as the owner of Zone 1, actually has.
 
 ### What a PM Must Supply Before Model Development Begins
 
@@ -170,18 +170,18 @@ Business context, error costs, and the product decisions attached to a model's o
 
 The Ownership Zones Model introduced above is this lesson's core takeaway tool. Before any model-driven feature ships, a PM should be able to answer, for each zone:
 
-1. **Zone 1 — Have I, as PM, explicitly specified the business decision, the error costs, and the minimum performance threshold**, rather than leaving these judgments to be inferred?
-2. **Zone 2 — Does data science have what they need to optimize toward the right target**, given the framing I supplied?
-3. **Zone 3 — Has someone translated the model's statistical output into what it actually means for a real product decision**, rather than treating a probability as a fact?
-4. **Zone 4 — Is there a clear, specific action the product will take based on the model's output**, decided before deployment rather than improvised after?
+1. **Zone 1 Have I, as PM, explicitly specified the business decision, the error costs, and the minimum performance threshold**, rather than leaving these judgments to be inferred?
+2. **Zone 2 Does data science have what they need to optimize toward the right target**, given the framing I supplied?
+3. **Zone 3 Has someone translated the model's statistical output into what it actually means for a real product decision**, rather than treating a probability as a fact?
+4. **Zone 4 Is there a clear, specific action the product will take based on the model's output**, decided before deployment rather than improvised after?
 
-A "no" to any of these questions indicates a specific, locatable gap in the collaboration — not a vague sense that "the model isn't working," but a precise zone where responsibility was never actually claimed.
+A "no" to any of these questions indicates a specific, locatable gap in the collaboration not a vague sense that "the model isn't working," but a precise zone where responsibility was never actually claimed.
 
 ---
 
 ## Real Company Example
 
-**LinkedIn's "People You May Know" (PYMK)** system is directly documented across a series of posts on LinkedIn's own engineering blog, describing exactly the kind of framing work this lesson's Zone 1/Zone 2 boundary addresses. One post, "Optimizing PYMK for Equity in Network Creation," describes LinkedIn's engineers and product team discovering that optimizing the recommendation model purely for a generic technical metric — predicted connection-acceptance likelihood — systematically under-recommended connections for members with smaller existing networks, since the model naturally favored recommending well-connected people to other well-connected people. The team explicitly reframed the model's objective to also account for network equity, not just raw acceptance-likelihood, which required product leadership to first define what "valuable recommendation" should mean at a policy level before the modeling team could encode it — a direct, sourced illustration of Zone 1 framing actively shaping Zone 2 model development, rather than a data science team optimizing a metric in isolation and hoping it captured the right outcome.
+**LinkedIn's "People You May Know" (PYMK)** system is directly documented across a series of posts on LinkedIn's own engineering blog, describing exactly the kind of framing work this lesson's Zone 1/Zone 2 boundary addresses. One post, "Optimizing PYMK for Equity in Network Creation," describes LinkedIn's engineers and product team discovering that optimizing the recommendation model purely for a generic technical metric predicted connection-acceptance likelihood systematically under-recommended connections for members with smaller existing networks, since the model naturally favored recommending well-connected people to other well-connected people. The team explicitly reframed the model's objective to also account for network equity, not just raw acceptance-likelihood, which required product leadership to first define what "valuable recommendation" should mean at a policy level before the modeling team could encode it a direct, sourced illustration of Zone 1 framing actively shaping Zone 2 model development, rather than a data science team optimizing a metric in isolation and hoping it captured the right outcome.
 
 *(Source: LinkedIn's own official engineering blog, "Optimizing People You May Know (PYMK) for equity in network creation," and its companion posts on the PYMK system's technical architecture.)*
 
@@ -189,7 +189,7 @@ A "no" to any of these questions indicates a specific, locatable gap in the coll
 
 ## Real World Perspective: Working with Data Science & ML Teams at Different Company Stages
 
-**Startup:** Early-stage companies often have PMs and data scientists (sometimes the same person) working in extremely tight loops, which can make formal Ownership Zone documentation feel unnecessary — but even informal collaboration benefits from at least verbally agreeing on error costs before model work begins, since the failure mode described in the Case Study below can occur even in a two-person team.
+**Startup:** Early-stage companies often have PMs and data scientists (sometimes the same person) working in extremely tight loops, which can make formal Ownership Zone documentation feel unnecessary but even informal collaboration benefits from at least verbally agreeing on error costs before model work begins, since the failure mode described in the Case Study below can occur even in a two-person team.
 
 **Mid-size company:** This is typically where dedicated data science teams first emerge as a distinct function from product, making explicit Ownership Zone agreements genuinely necessary for the first time, since the tight informal loop of a founding team no longer exists by default and must be deliberately reconstructed through process.
 
@@ -199,13 +199,13 @@ A "no" to any of these questions indicates a specific, locatable gap in the coll
 
 ## Detailed Case Study: The Overzealous Churn Model
 
-A subscription software company's data science team built a churn-prediction model at the request of the customer success organization, optimized for recall — deliberately designed to catch as many potential churners as possible, on the general reasoning that "missing a real churn risk is worse than a false alarm." The model performed excellently against its recall target in testing. On deployment, every customer flagged as high-risk automatically triggered a personal outreach call from a customer success representative.
+A subscription software company's data science team built a churn-prediction model at the request of the customer success organization, optimized for recall deliberately designed to catch as many potential churners as possible, on the general reasoning that "missing a real churn risk is worse than a false alarm." The model performed excellently against its recall target in testing. On deployment, every customer flagged as high-risk automatically triggered a personal outreach call from a customer success representative.
 
-Within weeks, customer success representatives were spending the large majority of their outreach time contacting customers who, it turned out, were not actually at meaningful risk of churning — the model's recall-oriented design meant it deliberately over-flagged in order to minimize missed true churners, producing a large volume of false positives as an accepted trade-off. No one had asked the customer success team, whose time was the actual resource being spent on each flagged case, what volume of false positives their team could realistically absorb before outreach quality across all calls, including to genuinely at-risk customers, began to degrade from sheer volume and rep burnout.
+Within weeks, customer success representatives were spending the large majority of their outreach time contacting customers who, it turned out, were not actually at meaningful risk of churning the model's recall-oriented design meant it deliberately over-flagged in order to minimize missed true churners, producing a large volume of false positives as an accepted trade-off. No one had asked the customer success team, whose time was the actual resource being spent on each flagged case, what volume of false positives their team could realistically absorb before outreach quality across all calls, including to genuinely at-risk customers, began to degrade from sheer volume and rep burnout.
 
-**What went wrong?** Using the Ownership Zones Model, the failure sits in Zone 1: the recall-oriented framing was chosen based on a generic, reasonable-sounding principle ("catching churners matters more than avoiding false alarms") rather than an actual, quantified cost analysis of what a false positive concretely cost in customer success representative time and attention. The PM who commissioned the model had not supplied data science with the real operational constraint — a limited outreach capacity — that should have shaped the precision/recall trade-off from the start.
+**What went wrong?** Using the Ownership Zones Model, the failure sits in Zone 1: the recall-oriented framing was chosen based on a generic, reasonable-sounding principle ("catching churners matters more than avoiding false alarms") rather than an actual, quantified cost analysis of what a false positive concretely cost in customer success representative time and attention. The PM who commissioned the model had not supplied data science with the real operational constraint a limited outreach capacity that should have shaped the precision/recall trade-off from the start.
 
-The company's recovery involved revisiting Zone 1 with actual capacity data from customer success, retraining the model with an explicit precision floor that respected the team's realistic outreach bandwidth, and building a tiered response system (automated email for lower-confidence flags, personal outreach reserved for the highest-confidence predictions) — a Zone 4 refinement that this curriculum will connect to the personalization and ranking concepts formalized in Lesson 66.
+The company's recovery involved revisiting Zone 1 with actual capacity data from customer success, retraining the model with an explicit precision floor that respected the team's realistic outreach bandwidth, and building a tiered response system (automated email for lower-confidence flags, personal outreach reserved for the highest-confidence predictions) a Zone 4 refinement that this curriculum will connect to the personalization and ranking concepts formalized in Lesson 66.
 
 ---
 
@@ -221,7 +221,7 @@ Before model development begins, a PM can use the following checklist to confirm
 | Capacity Constraints Shared | Does the team acting on the model's output have a realistic operational capacity limit? | Recall-oriented models overwhelm downstream teams, as in the Case Study |
 | Interpretation Owner Named | Who is responsible for translating statistical output into a concrete product decision? | Probabilistic output gets treated as fact, leading to overconfident decisions |
 
-A "no" on Error Cost Specified should be treated as a launch-blocking gap — proceeding without it means the precision/recall trade-off is being made implicitly, by default, rather than deliberately.
+A "no" on Error Cost Specified should be treated as a launch-blocking gap proceeding without it means the precision/recall trade-off is being made implicitly, by default, rather than deliberately.
 
 ---
 
@@ -237,7 +237,7 @@ A "no" on Error Cost Specified should be treated as a launch-blocking gap — pr
 
 ## Summary
 
-A model can be technically excellent and still be the wrong model for a product's actual needs, because the technical metric it was optimized for is a proxy for a business outcome, and proxies can diverge sharply from that outcome in ways invisible during model development itself. The Ownership Zones Model divides the path from business problem to shipped model-driven decision into four zones — Problem Framing (PM), Model Development (data science), Output Interpretation (shared), and Product Decision and Deployment (PM) — and the most common, costly failure in PM/data-science collaboration occurs at the Zone 1/Zone 2 boundary, when a PM fails to specify error costs and operational constraints that only the PM actually has visibility into. Precision and recall are not neutral technical properties to be optimized generically; the trade-off between them is fundamentally a product decision about the relative cost of two different kinds of errors, and data science cannot make that trade-off correctly without explicit input from the PM who owns Zone 1. Before any model-driven feature ships, a PM should be able to name the specific business decision at stake, the relative error costs, the minimum acceptable performance threshold, and a concrete plan for what the product will do with the model's output — and gaps in any of these are precise, locatable failures of collaboration, not vague technical shortcomings.
+A model can be technically excellent and still be the wrong model for a product's actual needs, because the technical metric it was optimized for is a proxy for a business outcome, and proxies can diverge sharply from that outcome in ways invisible during model development itself. The Ownership Zones Model divides the path from business problem to shipped model-driven decision into four zones Problem Framing (PM), Model Development (data science), Output Interpretation (shared), and Product Decision and Deployment (PM) and the most common, costly failure in PM/data-science collaboration occurs at the Zone 1/Zone 2 boundary, when a PM fails to specify error costs and operational constraints that only the PM actually has visibility into. Precision and recall are not neutral technical properties to be optimized generically; the trade-off between them is fundamentally a product decision about the relative cost of two different kinds of errors, and data science cannot make that trade-off correctly without explicit input from the PM who owns Zone 1. Before any model-driven feature ships, a PM should be able to name the specific business decision at stake, the relative error costs, the minimum acceptable performance threshold, and a concrete plan for what the product will do with the model's output and gaps in any of these are precise, locatable failures of collaboration, not vague technical shortcomings.
 
 ---
 
@@ -261,7 +261,7 @@ A model can be technically excellent and still be the wrong model for a product'
 - Ownership Zones: Problem Framing (PM) → Model Development (DS) → Interpretation (Shared) → Decision & Deployment (PM).
 - Precision vs. recall is a business trade-off about error cost, not a purely technical choice.
 - Before model work starts: specify the decision, the error costs, the capacity constraints, and the minimum threshold.
-- A probability is not a fact — someone must own translating model output into product action.
+- A probability is not a fact someone must own translating model output into product action.
 
 ---
 
@@ -335,7 +335,7 @@ A model can be technically excellent and still be the wrong model for a product'
 
 You are the PM for a fintech app, and your data science team has just proposed a fraud-detection model. You know that a false positive (blocking a legitimate transaction) creates significant customer frustration and support burden, while a false negative (missing actual fraud) creates direct financial loss and regulatory risk.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Ownership Zones Model and the precision/recall trade-off to a genuinely difficult, asymmetric-cost scenario.
+There is no single correct answer to the prompts below the goal is to practice applying the Ownership Zones Model and the precision/recall trade-off to a genuinely difficult, asymmetric-cost scenario.
 
 1. Using the Ownership Zones Model, what specific information must you supply in Zone 1 before data science can responsibly begin Zone 2 work?
 2. Both false positives and false negatives carry serious costs here. How would you go about quantifying and comparing them, given they affect different stakeholders (customers vs. the business/regulators)?
@@ -367,7 +367,7 @@ C) Neither party; it emerges automatically from the underlying data
 D) Executive leadership, exclusively, in every organization
 
 *Correct answer: A*
-*Explanation: Problem Framing — defining the business decision, error costs, and minimum threshold — is explicitly a PM responsibility in this model.*
+*Explanation: Problem Framing defining the business decision, error costs, and minimum threshold is explicitly a PM responsibility in this model.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -380,7 +380,7 @@ C) The fraction of flagged positives that were actually positive
 D) The fraction of actual positives that the model successfully flagged
 
 *Correct answer: D*
-*Explanation: Recall specifically measures coverage of true positives — how many actual positive cases the model successfully caught.*
+*Explanation: Recall specifically measures coverage of true positives how many actual positive cases the model successfully caught.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -432,7 +432,7 @@ C) Customer success representatives simply refused to use its output
 D) Recall-oriented framing was chosen without quantifying real capacity
 
 *Correct answer: D*
-*Explanation: The failure was a Zone 1 gap — real operational capacity data was never supplied to inform the precision/recall trade-off.*
+*Explanation: The failure was a Zone 1 gap real operational capacity data was never supplied to inform the precision/recall trade-off.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
@@ -546,9 +546,9 @@ D) Quantify both costs explicitly in Zone 1, then design a tiered Zone 4 plan
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 64 — Data-Informed Product Management: Building a Metrics Culture | Extends the Metric Provenance Chain's trust discipline to model outputs specifically, treating a prediction as a metric requiring the same scrutiny |
-| **Current Lesson** | Lesson 65 — Working with Data Science & ML Teams | Ownership Zones Model; precision/recall as a product decision; error cost specification; PM–Data Science Collaboration Checklist |
-| **Next Lesson** | Lesson 66 — Recommender Systems and Personalization for PMs | Applies the Ownership Zones Model to the specific case of ranking and personalization models |
+| **Previous Lesson** | Lesson 64 Data-Informed Product Management: Building a Metrics Culture | Extends the Metric Provenance Chain's trust discipline to model outputs specifically, treating a prediction as a metric requiring the same scrutiny |
+| **Current Lesson** | Lesson 65 Working with Data Science & ML Teams | Ownership Zones Model; precision/recall as a product decision; error cost specification; PM–Data Science Collaboration Checklist |
+| **Next Lesson** | Lesson 66 Recommender Systems and Personalization for PMs | Applies the Ownership Zones Model to the specific case of ranking and personalization models |
 | **Future Concepts Unlocked** | Lesson 84 (PM in AI-Native Companies) | Extends error-cost and ownership discipline into the broader organizational context of building an AI-native product company |
 | | Lesson 85 (Responsible AI Product Management) | Builds directly on error-cost framing when addressing fairness and harm across different user segments |
 

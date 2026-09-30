@@ -1,10 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import { QUICK_START_STEPS } from '../../components/quick-start/quick-start-steps'
+import {
+  QUICK_START_STEPS,
+  QUICK_START_AUTO_LAUNCH_ENABLED,
+} from '../../components/quick-start/quick-start-steps'
 
+// Mirrors the guarded auto-launch condition in QuickStartContext: the tour only auto-fires when
+// the feature flag is enabled AND onboarding is complete AND the tour has not been completed.
 function shouldAutoLaunchQuickStart(userMetadata?: {
   onboarding_complete?: boolean
   quick_start_completed?: boolean
 }): boolean {
+  if (!QUICK_START_AUTO_LAUNCH_ENABLED) return false
   const isOnboardingComplete = Boolean(userMetadata?.onboarding_complete)
   const isQuickStartCompleted = Boolean(userMetadata?.quick_start_completed)
   return isOnboardingComplete && !isQuickStartCompleted
@@ -34,10 +40,16 @@ describe('Quick Start Feature Unit Tests', () => {
     })
   })
 
-  describe('Auto-Launch Trigger Logic', () => {
-    it('returns true when onboarding is complete and quick start is not completed', () => {
+  // Phase 4.2 (Collapse the Entrance): the tour no longer auto-fires at the entrance. Auto-launch
+  // is disabled behind a flag; the tour stays available on demand via the Topbar control.
+  describe('Auto-Launch Trigger Logic (disabled in Phase 4.2)', () => {
+    it('auto-launch is disabled by the feature flag', () => {
+      expect(QUICK_START_AUTO_LAUNCH_ENABLED).toBe(false)
+    })
+
+    it('never auto-launches, even when onboarding is complete and the tour is not completed', () => {
       const userMeta = { onboarding_complete: true, quick_start_completed: false }
-      expect(shouldAutoLaunchQuickStart(userMeta)).toBe(true)
+      expect(shouldAutoLaunchQuickStart(userMeta)).toBe(false)
     })
 
     it('returns false when onboarding is NOT complete', () => {

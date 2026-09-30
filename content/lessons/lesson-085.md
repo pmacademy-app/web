@@ -4,7 +4,7 @@
 
 Lesson 81 established the Outcome Layer of regulatory constraint: a well-documented process can still produce an impermissible, discriminatory result. Lesson 84 established that a generative model's capability and reliability must be assessed separately before deciding how much to automate. This lesson combines both threads into a specific, ongoing discipline: responsible AI product management, the practice of continuously verifying that an AI system's actual outcomes are fair and accountable across the different populations it affects, rather than assuming fairness follows automatically from technical accuracy or good intentions.
 
-A model can be highly accurate in aggregate while producing systematically worse outcomes for a specific subgroup, a pattern invisible unless someone deliberately measures outcomes by group rather than trusting an overall accuracy number. This is not a hypothetical concern; it is one of the most well-documented and recurring failure patterns in applied machine learning, and it recurs specifically because aggregate metrics, by construction, can mask exactly this kind of disparity. Responsible AI product management treats this disparity risk as something requiring active, ongoing measurement — not a one-time audit, but a continuous practice, echoing the same "ongoing, not one-time" discipline Lesson 84 established for evals generally.
+A model can be highly accurate in aggregate while producing systematically worse outcomes for a specific subgroup, a pattern invisible unless someone deliberately measures outcomes by group rather than trusting an overall accuracy number. This is not a hypothetical concern; it is one of the most well-documented and recurring failure patterns in applied machine learning, and it recurs specifically because aggregate metrics, by construction, can mask exactly this kind of disparity. Responsible AI product management treats this disparity risk as something requiring active, ongoing measurement not a one-time audit, but a continuous practice, echoing the same "ongoing, not one-time" discipline Lesson 84 established for evals generally.
 
 ---
 
@@ -12,13 +12,13 @@ A model can be highly accurate in aggregate while producing systematically worse
 
 | Field | Detail |
 |---|---|
-| **Module** | 9 — Specialized Domains and Synthesis |
+| **Module** | 9 Specialized Domains and Synthesis |
 | **Current Lesson** | 85 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 81 (Outcome Layer), Lesson 84 (Capability-Reliability Matrix, continuous evals), Lesson 67 (Escalation Staircase, appeals) |
-| **Next Lesson** | Lesson 86 — Scaling International Products: Beyond Localization |
-| **Future Topics Unlocked** | Lesson 90 (Capstone) — draws on the Fairness Audit Loop as established canon |
+| **Next Lesson** | Lesson 86 Scaling International Products: Beyond Localization |
+| **Future Topics Unlocked** | Lesson 90 (Capstone) draws on the Fairness Audit Loop as established canon |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes the Regulatory Surface Map's Outcome Layer from Lesson 81, t
 
 ### Why Aggregate Accuracy Can Mask Disparity
 
-A model can achieve 95% overall accuracy while performing at 99% accuracy for one group and 70% for another, and the aggregate number alone would never reveal this. This is the same base-rate and aggregation risk introduced in Lesson 65's discussion of accuracy on imbalanced classes, now applied specifically to demographic or protected-group disparity rather than class imbalance. The arithmetic reason this happens is straightforward once stated: if one group makes up 90% of the training data and the model performs well on that majority group, the aggregate accuracy figure will be dominated by that majority group's performance almost regardless of how poorly the model does on the remaining 10%. A team that only ever looks at the single headline accuracy number has, in effect, built a measurement system that is structurally blind to exactly the kind of harm a smaller or underrepresented group is most likely to experience — which is precisely why subgroup measurement cannot be treated as an optional, nice-to-have addition to standard model evaluation.
+A model can achieve 95% overall accuracy while performing at 99% accuracy for one group and 70% for another, and the aggregate number alone would never reveal this. This is the same base-rate and aggregation risk introduced in Lesson 65's discussion of accuracy on imbalanced classes, now applied specifically to demographic or protected-group disparity rather than class imbalance. The arithmetic reason this happens is straightforward once stated: if one group makes up 90% of the training data and the model performs well on that majority group, the aggregate accuracy figure will be dominated by that majority group's performance almost regardless of how poorly the model does on the remaining 10%. A team that only ever looks at the single headline accuracy number has, in effect, built a measurement system that is structurally blind to exactly the kind of harm a smaller or underrepresented group is most likely to experience which is precisely why subgroup measurement cannot be treated as an optional, nice-to-have addition to standard model evaluation.
 
 ### The Fairness Audit Loop
 
@@ -88,19 +88,19 @@ graph LR
     D --> A
 ```
 
-The loop's discipline is that it never terminates — remediation feeds back into re-measurement, since a fix applied once can itself introduce a new disparity elsewhere, or can decay as data and usage patterns shift over time.
+The loop's discipline is that it never terminates remediation feeds back into re-measurement, since a fix applied once can itself introduce a new disparity elsewhere, or can decay as data and usage patterns shift over time.
 
 ### Root Cause vs. Output Adjustment
 
-A superficial fix — adjusting a model's output thresholds differently by group after the fact — can mask rather than resolve the underlying issue, and can itself introduce new legal and ethical complications. Genuine remediation investigates whether the disparity traces to biased training data, a proxy variable correlated with a protected characteristic, or a genuine difference in the underlying task that requires a different solution entirely.
+A superficial fix adjusting a model's output thresholds differently by group after the fact can mask rather than resolve the underlying issue, and can itself introduce new legal and ethical complications. Genuine remediation investigates whether the disparity traces to biased training data, a proxy variable correlated with a protected characteristic, or a genuine difference in the underlying task that requires a different solution entirely.
 
 ### Transparency, Explainability, and Recourse
 
-Responsible AI deployment requires that affected individuals can understand, at some level, why a decision was made, and have a genuine path to contest it — directly connecting to the Escalation Staircase's appeals requirement from Lesson 67, now applied specifically to AI-driven decisions.
+Responsible AI deployment requires that affected individuals can understand, at some level, why a decision was made, and have a genuine path to contest it directly connecting to the Escalation Staircase's appeals requirement from Lesson 67, now applied specifically to AI-driven decisions.
 
 ### Why "Fair" Is Not a Single, Agreed-Upon Definition
 
-A specific complication that trips up even well-intentioned teams: there is no single, universally agreed mathematical definition of fairness, and several reasonable-sounding definitions can be mutually incompatible with each other for the same decision. A model can achieve *equal approval rates* across groups (demographic parity) while still producing *unequal error rates* within those groups (unequal false-positive or false-negative rates), and it is mathematically impossible, in most realistic cases, to satisfy both definitions simultaneously if the underlying base rates differ across groups. This means a PM cannot simply instruct a team to "make the model fair" and expect a single unambiguous target — the team must first make an explicit, documented choice about which fairness definition is appropriate for the specific decision at hand (a lending decision, a hiring screen, a content-moderation call), and that choice itself deserves the same scrutiny and stakeholder input as any other significant product decision, since different definitions can be more or less appropriate depending on the real-world consequences of false positives versus false negatives for the specific population affected.
+A specific complication that trips up even well-intentioned teams: there is no single, universally agreed mathematical definition of fairness, and several reasonable-sounding definitions can be mutually incompatible with each other for the same decision. A model can achieve *equal approval rates* across groups (demographic parity) while still producing *unequal error rates* within those groups (unequal false-positive or false-negative rates), and it is mathematically impossible, in most realistic cases, to satisfy both definitions simultaneously if the underlying base rates differ across groups. This means a PM cannot simply instruct a team to "make the model fair" and expect a single unambiguous target the team must first make an explicit, documented choice about which fairness definition is appropriate for the specific decision at hand (a lending decision, a hiring screen, a content-moderation call), and that choice itself deserves the same scrutiny and stakeholder input as any other significant product decision, since different definitions can be more or less appropriate depending on the real-world consequences of false positives versus false negatives for the specific population affected.
 
 ---
 
@@ -108,19 +108,19 @@ A specific complication that trips up even well-intentioned teams: there is no s
 
 **Mistake 1: Trusting an aggregate accuracy number without measuring outcomes by subgroup**
 
-A model can report 95% overall accuracy while performing at 99% for one group and 70% for another, and the single headline number will never reveal this gap. If one group dominates the training data, aggregate accuracy is dominated by that group's performance almost regardless of how poorly the model does on a smaller or underrepresented group — which is exactly the group most likely to be harmed. Subgroup measurement is not an optional addition to standard evaluation; without it, a team has built a measurement system that is structurally blind to the disparity it most needs to catch.
+A model can report 95% overall accuracy while performing at 99% for one group and 70% for another, and the single headline number will never reveal this gap. If one group dominates the training data, aggregate accuracy is dominated by that group's performance almost regardless of how poorly the model does on a smaller or underrepresented group which is exactly the group most likely to be harmed. Subgroup measurement is not an optional addition to standard evaluation; without it, a team has built a measurement system that is structurally blind to the disparity it most needs to catch.
 
 **Mistake 2: Treating a fairness audit as a one-time pre-launch check rather than a continuous loop**
 
-The Fairness Audit Loop — define equity metric, measure across groups, diagnose disparity source, remediate — never terminates, because a remediation applied once can itself introduce a new disparity elsewhere, or can decay as data and usage patterns shift over time. Teams that treat a pre-launch audit as a permanent clearance are applying a one-time-check mental model to a problem that requires ongoing monitoring. A fairness measurement that isn't re-run periodically is a snapshot of a model that no longer exists by the time real usage has diverged from the original test conditions.
+The Fairness Audit Loop define equity metric, measure across groups, diagnose disparity source, remediate never terminates, because a remediation applied once can itself introduce a new disparity elsewhere, or can decay as data and usage patterns shift over time. Teams that treat a pre-launch audit as a permanent clearance are applying a one-time-check mental model to a problem that requires ongoing monitoring. A fairness measurement that isn't re-run periodically is a snapshot of a model that no longer exists by the time real usage has diverged from the original test conditions.
 
 **Mistake 3: Adjusting output thresholds by group as a superficial fix without diagnosing root cause, including assuming that removing a protected characteristic from model inputs alone eliminates disparity risk**
 
-Changing a model's decision threshold differently by group after the fact can mask rather than resolve the underlying issue, and can itself introduce new legal and ethical complications. Genuine remediation instead investigates whether the disparity traces to biased training data, a proxy variable correlated with a protected characteristic, or a genuine difference in the underlying task — simply deleting the protected characteristic from a model's inputs does not solve this, because other correlated variables (a zip code standing in for race, a shopping pattern standing in for gender) can reproduce the same disparity through a different door. Root-cause diagnosis, not output adjustment, is the difference between a real fix and a fix that only looks like one on a dashboard.
+Changing a model's decision threshold differently by group after the fact can mask rather than resolve the underlying issue, and can itself introduce new legal and ethical complications. Genuine remediation instead investigates whether the disparity traces to biased training data, a proxy variable correlated with a protected characteristic, or a genuine difference in the underlying task simply deleting the protected characteristic from a model's inputs does not solve this, because other correlated variables (a zip code standing in for race, a shopping pattern standing in for gender) can reproduce the same disparity through a different door. Root-cause diagnosis, not output adjustment, is the difference between a real fix and a fix that only looks like one on a dashboard.
 
 **Mistake 4: Failing to provide a genuine appeal mechanism for AI-driven decisions, per Lesson 67's structural requirement**
 
-Responsible deployment requires that people affected by a model's decision can understand, at some level, why it was made, and have a real path to contest it — directly extending the appeals requirement this curriculum established for platform governance to the specific case of AI-driven decisions. A model that denies a loan, flags an account, or rejects an application without any accessible explanation or recourse leaves the people most affected by an error with no way to correct it. Skipping this step is easy to justify under launch pressure, but it is exactly the gap that turns an isolated model error into a harm nobody can challenge.
+Responsible deployment requires that people affected by a model's decision can understand, at some level, why it was made, and have a real path to contest it directly extending the appeals requirement this curriculum established for platform governance to the specific case of AI-driven decisions. A model that denies a loan, flags an account, or rejects an application without any accessible explanation or recourse leaves the people most affected by an error with no way to correct it. Skipping this step is easy to justify under launch pressure, but it is exactly the gap that turns an isolated model error into a harm nobody can challenge.
 
 **Mistake 5: Assuming a single, universally correct mathematical definition of fairness exists**
 
@@ -136,9 +136,9 @@ Ask continuously: (1) What equity metric matters for this specific decision? (2)
 
 ## Real Company Example
 
-**IBM's AI Fairness 360 (AIF360)**, introduced directly on IBM Research's own blog in 2018 and released as an open-source toolkit, gives this lesson's subgroup-specific fairness argument a concrete, inspectable technical form rather than a general aspiration. AIF360 provides two distinct categories of tooling, confirmed in IBM's own published paper describing it: a comprehensive set of fairness *metrics* — including specific, named measures like disparate impact and statistical parity difference, each designed to detect a different kind of subgroup disadvantage a single aggregate accuracy number would hide — and a separate set of bias *mitigation algorithms* (nine in the initial release, drawn from the broader academic fairness research community) that can be applied at different stages of the machine learning pipeline: pre-processing the training data, adjusting the model during training, or post-processing its outputs after the fact. IBM's own stated design goal was explicitly to translate fairness research from academic papers into a form usable "in the actual practice of domains as wide-ranging as finance, human capital management, healthcare, and education" — the same regulated and high-stakes domains this lesson and Lesson 81 both address.
+**IBM's AI Fairness 360 (AIF360)**, introduced directly on IBM Research's own blog in 2018 and released as an open-source toolkit, gives this lesson's subgroup-specific fairness argument a concrete, inspectable technical form rather than a general aspiration. AIF360 provides two distinct categories of tooling, confirmed in IBM's own published paper describing it: a comprehensive set of fairness *metrics* including specific, named measures like disparate impact and statistical parity difference, each designed to detect a different kind of subgroup disadvantage a single aggregate accuracy number would hide and a separate set of bias *mitigation algorithms* (nine in the initial release, drawn from the broader academic fairness research community) that can be applied at different stages of the machine learning pipeline: pre-processing the training data, adjusting the model during training, or post-processing its outputs after the fact. IBM's own stated design goal was explicitly to translate fairness research from academic papers into a form usable "in the actual practice of domains as wide-ranging as finance, human capital management, healthcare, and education" the same regulated and high-stakes domains this lesson and Lesson 81 both address.
 
-The structural point worth drawing out for this lesson: IBM built separate metrics *and* separate mitigation algorithms rather than a single "fairness score," because the underlying problem is genuinely multidimensional — a model can satisfy one fairness metric (say, equal overall accuracy across groups) while badly violating another (say, equal false-positive rates), and different mitigation techniques address different points in that trade-off space. A PM treating "check for bias" as a single pass/fail gate is working with a far cruder tool than what IBM's own research organization judged the problem actually requires.
+The structural point worth drawing out for this lesson: IBM built separate metrics *and* separate mitigation algorithms rather than a single "fairness score," because the underlying problem is genuinely multidimensional a model can satisfy one fairness metric (say, equal overall accuracy across groups) while badly violating another (say, equal false-positive rates), and different mitigation techniques address different points in that trade-off space. A PM treating "check for bias" as a single pass/fail gate is working with a far cruder tool than what IBM's own research organization judged the problem actually requires.
 
 *(Source: IBM Research's own official blog post introducing AIF360, and the toolkit's own published technical paper describing its metrics and mitigation algorithms.)*
 
@@ -146,11 +146,11 @@ The structural point worth drawing out for this lesson: IBM built separate metri
 
 ## Real World Perspective: Responsible AI Product Management at Different Company Stages
 
-**At a startup:** Early-stage AI products often skip subgroup measurement entirely, not out of indifference but because small user bases genuinely make some subgroup samples too small to draw statistically meaningful conclusions from, and limited engineering resources are typically prioritized toward core product functionality rather than fairness infrastructure. This is a real and understandable tradeoff at very small scale, but it is a risk that compounds silently as the product scales — a disparity that was statistically invisible at 500 users can become a serious, measurable, and legally consequential pattern at 500,000 users, and teams that never built the measurement habit early often discover the problem only once it is large enough to cause visible harm.
+**At a startup:** Early-stage AI products often skip subgroup measurement entirely, not out of indifference but because small user bases genuinely make some subgroup samples too small to draw statistically meaningful conclusions from, and limited engineering resources are typically prioritized toward core product functionality rather than fairness infrastructure. This is a real and understandable tradeoff at very small scale, but it is a risk that compounds silently as the product scales a disparity that was statistically invisible at 500 users can become a serious, measurable, and legally consequential pattern at 500,000 users, and teams that never built the measurement habit early often discover the problem only once it is large enough to cause visible harm.
 
-**At a mid-size company:** This is typically the stage where disparate impact first becomes both statistically measurable (the user base is large enough for subgroup analysis to be meaningful) and organizationally consequential (the company has enough at stake — reputation, revenue, potential legal exposure — that a discovered disparity demands a real response rather than a shrug). Mid-size companies operating AI-driven decisions at this stage often face a genuine resourcing tension between building fairness infrastructure and continuing to ship new capability, and how that tension gets resolved is frequently where a company's actual values, as opposed to its stated values, become visible.
+**At a mid-size company:** This is typically the stage where disparate impact first becomes both statistically measurable (the user base is large enough for subgroup analysis to be meaningful) and organizationally consequential (the company has enough at stake reputation, revenue, potential legal exposure that a discovered disparity demands a real response rather than a shrug). Mid-size companies operating AI-driven decisions at this stage often face a genuine resourcing tension between building fairness infrastructure and continuing to ship new capability, and how that tension gets resolved is frequently where a company's actual values, as opposed to its stated values, become visible.
 
-**At Big Tech:** Large organizations typically maintain dedicated responsible AI or algorithmic fairness teams that run the Fairness Audit Loop continuously across many models and product surfaces simultaneously, often with formal review gates that a new AI-driven decision feature must pass before launch. At this scale, disparities that would be statistically invisible in a smaller population become both detectable and, given the sheer number of people affected, high-stakes — a one-percentage-point disparity in approval rates across a protected group can translate into thousands of individually affected people, which is part of why large organizations tend to invest heavily in this infrastructure well beyond what regulation strictly requires.
+**At Big Tech:** Large organizations typically maintain dedicated responsible AI or algorithmic fairness teams that run the Fairness Audit Loop continuously across many models and product surfaces simultaneously, often with formal review gates that a new AI-driven decision feature must pass before launch. At this scale, disparities that would be statistically invisible in a smaller population become both detectable and, given the sheer number of people affected, high-stakes a one-percentage-point disparity in approval rates across a protected group can translate into thousands of individually affected people, which is part of why large organizations tend to invest heavily in this infrastructure well beyond what regulation strictly requires.
 
 ---
 
@@ -158,9 +158,9 @@ The structural point worth drawing out for this lesson: IBM built separate metri
 
 A company deployed an AI resume-screening tool trained on historical hiring data, achieving strong aggregate accuracy at predicting which candidates the company had historically hired. A later audit revealed the tool systematically down-ranked candidates from certain universities and with employment gaps, patterns that correlated strongly with gender and disability status, because the historical training data reflected the company's own past biased hiring patterns.
 
-**What went wrong?** Aggregate accuracy masked the disparity; the fairness measurement had been a one-time pre-launch check rather than an ongoing loop; and the root cause — biased historical training data — was never diagnosed, only the symptom (screening scores) was superficially reviewed. The team had, in good faith, excluded gender and disability status directly from the model's inputs, believing this was sufficient to prevent discriminatory outcomes. It was not: university attended and employment gaps functioned as proxy variables, correlated with the excluded characteristics closely enough that the model reconstructed much of the same discriminatory pattern indirectly, without ever seeing the protected attributes explicitly. This is precisely the proxy-variable risk this lesson's Theory section describes, and it is a specific reason "we don't use protected characteristics as inputs" is frequently offered as a defense that does not, on its own, establish fairness.
+**What went wrong?** Aggregate accuracy masked the disparity; the fairness measurement had been a one-time pre-launch check rather than an ongoing loop; and the root cause biased historical training data was never diagnosed, only the symptom (screening scores) was superficially reviewed. The team had, in good faith, excluded gender and disability status directly from the model's inputs, believing this was sufficient to prevent discriminatory outcomes. It was not: university attended and employment gaps functioned as proxy variables, correlated with the excluded characteristics closely enough that the model reconstructed much of the same discriminatory pattern indirectly, without ever seeing the protected attributes explicitly. This is precisely the proxy-variable risk this lesson's Theory section describes, and it is a specific reason "we don't use protected characteristics as inputs" is frequently offered as a defense that does not, on its own, establish fairness.
 
-Recovery involved retraining on de-biased data, instituting ongoing subgroup measurement across the specific dimensions the original audit had missed, and adding a human review and appeal step for any rejected candidate, connecting directly to Lesson 67's appeals discipline. The company also instituted a policy requiring any new proxy variable candidate — a data field newly added to the model's inputs — to be explicitly checked for correlation with protected characteristics before being approved for use, closing the specific gap that had allowed university and employment-gap data to enter the model unexamined in the first place.
+Recovery involved retraining on de-biased data, instituting ongoing subgroup measurement across the specific dimensions the original audit had missed, and adding a human review and appeal step for any rejected candidate, connecting directly to Lesson 67's appeals discipline. The company also instituted a policy requiring any new proxy variable candidate a data field newly added to the model's inputs to be explicitly checked for correlation with protected characteristics before being approved for use, closing the specific gap that had allowed university and employment-gap data to enter the model unexamined in the first place.
 
 1. What specific defense did the team offer that turned out to be insufficient, and why did it fail?
 2. If you were designing the ongoing subgroup measurement process from scratch, what data would you need that the original team apparently didn't collect or examine?
@@ -177,7 +177,7 @@ Recovery involved retraining on de-biased data, instituting ongoing subgroup mea
 | Ongoing Re-Measurement | Does the loop continue after initial remediation? | Fixes decay or introduce new disparities unnoticed |
 | Misuse Potential Assessed | Has potential for harmful misuse been considered? | Foreseeable harms go unaddressed |
 
-As with the AI Product Readiness Checklist introduced in Lesson 84, this checklist earns its value from repetition, not from a single completion. A team should explicitly revisit it whenever the underlying training data is refreshed, whenever the model architecture or feature set changes, and on a fixed recurring cadence even absent any specific trigger — since, as the Biased Hiring Screener case study illustrates, disparity can be present from day one and simply go undetected until someone deliberately looks for it at the subgroup level.
+As with the AI Product Readiness Checklist introduced in Lesson 84, this checklist earns its value from repetition, not from a single completion. A team should explicitly revisit it whenever the underlying training data is refreshed, whenever the model architecture or feature set changes, and on a fixed recurring cadence even absent any specific trigger since, as the Biased Hiring Screener case study illustrates, disparity can be present from day one and simply go undetected until someone deliberately looks for it at the subgroup level.
 
 ---
 
@@ -187,7 +187,7 @@ As with the AI Product Readiness Checklist introduced in Lesson 84, this checkli
 *What the interviewer is actually evaluating:* Whether you default to aggregate metrics or immediately think in terms of subgroup measurement. A weak answer describes checking overall accuracy or user satisfaction. A strong answer explains that fairness has to be measured by relevant subgroup specifically, names that there are multiple, sometimes incompatible, mathematical definitions of fairness, and describes how the appropriate definition depends on the specific decision's real-world consequences.
 
 **Typical question 2: "Why might fixing a disparity by adjusting output thresholds be insufficient?"**
-*What the interviewer is actually evaluating:* Whether you distinguish symptom management from root-cause diagnosis. A weak answer treats a threshold adjustment as an adequate fix on its own. A strong answer explains that a superficial adjustment can mask an underlying problem — biased training data, a proxy variable — without resolving it, and can introduce new legal or ethical complications of its own, echoing this lesson's Biased Hiring Screener case study.
+*What the interviewer is actually evaluating:* Whether you distinguish symptom management from root-cause diagnosis. A weak answer treats a threshold adjustment as an adequate fix on its own. A strong answer explains that a superficial adjustment can mask an underlying problem biased training data, a proxy variable without resolving it, and can introduce new legal or ethical complications of its own, echoing this lesson's Biased Hiring Screener case study.
 
 **Typical question 3: "What role does an appeal mechanism play in a responsible AI deployment?"**
 *What the interviewer is actually evaluating:* Whether you treat recourse as a genuine structural requirement or an afterthought. A strong answer connects this directly to Lesson 67's Escalation Staircase, explaining that any consequential AI-driven decision affecting a real person should carry the same appeal discipline this curriculum established for platform enforcement generally, and that a system without a meaningful appeal path leaves wrongly harmed individuals with no recourse at all.
@@ -196,7 +196,7 @@ As with the AI Product Readiness Checklist introduced in Lesson 84, this checkli
 
 ## Summary
 
-Aggregate accuracy metrics can mask significant disparity across subgroups, and responsible AI product management requires the Fairness Audit Loop — defining an equity metric, measuring it by group, diagnosing root cause when disparity appears, and remediating with continuous re-measurement rather than a one-time fix. Genuine remediation traces disparity to its source, whether biased training data or a proxy variable, rather than superficially adjusting outputs, and every AI-driven decision affecting real people deserves the same transparency and appeal mechanism this curriculum's Escalation Staircase established for platform enforcement generally. A final, easily overlooked complication deserves emphasis: fairness itself is not a single, universally agreed target. Different mathematical definitions of fairness can conflict with each other for the same decision, which means responsible AI product management requires an explicit, documented choice about which definition applies — a choice that deserves the same rigor and stakeholder scrutiny as any other consequential product decision, rather than being left implicit or assumed by default.
+Aggregate accuracy metrics can mask significant disparity across subgroups, and responsible AI product management requires the Fairness Audit Loop defining an equity metric, measuring it by group, diagnosing root cause when disparity appears, and remediating with continuous re-measurement rather than a one-time fix. Genuine remediation traces disparity to its source, whether biased training data or a proxy variable, rather than superficially adjusting outputs, and every AI-driven decision affecting real people deserves the same transparency and appeal mechanism this curriculum's Escalation Staircase established for platform enforcement generally. A final, easily overlooked complication deserves emphasis: fairness itself is not a single, universally agreed target. Different mathematical definitions of fairness can conflict with each other for the same decision, which means responsible AI product management requires an explicit, documented choice about which definition applies a choice that deserves the same rigor and stakeholder scrutiny as any other consequential product decision, rather than being left implicit or assumed by default.
 
 ---
 
@@ -220,7 +220,7 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 - Fairness Audit Loop: Define → Measure → Diagnose → Remediate → repeat.
 - Fix the root cause, not just the symptom.
 - Appeals are structural, not optional, per Lesson 67.
-- Removing a protected characteristic from inputs doesn't guarantee fairness — check for proxy variables.
+- Removing a protected characteristic from inputs doesn't guarantee fairness check for proxy variables.
 - No single definition of "fair" exists. Choose and document the appropriate one explicitly, based on real-world consequences.
 
 ---
@@ -255,7 +255,7 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 
 **Card 2**
 - Front: What are the four steps of the Fairness Audit Loop?
-- Back: Define equity metric, measure across groups, diagnose disparity source, remediate — then repeat.
+- Back: Define equity metric, measure across groups, diagnose disparity source, remediate then repeat.
 - Difficulty: 2
 - Tags: fairness-audit-loop
 
@@ -273,7 +273,7 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 
 **Card 5**
 - Front: Why can't a team simply instruct engineers to "make the model fair"?
-- Back: There is no single, universally agreed mathematical definition of fairness — demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
+- Back: There is no single, universally agreed mathematical definition of fairness demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
 - Difficulty: 2
 - Tags: fairness-definitions
 
@@ -320,7 +320,7 @@ C) Collect data, store it, process it, then share results
 D) Draft a concept, build a prototype, pilot, then scale
 
 *Correct answer: B*
-*Explanation: The Fairness Audit Loop follows four steps — define equity metric, measure across groups, diagnose disparity source, and remediate — as a structured, repeatable cycle.*
+*Explanation: The Fairness Audit Loop follows four steps define equity metric, measure across groups, diagnose disparity source, and remediate as a structured, repeatable cycle.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -499,9 +499,9 @@ D) Measure by subgroup, find the root cause, then run the audit loop
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 84 — PM in AI-Native Companies | Extends reliability discipline into fairness and harm-specific measurement |
-| **Current Lesson** | Lesson 85 — Responsible AI Product Management | Fairness Audit Loop; root cause diagnosis; appeal mechanisms |
-| **Next Lesson** | Lesson 86 — Scaling International Products: Beyond Localization | Shifts to a different specialized domain: international product scaling |
+| **Previous Lesson** | Lesson 84 PM in AI-Native Companies | Extends reliability discipline into fairness and harm-specific measurement |
+| **Current Lesson** | Lesson 85 Responsible AI Product Management | Fairness Audit Loop; root cause diagnosis; appeal mechanisms |
+| **Next Lesson** | Lesson 86 Scaling International Products: Beyond Localization | Shifts to a different specialized domain: international product scaling |
 | **Future Concepts Unlocked** | Lesson 90 (Capstone) | Treats the Fairness Audit Loop as established canon |
 
 This curriculum continues to build as one continuous argument. This lesson resolves the accumulated threads from Lessons 65, 66, 67, and 81 regarding fairness, appeals, and outcome-layer compliance in AI-driven decisions.

@@ -298,34 +298,97 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     expect(resultInvalid).toEqual({ error: 'Unauthorized: Invalid session' })
   })
 
-  it('validates required fields before executing database updates', async () => {
-    mockCookieStore.set('sb-access-token', { value: 'valid-token' })
-    mockGetUser.mockResolvedValue({
-      data: {
-        user: {
-          id: 'usr_123',
-          email: 'alex@example.com',
-          user_metadata: { onboarding_complete: false },
-          app_metadata: {},
+  // Phase 4 (Collapse the Entrance): goal + experience are the required onboarding contract.
+  // Identity fields (username, name, avatar, bio, socials) are deferred and must not block.
+  describe('Phase 4 — collapsed onboarding contract', () => {
+    beforeEach(() => {
+      mockCookieStore.set('sb-access-token', { value: 'valid-token' })
+      mockGetUser.mockResolvedValue({
+        data: {
+          user: {
+            id: 'usr_123',
+            email: 'alex@example.com',
+            user_metadata: { onboarding_complete: false },
+            app_metadata: {},
+          },
         },
-      },
-      error: null,
+        error: null,
+      })
+      mockUpdateUserById.mockResolvedValue({ error: null })
     })
 
-    const invalidUsername = await submitOnboarding({
-      ...validOnboardingData,
-      username: 'a', // Too short
-    })
-    expect(invalidUsername).toEqual({
-      error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.',
+    it('rejects a missing goal (a required field)', async () => {
+      const result = await submitOnboarding({ goal: '', career_role: 'beginner' })
+      expect(result).toEqual({ error: 'Please choose your primary learning goal.' })
+      expect(mockDbUpdate).not.toHaveBeenCalled()
     })
 
-    const emptyName = await submitOnboarding({
-      ...validOnboardingData,
-      name: '   ',
+    it('rejects a missing experience level (a required field)', async () => {
+      const result = await submitOnboarding({ goal: 'become_pm', career_role: '' })
+      expect(result).toEqual({ error: 'Please choose your experience level.' })
+      expect(mockDbUpdate).not.toHaveBeenCalled()
     })
-    expect(emptyName).toEqual({
-      error: 'Display name is required.',
+
+    it('completes with ONLY goal + experience and does not write deferred identity fields', async () => {
+      const result = await submitOnboarding({ goal: 'become_pm', career_role: 'beginner' })
+      expect(result).toEqual({ success: true })
+
+      // The DB update carries the required fields and the completion flag...
+      const updatePayload = mockDbUpdate.mock.calls[0][0]
+      expect(updatePayload).toMatchObject({
+        goal: 'become_pm',
+        career_role: 'beginner',
+        onboarding_completed: true,
+      })
+      // ...and does NOT touch the deferred identity columns (they stay NULL / collected later).
+      expect(updatePayload).not.toHaveProperty('username')
+      expect(updatePayload).not.toHaveProperty('name')
+      expect(updatePayload).not.toHaveProperty('avatar_url')
+      expect(updatePayload).not.toHaveProperty('bio')
+      expect(updatePayload).not.toHaveProperty('linkedin_url')
+      expect(updatePayload).not.toHaveProperty('github_url')
+      expect(updatePayload).not.toHaveProperty('website_url')
+    })
+
+    it('still validates a deferred field when a value IS supplied (malformed username)', async () => {
+      const result = await submitOnboarding({
+        goal: 'become_pm',
+        career_role: 'beginner',
+        username: 'a', // too short — rejected rather than silently persisted
+      })
+      expect(result).toEqual({
+        error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.',
+      })
+      expect(mockDbUpdate).not.toHaveBeenCalled()
+    })
+
+    it('persists a deferred field when supplied and well-formed (backward compatibility)', async () => {
+      const result = await submitOnboarding({
+        goal: 'become_pm',
+        career_role: 'beginner',
+        username: 'alex_pm',
+        name: 'Alex Rivera',
+      })
+      expect(result).toEqual({ success: true })
+      const updatePayload = mockDbUpdate.mock.calls[0][0]
+      expect(updatePayload).toMatchObject({
+        goal: 'become_pm',
+        career_role: 'beginner',
+        username: 'alex_pm',
+        name: 'Alex Rivera',
+        onboarding_completed: true,
+      })
+    })
+
+    it('does not overwrite an existing display name with a blank value', async () => {
+      const result = await submitOnboarding({
+        goal: 'become_pm',
+        career_role: 'beginner',
+        name: '   ', // blank — treated as "not supplied", never written
+      })
+      expect(result).toEqual({ success: true })
+      const updatePayload = mockDbUpdate.mock.calls[0][0]
+      expect(updatePayload).not.toHaveProperty('name')
     })
   })
 })

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Module 7 gave you the Ownership Zones Model (Lesson 65) for assigning responsibility around a model's output, and the Discovery Frontier (Lesson 66) for reasoning about a recommender's explore/exploit balance. Lesson 81 established that some automated decisions legally require a human in the loop, and Lesson 82 established that data handling must be minimized and purpose-limited. An AI-native company — one whose core product is built around large generative models rather than using a model as one feature among many — inherits every one of these concerns simultaneously, and adds a genuinely new one: the model's capability and reliability are not fixed properties you can fully test once and trust forever. They shift with every model update, every prompt change, and every new edge case a large, open-ended user base discovers.
+Module 7 gave you the Ownership Zones Model (Lesson 65) for assigning responsibility around a model's output, and the Discovery Frontier (Lesson 66) for reasoning about a recommender's explore/exploit balance. Lesson 81 established that some automated decisions legally require a human in the loop, and Lesson 82 established that data handling must be minimized and purpose-limited. An AI-native company one whose core product is built around large generative models rather than using a model as one feature among many inherits every one of these concerns simultaneously, and adds a genuinely new one: the model's capability and reliability are not fixed properties you can fully test once and trust forever. They shift with every model update, every prompt change, and every new edge case a large, open-ended user base discovers.
 
-A PM new to AI-native product work tends to treat a generative model the way they'd treat any other software dependency: build it, test it, ship it, move on. This instinct fails because a generative model doesn't produce a fixed, enumerable set of outputs the way traditional software does — it produces a probability distribution over an effectively unbounded output space, meaning "testing it" can never mean the same thing "testing it" means for deterministic software. The central discipline this lesson introduces is refusing to treat model capability as a single number ("is it good enough to ship") and instead asking a two-part question: how *capable* is the model at this specific task, and how *reliably* does it perform at that capability level, since these two properties can diverge sharply and require entirely different product responses.
+A PM new to AI-native product work tends to treat a generative model the way they'd treat any other software dependency: build it, test it, ship it, move on. This instinct fails because a generative model doesn't produce a fixed, enumerable set of outputs the way traditional software does it produces a probability distribution over an effectively unbounded output space, meaning "testing it" can never mean the same thing "testing it" means for deterministic software. The central discipline this lesson introduces is refusing to treat model capability as a single number ("is it good enough to ship") and instead asking a two-part question: how *capable* is the model at this specific task, and how *reliably* does it perform at that capability level, since these two properties can diverge sharply and require entirely different product responses.
 
 ---
 
@@ -12,13 +12,13 @@ A PM new to AI-native product work tends to treat a generative model the way the
 
 | Field | Detail |
 |---|---|
-| **Module** | 9 — Specialized Domains and Synthesis |
+| **Module** | 9 Specialized Domains and Synthesis |
 | **Current Lesson** | 84 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 65 (Ownership Zones Model), Lesson 66 (Discovery Frontier), Lesson 81 (Regulatory Surface Map, human-in-the-loop) |
-| **Next Lesson** | Lesson 85 — Responsible AI Product Management |
-| **Future Topics Unlocked** | Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) — depend on the Capability-Reliability Matrix introduced here |
+| **Next Lesson** | Lesson 85 Responsible AI Product Management |
+| **Future Topics Unlocked** | Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) depend on the Capability-Reliability Matrix introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes the Ownership Zones Model from Lesson 65, the Discovery Fron
 
 ### Capability Is Not a Single Number
 
-A generative model can be highly *capable* at a task — able, in its best outputs, to perform at a genuinely impressive level — while being unreliable at that same task, meaning its performance varies significantly across similar-seeming inputs, sometimes producing an excellent result and sometimes producing a confidently-stated but wrong one (a "hallucination"). Capability and reliability are distinct properties, and a product decision informed only by capability ("look how good this can be") without accounting for reliability risks shipping a feature that performs impressively in a demo and unpredictably in production.
+A generative model can be highly *capable* at a task able, in its best outputs, to perform at a genuinely impressive level while being unreliable at that same task, meaning its performance varies significantly across similar-seeming inputs, sometimes producing an excellent result and sometimes producing a confidently-stated but wrong one (a "hallucination"). Capability and reliability are distinct properties, and a product decision informed only by capability ("look how good this can be") without accounting for reliability risks shipping a feature that performs impressively in a demo and unpredictably in production.
 
 ### The Capability-Reliability Matrix
 
@@ -88,19 +88,19 @@ graph TD
     D["Low Capability + Low Reliability<br/>→ Do not ship this use case yet"]
 ```
 
-A task landing in quadrant A can reasonably be fully automated. A task in quadrant B — the most common position for many current generative use cases — calls for keeping a human explicitly in the loop, per the Ownership Zones Model's Zone 4 discipline and, in regulated contexts, per Lesson 81's legal human-in-the-loop requirements. Quadrant D should not ship at all for that specific use case, regardless of how compelling a demo made it look.
+A task landing in quadrant A can reasonably be fully automated. A task in quadrant B the most common position for many current generative use cases calls for keeping a human explicitly in the loop, per the Ownership Zones Model's Zone 4 discipline and, in regulated contexts, per Lesson 81's legal human-in-the-loop requirements. Quadrant D should not ship at all for that specific use case, regardless of how compelling a demo made it look.
 
 ### Evals as an Ongoing Practice
 
-**Evals** — structured evaluation suites measuring a model's performance on representative tasks — must be run continuously, not once before launch, because model behavior shifts with every underlying model version update and every prompt or system change, directly echoing the Metric Provenance Chain's insistence (Lesson 64) that a metric must be continuously validated, not validated once and trusted forever.
+**Evals** structured evaluation suites measuring a model's performance on representative tasks must be run continuously, not once before launch, because model behavior shifts with every underlying model version update and every prompt or system change, directly echoing the Metric Provenance Chain's insistence (Lesson 64) that a metric must be continuously validated, not validated once and trusted forever.
 
 ### Per-Inference Cost Economics
 
-Unlike most software, where serving one more user costs almost nothing, generative AI features carry a genuine, often significant per-inference cost that scales directly with usage — a cost structure a PM must model explicitly, since a feature can be capable, reliable, and popular, and still be a poor product decision if its unit economics don't work at scale.
+Unlike most software, where serving one more user costs almost nothing, generative AI features carry a genuine, often significant per-inference cost that scales directly with usage a cost structure a PM must model explicitly, since a feature can be capable, reliable, and popular, and still be a poor product decision if its unit economics don't work at scale.
 
 ### Why AI Products Break Traditional QA Assumptions
 
-Traditional software QA rests on a quiet assumption that most PMs never have to state explicitly: a given input, run through a given version of the code, produces the same output every time. This determinism is what makes a fixed test suite meaningful — if a test passes today, it will pass tomorrow unless the code changes. Generative models violate this assumption at the root. The same prompt, run twice against the same model version, can produce two different outputs, and a test suite that passed cleanly last week can begin failing this week with no code change at all, purely because the underlying model provider shipped a silent update, or because the specific inputs users send have drifted from the inputs the team originally tested against. This means a PM cannot treat "we have a test suite and it's green" as evidence of ongoing quality the way they could for deterministic software — the test suite itself must be re-run continuously against production-representative inputs, and its results must be watched for drift, not just checked once at a release gate. This is the deeper reason evals function differently from unit tests, and why an AI-native PM's mental model of "quality assurance" has to be rebuilt rather than simply carried over from prior software experience.
+Traditional software QA rests on a quiet assumption that most PMs never have to state explicitly: a given input, run through a given version of the code, produces the same output every time. This determinism is what makes a fixed test suite meaningful if a test passes today, it will pass tomorrow unless the code changes. Generative models violate this assumption at the root. The same prompt, run twice against the same model version, can produce two different outputs, and a test suite that passed cleanly last week can begin failing this week with no code change at all, purely because the underlying model provider shipped a silent update, or because the specific inputs users send have drifted from the inputs the team originally tested against. This means a PM cannot treat "we have a test suite and it's green" as evidence of ongoing quality the way they could for deterministic software the test suite itself must be re-run continuously against production-representative inputs, and its results must be watched for drift, not just checked once at a release gate. This is the deeper reason evals function differently from unit tests, and why an AI-native PM's mental model of "quality assurance" has to be rebuilt rather than simply carried over from prior software experience.
 
 ---
 
@@ -108,7 +108,7 @@ Traditional software QA rests on a quiet assumption that most PMs never have to 
 
 **Mistake 1: Treating "the model is impressive in a demo" as sufficient evidence to ship at full automation**
 
-A demo showcases a model's best-case behavior, often on inputs the team implicitly selected because the model handles them well. Demos showcase capability, not reliability across the full range of real inputs a production system will actually encounter, including edge cases and phrasing the team never thought to try. A PM who greenlights full automation based on a demo alone is confusing "this can be impressive" with "this will be dependably correct" — the two separate axes the Capability-Reliability Matrix is built to keep apart.
+A demo showcases a model's best-case behavior, often on inputs the team implicitly selected because the model handles them well. Demos showcase capability, not reliability across the full range of real inputs a production system will actually encounter, including edge cases and phrasing the team never thought to try. A PM who greenlights full automation based on a demo alone is confusing "this can be impressive" with "this will be dependably correct" the two separate axes the Capability-Reliability Matrix is built to keep apart.
 
 **Mistake 2: Running evals once before launch and treating the model as permanently validated**
 
@@ -136,9 +136,9 @@ Apply it by asking: (1) How capable is the model at this specific task? (2) How 
 
 ## Real Company Example
 
-**OpenAI's own published "system cards"** make its staged evaluation process directly inspectable, not just described in general terms. The GPT-4o system card, published by OpenAI itself, documents specifics: more than 100 external red teamers, spanning 45 languages and 29 countries, tested successive model checkpoints across four distinct phases between March and June 2024 — starting with early, less-capable checkpoints tested via an internal tool, and ending with the model tested through the actual production iOS app experience real users would encounter. Each phase deliberately expanded both the model's capability (audio-only, then audio-plus-image, then full multimodal) and the red teamers' access, evaluating categories spanning disallowed content, misinformation, bias, fraudulent impersonation, and copyright — with insights from earlier phases directly informing quantitative evaluations and mitigations built before the next phase began. OpenAI states this process operates under a broader "Preparedness Framework," which defines specific risk thresholds and evaluation criteria across misuse categories like cybersecurity and CBRN before a model is judged ready for deployment.
+**OpenAI's own published "system cards"** make its staged evaluation process directly inspectable, not just described in general terms. The GPT-4o system card, published by OpenAI itself, documents specifics: more than 100 external red teamers, spanning 45 languages and 29 countries, tested successive model checkpoints across four distinct phases between March and June 2024 starting with early, less-capable checkpoints tested via an internal tool, and ending with the model tested through the actual production iOS app experience real users would encounter. Each phase deliberately expanded both the model's capability (audio-only, then audio-plus-image, then full multimodal) and the red teamers' access, evaluating categories spanning disallowed content, misinformation, bias, fraudulent impersonation, and copyright with insights from earlier phases directly informing quantitative evaluations and mitigations built before the next phase began. OpenAI states this process operates under a broader "Preparedness Framework," which defines specific risk thresholds and evaluation criteria across misuse categories like cybersecurity and CBRN before a model is judged ready for deployment.
 
-This staged structure is a direct, company-documented illustration of this lesson's evals-as-ongoing-practice argument: capability and reliability are evaluated as two genuinely separate questions across every phase (what can the model newly do, and can it be trusted to do it safely), rather than a single pre-launch check treated as sufficient once passed. Worth noting honestly, though, since it complicates a purely admiring account: independent commentary — including discussion on LessWrong following GPT-4o's release — has raised concerns that evaluation timelines for major releases can come under real commercial pressure to compress, and OpenAI's own Preparedness team saw leadership turnover around this period. The existence of a rigorous, documented framework doesn't by itself guarantee the framework is followed with equal rigor under every competitive and timeline pressure — a genuinely important caution for a PM shipping AI capabilities under real deadline pressure of their own.
+This staged structure is a direct, company-documented illustration of this lesson's evals-as-ongoing-practice argument: capability and reliability are evaluated as two genuinely separate questions across every phase (what can the model newly do, and can it be trusted to do it safely), rather than a single pre-launch check treated as sufficient once passed. Worth noting honestly, though, since it complicates a purely admiring account: independent commentary including discussion on LessWrong following GPT-4o's release has raised concerns that evaluation timelines for major releases can come under real commercial pressure to compress, and OpenAI's own Preparedness team saw leadership turnover around this period. The existence of a rigorous, documented framework doesn't by itself guarantee the framework is followed with equal rigor under every competitive and timeline pressure a genuinely important caution for a PM shipping AI capabilities under real deadline pressure of their own.
 
 *(Source: OpenAI's own published GPT-4o system card and Preparedness Framework documentation, corroborated by independent reporting on the evaluation process's external red-teaming structure.)*
 
@@ -146,9 +146,9 @@ This staged structure is a direct, company-documented illustration of this lesso
 
 ## Real World Perspective: PM in AI-Native Companies: New Skills, New Risks at Different Company Stages
 
-**At a startup:** Early AI-native startups often ship quadrant B use cases (high capability, imperfect reliability) at full automation under intense competitive pressure to demonstrate a magical, hands-off experience to investors and early users. Small teams frequently lack the dedicated headcount to build a continuous eval pipeline in parallel with feature development, so evaluation is often treated as a one-time pre-launch check performed by whoever is available, rather than an ongoing discipline. This is a specific and common early-stage mistake, and it is also where the cost of getting it wrong is highest relative to the company's resources — a single high-profile hallucination incident can disproportionately damage a young company's credibility before it has built a reputation to absorb the hit.
+**At a startup:** Early AI-native startups often ship quadrant B use cases (high capability, imperfect reliability) at full automation under intense competitive pressure to demonstrate a magical, hands-off experience to investors and early users. Small teams frequently lack the dedicated headcount to build a continuous eval pipeline in parallel with feature development, so evaluation is often treated as a one-time pre-launch check performed by whoever is available, rather than an ongoing discipline. This is a specific and common early-stage mistake, and it is also where the cost of getting it wrong is highest relative to the company's resources a single high-profile hallucination incident can disproportionately damage a young company's credibility before it has built a reputation to absorb the hit.
 
-**At a mid-size company:** This is typically the stage where formal, continuous eval infrastructure first becomes a genuine organizational priority, usually prompted by a specific incident — a customer-facing hallucination, a costly automated error, or a near-miss caught internally — rather than being built proactively in advance. Mid-size AI-native companies often staff a small, dedicated "model quality" or "AI safety" function at this stage, distinct from general QA, specifically because the continuous, statistical nature of eval work doesn't fit cleanly into a traditional QA team's pass/fail testing habits.
+**At a mid-size company:** This is typically the stage where formal, continuous eval infrastructure first becomes a genuine organizational priority, usually prompted by a specific incident a customer-facing hallucination, a costly automated error, or a near-miss caught internally rather than being built proactively in advance. Mid-size AI-native companies often staff a small, dedicated "model quality" or "AI safety" function at this stage, distinct from general QA, specifically because the continuous, statistical nature of eval work doesn't fit cleanly into a traditional QA team's pass/fail testing habits.
 
 **At Big Tech:** Large AI-native organizations typically maintain dedicated eval, red-teaming, and model-monitoring functions that run continuously against every model version change and every significant prompt or system update, often with formal sign-off gates before a change can reach production. At this scale, the cost of a Capability-Reliability Matrix misclassification is amplified by sheer user volume, so these organizations tend to invest heavily in automated, statistically rigorous eval pipelines rather than relying on manual spot-checks, and often maintain dedicated red-teaming staff whose explicit job is to actively search for failure modes before real users find them.
 
@@ -156,11 +156,11 @@ This staged structure is a direct, company-documented illustration of this lesso
 
 ## Detailed Case Study: The Automated Refund Assistant
 
-A company shipped a fully-automated AI customer support agent authorized to approve refunds up to a moderate dollar threshold with no human review, based on strong demo performance. In production, the model occasionally hallucinated policy terms that didn't exist, approving refunds it should have denied and, in rarer cases, confidently citing a non-existent policy to deny a legitimate refund. The task was clearly quadrant B — high capability, meaningfully imperfect reliability — but was shipped as if it were quadrant A.
+A company shipped a fully-automated AI customer support agent authorized to approve refunds up to a moderate dollar threshold with no human review, based on strong demo performance. In production, the model occasionally hallucinated policy terms that didn't exist, approving refunds it should have denied and, in rarer cases, confidently citing a non-existent policy to deny a legitimate refund. The task was clearly quadrant B high capability, meaningfully imperfect reliability but was shipped as if it were quadrant A.
 
-**What went wrong?** Capability was mistaken for reliability, and full automation was applied to a task that, per the Ownership Zones Model and Lesson 81's human-in-the-loop discipline, required a human review step given the financial stakes involved. The team's pre-launch evaluation process had genuinely tested the model against a representative set of common refund scenarios, and the model had performed well — but "performed well on a representative test set" and "will perform reliably across the full, open-ended range of real customer messages, including ones that reference policies that don't exist" turned out to be two different claims. The team had implicitly treated a passing eval run as equivalent to a passing traditional software test — a one-time gate rather than an ongoing signal — which meant the specific hallucination pattern that eventually caused customer harm was never caught before it reached production, because it simply hadn't appeared in the original test set.
+**What went wrong?** Capability was mistaken for reliability, and full automation was applied to a task that, per the Ownership Zones Model and Lesson 81's human-in-the-loop discipline, required a human review step given the financial stakes involved. The team's pre-launch evaluation process had genuinely tested the model against a representative set of common refund scenarios, and the model had performed well but "performed well on a representative test set" and "will perform reliably across the full, open-ended range of real customer messages, including ones that reference policies that don't exist" turned out to be two different claims. The team had implicitly treated a passing eval run as equivalent to a passing traditional software test a one-time gate rather than an ongoing signal which meant the specific hallucination pattern that eventually caused customer harm was never caught before it reached production, because it simply hadn't appeared in the original test set.
 
-The recovery involved adding human review for any refund above a small threshold, and instituting continuous evals specifically tracking hallucination rate on refund-policy questions, sampled from real production traffic rather than the original curated test set. Notably, the company also discovered that a meaningful share of the hallucinated policy citations followed a specific pattern — the model would fabricate exception clauses when a customer's message combined two unrelated complaints in a single request — which only became visible once the team began analyzing real failure cases rather than relying on aggregate pass rates alone.
+The recovery involved adding human review for any refund above a small threshold, and instituting continuous evals specifically tracking hallucination rate on refund-policy questions, sampled from real production traffic rather than the original curated test set. Notably, the company also discovered that a meaningful share of the hallucinated policy citations followed a specific pattern the model would fabricate exception clauses when a customer's message combined two unrelated complaints in a single request which only became visible once the team began analyzing real failure cases rather than relying on aggregate pass rates alone.
 
 1. What specific assumption caused the team to treat their pre-launch eval results as sufficient evidence for full automation?
 2. If you were rebuilding this feature's launch plan from scratch, at what refund dollar threshold would you require human review, and what evidence would you want before raising that threshold over time?
@@ -177,26 +177,26 @@ The recovery involved adding human review for any refund above a small threshold
 | Per-Inference Cost Modeled | Is unit economics understood before scale? | Popular feature with unsustainable cost structure |
 | Failure Mode Cataloged | Are known hallucination or failure patterns documented and monitored? | Repeat failures go unaddressed |
 
-The checklist is most useful as a pre-launch gate that gets *re-run*, not a document that gets filled out once and archived. A team that revisits it before every meaningful model version bump, prompt change, or significant shift in how the feature is used will catch quadrant drift — a feature that was genuinely quadrant A at launch sliding toward quadrant B as usage patterns diversify beyond what the original evals covered — long before a customer-facing incident forces the same discovery the hard way, as happened in the Automated Refund Assistant case above.
+The checklist is most useful as a pre-launch gate that gets *re-run*, not a document that gets filled out once and archived. A team that revisits it before every meaningful model version bump, prompt change, or significant shift in how the feature is used will catch quadrant drift a feature that was genuinely quadrant A at launch sliding toward quadrant B as usage patterns diversify beyond what the original evals covered long before a customer-facing incident forces the same discovery the hard way, as happened in the Automated Refund Assistant case above.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How would you decide whether to fully automate an AI-powered feature?"**
-*What the interviewer is actually evaluating:* Whether you reflexively equate "the model performs well" with "this should be fully automated." A weak answer describes evaluating the model's capability alone. A strong answer explicitly separates capability from reliability, describes how you'd gather evidence on both across representative real inputs, and explains that the answer determines the Capability-Reliability Matrix quadrant — and therefore the appropriate level of human involvement — rather than assuming a capable model should always run unsupervised.
+*What the interviewer is actually evaluating:* Whether you reflexively equate "the model performs well" with "this should be fully automated." A weak answer describes evaluating the model's capability alone. A strong answer explicitly separates capability from reliability, describes how you'd gather evidence on both across representative real inputs, and explains that the answer determines the Capability-Reliability Matrix quadrant and therefore the appropriate level of human involvement rather than assuming a capable model should always run unsupervised.
 
 **Typical question 2: "Why can't you evaluate a generative model once and trust it forever?"**
-*What the interviewer is actually evaluating:* Whether you understand that model behavior is not fixed the way traditional software behavior is. A weak answer treats a pre-launch test suite as sufficient, the same way it would be for deterministic code. A strong answer explains that model providers ship updates outside your control, that prompt and system changes can shift behavior in subtle ways, and that real-world input distributions drift over time — all of which require evals to run as an ongoing, monitored practice rather than a one-time release gate.
+*What the interviewer is actually evaluating:* Whether you understand that model behavior is not fixed the way traditional software behavior is. A weak answer treats a pre-launch test suite as sufficient, the same way it would be for deterministic code. A strong answer explains that model providers ship updates outside your control, that prompt and system changes can shift behavior in subtle ways, and that real-world input distributions drift over time all of which require evals to run as an ongoing, monitored practice rather than a one-time release gate.
 
 **Typical question 3: "What's the risk of shipping an impressive demo feature at full automation?"**
-*What the interviewer is actually evaluating:* Direct pattern-matching to the Automated Refund Assistant failure mode described in this lesson's Case Study. They want to see that you recognize demos are curated, low-variance showcases of capability, not evidence of reliability across the full, messy range of real production inputs, and that you would insist on reliability evidence — not just an impressive demo — before removing a human from a consequential decision loop.
+*What the interviewer is actually evaluating:* Direct pattern-matching to the Automated Refund Assistant failure mode described in this lesson's Case Study. They want to see that you recognize demos are curated, low-variance showcases of capability, not evidence of reliability across the full, messy range of real production inputs, and that you would insist on reliability evidence not just an impressive demo before removing a human from a consequential decision loop.
 
 ---
 
 ## Summary
 
-AI-native product work requires distinguishing a model's capability from its reliability, since these diverge and demand genuinely different product responses: full automation only where both are high, human-in-the-loop assistance where capability is high but reliability is not, and no shipment at all where capability itself is insufficient. Evals must run continuously, not once, and per-inference cost must be modeled explicitly given generative AI's departure from near-zero marginal cost software economics. Underlying all of this is a more fundamental shift in mindset: traditional software QA assumes deterministic, stable behavior that, once verified, stays verified until the code changes deliberately. Generative AI products don't offer that guarantee — model providers ship changes outside your direct control, real-world inputs drift over time, and a feature's position on the Capability-Reliability Matrix can move without any deliberate product decision at all. Treating quadrant classification, like evals, as an ongoing discipline rather than a one-time gate is the single habit that most reliably separates AI-native teams that catch problems early from those that discover them through a customer-facing incident.
+AI-native product work requires distinguishing a model's capability from its reliability, since these diverge and demand genuinely different product responses: full automation only where both are high, human-in-the-loop assistance where capability is high but reliability is not, and no shipment at all where capability itself is insufficient. Evals must run continuously, not once, and per-inference cost must be modeled explicitly given generative AI's departure from near-zero marginal cost software economics. Underlying all of this is a more fundamental shift in mindset: traditional software QA assumes deterministic, stable behavior that, once verified, stays verified until the code changes deliberately. Generative AI products don't offer that guarantee model providers ship changes outside your direct control, real-world inputs drift over time, and a feature's position on the Capability-Reliability Matrix can move without any deliberate product decision at all. Treating quadrant classification, like evals, as an ongoing discipline rather than a one-time gate is the single habit that most reliably separates AI-native teams that catch problems early from those that discover them through a customer-facing incident.
 
 ---
 
@@ -218,9 +218,9 @@ AI-native product work requires distinguishing a model's capability from its rel
 
 - Capability ≠ reliability. Assess both separately.
 - Matrix: high/high = automate. high/low = human-in-loop. low/anything = don't ship yet.
-- Evals are continuous, not one-time — model behavior isn't deterministic the way traditional software is.
+- Evals are continuous, not one-time model behavior isn't deterministic the way traditional software is.
 - Model unit economics before scale.
-- A passing eval run is a snapshot, not a permanent guarantee — re-run the AI Product Readiness Checklist on every meaningful model or prompt change.
+- A passing eval run is a snapshot, not a permanent guarantee re-run the AI Product Readiness Checklist on every meaningful model or prompt change.
 - Demo performance shows curated capability, not production reliability. Never conflate the two when deciding automation level.
 
 ---
@@ -274,13 +274,13 @@ AI-native product work requires distinguishing a model's capability from its rel
 
 **Card 5**
 - Front: Why do traditional QA assumptions break down for generative AI products?
-- Back: Traditional QA assumes deterministic behavior — same input, same output, forever, unless the code changes. Generative models can produce different outputs for the same input, and behavior can shift with silent provider-side updates, so a passing test suite doesn't guarantee ongoing quality the way it does for deterministic software.
+- Back: Traditional QA assumes deterministic behavior same input, same output, forever, unless the code changes. Generative models can produce different outputs for the same input, and behavior can shift with silent provider-side updates, so a passing test suite doesn't guarantee ongoing quality the way it does for deterministic software.
 - Difficulty: 2
 - Tags: qa, evals
 
 **Card 6**
 - Front: What is "quadrant drift" and why does it matter?
-- Back: A feature's real capability/reliability position shifting over time — even without any deliberate product change — as usage patterns diversify or the underlying model updates. It matters because a feature correctly classified as quadrant A at launch can silently become quadrant B, which is why the AI Product Readiness Checklist should be re-run periodically, not filled out once.
+- Back: A feature's real capability/reliability position shifting over time even without any deliberate product change as usage patterns diversify or the underlying model updates. It matters because a feature correctly classified as quadrant A at launch can silently become quadrant B, which is why the AI Product Readiness Checklist should be re-run periodically, not filled out once.
 - Difficulty: 2
 - Tags: capability-reliability-matrix, evals
 
@@ -334,7 +334,7 @@ C) Continuous evals are described as a purely legal requirement
 D) Models never change meaningfully once they reach production
 
 *Correct answer: A*
-*Explanation: Model and prompt changes shift behavior over time, so a one-time pre-launch evaluation cannot guarantee ongoing quality — continuous re-evaluation is required.*
+*Explanation: Model and prompt changes shift behavior over time, so a one-time pre-launch evaluation cannot guarantee ongoing quality continuous re-evaluation is required.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -438,7 +438,7 @@ C) The eval set is flawed and its results should be disregarded
 D) No further action is needed, since the demo already looked strong
 
 *Correct answer: A*
-*Explanation: Excellent demo performance but inconsistent quality on a broader eval set indicates high capability with lower reliability — a quadrant B position requiring human-in-the-loop consideration.*
+*Explanation: Excellent demo performance but inconsistent quality on a broader eval set indicates high capability with lower reliability a quadrant B position requiring human-in-the-loop consideration.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
@@ -490,7 +490,7 @@ C) Cancel the feature entirely rather than negotiate the automation level
 D) Classify the quadrant honestly, add human review, and keep improving via evals
 
 *Correct answer: D*
-*Explanation: The defensible response is honest quadrant classification, human-in-the-loop review matched to actual reliability evidence, and continued eval-driven improvement — resisting launch pressure to over-automate.*
+*Explanation: The defensible response is honest quadrant classification, human-in-the-loop review matched to actual reliability evidence, and continued eval-driven improvement resisting launch pressure to over-automate.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
@@ -500,9 +500,9 @@ D) Classify the quadrant honestly, add human review, and keep improving via eval
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 83 — Hardware and Physical Products | Shifts from physical irreversibility to AI-specific reliability constraints |
-| **Current Lesson** | Lesson 84 — PM in AI-Native Companies | Capability-Reliability Matrix; continuous evals; per-inference economics |
-| **Next Lesson** | Lesson 85 — Responsible AI Product Management | Extends reliability and human-in-the-loop discipline into fairness and harm considerations |
+| **Previous Lesson** | Lesson 83 Hardware and Physical Products | Shifts from physical irreversibility to AI-specific reliability constraints |
+| **Current Lesson** | Lesson 84 PM in AI-Native Companies | Capability-Reliability Matrix; continuous evals; per-inference economics |
+| **Next Lesson** | Lesson 85 Responsible AI Product Management | Extends reliability and human-in-the-loop discipline into fairness and harm considerations |
 | **Future Concepts Unlocked** | Lesson 90 (Capstone) | Treats the Capability-Reliability Matrix as established canon |
 
 This curriculum continues to build as one continuous argument. This lesson resolves the open thread from Lessons 65, 66, and 81 regarding model-driven decision risk, now applied specifically to generative AI.

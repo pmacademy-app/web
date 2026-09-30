@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 61 introduced the Leverage Stack and made a claim that this lesson now has to make good on: that Layer 2, the Developer Surface, is the load-bearing layer of any platform — the one every marketplace and ecosystem ambition ultimately depends on. But "build a stable Developer Surface" is not yet an actionable instruction. It doesn't tell you what to actually design, decide, or refuse when you sit down to define an API.
+Lesson 61 introduced the Leverage Stack and made a claim that this lesson now has to make good on: that Layer 2, the Developer Surface, is the load-bearing layer of any platform the one every marketplace and ecosystem ambition ultimately depends on. But "build a stable Developer Surface" is not yet an actionable instruction. It doesn't tell you what to actually design, decide, or refuse when you sit down to define an API.
 
-This lesson treats the API itself as a product with its own user — the developer — and its own version of the three core questions from Lesson 1: what problem is this API solving, for which developer, and how will you know if it worked? Most engineers, and most PMs new to platform work, treat an API as a technical artifact: a set of endpoints that exposes internal functionality to the outside world. That framing is incomplete in a way that causes real damage. An API is not just an interface. It is a **promise** — a commitment about what will and will not change, made to people who will build businesses, careers, and production systems on the assumption that the promise holds.
+This lesson treats the API itself as a product with its own user the developer and its own version of the three core questions from Lesson 1: what problem is this API solving, for which developer, and how will you know if it worked? Most engineers, and most PMs new to platform work, treat an API as a technical artifact: a set of endpoints that exposes internal functionality to the outside world. That framing is incomplete in a way that causes real damage. An API is not just an interface. It is a **promise** a commitment about what will and will not change, made to people who will build businesses, careers, and production systems on the assumption that the promise holds.
 
-This reframing — API as promise, not just as interface — is the foundation for everything else in this lesson, and it directly explains why the Case Study in Lesson 61 went wrong: the company had endpoints, but it had never actually decided, articulated, or communicated what it was promising anyone. This lesson gives you the vocabulary and the discipline to make that promise explicit, and to design an API that a developer can safely build a business on top of.
+This reframing API as promise, not just as interface is the foundation for everything else in this lesson, and it directly explains why the Case Study in Lesson 61 went wrong: the company had endpoints, but it had never actually decided, articulated, or communicated what it was promising anyone. This lesson gives you the vocabulary and the discipline to make that promise explicit, and to design an API that a developer can safely build a business on top of.
 
 ---
 
@@ -14,13 +14,13 @@ This reframing — API as promise, not just as interface — is the foundation f
 
 | Field | Detail |
 |---|---|
-| **Module** | 7 — Platform, Technical & Data-Intensive Product Management |
+| **Module** | 7 Platform, Technical & Data-Intensive Product Management |
 | **Current Lesson** | 62 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 61 (Leverage Stack, Platform Readiness Checklist) |
-| **Next Lesson** | Lesson 63 — Two-Sided Marketplaces and Network Effects |
-| **Future Topics Unlocked** | Lesson 63 (Two-Sided Marketplaces), Lesson 67 (Platform Governance), Lesson 68 (Technical Debt at Scale) — all depend on the Promise Tiers model and versioning discipline introduced here |
+| **Next Lesson** | Lesson 63 Two-Sided Marketplaces and Network Effects |
+| **Future Topics Unlocked** | Lesson 63 (Two-Sided Marketplaces), Lesson 67 (Platform Governance), Lesson 68 (Technical Debt at Scale) all depend on the Promise Tiers model and versioning discipline introduced here |
 
 ---
 
@@ -48,7 +48,7 @@ This lesson assumes you carry forward the Leverage Stack and the Platform Readin
 
 Every API endpoint makes an implicit or explicit claim about three things: **what it does**, **what shape its inputs and outputs take**, and **how long that behavior can be relied upon**. Internal APIs, used only by teams inside the same company, can get away with treating this claim loosely, because the people affected by a change sit in the same building and can be told directly, or can simply read the updated code. External developer-facing APIs cannot. The developer building against your API today may not read your changelog, may not be in contact with anyone at your company, and may have shipped code six months ago that assumes today's behavior will still hold next year.
 
-This asymmetry — the API provider can see and control every change, while the API consumer can only see the promise as it stood at the time they built against it — is the central design constraint of Layer 2. Good API design is, above all, a discipline of making explicit, keepable promises, and then keeping them.
+This asymmetry the API provider can see and control every change, while the API consumer can only see the promise as it stood at the time they built against it is the central design constraint of Layer 2. Good API design is, above all, a discipline of making explicit, keepable promises, and then keeping them.
 
 ### The Promise Tiers Model
 
@@ -98,11 +98,11 @@ graph TD
     A --> B --> C
 ```
 
-The critical discipline is not choosing the right tier once — it is being explicit, in the documentation itself, about which tier any given endpoint or field belongs to, and never silently promoting a Tier 3 experimental feature into de facto Tier 1 status just because developers started depending on it. A common and dangerous failure mode is the reverse: a company labels something "beta" to buy itself flexibility, developers adopt it heavily anyway because it is useful, and the company later discovers it cannot actually change the "beta" endpoint without breaking a large fraction of its ecosystem — the promise became real in practice even though it was never made real on paper.
+The critical discipline is not choosing the right tier once it is being explicit, in the documentation itself, about which tier any given endpoint or field belongs to, and never silently promoting a Tier 3 experimental feature into de facto Tier 1 status just because developers started depending on it. A common and dangerous failure mode is the reverse: a company labels something "beta" to buy itself flexibility, developers adopt it heavily anyway because it is useful, and the company later discovers it cannot actually change the "beta" endpoint without breaking a large fraction of its ecosystem the promise became real in practice even though it was never made real on paper.
 
 ### Semantic Versioning and Deprecation as Trust Mechanisms
 
-**Semantic versioning** (a MAJOR.MINOR.PATCH numbering scheme) gives developers a fast, unambiguous signal about the size of a change: patch releases fix bugs without changing behavior developers rely on; minor releases add capability without breaking existing usage; major releases may break existing usage and require developers to take action. A **deprecation policy** — a published minimum time window between announcing that a feature will be removed and actually removing it — converts an abstract promise ("we won't surprise you") into an operational guarantee developers can plan around, budget engineering time for, and trust.
+**Semantic versioning** (a MAJOR.MINOR.PATCH numbering scheme) gives developers a fast, unambiguous signal about the size of a change: patch releases fix bugs without changing behavior developers rely on; minor releases add capability without breaking existing usage; major releases may break existing usage and require developers to take action. A **deprecation policy** a published minimum time window between announcing that a feature will be removed and actually removing it converts an abstract promise ("we won't surprise you") into an operational guarantee developers can plan around, budget engineering time for, and trust.
 
 Together, these two mechanisms are what actually make the Tier 1/Tier 2 distinction meaningful. Without them, "stable" is just a marketing word.
 
@@ -167,7 +167,7 @@ When different parts of an API return errors in different shapes, every develope
 
 **Mistake 5: Announcing a deprecation with no migration path**
 
-Telling developers something will stop working, without a concrete alternative and enough lead time to adopt it, converts a manageable transition into a forced, disruptive scramble — and is remembered.
+Telling developers something will stop working, without a concrete alternative and enough lead time to adopt it, converts a manageable transition into a forced, disruptive scramble and is remembered.
 
 ---
 
@@ -176,9 +176,9 @@ Telling developers something will stop working, without a concrete alternative a
 
 The Promise Tiers model introduced above is this lesson's core takeaway tool. When evaluating any proposed API change, ask:
 
-1. **Which tier does the affected surface currently sit in** — Stable Core, Versioned Standard, or Experimental/Beta — according to your own published documentation?
+1. **Which tier does the affected surface currently sit in** Stable Core, Versioned Standard, or Experimental/Beta according to your own published documentation?
 2. **Does the proposed change respect that tier's guarantee?** A breaking change to Tier 1 without a major version bump and long notice is a broken promise, regardless of engineering's intent.
-3. **If the change is necessary, what is the correct rollout mechanism for that tier** — a deprecation notice and migration window for Tier 2, or a simple heads-up for Tier 3?
+3. **If the change is necessary, what is the correct rollout mechanism for that tier** a deprecation notice and migration window for Tier 2, or a simple heads-up for Tier 3?
 
 This model gives you a fast, defensible answer any time an engineering team proposes shipping a change quickly: not "can we ship this," but "which promise does this touch, and are we honoring it."
 
@@ -186,9 +186,9 @@ This model gives you a fast, defensible answer any time an engineering team prop
 
 ## Real Company Example
 
-Stripe's API versioning system is directly documented in the company's own engineering blog, not just inferred from developer commentary. Stripe implements what it calls rolling versions, each named by release date (for example, `2017-05-24`): the first time an account makes an API request, it is automatically pinned to whichever version is current at that moment, and every subsequent call from that account uses the pinned version by default — even as Stripe continues shipping new versions for new accounts. A developer can explicitly override the version on a single request via the `Stripe-Version` header, or deliberately upgrade their account's pinned version from the dashboard when they're ready to absorb the behavioral changes, rather than having those changes silently imposed on them. Stripe's own blog states the company has maintained compatibility with every API version released since its 2011 founding — a striking operational commitment, since it means Stripe's infrastructure must correctly serve requests written against more than a decade of accumulated version behavior simultaneously.
+Stripe's API versioning system is directly documented in the company's own engineering blog, not just inferred from developer commentary. Stripe implements what it calls rolling versions, each named by release date (for example, `2017-05-24`): the first time an account makes an API request, it is automatically pinned to whichever version is current at that moment, and every subsequent call from that account uses the pinned version by default even as Stripe continues shipping new versions for new accounts. A developer can explicitly override the version on a single request via the `Stripe-Version` header, or deliberately upgrade their account's pinned version from the dashboard when they're ready to absorb the behavioral changes, rather than having those changes silently imposed on them. Stripe's own blog states the company has maintained compatibility with every API version released since its 2011 founding a striking operational commitment, since it means Stripe's infrastructure must correctly serve requests written against more than a decade of accumulated version behavior simultaneously.
 
-This is a sharp, concrete illustration of what "Layer 2 trustworthiness" (per Lesson 61's Leverage Stack) actually requires in practice: the mechanism isn't just "we try not to break things" — it's a specific architectural commitment (implicit version pinning plus explicit, developer-controlled upgrade timing) that removes the developer's exposure to unannounced breaking changes almost entirely. Consistent, well-documented error object formats across all endpoints, also confirmed in Stripe's own API reference documentation, reinforce the same pattern: predictability engineered in as a first-class design constraint, not bolted on as an afterthought.
+This is a sharp, concrete illustration of what "Layer 2 trustworthiness" (per Lesson 61's Leverage Stack) actually requires in practice: the mechanism isn't just "we try not to break things" it's a specific architectural commitment (implicit version pinning plus explicit, developer-controlled upgrade timing) that removes the developer's exposure to unannounced breaking changes almost entirely. Consistent, well-documented error object formats across all endpoints, also confirmed in Stripe's own API reference documentation, reinforce the same pattern: predictability engineered in as a first-class design constraint, not bolted on as an afterthought.
 
 *(Source: Stripe's own engineering blog post "APIs as infrastructure: future-proofing Stripe with versioning" and its official API reference documentation on versioning.)*
 
@@ -198,7 +198,7 @@ This is a sharp, concrete illustration of what "Layer 2 trustworthiness" (per Le
 
 **Startup:** Early-stage companies building their first external API often skip formal versioning entirely, reasoning that they have few enough external developers to coordinate changes manually. This is a defensible short-term trade-off, but the Case Study below shows how quickly it becomes unmanageable once developer count grows even modestly, and the fix is far more expensive after the fact than the discipline would have been from the start.
 
-**Mid-size company:** This is typically where the absence of formal Promise Tiers starts to hurt visibly — enough external developers now depend on the API that undocumented changes generate real support tickets and real churn, but not enough process discipline yet exists to prevent them. The PM's job here is often to introduce versioning and deprecation policy retroactively onto an API that was never designed with them in mind, which is materially harder than building it in from the start.
+**Mid-size company:** This is typically where the absence of formal Promise Tiers starts to hurt visibly enough external developers now depend on the API that undocumented changes generate real support tickets and real churn, but not enough process discipline yet exists to prevent them. The PM's job here is often to introduce versioning and deprecation policy retroactively onto an API that was never designed with them in mind, which is materially harder than building it in from the start.
 
 **Big Tech:** Mature platform organizations typically maintain dedicated API governance teams whose job is enforcing Promise Tier discipline across dozens or hundreds of internal teams shipping API changes, precisely because at this scale no single person can track every external dependency by memory, and a single careless breaking change can generate ecosystem-wide damage.
 
@@ -206,11 +206,11 @@ This is a sharp, concrete illustration of what "Layer 2 trustworthiness" (per Le
 
 ## Detailed Case Study: The Silent Webhook Change
 
-A payments infrastructure startup offered a webhook system that notified partner businesses whenever a transaction's status changed, allowing those partners to update their own records automatically. The webhook payload had grown organically over two years, and the engineering team, working on an internal refactor, renamed a field from `transaction_status` to `status` to simplify their internal data model — a change that felt trivial internally, since it was a single line of code and every internal consumer of the webhook was updated in the same pull request.
+A payments infrastructure startup offered a webhook system that notified partner businesses whenever a transaction's status changed, allowing those partners to update their own records automatically. The webhook payload had grown organically over two years, and the engineering team, working on an internal refactor, renamed a field from `transaction_status` to `status` to simplify their internal data model a change that felt trivial internally, since it was a single line of code and every internal consumer of the webhook was updated in the same pull request.
 
-The team did not realize, because no one had ever inventoried who consumed the webhook externally, that dozens of partner businesses had built reconciliation systems that parsed the payload by field name. The rename shipped on a Friday afternoon with no changelog entry and no advance notice. Over the following weekend, partner reconciliation jobs silently began failing to detect status changes at all, since their code was looking for a field that no longer existed. Several partners did not notice the failure until Monday, by which point a weekend's worth of transactions had gone unreconciled — a problem that took additional days to trace back to its actual cause, since nothing in the partners' own systems had thrown an error; the field had simply stopped appearing.
+The team did not realize, because no one had ever inventoried who consumed the webhook externally, that dozens of partner businesses had built reconciliation systems that parsed the payload by field name. The rename shipped on a Friday afternoon with no changelog entry and no advance notice. Over the following weekend, partner reconciliation jobs silently began failing to detect status changes at all, since their code was looking for a field that no longer existed. Several partners did not notice the failure until Monday, by which point a weekend's worth of transactions had gone unreconciled a problem that took additional days to trace back to its actual cause, since nothing in the partners' own systems had thrown an error; the field had simply stopped appearing.
 
-**What went wrong?** Using the Promise Tiers model, the failure is precise: the webhook payload had, in practice, become part of the Stable Core — dozens of partners depended on its exact shape for financially significant reconciliation — but the company had never formally classified it as such, and treated it internally as though it were still an implementation detail free to change at will. There was no versioning, no deprecation notice, and critically, no inventory of who was actually depending on the field. The company's actual promise (unstated) diverged sharply from its actual behavior (silent breaking changes), and partners paid the cost of that gap.
+**What went wrong?** Using the Promise Tiers model, the failure is precise: the webhook payload had, in practice, become part of the Stable Core dozens of partners depended on its exact shape for financially significant reconciliation but the company had never formally classified it as such, and treated it internally as though it were still an implementation detail free to change at will. There was no versioning, no deprecation notice, and critically, no inventory of who was actually depending on the field. The company's actual promise (unstated) diverged sharply from its actual behavior (silent breaking changes), and partners paid the cost of that gap.
 
 The company's recovery involved formally classifying the webhook payload as Tier 1, introducing a versioned webhook format going forward, and building the kind of partner-facing change communication process this curriculum will revisit directly in Lesson 67 (Platform Governance), when we address the broader question of how a platform maintains trust and safety obligations toward the ecosystem built on top of it.
 
@@ -229,23 +229,23 @@ Before shipping a new external-facing endpoint or modifying an existing one, a p
 | Rate Limit Transparency | Are current rate limits communicated in response headers, not just documentation? | Developers discover limits only by being throttled in production |
 | Tier Classification | Is it documented, explicitly, which Promise Tier this endpoint belongs to? | Developers cannot assess their own integration risk accurately |
 
-A "no" on the Tier Classification row in particular should block a launch outright — an unclassified endpoint is a promise made by default, without anyone having actually decided what that promise is.
+A "no" on the Tier Classification row in particular should block a launch outright an unclassified endpoint is a promise made by default, without anyone having actually decided what that promise is.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
-**"How would you decide whether an API change is safe to ship?"** The interviewer is evaluating whether you reach for a structured model like Promise Tiers — asking which tier the surface belongs to and whether the change respects that tier's guarantee — rather than relying on engineering intuition about whether a change "feels big."
+**"How would you decide whether an API change is safe to ship?"** The interviewer is evaluating whether you reach for a structured model like Promise Tiers asking which tier the surface belongs to and whether the change respects that tier's guarantee rather than relying on engineering intuition about whether a change "feels big."
 
 **"Tell me about a time an API change caused unexpected downstream problems."** The interviewer is listening for whether you recognize the root cause pattern from this lesson: an implicit promise (often around something like a webhook field or response shape) that was never explicitly classified or inventoried, and therefore was broken without anyone realizing a promise existed.
 
-**"How do you balance API stability with the need for the internal team to move quickly?"** The interviewer is testing whether you understand that Promise Tiers is precisely the mechanism for resolving this tension — Tier 3 experimental surfaces preserve internal speed, while Tier 1 surfaces protect ecosystem trust, and the discipline is in classifying correctly and never quietly blurring the two.
+**"How do you balance API stability with the need for the internal team to move quickly?"** The interviewer is testing whether you understand that Promise Tiers is precisely the mechanism for resolving this tension Tier 3 experimental surfaces preserve internal speed, while Tier 1 surfaces protect ecosystem trust, and the discipline is in classifying correctly and never quietly blurring the two.
 
 ---
 
 ## Summary
 
-An API is best understood not as a technical interface but as a promise made to developers who cannot see your internal roadmap and may have built production systems on the assumption that today's behavior will hold. The Promise Tiers model — Stable Core, Versioned Standard, and Experimental/Beta — gives a platform PM a concrete way to classify any part of an API surface and decide what rollout process a proposed change requires, with semantic versioning and published deprecation policies converting the abstract promise of stability into an operational guarantee developers can actually plan around. Good API design further reduces integration cost through consistency, predictable errors, idempotency, sensible pagination, and transparent rate limiting — none of which are exotic, but all of which are frequently skipped under deadline pressure at real cost to every developer who integrates afterward. The most damaging platform failures often occur not because a company broke an explicit promise, but because it never classified an implicit one, and changed something developers had, in practice, already come to depend on as though it were permanent.
+An API is best understood not as a technical interface but as a promise made to developers who cannot see your internal roadmap and may have built production systems on the assumption that today's behavior will hold. The Promise Tiers model Stable Core, Versioned Standard, and Experimental/Beta gives a platform PM a concrete way to classify any part of an API surface and decide what rollout process a proposed change requires, with semantic versioning and published deprecation policies converting the abstract promise of stability into an operational guarantee developers can actually plan around. Good API design further reduces integration cost through consistency, predictable errors, idempotency, sensible pagination, and transparent rate limiting none of which are exotic, but all of which are frequently skipped under deadline pressure at real cost to every developer who integrates afterward. The most damaging platform failures often occur not because a company broke an explicit promise, but because it never classified an implicit one, and changed something developers had, in practice, already come to depend on as though it were permanent.
 
 ---
 
@@ -255,7 +255,7 @@ An API is best understood not as a technical interface but as a promise made to 
 - The Promise Tiers model classifies any API surface as Stable Core, Versioned Standard, or Experimental/Beta, each with a different stability guarantee.
 - Semantic versioning and published deprecation policies convert abstract stability claims into guarantees developers can actually plan around.
 - Good API design reduces integration cost through consistent naming, predictable errors, idempotency, sensible pagination, and transparent rate limits.
-- Labeling something "beta" does not reduce your real-world obligation if developers adopt it heavily anyway — the promise becomes real in practice regardless of labeling.
+- Labeling something "beta" does not reduce your real-world obligation if developers adopt it heavily anyway the promise becomes real in practice regardless of labeling.
 - The most damaging platform failures often stem from an implicit, unclassified promise being broken, not an explicit one.
 - Before shipping any external-facing endpoint, explicit tier classification should be a launch-blocking requirement, not an afterthought.
 
@@ -298,7 +298,7 @@ An API is best understood not as a technical interface but as a promise made to 
 
 **Card 1**
 - Front: Why should an API be understood as a promise rather than an interface?
-- Back: Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap — a broken assumption has real downstream cost.
+- Back: Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap a broken assumption has real downstream cost.
 - Difficulty: 2
 - Tags: api-design, core-concept
 
@@ -310,7 +310,7 @@ An API is best understood not as a technical interface but as a promise made to 
 
 **Card 3**
 - Front: What does semantic versioning communicate that a plain version number doesn't?
-- Back: The size and safety of a change — patch (bug fix), minor (additive), major (breaking) — so developers know how much risk a change carries.
+- Back: The size and safety of a change patch (bug fix), minor (additive), major (breaking) so developers know how much risk a change carries.
 - Difficulty: 2
 - Tags: versioning
 
@@ -322,13 +322,13 @@ An API is best understood not as a technical interface but as a promise made to 
 
 **Card 5**
 - Front: What is idempotency and why does it matter for API design?
-- Back: The property that repeating an operation produces the same result without unintended side effects — critical so retry logic after network failures doesn't create duplicates.
+- Back: The property that repeating an operation produces the same result without unintended side effects critical so retry logic after network failures doesn't create duplicates.
 - Difficulty: 2
 - Tags: api-design
 
 **Card 6**
 - Front: What should block a launch, according to the API Design Checklist?
-- Back: An endpoint with no explicit Promise Tier classification — an unclassified endpoint is a promise made by default without anyone deciding what it is.
+- Back: An endpoint with no explicit Promise Tier classification an unclassified endpoint is a promise made by default without anyone deciding what it is.
 - Difficulty: 2
 - Tags: api-design-checklist
 
@@ -343,7 +343,7 @@ An API is best understood not as a technical interface but as a promise made to 
 
 You are the PM for a mid-size logistics software company. Your API currently has no formal versioning, and engineering wants to change the response format of the `/shipments` endpoint to add nested location data, restructuring several existing fields in the process. Product analytics show at least 40 external companies actively integrate with this endpoint, but you don't have complete visibility into exactly how each of them parses the response.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Promise Tiers model and the API Design Checklist under incomplete information.
+There is no single correct answer to the prompts below the goal is to practice applying the Promise Tiers model and the API Design Checklist under incomplete information.
 
 1. Using the Promise Tiers model, which tier does the `/shipments` endpoint most likely belong to in practice, even though it was never formally classified? Justify your answer.
 2. What steps would you take to build a more complete inventory of who depends on this endpoint and how, before deciding on a rollout plan?
@@ -466,7 +466,7 @@ C) With few external developers, changes can be coordinated manually
 D) Formal versioning, this lesson claims, only matters for hardware products
 
 *Correct answer: C*
-*Explanation: With a small developer base, manual coordination can substitute for formal versioning in the short term — though this becomes unmanageable as the developer base grows.*
+*Explanation: With a small developer base, manual coordination can substitute for formal versioning in the short term though this becomes unmanageable as the developer base grows.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
@@ -492,7 +492,7 @@ C) Only internal teams need to be informed before the change ships
 D) Advance notice and a migration path must precede the change
 
 *Correct answer: D*
-*Explanation: Tier 2 explicitly permits change, but only with advance notice and a migration path — unlike Tier 1 (near-immutable) or Tier 3 (change anytime).*
+*Explanation: Tier 2 explicitly permits change, but only with advance notice and a migration path unlike Tier 1 (near-immutable) or Tier 3 (change anytime).*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
@@ -505,7 +505,7 @@ C) No tier applies at all to a field that was never documented
 D) Tier 2, because forty is judged a moderate number of dependents
 
 *Correct answer: B*
-*Explanation: As established in the lesson, real-world dependency — not internal documentation status — determines the effective promise tier a surface occupies.*
+*Explanation: As established in the lesson, real-world dependency not internal documentation status determines the effective promise tier a surface occupies.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
@@ -554,9 +554,9 @@ D) Treat it as Tier 1, build the best inventory available, and roll out with not
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 61 — Platform Thinking: Products, Platforms, and Ecosystems | Extends the Leverage Stack's Developer Surface layer into a full design and governance discipline |
-| **Current Lesson** | Lesson 62 — APIs as Products: Designing for Developers | API as promise; Promise Tiers; semantic versioning and deprecation; API Design Checklist |
-| **Next Lesson** | Lesson 63 — Two-Sided Marketplaces and Network Effects | Builds on cross-side network effects from Lesson 61, now assuming a stable Developer Surface exists to support marketplace design |
+| **Previous Lesson** | Lesson 61 Platform Thinking: Products, Platforms, and Ecosystems | Extends the Leverage Stack's Developer Surface layer into a full design and governance discipline |
+| **Current Lesson** | Lesson 62 APIs as Products: Designing for Developers | API as promise; Promise Tiers; semantic versioning and deprecation; API Design Checklist |
+| **Next Lesson** | Lesson 63 Two-Sided Marketplaces and Network Effects | Builds on cross-side network effects from Lesson 61, now assuming a stable Developer Surface exists to support marketplace design |
 | **Future Concepts Unlocked** | Lesson 67 (Platform Governance) | Extends the webhook Case Study's trust failure into a full framework for ecosystem-wide trust and safety enforcement |
 | | Lesson 68 (Technical Debt at Scale) | Revisits Promise Tiers when addressing large-scale platform migrations and deprecations |
 | | Lesson 78 (Build, Buy, or Partner) | Uses the API Design Checklist as a diagnostic when evaluating whether to build a platform capability internally |

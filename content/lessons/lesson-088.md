@@ -4,7 +4,7 @@
 
 This lesson has been owed since Lesson 71 planted the thread, and it draws on a wide arc of this curriculum: the Friction Ledger from Lesson 69 established that internal friction compounds invisibly; the Portfolio Health Grid from Lesson 77 established that bets at different maturity stages need different oversight; and the Strategic Judgment Radar from Lesson 80 established that a company's specialist functions must coordinate around a shared understanding rather than each optimizing in isolation. This lesson addresses the organizational structure question underneath all of these: as a product organization grows, how should PM ownership actually be divided, and what specific signal indicates a single PM's scope has grown beyond what one person can meaningfully own?
 
-A company experiencing rapid growth tends to add headcount to a product organization reactively — hiring more PMs as more work appears — without a deliberate model for how ownership should actually be divided among them. This produces a specific and recognizable failure pattern: a single PM, having successfully owned a coherent set of initiatives at an earlier stage of company growth, continues accumulating additional, increasingly disconnected responsibilities as the company scales, until their nominal ownership span has grown well past what any one person can meaningfully track, prioritize, or make good decisions about.
+A company experiencing rapid growth tends to add headcount to a product organization reactively hiring more PMs as more work appears without a deliberate model for how ownership should actually be divided among them. This produces a specific and recognizable failure pattern: a single PM, having successfully owned a coherent set of initiatives at an earlier stage of company growth, continues accumulating additional, increasingly disconnected responsibilities as the company scales, until their nominal ownership span has grown well past what any one person can meaningfully track, prioritize, or make good decisions about.
 
 ---
 
@@ -12,13 +12,13 @@ A company experiencing rapid growth tends to add headcount to a product organiza
 
 | Field | Detail |
 |---|---|
-| **Module** | 9 — Specialized Domains and Synthesis |
+| **Module** | 9 Specialized Domains and Synthesis |
 | **Current Lesson** | 88 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 69 (Friction Ledger), Lesson 77 (Portfolio Health Grid), Lesson 80 (Strategic Judgment Radar) |
-| **Next Lesson** | Lesson 89 — The Future of Product Management |
-| **Future Topics Unlocked** | Lesson 89 (The Future of Product Management), Lesson 90 (Capstone) — depend on the Coherence Span Model introduced here |
+| **Next Lesson** | Lesson 89 The Future of Product Management |
+| **Future Topics Unlocked** | Lesson 89 (The Future of Product Management), Lesson 90 (Capstone) depend on the Coherence Span Model introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes the Friction Ledger from Lesson 69, the Portfolio Health Gri
 
 ### Why Reactive Headcount Addition Fails
 
-Adding PMs reactively, as work volume grows, without a deliberate model for dividing ownership, tends to preserve an existing PM's overall scope while adding new PMs alongside them for entirely new initiatives — rather than splitting the original PM's now-overgrown scope into more coherent, individually ownable pieces. This produces organizations where the newest, smallest initiatives are well-owned while the most established, often most important, product areas are owned by a single PM whose attention is spread across far more than they can meaningfully track.
+Adding PMs reactively, as work volume grows, without a deliberate model for dividing ownership, tends to preserve an existing PM's overall scope while adding new PMs alongside them for entirely new initiatives rather than splitting the original PM's now-overgrown scope into more coherent, individually ownable pieces. This produces organizations where the newest, smallest initiatives are well-owned while the most established, often most important, product areas are owned by a single PM whose attention is spread across far more than they can meaningfully track.
 
 ### The Coherence Span Model
 
@@ -86,7 +86,7 @@ graph TD
     B --> C["Beyond Coherence Limit<br/>(split ownership required)"]
 ```
 
-A PM's **span of coherence** — the point past which additional initiatives or complexity make genuinely good, well-informed decision-making impossible — is not a fixed number, since it depends heavily on how interdependent the owned initiatives are; a few tightly related initiatives may be easier to own coherently than the same number of entirely unrelated ones. The Coherence Span Model's discipline is watching for specific signals — decisions increasingly deferred or delayed, decreasing depth of engagement with any single initiative, rising Friction Ledger-style complaints from teams feeling under-supported — that indicate a PM has moved past their sustainable span, rather than waiting for an obvious crisis to force the issue.
+A PM's **span of coherence** the point past which additional initiatives or complexity make genuinely good, well-informed decision-making impossible is not a fixed number, since it depends heavily on how interdependent the owned initiatives are; a few tightly related initiatives may be easier to own coherently than the same number of entirely unrelated ones. The Coherence Span Model's discipline is watching for specific signals decisions increasingly deferred or delayed, decreasing depth of engagement with any single initiative, rising Friction Ledger-style complaints from teams feeling under-supported that indicate a PM has moved past their sustainable span, rather than waiting for an obvious crisis to force the issue.
 
 ### Splitting Ownership vs. Adding Support
 
@@ -94,43 +94,43 @@ A specific organizational mistake is responding to an overextended PM by adding 
 
 ### Why This Failure Pattern Is So Persistent
 
-If overextension is this recognizable in hindsight, it's worth asking why it happens so consistently across so many growing companies. Part of the answer is structural: splitting a well-performing PM's ownership can feel, to both the PM and to leadership, like a demotion or a vote of no confidence, even when it is exactly the opposite — a recognition that the area has grown important enough to deserve dedicated, undivided attention. This makes leadership reluctant to initiate the conversation, and PMs reluctant to request it themselves, even once they privately recognize they're stretched thin. The other part of the answer is that overextension develops gradually, one individually reasonable addition at a time, so there is rarely a single obvious moment that triggers a structural review — unlike a hiring decision, which has a clear trigger (new work exists, nobody owns it), a splitting decision requires someone to proactively notice a slow accumulation and decide to act on it before a crisis forces the issue. Naming this reluctance explicitly, and building a periodic, scheduled review that doesn't depend on someone first working up the nerve to raise it, is what allows companies to catch coherence overextension while it's still a manageable adjustment rather than an acute organizational crisis.
+If overextension is this recognizable in hindsight, it's worth asking why it happens so consistently across so many growing companies. Part of the answer is structural: splitting a well-performing PM's ownership can feel, to both the PM and to leadership, like a demotion or a vote of no confidence, even when it is exactly the opposite a recognition that the area has grown important enough to deserve dedicated, undivided attention. This makes leadership reluctant to initiate the conversation, and PMs reluctant to request it themselves, even once they privately recognize they're stretched thin. The other part of the answer is that overextension develops gradually, one individually reasonable addition at a time, so there is rarely a single obvious moment that triggers a structural review unlike a hiring decision, which has a clear trigger (new work exists, nobody owns it), a splitting decision requires someone to proactively notice a slow accumulation and decide to act on it before a crisis forces the issue. Naming this reluctance explicitly, and building a periodic, scheduled review that doesn't depend on someone first working up the nerve to raise it, is what allows companies to catch coherence overextension while it's still a manageable adjustment rather than an acute organizational crisis.
 
 ---
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Adding headcount reactively — including support roles under an overextended PM — without a deliberate model for dividing existing ownership**
+**Mistake 1: Adding headcount reactively including support roles under an overextended PM without a deliberate model for dividing existing ownership**
 
 Adding PMs reactively, as work volume grows, tends to preserve an existing PM's overall scope while adding new PMs alongside them for entirely new initiatives, rather than splitting the original PM's now-overgrown scope into more coherent, individually ownable pieces. A common variant of this mistake is adding a supporting analyst or associate PM role reporting to the overextended PM instead: support roles can help with execution capacity, but they don't solve the underlying coherence problem, since the original PM remains the single point of prioritization and decision-making judgment across an unchanged, overextended scope. Either way, the newest, smallest initiatives end up well-owned while the most established, often most important, product areas remain owned by someone whose attention is spread across far more than they can meaningfully track.
 
 **Mistake 2: Treating span of coherence as a fixed number of initiatives regardless of interdependency complexity**
 
-A PM's span of coherence is not a fixed headcount or initiative count, since it depends heavily on how interdependent the owned initiatives are — a few tightly related initiatives may be easier to own coherently than the same number of entirely unrelated ones. Applying a flat rule ("no PM should own more than three initiatives") ignores this and can either under-support a PM juggling several tightly coupled efforts or over-correct for one managing several independent, low-interaction areas. The Coherence Span Model is meant to be applied to the actual complexity of the specific ownership in question, not to a generic count.
+A PM's span of coherence is not a fixed headcount or initiative count, since it depends heavily on how interdependent the owned initiatives are a few tightly related initiatives may be easier to own coherently than the same number of entirely unrelated ones. Applying a flat rule ("no PM should own more than three initiatives") ignores this and can either under-support a PM juggling several tightly coupled efforts or over-correct for one managing several independent, low-interaction areas. The Coherence Span Model is meant to be applied to the actual complexity of the specific ownership in question, not to a generic count.
 
-**Mistake 3: Failing to notice the early signals of coherence overextension — delayed decisions, shallow engagement — before they become an acute crisis**
+**Mistake 3: Failing to notice the early signals of coherence overextension delayed decisions, shallow engagement before they become an acute crisis**
 
-The Coherence Span Model's discipline depends on watching for specific early signals — decisions increasingly deferred or delayed, decreasing depth of engagement with any single initiative, rising complaints from teams feeling under-supported — rather than waiting for an obvious crisis to force the issue. Overextension develops gradually, one individually reasonable addition at a time, so there is rarely a single moment that triggers a structural review the way a hiring decision does. Building a periodic, scheduled review that doesn't depend on someone first noticing a crisis is what allows an organization to catch overextension while it's still a manageable adjustment.
+The Coherence Span Model's discipline depends on watching for specific early signals decisions increasingly deferred or delayed, decreasing depth of engagement with any single initiative, rising complaints from teams feeling under-supported rather than waiting for an obvious crisis to force the issue. Overextension develops gradually, one individually reasonable addition at a time, so there is rarely a single moment that triggers a structural review the way a hiring decision does. Building a periodic, scheduled review that doesn't depend on someone first noticing a crisis is what allows an organization to catch overextension while it's still a manageable adjustment.
 
 **Mistake 4: Creating ambiguous or overlapping ownership boundaries when splitting scope, producing duplicated or competing decision rights**
 
-Splitting an overextended PM's scope solves the coherence problem only if the resulting boundaries are genuinely clear; a split that leaves two PMs with overlapping or ambiguous decision rights over the same area can produce new friction — duplicated work, competing priorities, stakeholders unsure who actually owns a given call — that partially offsets the benefit of splitting in the first place. Defining explicit decision-rights boundaries at the moment of the split, not after the resulting confusion surfaces, is what makes a split actually resolve the coherence problem rather than just relabel it.
+Splitting an overextended PM's scope solves the coherence problem only if the resulting boundaries are genuinely clear; a split that leaves two PMs with overlapping or ambiguous decision rights over the same area can produce new friction duplicated work, competing priorities, stakeholders unsure who actually owns a given call that partially offsets the benefit of splitting in the first place. Defining explicit decision-rights boundaries at the moment of the split, not after the resulting confusion surfaces, is what makes a split actually resolve the coherence problem rather than just relabel it.
 
 **Mistake 5: Treating a splitting conversation as an implicit judgment on past performance rather than scope-appropriate role design, which discourages leadership from raising it early**
 
-Splitting a well-performing PM's ownership can feel, to both the PM and to leadership, like a demotion or a vote of no confidence, even when it is exactly the opposite — a recognition that the area has grown important enough to deserve dedicated, undivided attention. This makes leadership reluctant to initiate the conversation, and PMs reluctant to request it themselves, even once they privately recognize they're stretched thin. Framing the conversation explicitly as scope-appropriate role design, rather than a comment on the PM's competence, is what allows it to happen before overextension becomes an acute crisis rather than after.
+Splitting a well-performing PM's ownership can feel, to both the PM and to leadership, like a demotion or a vote of no confidence, even when it is exactly the opposite a recognition that the area has grown important enough to deserve dedicated, undivided attention. This makes leadership reluctant to initiate the conversation, and PMs reluctant to request it themselves, even once they privately recognize they're stretched thin. Framing the conversation explicitly as scope-appropriate role design, rather than a comment on the PM's competence, is what allows it to happen before overextension becomes an acute crisis rather than after.
 ---
 
 
 ## Mental Model: The Coherence Span Model
 
-Ask: (1) How many initiatives does this PM currently own, and how interdependent are they? (2) Are there signals — delayed decisions, shallow engagement, rising friction complaints — indicating the coherence limit has been reached? (3) When splitting scope, are the resulting ownership boundaries clear and non-overlapping?
+Ask: (1) How many initiatives does this PM currently own, and how interdependent are they? (2) Are there signals delayed decisions, shallow engagement, rising friction complaints indicating the coherence limit has been reached? (3) When splitting scope, are the resulting ownership boundaries clear and non-overlapping?
 
 ---
 
 ## Real Company Example
 
-**Netflix's own official Culture Memo**, published directly on the company's careers site, states this lesson's core warning as an explicit, named organizational principle: "People Over Process." The memo describes deliberately keeping rules and process to a minimum specifically to prevent what it calls "process creep... that typically happens when companies grow and try to dummy proof their organizations — stifling creativity and making it harder for businesses to adapt." Rather than growing headcount and layers of process reactively as the company scales, Netflix's stated approach is to maintain what it calls "talent density" — favoring fewer, more senior, more autonomous people over a larger organization requiring more coordination overhead and more process to manage — and to make decisions through direct accountability and what the memo calls "farming for dissent" (actively soliciting disagreement before a decision, rather than after) instead of decision-by-committee, which the memo states explicitly "tends to slow companies down and undermine accountability."
+**Netflix's own official Culture Memo**, published directly on the company's careers site, states this lesson's core warning as an explicit, named organizational principle: "People Over Process." The memo describes deliberately keeping rules and process to a minimum specifically to prevent what it calls "process creep... that typically happens when companies grow and try to dummy proof their organizations stifling creativity and making it harder for businesses to adapt." Rather than growing headcount and layers of process reactively as the company scales, Netflix's stated approach is to maintain what it calls "talent density" favoring fewer, more senior, more autonomous people over a larger organization requiring more coordination overhead and more process to manage and to make decisions through direct accountability and what the memo calls "farming for dissent" (actively soliciting disagreement before a decision, rather than after) instead of decision-by-committee, which the memo states explicitly "tends to slow companies down and undermine accountability."
 
 This is a direct, company-published counter-model to the reactive scaling pattern this lesson warns against: rather than treating growing headcount as the default response to growing scope, and layering in process to manage the coordination cost that headcount growth creates, Netflix's own stated philosophy treats minimizing both headcount growth and process accumulation as the deliberate goal, accepting that this approach won't suit everyone (the memo is candid that "many people will be happier at companies that are more stable or take fewer risks").
 
@@ -140,11 +140,11 @@ This is a direct, company-published counter-model to the reactive scaling patter
 
 ## Real World Perspective: Building and Scaling a Product Organization at Different Company Stages
 
-**At a startup:** A single PM owning the entire product is normal and appropriate at very early stages, since initiative count and complexity are both genuinely low, and the founder or founding PM typically has deep enough context on every part of the product that coherent decision-making across the full scope is genuinely achievable. The risk at this stage isn't overextension yet — it's failing to notice the moment this stops being true as the product and team grow.
+**At a startup:** A single PM owning the entire product is normal and appropriate at very early stages, since initiative count and complexity are both genuinely low, and the founder or founding PM typically has deep enough context on every part of the product that coherent decision-making across the full scope is genuinely achievable. The risk at this stage isn't overextension yet it's failing to notice the moment this stops being true as the product and team grow.
 
-**At a mid-size company:** This is typically where the first coherence overextension crisis occurs, as an early PM's scope grows past sustainable limits without deliberate splitting, often the same founding or first-hired PM whose historical ownership feels natural to preserve even as the underlying scope has grown well past what it originally was. This is frequently also the stage where the reluctance described above is most visible — leadership hesitates to restructure around someone who has been core to the company's success so far, even as the signals of overextension accumulate.
+**At a mid-size company:** This is typically where the first coherence overextension crisis occurs, as an early PM's scope grows past sustainable limits without deliberate splitting, often the same founding or first-hired PM whose historical ownership feels natural to preserve even as the underlying scope has grown well past what it originally was. This is frequently also the stage where the reluctance described above is most visible leadership hesitates to restructure around someone who has been core to the company's success so far, even as the signals of overextension accumulate.
 
-**At Big Tech:** Large organizations typically maintain formal, deliberately-designed ownership boundaries and decision-rights documentation specifically to prevent both overextension and ambiguous, overlapping ownership, often paired with a regular organizational design review cadence — sometimes tied to broader planning cycles — where ownership spans are explicitly re-examined rather than left to persist by default. At this scale, getting ownership boundaries wrong has outsized cost, since ambiguity between two PMs' scopes can silently stall decisions across teams that depend on clarity about who actually owns a given call.
+**At Big Tech:** Large organizations typically maintain formal, deliberately-designed ownership boundaries and decision-rights documentation specifically to prevent both overextension and ambiguous, overlapping ownership, often paired with a regular organizational design review cadence sometimes tied to broader planning cycles where ownership spans are explicitly re-examined rather than left to persist by default. At this scale, getting ownership boundaries wrong has outsized cost, since ambiguity between two PMs' scopes can silently stall decisions across teams that depend on clarity about who actually owns a given call.
 
 ---
 
@@ -152,9 +152,9 @@ This is a direct, company-published counter-model to the reactive scaling patter
 
 A growing company's founding PM had successfully owned the entire core product area since the company's earliest days. As the company scaled, new initiatives were added to this same PM's scope one at a time, each addition seeming individually reasonable, while new PMs were hired only for genuinely new product lines. Within two years, the founding PM's nominal ownership spanned a dozen loosely related initiatives, and decision requests routed through them began taking noticeably longer to resolve, with several teams reporting they felt under-supported and often had to make significant decisions without adequate PM input at all.
 
-**What went wrong?** The company had added headcount reactively for new initiatives without ever revisiting the founding PM's now-overextended scope, mistaking preserved historical ownership for organizational stability. The specific signals — delayed decisions, teams making unsupported decisions — were present well before the situation became acute, but no one had a deliberate model for recognizing them as a coherence-span problem. Interviews conducted after the fact revealed a specific dynamic worth naming directly: several members of leadership had privately noticed the founding PM seemed stretched thin more than a year before any structural change was made, but no one raised it formally, partly out of respect for the PM's historical contribution to the company and partly because there was no scheduled moment — no natural trigger — at which the question was expected to come up.
+**What went wrong?** The company had added headcount reactively for new initiatives without ever revisiting the founding PM's now-overextended scope, mistaking preserved historical ownership for organizational stability. The specific signals delayed decisions, teams making unsupported decisions were present well before the situation became acute, but no one had a deliberate model for recognizing them as a coherence-span problem. Interviews conducted after the fact revealed a specific dynamic worth naming directly: several members of leadership had privately noticed the founding PM seemed stretched thin more than a year before any structural change was made, but no one raised it formally, partly out of respect for the PM's historical contribution to the company and partly because there was no scheduled moment no natural trigger at which the question was expected to come up.
 
-Recovery involved splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas, each led by a dedicated PM with clear decision rights, and instituting a periodic organizational review specifically checking PM ownership spans against the Coherence Span Model's signals. Notably, the founding PM, once relieved of two-thirds of their prior scope, reported feeling relief rather than diminishment — a specific detail the company later used internally to normalize future splitting conversations, framing them explicitly as scope-appropriate role design rather than as a judgment on past performance.
+Recovery involved splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas, each led by a dedicated PM with clear decision rights, and instituting a periodic organizational review specifically checking PM ownership spans against the Coherence Span Model's signals. Notably, the founding PM, once relieved of two-thirds of their prior scope, reported feeling relief rather than diminishment a specific detail the company later used internally to normalize future splitting conversations, framing them explicitly as scope-appropriate role design rather than as a judgment on past performance.
 
 1. Why did leadership's private awareness of the problem fail to translate into action for over a year, and what kind of structural trigger could have closed that gap sooner?
 2. If you were designing the periodic organizational review mentioned in the recovery, what specific signals would you want it to check, and how often would you run it?
@@ -170,26 +170,26 @@ Recovery involved splitting the founding PM's scope into three genuinely indepen
 | Clear Decision Rights | Are ownership boundaries explicit and non-overlapping after any split? | Duplicated or competing ownership |
 | Periodic Review | Is PM ownership span reviewed periodically as the organization grows? | Reactive rather than deliberate scaling |
 
-The Periodic Review item deliberately does not depend on someone first noticing a problem and deciding to escalate it — it is a scheduled check specifically because, as the Overextended Owner case study shows, the individuals best positioned to notice overextension early are often the least likely to raise it unprompted, whether out of respect for a colleague's track record or simple uncertainty about whether the concern is theirs to voice.
+The Periodic Review item deliberately does not depend on someone first noticing a problem and deciding to escalate it it is a scheduled check specifically because, as the Overextended Owner case study shows, the individuals best positioned to notice overextension early are often the least likely to raise it unprompted, whether out of respect for a colleague's track record or simple uncertainty about whether the concern is theirs to voice.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How would you decide when a PM's scope has grown too large?"**
-*What the interviewer is actually evaluating:* Whether you reach for a fixed number ("more than five projects is too many") or think in terms of genuine signals. A strong answer names the Coherence Span Model's signals directly — delayed decisions, shallowing engagement, rising friction complaints from dependent teams — and explains that the right threshold depends on interdependency complexity, not a universal count.
+*What the interviewer is actually evaluating:* Whether you reach for a fixed number ("more than five projects is too many") or think in terms of genuine signals. A strong answer names the Coherence Span Model's signals directly delayed decisions, shallowing engagement, rising friction complaints from dependent teams and explains that the right threshold depends on interdependency complexity, not a universal count.
 
 **Typical question 2: "What's the difference between adding support to an overextended PM and splitting their ownership?"**
 *What the interviewer is actually evaluating:* Whether you recognize that execution capacity and decision-making capacity are different bottlenecks. A weak answer treats an added analyst as a solution. A strong answer explains that support roles help with execution volume but leave the original PM as the sole point of prioritization judgment across an unchanged scope, so the coherence problem persists even as the team around it grows.
 
 **Typical question 3: "How would you design ownership boundaries when splitting a PM's scope?"**
-*What the interviewer is actually evaluating:* Whether you treat boundary-drawing as an afterthought or a deliberate design task in its own right. A strong answer emphasizes explicit, non-overlapping decision rights as a stated goal of the split, and acknowledges the real risk of getting it wrong — that a poorly drawn boundary can recreate ambiguity in a new form, with two PMs now unintentionally competing over adjacent decisions instead of one PM being stretched too thin.
+*What the interviewer is actually evaluating:* Whether you treat boundary-drawing as an afterthought or a deliberate design task in its own right. A strong answer emphasizes explicit, non-overlapping decision rights as a stated goal of the split, and acknowledges the real risk of getting it wrong that a poorly drawn boundary can recreate ambiguity in a new form, with two PMs now unintentionally competing over adjacent decisions instead of one PM being stretched too thin.
 
 ---
 
 ## Summary
 
-Reactive headcount addition, without a deliberate model for dividing existing ownership, tends to preserve an early PM's scope while adding new PMs only for new initiatives, producing overextended ownership over a company's most established product areas. The Coherence Span Model tracks initiative count against interdependency complexity, watching for specific signals — delayed decisions, shallow engagement, rising friction complaints — that indicate a PM has moved past a sustainable span, and its central discipline distinguishes genuinely splitting ownership from merely adding support, since support roles preserve rather than resolve the underlying coherence problem. A final, less obvious lesson from this pattern is worth carrying forward: the people best positioned to notice overextension early are frequently the most reluctant to raise it, since a splitting conversation can feel, wrongly, like a verdict on the PM's past performance rather than what it actually is — a recognition that an area has grown important enough to deserve dedicated, undivided ownership. Building a scheduled review that doesn't depend on someone finding the courage to raise the concern first is what turns this from a crisis response into a routine, low-drama part of scaling.
+Reactive headcount addition, without a deliberate model for dividing existing ownership, tends to preserve an early PM's scope while adding new PMs only for new initiatives, producing overextended ownership over a company's most established product areas. The Coherence Span Model tracks initiative count against interdependency complexity, watching for specific signals delayed decisions, shallow engagement, rising friction complaints that indicate a PM has moved past a sustainable span, and its central discipline distinguishes genuinely splitting ownership from merely adding support, since support roles preserve rather than resolve the underlying coherence problem. A final, less obvious lesson from this pattern is worth carrying forward: the people best positioned to notice overextension early are frequently the most reluctant to raise it, since a splitting conversation can feel, wrongly, like a verdict on the PM's past performance rather than what it actually is a recognition that an area has grown important enough to deserve dedicated, undivided ownership. Building a scheduled review that doesn't depend on someone finding the courage to raise the concern first is what turns this from a crisis response into a routine, low-drama part of scaling.
 
 ---
 
@@ -210,10 +210,10 @@ Reactive headcount addition, without a deliberate model for dividing existing ow
 
 *A two-minute review of everything in this lesson.*
 
-- Watch for delayed decisions and shallow engagement — early coherence-overextension signals.
+- Watch for delayed decisions and shallow engagement early coherence-overextension signals.
 - Split ownership, don't just add support underneath an overextended PM.
 - Clear, non-overlapping decision rights when splitting.
-- Schedule periodic ownership-span reviews — don't rely on someone volunteering the concern.
+- Schedule periodic ownership-span reviews don't rely on someone volunteering the concern.
 - Frame a split as scope-appropriate role design, not a judgment on past performance.
 
 ---
@@ -265,7 +265,7 @@ Reactive headcount addition, without a deliberate model for dividing existing ow
 
 **Card 5**
 - Front: Why is this overextension failure pattern so persistent across growing companies, even though it's recognizable in hindsight?
-- Back: Splitting ownership can feel like a demotion to both the PM and leadership, and overextension accumulates gradually with no single obvious trigger for a structural review — unlike hiring, which has a clear trigger.
+- Back: Splitting ownership can feel like a demotion to both the PM and leadership, and overextension accumulates gradually with no single obvious trigger for a structural review unlike hiring, which has a clear trigger.
 - Difficulty: 2
 - Tags: org-scaling, reluctance
 
@@ -403,7 +403,7 @@ C) Initiative count has no bearing on ownership coherence
 D) It changes only when a PM's title changes, not workload
 
 *Correct answer: B*
-*Explanation: A PM's span of coherence depends heavily on how interdependent the owned initiatives are — a few tightly related initiatives may be easier to own than the same number of unrelated ones.*
+*Explanation: A PM's span of coherence depends heavily on how interdependent the owned initiatives are a few tightly related initiatives may be easier to own than the same number of unrelated ones.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
@@ -491,9 +491,9 @@ D) Split ownership into independent, clear-rights areas
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 87 — Crisis Management and Incident Response | Extends organizational discipline from crisis response into ongoing structural design |
-| **Current Lesson** | Lesson 88 — Building and Scaling a Product Organization | Coherence Span Model; splitting vs. supporting; decision-rights clarity |
-| **Next Lesson** | Lesson 89 — The Future of Product Management | Shifts toward forward-looking reflection on the discipline as a whole |
+| **Previous Lesson** | Lesson 87 Crisis Management and Incident Response | Extends organizational discipline from crisis response into ongoing structural design |
+| **Current Lesson** | Lesson 88 Building and Scaling a Product Organization | Coherence Span Model; splitting vs. supporting; decision-rights clarity |
+| **Next Lesson** | Lesson 89 The Future of Product Management | Shifts toward forward-looking reflection on the discipline as a whole |
 | **Future Concepts Unlocked** | Lesson 90 (Capstone) | Treats the Coherence Span Model as established canon |
 
 This curriculum continues to build as one continuous argument. This lesson resolves the open thread planted since Lesson 71 regarding organizational scaling.

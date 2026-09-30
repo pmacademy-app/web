@@ -107,12 +107,14 @@ describe('server call sites are unchanged by the moves', () => {
   it('settings-service still re-exports the onboarding defaults', () => {
     const source = read('lib/admin/settings-service.ts')
 
+    // Phase 4C: DEFAULT_ONBOARDING_STEPS was removed with the 4-step wizard model. The
+    // goal/experience/topic/preference option constants remain re-exported for server
+    // call sites (e.g. the settings service and path-resolver).
     for (const name of [
       'DEFAULT_GOAL_OPTIONS',
       'DEFAULT_EXPERIENCE_OPTIONS',
       'DEFAULT_TOPIC_OPTIONS',
       'DEFAULT_PREFERENCE_OPTIONS',
-      'DEFAULT_ONBOARDING_STEPS',
     ]) {
       expect(source, name).toContain(name)
     }
@@ -125,7 +127,7 @@ describe('server call sites are unchanged by the moves', () => {
 
     // Re-export, not a copy: a duplicate would drift.
     expect(service.DEFAULT_GOAL_OPTIONS).toBe(defaults.DEFAULT_GOAL_OPTIONS)
-    expect(service.DEFAULT_ONBOARDING_STEPS).toBe(defaults.DEFAULT_ONBOARDING_STEPS)
+    expect(service.DEFAULT_TOPIC_OPTIONS).toBe(defaults.DEFAULT_TOPIC_OPTIONS)
     expect(defaults.DEFAULT_GOAL_OPTIONS.length).toBeGreaterThan(0)
   })
 })

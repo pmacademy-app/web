@@ -1,3 +1,5 @@
+import { describeDbError } from '@/lib/monitoring/db-error'
+
 import type { StandardFeatureFlagKey, FeatureFlagRecord } from './types'
 
 /**
@@ -34,6 +36,22 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
 /** How long a hydrated snapshot is trusted before the next read-through. */
 const HYDRATION_TTL_MS = 10_000
 
+/**
+ * After a failed hydration, keep serving the last-known-good cache for this long
+ * before hitting the database again.
+ *
+ * Without it, the error path left the snapshot un-fresh and EVERY subsequent gated
+ * call (each email send, each queue tick) re-issued the read — so a Supabase gateway
+ * timeout added its full latency to every one of them and hammered a database that was
+ * already struggling. This is much shorter than the success TTL so an admin kill
+ * switch still takes effect within a couple of seconds of the database recovering.
+ */
+const FAILURE_RETRY_BACKOFF_MS = 2_000
+
+/** In-call retries for a transient read failure, before falling back to cache. */
+const LOAD_RETRY_ATTEMPTS = 2
+const LOAD_RETRY_DELAY_MS = 150
+
 let flagFailureReportInFlight = false
 
 /**
@@ -43,7 +61,11 @@ let flagFailureReportInFlight = false
  * hydration keeps failing, every instance silently serves DEFAULT_FEATURE_FLAGS and
  * the admin kill switch does nothing, with no signal that anything is wrong.
  */
-async function reportFlagFailure(operation: string, summary: string, detail: string): Promise<void> {
+async function reportFlagFailure(
+  operation: string,
+  summary: string,
+  details: Record<string, unknown>
+): Promise<void> {
   // Re-entrancy guard. A critical incident fans out an admin in-app notification,
   // which reads IN_APP_NOTIFICATIONS_ENABLED, which hydrates flags again — so a
   // sustained database outage could otherwise re-enter this path. Incident dedup
@@ -59,8 +81,8 @@ async function reportFlagFailure(operation: string, summary: string, detail: str
       operation,
       summary,
       nextAction:
-        'Feature flags are falling back to compiled defaults, so admin toggles have no effect. Check Supabase availability and the system_settings table.',
-      details: { detail },
+        'Feature flags are serving the last-known-good cache (or compiled defaults if never hydrated), so admin toggles may be stale. Check Supabase availability and the system_settings table.',
+      details,
     })
   } catch {
     // Never let instrumentation break flag resolution.
@@ -69,10 +91,20 @@ async function reportFlagFailure(operation: string, summary: string, detail: str
   }
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export class FeatureFlagService {
   private inMemoryCache: Map<string, FeatureFlagRecord> = new Map()
   /** Epoch ms of the last successful DB hydration; 0 means never hydrated. */
   private hydratedAt = 0
+  /**
+   * Epoch ms of the most recent SUCCESSFUL hydration, ever. Distinct from
+   * `hydratedAt`, which the success TTL advances: this one only moves on a real read,
+   * so the reported staleness age is honest during an outage.
+   */
+  private lastGoodHydrationAt = 0
+  /** While `now < failureBackoffUntil`, serve cache without re-hitting a failing DB. */
+  private failureBackoffUntil = 0
   /** In-flight hydration, so concurrent callers share one query. */
   private hydrationPromise: Promise<void> | null = null
 
@@ -115,7 +147,14 @@ export class FeatureFlagService {
    * the next call retries rather than pinning stale values.
    */
   public async ensureHydrated(force = false): Promise<void> {
-    if (!force && Date.now() - this.hydratedAt < HYDRATION_TTL_MS) return
+    const now = Date.now()
+    if (!force) {
+      // A fresh successful snapshot is trusted for the full TTL.
+      if (now - this.hydratedAt < HYDRATION_TTL_MS) return
+      // A recent failure: keep serving last-known-good for a short backoff instead of
+      // re-hitting a failing database on this (and every other) gated call.
+      if (now < this.failureBackoffUntil) return
+    }
     if (this.hydrationPromise) return this.hydrationPromise
 
     this.hydrationPromise = this.loadFromDatabase().finally(() => {
@@ -125,44 +164,60 @@ export class FeatureFlagService {
   }
 
   private async loadFromDatabase(): Promise<void> {
-    try {
-      const { createServiceRoleClient } = await import('../../supabase')
-      const supabase = createServiceRoleClient()
-      const { data, error } = await supabase
-        .from('system_settings')
-        .select('value')
-        .eq('key', 'feature_flags')
-        .maybeSingle()
+    let lastError: unknown = null
 
-      if (error) {
-        await reportFlagFailure('config.flag_hydrate', 'Feature flags could not be read from the database', error.message)
-        return
-      }
+    // A short in-call retry absorbs a transient blip (a single dropped connection or
+    // gateway hiccup) without giving up on the read and dropping to cached values.
+    for (let attempt = 0; attempt < LOAD_RETRY_ATTEMPTS; attempt++) {
+      try {
+        const { createServiceRoleClient } = await import('../../supabase')
+        const supabase = createServiceRoleClient()
+        const { data, error } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'feature_flags')
+          .maybeSingle()
 
-      const value = (data as { value?: unknown } | null)?.value
-      if (value && typeof value === 'object') {
-        const updatedAt = new Date().toISOString()
-        for (const [key, enabled] of Object.entries(value as Record<string, unknown>)) {
-          this.inMemoryCache.set(key, {
-            key,
-            description: this.inMemoryCache.get(key)?.description,
-            enabled: Boolean(enabled),
-            updatedAt,
-          })
+        if (error) throw error
+
+        const value = (data as { value?: unknown } | null)?.value
+        if (value && typeof value === 'object') {
+          const updatedAt = new Date().toISOString()
+          for (const [key, enabled] of Object.entries(value as Record<string, unknown>)) {
+            this.inMemoryCache.set(key, {
+              key,
+              description: this.inMemoryCache.get(key)?.description,
+              enabled: Boolean(enabled),
+              updatedAt,
+            })
+          }
         }
+        // A row that is absent or empty is a legitimate "no overrides" answer, so the
+        // defaults stand and the snapshot still counts as fresh. Clear any backoff.
+        const now = Date.now()
+        this.hydratedAt = now
+        this.lastGoodHydrationAt = now
+        this.failureBackoffUntil = 0
+        return
+      } catch (err) {
+        lastError = err
+        if (attempt < LOAD_RETRY_ATTEMPTS - 1) await sleep(LOAD_RETRY_DELAY_MS)
       }
-      // A row that is absent or empty is a legitimate "no overrides" answer, so the
-      // defaults stand and the snapshot still counts as fresh.
-      this.hydratedAt = Date.now()
-    } catch (err) {
-      // Offline / test environments: keep serving the current cache. Still reported —
-      // a flag read that never succeeds means the kill switch is silently inert.
-      await reportFlagFailure(
-        'config.flag_hydrate',
-        'Feature flags could not be read from the database',
-        err instanceof Error ? err.message : String(err)
-      )
     }
+
+    // Every attempt failed. Keep serving the current cache (last-known-good, or the
+    // compiled defaults if we have never hydrated) and back off before the next try,
+    // so a sustained outage does not add DB latency to every gated call. Report it —
+    // a flag read that never succeeds means the kill switch may be silently stale.
+    this.failureBackoffUntil = Date.now() + FAILURE_RETRY_BACKOFF_MS
+    const described = describeDbError(lastError)
+    await reportFlagFailure('config.flag_hydrate', 'Feature flags could not be read from the database', {
+      ...described,
+      attempts: LOAD_RETRY_ATTEMPTS,
+      everHydrated: this.lastGoodHydrationAt > 0,
+      staleForMs: this.lastGoodHydrationAt > 0 ? Date.now() - this.lastGoodHydrationAt : null,
+      servingCompiledDefaults: this.lastGoodHydrationAt === 0,
+    })
   }
 
   /**
@@ -260,7 +315,7 @@ export class FeatureFlagService {
       await reportFlagFailure(
         'config.flag_persist',
         'Feature flag change could not be persisted',
-        err instanceof Error ? err.message : String(err)
+        { ...describeDbError(err) }
       )
     }
   }

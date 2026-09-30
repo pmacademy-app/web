@@ -18,10 +18,18 @@ export default async function OnboardingPage() {
     SettingsService.getOnboardingSettings().catch(() => null),
   ])
 
+  // Phase 4: the single-screen wizard only needs the two path fields for pre-fill; identity
+  // fields are deferred to Settings → Portfolio and are not surfaced here.
+  const typedProfile = profile as { goal?: string | null; career_role?: string | null } | null
+
   return (
     <OnboardingWizard
       user={user}
-      profile={profile as unknown as Record<string, unknown>}
+      profile={
+        typedProfile
+          ? { goal: typedProfile.goal ?? null, career_role: typedProfile.career_role ?? null }
+          : null
+      }
       onboardingSettings={onboardingSettings || undefined}
     />
   )

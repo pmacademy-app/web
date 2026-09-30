@@ -16,9 +16,13 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 
-const patchSchema = z.object({
-  status: z.literal('in_progress'),
-})
+// Two mutually-exclusive PATCH shapes: the existing "mark in progress", and the Phase 4
+// (§4.4) idempotent "deep dive opened" marker. Kept as a union so each call declares its
+// intent explicitly and neither can smuggle the other's field.
+const patchSchema = z.union([
+  z.object({ status: z.literal('in_progress') }),
+  z.object({ deep_dive_opened: z.literal(true) }),
+])
 
 interface ProgressRow {
   user_id: string
@@ -29,6 +33,7 @@ interface ProgressRow {
   quiz_attempts: number
   xp_earned: number
   completed_at: string | null
+  deep_dive_opened_at: string | null
 }
 
 interface SupabaseTable {
@@ -109,11 +114,45 @@ export const PATCH = withRoute(
     const body = await request.json()
     const parsed = patchSchema.safeParse(body)
     if (!parsed.success) {
-      throw new RouteError(400, 'VALIDATION', 'status must be "in_progress".')
+      throw new RouteError(400, 'VALIDATION', 'Body must be {status:"in_progress"} or {deep_dive_opened:true}.')
+    }
+
+    const serviceSupabase = createServiceRoleClient()
+
+    // Phase 4 (§4.4): first Deep-dive open. Idempotent — record the timestamp once and never
+    // overwrite it, so re-opening the section doesn't reset the marker. The upsert touches
+    // only this column, leaving status/theory/quiz state untouched.
+    if ('deep_dive_opened' in parsed.data) {
+      const { data: existing } = (await serviceSupabase
+        .from('user_lesson_progress')
+        .select('deep_dive_opened_at')
+        .eq('user_id', userId)
+        .eq('lesson_id', lessonId)
+        .maybeSingle()) as unknown as { data: { deep_dive_opened_at: string | null } | null; error: unknown }
+
+      if (existing?.deep_dive_opened_at) {
+        return Response.json({ message: 'Deep dive already recorded.' })
+      }
+
+      const { data: updated, error } = (await (serviceSupabase
+        .from('user_lesson_progress') as unknown as SupabaseTable)
+        .upsert({
+          user_id: userId,
+          lesson_id: lessonId,
+          deep_dive_opened_at: new Date().toISOString(),
+        }, { onConflict: 'user_id,lesson_id' })
+        .select()
+        .single()) as unknown as { data: ProgressRow | null; error: unknown }
+
+      if (error) {
+        console.error(`[api/v2/lessons/${lessonId}/progress] Error recording deep dive:`, error)
+        throw new RouteError(500, 'SERVER_ERROR', 'Database error')
+      }
+
+      return Response.json(updated)
     }
 
     const { status } = parsed.data
-    const serviceSupabase = createServiceRoleClient()
 
     // Query current status to prevent overriding a completed state with in_progress
     const { data: existing } = (await serviceSupabase

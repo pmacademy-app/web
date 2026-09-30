@@ -160,7 +160,10 @@ describe('B14-B — CI security configuration is present', () => {
       readFileSync(path.join(REPO_ROOT, 'scripts/ci/npm-audit-allowlist.json'), 'utf8')
     ) as AllowlistFile
 
-    expect(raw.advisories.length).toBeGreaterThan(0)
+    // An empty allowlist is the ideal state: it means no blocking advisory
+    // currently needs a reviewed acceptance. What matters is that any entry
+    // that IS present is well-formed.
+    expect(Array.isArray(raw.advisories)).toBe(true)
     for (const entry of raw.advisories) {
       expect(entry.id).toMatch(/^GHSA-/)
       expect(entry.reason.length).toBeGreaterThan(20)

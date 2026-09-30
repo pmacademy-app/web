@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 23 ended with the INVEST criteria, and one letter in particular deserves a lesson of its own: **Testable**. A user story can pass every other INVEST check — independent, negotiable, valuable, estimable, small — and still leave open a question that causes real damage during a project: how does anyone actually know when it's done? Without an explicit answer, "done" quietly becomes whatever the engineer who built it believes is done, which may or may not match what the PM who wrote the story had in mind, which may or may not match what QA expects to verify, which may or may not match what the actual user experiences.
+Lesson 23 ended with the INVEST criteria, and one letter in particular deserves a lesson of its own: **Testable**. A user story can pass every other INVEST check independent, negotiable, valuable, estimable, small and still leave open a question that causes real damage during a project: how does anyone actually know when it's done? Without an explicit answer, "done" quietly becomes whatever the engineer who built it believes is done, which may or may not match what the PM who wrote the story had in mind, which may or may not match what QA expects to verify, which may or may not match what the actual user experiences.
 
-**Acceptance criteria** are the specific, testable conditions that define when a user story is genuinely complete — a checklist, written before implementation begins, that removes ambiguity about what "done" means and gives everyone involved (engineering, QA, design, and the PM) a shared, verifiable standard to build and test against. This lesson treats acceptance criteria not as bureaucratic overhead added on top of a user story, but as the mechanism that actually makes a story testable in more than name — closing the loop that Lesson 23 opened but didn't fully resolve.
+**Acceptance criteria** are the specific, testable conditions that define when a user story is genuinely complete a checklist, written before implementation begins, that removes ambiguity about what "done" means and gives everyone involved (engineering, QA, design, and the PM) a shared, verifiable standard to build and test against. This lesson treats acceptance criteria not as bureaucratic overhead added on top of a user story, but as the mechanism that actually makes a story testable in more than name closing the loop that Lesson 23 opened but didn't fully resolve.
 
 ---
 
@@ -12,13 +12,13 @@ Lesson 23 ended with the INVEST criteria, and one letter in particular deserves 
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design |
+| **Module** | 3 Product Design |
 | **Current Lesson** | 24 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 17 (Problem Statements), Lesson 23 (User Stories) |
-| **Next Lesson** | Lesson 25 — Wireframing |
-| **Future Topics Unlocked** | Lesson 25 (Wireframing — visualizing what acceptance criteria describe), Lesson 34 (Sprint Planning & Backlog Grooming) |
+| **Next Lesson** | Lesson 25 Wireframing |
+| **Future Topics Unlocked** | Lesson 25 (Wireframing visualizing what acceptance criteria describe), Lesson 34 (Sprint Planning & Backlog Grooming) |
 
 ---
 
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 17 (Problem Statements) and Lesson 23 (User Stories). This lesson assumes you can write a well-formed user story satisfying INVEST — acceptance criteria are the mechanism that operationalizes the "Testable" criterion specifically, turning a story's stated capability into a concrete, verifiable definition of done.
+Lesson 17 (Problem Statements) and Lesson 23 (User Stories). This lesson assumes you can write a well-formed user story satisfying INVEST acceptance criteria are the mechanism that operationalizes the "Testable" criterion specifically, turning a story's stated capability into a concrete, verifiable definition of done.
 
 ---
 
@@ -46,8 +46,8 @@ Lesson 17 (Problem Statements) and Lesson 23 (User Stories). This lesson assumes
 
 Acceptance criteria are the specific, testable conditions a user story must satisfy to be considered complete. It's useful to place this artifact precisely relative to its neighbors, since confusion between them is common:
 
-- A user story's **"so that" clause** (Lesson 23) states the underlying value or benefit — it explains *why* the capability matters, but doesn't specify exactly what conditions must hold for the capability to be considered correctly built.
-- **Acceptance criteria** specify the exact, verifiable conditions that must be true for the story to be considered done — a concrete checklist derived from, and consistent with, the story's stated benefit.
+- A user story's **"so that" clause** (Lesson 23) states the underlying value or benefit it explains *why* the capability matters, but doesn't specify exactly what conditions must hold for the capability to be considered correctly built.
+- **Acceptance criteria** specify the exact, verifiable conditions that must be true for the story to be considered done a concrete checklist derived from, and consistent with, the story's stated benefit.
 - A **PRD's functional requirements** (Lesson 22) typically operate at a broader, feature-level scope, while acceptance criteria operate at the level of an individual, already-scoped user story.
 
 ```mermaid
@@ -98,7 +98,7 @@ For example, for a story "As a user, I want to reset my password, so that I can 
 
 > Given a user has requested a password reset and received a reset link, When they click the link and submit a new password meeting the minimum complexity requirements, Then their password should be updated and they should be able to log in with the new password.
 
-This format is valuable specifically because it forces explicitness about context (the "Given"), the specific triggering action (the "When"), and a specific, observable result (the "Then") — removing the ambiguity that a vaguer statement like "password reset should work correctly" would leave wide open to inconsistent interpretation, directly echoing Lesson 22's under-specification warning.
+This format is valuable specifically because it forces explicitness about context (the "Given"), the specific triggering action (the "When"), and a specific, observable result (the "Then") removing the ambiguity that a vaguer statement like "password reset should work correctly" would leave wide open to inconsistent interpretation, directly echoing Lesson 22's under-specification warning.
 
 ```mermaid
 %%{init: {
@@ -141,10 +141,10 @@ graph LR
 Directly extending Lesson 15's "happy path only" warning to the level of acceptance criteria, a genuinely complete set of criteria must cover more than just the smoothest, most successful scenario. A well-rounded set of acceptance criteria for a given story should include:
 
 - **The happy path**: the primary, most common scenario in which everything goes as intended.
-- **Edge cases**: less common but plausible scenarios at the boundaries of expected behavior — an unusually long input, a boundary value, a rare but valid combination of conditions.
-- **Negative scenarios**: cases where something goes wrong or a precondition isn't met — invalid input, an expired session, insufficient permissions — and what the system should do in response.
+- **Edge cases**: less common but plausible scenarios at the boundaries of expected behavior an unusually long input, a boundary value, a rare but valid combination of conditions.
+- **Negative scenarios**: cases where something goes wrong or a precondition isn't met invalid input, an expired session, insufficient permissions and what the system should do in response.
 
-A story whose acceptance criteria only cover the happy path is vulnerable to precisely the same blind spot Lesson 15 warned about for journey maps: real users, in aggregate, will encounter edge cases and error conditions with some regularity, and a story that hasn't specified expected behavior for these scenarios leaves engineering and QA to guess — usually inconsistently — what should happen, discovering the gaps only when a real user hits one in production.
+A story whose acceptance criteria only cover the happy path is vulnerable to precisely the same blind spot Lesson 15 warned about for journey maps: real users, in aggregate, will encounter edge cases and error conditions with some regularity, and a story that hasn't specified expected behavior for these scenarios leaves engineering and QA to guess usually inconsistently what should happen, discovering the gaps only when a real user hits one in production.
 
 ```mermaid
 %%{init: {
@@ -185,9 +185,9 @@ graph TD
 
 ### The "Acceptance Criteria Written After the Fact" Failure Pattern
 
-A specific, common failure — closely related to Lesson 8's discovery theater and Lesson 21's MVP theater patterns — is writing acceptance criteria only after a story has already been implemented, rather than before implementation begins. This inverts the entire purpose of the artifact: acceptance criteria's primary value is in forcing explicit, shared clarity about what "done" means *before* work starts, so that ambiguity is resolved through discussion rather than discovered through divergent interpretation during or after implementation.
+A specific, common failure closely related to Lesson 8's discovery theater and Lesson 21's MVP theater patterns is writing acceptance criteria only after a story has already been implemented, rather than before implementation begins. This inverts the entire purpose of the artifact: acceptance criteria's primary value is in forcing explicit, shared clarity about what "done" means *before* work starts, so that ambiguity is resolved through discussion rather than discovered through divergent interpretation during or after implementation.
 
-When criteria are written retroactively, they tend to simply describe whatever was actually built, rather than genuinely testing whether the built solution correctly satisfies the story's intended benefit — a practice that provides the appearance of rigor (a checklist exists) without its substance (the checklist was never actually capable of catching a mismatch between intention and implementation, since it was written to match the implementation after the fact). This is functionally identical to Lesson 8's discovery theater concept: a test that could not, even in principle, have produced a disconfirming result is not really testing anything.
+When criteria are written retroactively, they tend to simply describe whatever was actually built, rather than genuinely testing whether the built solution correctly satisfies the story's intended benefit a practice that provides the appearance of rigor (a checklist exists) without its substance (the checklist was never actually capable of catching a mismatch between intention and implementation, since it was written to match the implementation after the fact). This is functionally identical to Lesson 8's discovery theater concept: a test that could not, even in principle, have produced a disconfirming result is not really testing anything.
 
 ---
 
@@ -199,11 +199,11 @@ This leaves edge cases and negative scenarios unspecified, echoing Lesson 15's "
 
 **Mistake 2: Writing vague criteria that don't specify a concrete, observable outcome**
 
-"Password reset should work" is not an acceptance criterion in the useful sense this lesson intends — it fails to specify the given context, the triggering action, and the specific expected result with enough precision to be genuinely testable.
+"Password reset should work" is not an acceptance criterion in the useful sense this lesson intends it fails to specify the given context, the triggering action, and the specific expected result with enough precision to be genuinely testable.
 
 **Mistake 3: Over-specifying implementation details within acceptance criteria**
 
-Just as Lesson 22 warned against over-specification in a PRD, acceptance criteria should specify observable behavior and outcomes, not dictate a specific technical implementation approach — the "Then" clause should describe what should be true, not how the system should internally achieve it.
+Just as Lesson 22 warned against over-specification in a PRD, acceptance criteria should specify observable behavior and outcomes, not dictate a specific technical implementation approach the "Then" clause should describe what should be true, not how the system should internally achieve it.
 
 **Mistake 4: Writing acceptance criteria after implementation is already complete**
 
@@ -218,7 +218,7 @@ Acceptance criteria specify the conditions for done, but the underlying benefit 
 
 ## Mental Model: The Acceptance Criteria Coverage Map
 
-This lesson's mental model is the **Acceptance Criteria Coverage Map** — a simple discipline for checking that a story's criteria genuinely cover the happy path, edge cases, and negative scenarios, rather than only the most obvious scenario.
+This lesson's mental model is the **Acceptance Criteria Coverage Map** a simple discipline for checking that a story's criteria genuinely cover the happy path, edge cases, and negative scenarios, rather than only the most obvious scenario.
 
 ```mermaid
 %%{init: {
@@ -255,7 +255,7 @@ graph TD
     A[User Story] --> B{Have Criteria Been Written<br/>for the Primary Happy Path?}
     A --> C{Have Criteria Been Written for<br/>at Least One Plausible Edge Case?}
     A --> D{Have Criteria Been Written for at<br/>Least One Negative/error Scenario?}
-    B --> E[Coverage Map Complete —<br/>Genuine Testable Definition of Done]
+    B --> E[Coverage Map Complete <br/>Genuine Testable Definition of Done]
     C --> E
     D --> E
 ```
@@ -266,7 +266,7 @@ Before considering a story's acceptance criteria finished, explicitly check all 
 
 ## Real Company Example
 
-**Cucumber** and the broader behavior-driven development (BDD) community's widespread adoption of Given/When/Then syntax across the software industry is itself the clearest illustration of this lesson's core technique — the format has become common practice specifically because it forces the explicit precondition/action/outcome structure this lesson emphasizes, adopted by engineering and product teams across a wide range of companies (from small startups to large enterprises) precisely because ambiguous, prose-only acceptance criteria were found, repeatedly and across many different organizational contexts, to produce inconsistent implementation and testing outcomes.
+**Cucumber** and the broader behavior-driven development (BDD) community's widespread adoption of Given/When/Then syntax across the software industry is itself the clearest illustration of this lesson's core technique the format has become common practice specifically because it forces the explicit precondition/action/outcome structure this lesson emphasizes, adopted by engineering and product teams across a wide range of companies (from small startups to large enterprises) precisely because ambiguous, prose-only acceptance criteria were found, repeatedly and across many different organizational contexts, to produce inconsistent implementation and testing outcomes.
 
 - Given/When/Then syntax emerged from the BDD community as a structured way to write acceptance criteria that removes ambiguity about preconditions, actions, and expected outcomes.
 - The format has been widely adopted across the software industry precisely because it forces explicit clarity before implementation begins.
@@ -279,7 +279,7 @@ Before considering a story's acceptance criteria finished, explicitly check all 
 ## Real World Perspective: Acceptance Criteria at Different Company Stages
 
 **At a startup:**
-Acceptance criteria are often written more informally, sometimes as a brief bullet list rather than strict Given/When/Then syntax, given close collaboration and shared context among a small team — the core discipline (specifying concrete, testable outcomes before implementation, covering more than just the happy path) remains valuable even without rigid adherence to formal syntax.
+Acceptance criteria are often written more informally, sometimes as a brief bullet list rather than strict Given/When/Then syntax, given close collaboration and shared context among a small team the core discipline (specifying concrete, testable outcomes before implementation, covering more than just the happy path) remains valuable even without rigid adherence to formal syntax.
 
 **At a mid-size company:**
 Acceptance criteria typically become a more standardized, expected part of every user story, often reviewed collaboratively by QA and engineering alongside the PM before implementation begins, precisely to catch ambiguous or incomplete criteria (missing edge cases, vague outcomes) before they become a source of divergent interpretation during a sprint.
@@ -295,19 +295,19 @@ Consider a simplified, illustrative scenario common across e-commerce platforms.
 
 A team implements a user story: "As a customer, I want to apply a discount code at checkout, so that I can receive a lower price on my order." The team writes a single acceptance criterion covering only the happy path: "Given a valid discount code, when the customer enters it at checkout, then the order total should be reduced by the correct discount amount." QA tests exactly this scenario, confirms it works correctly, and the story is marked complete and shipped.
 
-Within the first week after launch, customer support receives a wave of complaints: some customers report entering an expired discount code and seeing no error message at all, simply having their order proceed at full price with no indication anything was wrong; others report that entering a code twice (accidentally double-clicking "apply") resulted in the discount being applied twice, producing an unexpectedly — and incorrectly — low order total.
+Within the first week after launch, customer support receives a wave of complaints: some customers report entering an expired discount code and seeing no error message at all, simply having their order proceed at full price with no indication anything was wrong; others report that entering a code twice (accidentally double-clicking "apply") resulted in the discount being applied twice, producing an unexpectedly and incorrectly low order total.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
-1. **The acceptance criteria covered only the happy path**, leaving negative scenarios (an expired or invalid code) and edge cases (double-application of the same code) entirely unspecified — precisely the Coverage Map gap this lesson warns about.
-2. **QA tested exactly, and only, what the criteria specified.** This is not a QA failure in isolation — QA correctly verified the criteria as written — but a demonstration of why incomplete criteria produce incomplete testing: QA can only verify what has been explicitly specified as a condition of done.
+1. **The acceptance criteria covered only the happy path**, leaving negative scenarios (an expired or invalid code) and edge cases (double-application of the same code) entirely unspecified precisely the Coverage Map gap this lesson warns about.
+2. **QA tested exactly, and only, what the criteria specified.** This is not a QA failure in isolation QA correctly verified the criteria as written but a demonstration of why incomplete criteria produce incomplete testing: QA can only verify what has been explicitly specified as a condition of done.
 3. **The gaps were discovered by real users in production, rather than caught before launch**, generating support burden and a poor customer experience precisely because the acceptance criteria never asked the question "what should happen when the code is invalid, expired, or applied more than once?"
 
-A team applying this lesson's Coverage Map discipline from the outset would have written at least two additional criteria before implementation began: a negative scenario ("Given an expired discount code, when the customer attempts to apply it, then a clear error message should be displayed and the order total should remain unchanged") and an edge case ("Given a discount code has already been successfully applied to the current order, when the customer attempts to apply it again, then the system should prevent a second application and display an appropriate message") — very likely surfacing and resolving both issues before launch, at a small fraction of the cost of the subsequent support burden and customer frustration.
+A team applying this lesson's Coverage Map discipline from the outset would have written at least two additional criteria before implementation began: a negative scenario ("Given an expired discount code, when the customer attempts to apply it, then a clear error message should be displayed and the order total should remain unchanged") and an edge case ("Given a discount code has already been successfully applied to the current order, when the customer attempts to apply it again, then the system should prevent a second application and display an appropriate message") very likely surfacing and resolving both issues before launch, at a small fraction of the cost of the subsequent support burden and customer frustration.
 
-This case connects directly back to **Lesson 15's "happy path only" journey-mapping warning**: the same underlying blind spot — building and verifying only the smoothest, most successful scenario — recurs here at the level of individual story verification, with the same fundamental corrective: deliberately seek out and specify the messier, less convenient scenarios before they're discovered the hard way.
+This case connects directly back to **Lesson 15's "happy path only" journey-mapping warning**: the same underlying blind spot building and verifying only the smoothest, most successful scenario recurs here at the level of individual story verification, with the same fundamental corrective: deliberately seek out and specify the messier, less convenient scenarios before they're discovered the hard way.
 
 ---
 
@@ -342,7 +342,7 @@ A set of acceptance criteria that fails several of these checks provides, at bes
 
 ## Summary
 
-Acceptance criteria are the specific, testable conditions that define when a user story is complete, sitting between a story's stated "so that" benefit and the broader functional requirements of a PRD, and operationalizing specifically the "Testable" INVEST criterion from Lesson 23. The Given/When/Then format structures criteria around a specific precondition, a specific triggering action, and a specific, observable outcome, removing the ambiguity that vaguer statements would leave open. A complete set of criteria must cover the happy path, meaningful edge cases, and negative scenarios — not just the smoothest, most successful case — directly extending Lesson 15's "happy path only" warning to the level of story verification, and this lesson's Detailed Case Study shows the real cost (production-discovered bugs, customer support burden) of skipping edge case and negative scenario coverage. The "acceptance criteria written after the fact" failure pattern — writing criteria only after implementation is complete — inverts the artifact's purpose, providing the appearance of a testable definition of done without the substance of having actually forced clarity before work began, directly echoing Lesson 8's discovery theater concept.
+Acceptance criteria are the specific, testable conditions that define when a user story is complete, sitting between a story's stated "so that" benefit and the broader functional requirements of a PRD, and operationalizing specifically the "Testable" INVEST criterion from Lesson 23. The Given/When/Then format structures criteria around a specific precondition, a specific triggering action, and a specific, observable outcome, removing the ambiguity that vaguer statements would leave open. A complete set of criteria must cover the happy path, meaningful edge cases, and negative scenarios not just the smoothest, most successful case directly extending Lesson 15's "happy path only" warning to the level of story verification, and this lesson's Detailed Case Study shows the real cost (production-discovered bugs, customer support burden) of skipping edge case and negative scenario coverage. The "acceptance criteria written after the fact" failure pattern writing criteria only after implementation is complete inverts the artifact's purpose, providing the appearance of a testable definition of done without the substance of having actually forced clarity before work began, directly echoing Lesson 8's discovery theater concept.
 
 ---
 
@@ -350,10 +350,10 @@ Acceptance criteria are the specific, testable conditions that define when a use
 
 - Acceptance criteria are specific, testable conditions defining when a user story is complete, sitting between a story's "so that" benefit and a PRD's broader functional requirements.
 - The Given/When/Then format structures criteria around a specific precondition, action, and observable outcome, removing ambiguity that vaguer statements would leave open.
-- A complete criteria set covers the happy path, meaningful edge cases, and negative scenarios — not just the smoothest, most successful scenario.
+- A complete criteria set covers the happy path, meaningful edge cases, and negative scenarios not just the smoothest, most successful scenario.
 - The "acceptance criteria written after the fact" failure pattern inverts the artifact's purpose, providing the appearance of rigor without its substance, echoing Lesson 8's discovery theater concept.
 - Criteria should specify observable behavior and outcomes without dictating specific technical implementation, extending Lesson 22's Precision Dial to a more granular level.
-- QA can only verify what has been explicitly specified — incomplete criteria produce incomplete testing, as shown in this lesson's Detailed Case Study.
+- QA can only verify what has been explicitly specified incomplete criteria produce incomplete testing, as shown in this lesson's Detailed Case Study.
 - Every criterion should plausibly connect back to the story's stated "so that" benefit, keeping technical correctness anchored to genuine user value.
 
 ---
@@ -364,10 +364,10 @@ Acceptance criteria are the specific, testable conditions that define when a use
 
 - **Acceptance criteria** = specific, testable conditions defining "done" for a user story.
 - **Given/When/Then:** precondition → triggering action → specific, observable outcome.
-- **Coverage Map:** happy path + edge cases + negative scenarios — not just the smooth path.
-- **Write criteria before implementation, not after** — retroactive criteria provide appearance without substance (discovery theater).
-- **Specify behavior, not implementation** — Lesson 22's Precision Dial, applied at the criteria level.
-- **QA only verifies what's specified** — incomplete criteria = incomplete testing = production-discovered gaps.
+- **Coverage Map:** happy path + edge cases + negative scenarios not just the smooth path.
+- **Write criteria before implementation, not after** retroactive criteria provide appearance without substance (discovery theater).
+- **Specify behavior, not implementation** Lesson 22's Precision Dial, applied at the criteria level.
+- **QA only verifies what's specified** incomplete criteria = incomplete testing = production-discovered gaps.
 
 ---
 
@@ -387,8 +387,8 @@ Acceptance criteria are the specific, testable conditions that define when a use
 ## Further Reading / Resources
 
 - Dan North's original writing introducing the Given/When/Then format in the context of behavior-driven development, the direct source of this lesson's core technique.
-- Mike Cohn, *User Stories Applied* — extends the user story format (Lesson 23) directly into acceptance criteria practice.
-- Gojko Adzic, *Specification by Example* — a detailed treatment of writing concrete, testable acceptance criteria collaboratively before implementation, closely related to this lesson's core discipline.
+- Mike Cohn, *User Stories Applied* extends the user story format (Lesson 23) directly into acceptance criteria practice.
+- Gojko Adzic, *Specification by Example* a detailed treatment of writing concrete, testable acceptance criteria collaboratively before implementation, closely related to this lesson's core discipline.
 
 ---
 
@@ -396,7 +396,7 @@ Acceptance criteria are the specific, testable conditions that define when a use
 
 **Card 1**
 - Front: What are acceptance criteria, and where do they sit relative to a user story and a PRD?
-- Back: The specific, testable conditions defining when a user story is complete — more granular than a PRD's functional requirements, and operationalizing a story's "Testable" INVEST criterion specifically.
+- Back: The specific, testable conditions defining when a user story is complete more granular than a PRD's functional requirements, and operationalizing a story's "Testable" INVEST criterion specifically.
 - Difficulty: 1
 - Tags: acceptance-criteria-definition
 
@@ -414,19 +414,19 @@ Acceptance criteria are the specific, testable conditions that define when a use
 
 **Card 4**
 - Front: What is the "acceptance criteria written after the fact" failure pattern?
-- Back: Writing criteria only after implementation is complete, which inverts the artifact's purpose — providing the appearance of a testable definition of done without the substance of having forced clarity before work began.
+- Back: Writing criteria only after implementation is complete, which inverts the artifact's purpose providing the appearance of a testable definition of done without the substance of having forced clarity before work began.
 - Difficulty: 2
 - Tags: after-the-fact-failure
 
 **Card 5**
 - Front: Why should acceptance criteria specify observable behavior rather than implementation details?
-- Back: This applies Lesson 22's Precision Dial at a more granular level — specifying the what/outcome while leaving the how (technical implementation) to engineering expertise.
+- Back: This applies Lesson 22's Precision Dial at a more granular level specifying the what/outcome while leaving the how (technical implementation) to engineering expertise.
 - Difficulty: 2
 - Tags: precision-in-criteria
 
 **Card 6**
 - Front: In the Detailed Case Study, what two specific gaps in the discount-code story's acceptance criteria caused production issues?
-- Back: No criterion covered an expired/invalid discount code (a negative scenario), and no criterion covered applying the same code twice (an edge case) — only the happy path (a valid code applied once) was specified.
+- Back: No criterion covered an expired/invalid discount code (a negative scenario), and no criterion covered applying the same code twice (an edge case) only the happy path (a valid code applied once) was specified.
 - Difficulty: 3
 - Tags: case-study
 
@@ -449,7 +449,7 @@ Work through the following, in writing, before reading further:
 4. Review your three criteria against the Acceptance Criteria Quality Checklist: are they specific and testable, do they avoid dictating implementation details, and do they each connect back to the story's "so that" benefit?
 5. Identify one additional edge case or negative scenario not covered by your three criteria, and explain why it might matter based on real-world usage patterns.
 
-There is no single correct answer. The purpose of this exercise is to practice applying the Coverage Map discipline — happy path, edge cases, and negative scenarios — before implementation begins, rather than discovering gaps after real users encounter them.
+There is no single correct answer. The purpose of this exercise is to practice applying the Coverage Map discipline happy path, edge cases, and negative scenarios before implementation begins, rather than discovering gaps after real users encounter them.
 
 ---
 
@@ -462,7 +462,7 @@ C) The testable conditions that define when a story is done
 D) The organisation's overall mission statement and purpose
 
 *Correct answer: C*
-*Explanation: They sit below the story's "so that" benefit and above nothing else — a concrete checklist for one already-scoped capability, narrower than a PRD's feature-level requirements.*
+*Explanation: They sit below the story's "so that" benefit and above nothing else a concrete checklist for one already-scoped capability, narrower than a PRD's feature-level requirements.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -624,7 +624,7 @@ D) The criteria likely lacked this edge case; check the Coverage Map for gaps
 
 ---
 
-**14. (Product Thinking, Higher Difficulty) A team's acceptance criteria are written using strict Given/When/Then format, cover happy path, edge cases, and negative scenarios, and were finalized before implementation began — but none of the criteria reference the story's stated "so that" benefit at all. What potential issue does this raise, according to this lesson?**
+**14. (Product Thinking, Higher Difficulty) A team's acceptance criteria are written using strict Given/When/Then format, cover happy path, edge cases, and negative scenarios, and were finalized before implementation began but none of the criteria reference the story's stated "so that" benefit at all. What potential issue does this raise, according to this lesson?**
 A) No issue; Given/When/Then alone guarantees a complete correct set
 B) Well-formed criteria can still miss whether they serve the story's actual value
 C) The "so that" clause should be removed once criteria are written
@@ -654,9 +654,9 @@ D) Raise it with the PM and revise the wording, preserving the intent
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 23 — User Stories | Operationalizes specifically the "Testable" INVEST criterion into concrete, verifiable conditions |
-| **Current Lesson** | Lesson 24 — Acceptance Criteria | Given/When/Then format; happy path/edge case/negative scenario coverage; the "written after the fact" failure pattern |
-| **Next Lesson** | Lesson 25 — Wireframing | Begins visualizing the specific interface behavior that acceptance criteria describe in text |
+| **Previous Lesson** | Lesson 23 User Stories | Operationalizes specifically the "Testable" INVEST criterion into concrete, verifiable conditions |
+| **Current Lesson** | Lesson 24 Acceptance Criteria | Given/When/Then format; happy path/edge case/negative scenario coverage; the "written after the fact" failure pattern |
+| **Next Lesson** | Lesson 25 Wireframing | Begins visualizing the specific interface behavior that acceptance criteria describe in text |
 | **Future Concepts Unlocked** | Lesson 34 (Sprint Planning & Backlog Grooming) | Uses well-defined acceptance criteria as a prerequisite for confidently estimating and committing to stories within a sprint |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a story being "done" assumes an explicit, pre-written set of acceptance criteria covering happy path, edge cases, and negative scenarios — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a story being "done" assumes an explicit, pre-written set of acceptance criteria covering happy path, edge cases, and negative scenarios this will not be re-explained, only re-applied.

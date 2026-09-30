@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 11 established the theory: qualitative research answers why/how questions, revealed preference beats stated preference, and several specific biases (confirmation bias, leading questions, social desirability bias, the "would you use this" trap) distort findings if not deliberately controlled for. This lesson is where that theory becomes a skill you can actually execute in a room — or on a call — with a real person, in real time, under the real pressure of wanting to hear a particular answer.
+Lesson 11 established the theory: qualitative research answers why/how questions, revealed preference beats stated preference, and several specific biases (confirmation bias, leading questions, social desirability bias, the "would you use this" trap) distort findings if not deliberately controlled for. This lesson is where that theory becomes a skill you can actually execute in a room or on a call with a real person, in real time, under the real pressure of wanting to hear a particular answer.
 
-**A customer interview** is a structured, one-on-one conversation designed to surface a person's actual past behavior, context, and reasoning — not their opinions about hypothetical futures, and not a pitch dressed up as a conversation. The central discipline of a good interview is almost the opposite of what feels natural in a normal conversation: instead of asking what someone thinks, wants, or would do, a skilled interviewer asks about what someone has actually done, in as much concrete, specific detail as possible, because specific past behavior is a form of revealed preference (Lesson 11) that is far more reliable than a hypothetical opinion.
+**A customer interview** is a structured, one-on-one conversation designed to surface a person's actual past behavior, context, and reasoning not their opinions about hypothetical futures, and not a pitch dressed up as a conversation. The central discipline of a good interview is almost the opposite of what feels natural in a normal conversation: instead of asking what someone thinks, wants, or would do, a skilled interviewer asks about what someone has actually done, in as much concrete, specific detail as possible, because specific past behavior is a form of revealed preference (Lesson 11) that is far more reliable than a hypothetical opinion.
 
-This lesson matters because customer interviews are simultaneously the most commonly used and the most commonly misused research method in product work. Nearly every PM conducts interviews at some point; comparatively few conduct them in a way that reliably produces trustworthy evidence rather than a comfortable, leading, self-fulfilling conversation. The gap between a good interview and a bad one is not raw talent — it is a specific, learnable set of techniques, which this lesson covers directly.
+This lesson matters because customer interviews are simultaneously the most commonly used and the most commonly misused research method in product work. Nearly every PM conducts interviews at some point; comparatively few conduct them in a way that reliably produces trustworthy evidence rather than a comfortable, leading, self-fulfilling conversation. The gap between a good interview and a bad one is not raw talent it is a specific, learnable set of techniques, which this lesson covers directly.
 
 ---
 
@@ -14,13 +14,13 @@ This lesson matters because customer interviews are simultaneously the most comm
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 12 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 6 (Jobs To Be Done), Lesson 11 (User Research) |
-| **Next Lesson** | Lesson 13 — Surveys |
-| **Future Topics Unlocked** | Lesson 13 (Surveys — the quantitative complement to interviews), Lesson 14 (Personas — built from interview synthesis), Lesson 16 (Pain Points), Lesson 17 (Problem Statements) |
+| **Next Lesson** | Lesson 13 Surveys |
+| **Future Topics Unlocked** | Lesson 13 (Surveys the quantitative complement to interviews), Lesson 14 (Personas built from interview synthesis), Lesson 16 (Pain Points), Lesson 17 (Problem Statements) |
 
 ---
 
@@ -52,7 +52,7 @@ The single most important technical skill in customer interviewing is the discip
 - **Opinion (weak)**: "What do you think about budgeting apps in general?"
 - **Past behavior (strong)**: "Tell me about the last time you tried to stick to a budget. Walk me through exactly what happened."
 
-The past-behavior question is dramatically more reliable, for reasons directly tied to Lesson 11's stated-versus-revealed-preference distinction: a hypothetical question asks someone to predict their own future behavior, which people are demonstrably bad at, and costs nothing to answer generously; an opinion question invites abstract, socially acceptable answers disconnected from lived experience; a past-behavior question asks for a specific, real memory, which is far harder to answer with a comfortable, generic platitude, and which tends to surface concrete detail — including friction, workarounds, and abandoned attempts — that a hypothetical question would never reveal.
+The past-behavior question is dramatically more reliable, for reasons directly tied to Lesson 11's stated-versus-revealed-preference distinction: a hypothetical question asks someone to predict their own future behavior, which people are demonstrably bad at, and costs nothing to answer generously; an opinion question invites abstract, socially acceptable answers disconnected from lived experience; a past-behavior question asks for a specific, real memory, which is far harder to answer with a comfortable, generic platitude, and which tends to surface concrete detail including friction, workarounds, and abandoned attempts that a hypothetical question would never reveal.
 
 ```mermaid
 %%{init: {
@@ -98,37 +98,37 @@ graph TD
 
 A particularly powerful, structured application of past-behavior questioning is the **switch interview** (closely associated with Bob Moesta's applied Jobs to Be Done work, previewed in Lesson 6's Forces of Progress model), which focuses specifically on the moment someone adopted, or seriously considered adopting, a new solution. The structure moves through a specific sequence:
 
-1. **First thought**: "When did you first start thinking you might need something like this?" — establishing the earliest moment of dissatisfaction (the Push force from Lesson 6).
+1. **First thought**: "When did you first start thinking you might need something like this?" establishing the earliest moment of dissatisfaction (the Push force from Lesson 6).
 2. **Passive looking**: "What did you do next? Did you look into any options at that point, even casually?"
-3. **Active looking**: "What made you go from casually considering this to actually seriously looking for a solution?" — often revealing a specific triggering event, not a gradual, generic realization.
-4. **Deciding**: "Walk me through how you actually chose [this solution] over the alternatives you were considering." — surfacing the Pull force and the specific comparison being made.
-5. **Anxiety and habit at the moment of commitment**: "What almost stopped you from going through with it?" — directly surfacing the Anxiety and Habit forces from Lesson 6's Forces of Progress model.
+3. **Active looking**: "What made you go from casually considering this to actually seriously looking for a solution?" often revealing a specific triggering event, not a gradual, generic realization.
+4. **Deciding**: "Walk me through how you actually chose [this solution] over the alternatives you were considering." surfacing the Pull force and the specific comparison being made.
+5. **Anxiety and habit at the moment of commitment**: "What almost stopped you from going through with it?" directly surfacing the Anxiety and Habit forces from Lesson 6's Forces of Progress model.
 
-This structure is powerful precisely because it anchors the entire conversation in a real, specific, already-completed event, rather than a general opinion or a hypothetical scenario — every question asks about something that actually happened, in a particular order, which the respondent can recall concretely rather than construct on the spot.
+This structure is powerful precisely because it anchors the entire conversation in a real, specific, already-completed event, rather than a general opinion or a hypothetical scenario every question asks about something that actually happened, in a particular order, which the respondent can recall concretely rather than construct on the spot.
 
 ### Common Interviewer Mistakes
 
 **Leading questions** (introduced in Lesson 11) remain the most pervasive interviewing mistake, but several additional, interview-specific mistakes deserve direct attention:
 
-- **Pitching instead of listening.** An interviewer excited about their own product idea often unconsciously turns an interview into a sales pitch — describing the proposed solution and gauging reaction, rather than first fully understanding the respondent's existing behavior and pain independent of any proposed solution. Once a solution has been described, the respondent's subsequent answers are contaminated by anchoring toward that specific solution, making it much harder to learn what they would have said, or wanted, absent that framing.
-- **Accepting vague answers.** A respondent saying "it was frustrating" or "I just wanted it to be easier" is common, and an inexperienced interviewer often moves on, treating this as sufficient detail. A skilled interviewer follows up specifically: "What does 'frustrating' mean, concretely — what happened, step by step, that felt frustrating?" Vague language is a signal to dig deeper, not a finished answer.
-- **Interviewing only easy-to-reach participants.** Directly echoing Lesson 11's representativeness concern, interviews conducted only with the most available, most enthusiastic, or most vocal customers systematically miss the perspectives — often including churned users, skeptical prospects, or quietly dissatisfied customers — that would most challenge the team's existing assumptions.
-- **Filling silence too quickly.** When a respondent pauses after a question, an uncomfortable-feeling silence often tempts the interviewer to jump in with a clarifying suggestion or a multiple-choice-style prompt. This frequently short-circuits the respondent's own, more genuine train of thought — deliberately tolerating a few seconds of silence often produces a more considered, more useful answer than immediately rescuing the respondent from having to think.
+- **Pitching instead of listening.** An interviewer excited about their own product idea often unconsciously turns an interview into a sales pitch describing the proposed solution and gauging reaction, rather than first fully understanding the respondent's existing behavior and pain independent of any proposed solution. Once a solution has been described, the respondent's subsequent answers are contaminated by anchoring toward that specific solution, making it much harder to learn what they would have said, or wanted, absent that framing.
+- **Accepting vague answers.** A respondent saying "it was frustrating" or "I just wanted it to be easier" is common, and an inexperienced interviewer often moves on, treating this as sufficient detail. A skilled interviewer follows up specifically: "What does 'frustrating' mean, concretely what happened, step by step, that felt frustrating?" Vague language is a signal to dig deeper, not a finished answer.
+- **Interviewing only easy-to-reach participants.** Directly echoing Lesson 11's representativeness concern, interviews conducted only with the most available, most enthusiastic, or most vocal customers systematically miss the perspectives often including churned users, skeptical prospects, or quietly dissatisfied customers that would most challenge the team's existing assumptions.
+- **Filling silence too quickly.** When a respondent pauses after a question, an uncomfortable-feeling silence often tempts the interviewer to jump in with a clarifying suggestion or a multiple-choice-style prompt. This frequently short-circuits the respondent's own, more genuine train of thought deliberately tolerating a few seconds of silence often produces a more considered, more useful answer than immediately rescuing the respondent from having to think.
 
 ### Discovery Interviews vs. Usability Interviews
 
-A conceptually important distinction, often blurred in practice: a **discovery interview** aims to understand a person's existing behavior, context, and needs — usually before a specific solution exists, or independent of one — while a **usability interview** (more precisely, a usability test conducted with an interview component) aims to observe how a person interacts with a specific, already-built prototype or product, to identify points of confusion or friction.
+A conceptually important distinction, often blurred in practice: a **discovery interview** aims to understand a person's existing behavior, context, and needs usually before a specific solution exists, or independent of one while a **usability interview** (more precisely, a usability test conducted with an interview component) aims to observe how a person interacts with a specific, already-built prototype or product, to identify points of confusion or friction.
 
-Conflating these two produces a specific, recognizable failure: a session framed as "discovery" that spends most of its time reacting to a shown prototype has, without anyone quite deciding to make this trade, actually become a usability session — collecting reactions to a specific proposed solution rather than the more foundational, solution-independent understanding discovery is meant to produce. Neither type of session is superior; they simply answer different questions, and a PM should be deliberate about which one they are running in a given conversation, rather than drifting between the two without noticing.
+Conflating these two produces a specific, recognizable failure: a session framed as "discovery" that spends most of its time reacting to a shown prototype has, without anyone quite deciding to make this trade, actually become a usability session collecting reactions to a specific proposed solution rather than the more foundational, solution-independent understanding discovery is meant to produce. Neither type of session is superior; they simply answer different questions, and a PM should be deliberate about which one they are running in a given conversation, rather than drifting between the two without noticing.
 
 ### Digging Deeper: The Five Whys and the Power of Silence
 
 Two specific, complementary techniques help move a conversation from a surface-level answer to a genuinely underlying one, directly extending Lesson 6's laddering technique into live interview practice:
 
-- **The Five Whys**: repeatedly asking "why" (or a softer equivalent, like "what made that important to you?") in response to a stated reason, until reaching an explanation that feels genuinely foundational rather than another intermediate justification. As in Lesson 6, this has a natural stopping point — the most specific, stable explanation, not the most abstract one imaginable.
+- **The Five Whys**: repeatedly asking "why" (or a softer equivalent, like "what made that important to you?") in response to a stated reason, until reaching an explanation that feels genuinely foundational rather than another intermediate justification. As in Lesson 6, this has a natural stopping point the most specific, stable explanation, not the most abstract one imaginable.
 - **Tolerating silence**: as described above, resisting the urge to fill a pause immediately after asking a question, giving the respondent genuine space to think past their first, most readily available answer.
 
-Used together, these techniques counteract a natural tendency in conversation — both interviewer and respondent are inclined to treat the first plausible-sounding answer as sufficient and move on — that, left unchecked, produces exactly the kind of surface-level, insufficiently specific finding this lesson (and Lesson 11) warns against.
+Used together, these techniques counteract a natural tendency in conversation both interviewer and respondent are inclined to treat the first plausible-sounding answer as sufficient and move on that, left unchecked, produces exactly the kind of surface-level, insufficiently specific finding this lesson (and Lesson 11) warns against.
 
 ---
 
@@ -136,7 +136,7 @@ Used together, these techniques counteract a natural tendency in conversation �
 
 **Mistake 1: Asking "would you use this?" partway through an interview, then treating the answer as reliable evidence**
 
-As covered in Lesson 11, this remains one of the single most reliable ways to generate falsely confident, stated-preference-only validation — an interview format doesn't inoculate against this trap; it requires the same discipline of avoiding hypothetical framing.
+As covered in Lesson 11, this remains one of the single most reliable ways to generate falsely confident, stated-preference-only validation an interview format doesn't inoculate against this trap; it requires the same discipline of avoiding hypothetical framing.
 
 **Mistake 2: Describing the proposed solution before fully understanding the respondent's existing behavior**
 
@@ -144,11 +144,11 @@ Once a solution is on the table, every subsequent answer is anchored to it, maki
 
 **Mistake 3: Treating a vague answer as a complete answer**
 
-"It's frustrating" or "I wish it were easier" are starting points, not findings — a skilled interviewer follows up for concrete, specific detail rather than recording the vague version as the finding itself.
+"It's frustrating" or "I wish it were easier" are starting points, not findings a skilled interviewer follows up for concrete, specific detail rather than recording the vague version as the finding itself.
 
 **Mistake 4: Recruiting only friendly, easy-to-reach participants**
 
-This produces exactly the unrepresentative sample problem from Lesson 11 — a systematic bias toward the perspectives of people already inclined to be positive and engaged, at the expense of skeptics, churned users, or people who never adopted the product at all.
+This produces exactly the unrepresentative sample problem from Lesson 11 a systematic bias toward the perspectives of people already inclined to be positive and engaged, at the expense of skeptics, churned users, or people who never adopted the product at all.
 
 **Mistake 5: Rushing past silence**
 
@@ -159,7 +159,7 @@ Jumping in to rescue a respondent from a pause, or offering a multiple-choice-st
 
 ## Mental Model: The Interview Depth Staircase
 
-This lesson's mental model is the **Interview Depth Staircase** — a way of visualizing how a single topic should be progressively deepened across a conversation, rather than left at its first, surface-level answer.
+This lesson's mental model is the **Interview Depth Staircase** a way of visualizing how a single topic should be progressively deepened across a conversation, rather than left at its first, surface-level answer.
 
 ```mermaid
 %%{init: {
@@ -199,15 +199,15 @@ graph BT
     D --> E[Step 5: Forces of Progress What Almost<br/>Stopped You, or What Finally Pushed You<br/>to Act?]
 ```
 
-Use this staircase as a discipline for noticing when a conversation has stalled on a lower step: if you find yourself recording "it was frustrating" as if it were a complete insight, you have stopped on Step 1, and the techniques covered in this lesson — concrete follow-up questions, the Five Whys, and tolerating silence — are specifically what climb the remaining steps.
+Use this staircase as a discipline for noticing when a conversation has stalled on a lower step: if you find yourself recording "it was frustrating" as if it were a complete insight, you have stopped on Step 1, and the techniques covered in this lesson concrete follow-up questions, the Five Whys, and tolerating silence are specifically what climb the remaining steps.
 
 ---
 
 ## Real Company Example
 
-**Intuit** (maker of QuickBooks and TurboTax) runs a company-wide practice called "Follow Me Home," started by co-founder Scott Cook in the company's early days: an employee would wait at a retail store until a customer bought an Intuit product, then ask permission to go watch them actually use it in their own home or office. The practice has been continuously in use since — Intuit's own product blog and design-award case studies describe employees across the company, not just researchers, still conducting Follow Me Home sessions as a standard part of "Design for Delight," the company's internal innovation methodology.
+**Intuit** (maker of QuickBooks and TurboTax) runs a company-wide practice called "Follow Me Home," started by co-founder Scott Cook in the company's early days: an employee would wait at a retail store until a customer bought an Intuit product, then ask permission to go watch them actually use it in their own home or office. The practice has been continuously in use since Intuit's own product blog and design-award case studies describe employees across the company, not just researchers, still conducting Follow Me Home sessions as a standard part of "Design for Delight," the company's internal innovation methodology.
 
-The reason Follow Me Home is a sharper example than a standard interview is precisely the distinction this lesson draws between recalled behavior and observed behavior: Cook's stated reasoning for the practice was that customers are often unwilling or unable to accurately recall the specific friction they hit while using software, so watching them in their actual working environment — with its real interruptions, real workarounds, and real second monitor full of a different task entirely — surfaces problems a conference-room interview alone would miss. It pairs direct observation with interview questions in real time, rather than treating either alone as sufficient.
+The reason Follow Me Home is a sharper example than a standard interview is precisely the distinction this lesson draws between recalled behavior and observed behavior: Cook's stated reasoning for the practice was that customers are often unwilling or unable to accurately recall the specific friction they hit while using software, so watching them in their actual working environment with its real interruptions, real workarounds, and real second monitor full of a different task entirely surfaces problems a conference-room interview alone would miss. It pairs direct observation with interview questions in real time, rather than treating either alone as sufficient.
 
 *(Source: Intuit's own product blog and multiple independently reported accounts of the program's 1989 origin and continued company-wide use are consistent on these specifics. This curriculum does not claim certainty about the exact current scale or frequency of the program.)*
 
@@ -216,10 +216,10 @@ The reason Follow Me Home is a sharper example than a standard interview is prec
 ## Real World Perspective: Customer Interviews at Different Company Stages
 
 **At a startup:**
-Customer interviews are often the primary, sometimes only, research method available, given limited resources, and founders frequently conduct these interviews personally in the earliest stages. The central risk at this stage is the "pitching instead of listening" mistake — a founder deeply attached to their own idea can find it especially difficult to resist describing the solution early and anchoring the conversation toward validating it, rather than first understanding the respondent's independent experience.
+Customer interviews are often the primary, sometimes only, research method available, given limited resources, and founders frequently conduct these interviews personally in the earliest stages. The central risk at this stage is the "pitching instead of listening" mistake a founder deeply attached to their own idea can find it especially difficult to resist describing the solution early and anchoring the conversation toward validating it, rather than first understanding the respondent's independent experience.
 
 **At a mid-size company:**
-Interviews are often conducted by dedicated researchers or research-trained PMs, using more standardized interview guides and recruitment processes designed specifically to counteract the representativeness problem — deliberately including skeptics, churned users, and less-engaged customers rather than relying on convenient, self-selected volunteers.
+Interviews are often conducted by dedicated researchers or research-trained PMs, using more standardized interview guides and recruitment processes designed specifically to counteract the representativeness problem deliberately including skeptics, churned users, and less-engaged customers rather than relying on convenient, self-selected volunteers.
 
 **At Big Tech:**
 Interviews at this scale are often used specifically to generate and refine hypotheses that will subsequently be tested quantitatively at scale (directly echoing Lesson 11's complementary-methods framework), and are frequently combined with more extensive documentation, coding, and synthesis practices (formal thematic analysis across dozens or hundreds of interview transcripts) to extract patterns systematically rather than relying on an individual interviewer's impressionistic recollection of a handful of conversations.
@@ -232,7 +232,7 @@ Consider a simplified, illustrative scenario common across early-stage productiv
 
 A team building a project management tool for small creative agencies conducts a round of ten customer interviews to validate their product concept. In each interview, following an initial round of warm-up questions, the interviewer shows a working prototype and walks the respondent through its key features, asking after each one, "Does this seem useful to you?" and "Would this solve your project-tracking problems?" All ten respondents respond positively, several enthusiastically. The team proceeds confidently into a significant engineering investment.
 
-Six months after launch, adoption among the target segment is markedly lower than the interview round's enthusiasm predicted. A second round of interviews, conducted with a different, more disciplined structure — past-behavior questions asked before any prototype was shown, with the prototype withheld until the final few minutes of each conversation — reveals a different picture: most respondents' actual current project-tracking behavior was a lightweight combination of a shared spreadsheet and informal team chat messages, and several specifically mentioned that they had tried more full-featured project management tools in the past and abandoned them within weeks because the overhead of maintaining detailed task structures didn't match their agency's fast-moving, informal working style.
+Six months after launch, adoption among the target segment is markedly lower than the interview round's enthusiasm predicted. A second round of interviews, conducted with a different, more disciplined structure past-behavior questions asked before any prototype was shown, with the prototype withheld until the final few minutes of each conversation reveals a different picture: most respondents' actual current project-tracking behavior was a lightweight combination of a shared spreadsheet and informal team chat messages, and several specifically mentioned that they had tried more full-featured project management tools in the past and abandoned them within weeks because the overhead of maintaining detailed task structures didn't match their agency's fast-moving, informal working style.
 
 **What went wrong?**
 
@@ -240,9 +240,9 @@ Applying this lesson's frameworks:
 
 1. **The original interviews pitched the solution early**, anchoring every subsequent answer to a reaction about the shown prototype rather than an independent account of the respondents' actual existing behavior and pain.
 2. **"Does this seem useful?" and "Would this solve your problem?" are hypothetical, stated-preference questions**, precisely the kind Lesson 11 and this lesson both warn produce falsely confident, low-cost-to-answer-generously validation.
-3. **No past-behavior questions were asked about respondents' actual current tracking methods and any prior tool-adoption attempts**, meaning the team never surfaced the specific, highly relevant fact — a documented history of trying and abandoning similar tools — that would have directly challenged their confidence before a costly engineering investment was made.
+3. **No past-behavior questions were asked about respondents' actual current tracking methods and any prior tool-adoption attempts**, meaning the team never surfaced the specific, highly relevant fact a documented history of trying and abandoning similar tools that would have directly challenged their confidence before a costly engineering investment was made.
 
-A team applying this lesson's discipline from the outset would have started every interview with past-behavior questions about current project-tracking methods and any prior tool adoption or abandonment, withheld any prototype until well into or after that discussion, and specifically probed prior abandoned-tool experiences using the switch-interview structure — likely surfacing the agency-specific mismatch (heavyweight tool overhead versus a fast-moving, informal working style) well before committing significant engineering resources to build it.
+A team applying this lesson's discipline from the outset would have started every interview with past-behavior questions about current project-tracking methods and any prior tool adoption or abandonment, withheld any prototype until well into or after that discussion, and specifically probed prior abandoned-tool experiences using the switch-interview structure likely surfacing the agency-specific mismatch (heavyweight tool overhead versus a fast-moving, informal working style) well before committing significant engineering resources to build it.
 
 This case connects directly back to **Lesson 8's discovery theater** concept: the original interview round had the visible form of validation (ten interviews were conducted) but was structured in a way that made a negative, disconfirming result nearly impossible to surface, precisely because the questions asked were hypothetical and solution-anchored rather than past-behavior-based.
 
@@ -270,10 +270,10 @@ The critical discipline this structure enforces: **the solution reaction segment
 *What the interviewer is actually evaluating:* Whether the candidate defaults to past-behavior questions and defers solution description until late in the conversation, versus immediately describing the idea and asking for reactions. A strong answer explicitly separates a discovery segment (past behavior, no solution mentioned) from a solution-reaction segment, and explains why that ordering matters.
 
 **Typical question 2: "Tell me about an interview where you learned something you didn't expect."**
-*What the interviewer is actually evaluating:* Whether the candidate's interviewing practice actually has the capacity to surface disconfirming, non-obvious findings — echoing Lesson 11's related question — or whether every described interview conveniently confirms a pre-existing hypothesis, suggesting a pitching-not-listening pattern.
+*What the interviewer is actually evaluating:* Whether the candidate's interviewing practice actually has the capacity to surface disconfirming, non-obvious findings echoing Lesson 11's related question or whether every described interview conveniently confirms a pre-existing hypothesis, suggesting a pitching-not-listening pattern.
 
 **Typical question 3: "A respondent gives you a vague answer like 'it was just annoying.' What do you do?"**
-*What the interviewer is actually evaluating:* Fluency with the Interview Depth Staircase — whether the candidate has a concrete follow-up technique (asking for specific detail, using the Five Whys, tolerating silence) rather than accepting the vague answer and moving to the next question.
+*What the interviewer is actually evaluating:* Fluency with the Interview Depth Staircase whether the candidate has a concrete follow-up technique (asking for specific detail, using the Five Whys, tolerating silence) rather than accepting the vague answer and moving to the next question.
 
 ---
 
@@ -301,11 +301,11 @@ A customer interview is a structured conversation designed to surface specific p
 
 - **Ask about past behavior, not hypotheticals or opinions:** "Tell me about the last time..." beats "Would you use this?"
 - **Switch interview structure:** first thought → passive looking → active looking → deciding → anxiety/habit at commitment.
-- **Don't pitch before you understand** — describing a solution early anchors every later answer to it.
-- **Vague answers aren't findings** — dig deeper with the Five Whys and concrete follow-ups.
-- **Recruit beyond the easy-to-reach** — include skeptics, churned users, and the quietly dissatisfied.
-- **Tolerate silence** — don't rescue a pause with a suggestion; let the respondent think past their first answer.
-- **Discovery ≠ usability testing** — keep solution-reaction segments separate and evidentially weaker than past-behavior findings.
+- **Don't pitch before you understand** describing a solution early anchors every later answer to it.
+- **Vague answers aren't findings** dig deeper with the Five Whys and concrete follow-ups.
+- **Recruit beyond the easy-to-reach** include skeptics, churned users, and the quietly dissatisfied.
+- **Tolerate silence** don't rescue a pause with a suggestion; let the respondent think past their first answer.
+- **Discovery ≠ usability testing** keep solution-reaction segments separate and evidentially weaker than past-behavior findings.
 
 ---
 
@@ -323,9 +323,9 @@ A customer interview is a structured conversation designed to surface specific p
 
 ## Further Reading / Resources
 
-- Steve Portigal, *Interviewing Users: How to Uncover Compelling Insights* — a widely used, detailed treatment of interview technique, including handling silence and digging past vague answers.
+- Steve Portigal, *Interviewing Users: How to Uncover Compelling Insights* a widely used, detailed treatment of interview technique, including handling silence and digging past vague answers.
 - Bob Moesta and Chris Spiek's public writing on the switch interview methodology, extending the Forces of Progress model introduced in Lesson 6 into a concrete interview structure.
-- Rob Fitzpatrick, *The Mom Test* — a widely referenced, practically oriented treatment specifically focused on avoiding the "pitching instead of listening" mistake and asking questions that produce honest, rather than polite, answers.
+- Rob Fitzpatrick, *The Mom Test* a widely referenced, practically oriented treatment specifically focused on avoiding the "pitching instead of listening" mistake and asking questions that produce honest, rather than polite, answers.
 
 ---
 
@@ -369,7 +369,7 @@ A customer interview is a structured conversation designed to surface specific p
 
 **Card 7**
 - Front: In the Detailed Case Study, what specific structural change in the second interview round revealed the agency's actual tool-adoption history?
-- Back: Past-behavior questions were asked before any prototype was shown, and the prototype was withheld until the final few minutes — surfacing prior tool abandonment that the original, solution-first interviews had missed.
+- Back: Past-behavior questions were asked before any prototype was shown, and the prototype was withheld until the final few minutes surfacing prior tool abandonment that the original, solution-first interviews had missed.
 - Difficulty: 3
 - Tags: case-study
 
@@ -399,7 +399,7 @@ C) "Do you think scheduling is a common problem for small firms?"
 D) "What do you generally think about scheduling software today?"
 
 *Correct answer: B*
-*Explanation: B asks for one real, completed event. The others ask for a prediction, a generalisation about other people, and an abstract opinion — none of which the respondent has to have actually lived.*
+*Explanation: B asks for one real, completed event. The others ask for a prediction, a generalisation about other people, and an abstract opinion none of which the respondent has to have actually lived.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -536,10 +536,10 @@ D) That interviews cannot in principle produce disconfirming findings
 ---
 
 **12. (Product Thinking, Higher Difficulty) A respondent in a switch interview describes actively searching for a new tool but ultimately says, "I almost didn't switch because I was worried about losing all my existing data." Which Force of Progress (Lesson 6) does this statement most directly surface?**
-A) Push — dissatisfaction with the current way of working
-B) Pull — the attraction of the new solution on offer
-C) Anxiety — worry about a specific consequence of switching
-D) Habit — comfort with the existing, familiar approach
+A) Push dissatisfaction with the current way of working
+B) Pull the attraction of the new solution on offer
+C) Anxiety worry about a specific consequence of switching
+D) Habit comfort with the existing, familiar approach
 
 *Correct answer: C*
 *Explanation: The worry attaches to the act of switching rather than to the old tool or the new one. That is what separates Anxiety from Habit, which is inertia without a specific fear.*
@@ -591,11 +591,11 @@ D) The sessions should have been run as usability tests rather than interviews
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 11 — User Research | Provides the theoretical foundation (stated vs. revealed preference, research biases) that this lesson translates into concrete interviewing technique |
-| **Current Lesson** | Lesson 12 — Customer Interviews | Past-behavior questions; the switch interview structure; the Interview Depth Staircase; discovery vs. usability interviews |
-| **Next Lesson** | Lesson 13 — Surveys | Extends this module's research methods into the quantitative domain, addressing how to design surveys that avoid the same leading-question and stated-preference traps at scale |
+| **Previous Lesson** | Lesson 11 User Research | Provides the theoretical foundation (stated vs. revealed preference, research biases) that this lesson translates into concrete interviewing technique |
+| **Current Lesson** | Lesson 12 Customer Interviews | Past-behavior questions; the switch interview structure; the Interview Depth Staircase; discovery vs. usability interviews |
+| **Next Lesson** | Lesson 13 Surveys | Extends this module's research methods into the quantitative domain, addressing how to design surveys that avoid the same leading-question and stated-preference traps at scale |
 | **Future Concepts Unlocked** | Lesson 14 (Personas) | Uses synthesized interview findings, rather than assumption, as the required input for building accurate personas |
 | | Lesson 16 (Pain Points) | Builds directly on the concrete, specific detail surfaced through past-behavior questioning and the Interview Depth Staircase |
 | | Lesson 17 (Problem Statements) | Formalizes interview findings, combined with Lesson 6's laddering, into a structured, testable problem statement |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "what customers told us" assumes the past-behavior discipline and the discovery-versus-usability distinction covered here — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "what customers told us" assumes the past-behavior discipline and the discovery-versus-usability distinction covered here this will not be re-explained, only re-applied.

@@ -46,17 +46,31 @@ function pct(part: number, whole: number): number {
  * what this reads.
  */
 export interface OnboardingStepUserRow {
-  /** Furthest wizard step reached (1..4). NULL = account predates instrumentation. */
+  /**
+   * Furthest onboarding step reached. NULL = account predates instrumentation.
+   *
+   * Phase 4A (ADR-007) collapsed the multi-step onboarding wizard into a single screen
+   * (goal + experience), so `recordOnboardingStep` now only ever records step 1 for new
+   * accounts. The step NUMBER's meaning also changed across that boundary — a pre-4A
+   * "step 1" was the old Profile step, a post-4A "step 1" is the single goal+experience
+   * screen — so intermediate step numbers are no longer comparable across the collapse.
+   * Only the "reached onboarding (≥1) → completed" reduction is meaningful for both
+   * regimes, which is what this funnel now reports.
+   */
   onboarding_step_reached: number | null
   onboarding_completed: boolean
 }
 
-/** The four wizard steps, in order. Labels mirror `OnboardingWizard.tsx`. */
+/**
+ * Onboarding stages, in order. Since Phase 4A (ADR-007) collapsed the wizard into a single
+ * goal + experience screen, onboarding is a single step: reaching the screen. The old
+ * per-step labels were removed because the step numbers no longer describe the live flow and
+ * are not comparable across the collapse (see `OnboardingStepUserRow.onboarding_step_reached`);
+ * the meaningful signal is now reached-onboarding → completed, carried by `completed` /
+ * `pctCompleted` below.
+ */
 export const ONBOARDING_STEP_LABELS = [
-  'Step 1 · Profile',
-  'Step 2 · About You',
-  'Step 3 · Interests',
-  'Step 4 · Your Path',
+  'Reached onboarding',
 ] as const
 
 export interface OnboardingStepFunnelStage {
@@ -88,18 +102,20 @@ export interface OnboardingStepFunnel {
 }
 
 /**
- * Per-step onboarding drop-off, over the instrumented cohort only.
+ * Onboarding reach → completion, over the instrumented cohort only.
  *
- * "Instrumented" = a non-null `onboarding_step_reached`. The wizard writes the marker on
- * mount and on each advance, so any account that reached onboarding after 2026-09-27 has
- * one. A NULL marker therefore means the account predates instrumentation; per
- * IMPLEMENTATION_PLAN.md R15 those accounts are excluded and surfaced separately rather
- * than counted as having dropped out at step 0.
+ * "Instrumented" = a non-null `onboarding_step_reached`. The wizard writes the marker when
+ * the learner reaches the onboarding screen, so any account that reached onboarding after
+ * instrumentation shipped has one. A NULL marker therefore means the account predates
+ * instrumentation; per IMPLEMENTATION_PLAN.md R15 those accounts are excluded and surfaced
+ * separately rather than counted as having dropped out before onboarding.
  *
- * `reached` for step k is the count of instrumented accounts whose furthest step is ≥ k,
- * which is monotonically non-increasing in k — a genuine funnel. `completed` is a stricter
- * signal than reaching step 4: both final-screen CTAs submit, so a learner who saw step 4
- * but never launched is a real, and interesting, last-mile drop.
+ * Since Phase 4A (ADR-007) onboarding is a single screen, so `steps` holds the one
+ * "reached onboarding" stage and `reachedAtLeast(1)` counts every instrumented account. The
+ * arithmetic stays a general ≥k funnel (monotonically non-increasing) so pre-4A rows with a
+ * higher marker are still folded in as "reached onboarding" rather than dropped. `completed`
+ * is the stricter signal — a learner can reach the screen but never submit — so
+ * reached-onboarding → completed is the real last-mile drop.
  */
 export function computeOnboardingStepFunnel(
   users: OnboardingStepUserRow[]
@@ -183,6 +199,65 @@ export function computeCompletedLessonDistribution(
   }
 }
 
+// ─── Deep-dive engagement (Plan Phase 4, §4.4) ───────────────────────────────
+
+/**
+ * Progress row shape for deep-dive counting. Declared locally (rather than reusing
+ * `BaselineProgressRow`) so the funnel can read the Phase 4 `deep_dive_opened_at` marker
+ * without widening the shared baseline type, which is unit-tested against its own fixtures.
+ */
+export interface DeepDiveProgressRow {
+  user_id: string | null
+  status: string
+  deep_dive_opened_at: string | null
+}
+
+export interface DeepDiveEngagement {
+  /** Learners who have opened ≥1 lesson (a progress row exists). */
+  learnersWhoOpenedLesson: number
+  /** Learners who opened the Deep-dive on ≥1 lesson. */
+  learnersWhoOpenedDeepDive: number
+  /** Share of lesson-openers who opened a Deep-dive — the §4.4 guardrail. */
+  pctOfOpeners: number
+  /** Total lessons on which a Deep-dive was opened (marker set). */
+  lessonsWithDeepDiveOpened: number
+}
+
+/**
+ * How many learners engage with the optional Deep-dive material.
+ *
+ * IMPLEMENTATION_PLAN.md §4.4 requires depth consumption to be "observable rather than
+ * assumed", and §"Phase 4 → Guardrails" warns that a near-zero Deep-dive open rate means
+ * "the depth that is Prodily's differentiator is being abandoned" — a strategic loss even
+ * if activation improves. This computes the guardrail from the persisted first-open marker
+ * (`deep_dive_opened_at`), consent-independent per correction C2. Rows for users no longer
+ * present are ignored so a deleted account cannot inflate the count.
+ */
+export function computeDeepDiveEngagement(
+  progress: DeepDiveProgressRow[],
+  knownUserIds: Set<string>
+): DeepDiveEngagement {
+  const openers = new Set<string>()
+  const deepDivers = new Set<string>()
+  let lessonsWithDeepDive = 0
+
+  for (const row of progress) {
+    if (!row.user_id || !knownUserIds.has(row.user_id)) continue
+    openers.add(row.user_id)
+    if (row.deep_dive_opened_at) {
+      deepDivers.add(row.user_id)
+      lessonsWithDeepDive++
+    }
+  }
+
+  return {
+    learnersWhoOpenedLesson: openers.size,
+    learnersWhoOpenedDeepDive: deepDivers.size,
+    pctOfOpeners: pct(deepDivers.size, openers.size),
+    lessonsWithDeepDiveOpened: lessonsWithDeepDive,
+  }
+}
+
 // ─── The assembled activation funnel view ────────────────────────────────────
 
 export interface VerificationStage {
@@ -216,6 +291,8 @@ export interface ActivationFunnelView {
   reviewPctOfOpeners: number
   capstone: BaselineCapstoneReality
   continued: CompletedLessonDistribution
+  /** Phase 4 (§4.4): optional Deep-dive engagement among lesson-openers. */
+  deepDive: DeepDiveEngagement
   failed?: boolean
 }
 

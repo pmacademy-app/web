@@ -77,32 +77,31 @@ const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
 import {
   DEFAULT_GOAL_OPTIONS,
   DEFAULT_EXPERIENCE_OPTIONS,
-  DEFAULT_TOPIC_OPTIONS,
-  DEFAULT_PREFERENCE_OPTIONS,
-  DEFAULT_ONBOARDING_STEPS,
 } from './onboarding-defaults'
 
 // Moved to `./onboarding-defaults` (client-safe) and re-exported so existing
 // server call sites are unchanged. A browser consumer must import them from
 // that module directly — importing them from here pulls this service, the
 // service-role client and the system_settings query code into the bundle.
+// `DEFAULT_TOPIC_OPTIONS` / `DEFAULT_PREFERENCE_OPTIONS` are the reference taxonomy
+// for existing learners' onboarding attributes (Phase 4C); they are no longer part
+// of the live single-screen onboarding config but remain re-exported for consumers
+// such as `lib/personalization/path-resolver.ts`.
 export {
   DEFAULT_GOAL_OPTIONS,
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
-  DEFAULT_ONBOARDING_STEPS,
 } from './onboarding-defaults'
 
 
+// Phase 4C: the live onboarding is a single screen collecting goal + experience only,
+// so the configurable settings model exposes exactly those two option groups.
 const DEFAULT_ONBOARDING_SETTINGS: OnboardingSettings = {
   enabled: true,
-  steps: DEFAULT_ONBOARDING_STEPS,
   fieldOptions: {
     goal: DEFAULT_GOAL_OPTIONS,
     experience_level: DEFAULT_EXPERIENCE_OPTIONS,
-    topics: DEFAULT_TOPIC_OPTIONS,
-    learning_preference: DEFAULT_PREFERENCE_OPTIONS,
   },
 }
 
@@ -276,14 +275,10 @@ export class SettingsService {
   public static async getOnboardingSettings(): Promise<OnboardingSettings> {
     const settings = await this.getSettings<OnboardingSettings>('onboarding')
 
-    // Ensure all 4 canonical steps exist and are valid. If legacy (<4 steps) or invalid step config exists in DB, use defaults:
-    const hasValid4Steps =
-      Array.isArray(settings.steps) &&
-      settings.steps.length === 4 &&
-      settings.steps.every((s) => s && s.id && typeof s.title === 'string')
-
-    const steps = hasValid4Steps ? settings.steps : DEFAULT_ONBOARDING_STEPS
-
+    // Phase 4C: the single-screen onboarding consumes only the goal and experience option
+    // lists. Fall back to the defaults when a group is missing or empty. Any legacy option
+    // groups still present in stored JSON (e.g. topics / learning_preference from the old
+    // 4-step model) are preserved as-is but no longer surfaced by the Admin UI or the wizard.
     const fieldOptions = {
       ...settings.fieldOptions,
       goal:
@@ -294,19 +289,10 @@ export class SettingsService {
         settings.fieldOptions?.experience_level && settings.fieldOptions.experience_level.length > 0
           ? settings.fieldOptions.experience_level
           : DEFAULT_EXPERIENCE_OPTIONS,
-      topics:
-        settings.fieldOptions?.topics && settings.fieldOptions.topics.length > 0
-          ? settings.fieldOptions.topics
-          : DEFAULT_TOPIC_OPTIONS,
-      learning_preference:
-        settings.fieldOptions?.learning_preference && settings.fieldOptions.learning_preference.length > 0
-          ? settings.fieldOptions.learning_preference
-          : DEFAULT_PREFERENCE_OPTIONS,
     }
 
     return {
       ...settings,
-      steps,
       fieldOptions,
     }
   }

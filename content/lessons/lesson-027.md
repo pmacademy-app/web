@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lessons 25 and 26 covered *how* to iterate on structure and interactivity cheaply, before committing to full development — wireframes for layout, prototypes for interaction. What neither lesson addressed is *what actually makes an interface good*, once you're deciding between two structurally valid layouts or two functionally working interaction patterns. This lesson fills that gap with a small set of durable UX principles — not a comprehensive design education, which is a genuinely separate discipline with its own multi-year expertise, but the specific, well-established principles a PM needs to participate meaningfully in design decisions, ask good questions, and recognize when a proposed design is likely to cause real friction, without overstepping into territory that belongs to a trained designer's expertise.
+Lessons 25 and 26 covered *how* to iterate on structure and interactivity cheaply, before committing to full development wireframes for layout, prototypes for interaction. What neither lesson addressed is *what actually makes an interface good*, once you're deciding between two structurally valid layouts or two functionally working interaction patterns. This lesson fills that gap with a small set of durable UX principles not a comprehensive design education, which is a genuinely separate discipline with its own multi-year expertise, but the specific, well-established principles a PM needs to participate meaningfully in design decisions, ask good questions, and recognize when a proposed design is likely to cause real friction, without overstepping into territory that belongs to a trained designer's expertise.
 
-This lesson exists because PMs sit in an uncomfortable middle position on design: enough involvement to ask good questions and catch clear problems, not enough formal training to make expert visual or interaction design judgments unilaterally. The principles covered here are chosen specifically because they're durable (not trend-dependent), broadly applicable across product categories, and genuinely useful for a PM's actual job — evaluating whether a design decision serves the validated problem (Lesson 17) and the user's actual cognitive experience, not dictating the specific visual execution, which properly belongs to design expertise per Lesson 22's Precision Dial.
+This lesson exists because PMs sit in an uncomfortable middle position on design: enough involvement to ask good questions and catch clear problems, not enough formal training to make expert visual or interaction design judgments unilaterally. The principles covered here are chosen specifically because they're durable (not trend-dependent), broadly applicable across product categories, and genuinely useful for a PM's actual job evaluating whether a design decision serves the validated problem (Lesson 17) and the user's actual cognitive experience, not dictating the specific visual execution, which properly belongs to design expertise per Lesson 22's Precision Dial.
 
 ---
 
@@ -12,12 +12,12 @@ This lesson exists because PMs sit in an uncomfortable middle position on design
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design |
+| **Module** | 3 Product Design |
 | **Current Lesson** | 27 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 22 (Product Requirements Document), Lesson 26 (Prototyping) |
-| **Next Lesson** | Lesson 28 — Information Architecture |
+| **Next Lesson** | Lesson 28 Information Architecture |
 | **Future Topics Unlocked** | Lesson 28 (Information Architecture), Lesson 29 (Prioritization Fundamentals) |
 
 ---
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 22 (Product Requirements Document) and Lesson 26 (Prototyping). This lesson assumes fluency with the Precision Dial (specifying the what/why while leaving the how to design expertise) and extends it directly: these UX principles give a PM a *what* to specify — reduced cognitive load, favoring recognition, appropriate choice quantity — without dictating the specific *how* a designer would use to achieve it.
+Lesson 22 (Product Requirements Document) and Lesson 26 (Prototyping). This lesson assumes fluency with the Precision Dial (specifying the what/why while leaving the how to design expertise) and extends it directly: these UX principles give a PM a *what* to specify reduced cognitive load, favoring recognition, appropriate choice quantity without dictating the specific *how* a designer would use to achieve it.
 
 ---
 
@@ -44,7 +44,7 @@ Lesson 22 (Product Requirements Document) and Lesson 26 (Prototyping). This less
 
 ### Hick's Law: More Choices, More Time
 
-**Hick's Law** states that the time it takes a person to make a decision increases with the number and complexity of choices available. This has a direct, practical implication for interface design: a screen presenting many options simultaneously — a long navigation menu, an extensive settings page, a form with many equally weighted fields — increases the cognitive burden and decision time for every person who encounters it, regardless of how well each individual option is designed.
+**Hick's Law** states that the time it takes a person to make a decision increases with the number and complexity of choices available. This has a direct, practical implication for interface design: a screen presenting many options simultaneously a long navigation menu, an extensive settings page, a form with many equally weighted fields increases the cognitive burden and decision time for every person who encounters it, regardless of how well each individual option is designed.
 
 ```mermaid
 %%{init: {
@@ -82,7 +82,7 @@ graph LR
     A -.->|More choices| B
 ```
 
-This does not mean fewer options are always better in an absolute sense — some tasks genuinely require presenting many options (a product catalog, for instance) — but it does mean that **unnecessary** choice proliferation carries a real cost, and that progressive disclosure (revealing options only as needed, rather than presenting everything simultaneously) is often a legitimate design response to Hick's Law, one a PM can advocate for at the level of "should we reduce the number of simultaneous choices here" without dictating the specific visual mechanism (a dropdown, a multi-step wizard, a search-first interface) design should use to achieve it.
+This does not mean fewer options are always better in an absolute sense some tasks genuinely require presenting many options (a product catalog, for instance) but it does mean that **unnecessary** choice proliferation carries a real cost, and that progressive disclosure (revealing options only as needed, rather than presenting everything simultaneously) is often a legitimate design response to Hick's Law, one a PM can advocate for at the level of "should we reduce the number of simultaneous choices here" without dictating the specific visual mechanism (a dropdown, a multi-step wizard, a search-first interface) design should use to achieve it.
 
 ### Fitts's Law: Distance, Size, and Time to Target
 
@@ -126,17 +126,17 @@ graph TD
     B -.->|Closer = Faster, More Accurate| C
 ```
 
-This principle has direct, practical implications for interaction design that a PM can evaluate without needing to specify exact pixel measurements: is a frequently used action (like a primary call-to-action button) sized and positioned appropriately for its importance and frequency of use, or is it small and tucked into a corner, forcing users to move precisely to a small, distant target repeatedly? A PM applying Fitts's Law as a review lens asks "is this important, frequent action easy to reach and hit reliably?" — a what-level question — rather than specifying "make the button exactly 48 pixels tall and position it at these exact coordinates," which is properly a design implementation decision.
+This principle has direct, practical implications for interaction design that a PM can evaluate without needing to specify exact pixel measurements: is a frequently used action (like a primary call-to-action button) sized and positioned appropriately for its importance and frequency of use, or is it small and tucked into a corner, forcing users to move precisely to a small, distant target repeatedly? A PM applying Fitts's Law as a review lens asks "is this important, frequent action easy to reach and hit reliably?" a what-level question rather than specifying "make the button exactly 48 pixels tall and position it at these exact coordinates," which is properly a design implementation decision.
 
 ### Cognitive Load
 
 **Cognitive load** refers to the total amount of mental effort being used in a person's working memory at a given moment. Interfaces that require a user to remember multiple pieces of information simultaneously, track state across several screens, or process several unrelated decisions at once impose higher cognitive load than interfaces that surface only what's immediately relevant, reduce the need to hold information in memory across steps, and clearly indicate current state.
 
-A practical, PM-relevant application of this principle: reviewing a multi-step flow (echoing Lesson 15's journey maps and Lesson 25's wireframes) and asking, at each step, whether the user is being asked to remember something from a previous step that the interface could instead simply display again, or whether multiple, unrelated decisions have been bundled into a single screen when they could be sequenced or grouped more coherently. This is a question about the user's cognitive experience — squarely within a PM's legitimate concern, since it connects directly to the validated pain points and jobs (Lessons 6 and 16) the solution is meant to serve — without dictating the specific visual or interaction design used to reduce that load.
+A practical, PM-relevant application of this principle: reviewing a multi-step flow (echoing Lesson 15's journey maps and Lesson 25's wireframes) and asking, at each step, whether the user is being asked to remember something from a previous step that the interface could instead simply display again, or whether multiple, unrelated decisions have been bundled into a single screen when they could be sequenced or grouped more coherently. This is a question about the user's cognitive experience squarely within a PM's legitimate concern, since it connects directly to the validated pain points and jobs (Lessons 6 and 16) the solution is meant to serve without dictating the specific visual or interaction design used to reduce that load.
 
 ### Recognition vs. Recall
 
-A closely related, highly practical principle: **recognition** (identifying something correctly when it's presented, such as choosing the right option from a visible list) is generally easier and faster for people than **recall** (retrieving information from memory without any cue, such as remembering and typing an exact command or a previously seen value). Interfaces that favor recognition — showing available options, previously entered information, or relevant context directly, rather than requiring a user to remember and re-enter or re-derive it — generally reduce user effort and error.
+A closely related, highly practical principle: **recognition** (identifying something correctly when it's presented, such as choosing the right option from a visible list) is generally easier and faster for people than **recall** (retrieving information from memory without any cue, such as remembering and typing an exact command or a previously seen value). Interfaces that favor recognition showing available options, previously entered information, or relevant context directly, rather than requiring a user to remember and re-enter or re-derive it generally reduce user effort and error.
 
 ```mermaid
 %%{init: {
@@ -178,7 +178,7 @@ A practical example: an interface requiring a user to remember an account number
 
 ### The "PM as Design Dictator" Failure Pattern
 
-A specific, important failure pattern — directly extending Lesson 22's over-specification warning — is a PM using these UX principles (or any design knowledge) as license to dictate specific visual or interaction design solutions, rather than raising the underlying cognitive or usability concern and trusting design expertise to determine the best specific execution. "This button needs to be blue and 60 pixels wide" is design dictation; "this frequently used action seems hard to locate and select reliably — can we make it easier to find and hit?" is legitimate UX evaluation, appropriately pitched at the level of the underlying principle (Fitts's Law, in this case) rather than a specific implementation prescription.
+A specific, important failure pattern directly extending Lesson 22's over-specification warning is a PM using these UX principles (or any design knowledge) as license to dictate specific visual or interaction design solutions, rather than raising the underlying cognitive or usability concern and trusting design expertise to determine the best specific execution. "This button needs to be blue and 60 pixels wide" is design dictation; "this frequently used action seems hard to locate and select reliably can we make it easier to find and hit?" is legitimate UX evaluation, appropriately pitched at the level of the underlying principle (Fitts's Law, in this case) rather than a specific implementation prescription.
 
 This distinction matters for the same reason Lesson 22 emphasized it at the level of a PRD: a PM's UX knowledge, however genuine, is not equivalent to a trained designer's expertise in visual design, interaction patterns, accessibility standards, and the many other considerations that inform a well-executed specific solution. A PM who has learned these principles well enough to notice a real problem has done valuable, legitimate work; a PM who uses that same knowledge to unilaterally prescribe the specific fix has overstepped into a domain where a different kind of expertise deserves to lead.
 
@@ -192,11 +192,11 @@ Some tasks genuinely require presenting many options; the principle concerns the
 
 **Mistake 2: Applying Fitts's Law by specifying exact pixel dimensions or coordinates, rather than raising the underlying concern**
 
-This crosses from legitimate UX evaluation into design dictation — the appropriate PM-level observation is "is this important action easy to reach and hit reliably," not a specific implementation prescription.
+This crosses from legitimate UX evaluation into design dictation the appropriate PM-level observation is "is this important action easy to reach and hit reliably," not a specific implementation prescription.
 
 **Mistake 3: Failing to recognize cognitive load concerns in a multi-step flow, focusing only on individual screens in isolation**
 
-Cognitive load often accumulates across a sequence of steps (echoing Lesson 15's full-journey view), not just within any single screen — a review that only evaluates screens independently can miss load that builds up across the whole flow.
+Cognitive load often accumulates across a sequence of steps (echoing Lesson 15's full-journey view), not just within any single screen a review that only evaluates screens independently can miss load that builds up across the whole flow.
 
 **Mistake 4: Requiring users to recall information the interface could simply display again (favoring recall over recognition) without noticing the cost**
 
@@ -204,14 +204,14 @@ This is a subtle, easy-to-miss usability cost, since the interface may function 
 
 **Mistake 5: Treating UX principle fluency as license to dictate specific visual or interaction design solutions**
 
-This is the "PM as design dictator" failure pattern — raising a genuine concern is valuable; prescribing the specific fix oversteps into design's domain of expertise.
+This is the "PM as design dictator" failure pattern raising a genuine concern is valuable; prescribing the specific fix oversteps into design's domain of expertise.
 
 ---
 
 
 ## Mental Model: The UX Principle Review Lens
 
-This lesson's mental model is the **UX Principle Review Lens** — a set of questions, derived from the four principles above, that a PM can apply when reviewing a wireframe or prototype, pitched consistently at the level of underlying concern rather than specific implementation.
+This lesson's mental model is the **UX Principle Review Lens** a set of questions, derived from the four principles above, that a PM can apply when reviewing a wireframe or prototype, pitched consistently at the level of underlying concern rather than specific implementation.
 
 ```mermaid
 %%{init: {
@@ -249,19 +249,19 @@ graph TD
     A --> C{Fitts Law: Are Important, Frequent<br/>Actions Easy to Reach and Hit Reliably?}
     A --> D{Cognitive Load: Does This Step, or This<br/>Flow, Ask Users to Hold Too Much in<br/>Memory?}
     A --> E{Recognition Vs. Recall: Are Users Being<br/>Asked to Remember Information the<br/>Interface Could Simply Show Again?}
-    B --> F[Raise Concerns at This Level — Trust<br/>Design Expertise for the Specific<br/>Execution]
+    B --> F[Raise Concerns at This Level Trust<br/>Design Expertise for the Specific<br/>Execution]
     C --> F
     D --> F
     E --> F
 ```
 
-Use this lens consistently as a review discipline: for each question, if a genuine concern surfaces, raise it explicitly and specifically (naming the principle and the specific step or element involved), then stop — resist the pull toward specifying the exact fix, and trust the design conversation that follows to determine the best specific solution.
+Use this lens consistently as a review discipline: for each question, if a genuine concern surfaces, raise it explicitly and specifically (naming the principle and the specific step or element involved), then stop resist the pull toward specifying the exact fix, and trust the design conversation that follows to determine the best specific solution.
 
 ---
 
 ## Real Company Example
 
-**Google**'s well-documented emphasis on minimizing cognitive load and choice complexity in its core search interface — a single input field, deliberately free of the extensive simultaneous options many competing products in adjacent categories present — is a widely discussed illustration of Hick's Law and cognitive load principles applied at the highest level of a product's core interaction. Public design commentary and Google's own publicly shared design philosophy documentation have described a long-standing emphasis on simplicity and minimal cognitive burden in the core search experience specifically, even as many advanced options and features exist and are deliberately kept out of the primary, most frequently used interaction surface — a practical example of progressive disclosure responding directly to the choice-proliferation cost this lesson describes.
+**Google**'s well-documented emphasis on minimizing cognitive load and choice complexity in its core search interface a single input field, deliberately free of the extensive simultaneous options many competing products in adjacent categories present is a widely discussed illustration of Hick's Law and cognitive load principles applied at the highest level of a product's core interaction. Public design commentary and Google's own publicly shared design philosophy documentation have described a long-standing emphasis on simplicity and minimal cognitive burden in the core search experience specifically, even as many advanced options and features exist and are deliberately kept out of the primary, most frequently used interaction surface a practical example of progressive disclosure responding directly to the choice-proliferation cost this lesson describes.
 
 *(Assumption flagged: this reflects widely reported, publicly shared descriptions of Google's general design philosophy rather than a claim about the company's complete, current internal design rationale for every specific feature, which this curriculum does not claim certainty about.)*
 
@@ -270,13 +270,13 @@ Use this lens consistently as a review discipline: for each question, if a genui
 ## Real World Perspective: UX Principles for Product Managers at Different Company Stages
 
 **At a startup:**
-PMs often work in especially close, informal collaboration with a small design team (or, in the earliest stages, may be responsible for some design work themselves), making fluency with these principles directly useful for making faster, more confident calls in the absence of a large, formal design review process — the risk of "PM as design dictator" is often heightened at this stage precisely because informal collaboration can blur the line between raising a concern and unilaterally deciding a specific solution.
+PMs often work in especially close, informal collaboration with a small design team (or, in the earliest stages, may be responsible for some design work themselves), making fluency with these principles directly useful for making faster, more confident calls in the absence of a large, formal design review process the risk of "PM as design dictator" is often heightened at this stage precisely because informal collaboration can blur the line between raising a concern and unilaterally deciding a specific solution.
 
 **At a mid-size company:**
 UX principle fluency helps a PM participate credibly and usefully in more formal design review processes, asking specific, principle-grounded questions rather than vague aesthetic preferences, and helps build productive working relationships with design teams who generally welcome informed, well-articulated concerns pitched at the appropriate level, rather than either uninformed silence or inappropriate design dictation.
 
 **At Big Tech:**
-UX principles often intersect with established, rigorously tested design systems and platform-level interaction conventions, and a PM's most valuable contribution at this scale is often recognizing when a proposed design deviates from well-established, principle-grounded conventions for a good reason versus for an insufficiently examined one — bringing genuine scrutiny without assuming every deviation from convention is automatically wrong.
+UX principles often intersect with established, rigorously tested design systems and platform-level interaction conventions, and a PM's most valuable contribution at this scale is often recognizing when a proposed design deviates from well-established, principle-grounded conventions for a good reason versus for an insufficiently examined one bringing genuine scrutiny without assuming every deviation from convention is automatically wrong.
 
 ---
 
@@ -284,9 +284,9 @@ UX principles often intersect with established, rigorously tested design systems
 
 Consider a simplified, illustrative scenario common across B2B software onboarding flows.
 
-A team designs a new account-setup form for a project management tool, presenting all required fields — company name, team size, primary use case, industry, preferred notification settings, and integration preferences — simultaneously on a single screen, reasoning that a single screen is more "efficient" than a multi-step flow. During internal review, a PM familiar with UX principles from this lesson raises a specific concern: "This screen presents six distinct, largely unrelated decisions simultaneously — per Hick's Law and cognitive load principles, this is likely to increase abandonment, since users are being asked to process too much at once before receiving any value from the product." The PM does not, however, specify a particular alternative layout, deferring that decision to the design team's expertise.
+A team designs a new account-setup form for a project management tool, presenting all required fields company name, team size, primary use case, industry, preferred notification settings, and integration preferences simultaneously on a single screen, reasoning that a single screen is more "efficient" than a multi-step flow. During internal review, a PM familiar with UX principles from this lesson raises a specific concern: "This screen presents six distinct, largely unrelated decisions simultaneously per Hick's Law and cognitive load principles, this is likely to increase abandonment, since users are being asked to process too much at once before receiving any value from the product." The PM does not, however, specify a particular alternative layout, deferring that decision to the design team's expertise.
 
-The design team responds by proposing a specific, appropriately staged solution: splitting the form into a shorter, immediately necessary first step (company name and team size, required to create a functional account) followed by progressively disclosed additional steps (use case, industry, and integration preferences) presented later, once the user has already experienced some initial product value — directly applying progressive disclosure as the design team's own chosen response to the cognitive-load concern the PM raised.
+The design team responds by proposing a specific, appropriately staged solution: splitting the form into a shorter, immediately necessary first step (company name and team size, required to create a functional account) followed by progressively disclosed additional steps (use case, industry, and integration preferences) presented later, once the user has already experienced some initial product value directly applying progressive disclosure as the design team's own chosen response to the cognitive-load concern the PM raised.
 
 Usability testing on the revised, staged flow shows meaningfully improved completion rates compared to the original single-screen version, confirming the concern was genuine and worth addressing.
 
@@ -294,11 +294,11 @@ Usability testing on the revised, staged flow shows meaningfully improved comple
 
 Applying this lesson's frameworks:
 
-1. **The original single-screen design violated both Hick's Law and cognitive load principles simultaneously** — presenting six distinct, largely unrelated decisions at once forced users to process an unnecessarily high decision burden before receiving any product value, a foreseeable risk this lesson's principles would have flagged before the design was even built.
-2. **The PM's intervention was correctly pitched at the level of underlying concern, not specific implementation.** The PM named the specific principles (Hick's Law, cognitive load) and the specific problem (six unrelated decisions bundled together), but explicitly left the choice of solution (a staged, progressively disclosed flow, in this case) to the design team's expertise — avoiding the "PM as design dictator" failure pattern while still raising a genuinely valuable, principle-grounded concern.
-3. **The design team's chosen solution (progressive disclosure via staged steps) was validated through subsequent usability testing (Lesson 26)**, rather than assumed correct simply because it addressed the stated concern — closing the loop between raising a UX concern and confirming, through genuine testing, that the resulting solution actually resolved it.
+1. **The original single-screen design violated both Hick's Law and cognitive load principles simultaneously** presenting six distinct, largely unrelated decisions at once forced users to process an unnecessarily high decision burden before receiving any product value, a foreseeable risk this lesson's principles would have flagged before the design was even built.
+2. **The PM's intervention was correctly pitched at the level of underlying concern, not specific implementation.** The PM named the specific principles (Hick's Law, cognitive load) and the specific problem (six unrelated decisions bundled together), but explicitly left the choice of solution (a staged, progressively disclosed flow, in this case) to the design team's expertise avoiding the "PM as design dictator" failure pattern while still raising a genuinely valuable, principle-grounded concern.
+3. **The design team's chosen solution (progressive disclosure via staged steps) was validated through subsequent usability testing (Lesson 26)**, rather than assumed correct simply because it addressed the stated concern closing the loop between raising a UX concern and confirming, through genuine testing, that the resulting solution actually resolved it.
 
-This case connects directly back to **Lesson 22's Precision Dial**: the PM specified the what (an unnecessary cognitive burden, tied to a specific, well-established principle) and the why (likely increased abandonment), while explicitly leaving the how (the specific staging and disclosure mechanism) to design's expertise — precisely the discipline this lesson's failure-pattern warning describes.
+This case connects directly back to **Lesson 22's Precision Dial**: the PM specified the what (an unnecessary cognitive burden, tied to a specific, well-established principle) and the why (likely increased abandonment), while explicitly leaving the how (the specific staging and disclosure mechanism) to design's expertise precisely the discipline this lesson's failure-pattern warning describes.
 
 ---
 
@@ -313,7 +313,7 @@ A practical table for translating each UX principle into an appropriately pitche
 | Cognitive Load | "Are we asking users to hold too much information in mind across this flow?" | "Combine these three screens into exactly two, structured this specific way." |
 | Recognition vs. Recall | "Are we requiring users to remember something we could simply show them again?" | "Add a tooltip here that displays this exact text in this exact location." |
 
-The consistent discipline this table reinforces: **every principle translates into a question about user experience and cognitive burden, never into a specific visual or interaction design prescription** — the question is the PM's legitimate contribution; the answer belongs to design.
+The consistent discipline this table reinforces: **every principle translates into a question about user experience and cognitive burden, never into a specific visual or interaction design prescription** the question is the PM's legitimate contribution; the answer belongs to design.
 
 ---
 
@@ -323,28 +323,28 @@ The consistent discipline this table reinforces: **every principle translates in
 *What the interviewer is actually evaluating:* Whether the candidate can name specific, established principles (Hick's Law, Fitts's Law, cognitive load) and apply them as genuine review questions, rather than relying on vague, untethered aesthetic preference or personal intuition alone.
 
 **Typical question 2: "Tell me about a time you raised a UX concern with a design team. How did you frame it?"**
-*What the interviewer is actually evaluating:* Whether the candidate framed the concern at the level of underlying principle and user impact, deferring specific solution choice to design's expertise, versus prescribing a specific fix unilaterally — directly testing for the "PM as design dictator" failure pattern.
+*What the interviewer is actually evaluating:* Whether the candidate framed the concern at the level of underlying principle and user impact, deferring specific solution choice to design's expertise, versus prescribing a specific fix unilaterally directly testing for the "PM as design dictator" failure pattern.
 
 **Typical question 3: "How do you balance having enough UX knowledge to be useful in design reviews without overstepping into design's domain?"**
-*What the interviewer is actually evaluating:* Direct self-awareness of the boundary this lesson describes — whether the candidate can articulate a clear, principled distinction between raising a legitimate concern and dictating a specific solution, rather than treating the boundary as vague or unimportant.
+*What the interviewer is actually evaluating:* Direct self-awareness of the boundary this lesson describes whether the candidate can articulate a clear, principled distinction between raising a legitimate concern and dictating a specific solution, rather than treating the boundary as vague or unimportant.
 
 ---
 
 ## Summary
 
-A small set of durable UX principles — Hick's Law (more choices increase decision time), Fitts's Law (target size and distance affect interaction speed and accuracy), cognitive load (the total mental effort required at a given moment), and recognition versus recall (recognizing presented information is generally easier than recalling it from memory) — give a PM enough grounding to participate meaningfully in design review without requiring full design expertise. Each principle translates into a specific, appropriately pitched review question about user experience and cognitive burden — never into a specific visual or interaction design prescription, which is properly design's domain. The "PM as design dictator" failure pattern describes using UX knowledge as license to unilaterally prescribe specific solutions rather than raising the underlying concern and trusting design expertise to determine execution, directly extending Lesson 22's Precision Dial into the design-review context. As shown in this lesson's Detailed Case Study, a well-pitched, principle-grounded concern (raised at the level of "why," not "how") can lead to a genuinely better design outcome, validated through subsequent usability testing, without the PM ever needing to specify the exact solution themselves.
+A small set of durable UX principles Hick's Law (more choices increase decision time), Fitts's Law (target size and distance affect interaction speed and accuracy), cognitive load (the total mental effort required at a given moment), and recognition versus recall (recognizing presented information is generally easier than recalling it from memory) give a PM enough grounding to participate meaningfully in design review without requiring full design expertise. Each principle translates into a specific, appropriately pitched review question about user experience and cognitive burden never into a specific visual or interaction design prescription, which is properly design's domain. The "PM as design dictator" failure pattern describes using UX knowledge as license to unilaterally prescribe specific solutions rather than raising the underlying concern and trusting design expertise to determine execution, directly extending Lesson 22's Precision Dial into the design-review context. As shown in this lesson's Detailed Case Study, a well-pitched, principle-grounded concern (raised at the level of "why," not "how") can lead to a genuinely better design outcome, validated through subsequent usability testing, without the PM ever needing to specify the exact solution themselves.
 
 ---
 
 ## Key Takeaways
 
-- Hick's Law: decision time increases with the number and complexity of available choices — unnecessary choice proliferation carries a real cost.
-- Fitts's Law: target size and distance affect interaction speed and accuracy — important, frequent actions should be easy to reach and hit reliably.
+- Hick's Law: decision time increases with the number and complexity of available choices unnecessary choice proliferation carries a real cost.
+- Fitts's Law: target size and distance affect interaction speed and accuracy important, frequent actions should be easy to reach and hit reliably.
 - Cognitive load: interfaces that require holding multiple pieces of information in working memory across steps impose real, measurable user effort.
-- Recognition (identifying presented information) is generally easier than recall (retrieving information from memory unprompted) — interfaces favoring recognition reduce user effort.
+- Recognition (identifying presented information) is generally easier than recall (retrieving information from memory unprompted) interfaces favoring recognition reduce user effort.
 - Every principle should translate into a what-level review question about user experience, never into a specific visual or interaction design prescription.
 - "PM as design dictator" describes overstepping from legitimate concern-raising into unilateral solution prescription, which belongs to design's expertise.
-- A well-pitched, principle-grounded concern, left open for design's expertise to resolve, can produce genuinely validated improvements — as shown in this lesson's Detailed Case Study.
+- A well-pitched, principle-grounded concern, left open for design's expertise to resolve, can produce genuinely validated improvements as shown in this lesson's Detailed Case Study.
 
 ---
 
@@ -357,7 +357,7 @@ A small set of durable UX principles — Hick's Law (more choices increase decis
 - **Cognitive load:** don't make users hold too much in working memory across a flow.
 - **Recognition > Recall:** show information again rather than requiring users to remember it.
 - **Pitch every concern as a "what/why" question** ("is this easy to reach?"), never a "how" prescription ("make it 48px").
-- **PM as Design Dictator** = overstepping from concern to unilateral solution — always defer specific execution to design expertise.
+- **PM as Design Dictator** = overstepping from concern to unilateral solution always defer specific execution to design expertise.
 
 ---
 
@@ -375,9 +375,9 @@ A small set of durable UX principles — Hick's Law (more choices increase decis
 
 ## Further Reading / Resources
 
-- Don Norman, *The Design of Everyday Things* — a foundational, widely cited treatment of usability principles including cognitive load and recognition/recall, directly relevant to this lesson's core concepts.
-- Steve Krug, *Don't Make Me Think* — a practical, accessible treatment of reducing cognitive burden in interface design, closely related to this lesson's core arguments.
-- Susan Weinschenk, *100 Things Every Designer Needs to Know About People* — includes accessible treatments of Hick's Law, Fitts's Law, and related cognitive principles for practitioners without formal design training.
+- Don Norman, *The Design of Everyday Things* a foundational, widely cited treatment of usability principles including cognitive load and recognition/recall, directly relevant to this lesson's core concepts.
+- Steve Krug, *Don't Make Me Think* a practical, accessible treatment of reducing cognitive burden in interface design, closely related to this lesson's core arguments.
+- Susan Weinschenk, *100 Things Every Designer Needs to Know About People* includes accessible treatments of Hick's Law, Fitts's Law, and related cognitive principles for practitioners without formal design training.
 
 ---
 
@@ -391,7 +391,7 @@ A small set of durable UX principles — Hick's Law (more choices increase decis
 
 **Card 2**
 - Front: What does Fitts's Law state?
-- Back: The time required to move to and successfully select a target depends on the target's size and distance — larger, closer targets are faster and more accurate to select.
+- Back: The time required to move to and successfully select a target depends on the target's size and distance larger, closer targets are faster and more accurate to select.
 - Difficulty: 2
 - Tags: fitts-law
 
@@ -403,7 +403,7 @@ A small set of durable UX principles — Hick's Law (more choices increase decis
 
 **Card 4**
 - Front: Why do interfaces favoring recognition over recall generally reduce user effort?
-- Back: Recognizing presented information is generally easier and faster than retrieving information from memory unprompted — showing relevant information again, rather than requiring users to remember it, reduces effort and error.
+- Back: Recognizing presented information is generally easier and faster than retrieving information from memory unprompted showing relevant information again, rather than requiring users to remember it, reduces effort and error.
 - Difficulty: 2
 - Tags: recognition-vs-recall
 
@@ -513,7 +513,7 @@ D) A PM who reviews wireframes but declines to review any prototypes
 A) "Change this button's colour to blue before the next review."
 B) "I have no particular thoughts on this button's size or place."
 C) "Make this button 48 pixels tall and move it to the top right."
-D) "This action is our most frequent — is it easy to reach and hit?"
+D) "This action is our most frequent is it easy to reach and hit?"
 
 *Correct answer: D*
 *Explanation: It names the principle's concern and stops there. The pixel figure in C is a design decision arrived at by someone without design's training in it.*
@@ -643,9 +643,9 @@ D) Encourage design to propose and test their own solutions
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 26 — Prototyping | Provides the interactive artifact that UX principles are applied to during review, before and alongside usability testing |
-| **Current Lesson** | Lesson 27 — UX Principles for Product Managers | Hick's Law; Fitts's Law; cognitive load; recognition vs. recall; the "PM as design dictator" failure pattern |
-| **Next Lesson** | Lesson 28 — Information Architecture | Extends cognitive load and choice-organization principles into a dedicated discipline for structuring information and navigation |
+| **Previous Lesson** | Lesson 26 Prototyping | Provides the interactive artifact that UX principles are applied to during review, before and alongside usability testing |
+| **Current Lesson** | Lesson 27 UX Principles for Product Managers | Hick's Law; Fitts's Law; cognitive load; recognition vs. recall; the "PM as design dictator" failure pattern |
+| **Next Lesson** | Lesson 28 Information Architecture | Extends cognitive load and choice-organization principles into a dedicated discipline for structuring information and navigation |
 | **Future Concepts Unlocked** | Lesson 29 (Prioritization Fundamentals) | Uses UX-informed usability considerations as one input into broader initiative prioritization |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "usability feedback" assumes the principle-grounded, appropriately pitched review discipline covered here — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to "usability feedback" assumes the principle-grounded, appropriately pitched review discipline covered here this will not be re-explained, only re-applied.

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Module 7 has introduced eight distinct mental models across nine lessons: the Leverage Stack (Lesson 61), Promise Tiers (Lesson 62), the Two-Sided Balance Model (Lesson 63), the Metric Provenance Chain (Lesson 64), the Ownership Zones Model (Lesson 65), the Discovery Frontier (Lesson 66), the Escalation Staircase (Lesson 67), the Sunset Runway (Lesson 68), and the Friction Ledger (Lesson 69). Each was introduced to solve a specific, narrow problem — where does a platform investment belong, what promise does an API make, which side of a marketplace is constrained, whether a metric deserves trust, who owns a model decision, how a recommender should balance exploration, how enforcement should escalate, how a migration should be sequenced, how internal friction should be tracked.
+Module 7 has introduced eight distinct mental models across nine lessons: the Leverage Stack (Lesson 61), Promise Tiers (Lesson 62), the Two-Sided Balance Model (Lesson 63), the Metric Provenance Chain (Lesson 64), the Ownership Zones Model (Lesson 65), the Discovery Frontier (Lesson 66), the Escalation Staircase (Lesson 67), the Sunset Runway (Lesson 68), and the Friction Ledger (Lesson 69). Each was introduced to solve a specific, narrow problem where does a platform investment belong, what promise does an API make, which side of a marketplace is constrained, whether a metric deserves trust, who owns a model decision, how a recommender should balance exploration, how enforcement should escalate, how a migration should be sequenced, how internal friction should be tracked.
 
-In real platform work, problems rarely announce which single model applies. A declining third-party developer ecosystem could be a Leverage Stack sequencing failure, a broken Promise Tier commitment, a governance trust failure, or some combination of all three simultaneously — and a PM who only knows how to apply one model at a time, in isolation, will often diagnose only part of what's actually happening. This closing lesson of Module 7 does not introduce new theory in the way the previous nine lessons did. Instead, it does something this curriculum's Lesson 60 capstone modeled for the foundational six modules: it consolidates the module's separate tools into a single, integrated diagnostic practice, so that when you encounter a real platform problem in the future, you reach for the right combination of models rather than forcing a single lens onto a multi-dimensional problem.
+In real platform work, problems rarely announce which single model applies. A declining third-party developer ecosystem could be a Leverage Stack sequencing failure, a broken Promise Tier commitment, a governance trust failure, or some combination of all three simultaneously and a PM who only knows how to apply one model at a time, in isolation, will often diagnose only part of what's actually happening. This closing lesson of Module 7 does not introduce new theory in the way the previous nine lessons did. Instead, it does something this curriculum's Lesson 60 capstone modeled for the foundational six modules: it consolidates the module's separate tools into a single, integrated diagnostic practice, so that when you encounter a real platform problem in the future, you reach for the right combination of models rather than forcing a single lens onto a multi-dimensional problem.
 
 ---
 
@@ -12,13 +12,13 @@ In real platform work, problems rarely announce which single model applies. A de
 
 | Field | Detail |
 |---|---|
-| **Module** | 7 — Platform, Technical & Data-Intensive Product Management |
+| **Module** | 7 Platform, Technical & Data-Intensive Product Management |
 | **Current Lesson** | 70 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 45 minutes (reading) + 20 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 61 (Platform Thinking: Products, Platforms, and Ecosystems), Lesson 62 (APIs as Products: Designing for Developers), Lesson 63 (Two-Sided Marketplaces and Network Effects), Lesson 64 (Data-Informed Product Management: Building a Metrics Culture), Lesson 65 (Working with Data Science & ML Teams), Lesson 66 (Recommender Systems and Personalization for PMs), Lesson 67 (Platform Governance: Trust, Safety, and Abuse Prevention), Lesson 68 (Technical Debt at Scale: Platform Migrations and Deprecations), Lesson 69 (Internal Platforms and Developer Experience (DevEx) as a Product) |
-| **Next Lesson** | Lesson 71 — Product Strategy Frameworks: From Vision to Bets |
-| **Future Topics Unlocked** | Lesson 78 (Build, Buy, or Partner), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) — all draw on this integrated Module 7 toolkit as established canon |
+| **Next Lesson** | Lesson 71 Product Strategy Frameworks: From Vision to Bets |
+| **Future Topics Unlocked** | Lesson 78 (Build, Buy, or Partner), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) all draw on this integrated Module 7 toolkit as established canon |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes fluency with all nine preceding lessons of Module 7 (Lessons
 
 ### Why Integration, Not Addition, Is the Point
 
-A PM who has memorized eight separate models but always applies exactly one to any given problem has not yet developed platform judgment — they have developed eight narrow reflexes. Platform judgment means recognizing that most real problems are multi-dimensional, and that the first diagnostic task is often determining *which combination* of models is actually relevant, not simply picking the model whose name sounds closest to the symptom being observed.
+A PM who has memorized eight separate models but always applies exactly one to any given problem has not yet developed platform judgment they have developed eight narrow reflexes. Platform judgment means recognizing that most real problems are multi-dimensional, and that the first diagnostic task is often determining *which combination* of models is actually relevant, not simply picking the model whose name sounds closest to the symptom being observed.
 
 ### The Platform Health Radar
 
@@ -92,11 +92,11 @@ graph TD
     R --> H[Sunset Runway:<br/>Are migrations planned around real dependency, not convenience?]
 ```
 
-A ninth axis, the **Friction Ledger**, applies this same radar internally — asking whether the company's own engineering teams experience the platform with the same rigor external assessment would apply. The Platform Health Radar's discipline is running through all nine questions whenever a platform problem surfaces, rather than stopping at the first model that seems to fit, since real incidents — as this lesson's Case Study will show — are frequently the product of failures across more than one axis simultaneously.
+A ninth axis, the **Friction Ledger**, applies this same radar internally asking whether the company's own engineering teams experience the platform with the same rigor external assessment would apply. The Platform Health Radar's discipline is running through all nine questions whenever a platform problem surfaces, rather than stopping at the first model that seems to fit, since real incidents as this lesson's Case Study will show are frequently the product of failures across more than one axis simultaneously.
 
 ### The Cross-Lesson Diagnostic Protocol
 
-When a platform symptom is observed — declining developer engagement, a damaging incident, an unexpected metric trend — this lesson recommends a **Cross-Lesson Diagnostic Protocol** with a deliberate order of investigation:
+When a platform symptom is observed declining developer engagement, a damaging incident, an unexpected metric trend this lesson recommends a **Cross-Lesson Diagnostic Protocol** with a deliberate order of investigation:
 
 1. **Locate the layer** (Leverage Stack, Lesson 61): is the symptom occurring at the Core Product, Developer Surface, Marketplace, or Ecosystem layer?
 2. **Check the promise** (Promise Tiers, Lesson 62): has an explicit or implicit commitment to developers or partners been broken?
@@ -108,7 +108,7 @@ When a platform symptom is observed — declining developer engagement, a damagi
 8. **Check migration discipline** (Sunset Runway, Lesson 68, where a change or deprecation is involved): was dependency genuinely inventoried, or assumed?
 9. **Check internal friction** (Friction Ledger, Lesson 69): could internal teams be quietly working around the platform rather than raising the issue?
 
-This ordered protocol does not mean every investigation touches all nine steps equally — a well-trained platform PM learns to move quickly past steps that clearly don't apply — but the discipline of *checking* each axis, rather than assuming only one applies from the outset, is what separates genuine platform diagnostic skill from pattern-matching a symptom to the first familiar-sounding model.
+This ordered protocol does not mean every investigation touches all nine steps equally a well-trained platform PM learns to move quickly past steps that clearly don't apply but the discipline of *checking* each axis, rather than assuming only one applies from the outset, is what separates genuine platform diagnostic skill from pattern-matching a symptom to the first familiar-sounding model.
 
 ### How the Models Interconnect
 
@@ -136,7 +136,7 @@ A PM fluent in Leverage Stack, Promise Tiers, and Escalation Staircase for exter
 
 **Mistake 5: Assuming platform judgment is complete once all eight models are individually memorized**
 
-Genuine platform judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
+Genuine platform judgment is the ability to recognize which combination applies to a novel, real situation a skill built through practice, not memorization alone.
 
 ---
 
@@ -169,23 +169,23 @@ Amazon is a useful synthesis example precisely because its business spans multip
 
 ## Real World Perspective: Module Synthesis: The Platform PM's Toolkit at Different Company Stages
 
-**Startup:** Early-stage platform teams typically encounter only one or two of these eight models as immediately relevant — usually the Leverage Stack and Promise Tiers, since the first platform decisions a startup faces tend to concern whether and how to expose a Developer Surface at all, before marketplace, governance, or migration concerns become pressing.
+**Startup:** Early-stage platform teams typically encounter only one or two of these eight models as immediately relevant usually the Leverage Stack and Promise Tiers, since the first platform decisions a startup faces tend to concern whether and how to expose a Developer Surface at all, before marketplace, governance, or migration concerns become pressing.
 
-**Mid-size company:** This is typically where several models become simultaneously relevant for the first time — a growing developer ecosystem raises Promise Tiers and Escalation Staircase concerns together, while growing internal engineering headcount raises Friction Ledger concerns, often within the same period, testing whether a PM can hold multiple frameworks in mind simultaneously rather than addressing them one at a time in isolation.
+**Mid-size company:** This is typically where several models become simultaneously relevant for the first time a growing developer ecosystem raises Promise Tiers and Escalation Staircase concerns together, while growing internal engineering headcount raises Friction Ledger concerns, often within the same period, testing whether a PM can hold multiple frameworks in mind simultaneously rather than addressing them one at a time in isolation.
 
-**Big Tech:** Mature platform organizations typically have dedicated specialists for different axes of this radar — developer relations teams focused on Promise Tiers and API design, trust and safety teams focused on the Escalation Staircase, internal platform teams focused on the Friction Ledger — making the PM's synthesis role less about personally applying every model and more about ensuring the specialized teams are coordinating around a shared, integrated understanding of the platform's overall health.
+**Big Tech:** Mature platform organizations typically have dedicated specialists for different axes of this radar developer relations teams focused on Promise Tiers and API design, trust and safety teams focused on the Escalation Staircase, internal platform teams focused on the Friction Ledger making the PM's synthesis role less about personally applying every model and more about ensuring the specialized teams are coordinating around a shared, integrated understanding of the platform's overall health.
 
 ---
 
 ## Detailed Case Study: The Multi-Front Ecosystem Decline
 
-A B2B software platform noticed, over two consecutive quarters, a decline in third-party developer engagement: fewer new integrations submitted to its partner marketplace, several vocal complaints from existing partners on social media, and a slower overall pace of ecosystem growth compared to the prior year. Leadership's initial instinct was to treat this as a single problem requiring a single fix — specifically, a renewed marketing push to attract new developers, on the theory that the ecosystem simply needed more top-of-funnel awareness.
+A B2B software platform noticed, over two consecutive quarters, a decline in third-party developer engagement: fewer new integrations submitted to its partner marketplace, several vocal complaints from existing partners on social media, and a slower overall pace of ecosystem growth compared to the prior year. Leadership's initial instinct was to treat this as a single problem requiring a single fix specifically, a renewed marketing push to attract new developers, on the theory that the ecosystem simply needed more top-of-funnel awareness.
 
-A more thorough investigation using the Cross-Lesson Diagnostic Protocol revealed a more complicated picture. First, the Metric Provenance Chain check (Lesson 64) revealed that the company's own dashboard for "active integrations" had drifted in definition over the prior year, following a platform migration, meaning the reported decline was partly a measurement artifact rather than a purely real trend — though a real decline did exist underneath the artifact once the metric was corrected. Second, the Promise Tiers check (Lesson 62) revealed that a breaking API change had, in fact, been shipped eight months earlier without adequate notice, consistent with the kind of Layer 2 trust failure discussed in that lesson's Case Study, and several of the public partner complaints directly referenced this incident. Third, the Escalation Staircase check (Lesson 67) revealed that the company's fraud-detection system for the partner marketplace had, around the same time, wrongly suspended a small number of legitimate long-standing partners with no functioning appeals process, further damaging trust among exactly the population whose continued participation the ecosystem depended on.
+A more thorough investigation using the Cross-Lesson Diagnostic Protocol revealed a more complicated picture. First, the Metric Provenance Chain check (Lesson 64) revealed that the company's own dashboard for "active integrations" had drifted in definition over the prior year, following a platform migration, meaning the reported decline was partly a measurement artifact rather than a purely real trend though a real decline did exist underneath the artifact once the metric was corrected. Second, the Promise Tiers check (Lesson 62) revealed that a breaking API change had, in fact, been shipped eight months earlier without adequate notice, consistent with the kind of Layer 2 trust failure discussed in that lesson's Case Study, and several of the public partner complaints directly referenced this incident. Third, the Escalation Staircase check (Lesson 67) revealed that the company's fraud-detection system for the partner marketplace had, around the same time, wrongly suspended a small number of legitimate long-standing partners with no functioning appeals process, further damaging trust among exactly the population whose continued participation the ecosystem depended on.
 
 **What went wrong?** Using the Platform Health Radar across multiple axes at once, the true picture was a compounding, multi-front trust failure: a broken Promise Tier commitment (Lesson 62), a governance enforcement failure with no adequate appeals process (Lesson 67), and a metric-definition drift (Lesson 64) that had partially obscured the real scope of the problem from leadership's own dashboards. A marketing-only response, as leadership initially proposed, would have addressed none of these underlying causes and likely worsened the situation by attracting new developers into an ecosystem whose existing trust problems had not yet been fixed.
 
-The company's recovery required addressing all three fronts simultaneously: correcting the metric definition and re-baselining the "active integrations" dashboard, formally apologizing to affected partners for the earlier breaking change with a concrete Layer 2 stability commitment going forward, and overhauling the marketplace's enforcement system with graduated, appealable responses per the Escalation Staircase — illustrating precisely why this lesson's synthesis, rather than any single model in isolation, was necessary to correctly diagnose and resolve the situation.
+The company's recovery required addressing all three fronts simultaneously: correcting the metric definition and re-baselining the "active integrations" dashboard, formally apologizing to affected partners for the earlier breaking change with a concrete Layer 2 stability commitment going forward, and overhauling the marketplace's enforcement system with graduated, appealable responses per the Escalation Staircase illustrating precisely why this lesson's synthesis, rather than any single model in isolation, was necessary to correctly diagnose and resolve the situation.
 
 ---
 
@@ -195,7 +195,7 @@ The following table summarizes the nine-step protocol introduced in the Theory s
 
 | Step | Model | Core Diagnostic Question |
 |---|---|---|
-| 1 | Leverage Stack (Lesson 61) | Which layer — Core, Developer Surface, Marketplace, Ecosystem — is implicated? |
+| 1 | Leverage Stack (Lesson 61) | Which layer Core, Developer Surface, Marketplace, Ecosystem is implicated? |
 | 2 | Promise Tiers (Lesson 62) | Has an explicit or implicit commitment been broken? |
 | 3 | Two-Sided Balance Model (Lesson 63) | If a marketplace, which side is the binding constraint? |
 | 4 | Metric Provenance Chain (Lesson 64) | Is the data used to diagnose this problem itself trustworthy? |
@@ -213,15 +213,15 @@ A thorough platform investigation moves through this table deliberately, ruling 
 
 **"Walk me through how you'd investigate a sudden decline in third-party developer engagement on a platform you manage."** The interviewer is evaluating whether you approach this as a potentially multi-dimensional problem, checking multiple axes (broken promises, enforcement issues, metric reliability) rather than jumping to a single explanation and a single fix.
 
-**"How do the concepts of platform layering and API stability relate to each other?"** The interviewer is testing whether you understand the interconnection between the Leverage Stack and Promise Tiers specifically — that Promise Tiers governs Layer 2, and instability there caps everything built on top of it.
+**"How do the concepts of platform layering and API stability relate to each other?"** The interviewer is testing whether you understand the interconnection between the Leverage Stack and Promise Tiers specifically that Promise Tiers governs Layer 2, and instability there caps everything built on top of it.
 
-**"Tell me about the most complex platform problem you've had to diagnose, and how you approached it."** The interviewer is listening for evidence of genuine synthesis — an investigation that considered and ruled in or out multiple contributing causes — rather than a story where a single framework, applied once, fully explained everything.
+**"Tell me about the most complex platform problem you've had to diagnose, and how you approached it."** The interviewer is listening for evidence of genuine synthesis an investigation that considered and ruled in or out multiple contributing causes rather than a story where a single framework, applied once, fully explained everything.
 
 ---
 
 ## Summary
 
-Module 7 introduced eight distinct mental models, plus the Friction Ledger's internal application, each answering a specific diagnostic question about a different aspect of platform health: where an investment belongs (Leverage Stack), what commitment an API makes (Promise Tiers), which side of a marketplace is constrained (Two-Sided Balance Model), whether a metric deserves trust (Metric Provenance Chain), who owns a model-driven decision (Ownership Zones Model), whether short-term optimization is damaging long-term value (Discovery Frontier), whether enforcement is proportionate (Escalation Staircase), whether a migration accounts for real dependency (Sunset Runway), and whether internal teams are experiencing unaddressed friction (Friction Ledger). Real platform problems are frequently multi-dimensional, and the Platform Health Radar, applied through the Cross-Lesson Diagnostic Protocol, provides a disciplined way to check all nine axes rather than stopping at whichever single model first seems to fit a given symptom. The models are not an unordered checklist but a connected structure — Promise Tiers governs Layer 2 of the Leverage Stack specifically, the Two-Sided Balance Model governs Layer 3 when a marketplace is involved, the Discovery Frontier is a specialized application of the Ownership Zones Model's error-cost logic, and the Escalation Staircase depends on that same error-cost reasoning applied to Layer 4 enforcement. Genuine platform judgment is the ability to recognize, in a real and often ambiguous situation, which combination of these tools actually applies — a skill this module has built lesson by lesson, and one this synthesis lesson has now explicitly connected into a single integrated practice.
+Module 7 introduced eight distinct mental models, plus the Friction Ledger's internal application, each answering a specific diagnostic question about a different aspect of platform health: where an investment belongs (Leverage Stack), what commitment an API makes (Promise Tiers), which side of a marketplace is constrained (Two-Sided Balance Model), whether a metric deserves trust (Metric Provenance Chain), who owns a model-driven decision (Ownership Zones Model), whether short-term optimization is damaging long-term value (Discovery Frontier), whether enforcement is proportionate (Escalation Staircase), whether a migration accounts for real dependency (Sunset Runway), and whether internal teams are experiencing unaddressed friction (Friction Ledger). Real platform problems are frequently multi-dimensional, and the Platform Health Radar, applied through the Cross-Lesson Diagnostic Protocol, provides a disciplined way to check all nine axes rather than stopping at whichever single model first seems to fit a given symptom. The models are not an unordered checklist but a connected structure Promise Tiers governs Layer 2 of the Leverage Stack specifically, the Two-Sided Balance Model governs Layer 3 when a marketplace is involved, the Discovery Frontier is a specialized application of the Ownership Zones Model's error-cost logic, and the Escalation Staircase depends on that same error-cost reasoning applied to Layer 4 enforcement. Genuine platform judgment is the ability to recognize, in a real and often ambiguous situation, which combination of these tools actually applies a skill this module has built lesson by lesson, and one this synthesis lesson has now explicitly connected into a single integrated practice.
 
 ---
 
@@ -230,7 +230,7 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 - Module 7 introduced nine interconnected mental models: Leverage Stack, Promise Tiers, Two-Sided Balance Model, Metric Provenance Chain, Ownership Zones Model, Discovery Frontier, Escalation Staircase, Sunset Runway, and Friction Ledger.
 - The Platform Health Radar assesses a platform across all nine dimensions simultaneously, rather than applying one model in isolation.
 - The Cross-Lesson Diagnostic Protocol provides an ordered approach to investigating an ambiguous platform problem across multiple axes.
-- The nine models form a connected structure, not an unordered checklist — for example, Promise Tiers specifically governs Layer 2 of the Leverage Stack.
+- The nine models form a connected structure, not an unordered checklist for example, Promise Tiers specifically governs Layer 2 of the Leverage Stack.
 - Real platform incidents are frequently the product of failures across more than one axis simultaneously, as illustrated by the Multi-Front Ecosystem Decline case study.
 - A single-cause diagnosis and a single-lever fix, applied to a genuinely multi-dimensional problem, often fails to resolve the underlying issue and can worsen it.
 - Genuine platform judgment is the applied skill of recognizing which combination of models fits a real situation, built through deliberate practice across increasingly complex scenarios.
@@ -242,9 +242,9 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 *A two-minute review of everything in this lesson.*
 
 - Nine axes: Leverage Stack, Promise Tiers, Two-Sided Balance, Metric Provenance, Ownership Zones, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
-- Don't stop at the first model that fits — run the full Cross-Lesson Diagnostic Protocol.
+- Don't stop at the first model that fits run the full Cross-Lesson Diagnostic Protocol.
 - The models connect: Promise Tiers → Layer 2. Two-Sided Balance → Layer 3 marketplaces. Discovery Frontier → a special case of Ownership Zones. Escalation Staircase → depends on Ownership Zones' error-cost logic, applied to Layer 4.
-- Multi-front problems need multi-front fixes — a single lever rarely resolves a compounding failure.
+- Multi-front problems need multi-front fixes a single lever rarely resolves a compounding failure.
 - Platform judgment = knowing which combination applies, not just memorizing each model individually.
 
 ---
@@ -308,7 +308,7 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 
 **Card 7**
 - Front: What does genuine "platform judgment" mean, per this synthesis lesson?
-- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation not simply memorizing each model individually.
 - Difficulty: 2
 - Tags: platform-judgment
 
@@ -317,7 +317,7 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 
 You are the PM for a developer tools company. Over the past quarter, you've noticed: a decline in new third-party plugin submissions, a rise in support tickets referencing "unexpected behavior" after a recent internal system update, and an internal engineering team casually mentioning they built their own version of a shared internal library rather than waiting for the platform team's roadmap.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Platform Health Radar and Cross-Lesson Diagnostic Protocol to a genuinely multi-symptom scenario.
+There is no single correct answer to the prompts below the goal is to practice applying the Platform Health Radar and Cross-Lesson Diagnostic Protocol to a genuinely multi-symptom scenario.
 
 1. Using the Cross-Lesson Diagnostic Protocol's nine steps, which steps would you investigate first given these three symptoms, and why?
 2. Could the decline in plugin submissions and the "unexpected behavior" support tickets share a common root cause? What model would you use to check this?
@@ -528,9 +528,9 @@ D) Address all three causes in parallel with a coordinated response
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 69 — Internal Platforms and Developer Experience (DevEx) as a Product | Integrates the Friction Ledger as the ninth axis of the Platform Health Radar |
-| **Current Lesson** | Lesson 70 — Module Synthesis: The Platform PM's Toolkit | Platform Health Radar; Cross-Lesson Diagnostic Protocol; model interconnection; platform judgment |
-| **Next Lesson** | Lesson 71 — Product Strategy Frameworks: From Vision to Bets | Opens Module 8 by shifting from platform-specific diagnosis to broader strategic frameworks for setting product direction |
+| **Previous Lesson** | Lesson 69 Internal Platforms and Developer Experience (DevEx) as a Product | Integrates the Friction Ledger as the ninth axis of the Platform Health Radar |
+| **Current Lesson** | Lesson 70 Module Synthesis: The Platform PM's Toolkit | Platform Health Radar; Cross-Lesson Diagnostic Protocol; model interconnection; platform judgment |
+| **Next Lesson** | Lesson 71 Product Strategy Frameworks: From Vision to Bets | Opens Module 8 by shifting from platform-specific diagnosis to broader strategic frameworks for setting product direction |
 | **Future Concepts Unlocked** | Lesson 78 (Build, Buy, or Partner) | Draws on the full Module 7 toolkit, especially the Leverage Stack and Sunset Runway, when evaluating internal-build platform decisions |
 | | Lesson 84 (PM in AI-Native Companies) | Extends the Ownership Zones Model and Discovery Frontier into the broader context of building an AI-native product company |
 | | Lesson 85 (Responsible AI Product Management) | Builds on the Escalation Staircase's proportionality discipline when addressing AI-driven fairness and harm considerations |

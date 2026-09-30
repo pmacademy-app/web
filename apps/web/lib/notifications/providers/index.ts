@@ -154,6 +154,27 @@ export async function sendEmailWithFailover(
     }
   }
 
+  // Ambiguous timeout policy (split by message criticality).
+  //
+  // A timeout means the primary MAY have already accepted the message before our
+  // client aborted. Brevo has no idempotency key, so a cross-provider failover here
+  // risks a genuine duplicate. The trade differs by message type:
+  //  - `critical` (verification, password reset): a missing email blocks the learner,
+  //    so we prefer delivery and fail over anyway, tolerating a rare duplicate.
+  //  - `standard` (welcome, achievements, marketing, broadcasts): a duplicate is worse
+  //    than a delayed retry, so we do NOT cross-fail-over on a bare timeout. The caller
+  //    (the queue) retries the same item later; a definitive failure would still fail
+  //    over normally.
+  if (primaryResult.deliveryUncertain && payload.criticality !== 'critical') {
+    return {
+      success: false,
+      provider: primaryResult.providerName,
+      error: `${primaryResult.error} (ambiguous timeout — not failing over a non-critical message to avoid a duplicate send)`,
+      attempts,
+      failedOver: startedOnSecondary,
+    }
+  }
+
   // Never fall back onto the provider we just started from.
   const secondaryName = getSecondaryProvider(primary.name as EmailProviderName)
   const secondary = startedOnSecondary ? undefined : registry.getProvider(secondaryName)

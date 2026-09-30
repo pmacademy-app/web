@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Three consecutive lessons have now ended by pointing forward to this one. Lesson 43's funnel Case Study found a plausible, evidence-based cause for a drop-off but stopped short of proving the proposed fix would actually work. Lesson 44's retention Case Study and Reflection Exercise both noted that a before-and-after cohort comparison cannot fully rule out confounding factors. In both cases, the missing piece is the same: a rigorous way to establish that a specific change *causes* a specific improvement, rather than merely correlating with one — precisely the correlation-versus-causation gap Lesson 41 first flagged and explicitly left unresolved until now.
+Three consecutive lessons have now ended by pointing forward to this one. Lesson 43's funnel Case Study found a plausible, evidence-based cause for a drop-off but stopped short of proving the proposed fix would actually work. Lesson 44's retention Case Study and Reflection Exercise both noted that a before-and-after cohort comparison cannot fully rule out confounding factors. In both cases, the missing piece is the same: a rigorous way to establish that a specific change *causes* a specific improvement, rather than merely correlating with one precisely the correlation-versus-causation gap Lesson 41 first flagged and explicitly left unresolved until now.
 
-This lesson closes that gap. A/B testing (more formally, controlled experimentation) is the discipline of randomly assigning users to different versions of a product experience and measuring the difference in outcomes between them — random assignment being the specific mechanism that allows a PM to conclude, with quantified confidence, that an observed difference was actually caused by the change rather than by some other factor that happened to vary alongside it. This lesson also covers the discipline's most common failure modes, since a poorly run experiment can produce a confident, precise-looking, and completely wrong answer — often more dangerous than no experiment at all, because it carries false authority.
+This lesson closes that gap. A/B testing (more formally, controlled experimentation) is the discipline of randomly assigning users to different versions of a product experience and measuring the difference in outcomes between them random assignment being the specific mechanism that allows a PM to conclude, with quantified confidence, that an observed difference was actually caused by the change rather than by some other factor that happened to vary alongside it. This lesson also covers the discipline's most common failure modes, since a poorly run experiment can produce a confident, precise-looking, and completely wrong answer often more dangerous than no experiment at all, because it carries false authority.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson closes that gap. A/B testing (more formally, controlled experimentat
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth |
+| **Module** | 5 Metrics, Experimentation & Growth |
 | **Current Lesson** | 45 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 41 (Product Metrics Fundamentals — correlation vs. causation, guardrail metrics), Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis) |
-| **Next Lesson** | Lesson 46 — Growth Loops & Virality |
-| **Future Topics Unlocked** | Lesson 46 (Growth Loops & Virality), Lesson 50 (Product-Led Growth), Lesson 57 (Ethics in Product Management, which revisits experimentation's ethical boundaries) — all build on the experimental validity discipline introduced here |
+| **Prerequisites** | Lesson 41 (Product Metrics Fundamentals correlation vs. causation, guardrail metrics), Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis) |
+| **Next Lesson** | Lesson 46 Growth Loops & Virality |
+| **Future Topics Unlocked** | Lesson 46 (Growth Loops & Virality), Lesson 50 (Product-Led Growth), Lesson 57 (Ethics in Product Management, which revisits experimentation's ethical boundaries) all build on the experimental validity discipline introduced here |
 
 ---
 
@@ -29,14 +29,14 @@ By the end of this lesson, you will be able to:
 1. Explain why random assignment is the specific mechanism that allows a controlled experiment to establish causation, resolving the correlation-versus-causation gap from Lesson 41.
 2. Define statistical significance and explain, in plain language, what a p-value does and does not tell you.
 3. Explain sample size and statistical power, and why an underpowered experiment risks missing a genuine effect entirely.
-4. Diagnose "peeking" — stopping an experiment early based on an interim result — and explain why it inflates false-positive rates.
+4. Diagnose "peeking" stopping an experiment early based on an interim result and explain why it inflates false-positive rates.
 5. Apply a pre-registration discipline (defining hypothesis, primary metric, guardrails, and sample size before launching) to design a trustworthy experiment.
 
 ---
 
 ## Prerequisites
 
-This lesson assumes **Lesson 41's** full toolkit: precise metric definitions, Goodhart's Law, guardrail metrics, and especially the correlation-versus-causation caution this lesson directly resolves. It also assumes **Lesson 43's** and **Lesson 44's** open threads — both lessons identified a plausible fix for a real problem but explicitly deferred the question of rigorously validating that fix to this lesson.
+This lesson assumes **Lesson 41's** full toolkit: precise metric definitions, Goodhart's Law, guardrail metrics, and especially the correlation-versus-causation caution this lesson directly resolves. It also assumes **Lesson 43's** and **Lesson 44's** open threads both lessons identified a plausible fix for a real problem but explicitly deferred the question of rigorously validating that fix to this lesson.
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 41's** full toolkit: precise metric definitions, Go
 
 ### Why Random Assignment Establishes Causation
 
-Recall Lesson 41's caution: two metrics moving together doesn't establish that one causes the other, because a confounding variable might independently drive both. A controlled experiment solves this specific problem through **random assignment**: users are randomly split into a control group (seeing the existing experience) and one or more treatment groups (seeing the proposed change), with randomization ensuring that, on average, the two groups are statistically identical in every other respect — same mix of acquisition channels, same mix of device types, same mix of user tenure, same mix of literally everything else that might otherwise confound the comparison. Because random assignment neutralizes every other systematic difference between the groups, any statistically reliable difference in outcomes between them can be attributed to the one thing that was deliberately varied: the change being tested.
+Recall Lesson 41's caution: two metrics moving together doesn't establish that one causes the other, because a confounding variable might independently drive both. A controlled experiment solves this specific problem through **random assignment**: users are randomly split into a control group (seeing the existing experience) and one or more treatment groups (seeing the proposed change), with randomization ensuring that, on average, the two groups are statistically identical in every other respect same mix of acquisition channels, same mix of device types, same mix of user tenure, same mix of literally everything else that might otherwise confound the comparison. Because random assignment neutralizes every other systematic difference between the groups, any statistically reliable difference in outcomes between them can be attributed to the one thing that was deliberately varied: the change being tested.
 
 ```mermaid
 %%{init: {
@@ -90,15 +90,15 @@ graph TD
 
 ### Statistical Significance and P-Values, in Plain Language
 
-A **p-value** answers a specific, narrow question: if the change genuinely had *no real effect at all*, how likely would it be to observe a difference this large (or larger) between groups purely by random chance? A small p-value (conventionally, below 0.05, though the right threshold depends on context) suggests the observed difference would be unlikely to arise from chance alone if there were truly no effect, giving some confidence that a real effect exists. Critically, a p-value does *not* tell you the probability that the change actually works, nor does it tell you how large or practically meaningful the effect is — a large sample size can produce a statistically significant result for an effect too small to matter practically, and a small sample size can fail to reach significance even for an effect that's genuinely large and meaningful, simply because there wasn't enough data to detect it reliably.
+A **p-value** answers a specific, narrow question: if the change genuinely had *no real effect at all*, how likely would it be to observe a difference this large (or larger) between groups purely by random chance? A small p-value (conventionally, below 0.05, though the right threshold depends on context) suggests the observed difference would be unlikely to arise from chance alone if there were truly no effect, giving some confidence that a real effect exists. Critically, a p-value does *not* tell you the probability that the change actually works, nor does it tell you how large or practically meaningful the effect is a large sample size can produce a statistically significant result for an effect too small to matter practically, and a small sample size can fail to reach significance even for an effect that's genuinely large and meaningful, simply because there wasn't enough data to detect it reliably.
 
 ### Sample Size and Statistical Power
 
-**Statistical power** is the probability that an experiment will correctly detect a real effect, if one genuinely exists, at a given sample size. An **underpowered** experiment — one run with too few users relative to the size of the effect being tested for — risks concluding "no significant difference found" not because the change had no effect, but simply because the experiment never had enough data to reliably detect an effect of that size, even if a real one existed. Before running an experiment, a PM should estimate the **minimum detectable effect** (the smallest change worth caring about, business-wise) and ensure the planned sample size is large enough to reliably detect an effect of that size — running an experiment without this calculation risks either wasting resources on a hopelessly underpowered test, or running it far longer than necessary for an effect large enough to be obvious much sooner.
+**Statistical power** is the probability that an experiment will correctly detect a real effect, if one genuinely exists, at a given sample size. An **underpowered** experiment one run with too few users relative to the size of the effect being tested for risks concluding "no significant difference found" not because the change had no effect, but simply because the experiment never had enough data to reliably detect an effect of that size, even if a real one existed. Before running an experiment, a PM should estimate the **minimum detectable effect** (the smallest change worth caring about, business-wise) and ensure the planned sample size is large enough to reliably detect an effect of that size running an experiment without this calculation risks either wasting resources on a hopelessly underpowered test, or running it far longer than necessary for an effect large enough to be obvious much sooner.
 
 ### The Peeking Problem
 
-A specific and extremely common mistake deserves detailed treatment: **peeking** — checking an experiment's results before it reaches its planned sample size or duration, and stopping it early the moment the result happens to look statistically significant. This inflates the true false-positive rate far beyond the nominal significance threshold, because random noise naturally causes an experiment's measured difference to fluctuate above and below the true effect throughout its run — checking repeatedly and stopping at the first moment the fluctuation happens to cross a significance threshold is systematically biased toward catching noise, not signal, since a sufficiently long-running experiment on a null effect will, by chance, cross a nominal 0.05 significance threshold at some point during its run far more than 5% of the time if checked and potentially stopped repeatedly.
+A specific and extremely common mistake deserves detailed treatment: **peeking** checking an experiment's results before it reaches its planned sample size or duration, and stopping it early the moment the result happens to look statistically significant. This inflates the true false-positive rate far beyond the nominal significance threshold, because random noise naturally causes an experiment's measured difference to fluctuate above and below the true effect throughout its run checking repeatedly and stopping at the first moment the fluctuation happens to cross a significance threshold is systematically biased toward catching noise, not signal, since a sufficiently long-running experiment on a null effect will, by chance, cross a nominal 0.05 significance threshold at some point during its run far more than 5% of the time if checked and potentially stopped repeatedly.
 
 ```mermaid
 %%{init: {
@@ -132,9 +132,9 @@ A specific and extremely common mistake deserves detailed treatment: **peeking**
   }
 }}%%
 graph LR
-    A[Experiment starts] --> B[Day 1: Check Result<br/>— Not Significant Yet]
-    B --> C[Day 2: Check Result<br/>— Not Significant Yet]
-    C --> D[Day 3: Check Result<br/>— Appears Significant!]
+    A[Experiment starts] --> B[Day 1: Check Result<br/> Not Significant Yet]
+    B --> C[Day 2: Check Result<br/> Not Significant Yet]
+    C --> D[Day 3: Check Result<br/> Appears Significant!]
     D --> E[Stop and Ship Based on Day 3 Result]
     E -.->|Risk: This May Be a Random<br/>Fluctuation, Not a Real Effect| F[False positive]
 ```
@@ -143,7 +143,7 @@ The correct discipline is to determine the required sample size and duration *be
 
 ### Pre-Registration: Deciding Before You Look
 
-The most reliable defense against both peeking and other, subtler forms of unintentional bias (sometimes called p-hacking when done more deliberately) is **pre-registration**: writing down, before the experiment launches, the specific hypothesis being tested, the single primary metric that will determine success, the guardrail metrics (Lesson 41) being monitored to catch unintended harm, the planned sample size and duration, and the specific threshold that will count as a meaningful result. Committing to these decisions in advance prevents the natural, often unconscious temptation to retroactively decide "well, this secondary metric moved significantly, so let's call that our success metric instead" after seeing results that didn't confirm the original hypothesis — a pattern that, applied loosely enough across many possible metrics, will eventually find *something* that looks significant purely by chance, without that finding representing a genuine effect.
+The most reliable defense against both peeking and other, subtler forms of unintentional bias (sometimes called p-hacking when done more deliberately) is **pre-registration**: writing down, before the experiment launches, the specific hypothesis being tested, the single primary metric that will determine success, the guardrail metrics (Lesson 41) being monitored to catch unintended harm, the planned sample size and duration, and the specific threshold that will count as a meaningful result. Committing to these decisions in advance prevents the natural, often unconscious temptation to retroactively decide "well, this secondary metric moved significantly, so let's call that our success metric instead" after seeing results that didn't confirm the original hypothesis a pattern that, applied loosely enough across many possible metrics, will eventually find *something* that looks significant purely by chance, without that finding representing a genuine effect.
 
 ---
 
@@ -151,7 +151,7 @@ The most reliable defense against both peeking and other, subtler forms of unint
 
 **Mistake 1: Treating a statistically significant result as proof the change definitely works and is worth shipping**
 
-As covered in Theory, statistical significance indicates the observed difference is unlikely to be pure chance — it says nothing about whether the effect size is practically meaningful, and a significant-but-tiny effect may not be worth the cost of shipping and maintaining the change.
+As covered in Theory, statistical significance indicates the observed difference is unlikely to be pure chance it says nothing about whether the effect size is practically meaningful, and a significant-but-tiny effect may not be worth the cost of shipping and maintaining the change.
 
 **Mistake 2: Running an experiment without first calculating the required sample size**
 
@@ -163,7 +163,7 @@ As covered in Theory, this specific behavior systematically inflates false posit
 
 **Mistake 4: Checking many secondary metrics after the fact and treating whichever one moved significantly as the "real" result**
 
-This is a subtler cousin of peeking — testing enough metrics, by chance alone, some will appear significant even with no genuine underlying effect, which is precisely why pre-registering a single primary metric in advance is essential.
+This is a subtler cousin of peeking testing enough metrics, by chance alone, some will appear significant even with no genuine underlying effect, which is precisely why pre-registering a single primary metric in advance is essential.
 
 **Mistake 5: Ignoring guardrail metrics because the primary metric improved**
 
@@ -174,7 +174,7 @@ An experiment that improves its primary metric while quietly damaging a guardrai
 
 ## Mental Model: The Peeking Trap
 
-This lesson's core takeaway tool visualizes why informal, repeated checking of an in-progress experiment is fundamentally different from — and far riskier than — a single, planned analysis at a pre-determined endpoint:
+This lesson's core takeaway tool visualizes why informal, repeated checking of an in-progress experiment is fundamentally different from and far riskier than a single, planned analysis at a pre-determined endpoint:
 
 ```mermaid
 %%{init: {
@@ -214,19 +214,19 @@ graph TD
     E --> F[Untrustworthy Result: True<br/>False-positive Rate Is Much Higher Than<br/>Stated]
 ```
 
-Use the Peeking Trap as a standing discipline whenever tempted to check an in-progress experiment's results before its planned endpoint: remind yourself that an appealing-looking interim result is not evidence of a real effect — it's exactly the kind of noise a properly powered, pre-registered experiment is specifically designed to filter out, and giving in to the temptation to stop early defeats that purpose entirely.
+Use the Peeking Trap as a standing discipline whenever tempted to check an in-progress experiment's results before its planned endpoint: remind yourself that an appealing-looking interim result is not evidence of a real effect it's exactly the kind of noise a properly powered, pre-registered experiment is specifically designed to filter out, and giving in to the temptation to stop early defeats that purpose entirely.
 
 ---
 
 ## Real Company Example
 
-**Google**'s "41 shades of blue" test is a directly sourceable story, not just a widely repeated anecdote: it surfaced publicly because Google's then-Visual Design Lead, Doug Bowman, cited it as his reason for leaving the company in a March 2009 farewell post on his own blog. Bowman wrote that a team at Google, unable to agree on which of two blues to use for a UI element, was tested across 41 shades in between to see which performed best empirically — a level of data-driven granularity he found stifling to design judgment. Marissa Mayer, the Google executive overseeing the testing, later confirmed the account's accuracy directly in a Fast Company interview, clarifying that the actual dispute involved link colors in ads.
+**Google**'s "41 shades of blue" test is a directly sourceable story, not just a widely repeated anecdote: it surfaced publicly because Google's then-Visual Design Lead, Doug Bowman, cited it as his reason for leaving the company in a March 2009 farewell post on his own blog. Bowman wrote that a team at Google, unable to agree on which of two blues to use for a UI element, was tested across 41 shades in between to see which performed best empirically a level of data-driven granularity he found stifling to design judgment. Marissa Mayer, the Google executive overseeing the testing, later confirmed the account's accuracy directly in a Fast Company interview, clarifying that the actual dispute involved link colors in ads.
 
-This is a genuinely two-sided example, not a pure endorsement of testing-over-everything: it's simultaneously a real illustration of how rigorously a company operating at Google's scale can test even a seemingly minor design decision (small, statistically detectable effects on click-through can translate into meaningful revenue at that traffic volume), and a real account of the organizational friction that kind of granularity can cause when it displaces design judgment entirely rather than complementing it — worth keeping in view before treating "test everything empirically" as an unqualified virtue.
+This is a genuinely two-sided example, not a pure endorsement of testing-over-everything: it's simultaneously a real illustration of how rigorously a company operating at Google's scale can test even a seemingly minor design decision (small, statistically detectable effects on click-through can translate into meaningful revenue at that traffic volume), and a real account of the organizational friction that kind of granularity can cause when it displaces design judgment entirely rather than complementing it worth keeping in view before treating "test everything empirically" as an unqualified virtue.
 
 *(Source: Doug Bowman's own farewell post at stopdesign.com (March 2009) and Marissa Mayer's on-the-record confirmation in Fast Company.)*
 
-The underlying principle connects directly to this lesson's Theory: even a seemingly minor design decision can be tested rigorously through controlled experimentation rather than settled by individual taste or intuition — with the important caveat, visible in this very story, that experimentation culture needs to complement design judgment rather than override it entirely.
+The underlying principle connects directly to this lesson's Theory: even a seemingly minor design decision can be tested rigorously through controlled experimentation rather than settled by individual taste or intuition with the important caveat, visible in this very story, that experimentation culture needs to complement design judgment rather than override it entirely.
 
 ---
 
@@ -239,23 +239,23 @@ Formal A/B testing is often impractical, since a startup's total user base may b
 This is typically the stage where formal A/B testing infrastructure and discipline become genuinely valuable, since sufficient traffic exists to reach meaningful sample sizes within reasonable timeframes, and enough decisions are being made that a systematic, less opinion-driven process for validating changes becomes worth the investment.
 
 **At Big Tech:**
-Experimentation is often deeply institutionalized, with dedicated platforms supporting many simultaneous experiments, automated guardrail monitoring, and statistical rigor enforced through required pre-registration and standardized power calculations — precisely the culture illustrated by the Google shades-of-blue example. The PM's job shifts toward correctly designing experiments within this infrastructure, interpreting results rigorously (resisting both Mistake 1's overconfidence and Mistake 3's peeking temptation), and understanding how multiple simultaneous experiments interact without contaminating each other's results.
+Experimentation is often deeply institutionalized, with dedicated platforms supporting many simultaneous experiments, automated guardrail monitoring, and statistical rigor enforced through required pre-registration and standardized power calculations precisely the culture illustrated by the Google shades-of-blue example. The PM's job shifts toward correctly designing experiments within this infrastructure, interpreting results rigorously (resisting both Mistake 1's overconfidence and Mistake 3's peeking temptation), and understanding how multiple simultaneous experiments interact without contaminating each other's results.
 
 ---
 
 ## Detailed Case Study: The Fix That Looked Like It Worked
 
-Consider a simplified, illustrative scenario that directly continues Lesson 43's funnel Case Study — the company that diagnosed a paid-channel expectation mismatch causing drop-off at a project setup step.
+Consider a simplified, illustrative scenario that directly continues Lesson 43's funnel Case Study the company that diagnosed a paid-channel expectation mismatch causing drop-off at a project setup step.
 
 Armed with a specific, evidence-based hypothesis (adjusting the paid channel's marketing messaging to set accurate expectations would improve conversion at the setup step), the team launches a controlled experiment: half of new paid-channel users see the adjusted messaging, half see the original. Eager to see results, the PM checks the experiment dashboard daily. On day four, the treatment group's conversion rate is meaningfully higher than the control group's, with a p-value just under 0.05. Excited, the PM stops the experiment immediately and ships the new messaging to all paid-channel users.
 
-Over the following month, however, overall paid-channel conversion at the setup step doesn't show the improvement the four-day experiment suggested — it settles back to roughly where it was before the change, with no meaningful, lasting difference detectable.
+Over the following month, however, overall paid-channel conversion at the setup step doesn't show the improvement the four-day experiment suggested it settles back to roughly where it was before the change, with no meaningful, lasting difference detectable.
 
 **What went wrong?**
 
-This is a direct, worked illustration of the Peeking Trap: the experiment was never pre-registered with a planned sample size or duration, and the PM's daily checking, stopping at the first appealing-looking result, is precisely the behavior this lesson's Theory identifies as systematically inflating false positives. The day-four result was very likely a random fluctuation — noise that happened, by chance, to cross the nominal significance threshold at that particular moment — rather than genuine evidence of a real, lasting effect, and the subsequent month's data (effectively serving as an unplanned larger sample) revealed the true, much smaller or nonexistent effect.
+This is a direct, worked illustration of the Peeking Trap: the experiment was never pre-registered with a planned sample size or duration, and the PM's daily checking, stopping at the first appealing-looking result, is precisely the behavior this lesson's Theory identifies as systematically inflating false positives. The day-four result was very likely a random fluctuation noise that happened, by chance, to cross the nominal significance threshold at that particular moment rather than genuine evidence of a real, lasting effect, and the subsequent month's data (effectively serving as an unplanned larger sample) revealed the true, much smaller or nonexistent effect.
 
-The corrective process for any future experiment requires exactly what this lesson's Theory prescribes: calculating the required sample size before launch, based on a realistic minimum detectable effect estimate, and committing to a single analysis at that pre-determined point rather than informal daily checking. Notably, the underlying hypothesis from Lesson 43's Case Study (a messaging-expectation mismatch) may still have been correct — this Case Study's failure is not necessarily evidence the hypothesis was wrong, but a demonstration that the specific experiment run to test it was not conducted rigorously enough to actually confirm or deny it. A properly powered, pre-registered re-run of the same experiment would be the appropriate next step, rather than either abandoning the hypothesis or reflexively re-shipping the original change based on the flawed initial result.
+The corrective process for any future experiment requires exactly what this lesson's Theory prescribes: calculating the required sample size before launch, based on a realistic minimum detectable effect estimate, and committing to a single analysis at that pre-determined point rather than informal daily checking. Notably, the underlying hypothesis from Lesson 43's Case Study (a messaging-expectation mismatch) may still have been correct this Case Study's failure is not necessarily evidence the hypothesis was wrong, but a demonstration that the specific experiment run to test it was not conducted rigorously enough to actually confirm or deny it. A properly powered, pre-registered re-run of the same experiment would be the appropriate next step, rather than either abandoning the hypothesis or reflexively re-shipping the original change based on the flawed initial result.
 
 ---
 
@@ -266,13 +266,13 @@ A second, more tactical tool: complete this checklist before launching any exper
 | Field | What to Specify Before Launch |
 |---|---|
 | Hypothesis | The specific, falsifiable claim being tested (e.g., "adjusted messaging will increase setup-step conversion for paid-channel users") |
-| Primary metric | The single metric that will determine success — chosen and locked in advance, not selected retroactively from whichever moved |
+| Primary metric | The single metric that will determine success chosen and locked in advance, not selected retroactively from whichever moved |
 | Guardrail metrics | Secondary metrics monitored to catch unintended harm, per Lesson 41's Goodhart's Law caution |
 | Minimum detectable effect | The smallest effect size that would be practically meaningful enough to justify shipping the change |
 | Required sample size / duration | Calculated in advance based on the minimum detectable effect and current traffic levels |
 | Analysis plan | A commitment to analyze results once, at the pre-determined endpoint, rather than through informal repeated checking |
 
-An experiment launched without completing this checklist in advance is at meaningful risk of producing exactly the kind of unreliable, non-reproducible result illustrated in this lesson's Case Study — regardless of how sound the underlying hypothesis might genuinely be.
+An experiment launched without completing this checklist in advance is at meaningful risk of producing exactly the kind of unreliable, non-reproducible result illustrated in this lesson's Case Study regardless of how sound the underlying hypothesis might genuinely be.
 
 ---
 
@@ -282,7 +282,7 @@ An experiment launched without completing this checklist in advance is at meanin
 *What the interviewer is actually evaluating:* Whether the candidate's process includes pre-registration elements (hypothesis, primary metric, guardrails, sample size) defined before launch, rather than an informal "run it and see what happens" approach.
 
 **Typical question 2: "What's wrong with checking an experiment's results every day and stopping as soon as you see a significant result?"**
-*What the interviewer is actually evaluating:* Whether the candidate can explain the peeking problem specifically — that repeated checking inflates the true false-positive rate beyond the nominal significance threshold — rather than only vaguely sensing that "checking too often" is somehow bad.
+*What the interviewer is actually evaluating:* Whether the candidate can explain the peeking problem specifically that repeated checking inflates the true false-positive rate beyond the nominal significance threshold rather than only vaguely sensing that "checking too often" is somehow bad.
 
 **Typical question 3: "An experiment showed a statistically significant improvement, but you're hesitant to ship it. Why might that be reasonable?"**
 *What the interviewer is actually evaluating:* Whether the candidate distinguishes statistical significance from practical significance (Mistake 1), and considers guardrail metric trade-offs (Mistake 5) before assuming a significant result is automatically worth shipping.
@@ -291,19 +291,19 @@ An experiment launched without completing this checklist in advance is at meanin
 
 ## Summary
 
-Controlled experimentation resolves the correlation-versus-causation gap left open since Lesson 41: random assignment ensures treatment and control groups are statistically identical in every respect except the change being tested, so a statistically reliable difference in outcomes can be attributed to that change specifically. A p-value indicates how unlikely an observed difference would be under pure chance if no real effect existed — it does not indicate the probability the change works, nor its practical significance, which is why minimum detectable effect and statistical power must be calculated before launching an experiment, ensuring adequate sample size to reliably detect an effect worth caring about. The peeking problem — informally checking an in-progress experiment and stopping early upon seeing an appealing result — systematically inflates false positives well beyond the nominal significance threshold, precisely the failure illustrated in this lesson's Case Study, where a four-day, unplanned early stop produced a result that didn't hold up over the following month. Pre-registration — committing in advance to a hypothesis, primary metric, guardrail metrics, sample size, and a single planned analysis point — is the primary discipline defending against both peeking and the subtler bias of retroactively selecting whichever metric happened to move significantly.
+Controlled experimentation resolves the correlation-versus-causation gap left open since Lesson 41: random assignment ensures treatment and control groups are statistically identical in every respect except the change being tested, so a statistically reliable difference in outcomes can be attributed to that change specifically. A p-value indicates how unlikely an observed difference would be under pure chance if no real effect existed it does not indicate the probability the change works, nor its practical significance, which is why minimum detectable effect and statistical power must be calculated before launching an experiment, ensuring adequate sample size to reliably detect an effect worth caring about. The peeking problem informally checking an in-progress experiment and stopping early upon seeing an appealing result systematically inflates false positives well beyond the nominal significance threshold, precisely the failure illustrated in this lesson's Case Study, where a four-day, unplanned early stop produced a result that didn't hold up over the following month. Pre-registration committing in advance to a hypothesis, primary metric, guardrail metrics, sample size, and a single planned analysis point is the primary discipline defending against both peeking and the subtler bias of retroactively selecting whichever metric happened to move significantly.
 
 ---
 
 ## Key Takeaways
 
 - Random assignment is the specific mechanism that allows a controlled experiment to establish causation, by ensuring treatment and control groups are statistically identical except for the change being tested.
-- A p-value indicates how unlikely an observed difference would be under pure chance if no real effect existed — it does not indicate the probability the change works or how practically meaningful the effect is.
+- A p-value indicates how unlikely an observed difference would be under pure chance if no real effect existed it does not indicate the probability the change works or how practically meaningful the effect is.
 - Statistical power and sample size must be calculated before launching an experiment, based on a realistic minimum detectable effect, or the experiment risks being unable to reliably detect a real effect even if one exists.
-- Peeking — checking results early and stopping at the first appealing-looking outcome — systematically inflates the true false-positive rate well beyond the nominal significance threshold.
+- Peeking checking results early and stopping at the first appealing-looking outcome systematically inflates the true false-positive rate well beyond the nominal significance threshold.
 - Pre-registration (committing to hypothesis, primary metric, guardrails, sample size, and analysis plan before launch) is the primary defense against both peeking and retroactive metric selection.
 - A statistically significant result should still be evaluated against guardrail metrics and practical significance before shipping, not treated as automatic proof a change is worth deploying.
-- A failed or inconclusive experiment doesn't necessarily disprove the underlying hypothesis — it may simply indicate the experiment itself wasn't conducted rigorously enough to test it properly.
+- A failed or inconclusive experiment doesn't necessarily disprove the underlying hypothesis it may simply indicate the experiment itself wasn't conducted rigorously enough to test it properly.
 
 ---
 
@@ -312,9 +312,9 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 *A two-minute review of everything in this lesson.*
 
 - **Random assignment:** the mechanism that lets a controlled experiment establish causation, not just correlation.
-- **P-value:** likelihood of seeing this result (or more extreme) by chance alone if there's truly no effect — not the probability the change works.
+- **P-value:** likelihood of seeing this result (or more extreme) by chance alone if there's truly no effect not the probability the change works.
 - **Power and sample size:** calculate before launch, based on the smallest effect size worth caring about.
-- **Peeking:** checking early and stopping at an appealing result inflates false positives — avoid it.
+- **Peeking:** checking early and stopping at an appealing result inflates false positives avoid it.
 - **Pre-registration:** lock in hypothesis, primary metric, guardrails, sample size, and analysis plan before launch.
 - **Significant ≠ worth shipping:** check practical significance and guardrail metrics before deploying a "winning" result.
 - **A failed experiment ≠ a false hypothesis:** it may just mean the experiment itself wasn't run rigorously enough.
@@ -336,9 +336,9 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 
 ## Further Reading / Resources
 
-- *Trustworthy Online Controlled Experiments* by Ron Kohavi, Diane Tang, and Ya Xu — the definitive, rigorous practitioner treatment of A/B testing methodology, referenced throughout this module.
+- *Trustworthy Online Controlled Experiments* by Ron Kohavi, Diane Tang, and Ya Xu the definitive, rigorous practitioner treatment of A/B testing methodology, referenced throughout this module.
 - "Twyman's Law and the Peeking Problem" and related practitioner writing on sequential testing and premature stopping in online experiments.
-- Public reporting and secondary accounts of Google's 2009 "41 shades of blue" experiment — useful background on this lesson's central worked example.
+- Public reporting and secondary accounts of Google's 2009 "41 shades of blue" experiment useful background on this lesson's central worked example.
 
 ---
 
@@ -352,7 +352,7 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 
 **Card 2**
 - Front: What does a p-value actually tell you?
-- Back: How unlikely it would be to observe a difference this large (or larger) by pure chance, if the change genuinely had no real effect — not the probability the change works, and not the effect's practical size.
+- Back: How unlikely it would be to observe a difference this large (or larger) by pure chance, if the change genuinely had no real effect not the probability the change works, and not the effect's practical size.
 - Difficulty: 2
 - Tags: p-value
 
@@ -391,7 +391,7 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 
 Consider the following novel scenario: Your team wants to test whether adding a progress bar to a multi-step signup flow improves completion rates. Based on rough traffic estimates, you calculate that reaching adequate statistical power for a minimum detectable effect of 2 percentage points will take approximately five weeks.
 
-There is no single correct answer to the prompts below — the goal is to practice applying this lesson's pre-registration and power discipline, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying this lesson's pre-registration and power discipline, not to reach one "right" answer.
 
 1. Using the Experiment Pre-Registration Checklist, what would you specify for each field before launching this experiment?
 2. Three days into the experiment, a teammate excitedly reports the treatment group is already showing a large, seemingly significant improvement. How would you respond, using the Peeking Trap mental model?
@@ -520,7 +520,7 @@ D) Shipping should rarely depend on any data at all
 
 ---
 
-**10. (Scenario) An experiment reaches its pre-registered sample size, and the primary metric shows a statistically significant 0.1 percentage point improvement — far below the pre-specified minimum detectable effect of 2 percentage points. What is the most appropriate conclusion?**
+**10. (Scenario) An experiment reaches its pre-registered sample size, and the primary metric shows a statistically significant 0.1 percentage point improvement far below the pre-specified minimum detectable effect of 2 percentage points. What is the most appropriate conclusion?**
 A) The improvement falls short of what was pre-specified
 B) Ship the change at once, since it reached significance
 C) The run was flawed, since it found significance at all
@@ -553,7 +553,7 @@ C) Skipping it risks an underpowered test or a needlessly long one
 D) Such calculations are a formality without real bearing
 
 *Correct answer: C*
-*Explanation: The calculation sizes the experiment correctly on both ends — not so small it misses a real effect, not so long it wastes time confirming an obvious one.*
+*Explanation: The calculation sizes the experiment correctly on both ends not so small it misses a real effect, not so long it wastes time confirming an obvious one.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
@@ -585,7 +585,7 @@ D) One analysis holds its rate; repeated checks exceed it
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM wants to test a change but calculates that reaching adequate statistical power would take four months given current traffic levels — far longer than the team's planning horizon allows. Using this lesson's frameworks, what is the most defensible approach?**
+**15. (Product Thinking, Highest Difficulty) A PM wants to test a change but calculates that reaching adequate statistical power would take four months given current traffic levels far longer than the team's planning horizon allows. Using this lesson's frameworks, what is the most defensible approach?**
 A) Run it for two weeks and treat that result as final
 B) Cut the required sample size to fit the horizon
 C) Abandon experimentation for this product for good
@@ -602,10 +602,10 @@ D) Reshape the test: bigger effect or added research
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 44 — Cohort & Retention Analysis | Resolves both Lesson 43's and Lesson 44's open threads about rigorously validating a proposed fix rather than assuming a plausible hypothesis is correct |
-| **Current Lesson** | Lesson 45 — A/B Testing & Experimentation | Random assignment; p-values; statistical power; the Peeking Trap; pre-registration |
-| **Next Lesson** | Lesson 46 — Growth Loops & Virality | Applies experimental rigor to validating growth mechanisms and loop interventions |
+| **Previous Lesson** | Lesson 44 Cohort & Retention Analysis | Resolves both Lesson 43's and Lesson 44's open threads about rigorously validating a proposed fix rather than assuming a plausible hypothesis is correct |
+| **Current Lesson** | Lesson 45 A/B Testing & Experimentation | Random assignment; p-values; statistical power; the Peeking Trap; pre-registration |
+| **Next Lesson** | Lesson 46 Growth Loops & Virality | Applies experimental rigor to validating growth mechanisms and loop interventions |
 | **Future Concepts Unlocked** | Lesson 50 (Product-Led Growth) | Depends on rigorous experimentation to validate self-serve growth mechanics |
 | | Lesson 57 (Ethics in Product Management) | Revisits experimentation's ethical boundaries, including informed consent and manipulation concerns |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry random assignment, statistical power, and the Peeking Trap with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry random assignment, statistical power, and the Peeking Trap with you they will not be re-explained, only re-applied in new contexts.

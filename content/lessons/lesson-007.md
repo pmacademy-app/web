@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Last lesson ended with a validated job: field staff need a way to guarantee a safety inspection gets recorded and eventually synced, regardless of momentary connectivity. Knowing the job is only half of the work. The other half is answering a much sharper question: **why should this specific person choose this specific product, over every other way — including doing nothing — of getting that job done?** That answer is a value proposition, and most product teams either skip articulating it explicitly, or write one so vague it could describe any competitor equally well.
+Last lesson ended with a validated job: field staff need a way to guarantee a safety inspection gets recorded and eventually synced, regardless of momentary connectivity. Knowing the job is only half of the work. The other half is answering a much sharper question: **why should this specific person choose this specific product, over every other way including doing nothing of getting that job done?** That answer is a value proposition, and most product teams either skip articulating it explicitly, or write one so vague it could describe any competitor equally well.
 
 A **value proposition** is a clear statement of the specific value a product delivers to a specific audience, for a specific job, better than the available alternatives. It is not a slogan, not a mission statement, and not a list of features. It is closer to a hypothesis: "for this person, doing this job, our product is the best available choice, because of these specific reasons, and here is the evidence."
 
-This lesson matters because a fuzzy value proposition produces fuzzy prioritization. If a team cannot state precisely why a customer chooses them over the alternative — a competitor, a workaround, or non-consumption from Lesson 6 — then every roadmap debate becomes a matter of opinion, because there is no shared, falsifiable claim to test decisions against. A sharp value proposition, by contrast, becomes a filter: any proposed feature can be checked against it directly — does this strengthen the specific value we claim to deliver, or is it unrelated, or worse, does it dilute it by pulling the product toward being a slightly-worse version of some other product's value proposition?
+This lesson matters because a fuzzy value proposition produces fuzzy prioritization. If a team cannot state precisely why a customer chooses them over the alternative a competitor, a workaround, or non-consumption from Lesson 6 then every roadmap debate becomes a matter of opinion, because there is no shared, falsifiable claim to test decisions against. A sharp value proposition, by contrast, becomes a filter: any proposed feature can be checked against it directly does this strengthen the specific value we claim to deliver, or is it unrelated, or worse, does it dilute it by pulling the product toward being a slightly-worse version of some other product's value proposition?
 
 ---
 
@@ -14,13 +14,13 @@ This lesson matters because a fuzzy value proposition produces fuzzy prioritizat
 
 | Field | Detail |
 |---|---|
-| **Module** | 1 — Foundations |
+| **Module** | 1 Foundations |
 | **Current Lesson** | 7 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 5 (Users vs. Customers), Lesson 6 (Jobs To Be Done) |
-| **Next Lesson** | Lesson 8 — Product Discovery |
-| **Future Topics Unlocked** | Lesson 8 (Product Discovery — testing a value proposition before building), Lesson 9 (Product Vision — a value proposition extended across time), Lesson 10 (Product Strategy Basics — choosing which value proposition to compete on) |
+| **Next Lesson** | Lesson 8 Product Discovery |
+| **Future Topics Unlocked** | Lesson 8 (Product Discovery testing a value proposition before building), Lesson 9 (Product Vision a value proposition extended across time), Lesson 10 (Product Strategy Basics choosing which value proposition to compete on) |
 
 ---
 
@@ -38,7 +38,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-Lesson 5 (Users vs. Customers) and Lesson 6 (Jobs To Be Done). This lesson assumes you can name a specific stakeholder role on the Alignment Spectrum and can produce a laddered job statement using the "When/I want to/so I can" structure — a value proposition is, in a real sense, the answer to "and this product is the best way to do that, because..." appended directly onto a job statement.
+Lesson 5 (Users vs. Customers) and Lesson 6 (Jobs To Be Done). This lesson assumes you can name a specific stakeholder role on the Alignment Spectrum and can produce a laddered job statement using the "When/I want to/so I can" structure a value proposition is, in a real sense, the answer to "and this product is the best way to do that, because..." appended directly onto a job statement.
 
 ---
 
@@ -50,21 +50,21 @@ A value proposition states: **for [a specific audience], who [has a specific job
 
 This is a widely used structural template (closely related to Geoffrey Moore's positioning statement format from *Crossing the Chasm*), and every clause in it is load-bearing:
 
-- **A specific audience** — not "everyone," but a named segment, ideally tied to a specific job (Lesson 6) or a specific position on the Alignment Spectrum (Lesson 5).
-- **A specific job or problem** — the thing this audience is actually trying to accomplish, stated in job terms rather than feature terms.
-- **A specific kind of solution** — the category the product belongs to, which sets the audience's basic expectations.
-- **A specific, differentiated benefit** — the part that actually does the strategic work: what does this product deliver that the alternative does not?
-- **The primary alternative** — explicitly named, because a value proposition that doesn't name what it's better *than* cannot actually be evaluated as a comparative claim at all.
+- **A specific audience** not "everyone," but a named segment, ideally tied to a specific job (Lesson 6) or a specific position on the Alignment Spectrum (Lesson 5).
+- **A specific job or problem** the thing this audience is actually trying to accomplish, stated in job terms rather than feature terms.
+- **A specific kind of solution** the category the product belongs to, which sets the audience's basic expectations.
+- **A specific, differentiated benefit** the part that actually does the strategic work: what does this product deliver that the alternative does not?
+- **The primary alternative** explicitly named, because a value proposition that doesn't name what it's better *than* cannot actually be evaluated as a comparative claim at all.
 
-### Why "For Everyone" Is Not a Value Proposition — It's the Absence of One
+### Why "For Everyone" Is Not a Value Proposition It's the Absence of One
 
-A recurring failure mode, especially at early-stage companies eager not to turn away any potential customer, is a value proposition that tries to serve every possible audience and every possible job simultaneously: "Our platform helps businesses of all sizes work more efficiently." This statement is not wrong, exactly — it is simply not a value proposition, because it fails the basic test of specificity: it says nothing that a hundred other tools could not equally claim, and it gives a PM no way to evaluate whether a proposed feature strengthens or weakens the product's actual position.
+A recurring failure mode, especially at early-stage companies eager not to turn away any potential customer, is a value proposition that tries to serve every possible audience and every possible job simultaneously: "Our platform helps businesses of all sizes work more efficiently." This statement is not wrong, exactly it is simply not a value proposition, because it fails the basic test of specificity: it says nothing that a hundred other tools could not equally claim, and it gives a PM no way to evaluate whether a proposed feature strengthens or weakens the product's actual position.
 
 This connects directly to a well-established idea in strategy: a real strategic choice necessarily excludes some options in favor of others. A value proposition that includes everyone and excludes nothing has not made a choice, and a product built to satisfy an unbounded audience with an unbounded set of jobs will tend to drift toward being a mediocre, generic version of many other products, rather than an excellent, differentiated version of one thing for one clearly named audience.
 
 ### The Relationship Between Value Proposition and Job to Be Done
 
-A value proposition is not a replacement for a job statement — it is built directly on top of one. Recall Lesson 6's structure:
+A value proposition is not a replacement for a job statement it is built directly on top of one. Recall Lesson 6's structure:
 
 > **Job statement:** "When [situation], I want to [motivation], so I can [outcome]."
 
@@ -72,11 +72,11 @@ A value proposition adds a claim about *why this specific product* is the best a
 
 > **Value proposition:** "For [the person in that situation], [product] is the [category] that [uniquely delivers X], unlike [the alternative they'd otherwise use]."
 
-Written this way, it becomes clear that a value proposition without a preceding, validated job statement is built on sand — it is a claim about being the best solution to a problem the team may not have actually confirmed is real, painful, or currently poorly served (the non-consumption question from Lesson 6). This is why this lesson sits directly after Jobs to Be Done in the curriculum sequence, rather than before it.
+Written this way, it becomes clear that a value proposition without a preceding, validated job statement is built on sand it is a claim about being the best solution to a problem the team may not have actually confirmed is real, painful, or currently poorly served (the non-consumption question from Lesson 6). This is why this lesson sits directly after Jobs to Be Done in the curriculum sequence, rather than before it.
 
 ### Value Propositions Across the User-Customer Divide
 
-Recall from Lesson 5 that users and customers frequently have different jobs and different concerns. A product with meaningful user-customer divergence often needs **two distinct value propositions** — one aimed at the user, one aimed at the customer/buyer — that are consistent with each other but not identical.
+Recall from Lesson 5 that users and customers frequently have different jobs and different concerns. A product with meaningful user-customer divergence often needs **two distinct value propositions** one aimed at the user, one aimed at the customer/buyer that are consistent with each other but not identical.
 
 ```mermaid
 %%{init: {
@@ -118,20 +118,20 @@ graph TD
 
 For example, a workplace analytics tool might have:
 
-- **User-facing value proposition:** "For managers who need a quick pulse on team workload, [Product] is the dashboard that surfaces the one metric that matters before your Monday stand-up — unlike digging through three separate spreadsheets."
-- **Customer/buyer-facing value proposition:** "For HR leaders who must demonstrate measurable productivity gains to the board, [Product] is the analytics platform that provides audit-ready reporting in one click — unlike stitching together exports from disconnected tools."
+- **User-facing value proposition:** "For managers who need a quick pulse on team workload, [Product] is the dashboard that surfaces the one metric that matters before your Monday stand-up unlike digging through three separate spreadsheets."
+- **Customer/buyer-facing value proposition:** "For HR leaders who must demonstrate measurable productivity gains to the board, [Product] is the analytics platform that provides audit-ready reporting in one click unlike stitching together exports from disconnected tools."
 
-Notice these are not contradictory — both could be true of the same underlying product — but they emphasize entirely different benefits, because they answer entirely different jobs held by entirely different people (Lesson 5's Stakeholder Ledger applied directly). A PM who writes only one value proposition and assumes it covers both audiences risks producing marketing, onboarding, and even feature-prioritization decisions that resonate with one side of the Alignment Spectrum and fall flat with the other.
+Notice these are not contradictory both could be true of the same underlying product but they emphasize entirely different benefits, because they answer entirely different jobs held by entirely different people (Lesson 5's Stakeholder Ledger applied directly). A PM who writes only one value proposition and assumes it covers both audiences risks producing marketing, onboarding, and even feature-prioritization decisions that resonate with one side of the Alignment Spectrum and fall flat with the other.
 
 ### Using a Value Proposition as a Prioritization Filter
 
 Beyond external communication, a value proposition's most important internal use is as a **filter for evaluating proposed work**. Given any proposed feature, a PM can ask:
 
 1. Does this feature strengthen the specific, differentiated benefit named in our value proposition?
-2. Does this feature address the named audience and named job — or does it serve a different audience or job entirely?
-3. Does this feature help us win specifically against the named alternative — or is it a feature the alternative already has, making it table stakes rather than differentiation?
+2. Does this feature address the named audience and named job or does it serve a different audience or job entirely?
+3. Does this feature help us win specifically against the named alternative or is it a feature the alternative already has, making it table stakes rather than differentiation?
 
-A feature can pass a naive "is this valuable?" test while failing this filter — it might be valuable to *someone*, just not to the specific audience and job the value proposition names, meaning building it doesn't advance the product's actual strategic position; it just adds scope.
+A feature can pass a naive "is this valuable?" test while failing this filter it might be valuable to *someone*, just not to the specific audience and job the value proposition names, meaning building it doesn't advance the product's actual strategic position; it just adds scope.
 
 ---
 
@@ -162,7 +162,7 @@ Broadening a value proposition to avoid excluding any potential customer feels s
 
 ## Mental Model: The Value Proposition Filter
 
-This lesson's mental model is the **Value Proposition Filter** — a habit of running every proposed feature through the three questions above before committing engineering resources to it.
+This lesson's mental model is the **Value Proposition Filter** a habit of running every proposed feature through the three questions above before committing engineering resources to it.
 
 ```mermaid
 %%{init: {
@@ -211,7 +211,7 @@ Use this filter as a standing discipline in roadmap reviews: any feature that ca
 
 ## Real Company Example
 
-**Duolingo** offers a useful illustration of a sharply specific value proposition rather than a generic one. Duolingo's positioning has consistently centered on making language learning accessible, habit-forming, and low-friction for casual learners — using short, gamified daily lessons, streaks, and reminders — rather than competing on the depth or fluency outcomes that more intensive, immersion-based, or classroom-based language programs claim to deliver. This is a deliberate exclusion: Duolingo's public communication and product design choices have not generally positioned the product as a replacement for full immersion or academic-level fluency, but as the best available option for a specific audience (people who want to build a language habit in small daily increments, and who would otherwise likely do no language learning at all — directly invoking the non-consumption idea from Lesson 6) against the alternative of a more intensive program that this same audience is unlikely to actually stick with.
+**Duolingo** offers a useful illustration of a sharply specific value proposition rather than a generic one. Duolingo's positioning has consistently centered on making language learning accessible, habit-forming, and low-friction for casual learners using short, gamified daily lessons, streaks, and reminders rather than competing on the depth or fluency outcomes that more intensive, immersion-based, or classroom-based language programs claim to deliver. This is a deliberate exclusion: Duolingo's public communication and product design choices have not generally positioned the product as a replacement for full immersion or academic-level fluency, but as the best available option for a specific audience (people who want to build a language habit in small daily increments, and who would otherwise likely do no language learning at all directly invoking the non-consumption idea from Lesson 6) against the alternative of a more intensive program that this same audience is unlikely to actually stick with.
 
 *(Assumption flagged: this reflects widely observed and reported product positioning rather than a claim about Duolingo's internal strategic documents, which this curriculum does not claim certainty about.)*
 
@@ -223,7 +223,7 @@ Use this filter as a standing discipline in roadmap reviews: any feature that ca
 The value proposition is often still a live hypothesis rather than a settled fact, and the primary job of early product discovery (Lesson 8) is testing whether the claimed differentiated benefit is actually true and actually valued by the named audience, rather than assumed to be true because the founding team believes it. Startups frequently iterate on the exact wording and even the exact audience of their value proposition multiple times before finding one that survives contact with real customer conversations.
 
 **At a mid-size company:**
-The value proposition often becomes a genuine internal tool for resolving prioritization disputes across multiple teams — used explicitly in roadmap reviews as the filter described above, and revisited periodically as the competitive landscape or the named "primary alternative" shifts (a new entrant, a competitor's new feature, a changing market expectation for "table stakes").
+The value proposition often becomes a genuine internal tool for resolving prioritization disputes across multiple teams used explicitly in roadmap reviews as the filter described above, and revisited periodically as the competitive landscape or the named "primary alternative" shifts (a new entrant, a competitor's new feature, a changing market expectation for "table stakes").
 
 **At Big Tech:**
 Large companies often manage multiple, deliberately distinct value propositions across different product lines or tiers within the same overall brand, and a substantial part of senior product strategy work involves ensuring these value propositions remain internally consistent (not contradicting or cannibalizing each other) rather than assuming a single company-wide value proposition can meaningfully describe every product in a large portfolio.
@@ -234,21 +234,21 @@ Large companies often manage multiple, deliberately distinct value propositions 
 
 Consider a simplified, illustrative scenario common across early-stage B2B SaaS.
 
-A startup builds a scheduling tool initially aimed at independent contractors and freelancers who need a simple way to let clients book time on their calendar without back-and-forth emails. Early value proposition: "For freelancers who lose time coordinating meetings by email, [Product] is the booking tool that lets clients pick a slot in one click — unlike endless email threads."
+A startup builds a scheduling tool initially aimed at independent contractors and freelancers who need a simple way to let clients book time on their calendar without back-and-forth emails. Early value proposition: "For freelancers who lose time coordinating meetings by email, [Product] is the booking tool that lets clients pick a slot in one click unlike endless email threads."
 
-The product gains modest early traction. Encouraged, the founding team notices that a few larger companies have also signed up, apparently using the tool for internal team scheduling across departments — a different audience, doing a somewhat different job (internal coordination across many calendars, rather than external client-facing booking). Excited by the larger contract sizes this segment implies, leadership directs the team to build features aimed at this new audience: multi-calendar team views, department-level permissions, and admin controls.
+The product gains modest early traction. Encouraged, the founding team notices that a few larger companies have also signed up, apparently using the tool for internal team scheduling across departments a different audience, doing a somewhat different job (internal coordination across many calendars, rather than external client-facing booking). Excited by the larger contract sizes this segment implies, leadership directs the team to build features aimed at this new audience: multi-calendar team views, department-level permissions, and admin controls.
 
 Eighteen months later, the product has a confusing feature set that partially serves both audiences and fully satisfies neither. Freelancer users complain the interface has become cluttered with team-administration concepts irrelevant to their simple, one-click booking need. Enterprise buyers, meanwhile, compare the product unfavorably to dedicated enterprise scheduling suites that were built from the ground up around multi-calendar administration, finding the freelancer-oriented core experience underpowered for their needs.
 
 **What went wrong?**
 
-The team never explicitly re-evaluated its value proposition when it discovered the second audience — it simply began building for both simultaneously, without confronting the fact that these were **two different jobs, two different primary alternatives, and arguably two different products** wearing one interface:
+The team never explicitly re-evaluated its value proposition when it discovered the second audience it simply began building for both simultaneously, without confronting the fact that these were **two different jobs, two different primary alternatives, and arguably two different products** wearing one interface:
 
 1. The freelancer audience's job (frictionless client-facing booking) and primary alternative (email back-and-forth) had almost nothing in common with the enterprise audience's job (internal team calendar coordination) and primary alternative (dedicated enterprise scheduling suites).
 2. Every feature built for the enterprise audience (multi-calendar views, permissions, admin controls) added complexity that directly worked against the original, sharply differentiated freelancer value proposition of frictionless simplicity.
 3. Every feature that kept the interface simple for freelancers left the product underpowered relative to purpose-built enterprise alternatives, since those competitors were not making the same compromise.
 
-A team applying the Value Proposition Filter from Lesson 7 at the moment enterprise usage was first noticed would have confronted an explicit strategic choice — commit fully to the freelancer value proposition and treat enterprise usage as an interesting but secondary signal, commit fully to pivoting toward the enterprise value proposition and accept some freelancer attrition, or deliberately build two genuinely separate product experiences (a common resolution in practice) — rather than attempting to serve both audiences within a single, increasingly incoherent value proposition by default.
+A team applying the Value Proposition Filter from Lesson 7 at the moment enterprise usage was first noticed would have confronted an explicit strategic choice commit fully to the freelancer value proposition and treat enterprise usage as an interesting but secondary signal, commit fully to pivoting toward the enterprise value proposition and accept some freelancer attrition, or deliberately build two genuinely separate product experiences (a common resolution in practice) rather than attempting to serve both audiences within a single, increasingly incoherent value proposition by default.
 
 This case will be revisited in **Lesson 10 (Product Strategy Basics)**, where we formalize the process of choosing which value proposition, and which audience, to commit strategic resources toward when multiple are viable.
 
@@ -260,14 +260,14 @@ The structural template introduced earlier in this lesson is worth restating as 
 
 > For **[target audience]**, who **[statement of job or problem]**, **[product name]** is a **[product category]** that **[key differentiated benefit]**. Unlike **[primary alternative]**, our product **[key point of differentiation]**.
 
-Filling in every blank forces the specificity this lesson argues for. A team that cannot fill in the "unlike" and "key point of differentiation" blanks with something specific and defensible has, in a real sense, discovered that it does not yet have a value proposition at all — only a product description. This is a useful diagnostic in its own right: **if you cannot complete this template with specific, non-generic language, that gap is itself a signal about what discovery work (Lesson 8) still needs to happen**, not simply a wording problem to be smoothed over with better marketing copy.
+Filling in every blank forces the specificity this lesson argues for. A team that cannot fill in the "unlike" and "key point of differentiation" blanks with something specific and defensible has, in a real sense, discovered that it does not yet have a value proposition at all only a product description. This is a useful diagnostic in its own right: **if you cannot complete this template with specific, non-generic language, that gap is itself a signal about what discovery work (Lesson 8) still needs to happen**, not simply a wording problem to be smoothed over with better marketing copy.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "Describe your product's value proposition."**
-*What the interviewer is actually evaluating:* Whether the candidate can state something specific and falsifiable — a named audience, a named job, a named differentiated benefit, a named alternative — versus a generic, feature-listing, or mission-statement-style answer that could apply to almost any product in the category. A strong answer sounds like a claim that could, in principle, be proven wrong by evidence; a weak answer sounds like marketing copy no one could disagree with.
+*What the interviewer is actually evaluating:* Whether the candidate can state something specific and falsifiable a named audience, a named job, a named differentiated benefit, a named alternative versus a generic, feature-listing, or mission-statement-style answer that could apply to almost any product in the category. A strong answer sounds like a claim that could, in principle, be proven wrong by evidence; a weak answer sounds like marketing copy no one could disagree with.
 
 **Typical question 2: "A stakeholder proposes a feature that's popular with users but doesn't fit your product's core value proposition. What do you do?"**
 *What the interviewer is actually evaluating:* Whether the candidate treats the value proposition as a genuine filter with real consequences (potentially declining or deprioritizing a popular-sounding feature) or treats it as decoration that never actually constrains a decision. A strong answer explains the specific mismatch (wrong audience, wrong job, or matches-but-doesn't-differentiate against the named alternative) rather than a vague sense that the feature "doesn't feel right."
@@ -279,16 +279,16 @@ Filling in every blank forces the specificity this lesson argues for. A team tha
 
 ## Summary
 
-A value proposition is a specific, falsifiable claim that a product is the best available way for a named audience, with a named job, to get better outcomes than a named alternative — built directly on top of a validated job statement from Lesson 6, not as a replacement for one. The most common failure is writing a value proposition broad enough to describe almost any competitor, which sacrifices the specificity that makes it useful at all, particularly the temptation to serve "everyone" rather than making a real strategic choice. Products with meaningful user-customer divergence (Lesson 5) frequently need two coherent but distinct value propositions, one per audience, rather than a single compromise statement. Beyond external communication, a value proposition's most important internal use is as a prioritization filter — checking whether a proposed feature strengthens the named differentiated benefit, serves the named audience and job, and helps win specifically against the named alternative, rather than merely sounding valuable in the abstract.
+A value proposition is a specific, falsifiable claim that a product is the best available way for a named audience, with a named job, to get better outcomes than a named alternative built directly on top of a validated job statement from Lesson 6, not as a replacement for one. The most common failure is writing a value proposition broad enough to describe almost any competitor, which sacrifices the specificity that makes it useful at all, particularly the temptation to serve "everyone" rather than making a real strategic choice. Products with meaningful user-customer divergence (Lesson 5) frequently need two coherent but distinct value propositions, one per audience, rather than a single compromise statement. Beyond external communication, a value proposition's most important internal use is as a prioritization filter checking whether a proposed feature strengthens the named differentiated benefit, serves the named audience and job, and helps win specifically against the named alternative, rather than merely sounding valuable in the abstract.
 
 ---
 
 ## Key Takeaways
 
-- A value proposition names a specific audience, a specific job, a specific differentiated benefit, and a specific named alternative — all four elements are load-bearing.
+- A value proposition names a specific audience, a specific job, a specific differentiated benefit, and a specific named alternative all four elements are load-bearing.
 - A value proposition is built directly on top of a validated job statement (Lesson 6); without a real, validated job underneath it, a value proposition is a claim built on sand.
-- "For everyone" is not an inclusive value proposition — it is the absence of a real strategic choice, and typically produces a diluted, less-differentiated product.
-- Products with meaningful user-customer divergence often require two distinct, coherent value propositions — one per audience — rather than a single compromise statement.
+- "For everyone" is not an inclusive value proposition it is the absence of a real strategic choice, and typically produces a diluted, less-differentiated product.
+- Products with meaningful user-customer divergence often require two distinct, coherent value propositions one per audience rather than a single compromise statement.
 - The Value Proposition Filter (does this strengthen our differentiated benefit, serve our named audience/job, and help us win against our named alternative?) is a practical prioritization tool, not just an external marketing exercise.
 - Discovering a new, unplanned audience for a product (as in the Detailed Case Study) requires an explicit strategic choice, not silent, simultaneous expansion to serve both the original and new audience.
 - If you cannot fill in a positioning statement template with specific language, that gap is a signal that more discovery work is needed, not simply a copywriting problem.
@@ -300,11 +300,11 @@ A value proposition is a specific, falsifiable claim that a product is the best 
 *A two-minute review of everything in this lesson.*
 
 - **Value proposition:** for [audience], with [job], [product] delivers [differentiated benefit], unlike [named alternative].
-- **Built on top of a job statement** (Lesson 6) — not a replacement for one.
-- **"For everyone" = no value proposition** — it's the absence of a real strategic choice.
+- **Built on top of a job statement** (Lesson 6) not a replacement for one.
+- **"For everyone" = no value proposition** it's the absence of a real strategic choice.
 - **User-customer divergence** (Lesson 5) often requires two distinct value propositions, not one.
 - **Value Proposition Filter:** does this feature strengthen the benefit? serve the named audience/job? help win against the named alternative (vs. just match it)?
-- **Positioning statement template:** fill every blank with something specific — if you can't, that's a discovery gap, not a wording problem.
+- **Positioning statement template:** fill every blank with something specific if you can't, that's a discovery gap, not a wording problem.
 - **Biggest trap:** discovering a new audience and silently trying to serve both without an explicit strategic choice.
 
 ---
@@ -323,9 +323,9 @@ A value proposition is a specific, falsifiable claim that a product is the best 
 
 ## Further Reading / Resources
 
-- Geoffrey Moore, *Crossing the Chasm* — the origin of the widely used positioning statement template referenced in this lesson.
-- Alexander Osterwalder, Yves Pigneur, et al., *Value Proposition Design* — a detailed, visual companion methodology (the Value Proposition Canvas) for mapping customer jobs, pains, and gains against product features and benefits.
-- April Dunford, *Obviously Awesome* — a modern, widely cited treatment of product positioning that directly addresses the "trying to serve everyone" failure pattern discussed in this lesson.
+- Geoffrey Moore, *Crossing the Chasm* the origin of the widely used positioning statement template referenced in this lesson.
+- Alexander Osterwalder, Yves Pigneur, et al., *Value Proposition Design* a detailed, visual companion methodology (the Value Proposition Canvas) for mapping customer jobs, pains, and gains against product features and benefits.
+- April Dunford, *Obviously Awesome* a modern, widely cited treatment of product positioning that directly addresses the "trying to serve everyone" failure pattern discussed in this lesson.
 
 ---
 
@@ -339,7 +339,7 @@ A value proposition is a specific, falsifiable claim that a product is the best 
 
 **Card 2**
 - Front: What must a value proposition be built directly on top of?
-- Back: A validated job statement (Lesson 6) — without a real, validated underlying job, a value proposition is a claim built on sand.
+- Back: A validated job statement (Lesson 6) without a real, validated underlying job, a value proposition is a claim built on sand.
 - Difficulty: 2
 - Tags: value-proposition, jtbd
 
@@ -370,7 +370,7 @@ A value proposition is a specific, falsifiable claim that a product is the best 
 
 ## Reflection Exercise
 
-You are the PM for a recipe app. Your current value proposition: "For home cooks who don't know what to make with what's already in their fridge, [Product] is the recipe app that generates a usable recipe from a photo of your fridge's contents — unlike scrolling through generic recipe blogs."
+You are the PM for a recipe app. Your current value proposition: "For home cooks who don't know what to make with what's already in their fridge, [Product] is the recipe app that generates a usable recipe from a photo of your fridge's contents unlike scrolling through generic recipe blogs."
 
 A subset of power users has begun using the app heavily for a different purpose: meticulous, macro-tracking meal planning for strict fitness diets, and this segment has an unusually high willingness to pay for a premium tier.
 
@@ -441,7 +441,7 @@ D) When user and customer audiences genuinely diverge
 ---
 
 **5. In the Value Proposition Filter, what does it mean if a proposed feature merely matches an alternative's existing capability?**
-A) It is table stakes — possibly necessary, but not differentiating
+A) It is table stakes possibly necessary, but not differentiating
 B) It should immediately become the single highest priority on the roadmap
 C) It should be rejected, since matching a rival is wasted effort
 D) It indicates the stated value proposition needs to be rewritten
@@ -473,7 +473,7 @@ C) "Unlike three separate spreadsheets, [Product] gives you one dashboard."
 D) "For HR leaders, [Product] delivers audit-ready reporting in one click."
 
 *Correct answer: A*
-*Explanation: A names three capabilities and stops. It never says who they are for, what job they serve, or what they beat — features are the means, and a value proposition is about the result the audience gets.*
+*Explanation: A names three capabilities and stops. It never says who they are for, what job they serve, or what they beat features are the means, and a value proposition is about the result the audience gets.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
@@ -482,7 +482,7 @@ D) "For HR leaders, [Product] delivers audit-ready reporting in one click."
 **8. (Scenario) A product's value proposition names "spreadsheets and manual tracking" as its primary alternative. According to this lesson, what does naming a primary alternative allow a PM to do that a value proposition without one cannot?**
 A) Evaluate the proposition as a genuinely testable comparative claim
 B) Guarantee that the product will outperform every rival automatically
-C) Little — naming an alternative is mainly a marketing formality
+C) Little naming an alternative is mainly a marketing formality
 D) Avoid revisiting the value proposition as the market shifts
 
 *Correct answer: A*
@@ -499,7 +499,7 @@ C) Reject it outright, since a filter failure settles the question
 D) Treat the mismatch as a flag for explicit discussion
 
 *Correct answer: D*
-*Explanation: The filter surfaces a question rather than answering it. The mismatch might mean scope creep, or it might be early evidence that the value proposition itself should evolve — and only a deliberate conversation distinguishes the two.*
+*Explanation: The filter surfaces a question rather than answering it. The mismatch might mean scope creep, or it might be early evidence that the value proposition itself should evolve and only a deliberate conversation distinguishes the two.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
@@ -519,8 +519,8 @@ D) Approval, since the framing is ambitious and universally positive
 ---
 
 **11. (Product Thinking, Higher Difficulty) A subscription fitness app's user-facing value proposition emphasizes "personalized workouts that adapt daily," while its customer-facing (corporate wellness buyer) value proposition emphasizes "measurable employee engagement reporting for HR." According to this lesson, is having two different value propositions here a problem?**
-A) Yes — a product must maintain exactly one universal value proposition
-B) Yes — users and buyers must receive identical product messaging
+A) Yes a product must maintain exactly one universal value proposition
+B) Yes users and buyers must receive identical product messaging
 C) No, provided the two stay coherent with each other rather than contradictory
 D) No, though this is a special exception peculiar to fitness products
 
@@ -572,7 +572,7 @@ D) Because serving two segments requires a formal legal review process
 
 **15. (Highest Difficulty) A team completes the positioning statement template but is unable to fill in a specific, defensible answer for the "unlike [primary alternative]" and "key point of differentiation" blanks. According to this lesson, what does this most likely indicate?**
 A) The template is flawed and the team should abandon it for another
-B) A gap in discovery — the team does not yet know what it competes against
+B) A gap in discovery the team does not yet know what it competes against
 C) The team should invent a plausible alternative, since any statement beats none
 D) The product should be discontinued and the segment abandoned entirely
 
@@ -587,11 +587,11 @@ D) The product should be discontinued and the segment abandoned entirely
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 6 — Jobs To Be Done | Provides the validated job statement that a value proposition is built directly on top of |
-| **Current Lesson** | Lesson 7 — Value Proposition | Positioning statement template; the Value Proposition Filter; divergent value propositions for divergent audiences |
-| **Next Lesson** | Lesson 8 — Product Discovery | Provides the methods for testing whether a proposed value proposition is actually true, before committing significant engineering investment to it |
+| **Previous Lesson** | Lesson 6 Jobs To Be Done | Provides the validated job statement that a value proposition is built directly on top of |
+| **Current Lesson** | Lesson 7 Value Proposition | Positioning statement template; the Value Proposition Filter; divergent value propositions for divergent audiences |
+| **Next Lesson** | Lesson 8 Product Discovery | Provides the methods for testing whether a proposed value proposition is actually true, before committing significant engineering investment to it |
 | **Future Concepts Unlocked** | Lesson 9 (Product Vision) | Extends a validated value proposition across time into a longer-term aspirational direction |
 | | Lesson 10 (Product Strategy Basics) | Formalizes the process (previewed in this lesson's Case Study) of choosing which value proposition and audience to commit strategic resources toward |
 | | Lesson 29 (Prioritization Fundamentals) | Incorporates the Value Proposition Filter as one lens within a fuller prioritization scoring model |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a product's strategic direction assumes a specific, filterable value proposition exists — this will not be re-explained, only re-applied and tested.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a product's strategic direction assumes a specific, filterable value proposition exists this will not be re-explained, only re-applied and tested.

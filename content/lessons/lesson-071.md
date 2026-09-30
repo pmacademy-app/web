@@ -4,9 +4,9 @@
 
 Module 7 closed with a synthesis lesson teaching you to diagnose platform problems by combining multiple narrow models into an integrated view. Module 8 shifts the altitude of the conversation considerably higher: instead of diagnosing a specific platform mechanism, you'll now be reasoning about the broader question of what a product organization should actually be trying to achieve, and how a leadership team decides where to place its limited resources among many plausible directions.
 
-Nearly every PM, at some point in their career, sits in a room where someone presents an inspiring vision statement — "we will be the platform every small business relies on to run their operations" — and watches the room nod in agreement, energized, and then leave with no clearer idea of what to actually build next month than they had walking in. This is not a failure of vision; visions are supposed to be aspirational and somewhat abstract. It is a failure of the connective tissue between vision and execution — the absence of a disciplined process for translating an inspiring but necessarily vague direction into a small number of concrete, falsifiable strategic bets that a team can actually execute against and later evaluate.
+Nearly every PM, at some point in their career, sits in a room where someone presents an inspiring vision statement "we will be the platform every small business relies on to run their operations" and watches the room nod in agreement, energized, and then leave with no clearer idea of what to actually build next month than they had walking in. This is not a failure of vision; visions are supposed to be aspirational and somewhat abstract. It is a failure of the connective tissue between vision and execution the absence of a disciplined process for translating an inspiring but necessarily vague direction into a small number of concrete, falsifiable strategic bets that a team can actually execute against and later evaluate.
 
-This lesson introduces the Strategy Cascade, this lesson's core mental model, to give you a structured way to trace the path from an abstract vision down to the specific, testable bets that vision should generate — and to recognize when that connective tissue is missing, which is one of the most common and expensive failures in product organizations of any size.
+This lesson introduces the Strategy Cascade, this lesson's core mental model, to give you a structured way to trace the path from an abstract vision down to the specific, testable bets that vision should generate and to recognize when that connective tissue is missing, which is one of the most common and expensive failures in product organizations of any size.
 
 ---
 
@@ -14,13 +14,13 @@ This lesson introduces the Strategy Cascade, this lesson's core mental model, to
 
 | Field | Detail |
 |---|---|
-| **Module** | 8 — Advanced Strategy, Innovation & Enterprise/B2B Product Management |
+| **Module** | 8 Advanced Strategy, Innovation & Enterprise/B2B Product Management |
 | **Current Lesson** | 71 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (Output vs. Outcome), Lesson 60 (Product Philosophy synthesis), Module 7's Platform Health Radar (Lesson 70) as an example of connected-model thinking |
-| **Next Lesson** | Lesson 72 — Enterprise & B2B Product Management Fundamentals |
-| **Future Topics Unlocked** | Lesson 72 (Enterprise & B2B Fundamentals), Lesson 77 (Innovation Accounting and Portfolio Management), Lesson 80 (Module Synthesis) — all depend on the Strategy Cascade and falsifiable-bet discipline introduced here |
+| **Next Lesson** | Lesson 72 Enterprise & B2B Product Management Fundamentals |
+| **Future Topics Unlocked** | Lesson 72 (Enterprise & B2B Fundamentals), Lesson 77 (Innovation Accounting and Portfolio Management), Lesson 80 (Module Synthesis) all depend on the Strategy Cascade and falsifiable-bet discipline introduced here |
 
 ---
 
@@ -46,7 +46,7 @@ This lesson assumes the Output vs. Outcome distinction from Lesson 1 and the per
 
 ### Why Vision Alone Is Insufficient
 
-A vision statement is, by design, abstract enough to remain stable over years and inspiring enough to motivate a large organization toward a shared aspiration. These very properties — stability and inspirational abstraction — make a vision statement unsuitable as a direct guide for near-term execution decisions, because it does not, on its own, specify what would count as evidence that the organization is on the right track versus the wrong one. "Be the platform every small business relies on" does not tell a team whether to build a payments feature or a scheduling feature next quarter, nor does it specify what result, if it failed to materialize within a defined period, would indicate the current approach isn't working.
+A vision statement is, by design, abstract enough to remain stable over years and inspiring enough to motivate a large organization toward a shared aspiration. These very properties stability and inspirational abstraction make a vision statement unsuitable as a direct guide for near-term execution decisions, because it does not, on its own, specify what would count as evidence that the organization is on the right track versus the wrong one. "Be the platform every small business relies on" does not tell a team whether to build a payments feature or a scheduling feature next quarter, nor does it specify what result, if it failed to materialize within a defined period, would indicate the current approach isn't working.
 
 The gap between vision and execution is filled by **strategy**: a smaller number of specific, falsifiable claims about how the organization intends to make progress toward the vision, given its actual current resources, market position, and competitive context. Strategy, done well, is the connective tissue that makes a vision actionable without diluting its aspirational scope.
 
@@ -92,11 +92,11 @@ graph TD
     D -->|feedback informs future bets| B
 ```
 
-The Strategy Cascade's core discipline is ensuring that every level below Vision earns the right to exist by being genuinely more specific and falsifiable than the level above it. A **Strategic Bet** is not simply the vision restated in slightly more concrete language ("we will invest in small business tools") — it must be a claim specific enough that it could, in principle, turn out to be wrong ("we believe small businesses will pay a premium for integrated payments and scheduling in a single product, and we will know this is working if attach rate for the combined offering exceeds 40% within two quarters of launch, and know it is failing if it falls below 15%"). A vague restatement of the vision, however specific-sounding its language, has not actually cleared the bar of being a genuine Strategic Bet if it cannot fail.
+The Strategy Cascade's core discipline is ensuring that every level below Vision earns the right to exist by being genuinely more specific and falsifiable than the level above it. A **Strategic Bet** is not simply the vision restated in slightly more concrete language ("we will invest in small business tools") it must be a claim specific enough that it could, in principle, turn out to be wrong ("we believe small businesses will pay a premium for integrated payments and scheduling in a single product, and we will know this is working if attach rate for the combined offering exceeds 40% within two quarters of launch, and know it is failing if it falls below 15%"). A vague restatement of the vision, however specific-sounding its language, has not actually cleared the bar of being a genuine Strategic Bet if it cannot fail.
 
 ### What Makes a Bet "Falsifiable"
 
-A genuine Strategic Bet has three properties: it names a specific hypothesis about the market, the customer, or the competitive landscape; it commits real, opportunity-costed resources to testing that hypothesis; and it specifies, in advance, what evidence would indicate the bet succeeded or failed, rather than allowing success to be declared after the fact based on whatever happened to occur. This third property — pre-committed success criteria — is what separates a real bet from a comfortable, unfalsifiable aspiration that can always be retroactively justified as "on track" regardless of actual results.
+A genuine Strategic Bet has three properties: it names a specific hypothesis about the market, the customer, or the competitive landscape; it commits real, opportunity-costed resources to testing that hypothesis; and it specifies, in advance, what evidence would indicate the bet succeeded or failed, rather than allowing success to be declared after the fact based on whatever happened to occur. This third property pre-committed success criteria is what separates a real bet from a comfortable, unfalsifiable aspiration that can always be retroactively justified as "on track" regardless of actual results.
 
 ### The Three Horizons Framework
 
@@ -104,9 +104,9 @@ A widely used framework for organizing a portfolio of strategic bets by time hor
 
 | Horizon | Focus | Risk Profile | Typical Resource Allocation |
 |---|---|---|---|
-| Horizon 1 | Core, existing business — defending and extending current strength | Low risk, well-understood | Majority of resources |
-| Horizon 2 | Emerging opportunities adjacent to the core — proven demand, unproven execution at scale | Moderate risk | A meaningful but minority share |
-| Horizon 3 | Transformational, exploratory bets — unproven demand, genuinely new territory | High risk, high potential | A small, deliberately protected share |
+| Horizon 1 | Core, existing business defending and extending current strength | Low risk, well-understood | Majority of resources |
+| Horizon 2 | Emerging opportunities adjacent to the core proven demand, unproven execution at scale | Moderate risk | A meaningful but minority share |
+| Horizon 3 | Transformational, exploratory bets unproven demand, genuinely new territory | High risk, high potential | A small, deliberately protected share |
 
 The discipline of the Three Horizons framework is ensuring an organization's bet portfolio is deliberately diversified across all three horizons, rather than either over-investing exclusively in Horizon 1 (safe but eventually stagnant) or over-investing in Horizon 3 (exciting but too risky to sustain the core business that funds it). A company with no Horizon 3 bets at all risks being disrupted by competitors willing to take exploratory risks; a company with too many Horizon 3 bets and insufficient Horizon 1 investment risks running out of resources before any transformational bet has time to prove itself.
 
@@ -142,7 +142,7 @@ Metrics from executed initiatives should inform which future bets are made, rath
 The Strategy Cascade introduced above is this lesson's core takeaway tool. When evaluating any organization's stated strategy, ask:
 
 1. **Is there a clear Vision**, and is it appropriately abstract and stable, rather than trying to also function as a specific execution plan?
-2. **Are the Strategic Bets genuinely falsifiable** — do they name a specific hypothesis, commit real resources, and specify success criteria in advance — or are they simply the vision restated in more specific-sounding language?
+2. **Are the Strategic Bets genuinely falsifiable** do they name a specific hypothesis, commit real resources, and specify success criteria in advance or are they simply the vision restated in more specific-sounding language?
 3. **Do Roadmap Initiatives clearly trace back to a specific bet**, so that every workstream's purpose in the broader strategy is traceable, rather than initiatives existing for their own sake?
 4. **Are Success Metrics specific and pre-committed**, providing genuine evidence of whether each bet is working, rather than metrics selected retroactively to justify whatever happened?
 
@@ -152,9 +152,9 @@ A strategy that can answer all four questions affirmatively has genuine connecti
 
 ## Real Company Example
 
-**Intuit's "AI-driven expert platform" strategy** is directly confirmed in the company's own investor relations materials, not just inferred from public commentary. At its 2024 Investor Day, Intuit's own press release quoted CEO Sasan Goodarzi stating the platform is built to deliver "seamless, connected, done-for-you experiences that help customers make more money with less work" — and the announcement paired that broad vision with specific, named product bets: deeper AI-powered integration between QuickBooks and Mailchimp aimed at automated invoicing and payment collection, and tighter connection between TurboTax and Credit Karma aimed at year-round (not just tax-season) financial guidance. Intuit's investor relations site further credits Goodarzi with the underlying strategic pivot itself — transforming Intuit from a tax-and-accounting software company into what the company explicitly frames as an AI-driven expert platform business.
+**Intuit's "AI-driven expert platform" strategy** is directly confirmed in the company's own investor relations materials, not just inferred from public commentary. At its 2024 Investor Day, Intuit's own press release quoted CEO Sasan Goodarzi stating the platform is built to deliver "seamless, connected, done-for-you experiences that help customers make more money with less work" and the announcement paired that broad vision with specific, named product bets: deeper AI-powered integration between QuickBooks and Mailchimp aimed at automated invoicing and payment collection, and tighter connection between TurboTax and Credit Karma aimed at year-round (not just tax-season) financial guidance. Intuit's investor relations site further credits Goodarzi with the underlying strategic pivot itself transforming Intuit from a tax-and-accounting software company into what the company explicitly frames as an AI-driven expert platform business.
 
-This is a directly citable example of a Strategy Cascade in action: the vision ("helping customers make smart money decisions and grow their businesses") is broad enough to be durable, while the specific bets named at Investor Day — automated QuickBooks/Mailchimp workflows, unified TurboTax/Credit Karma guidance — are concrete and falsifiable enough that Intuit's own investors can later check whether they actually happened, exactly the property this lesson's Strategy Cascade requires of a well-formed bet.
+This is a directly citable example of a Strategy Cascade in action: the vision ("helping customers make smart money decisions and grow their businesses") is broad enough to be durable, while the specific bets named at Investor Day automated QuickBooks/Mailchimp workflows, unified TurboTax/Credit Karma guidance are concrete and falsifiable enough that Intuit's own investors can later check whether they actually happened, exactly the property this lesson's Strategy Cascade requires of a well-formed bet.
 
 *(Source: Intuit's own investor relations press release from its 2024 Investor Day, and Intuit's official investor relations site.)*
 
@@ -162,7 +162,7 @@ This is a directly citable example of a Strategy Cascade in action: the vision (
 
 ## Real World Perspective: Product Strategy Frameworks: From Vision to Bets at Different Company Stages
 
-**Startup:** Early-stage companies often operate with an implicit rather than explicitly documented Strategy Cascade, since a small, tightly aligned founding team may not need a formal document to share an understanding of the current bet — but this informality becomes a liability the moment the team grows large enough that shared understanding can no longer be assumed by default.
+**Startup:** Early-stage companies often operate with an implicit rather than explicitly documented Strategy Cascade, since a small, tightly aligned founding team may not need a formal document to share an understanding of the current bet but this informality becomes a liability the moment the team grows large enough that shared understanding can no longer be assumed by default.
 
 **Mid-size company:** This is typically where the gap between an inspiring vision and an actionable execution plan first becomes organizationally painful, as growing teams working somewhat independently need an explicit, shared Strategy Cascade to avoid pursuing initiatives that, however individually reasonable, don't clearly trace back to any coherent shared bet.
 
@@ -172,13 +172,13 @@ This is a directly citable example of a Strategy Cascade in action: the vision (
 
 ## Detailed Case Study: The Unfalsifiable Pivot
 
-A mid-size software company, facing slowing growth in its core product, announced an ambitious new vision: to become "the essential platform for how modern teams collaborate." Leadership presented this vision enthusiastically at an all-hands meeting, and several teams were subsequently reorganized around loosely related initiatives — a new messaging feature, a document collaboration tool, a project management module — each justified internally as "supporting the collaboration vision."
+A mid-size software company, facing slowing growth in its core product, announced an ambitious new vision: to become "the essential platform for how modern teams collaborate." Leadership presented this vision enthusiastically at an all-hands meeting, and several teams were subsequently reorganized around loosely related initiatives a new messaging feature, a document collaboration tool, a project management module each justified internally as "supporting the collaboration vision."
 
-A year later, when asked to report progress against the vision, no team could point to a specific, pre-committed metric that would have indicated whether the pivot was succeeding or failing. Each team reported activity (features shipped, initiatives launched) but none had ever defined, in advance, what result would count as evidence the underlying strategic bet — that customers wanted an integrated collaboration platform rather than separate best-of-breed tools — was actually correct. When a board member later asked directly whether the collaboration pivot was working, the honest answer was that no one could say with confidence, because nothing had ever been set up to be capable of being wrong.
+A year later, when asked to report progress against the vision, no team could point to a specific, pre-committed metric that would have indicated whether the pivot was succeeding or failing. Each team reported activity (features shipped, initiatives launched) but none had ever defined, in advance, what result would count as evidence the underlying strategic bet that customers wanted an integrated collaboration platform rather than separate best-of-breed tools was actually correct. When a board member later asked directly whether the collaboration pivot was working, the honest answer was that no one could say with confidence, because nothing had ever been set up to be capable of being wrong.
 
-**What went wrong?** Using the Strategy Cascade, the failure is precise: the organization had a Vision (Level 1) and a set of Roadmap Initiatives (Level 3), but had skipped Level 2 (genuine, falsifiable Strategic Bets) entirely, jumping straight from an inspiring but necessarily vague aspiration directly to specific workstreams, with no intervening layer specifying what hypothesis those workstreams were actually testing or what evidence would indicate success or failure. Because Level 2 was never made explicit and falsifiable, Level 4 (Success Metrics) had nothing genuine to measure against, and the entire pivot became functionally unfalsifiable — impossible to definitively judge as either working or not working, regardless of how much activity it generated.
+**What went wrong?** Using the Strategy Cascade, the failure is precise: the organization had a Vision (Level 1) and a set of Roadmap Initiatives (Level 3), but had skipped Level 2 (genuine, falsifiable Strategic Bets) entirely, jumping straight from an inspiring but necessarily vague aspiration directly to specific workstreams, with no intervening layer specifying what hypothesis those workstreams were actually testing or what evidence would indicate success or failure. Because Level 2 was never made explicit and falsifiable, Level 4 (Success Metrics) had nothing genuine to measure against, and the entire pivot became functionally unfalsifiable impossible to definitively judge as either working or not working, regardless of how much activity it generated.
 
-The company's recovery involved retroactively articulating explicit, falsifiable Strategic Bets for the collaboration vision (for instance, a specific hypothesis about cross-feature usage correlating with retention, with a defined threshold), and instituting a requirement that any future major initiative be traceable to a specific, falsifiable bet before receiving significant resource commitment — a discipline this curriculum will connect directly to the innovation accounting practices formalized in Lesson 77.
+The company's recovery involved retroactively articulating explicit, falsifiable Strategic Bets for the collaboration vision (for instance, a specific hypothesis about cross-feature usage correlating with retention, with a defined threshold), and instituting a requirement that any future major initiative be traceable to a specific, falsifiable bet before receiving significant resource commitment a discipline this curriculum will connect directly to the innovation accounting practices formalized in Lesson 77.
 
 ---
 
@@ -198,9 +198,9 @@ A portfolio concentrated entirely in Horizon 1 risks long-term stagnation; a por
 
 ## Interview Perspective: How Interviewers Think About This
 
-**"How would you translate a company's broad vision statement into an actionable product strategy?"** The interviewer is evaluating whether you propose something resembling the Strategy Cascade — specifically, whether you recognize the need for an intermediate, falsifiable Strategic Bet layer, rather than jumping directly from vision to roadmap initiatives.
+**"How would you translate a company's broad vision statement into an actionable product strategy?"** The interviewer is evaluating whether you propose something resembling the Strategy Cascade specifically, whether you recognize the need for an intermediate, falsifiable Strategic Bet layer, rather than jumping directly from vision to roadmap initiatives.
 
-**"What makes a strategic bet different from a vague company goal?"** The interviewer is testing whether you can articulate the three properties of a genuine bet — a specific hypothesis, committed resources, and pre-defined success criteria — rather than simply restating that a bet should be "specific."
+**"What makes a strategic bet different from a vague company goal?"** The interviewer is testing whether you can articulate the three properties of a genuine bet a specific hypothesis, committed resources, and pre-defined success criteria rather than simply restating that a bet should be "specific."
 
 **"How would you evaluate whether a company's portfolio of initiatives is appropriately balanced across risk levels?"** The interviewer is listening for the Three Horizons framework specifically, and whether you can explain the risk of over-concentration in either Horizon 1 (stagnation) or Horizon 3 (unsustainable risk).
 
@@ -208,7 +208,7 @@ A portfolio concentrated entirely in Horizon 1 risks long-term stagnation; a por
 
 ## Summary
 
-A vision statement, however inspiring, cannot on its own guide near-term execution decisions, because its necessary abstraction and stability mean it does not specify what would count as evidence the organization is succeeding or failing at any given moment. The Strategy Cascade — Vision, Strategic Bets, Roadmap Initiatives, Success Metrics — provides the connective tissue between aspiration and execution, and its critical, most frequently skipped step is the Strategic Bet layer: a small number of genuinely falsifiable claims, each naming a specific hypothesis, committing real resources, and specifying success criteria in advance, rather than simply restating the vision in more specific-sounding language. The Three Horizons framework provides a complementary discipline for ensuring a portfolio of such bets is deliberately diversified across near-term core extension, proven-but-unscaled adjacent opportunities, and genuinely exploratory transformational bets, since over-concentration in either the safest or riskiest horizon carries its own characteristic failure mode. An organization that skips the falsifiable Strategic Bet layer entirely, jumping directly from vision to initiatives, risks the specific failure illustrated in this lesson's Case Study: a pivot that generates real activity and genuine effort, but that can never actually be judged a success or a failure, because nothing about it was ever set up to be capable of being wrong.
+A vision statement, however inspiring, cannot on its own guide near-term execution decisions, because its necessary abstraction and stability mean it does not specify what would count as evidence the organization is succeeding or failing at any given moment. The Strategy Cascade Vision, Strategic Bets, Roadmap Initiatives, Success Metrics provides the connective tissue between aspiration and execution, and its critical, most frequently skipped step is the Strategic Bet layer: a small number of genuinely falsifiable claims, each naming a specific hypothesis, committing real resources, and specifying success criteria in advance, rather than simply restating the vision in more specific-sounding language. The Three Horizons framework provides a complementary discipline for ensuring a portfolio of such bets is deliberately diversified across near-term core extension, proven-but-unscaled adjacent opportunities, and genuinely exploratory transformational bets, since over-concentration in either the safest or riskiest horizon carries its own characteristic failure mode. An organization that skips the falsifiable Strategic Bet layer entirely, jumping directly from vision to initiatives, risks the specific failure illustrated in this lesson's Case Study: a pivot that generates real activity and genuine effort, but that can never actually be judged a success or a failure, because nothing about it was ever set up to be capable of being wrong.
 
 ---
 
@@ -216,7 +216,7 @@ A vision statement, however inspiring, cannot on its own guide near-term executi
 
 - A vision statement alone cannot guide execution, since its necessary abstraction means it doesn't specify what would count as evidence of success or failure.
 - The Strategy Cascade traces the path from Vision through falsifiable Strategic Bets, to Roadmap Initiatives, to Success Metrics, with feedback flowing back to inform future bets.
-- A genuine Strategic Bet names a specific hypothesis, commits real resources, and specifies success criteria in advance — distinguishing it from a vague aspiration disguised as a plan.
+- A genuine Strategic Bet names a specific hypothesis, commits real resources, and specifies success criteria in advance distinguishing it from a vague aspiration disguised as a plan.
 - The Three Horizons framework diversifies a bet portfolio across core extension (Horizon 1), adjacent opportunities (Horizon 2), and transformational exploration (Horizon 3).
 - Over-concentration in Horizon 1 risks long-term stagnation; over-concentration in Horizon 3 without near-term protection risks unsustainable resource depletion.
 - Skipping the falsifiable Strategic Bet layer, and jumping directly from vision to initiatives, produces pivots that generate activity but can never be definitively judged as working or not.
@@ -232,7 +232,7 @@ A vision statement, however inspiring, cannot on its own guide near-term executi
 - Strategy Cascade: Vision → Strategic Bets → Roadmap Initiatives → Success Metrics → feedback loop.
 - A real bet: specific hypothesis + committed resources + pre-defined success criteria.
 - Three Horizons: Core (majority resources) → Adjacent (protected minority) → Transformational (small, protected share).
-- If a "pivot" can't fail, it isn't a strategy — it's an unfalsifiable restatement of the vision.
+- If a "pivot" can't fail, it isn't a strategy it's an unfalsifiable restatement of the vision.
 
 ---
 
@@ -303,9 +303,9 @@ A vision statement, however inspiring, cannot on its own guide near-term executi
 
 ## Reflection Exercise
 
-You are the PM at a mid-size company whose leadership has just announced a new company vision: "to be the trusted financial co-pilot for every freelancer." Several teams are excited and have already begun proposing features — an expense tracker, a tax estimation tool, an invoicing assistant — all loosely justified as "supporting the co-pilot vision."
+You are the PM at a mid-size company whose leadership has just announced a new company vision: "to be the trusted financial co-pilot for every freelancer." Several teams are excited and have already begun proposing features an expense tracker, a tax estimation tool, an invoicing assistant all loosely justified as "supporting the co-pilot vision."
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Strategy Cascade and the falsifiability test to a real, still-vague strategic moment before it repeats the Unfalsifiable Pivot's mistake.
+There is no single correct answer to the prompts below the goal is to practice applying the Strategy Cascade and the falsifiability test to a real, still-vague strategic moment before it repeats the Unfalsifiable Pivot's mistake.
 
 1. Using the Strategy Cascade, what specific question would you ask leadership to help surface the missing Strategic Bet layer?
 2. Propose one possible falsifiable Strategic Bet this vision could generate, including a specific hypothesis and pre-defined success criteria.
@@ -396,10 +396,10 @@ D) Horizon 3 bets automatically failing once their budget exceeds a cap
 ---
 
 **7. In the Unfalsifiable Pivot case study, which level of the Strategy Cascade was skipped?**
-A) Success Metrics — dashboards existed, but nobody reviewed them
-B) Roadmap Initiatives — teams never actually began any workstreams
-C) Strategic Bets — the vague vision led straight to initiatives
-D) Vision — leadership never articulated one for the collaboration push
+A) Success Metrics dashboards existed, but nobody reviewed them
+B) Roadmap Initiatives teams never actually began any workstreams
+C) Strategic Bets the vague vision led straight to initiatives
+D) Vision leadership never articulated one for the collaboration push
 
 *Correct answer: C*
 *Explanation: The organization had a Vision and Roadmap Initiatives but jumped between them without ever making a falsifiable Strategic Bet explicit.*
@@ -516,9 +516,9 @@ D) Articulate the bets the vision implies, requiring each initiative to trace to
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 70 — Module Synthesis: The Platform PM's Toolkit | Extends the discipline of connected, falsifiable models from platform diagnosis to broader organizational strategy |
-| **Current Lesson** | Lesson 71 — Product Strategy Frameworks: From Vision to Bets | Strategy Cascade; falsifiable Strategic Bets; Three Horizons framework |
-| **Next Lesson** | Lesson 72 — Enterprise & B2B Product Management Fundamentals | Applies the Strategy Cascade to the specific context of enterprise and B2B strategic bets |
+| **Previous Lesson** | Lesson 70 Module Synthesis: The Platform PM's Toolkit | Extends the discipline of connected, falsifiable models from platform diagnosis to broader organizational strategy |
+| **Current Lesson** | Lesson 71 Product Strategy Frameworks: From Vision to Bets | Strategy Cascade; falsifiable Strategic Bets; Three Horizons framework |
+| **Next Lesson** | Lesson 72 Enterprise & B2B Product Management Fundamentals | Applies the Strategy Cascade to the specific context of enterprise and B2B strategic bets |
 | **Future Concepts Unlocked** | Lesson 77 (Innovation Accounting and Portfolio Management) | Extends the falsifiable Strategic Bet concept into formal metrics for managing a portfolio of bets over time |
 | | Lesson 80 (Module Synthesis) | Treats the Strategy Cascade and Three Horizons framework as established canon for Module 8's closing synthesis |
 

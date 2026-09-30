@@ -50,7 +50,25 @@ describe('Brevo <-> Resend fallback — transient-only, failure-aware', () => {
   }
 
   describe('Transient failures DO trigger fallback', () => {
-    it('Brevo timeout -> falls back to Resend', async () => {
+    // Ambiguous-timeout policy (split by message criticality). A timeout may have been
+    // accepted by Brevo before the client aborted, and Brevo has no idempotency key, so
+    // cross-failover on a timeout risks a duplicate. Critical auth mail prefers delivery
+    // and fails over anyway; a standard message does not (the queue retries instead).
+    it('Brevo timeout on a CRITICAL message -> falls back to Resend (delivery preferred)', async () => {
+      const timeoutErr = new Error('The operation was aborted due to timeout')
+      timeoutErr.name = 'TimeoutError'
+      const { calls } = mockFetchByHost({
+        brevo: () => { throw timeoutErr },
+      })
+
+      const result = await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't', isCritical: true })
+
+      expect(calls).toEqual(['brevo', 'resend'])
+      expect(result.success).toBe(true)
+      expect(result.provider).toBe('resend')
+    })
+
+    it('Brevo timeout on a STANDARD message -> does NOT fall back (no duplicate)', async () => {
       const timeoutErr = new Error('The operation was aborted due to timeout')
       timeoutErr.name = 'TimeoutError'
       const { calls } = mockFetchByHost({
@@ -59,9 +77,8 @@ describe('Brevo <-> Resend fallback — transient-only, failure-aware', () => {
 
       const result = await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't' })
 
-      expect(calls).toEqual(['brevo', 'resend'])
-      expect(result.success).toBe(true)
-      expect(result.provider).toBe('resend')
+      expect(calls).toEqual(['brevo'])
+      expect(result.success).toBe(false)
     })
 
     it('Brevo network failure (non-timeout exception) -> falls back to Resend', async () => {
@@ -231,6 +248,47 @@ describe('Brevo <-> Resend fallback — transient-only, failure-aware', () => {
       expect(calls).toEqual(['resend', 'brevo'])
       expect(result.success).toBe(true)
       expect(result.provider).toBe('brevo')
+    })
+  })
+
+  describe('Idempotency key forwarding', () => {
+    it('sends the Idempotency-Key header to Resend when a key is provided', async () => {
+      process.env.PRIMARY_EMAIL_PROVIDER = 'resend'
+      let resendHeaders: Record<string, string> | undefined
+      const fn = vi.fn(async (url: string, init?: { headers?: Record<string, string> }) => {
+        if (url.includes('resend.com')) {
+          resendHeaders = init?.headers
+          return { ok: true, status: 200, json: async () => ({ id: 'r1' }) }
+        }
+        return { ok: true, status: 200, json: async () => ({ messageId: 'b1' }) }
+      })
+      vi.stubGlobal('fetch', fn)
+
+      const result = await sendEmail({
+        to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't',
+        idempotencyKey: 'auth:user-1:password_reset:abcd',
+      })
+
+      expect(result.success).toBe(true)
+      expect(result.provider).toBe('resend')
+      expect(resendHeaders?.['Idempotency-Key']).toBe('auth:user-1:password_reset:abcd')
+    })
+
+    it('omits the Idempotency-Key header when no key is provided', async () => {
+      process.env.PRIMARY_EMAIL_PROVIDER = 'resend'
+      let resendHeaders: Record<string, string> | undefined
+      const fn = vi.fn(async (url: string, init?: { headers?: Record<string, string> }) => {
+        if (url.includes('resend.com')) {
+          resendHeaders = init?.headers
+          return { ok: true, status: 200, json: async () => ({ id: 'r1' }) }
+        }
+        return { ok: true, status: 200, json: async () => ({ messageId: 'b1' }) }
+      })
+      vi.stubGlobal('fetch', fn)
+
+      await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't' })
+
+      expect(resendHeaders && 'Idempotency-Key' in resendHeaders).toBeFalsy()
     })
   })
 })

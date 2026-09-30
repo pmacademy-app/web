@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 72 introduced the Enterprise Adoption Ladder and established that Rung 3 progression requires engaging gatekeepers — central IT and security stakeholders — who were never part of a product's original grassroots adoption. This lesson names those gatekeepers explicitly and extends the picture further: in most B2B purchasing decisions of any real size, there is no single "customer" at all. There is a committee of distinct people, each with a different relationship to the product, a different definition of success, and often genuinely conflicting incentives, and a deal succeeds or fails based on whether all of them, not just the most enthusiastic one, are satisfied.
+Lesson 72 introduced the Enterprise Adoption Ladder and established that Rung 3 progression requires engaging gatekeepers central IT and security stakeholders who were never part of a product's original grassroots adoption. This lesson names those gatekeepers explicitly and extends the picture further: in most B2B purchasing decisions of any real size, there is no single "customer" at all. There is a committee of distinct people, each with a different relationship to the product, a different definition of success, and often genuinely conflicting incentives, and a deal succeeds or fails based on whether all of them, not just the most enthusiastic one, are satisfied.
 
-Consumer product intuition breaks down badly here. A consumer PM learns to obsess over a single user's needs, because in a consumer context the person using the product, the person paying for it, and the person deciding to buy it are almost always the same individual. In B2B, these are frequently three, four, or five different people: an end user who will interact with the product daily, a champion within the organization who is personally invested in seeing the purchase succeed, an economic buyer who controls the budget and cares primarily about return on investment, and a technical evaluator or gatekeeper — often from IT or security, echoing Lesson 72's Rung 3 concept directly — whose approval is required regardless of how enthusiastic anyone else on the committee is.
+Consumer product intuition breaks down badly here. A consumer PM learns to obsess over a single user's needs, because in a consumer context the person using the product, the person paying for it, and the person deciding to buy it are almost always the same individual. In B2B, these are frequently three, four, or five different people: an end user who will interact with the product daily, a champion within the organization who is personally invested in seeing the purchase succeed, an economic buyer who controls the budget and cares primarily about return on investment, and a technical evaluator or gatekeeper often from IT or security, echoing Lesson 72's Rung 3 concept directly whose approval is required regardless of how enthusiastic anyone else on the committee is.
 
 This lesson introduces the Stakeholder Compass, this lesson's core mental model, to give you a structured way to identify who actually needs to be satisfied for a B2B deal to close, and what "satisfied" concretely means for each of them.
 
@@ -14,13 +14,13 @@ This lesson introduces the Stakeholder Compass, this lesson's core mental model,
 
 | Field | Detail |
 |---|---|
-| **Module** | 8 — Advanced Strategy, Innovation & Enterprise/B2B Product Management |
+| **Module** | 8 Advanced Strategy, Innovation & Enterprise/B2B Product Management |
 | **Current Lesson** | 73 of 90 |
 | **Difficulty** | 6 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 72 (Enterprise Adoption Ladder, Rung 3 gatekeepers) |
-| **Next Lesson** | Lesson 74 — Land-and-Expand: Packaging for Enterprise Growth |
-| **Future Topics Unlocked** | Lesson 74 (Land-and-Expand Packaging), Lesson 79 (Pricing Strategy at Scale), Lesson 88 (Building and Scaling a Product Organization) — all depend on the Stakeholder Compass introduced here |
+| **Next Lesson** | Lesson 74 Land-and-Expand: Packaging for Enterprise Growth |
+| **Future Topics Unlocked** | Lesson 74 (Land-and-Expand Packaging), Lesson 79 (Pricing Strategy at Scale), Lesson 88 (Building and Scaling a Product Organization) all depend on the Stakeholder Compass introduced here |
 
 ---
 
@@ -90,17 +90,17 @@ graph TD
     U --- C
 ```
 
-The **Champion** is someone inside the buying organization, often but not always an end user themselves, who is personally invested in seeing the purchase succeed — sometimes because it solves a problem they're accountable for, sometimes because their own reputation is tied to advocating for the change. The **Economic Buyer** controls the budget and evaluates the purchase primarily in terms of cost, return on investment, and opportunity cost relative to other uses of the same budget — and critically, may have limited or no firsthand exposure to the product itself. The **Technical Evaluator**, directly connected to the Rung 3 gatekeeper concept from Lesson 72, assesses security, compliance, integration, and technical risk, and typically has veto power regardless of how compelling the product is to everyone else on the committee. The **End User** is the person who will actually interact with the product daily, and whose primary concern is whether it genuinely fits and improves their actual workflow.
+The **Champion** is someone inside the buying organization, often but not always an end user themselves, who is personally invested in seeing the purchase succeed sometimes because it solves a problem they're accountable for, sometimes because their own reputation is tied to advocating for the change. The **Economic Buyer** controls the budget and evaluates the purchase primarily in terms of cost, return on investment, and opportunity cost relative to other uses of the same budget and critically, may have limited or no firsthand exposure to the product itself. The **Technical Evaluator**, directly connected to the Rung 3 gatekeeper concept from Lesson 72, assesses security, compliance, integration, and technical risk, and typically has veto power regardless of how compelling the product is to everyone else on the committee. The **End User** is the person who will actually interact with the product daily, and whose primary concern is whether it genuinely fits and improves their actual workflow.
 
-The Stakeholder Compass's core discipline is recognizing that a deal requires, at minimum, adequate engagement across all four roles — not necessarily unanimous enthusiasm, but at least no unaddressed veto-level objection from any one of them — and that strong performance with one role does not substitute for engagement with the others.
+The Stakeholder Compass's core discipline is recognizing that a deal requires, at minimum, adequate engagement across all four roles not necessarily unanimous enthusiasm, but at least no unaddressed veto-level objection from any one of them and that strong performance with one role does not substitute for engagement with the others.
 
 ### The Champion-Without-Authority Trap
 
-A specific and extremely common B2B failure mode is over-relying on a single, genuinely enthusiastic Champion, particularly one who is also an End User, to carry a deal forward without ever directly engaging the Economic Buyer or Technical Evaluator. A Champion's enthusiasm is a genuinely valuable asset — often the reason a deal exists at all — but a Champion without formal budget authority or technical sign-off authority cannot, by themselves, complete a purchase, and treating their strong internal advocacy as equivalent to deal progress risks the sales-and-product team investing significant effort in an account that stalls the moment it needs sign-off from stakeholders who were never engaged directly.
+A specific and extremely common B2B failure mode is over-relying on a single, genuinely enthusiastic Champion, particularly one who is also an End User, to carry a deal forward without ever directly engaging the Economic Buyer or Technical Evaluator. A Champion's enthusiasm is a genuinely valuable asset often the reason a deal exists at all but a Champion without formal budget authority or technical sign-off authority cannot, by themselves, complete a purchase, and treating their strong internal advocacy as equivalent to deal progress risks the sales-and-product team investing significant effort in an account that stalls the moment it needs sign-off from stakeholders who were never engaged directly.
 
 ### Distinct Success Criteria by Role
 
-Each stakeholder role's definition of "this product is good" differs meaningfully, and a product or sales narrative optimized for one role's success criteria may fail to resonate with, or even actively concern, another. The End User evaluates task fit and day-to-day usability. The Economic Buyer evaluates return on investment and total cost relative to alternatives, often with limited patience for feature-level detail that doesn't connect to a business outcome. The Technical Evaluator evaluates risk exposure, compliance, and integration burden, largely independent of how well the product performs its core function. The Champion, depending on their own role, may care about all of the above simultaneously, but their success is also frequently tied to their own internal credibility — meaning a Champion needs not just a good product, but a good, defensible story they can personally tell to the other stakeholders on their own behalf.
+Each stakeholder role's definition of "this product is good" differs meaningfully, and a product or sales narrative optimized for one role's success criteria may fail to resonate with, or even actively concern, another. The End User evaluates task fit and day-to-day usability. The Economic Buyer evaluates return on investment and total cost relative to alternatives, often with limited patience for feature-level detail that doesn't connect to a business outcome. The Technical Evaluator evaluates risk exposure, compliance, and integration burden, largely independent of how well the product performs its core function. The Champion, depending on their own role, may care about all of the above simultaneously, but their success is also frequently tied to their own internal credibility meaning a Champion needs not just a good product, but a good, defensible story they can personally tell to the other stakeholders on their own behalf.
 
 ---
 
@@ -133,9 +133,9 @@ In smaller organizations, a single person may occupy multiple roles simultaneous
 
 The Stakeholder Compass introduced above is this lesson's core takeaway tool. For any B2B deal or account, ask:
 
-1. **Who occupies each of the four roles** — Champion, Economic Buyer, Technical Evaluator, End User — in this specific account, recognizing that one person may occupy more than one role?
+1. **Who occupies each of the four roles** Champion, Economic Buyer, Technical Evaluator, End User in this specific account, recognizing that one person may occupy more than one role?
 2. **Has each role actually been engaged directly**, or has engagement been assumed based on strong performance with only one or two of the roles?
-3. **Does the narrative or evidence presented to each stakeholder match their actual success criteria** — ROI for the Economic Buyer, risk and compliance for the Technical Evaluator, task fit for the End User — rather than a single generic pitch applied uniformly?
+3. **Does the narrative or evidence presented to each stakeholder match their actual success criteria** ROI for the Economic Buyer, risk and compliance for the Technical Evaluator, task fit for the End User rather than a single generic pitch applied uniformly?
 4. **Is the deal currently relying too heavily on a single stakeholder**, particularly a Champion, to carry momentum without direct engagement from the roles that hold actual authority to approve or veto the purchase?
 
 A B2B PM or sales team that runs every account through this diagnostic is far less likely to be surprised by a deal stalling after apparently strong progress, since the stall is usually explainable by an unaddressed role on the Compass rather than a mysterious, unexplained loss of momentum.
@@ -144,9 +144,9 @@ A B2B PM or sales team that runs every account through this diagnostic is far le
 
 ## Real Company Example
 
-**MEDDIC** (now more commonly extended to MEDDPICC) is the actual origin of the formalized buying-committee-role vocabulary this lesson uses, not just an illustration of it. The methodology was developed inside PTC (Parametric Technology Corporation) in the early-to-mid 1990s by Dick Dunkel, working under sales leader John McMahon alongside Jack Napoli, specifically to bring structure and predictability to PTC's complex, multi-stakeholder enterprise deals. McMahon has described the underlying motivation directly: before the framework existed, he taught the same qualifying questions informally on every forecasted deal — "do we have a Champion or just a coach? Has the Champion helped us get to the Economic Buyer?" — and MEDDIC codified those questions into a repeatable acronym: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion. The framework's own definition of "Economic Buyer" — the person with actual discretionary authority to approve spend, distinct from an enthusiastic internal user or technical evaluator — is precisely the buyer/user distinction this lesson formalizes, and MEDDIC has since become one of the most widely adopted enterprise sales methodologies in B2B software, including, by industry accounts, at Salesforce itself.
+**MEDDIC** (now more commonly extended to MEDDPICC) is the actual origin of the formalized buying-committee-role vocabulary this lesson uses, not just an illustration of it. The methodology was developed inside PTC (Parametric Technology Corporation) in the early-to-mid 1990s by Dick Dunkel, working under sales leader John McMahon alongside Jack Napoli, specifically to bring structure and predictability to PTC's complex, multi-stakeholder enterprise deals. McMahon has described the underlying motivation directly: before the framework existed, he taught the same qualifying questions informally on every forecasted deal "do we have a Champion or just a coach? Has the Champion helped us get to the Economic Buyer?" and MEDDIC codified those questions into a repeatable acronym: Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion. The framework's own definition of "Economic Buyer" the person with actual discretionary authority to approve spend, distinct from an enthusiastic internal user or technical evaluator is precisely the buyer/user distinction this lesson formalizes, and MEDDIC has since become one of the most widely adopted enterprise sales methodologies in B2B software, including, by industry accounts, at Salesforce itself.
 
-Under McMahon and Napoli's leadership at PTC, the methodology is credited with helping grow the company's sales from $300 million to $1 billion in four years — a concrete, if secondhand-reported, illustration of what disciplined buying-committee mapping is claimed to be worth in practice.
+Under McMahon and Napoli's leadership at PTC, the methodology is credited with helping grow the company's sales from $300 million to $1 billion in four years a concrete, if secondhand-reported, illustration of what disciplined buying-committee mapping is claimed to be worth in practice.
 
 *(Source: MEDDICC's own published account of the methodology's origin, McMahon's own recollection as quoted across multiple independent sales-methodology publications, and Atlassian's own published explainer on MEDDIC's history.)*
 
@@ -154,7 +154,7 @@ Under McMahon and Napoli's leadership at PTC, the methodology is credited with h
 
 ## Real World Perspective: Selling to Committees: Buyer vs. User in B2B at Different Company Stages
 
-**Startup:** Early-stage B2B companies frequently sell into smaller organizations where a single person may genuinely occupy multiple Stakeholder Compass roles simultaneously (a small business owner who is Economic Buyer, Technical Evaluator, and End User all at once), making the full four-role framework feel like unnecessary complexity — a reasonable simplification at this scale, but one that stops holding as soon as the startup begins selling into larger organizations with genuinely distributed roles.
+**Startup:** Early-stage B2B companies frequently sell into smaller organizations where a single person may genuinely occupy multiple Stakeholder Compass roles simultaneously (a small business owner who is Economic Buyer, Technical Evaluator, and End User all at once), making the full four-role framework feel like unnecessary complexity a reasonable simplification at this scale, but one that stops holding as soon as the startup begins selling into larger organizations with genuinely distributed roles.
 
 **Mid-size company:** This is typically where distinct Stakeholder Compass roles first become clearly separated within target accounts, and where sales and product teams must deliberately develop differentiated materials and engagement strategies for each role rather than relying on a single generic pitch that worked adequately for smaller accounts.
 
@@ -164,13 +164,13 @@ Under McMahon and Napoli's leadership at PTC, the methodology is credited with h
 
 ## Detailed Case Study: The Champion Who Couldn't Deliver
 
-A B2B data analytics startup had, over several months, cultivated an extremely enthusiastic internal champion at a mid-size retail company — a data analyst who had personally piloted the product, presented it favorably at an internal team meeting, and repeatedly assured the startup's sales team that "everyone loves this" and that a formal purchase was imminent. The startup's sales team, encouraged by this consistent enthusiasm, invested significant effort in supporting the champion with additional demos, technical documentation, and customized reports, all directed at reinforcing the champion's own internal advocacy.
+A B2B data analytics startup had, over several months, cultivated an extremely enthusiastic internal champion at a mid-size retail company a data analyst who had personally piloted the product, presented it favorably at an internal team meeting, and repeatedly assured the startup's sales team that "everyone loves this" and that a formal purchase was imminent. The startup's sales team, encouraged by this consistent enthusiasm, invested significant effort in supporting the champion with additional demos, technical documentation, and customized reports, all directed at reinforcing the champion's own internal advocacy.
 
 After several months of what felt like steady progress, the deal abruptly stalled and ultimately did not close. A later post-mortem conversation revealed that the champion, while genuinely enthusiastic and influential among her immediate peers, had no actual budget authority and had never successfully gotten the purchase on the agenda of the department's actual economic buyer, a VP who controlled the relevant budget and had, in fact, never been directly engaged by the startup's sales team at any point in the process. Separately, the company's IT security team, also never engaged, had a standing policy requiring a formal security review for any new data tool, a requirement the champion had not raised because she did not know engaging IT was necessary or was not confident in how to initiate that process herself.
 
-**What went wrong?** Using the Stakeholder Compass, the failure is precise: the startup had invested heavily and exclusively in the Champion role, mistaking her genuine internal enthusiasm for evidence of overall deal progress, while never directly engaging either the Economic Buyer or the Technical Evaluator — the two roles whose actual authority was required to complete the purchase. The Champion's own account of progress, however sincere, reflected her limited visibility into the departmental budget process and her own uncertainty about navigating IT security review, not an accurate picture of the deal's true status across the full Compass.
+**What went wrong?** Using the Stakeholder Compass, the failure is precise: the startup had invested heavily and exclusively in the Champion role, mistaking her genuine internal enthusiasm for evidence of overall deal progress, while never directly engaging either the Economic Buyer or the Technical Evaluator the two roles whose actual authority was required to complete the purchase. The Champion's own account of progress, however sincere, reflected her limited visibility into the departmental budget process and her own uncertainty about navigating IT security review, not an accurate picture of the deal's true status across the full Compass.
 
-The company's recovery involved instituting a formal account-mapping practice requiring explicit identification and direct engagement confirmation for all four Stakeholder Compass roles before a deal could be marked as "advancing" internally, and developing differentiated materials — an ROI-focused business case for economic buyers, a security and compliance overview for technical evaluators — rather than relying on a single champion-facing narrative across the entire process, a discipline that connects directly to the packaging strategies formalized in Lesson 74.
+The company's recovery involved instituting a formal account-mapping practice requiring explicit identification and direct engagement confirmation for all four Stakeholder Compass roles before a deal could be marked as "advancing" internally, and developing differentiated materials an ROI-focused business case for economic buyers, a security and compliance overview for technical evaluators rather than relying on a single champion-facing narrative across the entire process, a discipline that connects directly to the packaging strategies formalized in Lesson 74.
 
 ---
 
@@ -195,13 +195,13 @@ A "no" on direct engagement with either the Economic Buyer or the Technical Eval
 
 **"What's the difference between a product's end user and its economic buyer in a B2B context, and why does the distinction matter?"** The interviewer is testing whether you can clearly articulate the differing success criteria of these two roles and explain why a pitch optimized for one may fail to address the other's concerns.
 
-**"Tell me about a deal or account that stalled unexpectedly after seeming to progress well."** The interviewer is listening for a diagnosis resembling the Champion Who Couldn't Deliver case study — a specific, locatable gap in engagement with a particular stakeholder role, rather than a vague account of "the timing just didn't work out."
+**"Tell me about a deal or account that stalled unexpectedly after seeming to progress well."** The interviewer is listening for a diagnosis resembling the Champion Who Couldn't Deliver case study a specific, locatable gap in engagement with a particular stakeholder role, rather than a vague account of "the timing just didn't work out."
 
 ---
 
 ## Summary
 
-B2B purchasing decisions of meaningful size typically involve multiple distinct stakeholder roles rather than a single customer, and the Stakeholder Compass — Champion, Economic Buyer, Technical Evaluator, End User — maps these roles and their distinct success criteria: personal advocacy credibility, return on investment, risk and compliance, and task fit and usability, respectively. A specific and extremely common failure mode, the Champion-Without-Authority Trap, occurs when a sales or product team over-relies on a genuinely enthusiastic Champion's account of progress without directly engaging the Economic Buyer or Technical Evaluator, both of whom typically hold effective veto authority regardless of how compelling the product is to other stakeholders. Each role requires a differentiated engagement approach and narrative matched to its actual success criteria, since a pitch optimized for one role's concerns — task fit for an End User, for instance — often fails to address, or even directly speaks past, the concerns most relevant to another role, such as an Economic Buyer's return-on-investment calculus or a Technical Evaluator's risk and compliance review. A deal that appears to be progressing well based on strong engagement with only one or two roles on the Compass should be treated with appropriate skepticism until direct, confirmed engagement exists across all four.
+B2B purchasing decisions of meaningful size typically involve multiple distinct stakeholder roles rather than a single customer, and the Stakeholder Compass Champion, Economic Buyer, Technical Evaluator, End User maps these roles and their distinct success criteria: personal advocacy credibility, return on investment, risk and compliance, and task fit and usability, respectively. A specific and extremely common failure mode, the Champion-Without-Authority Trap, occurs when a sales or product team over-relies on a genuinely enthusiastic Champion's account of progress without directly engaging the Economic Buyer or Technical Evaluator, both of whom typically hold effective veto authority regardless of how compelling the product is to other stakeholders. Each role requires a differentiated engagement approach and narrative matched to its actual success criteria, since a pitch optimized for one role's concerns task fit for an End User, for instance often fails to address, or even directly speaks past, the concerns most relevant to another role, such as an Economic Buyer's return-on-investment calculus or a Technical Evaluator's risk and compliance review. A deal that appears to be progressing well based on strong engagement with only one or two roles on the Compass should be treated with appropriate skepticism until direct, confirmed engagement exists across all four.
 
 ---
 
@@ -210,7 +210,7 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 - B2B purchasing decisions typically involve multiple distinct stakeholder roles, unlike consumer purchases where one person fulfills all roles.
 - The Stakeholder Compass maps four roles: Champion, Economic Buyer, Technical Evaluator, and End User, each with distinct success criteria.
 - The Champion-Without-Authority Trap occurs when a team over-relies on an enthusiastic Champion's account of progress without directly engaging the Economic Buyer or Technical Evaluator.
-- Each stakeholder role requires a differentiated narrative matched to its actual concerns — ROI, risk and compliance, or task fit — rather than a single generic pitch.
+- Each stakeholder role requires a differentiated narrative matched to its actual concerns ROI, risk and compliance, or task fit rather than a single generic pitch.
 - The Economic Buyer and Technical Evaluator typically hold effective veto authority, and their direct engagement should not be assumed based on Champion or End User enthusiasm alone.
 - In smaller organizations, a single person may genuinely occupy multiple Compass roles simultaneously, requiring careful recognition rather than blind application of all four roles as always distinct.
 - Deals should be evaluated for direct, confirmed engagement across all four roles before being considered genuinely "on track," rather than relying on secondhand accounts from a single enthusiastic contact.
@@ -225,7 +225,7 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 - Stakeholder Compass: Champion, Economic Buyer, Technical Evaluator, End User.
 - Champion enthusiasm ≠ deal progress if the Champion lacks budget or technical sign-off authority.
 - Match your pitch to each role's actual concern: ROI for Economic Buyers, risk/compliance for Technical Evaluators, task fit for End Users.
-- Engage Technical Evaluators early — they hold veto power and late engagement risks a costly stall.
+- Engage Technical Evaluators early they hold veto power and late engagement risks a costly stall.
 
 ---
 
@@ -299,7 +299,7 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 
 You are the PM for a B2B HR software company. Your sales team reports strong enthusiasm from an HR manager at a target account who has been actively using a free trial and advocating internally, but the formal contract has been "in review" for two months with no clear update.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Stakeholder Compass and the Stakeholder Engagement Checklist to a deal that may be caught in the Champion-Without-Authority Trap.
+There is no single correct answer to the prompts below the goal is to practice applying the Stakeholder Compass and the Stakeholder Engagement Checklist to a deal that may be caught in the Champion-Without-Authority Trap.
 
 1. Using the Stakeholder Compass, which role does the enthusiastic HR manager most likely occupy, and what does this tell you about the deal's true status?
 2. What specific questions would you want your sales team to ask the HR manager to determine whether the Economic Buyer and Technical Evaluator have actually been engaged?
@@ -510,9 +510,9 @@ D) Proactively engage both roles with materials matched to their concerns
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 72 — Enterprise & B2B Product Management Fundamentals | Names and elaborates the Rung 3 gatekeeper concept into a full four-role Stakeholder Compass |
-| **Current Lesson** | Lesson 73 — Selling to Committees: Buyer vs. User in B2B | Stakeholder Compass; Champion-Without-Authority Trap; role-differentiated engagement; Stakeholder Engagement Checklist |
-| **Next Lesson** | Lesson 74 — Land-and-Expand: Packaging for Enterprise Growth | Uses the Stakeholder Compass to inform how packaging and pricing tiers should be designed around different stakeholder roles |
+| **Previous Lesson** | Lesson 72 Enterprise & B2B Product Management Fundamentals | Names and elaborates the Rung 3 gatekeeper concept into a full four-role Stakeholder Compass |
+| **Current Lesson** | Lesson 73 Selling to Committees: Buyer vs. User in B2B | Stakeholder Compass; Champion-Without-Authority Trap; role-differentiated engagement; Stakeholder Engagement Checklist |
+| **Next Lesson** | Lesson 74 Land-and-Expand: Packaging for Enterprise Growth | Uses the Stakeholder Compass to inform how packaging and pricing tiers should be designed around different stakeholder roles |
 | **Future Concepts Unlocked** | Lesson 79 (Pricing Strategy at Scale) | Extends role-differentiated messaging into pricing negotiation strategy specifically |
 | | Lesson 88 (Building and Scaling a Product Organization) | Extends stakeholder-mapping discipline into internal organizational stakeholder management |
 

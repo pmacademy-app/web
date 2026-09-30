@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 7 ended with a pointed diagnostic: if you can't fill in a value proposition's "unlike [alternative]" blank with something specific and defensible, that gap isn't a wording problem — it's evidence that discovery work hasn't happened yet. This lesson is that missing work made explicit.
+Lesson 7 ended with a pointed diagnostic: if you can't fill in a value proposition's "unlike [alternative]" blank with something specific and defensible, that gap isn't a wording problem it's evidence that discovery work hasn't happened yet. This lesson is that missing work made explicit.
 
-**Product discovery** is the set of activities a team uses to determine whether a proposed solution is worth building, *before* committing significant engineering investment to building it. It sits in deliberate contrast to what many teams do by default: skip straight from an idea (often a stakeholder's proposed solution, per Lesson 6) to delivery — designing, building, and shipping — and only discover afterward, via low adoption or a disappointing metric, that the underlying assumption was wrong. Discovery exists to catch that failure earlier and cheaper, when the cost of being wrong is a few days of research rather than a quarter of engineering time.
+**Product discovery** is the set of activities a team uses to determine whether a proposed solution is worth building, *before* committing significant engineering investment to building it. It sits in deliberate contrast to what many teams do by default: skip straight from an idea (often a stakeholder's proposed solution, per Lesson 6) to delivery designing, building, and shipping and only discover afterward, via low adoption or a disappointing metric, that the underlying assumption was wrong. Discovery exists to catch that failure earlier and cheaper, when the cost of being wrong is a few days of research rather than a quarter of engineering time.
 
-This matters urgently because the two most expensive kinds of product failure are not failures of execution — a bug, a missed deadline, a rough UI — but failures of **validity**: building something nobody actually wants (a desirability failure) or building something that technically works but that the business cannot sustain (a viability failure). Both are, in principle, detectable before a single line of production code is written, if a team is willing to structure its work around testing assumptions rather than assuming validity by default. Discovery is the discipline of doing that testing deliberately, rather than by accident, and rather than not at all.
+This matters urgently because the two most expensive kinds of product failure are not failures of execution a bug, a missed deadline, a rough UI but failures of **validity**: building something nobody actually wants (a desirability failure) or building something that technically works but that the business cannot sustain (a viability failure). Both are, in principle, detectable before a single line of production code is written, if a team is willing to structure its work around testing assumptions rather than assuming validity by default. Discovery is the discipline of doing that testing deliberately, rather than by accident, and rather than not at all.
 
 ---
 
@@ -14,13 +14,13 @@ This matters urgently because the two most expensive kinds of product failure ar
 
 | Field | Detail |
 |---|---|
-| **Module** | 1 — Foundations |
+| **Module** | 1 Foundations |
 | **Current Lesson** | 8 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (What is Product Management?), Lesson 6 (Jobs To Be Done), Lesson 7 (Value Proposition) |
-| **Next Lesson** | Lesson 9 — Product Vision |
-| **Future Topics Unlocked** | Lesson 11 (User Research — the specific methods discovery relies on), Lesson 20 (Product Discovery Process — a deeper, structured version of this lesson), Lesson 21 (MVP — the delivery-side counterpart to discovery) |
+| **Next Lesson** | Lesson 9 Product Vision |
+| **Future Topics Unlocked** | Lesson 11 (User Research the specific methods discovery relies on), Lesson 20 (Product Discovery Process a deeper, structured version of this lesson), Lesson 21 (MVP the delivery-side counterpart to discovery) |
 
 ---
 
@@ -32,13 +32,13 @@ By the end of this lesson, you will be able to:
 2. Identify the four categories of risk a discovery process is designed to reduce: value, usability, feasibility, and viability risk.
 3. Explain why discovery and delivery should run continuously and in parallel, rather than as sequential phases.
 4. Apply a basic assumption-mapping technique to identify which assumption in a proposed solution is riskiest and most in need of testing first.
-5. Distinguish a genuine discovery test from "discovery theater" — activity that resembles validation but does not actually reduce risk.
+5. Distinguish a genuine discovery test from "discovery theater" activity that resembles validation but does not actually reduce risk.
 
 ---
 
 ## Prerequisites
 
-Lesson 1 (What is Product Management?), Lesson 6 (Jobs To Be Done), and Lesson 7 (Value Proposition). This lesson assumes familiarity with the Accountability Triangle (desirability, feasibility, viability) from Lesson 1, and treats discovery as the active process of testing each leg of that triangle before committing to delivery — extending the "how do we know" question from Lesson 1 into a repeatable practice.
+Lesson 1 (What is Product Management?), Lesson 6 (Jobs To Be Done), and Lesson 7 (Value Proposition). This lesson assumes familiarity with the Accountability Triangle (desirability, feasibility, viability) from Lesson 1, and treats discovery as the active process of testing each leg of that triangle before committing to delivery extending the "how do we know" question from Lesson 1 into a repeatable practice.
 
 ---
 
@@ -46,9 +46,9 @@ Lesson 1 (What is Product Management?), Lesson 6 (Jobs To Be Done), and Lesson 7
 
 ### The Core Definition
 
-Product discovery is the process of testing assumptions and reducing risk in a proposed solution *before* it is built at full scale. It is distinct from **product delivery** — the process of actually designing, building, testing for quality, and shipping a solution once it has been validated. Discovery asks "should we build this, and if so, roughly what should it look like?" Delivery asks "how do we build this well, on time, and to a high quality bar?"
+Product discovery is the process of testing assumptions and reducing risk in a proposed solution *before* it is built at full scale. It is distinct from **product delivery** the process of actually designing, building, testing for quality, and shipping a solution once it has been validated. Discovery asks "should we build this, and if so, roughly what should it look like?" Delivery asks "how do we build this well, on time, and to a high quality bar?"
 
-A useful shorthand, widely used in modern product practice (closely associated with Marty Cagan's writing at the Silicon Valley Product Group): discovery is optimized for **speed and learning**, often producing artifacts that are never meant to be shippable — rough prototypes, landing pages, concierge-style manual processes standing in for automation, or simple prompts to a small group of real users. Delivery is optimized for **quality and scale**, producing the actual production-grade product that will serve the full user base reliably.
+A useful shorthand, widely used in modern product practice (closely associated with Marty Cagan's writing at the Silicon Valley Product Group): discovery is optimized for **speed and learning**, often producing artifacts that are never meant to be shippable rough prototypes, landing pages, concierge-style manual processes standing in for automation, or simple prompts to a small group of real users. Delivery is optimized for **quality and scale**, producing the actual production-grade product that will serve the full user base reliably.
 
 ### The Four Risks Discovery Tests
 
@@ -57,7 +57,7 @@ Discovery exists to reduce four categories of risk, extending the Accountability
 - **Value risk**: will people actually want this, and choose to use or pay for it? (Directly tied to the job and value proposition validated in Lessons 6 and 7.)
 - **Usability risk**: can people actually figure out how to use it, even if they want the underlying value?
 - **Feasibility risk**: can the team actually build it, within realistic technical, legal, or resource constraints?
-- **Viability risk**: does the solution work for the business — economically, legally, and strategically — even if users love it and engineering can build it?
+- **Viability risk**: does the solution work for the business economically, legally, and strategically even if users love it and engineering can build it?
 
 ```mermaid
 %%{init: {
@@ -101,17 +101,17 @@ graph TD
     E --> F
 ```
 
-Each risk category calls for a different kind of test, and a common discovery mistake is testing only one risk (usually value risk, via a prototype demo) while quietly assuming the other three away. A beautifully validated, highly desirable idea that turns out to be legally non-viable, or technically infeasible at the required scale, has still failed — discovery that stops after confirming value risk has only done a quarter of the job.
+Each risk category calls for a different kind of test, and a common discovery mistake is testing only one risk (usually value risk, via a prototype demo) while quietly assuming the other three away. A beautifully validated, highly desirable idea that turns out to be legally non-viable, or technically infeasible at the required scale, has still failed discovery that stops after confirming value risk has only done a quarter of the job.
 
 ### Discovery and Delivery Run Continuously, Not Sequentially
 
-A common misunderstanding treats discovery as a distinct, front-loaded "phase" that happens before delivery begins — research this quarter, build next quarter. Modern product practice generally rejects this framing in favor of **continuous discovery**: a standing, ongoing habit of testing assumptions in parallel with delivery, rather than a one-time gate a project passes through once.
+A common misunderstanding treats discovery as a distinct, front-loaded "phase" that happens before delivery begins research this quarter, build next quarter. Modern product practice generally rejects this framing in favor of **continuous discovery**: a standing, ongoing habit of testing assumptions in parallel with delivery, rather than a one-time gate a project passes through once.
 
-This matters for a specific practical reason: a team that treats discovery as a phase that ends once delivery begins loses its ability to catch new risks that emerge *during* building — a technical constraint discovered mid-implementation, a competitor's launch that changes the viability picture, or user feedback on an early build that reveals a usability problem no prototype surfaced. Continuous discovery treats validation as a standing capability the team maintains throughout a product's life, not a box checked once at the start of a project.
+This matters for a specific practical reason: a team that treats discovery as a phase that ends once delivery begins loses its ability to catch new risks that emerge *during* building a technical constraint discovered mid-implementation, a competitor's launch that changes the viability picture, or user feedback on an early build that reveals a usability problem no prototype surfaced. Continuous discovery treats validation as a standing capability the team maintains throughout a product's life, not a box checked once at the start of a project.
 
 ### Assumption Mapping: Finding the Riskiest Assumption First
 
-Any proposed solution rests on a stack of assumptions, and not all assumptions carry equal risk. **Assumption mapping** is the practice of explicitly listing the assumptions a solution depends on, and identifying which one is both least certain and most consequential if wrong — the assumption whose failure would most completely invalidate the whole idea.
+Any proposed solution rests on a stack of assumptions, and not all assumptions carry equal risk. **Assumption mapping** is the practice of explicitly listing the assumptions a solution depends on, and identifying which one is both least certain and most consequential if wrong the assumption whose failure would most completely invalidate the whole idea.
 
 A simple two-axis technique plots each assumption by:
 
@@ -157,15 +157,15 @@ graph TD
     B --> F[High Confidence, Low<br/>Importance = Rarely Worth Testing]
 ```
 
-The assumption sitting in the "low confidence, high importance" position is the one to test first, regardless of which of the four risk categories it belongs to. A team that instead defaults to testing whichever assumption is easiest or most comfortable to test (frequently a usability question, since usability testing is procedurally familiar) can spend real discovery effort while leaving the actual riskiest assumption — often a value or viability question — completely unexamined.
+The assumption sitting in the "low confidence, high importance" position is the one to test first, regardless of which of the four risk categories it belongs to. A team that instead defaults to testing whichever assumption is easiest or most comfortable to test (frequently a usability question, since usability testing is procedurally familiar) can spend real discovery effort while leaving the actual riskiest assumption often a value or viability question completely unexamined.
 
 ### Discovery Theater: Activity That Looks Like Validation But Isn't
 
-A specific and common failure mode deserves its own name: **discovery theater** — activities that have the visible form of discovery (interviews were conducted, a prototype was shown, a survey was sent) but that do not actually reduce risk, because they were structured in a way that could not have produced disconfirming evidence even if the underlying assumption were false.
+A specific and common failure mode deserves its own name: **discovery theater** activities that have the visible form of discovery (interviews were conducted, a prototype was shown, a survey was sent) but that do not actually reduce risk, because they were structured in a way that could not have produced disconfirming evidence even if the underlying assumption were false.
 
 Common patterns of discovery theater include:
 
-- Showing a polished prototype and asking "would you use this?" — a question people tend to answer generously regardless of their actual future behavior, because there is no real cost to saying yes in the moment.
+- Showing a polished prototype and asking "would you use this?" a question people tend to answer generously regardless of their actual future behavior, because there is no real cost to saying yes in the moment.
 - Surveying existing enthusiastic users about a new feature idea, rather than a broader or more skeptical population, producing artificially positive signal.
 - Running a study but only after the team has already effectively committed (engineering has started, a launch date is set), such that negative findings would be organizationally very difficult to act on even if they appeared.
 - Interpreting polite, encouraging feedback in a demo as validation, without ever observing what people actually do when given a real opportunity to adopt or reject the solution with real stakes (time, money, switching cost).
@@ -178,7 +178,7 @@ The corrective principle: a genuine discovery test must be designed so that a pl
 
 **Mistake 1: Skipping discovery for "obviously good" ideas**
 
-An idea that feels self-evidently good to the team — often because it addresses a real pain the team itself has experienced, or because a senior stakeholder is confident in it — is exactly the kind of idea most likely to skip discovery, and exactly the kind of idea where an untested assumption can hide in plain sight because no one felt the need to question it.
+An idea that feels self-evidently good to the team often because it addresses a real pain the team itself has experienced, or because a senior stakeholder is confident in it is exactly the kind of idea most likely to skip discovery, and exactly the kind of idea where an untested assumption can hide in plain sight because no one felt the need to question it.
 
 **Mistake 2: Treating a single successful prototype demo as complete validation**
 
@@ -186,7 +186,7 @@ As covered above, a demo that produces polite enthusiasm has usually only tested
 
 **Mistake 3: Running discovery only at the very start of a project, then treating it as "done."**
 
-This misses the continuous nature of discovery described above — new risks emerge throughout delivery, and a one-time discovery phase leaves a team blind to them.
+This misses the continuous nature of discovery described above new risks emerge throughout delivery, and a one-time discovery phase leaves a team blind to them.
 
 **Mistake 4: Testing the easiest assumption instead of the riskiest one**
 
@@ -194,14 +194,14 @@ A team eager to show discovery progress may gravitate toward whichever assumptio
 
 **Mistake 5: Confusing discovery activity with discovery outcomes**
 
-"We did five user interviews" describes an activity, not a finding. Discovery should be evaluated by what was actually learned and what decision it changed, not by the volume of research activity conducted — a team can conduct extensive research and still learn nothing decision-relevant if the research was poorly targeted.
+"We did five user interviews" describes an activity, not a finding. Discovery should be evaluated by what was actually learned and what decision it changed, not by the volume of research activity conducted a team can conduct extensive research and still learn nothing decision-relevant if the research was poorly targeted.
 
 ---
 
 
 ## Mental Model: The Assumption Map
 
-This lesson's mental model is the **Assumption Map** introduced above — used as a standing discipline before committing meaningful resources to any new initiative.
+This lesson's mental model is the **Assumption Map** introduced above used as a standing discipline before committing meaningful resources to any new initiative.
 
 ```mermaid
 %%{init: {
@@ -243,7 +243,7 @@ graph LR
     F --> G[Only Proceed to Delivery Once the<br/>Riskiest Assumptions Are Addressed]
 ```
 
-Use this as a repeatable checklist before any significant delivery commitment: name the assumptions, categorize them, find the riskiest one, and design a test that could actually fail. A team that has done this — even briefly and informally — has done meaningfully more real discovery than a team that ran a longer but less targeted research process without ever identifying which assumption mattered most.
+Use this as a repeatable checklist before any significant delivery commitment: name the assumptions, categorize them, find the riskiest one, and design a test that could actually fail. A team that has done this even briefly and informally has done meaningfully more real discovery than a team that ran a longer but less targeted research process without ever identifying which assumption mattered most.
 
 ---
 
@@ -258,7 +258,7 @@ Use this as a repeatable checklist before any significant delivery commitment: n
 ## Real World Perspective: Product Discovery at Different Company Stages
 
 **At a startup:**
-Discovery is often existential rather than incremental — the central open question is frequently whether the entire product concept addresses a real, sufficiently painful job at all (value risk in its most fundamental form), and viability risk (can this ever become a sustainable business) looms especially large given limited runway. Startups often rely heavily on manual, unscalable "concierge" discovery methods precisely because building scalable infrastructure before value risk is resolved would be a poor use of extremely scarce resources.
+Discovery is often existential rather than incremental the central open question is frequently whether the entire product concept addresses a real, sufficiently painful job at all (value risk in its most fundamental form), and viability risk (can this ever become a sustainable business) looms especially large given limited runway. Startups often rely heavily on manual, unscalable "concierge" discovery methods precisely because building scalable infrastructure before value risk is resolved would be a poor use of extremely scarce resources.
 
 **At a mid-size company:**
 Discovery more often concerns a specific feature or expansion decision within an already-validated core product, and usability and feasibility risk frequently carry more relative weight, since the core value proposition (Lesson 7) is often already established. Discovery here is more likely to run as a continuous, embedded practice alongside ongoing delivery work, rather than as a distinct existential question.
@@ -272,19 +272,19 @@ Discovery at scale often involves rigorous, large-sample quantitative testing (A
 
 Consider a simplified, illustrative scenario common across consumer subscription products.
 
-A subscription meal-kit company's leadership becomes convinced, based on a handful of enthusiastic comments in customer support tickets, that customers want the ability to fully customize every ingredient in every recipe, rather than choosing from a fixed set of recipe options each week. The idea is popular internally — several senior stakeholders personally find the current fixed-recipe system limiting — and the team moves directly to building a full ingredient-customization engine: a substantial engineering investment involving new inventory logic, a redesigned recipe-selection interface, and new fulfillment and packing workflows.
+A subscription meal-kit company's leadership becomes convinced, based on a handful of enthusiastic comments in customer support tickets, that customers want the ability to fully customize every ingredient in every recipe, rather than choosing from a fixed set of recipe options each week. The idea is popular internally several senior stakeholders personally find the current fixed-recipe system limiting and the team moves directly to building a full ingredient-customization engine: a substantial engineering investment involving new inventory logic, a redesigned recipe-selection interface, and new fulfillment and packing workflows.
 
-Three months after launch, usage data shows fewer than 4% of customers use the customization feature regularly, and internal fulfillment costs have risen meaningfully due to the added packing complexity of handling highly variable, per-customer ingredient combinations. A brief post-launch investigation, conducted only after the disappointing results were already visible, finds that most customers actually valued the fixed recipe structure specifically because it removed decision-making burden from their week — the "job" the product was actually hired for was reducing weekly meal-planning effort, not maximizing ingredient control.
+Three months after launch, usage data shows fewer than 4% of customers use the customization feature regularly, and internal fulfillment costs have risen meaningfully due to the added packing complexity of handling highly variable, per-customer ingredient combinations. A brief post-launch investigation, conducted only after the disappointing results were already visible, finds that most customers actually valued the fixed recipe structure specifically because it removed decision-making burden from their week the "job" the product was actually hired for was reducing weekly meal-planning effort, not maximizing ingredient control.
 
 **What went wrong?**
 
 Applying this lesson's frameworks in hindsight:
 
-1. **Value risk was never genuinely tested.** The handful of enthusiastic support comments represented a self-selected, vocal minority — not evidence that a broader, largely silent majority shared the same preference — and no test was designed that could have surfaced a negative signal before full investment.
-2. **The riskiest assumption was never explicitly identified.** Applying assumption mapping in hindsight, the assumption "customers want more ingredient control, even at the cost of more weekly decision-making" was both low-confidence (untested beyond a handful of comments) and high-importance (the entire engineering investment depended on it) — precisely the assumption that should have been tested first, and cheaply, before any fulfillment-workflow investment was made.
+1. **Value risk was never genuinely tested.** The handful of enthusiastic support comments represented a self-selected, vocal minority not evidence that a broader, largely silent majority shared the same preference and no test was designed that could have surfaced a negative signal before full investment.
+2. **The riskiest assumption was never explicitly identified.** Applying assumption mapping in hindsight, the assumption "customers want more ingredient control, even at the cost of more weekly decision-making" was both low-confidence (untested beyond a handful of comments) and high-importance (the entire engineering investment depended on it) precisely the assumption that should have been tested first, and cheaply, before any fulfillment-workflow investment was made.
 3. **Viability risk was assumed away entirely.** No one modeled the fulfillment cost impact of highly variable, per-customer ingredient combinations before building the feature, despite this being a foreseeable and quantifiable operational risk.
 
-A team applying continuous discovery would likely have run a cheap, disconfirmable test first — perhaps a manual, "concierge"-style limited pilot with a small group of customers choosing custom ingredients through a simple form, with a human coordinating fulfillment manually — before building any automated inventory or interface systems. Such a test could have surfaced both the low genuine demand and the fulfillment cost problem at a small fraction of the cost actually incurred, while still allowing the team to observe real behavior rather than solicited opinions.
+A team applying continuous discovery would likely have run a cheap, disconfirmable test first perhaps a manual, "concierge"-style limited pilot with a small group of customers choosing custom ingredients through a simple form, with a human coordinating fulfillment manually before building any automated inventory or interface systems. Such a test could have surfaced both the low genuine demand and the fulfillment cost problem at a small fraction of the cost actually incurred, while still allowing the team to observe real behavior rather than solicited opinions.
 
 This case will be revisited in **Lesson 20 (Product Discovery Process)**, where we formalize a repeatable, structured discovery workflow, and in **Lesson 21 (MVP)**, where we discuss scoping the smallest version of a solution capable of testing the riskiest assumption cheaply.
 
@@ -332,35 +332,35 @@ graph BT
     D --> E[Rung 5: Full Delivery Scaled,<br/>Production-grade Build and Rollout]
 ```
 
-The core discipline this ladder enforces: **do not skip rungs.** A team eager to move fast can be tempted to jump straight from Rung 1 (a few encouraging conversations) to Rung 5 (full production build), skipping the cheaper, faster rungs that would have surfaced the same disconfirming evidence at a fraction of the cost — exactly what happened in the Detailed Case Study above. Climbing the ladder deliberately, one rung at a time, is what keeps discovery cheap relative to the cost of a full, wrong delivery investment.
+The core discipline this ladder enforces: **do not skip rungs.** A team eager to move fast can be tempted to jump straight from Rung 1 (a few encouraging conversations) to Rung 5 (full production build), skipping the cheaper, faster rungs that would have surfaced the same disconfirming evidence at a fraction of the cost exactly what happened in the Detailed Case Study above. Climbing the ladder deliberately, one rung at a time, is what keeps discovery cheap relative to the cost of a full, wrong delivery investment.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "Walk me through how you validated an idea before building it."**
-*What the interviewer is actually evaluating:* Whether the candidate can describe a genuine, disconfirmable test — one that could plausibly have produced a negative result and changed the plan — versus a description of discovery theater (a well-received demo, an enthusiastic survey of existing fans) presented as if it were rigorous validation. A strong answer names the specific riskiest assumption tested and what result would have caused the team to change course.
+*What the interviewer is actually evaluating:* Whether the candidate can describe a genuine, disconfirmable test one that could plausibly have produced a negative result and changed the plan versus a description of discovery theater (a well-received demo, an enthusiastic survey of existing fans) presented as if it were rigorous validation. A strong answer names the specific riskiest assumption tested and what result would have caused the team to change course.
 
 **Typical question 2: "How do you decide how much discovery is enough before starting to build?"**
 *What the interviewer is actually evaluating:* Whether the candidate has a principled way of scaling discovery effort to risk (using something like assumption mapping) rather than a fixed, one-size-fits-all amount of research regardless of how confident or how consequential the underlying assumptions are. A weak answer treats discovery as a mandatory checklist step of fixed size; a strong answer explains how the amount and kind of discovery should vary with the specific risk profile of the idea.
 
 **Typical question 3: "Tell me about a time you were confident an idea was good, but discovery proved you wrong."**
-*What the interviewer is actually evaluating:* Intellectual honesty and a genuine track record of letting evidence override prior conviction — a candidate who cannot produce a real example of this, or who reframes every past project as ultimately having been correct, may signal a discovery process that never actually has teeth, echoing this lesson's theme that discovery must be capable of producing an inconvenient answer to be real.
+*What the interviewer is actually evaluating:* Intellectual honesty and a genuine track record of letting evidence override prior conviction a candidate who cannot produce a real example of this, or who reframes every past project as ultimately having been correct, may signal a discovery process that never actually has teeth, echoing this lesson's theme that discovery must be capable of producing an inconvenient answer to be real.
 
 ---
 
 ## Summary
 
-Product discovery is the process of testing assumptions and reducing risk before committing to full-scale delivery, distinct from delivery's focus on building a validated solution well and at scale. Discovery targets four categories of risk — value, usability, feasibility, and viability — and a common failure is testing only value risk (often shallowly, via a well-received demo) while leaving the other three unexamined. Discovery should run continuously alongside delivery, rather than as a one-time phase that ends once building begins, since new risks emerge throughout a product's life. Assumption mapping — plotting each assumption a solution depends on by confidence and importance — identifies the riskiest assumption to test first, regardless of which risk category it falls into. Finally, "discovery theater" describes activity that has the visible form of validation without the capacity to actually produce disconfirming evidence; genuine discovery requires a test structured so that a plausible negative result is actually observable and would actually change the team's plan.
+Product discovery is the process of testing assumptions and reducing risk before committing to full-scale delivery, distinct from delivery's focus on building a validated solution well and at scale. Discovery targets four categories of risk value, usability, feasibility, and viability and a common failure is testing only value risk (often shallowly, via a well-received demo) while leaving the other three unexamined. Discovery should run continuously alongside delivery, rather than as a one-time phase that ends once building begins, since new risks emerge throughout a product's life. Assumption mapping plotting each assumption a solution depends on by confidence and importance identifies the riskiest assumption to test first, regardless of which risk category it falls into. Finally, "discovery theater" describes activity that has the visible form of validation without the capacity to actually produce disconfirming evidence; genuine discovery requires a test structured so that a plausible negative result is actually observable and would actually change the team's plan.
 
 ---
 
 ## Key Takeaways
 
 - Discovery tests whether a solution is worth building; delivery builds a validated solution well, at scale. These are distinct activities with different goals.
-- Discovery reduces four categories of risk: value, usability, feasibility, and viability — testing only one (usually value) while ignoring the others is incomplete discovery.
+- Discovery reduces four categories of risk: value, usability, feasibility, and viability testing only one (usually value) while ignoring the others is incomplete discovery.
 - Discovery should run continuously alongside delivery, not as a one-time phase completed before building begins.
-- Assumption mapping (plotting assumptions by confidence and importance) identifies the riskiest, most consequential untested assumption — the one to test first, regardless of category.
+- Assumption mapping (plotting assumptions by confidence and importance) identifies the riskiest, most consequential untested assumption the one to test first, regardless of category.
 - "Discovery theater" is activity that resembles validation but cannot produce a disconfirming result; genuine discovery must be able to fail.
 - A confidence ladder (conversation → concept test → concierge/manual test → limited pilot → full delivery) keeps discovery cheap by not skipping rungs on the way to full-scale investment.
 - Evaluate discovery by what was learned and what decision it changed, not by the volume of research activity conducted.
@@ -372,7 +372,7 @@ Product discovery is the process of testing assumptions and reducing risk before
 *A two-minute review of everything in this lesson.*
 
 - **Discovery** tests whether to build; **delivery** builds it well at scale. Different goals, different methods.
-- **Four risks:** value, usability, feasibility, viability — test all four, not just value.
+- **Four risks:** value, usability, feasibility, viability test all four, not just value.
 - **Continuous, not phased:** discovery runs alongside delivery throughout a product's life.
 - **Assumption mapping:** plot assumptions by confidence x importance; test the low-confidence, high-importance one first.
 - **Discovery theater:** activity that can't produce a negative result isn't real validation.
@@ -399,9 +399,9 @@ Product discovery is the process of testing assumptions and reducing risk before
 
 ## Further Reading / Resources
 
-- Marty Cagan, *Inspired: How to Create Tech Products Customers Love* — a widely referenced modern treatment of continuous discovery and the distinction between discovery and delivery teams.
-- Teresa Torres, *Continuous Discovery Habits* — a detailed, practice-oriented treatment of running discovery as an ongoing habit rather than a phase, including assumption-mapping techniques closely related to this lesson's framework.
-- Eric Ries, *The Lean Startup* — the origin of much of the "build-measure-learn" and minimum-viable-test thinking that underlies this lesson's confidence ladder concept.
+- Marty Cagan, *Inspired: How to Create Tech Products Customers Love* a widely referenced modern treatment of continuous discovery and the distinction between discovery and delivery teams.
+- Teresa Torres, *Continuous Discovery Habits* a detailed, practice-oriented treatment of running discovery as an ongoing habit rather than a phase, including assumption-mapping techniques closely related to this lesson's framework.
+- Eric Ries, *The Lean Startup* the origin of much of the "build-measure-learn" and minimum-viable-test thinking that underlies this lesson's confidence ladder concept.
 
 ---
 
@@ -445,7 +445,7 @@ Product discovery is the process of testing assumptions and reducing risk before
 
 **Card 7**
 - Front: What is the core discipline enforced by the confidence ladder (conversation → concept test → concierge test → pilot → full delivery)?
-- Back: Do not skip rungs — climb from cheap, low-fidelity tests to expensive, high-fidelity ones deliberately, since skipping ahead sacrifices cheap opportunities to catch a wrong assumption early.
+- Back: Do not skip rungs climb from cheap, low-fidelity tests to expensive, high-fidelity ones deliberately, since skipping ahead sacrifices cheap opportunities to catch a wrong assumption early.
 - Difficulty: 2
 - Tags: confidence-ladder
 
@@ -459,7 +459,7 @@ Work through the following, in writing, before reading further:
 1. List at least four distinct assumptions this proposed feature depends on (consider assumptions about actual usage volume across currencies, willingness to pay for it, technical/legal complexity of live exchange-rate data, and whether prospects citing this as a requirement would actually convert if it were built).
 2. Categorize each assumption as primarily a value, usability, feasibility, or viability risk.
 3. Using the confidence/importance plot, identify which assumption is likely lowest-confidence and highest-importance, and explain your reasoning.
-4. Design one specific, genuinely disconfirmable test for that riskiest assumption — one that could plausibly return a negative result — using the confidence ladder (starting from the cheapest applicable rung).
+4. Design one specific, genuinely disconfirmable test for that riskiest assumption one that could plausibly return a negative result using the confidence ladder (starting from the cheapest applicable rung).
 5. Referencing the Detailed Case Study, name one way this scenario could turn into "discovery theater" if handled carelessly (for example, by only asking existing enthusiastic prospects, or by testing after committing to a launch date).
 
 There is no single correct answer. The purpose of this exercise is to practice moving from a stakeholder-driven feature request directly to a structured, testable discovery plan, rather than either fast-tracking the request uncritically or dismissing it without genuine investigation.
@@ -514,7 +514,7 @@ C) Because new risks surface during the build that early work missed
 D) Because the same person must own both discovery and delivery work
 
 *Correct answer: C*
-*Explanation: A constraint found mid-implementation, a competitor launch that changes the viability picture, a usability problem no prototype exposed — none of these are visible to a research phase that closed before building started.*
+*Explanation: A constraint found mid-implementation, a competitor launch that changes the viability picture, a usability problem no prototype exposed none of these are visible to a research phase that closed before building started.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -644,7 +644,7 @@ C) Distinguishing value, usability, feasibility, and viability when scoping
 D) Referencing the confidence ladder to decide how far to climb first
 
 *Correct answer: B*
-*Explanation: A fixed ritual — always five interviews — treats a low-stakes tweak and a bet-the-quarter initiative as equivalent. The other three each tie the depth of discovery to what is actually at risk.*
+*Explanation: A fixed ritual always five interviews treats a low-stakes tweak and a bet-the-quarter initiative as equivalent. The other three each tie the depth of discovery to what is actually at risk.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
@@ -667,11 +667,11 @@ D) Disregard the cost finding, since value risk is what matters here
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 7 — Value Proposition | Directly answers Lesson 7's closing diagnostic — an unfillable "unlike" blank in a value proposition is precisely the kind of gap discovery work is meant to close |
-| **Current Lesson** | Lesson 8 — Product Discovery | Four risk categories; assumption mapping; discovery theater; the confidence ladder |
-| **Next Lesson** | Lesson 9 — Product Vision | Extends validated discovery findings into a longer-term aspirational direction for where the product should go next |
+| **Previous Lesson** | Lesson 7 Value Proposition | Directly answers Lesson 7's closing diagnostic an unfillable "unlike" blank in a value proposition is precisely the kind of gap discovery work is meant to close |
+| **Current Lesson** | Lesson 8 Product Discovery | Four risk categories; assumption mapping; discovery theater; the confidence ladder |
+| **Next Lesson** | Lesson 9 Product Vision | Extends validated discovery findings into a longer-term aspirational direction for where the product should go next |
 | **Future Concepts Unlocked** | Lesson 11 (User Research) | Provides the specific interview and research methods that populate the early rungs of the confidence ladder |
 | | Lesson 20 (Product Discovery Process) | Formalizes this lesson's concepts into a complete, repeatable, structured discovery workflow |
-| | Lesson 21 (MVP) | The delivery-side counterpart — scoping the smallest solution capable of testing the riskiest assumption cheaply |
+| | Lesson 21 (MVP) | The delivery-side counterpart scoping the smallest solution capable of testing the riskiest assumption cheaply |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any proposed feature or initiative is assumed to require an explicit accounting of its riskiest assumption before delivery begins — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any proposed feature or initiative is assumed to require an explicit accounting of its riskiest assumption before delivery begins this will not be re-explained, only re-applied.

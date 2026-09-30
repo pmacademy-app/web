@@ -2,11 +2,11 @@
 
 ## Why This Lesson Matters
 
-Lesson 30 closed out Module 3 by teaching you how to decide *what* to build — prioritization frameworks, trade-off reasoning, and the discipline of saying no to good ideas in service of better ones. That module answered the second of the three core questions from Lesson 1: "What should we build to solve it?" This lesson begins Module 4, and Module 4 answers a question Lesson 1 mentioned but deliberately did not resolve: once a decision is made, *how does a team actually turn it into working software, week over week, without losing the thread of why the decision was made in the first place?*
+Lesson 30 closed out Module 3 by teaching you how to decide *what* to build prioritization frameworks, trade-off reasoning, and the discipline of saying no to good ideas in service of better ones. That module answered the second of the three core questions from Lesson 1: "What should we build to solve it?" This lesson begins Module 4, and Module 4 answers a question Lesson 1 mentioned but deliberately did not resolve: once a decision is made, *how does a team actually turn it into working software, week over week, without losing the thread of why the decision was made in the first place?*
 
-This is a real gap in how new PMs are trained. Many PMs can prioritize a backlog beautifully and then watch that backlog degrade into chaos within a month, because they never learned the operating system that engineering and design teams actually run on day to day. Agile is that operating system — not a single tool, not a checklist, but a family of practices built around a specific bet: that in a domain as uncertain as software product development, short feedback loops beat long up-front plans.
+This is a real gap in how new PMs are trained. Many PMs can prioritize a backlog beautifully and then watch that backlog degrade into chaos within a month, because they never learned the operating system that engineering and design teams actually run on day to day. Agile is that operating system not a single tool, not a checklist, but a family of practices built around a specific bet: that in a domain as uncertain as software product development, short feedback loops beat long up-front plans.
 
-This matters concretely because most of your career-long working relationship with engineering will be mediated through an Agile process of some kind — a sprint, a Kanban board, a standup, a retrospective. If you don't understand *why* these rituals exist, you will experience them as bureaucratic overhead to be tolerated. If you do understand why, you will recognize them as the primary mechanism through which the Decision Chain (Lesson 1) actually executes in practice — and you will know when to adapt them, and when a ritual has calcified into theater. This lesson establishes the underlying philosophy; Lessons 32 and 33 will cover the two dominant concrete frameworks (Scrum and Kanban) built on top of it.
+This matters concretely because most of your career-long working relationship with engineering will be mediated through an Agile process of some kind a sprint, a Kanban board, a standup, a retrospective. If you don't understand *why* these rituals exist, you will experience them as bureaucratic overhead to be tolerated. If you do understand why, you will recognize them as the primary mechanism through which the Decision Chain (Lesson 1) actually executes in practice and you will know when to adapt them, and when a ritual has calcified into theater. This lesson establishes the underlying philosophy; Lessons 32 and 33 will cover the two dominant concrete frameworks (Scrum and Kanban) built on top of it.
 
 ---
 
@@ -14,13 +14,13 @@ This matters concretely because most of your career-long working relationship wi
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery |
+| **Module** | 4 Execution & Agile Delivery |
 | **Current Lesson** | 31 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 1 (Decision Chain, Output vs. Outcome), Lesson 29 (Prioritization Basics) |
-| **Next Lesson** | Lesson 32 — Scrum Framework |
-| **Future Topics Unlocked** | Lesson 32 (Scrum Framework), Lesson 33 (Kanban Framework), Lesson 34 (Sprint Planning & Backlog Grooming), Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation) — all directly build on the Iteration Loop and the four Agile Values introduced here |
+| **Next Lesson** | Lesson 32 Scrum Framework |
+| **Future Topics Unlocked** | Lesson 32 (Scrum Framework), Lesson 33 (Kanban Framework), Lesson 34 (Sprint Planning & Backlog Grooming), Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation) all directly build on the Iteration Loop and the four Agile Values introduced here |
 
 ---
 
@@ -38,7 +38,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes you are comfortable with two things established earlier in this curriculum. First, from **Lesson 1**, it assumes fluency with the Decision Chain (Problem → Understanding → Decision → Execution → Outcome) and the Output vs. Outcome distinction — Agile is, at its core, a way of structuring the "Execution" link of that chain so that it stays connected to the "Outcome" link instead of drifting into pure output production. Second, from **Lesson 29 (Prioritization Basics)**, it assumes you already know how to rank and sequence a backlog of candidate ideas by value and cost. This lesson does not re-teach prioritization; it teaches what happens to a prioritized backlog *after* prioritization is done, once engineering begins turning it into software.
+This lesson assumes you are comfortable with two things established earlier in this curriculum. First, from **Lesson 1**, it assumes fluency with the Decision Chain (Problem → Understanding → Decision → Execution → Outcome) and the Output vs. Outcome distinction Agile is, at its core, a way of structuring the "Execution" link of that chain so that it stays connected to the "Outcome" link instead of drifting into pure output production. Second, from **Lesson 29 (Prioritization Basics)**, it assumes you already know how to rank and sequence a backlog of candidate ideas by value and cost. This lesson does not re-teach prioritization; it teaches what happens to a prioritized backlog *after* prioritization is done, once engineering begins turning it into software.
 
 ---
 
@@ -46,9 +46,9 @@ This lesson assumes you are comfortable with two things established earlier in t
 
 ### The Problem Agile Was Built to Solve
 
-To understand why Agile exists, it helps to understand what it replaced: the **Waterfall model**. Waterfall borrowed its structure from civil engineering and manufacturing, where it is often genuinely wise to fully specify requirements, then design, then build, then test, then release, in strict sequence — because the cost of changing a bridge design after concrete has been poured is catastrophic. Software inherited this sequential model for decades, on the assumption that the same logic applied.
+To understand why Agile exists, it helps to understand what it replaced: the **Waterfall model**. Waterfall borrowed its structure from civil engineering and manufacturing, where it is often genuinely wise to fully specify requirements, then design, then build, then test, then release, in strict sequence because the cost of changing a bridge design after concrete has been poured is catastrophic. Software inherited this sequential model for decades, on the assumption that the same logic applied.
 
-It largely did not. Software requirements are rarely knowable in full up front, because much of what a team learns about the "right" solution only becomes visible once real users interact with something real. Under Waterfall, a team might spend six to twelve months writing a complete specification, only to discover — after building the entire thing — that a core assumption was wrong. By then, the cost of change is enormous, because everything downstream was built on top of the flawed assumption. This is precisely the failure mode described in Lesson 1's Case Study, except stretched across a full release cycle instead of a single feature decision.
+It largely did not. Software requirements are rarely knowable in full up front, because much of what a team learns about the "right" solution only becomes visible once real users interact with something real. Under Waterfall, a team might spend six to twelve months writing a complete specification, only to discover after building the entire thing that a core assumption was wrong. By then, the cost of change is enormous, because everything downstream was built on top of the flawed assumption. This is precisely the failure mode described in Lesson 1's Case Study, except stretched across a full release cycle instead of a single feature decision.
 
 ### The Agile Manifesto
 
@@ -59,17 +59,17 @@ In 2001, seventeen software practitioners met and produced the **Agile Manifesto
 3. **Customer collaboration** over contract negotiation
 4. **Responding to change** over following a plan
 
-A critical, frequently misunderstood detail: the Manifesto does not say the items on the right have *no* value — it says the items on the left are valued *more*, when the two are in tension. Process and tools still matter; documentation still matters; contracts and plans still matter. The claim is narrower and more defensible: when circumstances force a trade-off, Agile teams choose adaptability over rigid adherence to an original plan.
+A critical, frequently misunderstood detail: the Manifesto does not say the items on the right have *no* value it says the items on the left are valued *more*, when the two are in tension. Process and tools still matter; documentation still matters; contracts and plans still matter. The claim is narrower and more defensible: when circumstances force a trade-off, Agile teams choose adaptability over rigid adherence to an original plan.
 
 Twelve supporting principles accompany these values, but three carry disproportionate weight for a PM specifically:
 
-- "Our highest priority is to satisfy the customer through early and continuous delivery of valuable software" — this is the Manifesto's version of Lesson 1's output-vs-outcome distinction, expressed as a delivery cadence.
-- "Working software is the primary measure of progress" — not a Gantt chart showing percentage complete, not a specification document, but software a user could actually touch.
-- "At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly" — this is the origin of the retrospective, covered further in Lesson 32.
+- "Our highest priority is to satisfy the customer through early and continuous delivery of valuable software" this is the Manifesto's version of Lesson 1's output-vs-outcome distinction, expressed as a delivery cadence.
+- "Working software is the primary measure of progress" not a Gantt chart showing percentage complete, not a specification document, but software a user could actually touch.
+- "At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly" this is the origin of the retrospective, covered further in Lesson 32.
 
 ### The Iteration Loop
 
-This lesson's core mental model — the **Iteration Loop** — describes how these values translate into a repeatable operating rhythm:
+This lesson's core mental model the **Iteration Loop** describes how these values translate into a repeatable operating rhythm:
 
 ```mermaid
 %%{init: {
@@ -109,13 +109,13 @@ graph LR
     D -.->|informs next batch| A
 ```
 
-The critical design choice is the word **small**. Rather than committing to a large batch of work over a long horizon (Waterfall), an Agile team commits to a small, time-boxed batch, builds it, exposes it to feedback quickly, and lets that feedback shape the next batch. This is not merely a scheduling preference — it is a direct, structural response to uncertainty. The smaller the batch, the cheaper it is to discover you were wrong, and the sooner you can course-correct.
+The critical design choice is the word **small**. Rather than committing to a large batch of work over a long horizon (Waterfall), an Agile team commits to a small, time-boxed batch, builds it, exposes it to feedback quickly, and lets that feedback shape the next batch. This is not merely a scheduling preference it is a direct, structural response to uncertainty. The smaller the batch, the cheaper it is to discover you were wrong, and the sooner you can course-correct.
 
-It is worth being precise about how the Iteration Loop relates to the Decision Chain from Lesson 1. The Decision Chain describes a single pass through Problem → Understanding → Decision → Execution → Outcome, at the level of a whole initiative. The Iteration Loop operates *inside* the Execution link of that chain — it is the mechanism by which Execution itself is broken into small, feedback-generating increments, rather than one large, feedback-blind push. Put differently: the Decision Chain tells you *what* you're trying to do; the Iteration Loop tells you *how* a team structures the actual building of it so that being wrong is cheap to discover and cheap to fix.
+It is worth being precise about how the Iteration Loop relates to the Decision Chain from Lesson 1. The Decision Chain describes a single pass through Problem → Understanding → Decision → Execution → Outcome, at the level of a whole initiative. The Iteration Loop operates *inside* the Execution link of that chain it is the mechanism by which Execution itself is broken into small, feedback-generating increments, rather than one large, feedback-blind push. Put differently: the Decision Chain tells you *what* you're trying to do; the Iteration Loop tells you *how* a team structures the actual building of it so that being wrong is cheap to discover and cheap to fix.
 
 ### "Doing Agile" vs. "Being Agile"
 
-A distinction every PM must learn to diagnose quickly: many organizations that claim to "do Agile" have adopted its ceremonies — daily standups, two-week sprints, retrospectives — without adopting its underlying values. This produces what practitioners sometimes call **"Waterfall in sprint's clothing"**: a team that plans an entire quarter's work in detail up front, breaks it into sprint-sized chunks purely for scheduling convenience, and treats each sprint's plan as fixed and non-negotiable regardless of what is learned along the way. The ceremonies are present; the responsiveness to change is not.
+A distinction every PM must learn to diagnose quickly: many organizations that claim to "do Agile" have adopted its ceremonies daily standups, two-week sprints, retrospectives without adopting its underlying values. This produces what practitioners sometimes call **"Waterfall in sprint's clothing"**: a team that plans an entire quarter's work in detail up front, breaks it into sprint-sized chunks purely for scheduling convenience, and treats each sprint's plan as fixed and non-negotiable regardless of what is learned along the way. The ceremonies are present; the responsiveness to change is not.
 
 You can diagnose which situation you're in with a simple test: when a team learns something significant mid-sprint that suggests the current plan is wrong, does the plan change, or does the team "finish what was committed" and defer the learning to next sprint's planning? Teams that consistently choose the latter are doing Agile. Teams willing to genuinely re-plan, even at the cost of an uncomfortable conversation about a broken commitment, are being Agile. This distinction will matter directly when you study Scrum in Lesson 32, because Scrum's ceremonies are frequently implemented in the "doing" mode without the "being" mode, and recognizing the gap is a specifically valuable PM skill.
 
@@ -125,12 +125,12 @@ New PMs are often unclear on where their responsibility begins and ends once a t
 
 | Role | Primary Responsibility in an Agile Context |
 |---|---|
-| **Product Manager** | Owns *what* gets built and *why* — maintains the backlog, prioritizes it (Lesson 29), and ensures every increment ladders up to a real outcome, not just output |
-| **Scrum Master / Agile Coach** (if present) | Owns the *process* — facilitates ceremonies, removes team-level blockers, protects the team's focus; does not decide what gets built |
-| **Engineering Manager / Tech Lead** | Owns *how* it gets built — technical approach, architecture, estimation accuracy, code quality |
+| **Product Manager** | Owns *what* gets built and *why* maintains the backlog, prioritizes it (Lesson 29), and ensures every increment ladders up to a real outcome, not just output |
+| **Scrum Master / Agile Coach** (if present) | Owns the *process* facilitates ceremonies, removes team-level blockers, protects the team's focus; does not decide what gets built |
+| **Engineering Manager / Tech Lead** | Owns *how* it gets built technical approach, architecture, estimation accuracy, code quality |
 | **Individual engineers/designers** | Own the actual construction and craft-level decisions within the constraints set above |
 
-The most common confusion for new PMs is conflating their role with the Scrum Master's. A PM who spends their energy facilitating standups and tracking velocity charts, while neglecting backlog quality and outcome clarity, has drifted into project-coordination work — precisely the trap Lesson 1 warned against. The PM's distinctive contribution to an Agile team is not running the ceremonies; it is making sure the ceremonies are operating on a backlog worth building.
+The most common confusion for new PMs is conflating their role with the Scrum Master's. A PM who spends their energy facilitating standups and tracking velocity charts, while neglecting backlog quality and outcome clarity, has drifted into project-coordination work precisely the trap Lesson 1 warned against. The PM's distinctive contribution to an Agile team is not running the ceremonies; it is making sure the ceremonies are operating on a backlog worth building.
 
 ---
 
@@ -142,11 +142,11 @@ Agile is not a speed technique; it is an uncertainty-management technique. A tea
 
 **Mistake 2: Believing the Manifesto rejects planning entirely**
 
-"Responding to change over following a plan" is frequently misquoted as "we don't need plans." The Manifesto values planning — it simply treats a plan as a working hypothesis to be revised with evidence, rather than a contract to be defended regardless of what is learned.
+"Responding to change over following a plan" is frequently misquoted as "we don't need plans." The Manifesto values planning it simply treats a plan as a working hypothesis to be revised with evidence, rather than a contract to be defended regardless of what is learned.
 
 **Mistake 3: Confusing ceremony attendance with Agile practice**
 
-As covered above, a team can run every ceremony precisely on schedule while still operating in a fundamentally Waterfall mindset internally. New PMs often assume that because standups and sprints exist, the team is "Agile" by default — this is the single most common misdiagnosis in the industry.
+As covered above, a team can run every ceremony precisely on schedule while still operating in a fundamentally Waterfall mindset internally. New PMs often assume that because standups and sprints exist, the team is "Agile" by default this is the single most common misdiagnosis in the industry.
 
 **Mistake 4: Assuming Agile removes the need for upfront strategic thinking**
 
@@ -154,7 +154,7 @@ Short iteration cycles at the execution level do not eliminate the need for the 
 
 **Mistake 5: Using "we're Agile" to avoid commitments to stakeholders**
 
-Some PMs and teams invoke Agile as a shield against giving any forward-looking estimate at all — "we can't tell you when this will ship, we're Agile." This is a misuse of the philosophy. Agile changes *how confidently and how far in advance* you commit, and demands that commitments be revisited as evidence arrives — it does not exempt a team from giving stakeholders a reasonable, honestly-caveated sense of direction and timing, a skill covered directly in Lesson 47 (Stakeholder Management).
+Some PMs and teams invoke Agile as a shield against giving any forward-looking estimate at all "we can't tell you when this will ship, we're Agile." This is a misuse of the philosophy. Agile changes *how confidently and how far in advance* you commit, and demands that commitments be revisited as evidence arrives it does not exempt a team from giving stakeholders a reasonable, honestly-caveated sense of direction and timing, a skill covered directly in Lesson 47 (Stakeholder Management).
 
 ---
 
@@ -207,21 +207,21 @@ Use the Iteration Loop as a diagnostic whenever a project feels "stuck" or "off 
 
 ## Real Company Example
 
-**Amazon**'s "two-pizza team" concept is real, but the more precise and more useful version of the story — as told firsthand by former Amazon VP Colin Bryar and former VP Bill Carr in their book *Working Backwards* — is that two-pizza teams were an early solution that Amazon later evolved beyond, not a practice that simply continues unchanged. Amazon found that team *size* wasn't actually the strongest predictor of a team's success; having a single accountable leader with the right authority was. That insight produced "single-threaded leadership" (STL): one leader, unencumbered by competing responsibilities, owns one initiative end-to-end with a dedicated, "separable" team, so the organization doesn't have to coordinate every decision through a large committee.
+**Amazon**'s "two-pizza team" concept is real, but the more precise and more useful version of the story as told firsthand by former Amazon VP Colin Bryar and former VP Bill Carr in their book *Working Backwards* is that two-pizza teams were an early solution that Amazon later evolved beyond, not a practice that simply continues unchanged. Amazon found that team *size* wasn't actually the strongest predictor of a team's success; having a single accountable leader with the right authority was. That insight produced "single-threaded leadership" (STL): one leader, unencumbered by competing responsibilities, owns one initiative end-to-end with a dedicated, "separable" team, so the organization doesn't have to coordinate every decision through a large committee.
 
-The underlying logic connects directly to this lesson's theory, and the evolution itself is the more instructive part: small, autonomous teams reduce coordination overhead — a team of eight can decide, build, and get feedback in days, while a team of eighty attempting the same decision typically cannot, because the number of people who must align before work begins grows the batch size by necessity. But Amazon's own experience shows that raw team size was a proxy for the real variable (clear, unambiguous ownership), not the cause itself — worth remembering before copying "keep teams small" as a rule in isolation from what it's actually meant to produce.
+The underlying logic connects directly to this lesson's theory, and the evolution itself is the more instructive part: small, autonomous teams reduce coordination overhead a team of eight can decide, build, and get feedback in days, while a team of eighty attempting the same decision typically cannot, because the number of people who must align before work begins grows the batch size by necessity. But Amazon's own experience shows that raw team size was a proxy for the real variable (clear, unambiguous ownership), not the cause itself worth remembering before copying "keep teams small" as a rule in isolation from what it's actually meant to produce.
 
-*(Source: Bryar and Carr's *Working Backwards* (2021), a firsthand insider account by two former Amazon executives directly involved in the practice's development — a stronger source than the general "widely reported" framing this section previously relied on.)*
+*(Source: Bryar and Carr's *Working Backwards* (2021), a firsthand insider account by two former Amazon executives directly involved in the practice's development a stronger source than the general "widely reported" framing this section previously relied on.)*
 
 ---
 
 ## Real World Perspective: Agile Fundamentals at Different Company Stages
 
 **At a startup:**
-Agile is often practiced informally and without much ceremony — a founder-PM might simply talk to engineers daily and adjust plans in real time, without a named framework, a tracked velocity chart, or a scheduled retrospective. This is not a failure to "do Agile properly"; in a five-person team sitting in one room, many formal ceremonies exist to solve coordination problems that don't yet exist at that scale. The values (short feedback loops, responsiveness to learning) are often present even when the vocabulary (sprints, standups) is not.
+Agile is often practiced informally and without much ceremony a founder-PM might simply talk to engineers daily and adjust plans in real time, without a named framework, a tracked velocity chart, or a scheduled retrospective. This is not a failure to "do Agile properly"; in a five-person team sitting in one room, many formal ceremonies exist to solve coordination problems that don't yet exist at that scale. The values (short feedback loops, responsiveness to learning) are often present even when the vocabulary (sprints, standups) is not.
 
 **At a mid-size company:**
-Formal frameworks typically appear — usually Scrum or Kanban (Lessons 32–33) — because the team has grown past the point where informal daily conversation can keep everyone aligned. This is also where "doing Agile vs. being Agile" drift most commonly begins, because ceremonies get standardized company-wide by a platform or operations team, sometimes without preserving the underlying reasoning for why each ceremony exists.
+Formal frameworks typically appear usually Scrum or Kanban (Lessons 32–33) because the team has grown past the point where informal daily conversation can keep everyone aligned. This is also where "doing Agile vs. being Agile" drift most commonly begins, because ceremonies get standardized company-wide by a platform or operations team, sometimes without preserving the underlying reasoning for why each ceremony exists.
 
 **At Big Tech:**
 Agile ceremonies are typically deeply institutionalized, often supported by dedicated tooling, embedded agile coaches, and standardized sprint cadences across dozens of teams simultaneously. The tension shifts: the risk is no longer "no process at all," but rather process ossifying into ritual disconnected from its purpose, at a scale where a single misaligned ceremony can quietly waste enormous amounts of engineering time across many teams before anyone notices. Senior PMs at this scale are often specifically valued for their willingness to challenge a ceremony that has stopped serving its original function.
@@ -232,15 +232,15 @@ Agile ceremonies are typically deeply institutionalized, often supported by dedi
 
 Consider a simplified, illustrative scenario, common at mid-size product organizations transitioning from ad hoc development into a formal Agile process for the first time.
 
-A twelve-person product team adopts two-week sprints after a consultant recommends it. In week one of the pilot sprint, the team commits to seven backlog items during sprint planning. On day four, a customer-facing bug is discovered that is actively costing the company revenue — engineers spend a day and a half fixing it, unplanned. On day seven, user interviews (conducted independently by design) reveal that one of the seven committed items is based on a wrong assumption about user behavior and should be redesigned before more engineering time is spent on it.
+A twelve-person product team adopts two-week sprints after a consultant recommends it. In week one of the pilot sprint, the team commits to seven backlog items during sprint planning. On day four, a customer-facing bug is discovered that is actively costing the company revenue engineers spend a day and a half fixing it, unplanned. On day seven, user interviews (conducted independently by design) reveal that one of the seven committed items is based on a wrong assumption about user behavior and should be redesigned before more engineering time is spent on it.
 
 Despite both discoveries, the PM insists the team "finish what we committed to," reasoning that changing the sprint mid-flight would look like poor planning to leadership. The team ships all seven original items at the end of the sprint, including the one now known to rest on a flawed assumption. The following sprint, the team has to redo roughly 40% of that item's work.
 
 **What went wrong?**
 
-The team had adopted Agile's ceremonies — a sprint, a fixed commitment, a two-week cadence — without adopting its underlying value of *responding to change over following a plan*. Mid-sprint learning, exactly the kind of feedback the Iteration Loop is designed to capture and act on, was treated as an inconvenience to be ignored rather than a signal to be acted on. The PM's instinct — protecting the appearance of predictable delivery — is understandable, but it inverted the entire purpose of the framework: a sprint commitment exists to create a short, protected window of focus, not a contract that must be honored even after it's known to be wrong.
+The team had adopted Agile's ceremonies a sprint, a fixed commitment, a two-week cadence without adopting its underlying value of *responding to change over following a plan*. Mid-sprint learning, exactly the kind of feedback the Iteration Loop is designed to capture and act on, was treated as an inconvenience to be ignored rather than a signal to be acted on. The PM's instinct protecting the appearance of predictable delivery is understandable, but it inverted the entire purpose of the framework: a sprint commitment exists to create a short, protected window of focus, not a contract that must be honored even after it's known to be wrong.
 
-A PM operating from genuine Agile values, rather than Agile ceremony, would have brought the new evidence to the team immediately, made the trade-off explicit to stakeholders ("we're pausing item 5 because we just learned it rests on a false assumption — here's what we'll do instead"), and treated the resulting short-term appearance of a "broken commitment" as a far better outcome than shipping something known to be wrong. This exact tension — protecting a plan versus responding to new evidence — will reappear directly in **Lesson 34 (Sprint Planning & Backlog Grooming)**, where we build a concrete process for handling mid-sprint changes without destabilizing the whole team's focus, and again in **Lesson 47 (Stakeholder Management)**, where we address how to communicate a changed plan upward without it reading as a failure.
+A PM operating from genuine Agile values, rather than Agile ceremony, would have brought the new evidence to the team immediately, made the trade-off explicit to stakeholders ("we're pausing item 5 because we just learned it rests on a false assumption here's what we'll do instead"), and treated the resulting short-term appearance of a "broken commitment" as a far better outcome than shipping something known to be wrong. This exact tension protecting a plan versus responding to new evidence will reappear directly in **Lesson 34 (Sprint Planning & Backlog Grooming)**, where we build a concrete process for handling mid-sprint changes without destabilizing the whole team's focus, and again in **Lesson 47 (Stakeholder Management)**, where we address how to communicate a changed plan upward without it reading as a failure.
 
 ---
 
@@ -256,37 +256,37 @@ A second, more tactical tool: before recommending that a team adopt or continue 
 | Working software as truth | Is progress measured by something a user could touch, or by percentage-complete estimates and documentation? | Status reports describe "80% done" for work with no demonstrable, testable output |
 | PM backlog ownership | Is the PM actively curating and prioritizing the backlog, or has that responsibility drifted to whoever runs the ceremonies? | Backlog is stale, unprioritized, or maintained by the Scrum Master/EM rather than the PM |
 
-This checklist is deliberately framework-agnostic — it applies equally whether the team ultimately uses Scrum, Kanban, or a hybrid, because it audits Agile *values*, not any single Agile *implementation*. We will apply it directly when comparing Scrum and Kanban in Lessons 32 and 33.
+This checklist is deliberately framework-agnostic it applies equally whether the team ultimately uses Scrum, Kanban, or a hybrid, because it audits Agile *values*, not any single Agile *implementation*. We will apply it directly when comparing Scrum and Kanban in Lessons 32 and 33.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How do you feel about Agile? Do you prefer Scrum or Kanban?"**
-*What the interviewer is actually evaluating:* Whether the candidate has a values-first understanding of Agile, or a ceremony-first one. A weak answer states a framework preference with no reasoning ("I like Scrum, it's more structured"). A strong answer explains what problem each framework solves and under what conditions each is a better fit — signaling that the candidate understands Agile as a response to a specific kind of uncertainty, not a personal style preference.
+*What the interviewer is actually evaluating:* Whether the candidate has a values-first understanding of Agile, or a ceremony-first one. A weak answer states a framework preference with no reasoning ("I like Scrum, it's more structured"). A strong answer explains what problem each framework solves and under what conditions each is a better fit signaling that the candidate understands Agile as a response to a specific kind of uncertainty, not a personal style preference.
 
 **Typical question 2: "Tell me about a time a project's plan had to change mid-execution. How did you handle it?"**
 *What the interviewer is actually evaluating:* Whether the candidate treats new evidence as something to act on or something to defer, mirroring this lesson's Case Study exactly. A weak answer describes forcing the original plan through regardless of what was learned, in the name of predictability. A strong answer describes communicating the change transparently, explaining the evidence behind it, and reprioritizing without treating the change itself as a failure.
 
 **Typical question 3: "What's the PM's job in a sprint, versus the Scrum Master's?"**
-*What the interviewer is actually evaluating:* Role clarity — whether the candidate understands that the PM owns backlog quality and outcome direction, not ceremony facilitation. Candidates who describe themselves running standups and tracking burndown charts, without mentioning backlog prioritization or outcome framing, reveal the exact role-confusion covered in this lesson's Theory section.
+*What the interviewer is actually evaluating:* Role clarity whether the candidate understands that the PM owns backlog quality and outcome direction, not ceremony facilitation. Candidates who describe themselves running standups and tracking burndown charts, without mentioning backlog prioritization or outcome framing, reveal the exact role-confusion covered in this lesson's Theory section.
 
 ---
 
 ## Summary
 
-Agile is not a single process but a family of practices built on a specific bet about software development: that in the presence of genuine uncertainty about what users actually need, short feedback loops beat long up-front plans. It emerged as a direct response to the failure modes of Waterfall, where large, sequential commitments made discovering a wrong assumption catastrophically expensive. The Agile Manifesto's four values — individuals and interactions, working software, customer collaboration, and responding to change — describe what to prioritize when trade-offs arise, not a rejection of process, documentation, contracts, or plans outright. This lesson's Iteration Loop (small batch → build → demo/release → feedback → informs next batch) describes how those values translate into a repeatable operating rhythm inside the Execution link of the Decision Chain from Lesson 1. The most important diagnostic skill this lesson teaches is distinguishing "doing Agile" (running ceremonies on schedule) from "being Agile" (genuinely responding to what each iteration reveals) — a gap that widens as organizations grow and ceremonies risk becoming ritual. Within an Agile team, the PM's distinctive job remains what it has always been since Lesson 1: owning the backlog's connection to real problems and real outcomes, while the Scrum Master owns process facilitation and engineering leadership owns technical execution.
+Agile is not a single process but a family of practices built on a specific bet about software development: that in the presence of genuine uncertainty about what users actually need, short feedback loops beat long up-front plans. It emerged as a direct response to the failure modes of Waterfall, where large, sequential commitments made discovering a wrong assumption catastrophically expensive. The Agile Manifesto's four values individuals and interactions, working software, customer collaboration, and responding to change describe what to prioritize when trade-offs arise, not a rejection of process, documentation, contracts, or plans outright. This lesson's Iteration Loop (small batch → build → demo/release → feedback → informs next batch) describes how those values translate into a repeatable operating rhythm inside the Execution link of the Decision Chain from Lesson 1. The most important diagnostic skill this lesson teaches is distinguishing "doing Agile" (running ceremonies on schedule) from "being Agile" (genuinely responding to what each iteration reveals) a gap that widens as organizations grow and ceremonies risk becoming ritual. Within an Agile team, the PM's distinctive job remains what it has always been since Lesson 1: owning the backlog's connection to real problems and real outcomes, while the Scrum Master owns process facilitation and engineering leadership owns technical execution.
 
 ---
 
 ## Key Takeaways
 
 - Agile emerged as a direct response to Waterfall's core weakness: expensive, late discovery of wrong assumptions after long, sequential commitments.
-- The four Agile values prioritize individuals/interactions, working software, customer collaboration, and responsiveness to change — without discarding process, documentation, contracts, or plans entirely.
+- The four Agile values prioritize individuals/interactions, working software, customer collaboration, and responsiveness to change without discarding process, documentation, contracts, or plans entirely.
 - The Iteration Loop (small batch → build → demo/release → feedback → next batch) operates inside the Execution link of the Decision Chain (Lesson 1), keeping execution connected to real feedback rather than isolated from it.
-- "Doing Agile" (ceremonies present) is not the same as "being Agile" (values genuinely practiced) — many organizations have the former without the latter.
-- Agile does not remove the need for upfront prioritization (Lesson 29) or longer-horizon planning (Lesson 35) — it governs execution once priorities are set, not the setting of priorities itself.
-- The PM's distinctive role inside an Agile team is backlog ownership and outcome clarity, not ceremony facilitation — that belongs to the Scrum Master or Agile Coach where one exists.
+- "Doing Agile" (ceremonies present) is not the same as "being Agile" (values genuinely practiced) many organizations have the former without the latter.
+- Agile does not remove the need for upfront prioritization (Lesson 29) or longer-horizon planning (Lesson 35) it governs execution once priorities are set, not the setting of priorities itself.
+- The PM's distinctive role inside an Agile team is backlog ownership and outcome clarity, not ceremony facilitation that belongs to the Scrum Master or Agile Coach where one exists.
 - Smaller, more autonomous teams (as in Amazon's two-pizza team model) tend to sustain tighter, more genuine iteration loops than large teams, because coordination overhead scales with team size.
 
 ---
@@ -296,7 +296,7 @@ Agile is not a single process but a family of practices built on a specific bet 
 *A two-minute review of everything in this lesson.*
 
 - **Agile exists because:** software requirements are rarely fully knowable up front; short feedback loops make being wrong cheap to discover.
-- **Four values:** individuals/interactions, working software, customer collaboration, responding to change — each "over," not "instead of," the item on the right.
+- **Four values:** individuals/interactions, working software, customer collaboration, responding to change each "over," not "instead of," the item on the right.
 - **Iteration Loop:** Small Batch → Build → Demo/Release → Feedback → back into next batch.
 - **Doing vs. Being Agile test:** when the team learns something mid-cycle that changes the picture, does the plan actually change?
 - **PM's job in Agile:** own the backlog and the "why," not the ceremonies.
@@ -322,9 +322,9 @@ Agile is not a single process but a family of practices built on a specific bet 
 
 ## Further Reading / Resources
 
-- *Agile Manifesto* — Kent Beck, Mike Beedle, et al. (2001), the original founding document and its twelve principles.
-- *The Lean Startup* by Eric Ries — extends the same build-measure-learn logic underlying the Iteration Loop to whole-company strategy, not just engineering execution.
-- *Inspired: How to Create Tech Products Customers Love* by Marty Cagan — situates Agile execution within the broader context of product discovery and PM responsibility.
+- *Agile Manifesto* Kent Beck, Mike Beedle, et al. (2001), the original founding document and its twelve principles.
+- *The Lean Startup* by Eric Ries extends the same build-measure-learn logic underlying the Iteration Loop to whole-company strategy, not just engineering execution.
+- *Inspired: How to Create Tech Products Customers Love* by Marty Cagan situates Agile execution within the broader context of product discovery and PM responsibility.
 
 ---
 
@@ -355,7 +355,7 @@ Agile is not a single process but a family of practices built on a specific bet 
 - Tags: diagnosis
 
 **Card 5**
-- Front: In an Agile team, who owns the backlog and outcome direction — the PM or the Scrum Master?
+- Front: In an Agile team, who owns the backlog and outcome direction the PM or the Scrum Master?
 - Back: The PM. The Scrum Master owns process facilitation; the PM owns what gets built and why.
 - Difficulty: 1
 - Tags: roles
@@ -375,9 +375,9 @@ Agile is not a single process but a family of practices built on a specific bet 
 
 ## Reflection Exercise
 
-Consider the following novel scenario: You've just joined a fourteen-person team as PM. They run two-week sprints, daily standups, and a retrospective every other Friday. On your first day, an engineer tells you, half-joking, "our retros are basically the same meeting every two weeks — same three complaints, nothing changes." You also notice the current sprint board shows three items that have been "in progress" for over five weeks each.
+Consider the following novel scenario: You've just joined a fourteen-person team as PM. They run two-week sprints, daily standups, and a retrospective every other Friday. On your first day, an engineer tells you, half-joking, "our retros are basically the same meeting every two weeks same three complaints, nothing changes." You also notice the current sprint board shows three items that have been "in progress" for over five weeks each.
 
-There is no single correct answer to the prompts below — the goal is to practice diagnostic reasoning using this lesson's frameworks, not to arrive at one "right" fix.
+There is no single correct answer to the prompts below the goal is to practice diagnostic reasoning using this lesson's frameworks, not to arrive at one "right" fix.
 
 1. Using the Agile Fit Checklist, which specific checks does this team appear to be failing, based on the evidence given?
 2. Is this team "doing Agile" or "being Agile," in your judgment? What additional evidence would you want before being confident in your answer?
@@ -409,7 +409,7 @@ C) Following a plan is prioritized once conditions grow uncertain
 D) Responding to change wins the tie, though plans keep value
 
 *Correct answer: D*
-*Explanation: The Manifesto's values are stated as "X over Y" — X wins when the two conflict, not that Y has no worth at all.*
+*Explanation: The Manifesto's values are stated as "X over Y" X wins when the two conflict, not that Y has no worth at all.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -422,7 +422,7 @@ C) A rule requiring each batch to repeat the last exactly
 D) An optional step most mature teams eventually drop
 
 *Correct answer: A*
-*Explanation: The dotted arrow is the loop's defining feature — feedback from what shipped directly shapes what gets built next.*
+*Explanation: The dotted arrow is the loop's defining feature feedback from what shipped directly shapes what gets built next.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -500,7 +500,7 @@ C) Stakeholders forfeit any right to ask about timing
 D) Only Waterfall teams are permitted to give estimates
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #5 frames this as a misuse — Agile changes how confidently and how far ahead a team commits, not whether it communicates direction.*
+*Explanation: Common Beginner Mistake #5 frames this as a misuse Agile changes how confidently and how far ahead a team commits, not whether it communicates direction.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
@@ -588,12 +588,12 @@ D) Redirect the VP to the Scrum Master instead of answering
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 30 — (Module 3 closing lesson on prioritization trade-offs) | This lesson picks up immediately after a backlog has been prioritized and asks how it actually gets executed |
-| **Current Lesson** | Lesson 31 — Agile Fundamentals | Iteration Loop; Agile's four values; Doing Agile vs. Being Agile; PM's role distinct from Scrum Master/EM; Agile Fit Checklist |
-| **Next Lesson** | Lesson 32 — Scrum Framework | Takes the Iteration Loop and formalizes it into Scrum's specific ceremonies, roles, and artifacts |
+| **Previous Lesson** | Lesson 30 (Module 3 closing lesson on prioritization trade-offs) | This lesson picks up immediately after a backlog has been prioritized and asks how it actually gets executed |
+| **Current Lesson** | Lesson 31 Agile Fundamentals | Iteration Loop; Agile's four values; Doing Agile vs. Being Agile; PM's role distinct from Scrum Master/EM; Agile Fit Checklist |
+| **Next Lesson** | Lesson 32 Scrum Framework | Takes the Iteration Loop and formalizes it into Scrum's specific ceremonies, roles, and artifacts |
 | **Future Concepts Unlocked** | Lesson 33 (Kanban Framework) | Presents a contrasting, flow-based implementation of the same underlying Agile values, to be evaluated using the Agile Fit Checklist introduced here |
 | | Lesson 34 (Sprint Planning & Backlog Grooming) | Builds a concrete process for handling mid-sprint changes, directly resolving the failure mode in this lesson's Case Study |
 | | Lesson 39 (Technical Debt & PM Trade-offs) | Applies Agile's short-feedback-loop logic to the specific trade-off of speed versus long-term code health |
 | | Lesson 47 (Stakeholder Management) | Extends this lesson's guidance on giving stakeholders honest, caveated forward commitments into a full toolkit |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Iteration Loop and the Doing vs. Being Agile distinction with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Iteration Loop and the Doing vs. Being Agile distinction with you they will not be re-explained, only re-applied in new contexts.

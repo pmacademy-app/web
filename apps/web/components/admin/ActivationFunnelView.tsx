@@ -117,9 +117,11 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
         )}
       </AdminSection>
 
-      {/* Onboarding step drop-off — the one new Phase 2 instrumentation. */}
+      {/* Onboarding reach → completion. Since Phase 4A (ADR-007) onboarding is a single
+          screen, so this is one "reached onboarding" stage plus the completion signal, not a
+          multi-step drop-off. */}
       <AdminSection
-        title="Onboarding step drop-off"
+        title="Onboarding completion"
         icon={ListOrdered}
         meta={`${num(data.onboardingSteps.instrumentedCohort)} instrumented`}
       >
@@ -127,7 +129,7 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
           <AdminEmptyState
             icon={ListOrdered}
             title="No instrumented onboarding sessions yet"
-            description="Per-step drop-off appears once learners move through the wizard after this phase ships. Accounts created before instrumentation are excluded, not counted as drop-offs."
+            description="Onboarding reach and completion appear once learners reach the onboarding screen after instrumentation shipped. Accounts created before instrumentation are excluded, not counted as drop-offs."
             className="py-8"
           />
         ) : (
@@ -248,6 +250,32 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
             </p>
           </div>
         )}
+      </AdminSection>
+
+      {/* Deep-dive engagement — Phase 4 (§4.4) guardrail: is the optional depth abandoned? */}
+      <AdminSection title="Deep-dive engagement" icon={GraduationCap} meta="Among lesson-openers">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">Opened Deep-dive</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">
+              {num(data.deepDive.learnersWhoOpenedDeepDive)}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">% of openers</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">{data.deepDive.pctOfOpeners}%</span>
+          </div>
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">Lessons w/ Deep-dive</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">
+              {num(data.deepDive.lessonsWithDeepDiveOpened)}
+            </span>
+          </div>
+        </div>
+        <p className="mt-3 text-[11px] text-admin-fg-muted">
+          A near-zero rate warns the depth that differentiates Prodily is being abandoned even if activation improves.
+          Consent-independent (server marker), so complete versus GA4.
+        </p>
       </AdminSection>
     </div>
   )

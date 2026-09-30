@@ -739,22 +739,21 @@ export interface OnboardingFieldOption {
   recommendedModule?: string
 }
 
-export interface OnboardingStepConfig {
-  id: string
-  title: string
-  description: string
-  requiredFields: string[]
-  fieldOptions?: Record<string, OnboardingFieldOption[]>
-}
-
+/**
+ * Phase 4C — the learner onboarding is a single focused screen collecting goal +
+ * experience (see `app/onboarding/OnboardingWizard.tsx` and ADR-007). The former 4-step
+ * wizard model — editable steps, per-step required fields, topic and learning-preference
+ * selection — was removed here because nothing in the live flow consumed it. Only the
+ * `goal` and `experience_level` option lists drive the live screen, so those are the only
+ * configurable groups. The optional index signature tolerates legacy option groups that
+ * may still exist in stored settings JSON without resurrecting them in the Admin UI.
+ */
 export interface OnboardingSettings {
+  /** Master switch for the learner onboarding screen. */
   enabled: boolean
-  steps: OnboardingStepConfig[]
   fieldOptions?: {
     goal?: OnboardingFieldOption[]
     experience_level?: OnboardingFieldOption[]
-    topics?: OnboardingFieldOption[]
-    learning_preference?: OnboardingFieldOption[]
     [key: string]: OnboardingFieldOption[] | undefined
   }
 }

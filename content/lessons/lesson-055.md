@@ -4,7 +4,7 @@
 
 Every lesson in this curriculum so far has addressed the work of an individual PM operating within a team, a stakeholder network, and an organization. This lesson addresses a genuine inflection point in many PM careers: the shift from doing product work individually to building and leading a team of PMs, where success is measured not by the quality of your own individual decisions, but by the quality of decisions made by people you lead, most of whom you cannot and should not make every decision for personally.
 
-This lesson matters because this transition is one of the most commonly mishandled in product management, precisely because the skills that make someone an excellent individual contributor PM — deep involvement in the details, strong personal judgment on prioritization and trade-offs, direct ownership of outcomes — do not automatically transfer to leading a team, and in some cases actively work against effective leadership if not deliberately adapted. A new PM leader who continues personally making every decision their team should be making has not actually become a leader; they have simply become a bottleneck with a new title.
+This lesson matters because this transition is one of the most commonly mishandled in product management, precisely because the skills that make someone an excellent individual contributor PM deep involvement in the details, strong personal judgment on prioritization and trade-offs, direct ownership of outcomes do not automatically transfer to leading a team, and in some cases actively work against effective leadership if not deliberately adapted. A new PM leader who continues personally making every decision their team should be making has not actually become a leader; they have simply become a bottleneck with a new title.
 
 ---
 
@@ -12,13 +12,13 @@ This lesson matters because this transition is one of the most commonly mishandl
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career |
+| **Module** | 6 Leadership, Communication & Career |
 | **Current Lesson** | 55 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 37 (Working with Engineering Teams — Trust Ladder, team boundaries), Lesson 53 (Negotiation & Influence Without Authority — coalition-building) |
-| **Next Lesson** | Lesson 56 — Product Management Career Paths |
-| **Future Topics Unlocked** | Lesson 56 (Product Management Career Paths), Lesson 57 (Ethics in Product Management) — both build on the leadership and organizational design concepts introduced here |
+| **Prerequisites** | Lesson 37 (Working with Engineering Teams Trust Ladder, team boundaries), Lesson 53 (Negotiation & Influence Without Authority coalition-building) |
+| **Next Lesson** | Lesson 56 Product Management Career Paths |
+| **Future Topics Unlocked** | Lesson 56 (Product Management Career Paths), Lesson 57 (Ethics in Product Management) both build on the leadership and organizational design concepts introduced here |
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 37's** discussion of team boundaries and the refere
 
 ### The Core Shift: From Doing to Enabling
 
-The central adjustment required when moving from individual-contributor PM work to leading a team of PMs is a shift from personally making decisions to enabling other people to make good decisions. This is a genuinely different skill, not simply "the same job at a larger scale." An individual-contributor PM is evaluated on the quality of their own prioritization, their own stakeholder relationships, their own product judgment. A PM leader is evaluated on whether the PMs they lead are making consistently good decisions, building trust with their own stakeholders, and growing in their own judgment over time — outcomes a leader achieves primarily through coaching, structure, and delegation, not through personally re-deciding everything their reports bring to them.
+The central adjustment required when moving from individual-contributor PM work to leading a team of PMs is a shift from personally making decisions to enabling other people to make good decisions. This is a genuinely different skill, not simply "the same job at a larger scale." An individual-contributor PM is evaluated on the quality of their own prioritization, their own stakeholder relationships, their own product judgment. A PM leader is evaluated on whether the PMs they lead are making consistently good decisions, building trust with their own stakeholders, and growing in their own judgment over time outcomes a leader achieves primarily through coaching, structure, and delegation, not through personally re-deciding everything their reports bring to them.
 
 ```mermaid
 %%{init: {
@@ -82,7 +82,7 @@ graph LR
     B --> C["Team leader:<br/>evaluated on team's<br/>collective decisions and growth"]
 ```
 
-A specific, common trap at this transition: a new PM leader, faced with a decision one of their reports brings to them, simply makes the call themselves — faster in the moment, and often genuinely correct, but corrosive over time, since it prevents the report from developing their own judgment and trains the whole team to bring decisions upward rather than resolving them independently. The better practice, developed further below, is coaching the report toward their own good decision rather than substituting the leader's decision for it.
+A specific, common trap at this transition: a new PM leader, faced with a decision one of their reports brings to them, simply makes the call themselves faster in the moment, and often genuinely correct, but corrosive over time, since it prevents the report from developing their own judgment and trains the whole team to bring decisions upward rather than resolving them independently. The better practice, developed further below, is coaching the report toward their own good decision rather than substituting the leader's decision for it.
 
 ### Common Product Organization Structures
 
@@ -94,11 +94,11 @@ As a product organization grows beyond a single team, it must choose a structure
 | Platform-based | Some teams own shared platform/infrastructure capabilities; others own customer-facing product surfaces built on that platform | Reduces duplicated infrastructure work, but requires careful coordination between platform and product teams (echoing Lesson 37's escalation reasoning) |
 | Customer-segment-based | Teams organized around distinct customer segments or use cases, each with full ownership of their segment's experience | Strong ownership and accountability per segment, but risks duplicated effort if segments have significant technical overlap |
 
-No structure is universally correct; the right choice depends on the product's actual technical architecture, the diversity of its customer base, and the organization's scale — a structure well-suited to a single, unified product may create significant friction once the company serves several genuinely distinct customer segments or product lines, and vice versa.
+No structure is universally correct; the right choice depends on the product's actual technical architecture, the diversity of its customer base, and the organization's scale a structure well-suited to a single, unified product may create significant friction once the company serves several genuinely distinct customer segments or product lines, and vice versa.
 
 ### Team Topologies: Diagnosing Structural Friction
 
-Extending Lesson 37's brief reference to *Team Topologies* by Matthew Skelton and Manuel Pais: a useful diagnostic distinguishes **stream-aligned teams** (organized around a continuous flow of work toward a specific customer or business outcome, with broad autonomy to deliver it end-to-end) from **platform teams** (providing shared, reusable capabilities that reduce the cognitive load stream-aligned teams would otherwise carry). A product organization experiencing significant coordination overhead or duplicated effort across teams often has a topology mismatch — too many stream-aligned teams independently rebuilding similar underlying capabilities (suggesting an under-invested platform layer), or an over-centralized platform team that has become a bottleneck every stream-aligned team must wait on (suggesting the platform has taken on too much, or coordination with it has become too heavy).
+Extending Lesson 37's brief reference to *Team Topologies* by Matthew Skelton and Manuel Pais: a useful diagnostic distinguishes **stream-aligned teams** (organized around a continuous flow of work toward a specific customer or business outcome, with broad autonomy to deliver it end-to-end) from **platform teams** (providing shared, reusable capabilities that reduce the cognitive load stream-aligned teams would otherwise carry). A product organization experiencing significant coordination overhead or duplicated effort across teams often has a topology mismatch too many stream-aligned teams independently rebuilding similar underlying capabilities (suggesting an under-invested platform layer), or an over-centralized platform team that has become a bottleneck every stream-aligned team must wait on (suggesting the platform has taken on too much, or coordination with it has become too heavy).
 
 ```mermaid
 %%{init: {
@@ -133,14 +133,14 @@ Extending Lesson 37's brief reference to *Team Topologies* by Matthew Skelton an
 }}%%
 graph TD
     A[Multiple teams experiencing<br/>friction or duplication] --> B{Are teams independently<br/>rebuilding similar<br/>underlying capabilities?}
-    B -->|Yes| C[Under-invested platform layer —<br/>consider consolidating<br/>shared capability]
+    B -->|Yes| C[Under-invested platform layer <br/>consider consolidating<br/>shared capability]
     B -->|No| D{Is a shared platform team<br/>a bottleneck every other<br/>team must wait on?}
-    D -->|Yes| E[Platform team overloaded or<br/>coordination too heavy —<br/>reconsider scope or process]
+    D -->|Yes| E[Platform team overloaded or<br/>coordination too heavy <br/>reconsider scope or process]
 ```
 
 ### Delegation Without Abandonment
 
-Effective delegation does not mean simply handing off a decision and disengaging entirely — it means being deliberate about which decisions a leader retains, which they delegate with guidance, and which they delegate fully, and being transparent with the team about which category a given decision falls into. A useful practice: when a report brings a decision to a leader, the leader's first instinct should be to ask what the report themselves would recommend and why, before offering a view — this coaches the report's own judgment (echoing this curriculum's Lesson 1 emphasis on judgment as the PM's core asset) rather than training them to outsource decisions upward by default.
+Effective delegation does not mean simply handing off a decision and disengaging entirely it means being deliberate about which decisions a leader retains, which they delegate with guidance, and which they delegate fully, and being transparent with the team about which category a given decision falls into. A useful practice: when a report brings a decision to a leader, the leader's first instinct should be to ask what the report themselves would recommend and why, before offering a view this coaches the report's own judgment (echoing this curriculum's Lesson 1 emphasis on judgment as the PM's core asset) rather than training them to outsource decisions upward by default.
 
 ---
 
@@ -148,23 +148,23 @@ Effective delegation does not mean simply handing off a decision and disengaging
 
 **Mistake 1: Continuing to personally make decisions that should be delegated to reports**
 
-As covered in Theory, this is faster in the short term but prevents reports from developing their own judgment and trains the team to escalate decisions rather than resolve them independently — the leader becomes a bottleneck rather than a multiplier.
+As covered in Theory, this is faster in the short term but prevents reports from developing their own judgment and trains the team to escalate decisions rather than resolve them independently the leader becomes a bottleneck rather than a multiplier.
 
 **Mistake 2: Choosing an organizational structure based on what's familiar or common elsewhere, rather than the specific product's actual architecture and customer base**
 
-As covered in Theory, no structure is universally correct — a structure copied from a well-known company without regard for genuine fit risks the exact coordination friction this lesson's Team Topologies diagnostic addresses.
+As covered in Theory, no structure is universally correct a structure copied from a well-known company without regard for genuine fit risks the exact coordination friction this lesson's Team Topologies diagnostic addresses.
 
 **Mistake 3: Treating a struggling product organization as purely a leadership/coaching problem, without checking for a structural mismatch**
 
-Some organizational dysfunction is genuinely caused by individual leadership gaps, but some is caused by a poor-fit team topology that no amount of individual coaching can fully resolve — misdiagnosing one as the other wastes effort on the wrong fix.
+Some organizational dysfunction is genuinely caused by individual leadership gaps, but some is caused by a poor-fit team topology that no amount of individual coaching can fully resolve misdiagnosing one as the other wastes effort on the wrong fix.
 
 **Mistake 4: Delegating a decision without any guidance, then criticizing the outcome after the fact**
 
-Effective delegation requires being explicit about the level of autonomy being granted and the context needed to exercise it well — delegating silently and only providing feedback after a decision has already been made and acted upon undermines a report's ability to succeed and erodes trust.
+Effective delegation requires being explicit about the level of autonomy being granted and the context needed to exercise it well delegating silently and only providing feedback after a decision has already been made and acted upon undermines a report's ability to succeed and erodes trust.
 
 **Mistake 5: Assuming leadership skill transfers automatically from individual-contributor excellence**
 
-Being an excellent individual-contributor PM does not automatically make someone a skilled leader of other PMs — the two roles require genuinely different, specifically developed skills, and treating the transition as automatic risks exactly the bottleneck failure this lesson's Case Study illustrates.
+Being an excellent individual-contributor PM does not automatically make someone a skilled leader of other PMs the two roles require genuinely different, specifically developed skills, and treating the transition as automatic risks exactly the bottleneck failure this lesson's Case Study illustrates.
 
 ---
 
@@ -215,9 +215,9 @@ Use the Leadership Shift as a standing check whenever a decision reaches a PM le
 
 ## Real Company Example
 
-**Spotify**'s "squads, tribes, chapters, guilds" model — describing small, autonomous, cross-functional teams aligned around specific product areas — originates from a 2012 paper by Henrik Kniberg and Anders Ivarsson, "Scaling Agile @ Spotify," describing how the company had organized itself at the time. The model's own history is now more instructive than the model itself: Kniberg has since publicly clarified, in a 2015 post titled "No, I didn't invent the Spotify model," that he was documenting a snapshot of practice, not proposing a transferable framework, and in 2020 former Spotify PM Jeremiah Lee published a widely discussed account, "Spotify's Failed #SquadGoals," reporting — with a direct quote from a Spotify insider — "even at the time we wrote it, we weren't doing it," and that the structure was aspirational, never fully implemented, and didn't survive the company's later growth.
+**Spotify**'s "squads, tribes, chapters, guilds" model describing small, autonomous, cross-functional teams aligned around specific product areas originates from a 2012 paper by Henrik Kniberg and Anders Ivarsson, "Scaling Agile @ Spotify," describing how the company had organized itself at the time. The model's own history is now more instructive than the model itself: Kniberg has since publicly clarified, in a 2015 post titled "No, I didn't invent the Spotify model," that he was documenting a snapshot of practice, not proposing a transferable framework, and in 2020 former Spotify PM Jeremiah Lee published a widely discussed account, "Spotify's Failed #SquadGoals," reporting with a direct quote from a Spotify insider "even at the time we wrote it, we weren't doing it," and that the structure was aspirational, never fully implemented, and didn't survive the company's later growth.
 
-The durable, still-valuable principle this example illustrates is real: small, autonomous, cross-functional teams aligned around specific outcomes (echoing the "stream-aligned team" concept from *Team Topologies*) is a genuinely useful organizational pattern. But the Spotify model's own trajectory — from an internal retrospective, to an internet-famous framework companies tried to copy wholesale, to a public correction from the very people involved — is itself a useful case study in how organizational folklore spreads faster than its own caveats, worth keeping in mind before adopting any widely-circulated "how Company X is organized" story as a literal blueprint.
+The durable, still-valuable principle this example illustrates is real: small, autonomous, cross-functional teams aligned around specific outcomes (echoing the "stream-aligned team" concept from *Team Topologies*) is a genuinely useful organizational pattern. But the Spotify model's own trajectory from an internal retrospective, to an internet-famous framework companies tried to copy wholesale, to a public correction from the very people involved is itself a useful case study in how organizational folklore spreads faster than its own caveats, worth keeping in mind before adopting any widely-circulated "how Company X is organized" story as a literal blueprint.
 
 *(Source: Kniberg and Ivarsson's original 2012 paper, Kniberg's own 2015 clarification, and Jeremiah Lee's 2020 "Failed #SquadGoals" account.)*
 
@@ -226,13 +226,13 @@ The durable, still-valuable principle this example illustrates is real: small, a
 ## Real World Perspective: Building and Leading Product Teams at Different Company Stages
 
 **At a startup:**
-Product organization structure is often minimal by necessity — a single PM or a very small team, with little need for the formal structural choices this lesson covers. The leadership transition covered in this lesson typically hasn't yet arrived at this stage, though the underlying coaching-versus-deciding principle is worth building as a habit even when leading just one or two people for the first time.
+Product organization structure is often minimal by necessity a single PM or a very small team, with little need for the formal structural choices this lesson covers. The leadership transition covered in this lesson typically hasn't yet arrived at this stage, though the underlying coaching-versus-deciding principle is worth building as a habit even when leading just one or two people for the first time.
 
 **At a mid-size company:**
 This is typically the stage where formal organizational structure choices (functional, platform-based, customer-segment-based) become genuinely consequential, and where the individual-contributor-to-leader transition becomes a common, real challenge as the PM function grows beyond a single layer.
 
 **At Big Tech:**
-Product organizations are often large and multi-layered, with structural choices (echoing Team Topologies) mattering enormously at scale, and leadership skill specifically — coaching, delegation, structural diagnosis — becoming a significant, formally developed and evaluated competency distinct from individual product judgment. The PM leader's job shifts toward diagnosing organizational-level dysfunction (structural versus individual) across many teams simultaneously, and toward developing other leaders beneath them, extending the same coaching-not-deciding principle recursively through additional layers of the organization.
+Product organizations are often large and multi-layered, with structural choices (echoing Team Topologies) mattering enormously at scale, and leadership skill specifically coaching, delegation, structural diagnosis becoming a significant, formally developed and evaluated competency distinct from individual product judgment. The PM leader's job shifts toward diagnosing organizational-level dysfunction (structural versus individual) across many teams simultaneously, and toward developing other leaders beneath them, extending the same coaching-not-deciding principle recursively through additional layers of the organization.
 
 ---
 
@@ -240,21 +240,21 @@ Product organizations are often large and multi-layered, with structural choices
 
 Consider a simplified, illustrative scenario common among newly promoted PM leaders.
 
-A highly successful individual-contributor PM is promoted to lead a team of four other PMs, largely because of their own excellent product judgment and track record. In the new role, this leader continues operating much as they did as an individual contributor: every significant prioritization call, every stakeholder escalation, and every roadmap decision from their four reports is brought to them directly, and the leader — genuinely skilled and well-intentioned — makes each call personally, reasoning that this ensures consistently high-quality decisions across the team.
+A highly successful individual-contributor PM is promoted to lead a team of four other PMs, largely because of their own excellent product judgment and track record. In the new role, this leader continues operating much as they did as an individual contributor: every significant prioritization call, every stakeholder escalation, and every roadmap decision from their four reports is brought to them directly, and the leader genuinely skilled and well-intentioned makes each call personally, reasoning that this ensures consistently high-quality decisions across the team.
 
-Within two quarters, several problems emerge. The leader is consistently overloaded, working long hours simply to keep up with the volume of decisions routed to them. Their four reports, meanwhile, show little visible growth in independent judgment — each has learned that bringing a decision to the leader reliably produces a fast, confident answer, and each has correspondingly stopped investing much effort in developing their own reasoning before escalating. When the leader takes a two-week vacation, several important decisions simply stall, waiting for their return, since no one on the team has developed the habit or confidence to resolve them independently.
+Within two quarters, several problems emerge. The leader is consistently overloaded, working long hours simply to keep up with the volume of decisions routed to them. Their four reports, meanwhile, show little visible growth in independent judgment each has learned that bringing a decision to the leader reliably produces a fast, confident answer, and each has correspondingly stopped investing much effort in developing their own reasoning before escalating. When the leader takes a two-week vacation, several important decisions simply stall, waiting for their return, since no one on the team has developed the habit or confidence to resolve them independently.
 
 **What went wrong?**
 
-Using the Leadership Shift mental model: the leader never actually made the transition this lesson describes — they continued operating as an unusually well-resourced individual contributor rather than as a leader whose primary output is the team's collective judgment and growth. Every decision personally made, rather than coached, taught the team a specific lesson (bring decisions here, don't develop your own answer first) that directly produced the eventual bottleneck, and the leader's own excellent judgment, ironically, made this dynamic worse rather than better, since reports had genuine reason to trust the leader's calls were consistently good, reinforcing the habit of escalation.
+Using the Leadership Shift mental model: the leader never actually made the transition this lesson describes they continued operating as an unusually well-resourced individual contributor rather than as a leader whose primary output is the team's collective judgment and growth. Every decision personally made, rather than coached, taught the team a specific lesson (bring decisions here, don't develop your own answer first) that directly produced the eventual bottleneck, and the leader's own excellent judgment, ironically, made this dynamic worse rather than better, since reports had genuine reason to trust the leader's calls were consistently good, reinforcing the habit of escalation.
 
-The corrective practice required a deliberate, uncomfortable shift: when a report brought a decision, the leader began consistently asking "what would you recommend, and why?" before offering any view of their own, gradually shifting from directly deciding to coaching — a practice that initially felt slower and produced some less-polished early decisions from reports still building their judgment, but that measurably improved the team's independent capability and decision quality within a couple of quarters. This same coaching-over-deciding principle, applied not just to specific decisions but to broader career growth and skill development, is developed further in **Lesson 56 (Product Management Career Paths)**.
+The corrective practice required a deliberate, uncomfortable shift: when a report brought a decision, the leader began consistently asking "what would you recommend, and why?" before offering any view of their own, gradually shifting from directly deciding to coaching a practice that initially felt slower and produced some less-polished early decisions from reports still building their judgment, but that measurably improved the team's independent capability and decision quality within a couple of quarters. This same coaching-over-deciding principle, applied not just to specific decisions but to broader career growth and skill development, is developed further in **Lesson 56 (Product Management Career Paths)**.
 
 ---
 
 ## Framework Explanation: The Structural vs. Individual Diagnostic
 
-A second, more tactical tool: when a product organization is struggling — missed deadlines, unclear ownership, duplicated effort, or an overloaded leader — use this table to distinguish a structural problem from an individual leadership problem before prescribing a fix.
+A second, more tactical tool: when a product organization is struggling missed deadlines, unclear ownership, duplicated effort, or an overloaded leader use this table to distinguish a structural problem from an individual leadership problem before prescribing a fix.
 
 | Signal | Structural (Org Design) Problem | Individual (Leadership) Problem |
 |---|---|---|
@@ -263,7 +263,7 @@ A second, more tactical tool: when a product organization is struggling — miss
 | Team frustration | Consistent complaints about unclear ownership or excessive cross-team coordination, across multiple teams | Complaints specific to one team's leadership style or delegation practices |
 | Onboarding difficulty | New team members struggle to understand who owns what, regardless of who's leading | New team members struggle specifically under one leader's unclear expectations |
 
-A struggling organization showing signals concentrated in the left column likely needs structural change (a Team Topologies-style redesign); one showing signals concentrated in the right column likely needs individual leadership coaching (echoing this lesson's Case Study) — applying the wrong fix to either wastes significant effort and risks leaving the actual root cause unaddressed.
+A struggling organization showing signals concentrated in the left column likely needs structural change (a Team Topologies-style redesign); one showing signals concentrated in the right column likely needs individual leadership coaching (echoing this lesson's Case Study) applying the wrong fix to either wastes significant effort and risks leaving the actual root cause unaddressed.
 
 ---
 
@@ -282,19 +282,19 @@ A struggling organization showing signals concentrated in the left column likely
 
 ## Summary
 
-Moving from individual-contributor PM work to leading a team of PMs requires a genuine shift, not simply a larger version of the same job: a leader is evaluated on the team's collective decision quality and growth, achieved primarily through coaching and delegation rather than personally re-deciding what reports bring forward — a habit this lesson's Leadership Shift mental model captures as moving from "I make the decision" to "I coach toward a good decision, made by the person closest to it." Choosing an organizational structure (functional, platform-based, or customer-segment-based) requires genuine fit assessment against the product's actual architecture and customer base, rather than copying a popular model without adaptation, as this lesson's nuanced treatment of the widely circulated "Spotify model" illustrates. Team Topologies principles — distinguishing stream-aligned teams from platform teams — provide a useful diagnostic for structural friction, identifying whether coordination overhead stems from an under-invested platform layer or an overloaded, bottlenecked one. Diagnosing organizational dysfunction requires distinguishing a structural problem from an individual leadership problem, since each requires a different fix, and failing to delegate — continuing to personally decide everything a team should be learning to resolve independently — is one of the most common and costly failures for a newly promoted PM leader, precisely the failure illustrated in this lesson's Case Study of a leader who became an overloaded bottleneck despite (and partly because of) their own excellent individual judgment.
+Moving from individual-contributor PM work to leading a team of PMs requires a genuine shift, not simply a larger version of the same job: a leader is evaluated on the team's collective decision quality and growth, achieved primarily through coaching and delegation rather than personally re-deciding what reports bring forward a habit this lesson's Leadership Shift mental model captures as moving from "I make the decision" to "I coach toward a good decision, made by the person closest to it." Choosing an organizational structure (functional, platform-based, or customer-segment-based) requires genuine fit assessment against the product's actual architecture and customer base, rather than copying a popular model without adaptation, as this lesson's nuanced treatment of the widely circulated "Spotify model" illustrates. Team Topologies principles distinguishing stream-aligned teams from platform teams provide a useful diagnostic for structural friction, identifying whether coordination overhead stems from an under-invested platform layer or an overloaded, bottlenecked one. Diagnosing organizational dysfunction requires distinguishing a structural problem from an individual leadership problem, since each requires a different fix, and failing to delegate continuing to personally decide everything a team should be learning to resolve independently is one of the most common and costly failures for a newly promoted PM leader, precisely the failure illustrated in this lesson's Case Study of a leader who became an overloaded bottleneck despite (and partly because of) their own excellent individual judgment.
 
 ---
 
 ## Key Takeaways
 
-- Leading a team of PMs requires a genuine shift from personally deciding to coaching and delegating — a leader is evaluated on the team's collective decision quality and growth, not their own individual decisions.
+- Leading a team of PMs requires a genuine shift from personally deciding to coaching and delegating a leader is evaluated on the team's collective decision quality and growth, not their own individual decisions.
 - No product organizational structure (functional, platform-based, customer-segment-based) is universally correct; the right choice depends on the product's actual architecture and customer base.
-- Team Topologies' distinction between stream-aligned teams and platform teams provides a useful diagnostic for structural friction — under-invested platform layers and overloaded platform bottlenecks are both common, distinct failure patterns.
+- Team Topologies' distinction between stream-aligned teams and platform teams provides a useful diagnostic for structural friction under-invested platform layers and overloaded platform bottlenecks are both common, distinct failure patterns.
 - Diagnosing organizational dysfunction requires distinguishing a structural (org design) problem from an individual (leadership/coaching) problem, since each requires a genuinely different fix.
 - A new leader who continues personally deciding everything their reports bring forward becomes a bottleneck and prevents those reports from developing their own judgment, regardless of how good the leader's individual decisions are.
 - Effective delegation requires explicit guidance about the level of autonomy being granted, not silent hand-off followed only by after-the-fact feedback.
-- Individual-contributor excellence does not automatically transfer to leadership skill — the two roles require genuinely different, deliberately developed capabilities.
+- Individual-contributor excellence does not automatically transfer to leadership skill the two roles require genuinely different, deliberately developed capabilities.
 
 ---
 
@@ -303,8 +303,8 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 *A two-minute review of everything in this lesson.*
 
 - **Leadership Shift:** from "I decide" to "I coach toward a good decision made by the person closest to it."
-- **Three structures:** functional, platform-based, customer-segment-based — fit depends on architecture and customer base, not popularity.
-- **Team Topologies:** stream-aligned teams (autonomous delivery) vs. platform teams (shared capability) — diagnose friction by checking which is under- or over-invested.
+- **Three structures:** functional, platform-based, customer-segment-based fit depends on architecture and customer base, not popularity.
+- **Team Topologies:** stream-aligned teams (autonomous delivery) vs. platform teams (shared capability) diagnose friction by checking which is under- or over-invested.
 - **Structural vs. individual diagnostic:** widespread ownership confusion → structural; one team's specific frustration → individual leadership.
 - **Delegate with guidance:** be explicit about autonomy level granted, not silent hand-off plus after-the-fact criticism.
 - **Bottleneck risk:** a leader who always decides trains the team to escalate rather than develop judgment.
@@ -325,9 +325,9 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 
 ## Further Reading / Resources
 
-- *Team Topologies* by Matthew Skelton and Manuel Pais — revisited here in depth for its stream-aligned/platform team distinction, first referenced in Lesson 37.
-- *The Making of a Manager* by Julie Zhuo — a widely used practitioner treatment of the individual-contributor-to-leader transition.
-- *High Output Management* by Andrew Grove — foundational writing on delegation, coaching, and organizational leverage.
+- *Team Topologies* by Matthew Skelton and Manuel Pais revisited here in depth for its stream-aligned/platform team distinction, first referenced in Lesson 37.
+- *The Making of a Manager* by Julie Zhuo a widely used practitioner treatment of the individual-contributor-to-leader transition.
+- *High Output Management* by Andrew Grove foundational writing on delegation, coaching, and organizational leverage.
 
 ---
 
@@ -335,7 +335,7 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 
 **Card 1**
 - Front: What is the core shift required when moving from individual-contributor PM work to leading a team of PMs?
-- Back: A shift from personally making decisions to coaching and enabling reports to make good decisions themselves — a leader is evaluated on the team's collective decisions and growth, not their own individual judgment.
+- Back: A shift from personally making decisions to coaching and enabling reports to make good decisions themselves a leader is evaluated on the team's collective decisions and growth, not their own individual judgment.
 - Difficulty: 1
 - Tags: leadership-shift
 
@@ -353,7 +353,7 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 
 **Card 4**
 - Front: What is the key coaching practice this lesson recommends when a report brings a decision to a leader?
-- Back: Ask what the report themselves would recommend and why, before offering a view — coaching their judgment rather than substituting the leader's own decision.
+- Back: Ask what the report themselves would recommend and why, before offering a view coaching their judgment rather than substituting the leader's own decision.
 - Difficulty: 2
 - Tags: coaching-practice
 
@@ -374,13 +374,13 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 
 Consider the following novel scenario: You've just been promoted to lead a team of three PMs. In your first two weeks, each of them has brought you several decisions to make directly, and you've noticed it feels faster and more satisfying to just answer them yourself.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Leadership Shift and delegation principles, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Leadership Shift and delegation principles, not to reach one "right" answer.
 
 1. Using the Leadership Shift mental model, what specific habit would you need to change in how you respond to these decisions?
 2. For the next decision one of your reports brings you, what specific question would you ask before offering your own view?
 3. How would you distinguish a decision you should actually retain yourself from one you should coach your report toward deciding independently?
 4. If a report makes a decision independently that you would have made differently, but it wasn't clearly wrong, how would you handle giving feedback without undermining their growing confidence?
-5. How would you know, a few months from now, whether your delegation approach is actually working — what would you look for as evidence?
+5. How would you know, a few months from now, whether your delegation approach is actually working what would you look for as evidence?
 
 ---
 
@@ -393,7 +393,7 @@ C) Moving from personally deciding to coaching reports toward good decisions
 D) Spending less time understanding the product areas reports own
 
 *Correct answer: C*
-*Explanation: The Theory section frames the transition as a change in what a leader is evaluated on — the team's collective judgment and growth, not the leader's own individual calls.*
+*Explanation: The Theory section frames the transition as a change in what a leader is evaluated on the team's collective judgment and growth, not the leader's own individual calls.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -432,7 +432,7 @@ C) A stream-aligned team exists only among senior executive roles
 D) The two terms are functionally interchangeable in most organizations
 
 *Correct answer: B*
-*Explanation: The Theory section draws this exact distinction — platform teams supply shared capability, stream-aligned teams deliver autonomously toward a specific customer or business outcome.*
+*Explanation: The Theory section draws this exact distinction platform teams supply shared capability, stream-aligned teams deliver autonomously toward a specific customer or business outcome.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -445,7 +445,7 @@ C) Personally-made decisions are inherently worse than delegated ones
 D) It breaks the formal reporting structure defined by HR systems
 
 *Correct answer: A*
-*Explanation: The Theory section and Case Study both trace the bottleneck directly to this dynamic — constant rescue teaches escalation instead of independent judgment.*
+*Explanation: The Theory section and Case Study both trace the bottleneck directly to this dynamic constant rescue teaches escalation instead of independent judgment.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -519,7 +519,7 @@ D) Well-known structures are inherently outdated compared to newer ones
 **11. (Interview Reasoning) A candidate describes their transition into leadership by saying, "I just kept operating the way I always had as an IC, since that approach had clearly worked." What weakness does this reveal?**
 A) It shows the candidate values stability over unnecessary disruption
 B) It demonstrates an unusually strong grasp of organizational design
-C) None — consistency in approach is always the strongest answer
+C) None consistency in approach is always the strongest answer
 D) It fails to name the shift toward coaching, risking the same bottleneck pattern
 
 *Correct answer: D*
@@ -536,7 +536,7 @@ C) Explicit guidance only matters for reports new to the company
 D) Silent hand-offs are equally effective and simply save the leader time
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #4 identifies exactly this risk — ungrounded delegation followed only by after-the-fact criticism erodes trust and sets reports up to fail.*
+*Explanation: Common Beginner Mistake #4 identifies exactly this risk ungrounded delegation followed only by after-the-fact criticism erodes trust and sets reports up to fail.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
@@ -549,7 +549,7 @@ C) The leader declines to discuss the decision, leaving the report without input
 D) The leader answers immediately with a preferred solution, the fastest path
 
 *Correct answer: A*
-*Explanation: This is the lesson's core recommended practice — coaching toward the report's own judgment — distinct from either over-deciding or disengaging entirely.*
+*Explanation: This is the lesson's core recommended practice coaching toward the report's own judgment distinct from either over-deciding or disengaging entirely.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
@@ -585,9 +585,9 @@ D) Address both on their own terms, since fixing only one likely leaves dysfunct
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 54 — Managing Up and Across | Extends relationship-management discipline from managing peers and managers to leading direct reports |
-| **Current Lesson** | Lesson 55 — Building and Leading Product Teams | Leadership Shift; organizational structures; Team Topologies; Structural vs. Individual Diagnostic |
-| **Next Lesson** | Lesson 56 — Product Management Career Paths | Builds on the leadership transition discussed here when mapping broader IC and management career trajectories |
+| **Previous Lesson** | Lesson 54 Managing Up and Across | Extends relationship-management discipline from managing peers and managers to leading direct reports |
+| **Current Lesson** | Lesson 55 Building and Leading Product Teams | Leadership Shift; organizational structures; Team Topologies; Structural vs. Individual Diagnostic |
+| **Next Lesson** | Lesson 56 Product Management Career Paths | Builds on the leadership transition discussed here when mapping broader IC and management career trajectories |
 | **Future Concepts Unlocked** | Lesson 57 (Ethics in Product Management) | Extends leadership responsibility to the ethical dimensions of decisions made at organizational scale |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Leadership Shift and the Structural vs. Individual Diagnostic with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Leadership Shift and the Structural vs. Individual Diagnostic with you they will not be re-explained, only re-applied in new contexts.

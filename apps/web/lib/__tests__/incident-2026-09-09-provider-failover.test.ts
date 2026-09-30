@@ -197,12 +197,24 @@ describe('Incident 2026-09-09 — sendEmail() failover state machine', () => {
     expect(result.success).toBe(true)
   })
 
-  it('Brevo timeout -> Resend delivers', async () => {
+  // Ambiguous-timeout policy (split by criticality). A timeout may have been accepted
+  // by Brevo before the client aborted, and Brevo has no idempotency key, so a standard
+  // message does NOT cross-fail-over on a timeout (avoids a duplicate). Critical auth
+  // mail prefers delivery and fails over anyway.
+  it('Brevo timeout on a CRITICAL message -> Resend delivers', async () => {
     const { calls } = harness({ brevo: { kind: 'timeout' }, resend: { kind: 'ok' } })
-    const result = await sendEmail(message)
+    const result = await sendEmail({ ...message, isCritical: true })
 
     expect(calls).toEqual(['brevo', 'resend'])
     expect(result.success).toBe(true)
+  })
+
+  it('Brevo timeout on a STANDARD message -> does NOT fail over (no duplicate)', async () => {
+    const { calls } = harness({ brevo: { kind: 'timeout' }, resend: { kind: 'ok' } })
+    const result = await sendEmail(message)
+
+    expect(calls).toEqual(['brevo'])
+    expect(result.success).toBe(false)
   })
 
   it('Brevo network failure -> Resend delivers', async () => {

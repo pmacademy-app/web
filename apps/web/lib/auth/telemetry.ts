@@ -24,6 +24,8 @@ export interface AuthTelemetryPayload {
   browserFamily?: 'chrome' | 'firefox' | 'safari' | 'edge' | 'other'
   onlineState?: boolean
   rawCode?: string
+  /** Masked, capped snippet of the underlying message — set only for unknown errors. */
+  rawMessage?: string
 }
 
 /**
@@ -59,6 +61,7 @@ export function recordAuthTelemetry(
       browserFamily: getNormalizedBrowserFamily(),
       onlineState: typeof navigator !== 'undefined' ? navigator.onLine : true,
       rawCode: typeof error.rawCode === 'string' ? error.rawCode.substring(0, 60) : undefined,
+      rawMessage: typeof error.rawMessage === 'string' ? error.rawMessage.substring(0, 300) : undefined,
     }
 
     const jsonString = JSON.stringify(payload)

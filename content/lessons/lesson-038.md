@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 37 addressed the PM-engineering relationship in depth. This lesson addresses its close parallel — the PM-design relationship — because although the underlying principle is the same (trust the domain expert with their domain), the specific failure modes are different enough to deserve their own treatment. Where the classic engineering mistake is handing over a fully-specified technical solution, the classic design mistake is bringing design in too late, after the problem has already been implicitly solved by the PM's own assumptions about what the interface should look like — leaving design to prettify a decision that was never actually theirs to shape.
+Lesson 37 addressed the PM-engineering relationship in depth. This lesson addresses its close parallel the PM-design relationship because although the underlying principle is the same (trust the domain expert with their domain), the specific failure modes are different enough to deserve their own treatment. Where the classic engineering mistake is handing over a fully-specified technical solution, the classic design mistake is bringing design in too late, after the problem has already been implicitly solved by the PM's own assumptions about what the interface should look like leaving design to prettify a decision that was never actually theirs to shape.
 
-This matters because design, done well, is not decoration applied after a decision is made; it is a core method of exploring the solution space itself, often surfacing problems with an approach that would otherwise only be discovered after expensive engineering work has already begun. A PM who involves design only at the end, to "make it look nice," is not just under-using a valuable resource — they are removing one of the cheapest, earliest opportunities to catch a bad idea before it becomes an expensive one.
+This matters because design, done well, is not decoration applied after a decision is made; it is a core method of exploring the solution space itself, often surfacing problems with an approach that would otherwise only be discovered after expensive engineering work has already begun. A PM who involves design only at the end, to "make it look nice," is not just under-using a valuable resource they are removing one of the cheapest, earliest opportunities to catch a bad idea before it becomes an expensive one.
 
 ---
 
@@ -12,13 +12,13 @@ This matters because design, done well, is not decoration applied after a decisi
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery |
+| **Module** | 4 Execution & Agile Delivery |
 | **Current Lesson** | 38 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 8 (Product Discovery), Lesson 37 (Working with Engineering Teams — trust and context-handoff principles) |
-| **Next Lesson** | Lesson 39 — Technical Debt & PM Trade-offs |
-| **Future Topics Unlocked** | Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation, which depends on testable design variants), Lesson 52 (Storytelling and Narrative for PMs) — all build on the fidelity discipline and early-involvement principles introduced here |
+| **Prerequisites** | Lesson 8 (Product Discovery), Lesson 37 (Working with Engineering Teams trust and context-handoff principles) |
+| **Next Lesson** | Lesson 39 Technical Debt & PM Trade-offs |
+| **Future Topics Unlocked** | Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation, which depends on testable design variants), Lesson 52 (Storytelling and Narrative for PMs) all build on the fidelity discipline and early-involvement principles introduced here |
 
 ---
 
@@ -29,14 +29,14 @@ By the end of this lesson, you will be able to:
 1. Explain why involving design early, during problem definition rather than after a solution is chosen, tends to produce better outcomes than involving design only at the visual-polish stage.
 2. Apply the fidelity ladder (low, mid, high fidelity) to match a design artifact's polish to the actual certainty behind the underlying decision.
 3. Describe the Double Diamond framework and use it to identify which phase of design work a given moment in a project actually calls for.
-4. Diagnose "premature high-fidelity" — a specific, common failure where polished mockups create false attachment to an unvalidated idea — and explain why it's costly.
+4. Diagnose "premature high-fidelity" a specific, common failure where polished mockups create false attachment to an unvalidated idea and explain why it's costly.
 5. Apply the same "give context, not commands" principle from Lesson 37 to the PM-design relationship specifically, distinguishing user needs and constraints (PM's domain) from visual and interaction solutions (design's domain).
 
 ---
 
 ## Prerequisites
 
-This lesson assumes **Lesson 8's** grounding in product discovery — the practice of understanding user problems before committing to solutions — since good design collaboration is, in large part, an extension of discovery practice into the visual and interaction domain. It also directly assumes **Lesson 37's** "give context, not commands" principle and Trust Ladder, since this lesson largely mirrors that framework, adapted for the specific dynamics of working with designers rather than engineers.
+This lesson assumes **Lesson 8's** grounding in product discovery the practice of understanding user problems before committing to solutions since good design collaboration is, in large part, an extension of discovery practice into the visual and interaction domain. It also directly assumes **Lesson 37's** "give context, not commands" principle and Trust Ladder, since this lesson largely mirrors that framework, adapted for the specific dynamics of working with designers rather than engineers.
 
 ---
 
@@ -44,11 +44,11 @@ This lesson assumes **Lesson 8's** grounding in product discovery — the practi
 
 ### Design as Exploration, Not Decoration
 
-The most consequential mental shift a PM can make about design is recognizing it as a method for exploring and pressure-testing a solution space, not a finishing step applied after the "real" decisions have already been made elsewhere. A PM who arrives at a design conversation having already decided the interface's layout, flow, and interaction pattern — asking design only to "make it look good" — has skipped past the phase where design's distinct expertise (understanding how users actually perceive, navigate, and form mental models of an interface) could have meaningfully shaped the underlying decision, not just its surface appearance.
+The most consequential mental shift a PM can make about design is recognizing it as a method for exploring and pressure-testing a solution space, not a finishing step applied after the "real" decisions have already been made elsewhere. A PM who arrives at a design conversation having already decided the interface's layout, flow, and interaction pattern asking design only to "make it look good" has skipped past the phase where design's distinct expertise (understanding how users actually perceive, navigate, and form mental models of an interface) could have meaningfully shaped the underlying decision, not just its surface appearance.
 
 ### The Double Diamond
 
-A widely used framework, originally developed by the UK Design Council, describes the design process as two consecutive diamonds — each expanding into divergent exploration before converging on a decision:
+A widely used framework, originally developed by the UK Design Council, describes the design process as two consecutive diamonds each expanding into divergent exploration before converging on a decision:
 
 ```mermaid
 %%{init: {
@@ -87,7 +87,7 @@ graph LR
     C --> D[Deliver Converge:<br/>Commit to a Specific Solution]
 ```
 
-The critical insight, easy to miss at a glance, is that there are *two* distinct divergent phases — one exploring the problem itself (Discover), and a separate one exploring possible solutions (Develop) — each followed by a deliberate narrowing (Define, Deliver). A PM who invites design in only at the "Deliver" stage has skipped both divergent phases entirely, asking design to visually finish a solution whose problem framing and solution exploration were never actually opened up for genuine design input. This directly parallels Lesson 8's discovery discipline: design has its own discovery process, and skipping it produces the same risk — building the wrong thing, confidently — that skipping user discovery does elsewhere in the product process.
+The critical insight, easy to miss at a glance, is that there are *two* distinct divergent phases one exploring the problem itself (Discover), and a separate one exploring possible solutions (Develop) each followed by a deliberate narrowing (Define, Deliver). A PM who invites design in only at the "Deliver" stage has skipped both divergent phases entirely, asking design to visually finish a solution whose problem framing and solution exploration were never actually opened up for genuine design input. This directly parallels Lesson 8's discovery discipline: design has its own discovery process, and skipping it produces the same risk building the wrong thing, confidently that skipping user discovery does elsewhere in the product process.
 
 ### Fidelity as a Signal of Certainty
 
@@ -129,11 +129,11 @@ graph LR
     B --> C["High Fidelity (polished,<br/>Pixel-accurate Visual Design)"]
 ```
 
-Low-fidelity artifacts are cheap to produce and cheap to discard, making them appropriate for early exploration when the underlying idea itself is still uncertain — a hand-drawn sketch invites genuine feedback and revision in a way a polished mockup does not, because it visibly signals "this is still an open question." High-fidelity artifacts are expensive to produce and, critically, tend to create a psychological sense of finality and ownership disproportionate to how validated the underlying idea actually is — a mistake this lesson calls **premature high-fidelity**, covered in detail in the Case Study below. The general rule: fidelity should track actual certainty, mirroring Lesson 35's Confidence Gradient principle applied here to design artifacts rather than roadmap items.
+Low-fidelity artifacts are cheap to produce and cheap to discard, making them appropriate for early exploration when the underlying idea itself is still uncertain a hand-drawn sketch invites genuine feedback and revision in a way a polished mockup does not, because it visibly signals "this is still an open question." High-fidelity artifacts are expensive to produce and, critically, tend to create a psychological sense of finality and ownership disproportionate to how validated the underlying idea actually is a mistake this lesson calls **premature high-fidelity**, covered in detail in the Case Study below. The general rule: fidelity should track actual certainty, mirroring Lesson 35's Confidence Gradient principle applied here to design artifacts rather than roadmap items.
 
 ### Applying "Give Context, Not Commands" to Design
 
-Lesson 37 established that a PM's job is to convey the problem, user need, and constraints precisely, while trusting the domain expert to own the solution space. Applied to design, this means a PM should be highly specific about the *user problem* being solved, the *constraints* that matter (technical limitations, brand guidelines, accessibility requirements, existing design system components), and the *outcome* being targeted — while resisting the urge to dictate specific layouts, visual treatments, or interaction patterns, which is squarely design's domain, just as technical architecture is squarely engineering's.
+Lesson 37 established that a PM's job is to convey the problem, user need, and constraints precisely, while trusting the domain expert to own the solution space. Applied to design, this means a PM should be highly specific about the *user problem* being solved, the *constraints* that matter (technical limitations, brand guidelines, accessibility requirements, existing design system components), and the *outcome* being targeted while resisting the urge to dictate specific layouts, visual treatments, or interaction patterns, which is squarely design's domain, just as technical architecture is squarely engineering's.
 
 | PM's Domain (context to convey precisely) | Design's Domain (solution space to own) |
 |---|---|
@@ -152,11 +152,11 @@ As covered in Theory, this skips both of the Double Diamond's divergent phases, 
 
 **Mistake 2: Commissioning high-fidelity mockups before the underlying idea has been validated**
 
-This is "premature high-fidelity" — producing a level of visual polish that creates false attachment and a false sense of finality around an idea that hasn't actually earned that level of certainty yet, covered in full in this lesson's Case Study.
+This is "premature high-fidelity" producing a level of visual polish that creates false attachment and a false sense of finality around an idea that hasn't actually earned that level of certainty yet, covered in full in this lesson's Case Study.
 
 **Mistake 3: Dictating specific layouts or visual treatments instead of describing the user problem and constraints**
 
-This is the design-specific version of Lesson 37's Mistake 1 — substituting the PM's own visual preference for design's domain expertise, often producing a worse outcome than trusting design with full context.
+This is the design-specific version of Lesson 37's Mistake 1 substituting the PM's own visual preference for design's domain expertise, often producing a worse outcome than trusting design with full context.
 
 **Mistake 4: Treating design feedback sessions as approval checkpoints rather than genuine collaboration**
 
@@ -164,14 +164,14 @@ A PM who shows design a nearly-finished mockup expecting only a rubber-stamp "lo
 
 **Mistake 5: Skipping user testing on a design because "the team already likes it."**
 
-Internal team enthusiasm for a design is not evidence that real users will understand or successfully use it — conflating internal consensus with user validation is a distinct and common failure, especially once a polished mockup has generated internal excitement (see Mistake 2).
+Internal team enthusiasm for a design is not evidence that real users will understand or successfully use it conflating internal consensus with user validation is a distinct and common failure, especially once a polished mockup has generated internal excitement (see Mistake 2).
 
 ---
 
 
 ## Mental Model: The Exploration Window
 
-This lesson's core takeaway tool is not about polish level (that is Lesson 25's Fidelity Ladder, applied here only as a supporting idea in Theory) — it is about *timing*: the specific point in a problem's lifecycle during which involving design still counts as exploration, versus the point after which it can only ever be decoration.
+This lesson's core takeaway tool is not about polish level (that is Lesson 25's Fidelity Ladder, applied here only as a supporting idea in Theory) it is about *timing*: the specific point in a problem's lifecycle during which involving design still counts as exploration, versus the point after which it can only ever be decoration.
 
 ```mermaid
 %%{init: {
@@ -211,24 +211,24 @@ graph LR
     D -.->|"Design brought in here<br/>can only decorate, not explore"| E["Prettified Predetermined Solution"]
 ```
 
-Use the Exploration Window as a standing check on your own behavior, not just design's: before looping design in, ask "have I already, even informally, decided what this should look like?" If the honest answer is yes — if you're arriving with a near-final layout in your head rather than a named problem — the window has already closed, regardless of what the calendar invite calls the meeting. Re-opening it means consciously setting your own mental picture aside and handing over the problem statement instead, per "Give Context, Not Commands" below.
+Use the Exploration Window as a standing check on your own behavior, not just design's: before looping design in, ask "have I already, even informally, decided what this should look like?" If the honest answer is yes if you're arriving with a near-final layout in your head rather than a named problem the window has already closed, regardless of what the calendar invite calls the meeting. Re-opening it means consciously setting your own mental picture aside and handing over the problem statement instead, per "Give Context, Not Commands" below.
 
 ---
 
 ## Real Company Example
 
-**Figma** has been publicly associated, through its own product positioning and design community writing, with popularizing real-time, multiplayer collaborative design work — allowing PMs, engineers, and designers to view and comment on in-progress design work simultaneously, rather than design happening in isolation and being "revealed" only once complete.
+**Figma** has been publicly associated, through its own product positioning and design community writing, with popularizing real-time, multiplayer collaborative design work allowing PMs, engineers, and designers to view and comment on in-progress design work simultaneously, rather than design happening in isolation and being "revealed" only once complete.
 
 The underlying principle connects directly to this lesson's Theory: tools that make early-stage, low-fidelity design work easily visible and commentable to the whole team support genuine collaboration during the Double Diamond's divergent phases, rather than confining cross-functional involvement to a single, late "reveal" moment.
 
-*(Assumption flagged: this reflects general, publicly observable positioning of Figma's collaborative design tooling, not a confirmed, complete, or current account of how any specific team uses the tool internally today. Specific team workflows vary widely and evolve continuously; the durable lesson is the underlying principle — visible, early collaborative access to in-progress design work supports genuine cross-functional input — rather than a claim about any particular team's exact current practice.)*
+*(Assumption flagged: this reflects general, publicly observable positioning of Figma's collaborative design tooling, not a confirmed, complete, or current account of how any specific team uses the tool internally today. Specific team workflows vary widely and evolve continuously; the durable lesson is the underlying principle visible, early collaborative access to in-progress design work supports genuine cross-functional input rather than a claim about any particular team's exact current practice.)*
 
 ---
 
 ## Real World Perspective: Working with Design Teams at Different Company Stages
 
 **At a startup:**
-A PM may work directly with a single designer, or wear the design hat personally in the absence of a dedicated designer at all. The risk here is Mistake 3 — without a dedicated design partner to push back, a PM's own visual instincts can go unchallenged, even when they lack the training to recognize interaction or usability problems a trained designer would catch immediately.
+A PM may work directly with a single designer, or wear the design hat personally in the absence of a dedicated designer at all. The risk here is Mistake 3 without a dedicated design partner to push back, a PM's own visual instincts can go unchallenged, even when they lack the training to recognize interaction or usability problems a trained designer would catch immediately.
 
 **At a mid-size company:**
 A PM typically works with one or a small number of dedicated designers, often participating in a shared team ritual (a design critique, a weekly review) that formalizes the Double Diamond's divergent-then-convergent rhythm. This is the stage where Mistake 1 (bringing design in late) most commonly causes friction, since designers with real capacity for deeper involvement are being under-utilized relative to what the team's process nominally allows for.
@@ -242,15 +242,15 @@ Design often operates as its own strong, semi-independent discipline with dedica
 
 Consider a simplified, illustrative scenario common at teams new to structured design collaboration.
 
-A PM, excited about a new onboarding flow idea, asks a designer to produce a polished, high-fidelity set of screens quickly, "just to see how it could look," before any user testing has occurred and before the underlying flow concept has been validated with real users. The designer produces a genuinely beautiful set of mockups. The PM shares them enthusiastically in a company-wide meeting, and the mockups generate real internal excitement — several stakeholders reference "the new onboarding flow" in subsequent planning conversations as though it were already a settled direction.
+A PM, excited about a new onboarding flow idea, asks a designer to produce a polished, high-fidelity set of screens quickly, "just to see how it could look," before any user testing has occurred and before the underlying flow concept has been validated with real users. The designer produces a genuinely beautiful set of mockups. The PM shares them enthusiastically in a company-wide meeting, and the mockups generate real internal excitement several stakeholders reference "the new onboarding flow" in subsequent planning conversations as though it were already a settled direction.
 
-Three weeks later, informal user testing on a simplified prototype (built only after the internal excitement prompted someone to ask "have we actually tested this with users yet?") reveals that the core flow concept confuses first-time users in a specific, structural way that no amount of visual polish can fix — the underlying information architecture, not the visual design, is the problem. Reworking the flow at this point requires largely discarding the beautiful mockups and starting over, and several stakeholders express visible disappointment and mild resistance to abandoning "the design we already loved."
+Three weeks later, informal user testing on a simplified prototype (built only after the internal excitement prompted someone to ask "have we actually tested this with users yet?") reveals that the core flow concept confuses first-time users in a specific, structural way that no amount of visual polish can fix the underlying information architecture, not the visual design, is the problem. Reworking the flow at this point requires largely discarding the beautiful mockups and starting over, and several stakeholders express visible disappointment and mild resistance to abandoning "the design we already loved."
 
 **What went wrong?**
 
-Using the Fidelity Ladder: this idea was still squarely in the Double Diamond's early "Develop" phase — a solution concept that hadn't yet been pressure-tested with real users — but was represented with "Deliver"-stage polish, creating a mismatch between the artifact's apparent finality and its actual, unvalidated status. The resulting internal enthusiasm was not really evidence the idea was good; it was evidence that polished visuals are persuasive regardless of underlying validation, a distinct and separate thing. The stakeholders' resistance to abandoning "the design we already loved" is precisely the psychological cost of premature high-fidelity: the team had become emotionally attached to a specific, expensive artifact before the underlying concept had earned that level of commitment, making a necessary pivot feel like a loss rather than a normal part of a healthy discovery process.
+Using the Fidelity Ladder: this idea was still squarely in the Double Diamond's early "Develop" phase a solution concept that hadn't yet been pressure-tested with real users but was represented with "Deliver"-stage polish, creating a mismatch between the artifact's apparent finality and its actual, unvalidated status. The resulting internal enthusiasm was not really evidence the idea was good; it was evidence that polished visuals are persuasive regardless of underlying validation, a distinct and separate thing. The stakeholders' resistance to abandoning "the design we already loved" is precisely the psychological cost of premature high-fidelity: the team had become emotionally attached to a specific, expensive artifact before the underlying concept had earned that level of commitment, making a necessary pivot feel like a loss rather than a normal part of a healthy discovery process.
 
-The fix is not to avoid high-fidelity work altogether, but to sequence it correctly: low-fidelity sketches and a testable mid-fidelity prototype should validate the underlying flow concept with real users *before* any high-fidelity visual polish is invested in it. This sequencing discipline — matching artifact investment to validation status — is directly related to the technical-debt trade-off reasoning covered next in **Lesson 39 (Technical Debt & PM Trade-offs)**, where a similar principle applies to engineering investment: build the cheapest version that answers the real question first, before investing in a polished, expensive version of an idea that hasn't yet earned that investment.
+The fix is not to avoid high-fidelity work altogether, but to sequence it correctly: low-fidelity sketches and a testable mid-fidelity prototype should validate the underlying flow concept with real users *before* any high-fidelity visual polish is invested in it. This sequencing discipline matching artifact investment to validation status is directly related to the technical-debt trade-off reasoning covered next in **Lesson 39 (Technical Debt & PM Trade-offs)**, where a similar principle applies to engineering investment: build the cheapest version that answers the real question first, before investing in a polished, expensive version of an idea that hasn't yet earned that investment.
 
 ---
 
@@ -265,35 +265,35 @@ A second, more tactical tool: use this table to check whether design is being br
 | Solution exploration (Develop) | Producing low/mid-fidelity concepts, testing multiple directions | Design is asked to visually execute a single, PM-specified layout with no real alternatives considered |
 | Solution delivery (Deliver) | Producing high-fidelity, validated final design, working with engineering on implementation detail | High-fidelity work is commissioned before user validation has occurred (see Case Study) |
 
-A project where design's actual involvement clusters entirely in the "Deliver" column, with little or no presence in "Discover" or "Develop," is very likely under-using design relative to what this lesson's Theory recommends — even if design is nominally "involved" throughout, in a purely reactive capacity.
+A project where design's actual involvement clusters entirely in the "Deliver" column, with little or no presence in "Discover" or "Develop," is very likely under-using design relative to what this lesson's Theory recommends even if design is nominally "involved" throughout, in a purely reactive capacity.
 
 ---
 
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How do you decide when to bring design into a project?"**
-*What the interviewer is actually evaluating:* Whether the candidate defaults to bringing design in early, during problem exploration, rather than only at the visual-polish stage — testing awareness of the Double Diamond's two divergent phases.
+*What the interviewer is actually evaluating:* Whether the candidate defaults to bringing design in early, during problem exploration, rather than only at the visual-polish stage testing awareness of the Double Diamond's two divergent phases.
 
 **Typical question 2: "Tell me about a time a design decision changed based on user feedback after significant work had already gone into it. How did the team handle it?"**
 *What the interviewer is actually evaluating:* Whether the candidate can recognize and navigate the emotional/organizational cost of premature high-fidelity, and whether they can describe a healthy process for pivoting without treating it as a personal or team failure.
 
 **Typical question 3: "How do you give feedback on a design without micromanaging the designer?"**
-*What the interviewer is actually evaluating:* Whether the candidate applies the "context, not commands" principle specifically to design — framing feedback around user problems and constraints rather than dictating specific visual choices.
+*What the interviewer is actually evaluating:* Whether the candidate applies the "context, not commands" principle specifically to design framing feedback around user problems and constraints rather than dictating specific visual choices.
 
 ---
 
 ## Summary
 
-The PM-design relationship mirrors the PM-engineering relationship covered in Lesson 37 in its core principle — trust the domain expert with their domain — but carries its own distinct failure modes, chiefly bringing design in too late, after a solution has already been implicitly decided. The Double Diamond framework makes explicit that design has two separate divergent phases (exploring the problem, then exploring solutions), each requiring genuine design involvement, not just a final "make it pretty" step at the end. The Fidelity Ladder captures a closely related principle: a design artifact's polish level should track the actual validation status of the underlying idea, since high-fidelity work produced before validation creates a specific, costly failure mode — premature high-fidelity — where polished visuals generate false internal confidence and psychological attachment to an idea that hasn't earned it, as demonstrated in this lesson's Case Study of an onboarding mockup the whole company fell in love with before it was ever tested with real users. Applying Lesson 37's "context, not commands" principle to design means conveying the user problem, constraints, and success criteria precisely, while trusting design to own layout, visual hierarchy, and interaction pattern decisions.
+The PM-design relationship mirrors the PM-engineering relationship covered in Lesson 37 in its core principle trust the domain expert with their domain but carries its own distinct failure modes, chiefly bringing design in too late, after a solution has already been implicitly decided. The Double Diamond framework makes explicit that design has two separate divergent phases (exploring the problem, then exploring solutions), each requiring genuine design involvement, not just a final "make it pretty" step at the end. The Fidelity Ladder captures a closely related principle: a design artifact's polish level should track the actual validation status of the underlying idea, since high-fidelity work produced before validation creates a specific, costly failure mode premature high-fidelity where polished visuals generate false internal confidence and psychological attachment to an idea that hasn't earned it, as demonstrated in this lesson's Case Study of an onboarding mockup the whole company fell in love with before it was ever tested with real users. Applying Lesson 37's "context, not commands" principle to design means conveying the user problem, constraints, and success criteria precisely, while trusting design to own layout, visual hierarchy, and interaction pattern decisions.
 
 ---
 
 ## Key Takeaways
 
-- Design is a method for exploring and pressure-testing a solution space, not a finishing step applied after the real decisions have already been made — treating it as decoration wastes its most valuable contribution.
+- Design is a method for exploring and pressure-testing a solution space, not a finishing step applied after the real decisions have already been made treating it as decoration wastes its most valuable contribution.
 - The Double Diamond's two divergent phases (Discover, Develop) both require genuine design involvement; skipping both to bring design in only at "Deliver" reduces the relationship to visual-polish execution.
-- Design artifact fidelity should track the actual validation status of the underlying idea — low fidelity for unvalidated exploration, high fidelity only after real user validation.
-- "Premature high-fidelity" — polished mockups produced before validation — creates false internal confidence and psychological attachment, making a necessary pivot feel like a loss rather than a normal part of discovery.
+- Design artifact fidelity should track the actual validation status of the underlying idea low fidelity for unvalidated exploration, high fidelity only after real user validation.
+- "Premature high-fidelity" polished mockups produced before validation creates false internal confidence and psychological attachment, making a necessary pivot feel like a loss rather than a normal part of discovery.
 - Internal team enthusiasm for a design is not evidence of user validation; these are separate things, and conflating them is a common and costly mistake.
 - Applying "context, not commands" to design means specifying the user problem, constraints, and success criteria precisely, while trusting design to own layout, visual hierarchy, and interaction pattern choices.
 - A design involvement pattern clustered entirely in the late "Deliver" phase, even if nominally continuous, signals under-use of design relative to its potential contribution.
@@ -327,9 +327,9 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 
 ## Further Reading / Resources
 
-- *Sprint: How to Solve Big Problems and Test New Ideas in Just Five Days* by Jake Knapp — a practitioner framework emphasizing rapid, low-fidelity testing before high-fidelity investment.
-- *The Design of Everyday Things* by Don Norman — foundational reading on how design decisions shape user understanding, independent of visual polish.
-- "The Double Diamond" — UK Design Council's original framework documentation, the source of this lesson's core process model.
+- *Sprint: How to Solve Big Problems and Test New Ideas in Just Five Days* by Jake Knapp a practitioner framework emphasizing rapid, low-fidelity testing before high-fidelity investment.
+- *The Design of Everyday Things* by Don Norman foundational reading on how design decisions shape user understanding, independent of visual polish.
+- "The Double Diamond" UK Design Council's original framework documentation, the source of this lesson's core process model.
 
 ---
 
@@ -367,7 +367,7 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 
 **Card 6**
 - Front: In the Detailed Case Study, what was the actual root cause of the onboarding flow's failure, and why couldn't visual polish fix it?
-- Back: A structural information-architecture problem in the flow concept itself, not a visual design issue — no amount of visual polish addresses a fundamentally confusing underlying flow.
+- Back: A structural information-architecture problem in the flow concept itself, not a visual design issue no amount of visual polish addresses a fundamentally confusing underlying flow.
 - Difficulty: 2
 - Tags: case-study
 
@@ -376,7 +376,7 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 
 Consider the following novel scenario: You're a PM who has just had an idea for a new feature after a single conversation with one enthusiastic customer. You're excited, and you're tempted to ask your designer to put together a polished set of screens to show at next week's leadership meeting, to build momentum for the idea.
 
-There is no single correct answer to the prompts below — the goal is to practice applying the Fidelity Ladder and Double Diamond, not to reach one "right" answer.
+There is no single correct answer to the prompts below the goal is to practice applying the Fidelity Ladder and Double Diamond, not to reach one "right" answer.
 
 1. Using the Double Diamond, which phase is this idea actually in right now, and what does that suggest about the appropriate fidelity level for any design artifact at this stage?
 2. What would you ask your designer to produce instead of a polished mockup, if your goal is to genuinely test the idea rather than just generate excitement?
@@ -525,7 +525,7 @@ C) It dictates visual choices instead of user context
 D) Strong design fluency and clear communication skill
 
 *Correct answer: C*
-*Explanation: A strong answer frames feedback around user problems and constraints, not specific visual dictates — this answer does the opposite.*
+*Explanation: A strong answer frames feedback around user problems and constraints, not specific visual dictates this answer does the opposite.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
@@ -577,7 +577,7 @@ C) Share the underlying need, leaving the solution open
 D) Direct the team to implement it as a firm requirement
 
 *Correct answer: C*
-*Explanation: This applies "context, not commands" — sharing the underlying need as useful context while preserving design's ownership of the actual solution space.*
+*Explanation: This applies "context, not commands" sharing the underlying need as useful context while preserving design's ownership of the actual solution space.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
@@ -587,10 +587,10 @@ D) Direct the team to implement it as a firm requirement
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 37 — Working with Engineering Teams | This lesson mirrors the "context, not commands" and trust-building principles from Lesson 37, applied specifically to the PM-design relationship |
-| **Current Lesson** | Lesson 38 — Working with Design Teams | Double Diamond; the Exploration Window; premature high-fidelity; Design Involvement Timing Table |
-| **Next Lesson** | Lesson 39 — Technical Debt & PM Trade-offs | Extends this lesson's "build cheap before investing" sequencing principle to engineering investment decisions |
+| **Previous Lesson** | Lesson 37 Working with Engineering Teams | This lesson mirrors the "context, not commands" and trust-building principles from Lesson 37, applied specifically to the PM-design relationship |
+| **Current Lesson** | Lesson 38 Working with Design Teams | Double Diamond; the Exploration Window; premature high-fidelity; Design Involvement Timing Table |
+| **Next Lesson** | Lesson 39 Technical Debt & PM Trade-offs | Extends this lesson's "build cheap before investing" sequencing principle to engineering investment decisions |
 | **Future Concepts Unlocked** | Lesson 45 (A/B Testing & Experimentation) | Depends on well-sequenced, testable design variants produced through appropriate fidelity discipline |
 | | Lesson 52 (Storytelling and Narrative for PMs) | Builds on this lesson's distinction between generating genuine excitement and manufacturing false confidence through polish |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Double Diamond and the Exploration Window with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Double Diamond and the Exploration Window with you they will not be re-explained, only re-applied in new contexts.

@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lessons 32 and 33 gave you the two dominant Agile frameworks at the level of their overall philosophy and structure — Scrum's roles, events, and artifacts, and Kanban's flow-based alternative. But knowing that "Sprint Planning" exists as an event, and knowing how to actually run one well, are very different levels of fluency. This lesson goes underneath the event itself, into the specific mechanics that separate a Sprint Planning meeting that produces a coherent, achievable Sprint Backlog from one that produces an overcommitted wish list nobody actually believes in.
+Lessons 32 and 33 gave you the two dominant Agile frameworks at the level of their overall philosophy and structure Scrum's roles, events, and artifacts, and Kanban's flow-based alternative. But knowing that "Sprint Planning" exists as an event, and knowing how to actually run one well, are very different levels of fluency. This lesson goes underneath the event itself, into the specific mechanics that separate a Sprint Planning meeting that produces a coherent, achievable Sprint Backlog from one that produces an overcommitted wish list nobody actually believes in.
 
-This lesson also directly resolves two loose threads left open earlier in this module. Lesson 31's Detailed Case Study ended with a PM forcing a sprint plan through after learning it rested on a false assumption, specifically because there was no established process for handling mid-sprint changes gracefully — this lesson builds that process. And Lesson 32's Case Study identified an unclear Definition of Done as a recurring, unresolved retrospective complaint — this lesson gives you the specific tool (a Definition of Ready, paired with the Definition of Done) that prevents that ambiguity from reaching the sprint in the first place. Backlog grooming is where a PM's upstream prioritization work (Lesson 29) gets translated into units small and clear enough for engineering to actually commit to — and doing this translation poorly is one of the most common, and most avoidable, sources of execution dysfunction in product organizations.
+This lesson also directly resolves two loose threads left open earlier in this module. Lesson 31's Detailed Case Study ended with a PM forcing a sprint plan through after learning it rested on a false assumption, specifically because there was no established process for handling mid-sprint changes gracefully this lesson builds that process. And Lesson 32's Case Study identified an unclear Definition of Done as a recurring, unresolved retrospective complaint this lesson gives you the specific tool (a Definition of Ready, paired with the Definition of Done) that prevents that ambiguity from reaching the sprint in the first place. Backlog grooming is where a PM's upstream prioritization work (Lesson 29) gets translated into units small and clear enough for engineering to actually commit to and doing this translation poorly is one of the most common, and most avoidable, sources of execution dysfunction in product organizations.
 
 ---
 
@@ -12,12 +12,12 @@ This lesson also directly resolves two loose threads left open earlier in this m
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery |
+| **Module** | 4 Execution & Agile Delivery |
 | **Current Lesson** | 34 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 15 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 29 (Prioritization Basics), Lesson 32 (Scrum Framework — Sprint Backlog, Sprint Goal, Definition of Done), Lesson 33 (Kanban Framework — for contrast with continuous refinement) |
-| **Next Lesson** | Lesson 35 — Roadmapping |
+| **Prerequisites** | Lesson 29 (Prioritization Basics), Lesson 32 (Scrum Framework Sprint Backlog, Sprint Goal, Definition of Done), Lesson 33 (Kanban Framework for contrast with continuous refinement) |
+| **Next Lesson** | Lesson 35 Roadmapping |
 | **Future Topics Unlocked** | Lesson 35 (Roadmapping, which sits one altitude above Sprint Planning), Lesson 36 (Release Planning & Launch Management), Lesson 39 (Technical Debt & PM Trade-offs, which reuses story-splitting logic), Lesson 45 (A/B Testing & Experimentation, which depends on cleanly-scoped, testable increments) |
 
 ---
@@ -36,7 +36,7 @@ By the end of this lesson, you will be able to:
 
 ## Prerequisites
 
-This lesson assumes **Lesson 29's** prioritization logic — you should already know how to rank a raw list of candidate ideas by value and cost. It also assumes **Lesson 32's** Scrum vocabulary in full: Sprint Backlog, Sprint Goal, and especially the Definition of Done, since this lesson introduces a companion concept (the Definition of Ready) that only makes sense in contrast to it. Finally, it assumes you remember **Lesson 33's** Kanban concepts of WIP limits and cycle time, because well-run backlog grooming is, in effect, a continuous-flow discipline (grooming happens constantly, not just at Sprint Planning) applied to a Scrum team's otherwise batch-oriented process.
+This lesson assumes **Lesson 29's** prioritization logic you should already know how to rank a raw list of candidate ideas by value and cost. It also assumes **Lesson 32's** Scrum vocabulary in full: Sprint Backlog, Sprint Goal, and especially the Definition of Done, since this lesson introduces a companion concept (the Definition of Ready) that only makes sense in contrast to it. Finally, it assumes you remember **Lesson 33's** Kanban concepts of WIP limits and cycle time, because well-run backlog grooming is, in effect, a continuous-flow discipline (grooming happens constantly, not just at Sprint Planning) applied to a Scrum team's otherwise batch-oriented process.
 
 ---
 
@@ -44,7 +44,7 @@ This lesson assumes **Lesson 29's** prioritization logic — you should already 
 
 ### Grooming Is Continuous; Planning Is a Single Event
 
-The single most common structural mistake in this space is treating backlog grooming and Sprint Planning as the same activity, performed only once every Sprint. They are not. **Backlog grooming** (also called backlog refinement) is an ongoing activity — ideally happening in small doses throughout the Sprint, not concentrated into a single pre-planning session — where the PM and team progressively clarify, split, and estimate upcoming backlog items well before they're due to enter a Sprint. **Sprint Planning** is the discrete Scrum event (Lesson 32) where the team selects already-groomed items into the Sprint Backlog and forms a Sprint Goal.
+The single most common structural mistake in this space is treating backlog grooming and Sprint Planning as the same activity, performed only once every Sprint. They are not. **Backlog grooming** (also called backlog refinement) is an ongoing activity ideally happening in small doses throughout the Sprint, not concentrated into a single pre-planning session where the PM and team progressively clarify, split, and estimate upcoming backlog items well before they're due to enter a Sprint. **Sprint Planning** is the discrete Scrum event (Lesson 32) where the team selects already-groomed items into the Sprint Backlog and forms a Sprint Goal.
 
 ```mermaid
 %%{init: {
@@ -86,7 +86,7 @@ graph LR
     E --> F[Sprint Backlog]
 ```
 
-When grooming is skipped and pushed entirely into the Sprint Planning meeting itself, the team is forced to clarify scope, split oversized items, and estimate effort all in the same session where it's also supposed to be forming a coherent Sprint Goal — a workload mismatch that reliably produces either a rushed, shallow planning session or one that runs for hours. Continuous grooming exists specifically to prevent this collision.
+When grooming is skipped and pushed entirely into the Sprint Planning meeting itself, the team is forced to clarify scope, split oversized items, and estimate effort all in the same session where it's also supposed to be forming a coherent Sprint Goal a workload mismatch that reliably produces either a rushed, shallow planning session or one that runs for hours. Continuous grooming exists specifically to prevent this collision.
 
 ### The INVEST Criteria
 
@@ -101,7 +101,7 @@ A widely used mnemonic, commonly attributed to Bill Wake, for evaluating whether
 | **S** | Small | Is the item sized to be completed comfortably within a single Sprint, ideally a fraction of it? |
 | **T** | Testable | Is there a clear, verifiable way to know when the item is actually done? |
 
-An item failing "Estimable" or "Small" is the most common real-world grooming failure — a large, vague item ("improve onboarding") gets dragged into Sprint Planning, is nominally "estimated," and then blows through its estimate because no one actually broke it down into pieces small enough to reason about clearly.
+An item failing "Estimable" or "Small" is the most common real-world grooming failure a large, vague item ("improve onboarding") gets dragged into Sprint Planning, is nominally "estimated," and then blows through its estimate because no one actually broke it down into pieces small enough to reason about clearly.
 
 ### Definition of Ready, Paired With Definition of Done
 
@@ -145,13 +145,13 @@ graph LR
     B -->|Definition of Done| C[Counted as Complete]
 ```
 
-A team with a strong Definition of Done but no Definition of Ready will frequently pull poorly-specified, oversized items into a Sprint, then discover mid-Sprint that the item was never actually well-formed enough to build — precisely the ambiguity that produced the recurring, unresolved complaint in Lesson 32's Case Study. Establishing a genuine Definition of Ready is the direct fix for that dysfunction.
+A team with a strong Definition of Done but no Definition of Ready will frequently pull poorly-specified, oversized items into a Sprint, then discover mid-Sprint that the item was never actually well-formed enough to build precisely the ambiguity that produced the recurring, unresolved complaint in Lesson 32's Case Study. Establishing a genuine Definition of Ready is the direct fix for that dysfunction.
 
 ### Capacity-Based Planning and Velocity
 
-Most Scrum teams plan a Sprint's capacity using **velocity** — a rolling average of how many story points (or equivalent estimation units) the team has completed in recent past Sprints. Rather than optimistically committing to however much backlog looks appealing, a disciplined team commits only up to its established velocity, adjusted for known factors like planned time off or a public holiday shortening the Sprint.
+Most Scrum teams plan a Sprint's capacity using **velocity** a rolling average of how many story points (or equivalent estimation units) the team has completed in recent past Sprints. Rather than optimistically committing to however much backlog looks appealing, a disciplined team commits only up to its established velocity, adjusted for known factors like planned time off or a public holiday shortening the Sprint.
 
-A simple, commonly used formula: **Sprint Capacity ≈ Historical Velocity × Focus Factor**, where the Focus Factor (often somewhere between 0.7 and 0.85 for many teams) accounts for the reality that not all of a team's nominal time converts into feature-delivery work — meetings, support interruptions, and unplanned work all consume real capacity that a naive full-time-hours estimate ignores.
+A simple, commonly used formula: **Sprint Capacity ≈ Historical Velocity × Focus Factor**, where the Focus Factor (often somewhere between 0.7 and 0.85 for many teams) accounts for the reality that not all of a team's nominal time converts into feature-delivery work meetings, support interruptions, and unplanned work all consume real capacity that a naive full-time-hours estimate ignores.
 
 The most common estimation pitfall is **planning fallacy**: systematically underestimating how long work will take, driven by focusing on the best-case scenario for a specific task while ignoring the base rate of how long similar tasks have taken historically. Anchoring Sprint commitments to actual historical velocity, rather than to each Sprint's fresh, optimistic estimate, is the primary structural defense against this bias.
 
@@ -165,11 +165,11 @@ As covered above, this collapses two workloads (clarifying/splitting/estimating,
 
 **Mistake 2: Writing backlog items as technical solutions instead of problems or needs**
 
-An item like "add a Redis cache layer to the search endpoint" violates INVEST's "Negotiable" criterion — it pre-supposes the solution and removes the team's ability to propose a better one. A better-formed version states the underlying need ("search response time is causing measurable user drop-off") and lets engineering propose the technical approach, including a cache layer if that's genuinely the best fix.
+An item like "add a Redis cache layer to the search endpoint" violates INVEST's "Negotiable" criterion it pre-supposes the solution and removes the team's ability to propose a better one. A better-formed version states the underlying need ("search response time is causing measurable user drop-off") and lets engineering propose the technical approach, including a cache layer if that's genuinely the best fix.
 
 **Mistake 3: Committing to Sprint capacity based on optimism rather than historical velocity**
 
-Teams new to Scrum frequently plan each Sprint as if it will be the team's best Sprint ever, ignoring their own established velocity trend. This produces chronic overcommitment, and — worse — chronic overcommitment quietly erodes a team's trust in the Sprint Goal itself, since it becomes an expectation everyone privately assumes won't be met.
+Teams new to Scrum frequently plan each Sprint as if it will be the team's best Sprint ever, ignoring their own established velocity trend. This produces chronic overcommitment, and worse chronic overcommitment quietly erodes a team's trust in the Sprint Goal itself, since it becomes an expectation everyone privately assumes won't be met.
 
 **Mistake 4: Having a Definition of Done but no Definition of Ready**
 
@@ -177,7 +177,7 @@ As covered above, this allows poorly-specified items to enter a Sprint, where th
 
 **Mistake 5: Treating any mid-sprint change as either forbidden or trivial, with no middle-ground protocol**
 
-This is the exact failure from Lesson 31's Case Study: a PM who treats the sprint plan as untouchable regardless of new evidence. The opposite failure also exists and is just as damaging — a team that re-plans the Sprint casually every time something new comes up, never actually protecting a period of focus. The fix, covered next, is a deliberate middle path.
+This is the exact failure from Lesson 31's Case Study: a PM who treats the sprint plan as untouchable regardless of new evidence. The opposite failure also exists and is just as damaging a team that re-plans the Sprint casually every time something new comes up, never actually protecting a period of focus. The fix, covered next, is a deliberate middle path.
 
 ---
 
@@ -229,15 +229,15 @@ graph TD
     F -->|Yes| G[Enters Sprint Planning]
 ```
 
-Use the Readiness Gate as a standing discipline in every grooming session: an item that can't pass through it honestly is not ready, regardless of how much pressure exists to bring it into the next Sprint anyway. The gate's real value is forcing the "Split into smaller items" step to happen during grooming — a calm, unhurried setting — rather than being discovered mid-Sprint, under time pressure, as an unpleasant surprise.
+Use the Readiness Gate as a standing discipline in every grooming session: an item that can't pass through it honestly is not ready, regardless of how much pressure exists to bring it into the next Sprint anyway. The gate's real value is forcing the "Split into smaller items" step to happen during grooming a calm, unhurried setting rather than being discovered mid-Sprint, under time pressure, as an unpleasant surprise.
 
 ---
 
 ## Real Company Example
 
-**Atlassian** — the company behind Jira and Confluence, and consequently one of the most public voices on Agile process itself — publishes its own Definition of Ready guidance as core material in its Agile Coach content, explicitly framing DoR as a checklist a backlog item must clear (a clear description, defined acceptance criteria, a rough estimate, identified dependencies, a validated user problem) before it is eligible for sprint planning at all, and pairs it explicitly with the INVEST criteria this lesson covers as the standard for evaluating whether a story is genuinely well-formed.
+**Atlassian** the company behind Jira and Confluence, and consequently one of the most public voices on Agile process itself publishes its own Definition of Ready guidance as core material in its Agile Coach content, explicitly framing DoR as a checklist a backlog item must clear (a clear description, defined acceptance criteria, a rough estimate, identified dependencies, a validated user problem) before it is eligible for sprint planning at all, and pairs it explicitly with the INVEST criteria this lesson covers as the standard for evaluating whether a story is genuinely well-formed.
 
-The underlying principle connects directly to this lesson's Theory: a culture that insists on genuinely small, well-specified units of work — rather than large, vaguely-scoped initiatives — tends to produce far more predictable Sprint outcomes, because less ambiguity is smuggled into the Sprint undetected.
+The underlying principle connects directly to this lesson's Theory: a culture that insists on genuinely small, well-specified units of work rather than large, vaguely-scoped initiatives tends to produce far more predictable Sprint outcomes, because less ambiguity is smuggled into the Sprint undetected.
 
 *(Source: Atlassian's own publicly published Agile Coach material. This is one of the more directly verifiable examples in this curriculum, since it comes from the company's own official documentation rather than secondhand reporting.)*
 
@@ -246,7 +246,7 @@ The underlying principle connects directly to this lesson's Theory: a culture th
 ## Real World Perspective: Sprint Planning & Backlog Grooming at Different Company Stages
 
 **At a startup:**
-Grooming is often informal and conversational — a founder-PM and a handful of engineers might clarify scope in a quick Slack thread rather than a scheduled ceremony. INVEST and a Definition of Ready are still useful as a mental checklist even without formal documentation, and are frequently the difference between a small team shipping smoothly and one that constantly discovers mid-Sprint that "simple" items were actually far more complex than assumed.
+Grooming is often informal and conversational a founder-PM and a handful of engineers might clarify scope in a quick Slack thread rather than a scheduled ceremony. INVEST and a Definition of Ready are still useful as a mental checklist even without formal documentation, and are frequently the difference between a small team shipping smoothly and one that constantly discovers mid-Sprint that "simple" items were actually far more complex than assumed.
 
 **At a mid-size company:**
 Grooming typically becomes a scheduled, recurring ceremony (often weekly, separate from Sprint Planning), with a written Definition of Ready the team holds itself to consistently. This is also the stage where velocity tracking becomes formalized enough to meaningfully anchor capacity planning, since enough Sprint history exists to establish a reliable trend.
@@ -264,7 +264,7 @@ Consider now, as a direct continuation, how that same team addressed the underly
 
 **What changed, and why it worked:**
 
-This protocol resolves the false dichotomy the original PM faced. It gives the team a clear, narrow, pre-agreed threshold for when a mid-Sprint change is warranted — protecting the Sprint Goal's stability against being disrupted by every minor new idea, while still allowing genuine, Sprint-Goal-threatening evidence to trigger a real change rather than being suppressed to protect appearances. Critically, the protocol also builds in transparent communication as a requirement, not an afterthought — directly addressing the original PM's underlying fear (that a changed plan would look like poor planning) by reframing a well-justified, well-communicated change as evidence of good judgment, not failure. This same communication skill — explaining a changed plan to stakeholders without it reading as failure — is developed in full in **Lesson 47 (Stakeholder Management)**, and the broader question of how much to specify upfront versus leave flexible is revisited at a longer time horizon in **Lesson 35 (Roadmapping)**.
+This protocol resolves the false dichotomy the original PM faced. It gives the team a clear, narrow, pre-agreed threshold for when a mid-Sprint change is warranted protecting the Sprint Goal's stability against being disrupted by every minor new idea, while still allowing genuine, Sprint-Goal-threatening evidence to trigger a real change rather than being suppressed to protect appearances. Critically, the protocol also builds in transparent communication as a requirement, not an afterthought directly addressing the original PM's underlying fear (that a changed plan would look like poor planning) by reframing a well-justified, well-communicated change as evidence of good judgment, not failure. This same communication skill explaining a changed plan to stakeholders without it reading as failure is developed in full in **Lesson 47 (Stakeholder Management)**, and the broader question of how much to specify upfront versus leave flexible is revisited at a longer time horizon in **Lesson 35 (Roadmapping)**.
 
 ---
 
@@ -280,7 +280,7 @@ A second, more tactical tool: use this checklist immediately before a Sprint Pla
 | Capacity anchor | Is the proposed Sprint Backlog sized against actual historical velocity, not optimistic best-case capacity? | Trim the Sprint Backlog to match established velocity |
 | Sprint Goal clarity | Can every item in the proposed Sprint Backlog be explained in one sentence in terms of the emerging Sprint Goal? | Reconsider whether the item belongs in this Sprint at all |
 
-A Sprint Planning meeting that fails several of these checks is not a planning problem — it's a symptom of insufficient upstream grooming, and no amount of skillful facilitation during the meeting itself can fully substitute for that missing work.
+A Sprint Planning meeting that fails several of these checks is not a planning problem it's a symptom of insufficient upstream grooming, and no amount of skillful facilitation during the meeting itself can fully substitute for that missing work.
 
 ---
 
@@ -290,16 +290,16 @@ A Sprint Planning meeting that fails several of these checks is not a planning p
 *What the interviewer is actually evaluating:* Whether the candidate has a concrete, repeatable standard (INVEST, a Definition of Ready) rather than a purely intuitive, case-by-case judgment that would be hard to apply consistently across a team.
 
 **Typical question 2: "Tell me about a time your team had to change a Sprint plan mid-way through. How did you handle it?"**
-*What the interviewer is actually evaluating:* Whether the candidate has a principled threshold for mid-Sprint changes — distinguishing Sprint-Goal-threatening evidence from minor new information — and whether they communicated the change transparently, directly testing the reasoning developed in this lesson's Case Study.
+*What the interviewer is actually evaluating:* Whether the candidate has a principled threshold for mid-Sprint changes distinguishing Sprint-Goal-threatening evidence from minor new information and whether they communicated the change transparently, directly testing the reasoning developed in this lesson's Case Study.
 
 **Typical question 3: "Your team consistently finishes only 60% of what it commits to each Sprint. What would you investigate?"**
-*What the interviewer is actually evaluating:* Whether the candidate's first instinct is to blame engineering effort, or to correctly suspect upstream causes — poor grooming, missing Definition of Ready discipline, or capacity planning anchored to optimism rather than historical velocity, as covered throughout this lesson.
+*What the interviewer is actually evaluating:* Whether the candidate's first instinct is to blame engineering effort, or to correctly suspect upstream causes poor grooming, missing Definition of Ready discipline, or capacity planning anchored to optimism rather than historical velocity, as covered throughout this lesson.
 
 ---
 
 ## Summary
 
-Backlog grooming and Sprint Planning are distinct activities that are frequently, and mistakenly, collapsed into one — grooming is a continuous, ongoing discipline of clarifying, splitting, and estimating backlog items, while Sprint Planning is the discrete event where already-ready items are selected into a Sprint Backlog around a coherent Sprint Goal. The INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable) give a concrete, repeatable standard for judging whether an item is well-formed, and a written Definition of Ready extends this standard into a team-wide gate, complementing the Definition of Done from Lesson 32 by guarding the opposite end of an item's lifecycle. Capacity-based planning, anchored to actual historical velocity rather than each Sprint's fresh optimism, is the primary structural defense against the planning fallacy that produces chronic overcommitment. Finally, this lesson resolves Lesson 31's open Case Study by showing a concrete mid-sprint change protocol — one that protects Sprint Goal stability against every minor new idea, while still allowing genuine, Sprint-Goal-threatening evidence to trigger a transparent, well-communicated change, rather than forcing a false choice between rigid over-commitment and constant re-planning.
+Backlog grooming and Sprint Planning are distinct activities that are frequently, and mistakenly, collapsed into one grooming is a continuous, ongoing discipline of clarifying, splitting, and estimating backlog items, while Sprint Planning is the discrete event where already-ready items are selected into a Sprint Backlog around a coherent Sprint Goal. The INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable) give a concrete, repeatable standard for judging whether an item is well-formed, and a written Definition of Ready extends this standard into a team-wide gate, complementing the Definition of Done from Lesson 32 by guarding the opposite end of an item's lifecycle. Capacity-based planning, anchored to actual historical velocity rather than each Sprint's fresh optimism, is the primary structural defense against the planning fallacy that produces chronic overcommitment. Finally, this lesson resolves Lesson 31's open Case Study by showing a concrete mid-sprint change protocol one that protects Sprint Goal stability against every minor new idea, while still allowing genuine, Sprint-Goal-threatening evidence to trigger a transparent, well-communicated change, rather than forcing a false choice between rigid over-commitment and constant re-planning.
 
 ---
 
@@ -307,10 +307,10 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 
 - Backlog grooming is continuous and ongoing; Sprint Planning is a discrete event that should only ever operate on already-groomed, ready items.
 - INVEST (Independent, Negotiable, Valuable, Estimable, Small, Testable) gives a concrete, repeatable standard for judging whether a backlog item is well-formed enough to plan against.
-- A Definition of Ready complements the Definition of Done (Lesson 32) by guarding entry into a Sprint, rather than completion out of it — teams with only one of the two standards remain exposed at the other end.
+- A Definition of Ready complements the Definition of Done (Lesson 32) by guarding entry into a Sprint, rather than completion out of it teams with only one of the two standards remain exposed at the other end.
 - Capacity-based planning anchored to historical velocity, adjusted with a realistic Focus Factor, is the main structural defense against the planning fallacy and chronic overcommitment.
 - Writing backlog items as problems/needs rather than pre-specified technical solutions preserves engineering's ability to propose the best approach and satisfies INVEST's "Negotiable" criterion.
-- A deliberate, narrow mid-sprint change protocol — reserved for evidence that threatens the Sprint Goal itself, always communicated transparently — resolves the false choice between rigid over-commitment and constant, destabilizing re-planning.
+- A deliberate, narrow mid-sprint change protocol reserved for evidence that threatens the Sprint Goal itself, always communicated transparently resolves the false choice between rigid over-commitment and constant, destabilizing re-planning.
 - A Sprint Planning meeting that struggles is very often a symptom of insufficient upstream grooming, not a facilitation failure inside the meeting itself.
 
 ---
@@ -345,9 +345,9 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 
 ## Further Reading / Resources
 
-- *User Stories Applied: For Agile Software Development* by Mike Cohn — the standard reference for writing well-formed user stories and applying the INVEST criteria in practice.
-- *Agile Estimating and Planning* by Mike Cohn — a detailed treatment of story points, velocity, and capacity-based Sprint planning.
-- *Scrum: The Art of Doing Twice the Work in Half the Time* by Jeff Sutherland — revisited here specifically for its discussion of estimation and the planning fallacy in software teams.
+- *User Stories Applied: For Agile Software Development* by Mike Cohn the standard reference for writing well-formed user stories and applying the INVEST criteria in practice.
+- *Agile Estimating and Planning* by Mike Cohn a detailed treatment of story points, velocity, and capacity-based Sprint planning.
+- *Scrum: The Art of Doing Twice the Work in Half the Time* by Jeff Sutherland revisited here specifically for its discussion of estimation and the planning fallacy in software teams.
 
 ---
 
@@ -391,7 +391,7 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 
 **Card 7**
 - Front: If a Sprint Planning meeting consistently runs long and feels chaotic, what is the most likely root cause according to this lesson?
-- Back: Insufficient upstream backlog grooming — items are arriving un-estimated, oversized, or unclear, forcing that work to happen live during Planning itself.
+- Back: Insufficient upstream backlog grooming items are arriving un-estimated, oversized, or unclear, forcing that work to happen live during Planning itself.
 - Difficulty: 2
 - Tags: diagnosis
 
@@ -400,13 +400,13 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 
 Consider the following novel scenario: You're the PM for a Scrum team that has just finished a retrospective revealing that three of the last four Sprints ended with only about 65% of committed story points actually completed. The team's velocity has been calculated as a simple average of the last four Sprints, without adjustment. During grooming sessions, items are typically discussed for the first time only a day or two before Sprint Planning.
 
-There is no single correct answer to the prompts below — the goal is to practice applying this lesson's diagnostic tools, not to reach one "right" fix.
+There is no single correct answer to the prompts below the goal is to practice applying this lesson's diagnostic tools, not to reach one "right" fix.
 
 1. Using the Sprint Planning Readiness Checklist, which specific checks does this team appear to be failing, based on the evidence given?
 2. Is the team's velocity calculation itself likely to be a reliable anchor for future capacity planning, given the pattern described? Why or why not?
 3. What specific INVEST criterion would you focus on first when you sit in on the next grooming session, and what would you look for as evidence that it's being met or missed?
 4. If you introduce a written Definition of Ready, what is one requirement you'd include that would have prevented the most likely root cause of this pattern?
-5. How would you explain this change to the team without it feeling like a criticism of their effort or work ethic — connecting back to this lesson's point that overcommitment is usually a grooming and estimation problem, not an effort problem?
+5. How would you explain this change to the team without it feeling like a criticism of their effort or work ethic connecting back to this lesson's point that overcommitment is usually a grooming and estimation problem, not an effort problem?
 
 ---
 
@@ -471,7 +471,7 @@ C) A Definition of Ready is optional once a Definition of Done exists
 D) Ready guards entry into a Sprint; Done guards completion out of it
 
 *Correct answer: D*
-*Explanation: The two standards guard opposite ends of an item's lifecycle — Ready governs what may enter a Sprint, and Done governs what may count as finished.*
+*Explanation: The two standards guard opposite ends of an item's lifecycle Ready governs what may enter a Sprint, and Done governs what may count as finished.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
@@ -562,7 +562,7 @@ C) As a rule that applies only to Kanban boards, not Scrum sprints
 D) As a replacement for the INVEST criteria rather than a companion to it
 
 *Correct answer: A*
-*Explanation: Atlassian publishes its Definition of Ready as a checklist — description, acceptance criteria, estimate, dependencies, validated problem — paired explicitly with INVEST.*
+*Explanation: Atlassian publishes its Definition of Ready as a checklist description, acceptance criteria, estimate, dependencies, validated problem paired explicitly with INVEST.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
@@ -611,12 +611,12 @@ D) Quietly drop the item from the Sprint without telling any stakeholders
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 33 — Kanban Framework | Continuous grooming borrows Kanban's flow-based discipline and applies it to keeping a Scrum backlog perpetually ready |
-| **Current Lesson** | Lesson 34 — Sprint Planning & Backlog Grooming | INVEST criteria; Definition of Ready; velocity-based capacity planning; planning fallacy; mid-sprint change protocol |
-| **Next Lesson** | Lesson 35 — Roadmapping | Moves one altitude above Sprint Planning, addressing how multiple Sprints' worth of work is sequenced into a longer-horizon view |
+| **Previous Lesson** | Lesson 33 Kanban Framework | Continuous grooming borrows Kanban's flow-based discipline and applies it to keeping a Scrum backlog perpetually ready |
+| **Current Lesson** | Lesson 34 Sprint Planning & Backlog Grooming | INVEST criteria; Definition of Ready; velocity-based capacity planning; planning fallacy; mid-sprint change protocol |
+| **Next Lesson** | Lesson 35 Roadmapping | Moves one altitude above Sprint Planning, addressing how multiple Sprints' worth of work is sequenced into a longer-horizon view |
 | **Future Concepts Unlocked** | Lesson 36 (Release Planning & Launch Management) | Builds on Definition of Ready/Done discipline when coordinating multi-team releases |
 | | Lesson 39 (Technical Debt & PM Trade-offs) | Reuses story-splitting and INVEST logic when deciding how to size and sequence technical debt work |
-| | Lesson 45 (A/B Testing & Experimentation) | Depends on cleanly-scoped, testable increments — a direct product of good INVEST and Definition of Ready discipline |
+| | Lesson 45 (A/B Testing & Experimentation) | Depends on cleanly-scoped, testable increments a direct product of good INVEST and Definition of Ready discipline |
 | | Lesson 47 (Stakeholder Management) | Develops in full the transparent-communication skill this lesson's mid-sprint change protocol depends on |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry INVEST, the Definition of Ready, and velocity-based capacity planning with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry INVEST, the Definition of Ready, and velocity-based capacity planning with you they will not be re-explained, only re-applied in new contexts.

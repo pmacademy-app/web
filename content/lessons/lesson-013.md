@@ -2,9 +2,9 @@
 
 ## Why This Lesson Matters
 
-Lesson 12 gave you a way to go deep with a small number of people. This lesson gives you the complementary tool: a way to check, across a much larger population, whether what you learned from those few conversations actually generalizes. A **survey** is a structured research instrument administered to many respondents at once, designed to answer quantitative questions — how many, how much, how often — that a handful of interviews cannot reliably answer on their own, directly extending Lesson 11's qualitative/quantitative distinction into a specific, buildable method.
+Lesson 12 gave you a way to go deep with a small number of people. This lesson gives you the complementary tool: a way to check, across a much larger population, whether what you learned from those few conversations actually generalizes. A **survey** is a structured research instrument administered to many respondents at once, designed to answer quantitative questions how many, how much, how often that a handful of interviews cannot reliably answer on their own, directly extending Lesson 11's qualitative/quantitative distinction into a specific, buildable method.
 
-Surveys are also, unfortunately, one of the easiest research instruments to build badly while feeling confident you've built them well. A leading question (Lesson 11), a biased sample, or a poorly worded scale can produce a clean-looking chart of numbers that feels authoritative precisely because it's quantitative — while actually encoding all the same distortions a bad interview would, just with more decimal places. This lesson exists to make sure the numbers you get out of a survey are actually measuring what you think they're measuring.
+Surveys are also, unfortunately, one of the easiest research instruments to build badly while feeling confident you've built them well. A leading question (Lesson 11), a biased sample, or a poorly worded scale can produce a clean-looking chart of numbers that feels authoritative precisely because it's quantitative while actually encoding all the same distortions a bad interview would, just with more decimal places. This lesson exists to make sure the numbers you get out of a survey are actually measuring what you think they're measuring.
 
 ---
 
@@ -12,13 +12,13 @@ Surveys are also, unfortunately, one of the easiest research instruments to buil
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research |
+| **Module** | 2 Users & Research |
 | **Current Lesson** | 13 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
 | **Prerequisites** | Lesson 11 (User Research), Lesson 12 (Customer Interviews) |
-| **Next Lesson** | Lesson 14 — Personas |
-| **Future Topics Unlocked** | Lesson 14 (Personas — often synthesized from combined interview and survey data), Lesson 18 (Customer Segmentation — frequently validated with survey data at scale), Lesson 19 (Opportunity Identification) |
+| **Next Lesson** | Lesson 14 Personas |
+| **Future Topics Unlocked** | Lesson 14 (Personas often synthesized from combined interview and survey data), Lesson 18 (Customer Segmentation frequently validated with survey data at scale), Lesson 19 (Opportunity Identification) |
 
 ---
 
@@ -50,14 +50,14 @@ Recall Lesson 11's framework: quantitative methods are well suited to how-many/h
 - You need to measure something efficiently across a large population that would be prohibitively expensive to interview individually.
 - You need a baseline measurement to track over time (e.g., satisfaction tracked quarterly).
 
-A survey is the wrong tool when you don't yet know what you're looking for — a survey can only ask about things the designer already thought to ask about, unlike an open-ended interview, which can follow an unexpected thread wherever it leads. This is why, per Lesson 11's complementary-methods framework, surveys typically work best *after* qualitative research has generated a specific hypothesis to test, not as a substitute for that earlier exploratory work.
+A survey is the wrong tool when you don't yet know what you're looking for a survey can only ask about things the designer already thought to ask about, unlike an open-ended interview, which can follow an unexpected thread wherever it leads. This is why, per Lesson 11's complementary-methods framework, surveys typically work best *after* qualitative research has generated a specific hypothesis to test, not as a substitute for that earlier exploratory work.
 
 ### Constructing Good Survey Questions
 
 Several specific, well-documented question-design failures distort survey results:
 
 - **Leading questions** (from Lesson 11): "How much do you love our new dashboard?" presupposes a positive reaction and biases responses toward it, compared to a neutral "How would you describe your experience with the new dashboard?"
-- **Double-barreled questions**: asking about two things at once, such as "How satisfied are you with our product's speed and ease of use?" — a respondent might feel very differently about speed than about ease of use, and a single combined answer obscures which one actually drove their response.
+- **Double-barreled questions**: asking about two things at once, such as "How satisfied are you with our product's speed and ease of use?" a respondent might feel very differently about speed than about ease of use, and a single combined answer obscures which one actually drove their response.
 - **Ambiguous or vague terms**: asking "How often do you use this feature regularly?" without defining "regularly" leaves each respondent to apply their own inconsistent standard, making aggregated results difficult to interpret meaningfully.
 - **Unbalanced or missing answer options**: a satisfaction scale that includes three positive options and only one negative option biases the aggregate distribution toward apparent satisfaction regardless of true sentiment.
 
@@ -112,19 +112,19 @@ graph TD
 Two widely used quantitative scales deserve specific attention, both for their usefulness and their well-documented limitations:
 
 - **Likert scales** (typically a 5- or 7-point agreement or satisfaction scale, e.g., "Strongly Disagree" to "Strongly Agree") allow respondents to express degree, not just direction, of sentiment. Their limitation: individual respondents interpret the middle and endpoint options differently (some respondents rarely select extreme options regardless of true sentiment, a pattern sometimes called central tendency bias), meaning cross-respondent comparisons carry more noise than the clean-looking numeric output might suggest.
-- **Net Promoter Score (NPS)**, based on the single question "How likely are you to recommend this to a friend or colleague?" on a 0–10 scale, is widely used as a simple, trackable proxy for overall sentiment. Its well-documented limitation, directly connected to Lesson 11's stated-preference warning: NPS asks about a hypothetical future action (a recommendation that may never actually happen), not a real, revealed behavior, and a single number provides no insight into *why* a respondent scored as they did — precisely the kind of why/how gap that quantitative methods, per Lesson 11's framework, are not well suited to answer alone.
+- **Net Promoter Score (NPS)**, based on the single question "How likely are you to recommend this to a friend or colleague?" on a 0–10 scale, is widely used as a simple, trackable proxy for overall sentiment. Its well-documented limitation, directly connected to Lesson 11's stated-preference warning: NPS asks about a hypothetical future action (a recommendation that may never actually happen), not a real, revealed behavior, and a single number provides no insight into *why* a respondent scored as they did precisely the kind of why/how gap that quantitative methods, per Lesson 11's framework, are not well suited to answer alone.
 
-Both scales are useful for tracking directional change over time and for flagging where deeper qualitative investigation (returning to Lesson 12's interview techniques) is warranted — but neither should be treated as a complete, self-sufficient answer to "how are we doing and why."
+Both scales are useful for tracking directional change over time and for flagging where deeper qualitative investigation (returning to Lesson 12's interview techniques) is warranted but neither should be treated as a complete, self-sufficient answer to "how are we doing and why."
 
 ### Sampling Bias in Survey Distribution
 
 Directly extending Lesson 11's representativeness concern, **how a survey is distributed** determines who is even eligible to respond, and this can silently and severely distort results before a single question is even answered. Common patterns:
 
-- **In-app pop-up surveys** reach only currently active users, systematically excluding churned users, users who found the product too frustrating to keep using, and non-users entirely — precisely the populations most likely to reveal the most serious, unaddressed problems.
+- **In-app pop-up surveys** reach only currently active users, systematically excluding churned users, users who found the product too frustrating to keep using, and non-users entirely precisely the populations most likely to reveal the most serious, unaddressed problems.
 - **Email surveys sent to an existing customer list** exclude prospects who never converted and churned customers who may have been removed from the active list.
 - **Surveys promoted through the product's own social media or community channels** oversample the most engaged, enthusiastic segment of the user base, who are demonstrably not representative of the broader population.
 
-A survey with a large number of responses can still produce badly misleading findings if the distribution method silently excluded the population segment most relevant to the question being asked — a large, biased sample is not more trustworthy than a small, biased one; it simply produces a false sense of confidence at a larger scale.
+A survey with a large number of responses can still produce badly misleading findings if the distribution method silently excluded the population segment most relevant to the question being asked a large, biased sample is not more trustworthy than a small, biased one; it simply produces a false sense of confidence at a larger scale.
 
 ### A Trustworthiness Checklist for Completed Surveys
 
@@ -134,7 +134,7 @@ Extending Lesson 11's general trustworthiness checklist to the specific case of 
 2. **Were questions neutral, single-barreled, and clearly defined**, or did any suffer from the failures described above?
 3. **Does the survey measure stated preference (e.g., NPS, hypothetical satisfaction) or something closer to revealed preference** (e.g., a question about actual, specific past behavior, similar in spirit to Lesson 12's past-behavior interview questions)?
 4. **Is the sample size and response rate sufficient to support the specific claim being made**, and has non-response bias (are the people who didn't respond systematically different from those who did) been considered?
-5. **Was the survey used to test an existing hypothesis**, generated through prior qualitative work, or was it used to explore blindly without a clear prior hypothesis — a pattern more likely to produce noisy, hard-to-interpret results?
+5. **Was the survey used to test an existing hypothesis**, generated through prior qualitative work, or was it used to explore blindly without a clear prior hypothesis a pattern more likely to produce noisy, hard-to-interpret results?
 
 ---
 
@@ -142,7 +142,7 @@ Extending Lesson 11's general trustworthiness checklist to the specific case of 
 
 **Mistake 1: Using a survey to explore an open-ended question with no prior hypothesis**
 
-Surveys can only ask about what the designer already thought to ask, making them poorly suited to genuinely open-ended exploration — that work belongs to qualitative interviews (Lesson 12), with the survey following afterward to test a specific, now-formed hypothesis at scale.
+Surveys can only ask about what the designer already thought to ask, making them poorly suited to genuinely open-ended exploration that work belongs to qualitative interviews (Lesson 12), with the survey following afterward to test a specific, now-formed hypothesis at scale.
 
 **Mistake 2: Writing double-barreled questions**
 
@@ -150,11 +150,11 @@ Combining two distinct dimensions ("speed and ease of use") into a single questi
 
 **Mistake 3: Distributing a survey only through channels that reach already-engaged users**
 
-In-app pop-ups, existing customer email lists, and community channels all systematically exclude churned users, frustrated non-adopters, and prospects — often the exact population whose perspective would be most revealing.
+In-app pop-ups, existing customer email lists, and community channels all systematically exclude churned users, frustrated non-adopters, and prospects often the exact population whose perspective would be most revealing.
 
 **Mistake 4: Treating NPS or a single satisfaction number as a complete answer**
 
-A single quantitative score can flag that something is wrong, or track directional change over time, but provides no insight into *why* — treating it as sufficient on its own skips the necessary qualitative follow-up.
+A single quantitative score can flag that something is wrong, or track directional change over time, but provides no insight into *why* treating it as sufficient on its own skips the necessary qualitative follow-up.
 
 **Mistake 5: Over-interpreting small differences in Likert scale averages**
 
@@ -165,7 +165,7 @@ Given individual variation in how respondents use rating scales (central tendenc
 
 ## Mental Model: The Survey Validity Chain
 
-This lesson's mental model is the **Survey Validity Chain** — a sequence of checkpoints, any one of which can silently invalidate an otherwise clean-looking result.
+This lesson's mental model is the **Survey Validity Chain** a sequence of checkpoints, any one of which can silently invalidate an otherwise clean-looking result.
 
 ```mermaid
 %%{init: {
@@ -206,13 +206,13 @@ graph LR
     E --> F[Trustworthy Finding]
 ```
 
-A break at any single link invalidates the chain regardless of how clean the final numbers look — a perfectly worded, neutral question distributed only to the most engaged users is still compromised at the distribution link, and a representatively distributed survey full of leading questions is compromised at the question-design link. Checking the whole chain, not just the parts that are easiest to verify (the final numbers), is the core discipline this lesson asks for.
+A break at any single link invalidates the chain regardless of how clean the final numbers look a perfectly worded, neutral question distributed only to the most engaged users is still compromised at the distribution link, and a representatively distributed survey full of leading questions is compromised at the question-design link. Checking the whole chain, not just the parts that are easiest to verify (the final numbers), is the core discipline this lesson asks for.
 
 ---
 
 ## Real Company Example
 
-**Airbnb**'s use of large-scale surveys alongside qualitative research to understand host and guest trust dynamics is a widely discussed illustration of pairing survey data with other methods rather than relying on either alone. Public product and research commentary from the company has described using broad, quantitative surveys to measure the prevalence of specific trust concerns (such as concerns about safety or unfamiliar hosts) across large segments of users, while pairing that quantitative prevalence data with qualitative interviews to understand the specific reasoning and emotional context behind those concerns — directly reflecting the complementary-methods discipline this lesson and Lesson 11 both describe, rather than treating a survey's aggregate percentages as a self-sufficient explanation on their own.
+**Airbnb**'s use of large-scale surveys alongside qualitative research to understand host and guest trust dynamics is a widely discussed illustration of pairing survey data with other methods rather than relying on either alone. Public product and research commentary from the company has described using broad, quantitative surveys to measure the prevalence of specific trust concerns (such as concerns about safety or unfamiliar hosts) across large segments of users, while pairing that quantitative prevalence data with qualitative interviews to understand the specific reasoning and emotional context behind those concerns directly reflecting the complementary-methods discipline this lesson and Lesson 11 both describe, rather than treating a survey's aggregate percentages as a self-sufficient explanation on their own.
 
 *(Assumption flagged: this reflects widely reported descriptions of Airbnb's general research approach rather than a claim about the company's specific, current internal survey methodology, which this curriculum does not claim certainty about.)*
 
@@ -224,7 +224,7 @@ A break at any single link invalidates the chain regardless of how clean the fin
 Surveys are often used sparingly, given small user bases that may not yet support statistically meaningful sample sizes, and qualitative interviews (Lesson 12) frequently carry proportionally more weight in early decision-making. When surveys are used, they are often deployed to test a specific, sharply defined hypothesis already surfaced through direct conversations, rather than for broad, exploratory purposes.
 
 **At a mid-size company:**
-Surveys become a more standard, recurring tool — tracking metrics like NPS or feature-specific satisfaction over time, and testing hypotheses generated by product and research teams at a scale that individual interviews cannot efficiently support. This is often where dedicated attention to distribution bias (deliberately including churned users, not just active ones) becomes a more formalized practice.
+Surveys become a more standard, recurring tool tracking metrics like NPS or feature-specific satisfaction over time, and testing hypotheses generated by product and research teams at a scale that individual interviews cannot efficiently support. This is often where dedicated attention to distribution bias (deliberately including churned users, not just active ones) becomes a more formalized practice.
 
 **At Big Tech:**
 Surveys at scale can achieve very high statistical precision, but this precision can create a specific risk: treating a statistically significant but practically small difference as meaningful without considering whether the underlying scale or question wording introduces systematic bias that a larger sample size does nothing to correct. Mature research organizations at this scale typically maintain rigorous survey methodology review (piloting questions, checking for leading or double-barreled phrasing) precisely because errors compound at scale rather than washing out.
@@ -237,17 +237,17 @@ Consider a simplified, illustrative scenario common across B2B SaaS companies.
 
 A project collaboration tool's leadership tracks NPS quarterly, distributed via an in-app pop-up shown to users who have been actively logged in for at least ten minutes in the current session. For several consecutive quarters, NPS remains stable and respectably positive, and leadership treats this as evidence that overall customer sentiment is healthy, deprioritizing several proposed initiatives aimed at addressing specific workflow friction that a smaller number of customer support tickets had flagged.
 
-Eighteen months later, the company faces an unexpectedly sharp increase in churn among mid-sized customer accounts. A retrospective investigation finds that the stable, positive NPS scores had been measuring the sentiment of users who were still actively, comfortably using the product — precisely the population least likely to be experiencing the friction driving churn — while excluding, by design, the users who had already begun disengaging or who left negative feedback through support channels rather than staying logged in long enough to see the in-app survey pop-up at all.
+Eighteen months later, the company faces an unexpectedly sharp increase in churn among mid-sized customer accounts. A retrospective investigation finds that the stable, positive NPS scores had been measuring the sentiment of users who were still actively, comfortably using the product precisely the population least likely to be experiencing the friction driving churn while excluding, by design, the users who had already begun disengaging or who left negative feedback through support channels rather than staying logged in long enough to see the in-app survey pop-up at all.
 
 **What went wrong?**
 
 Applying this lesson's frameworks:
 
 1. **The distribution method silently excluded the population most relevant to the churn question.** A survey requiring ten minutes of active session time before triggering will, by construction, undersample exactly the disengaging or frustrated users whose declining engagement is the leading indicator of the churn problem the company later discovered.
-2. **A single quantitative score (NPS) was treated as a complete, self-sufficient answer**, rather than as a signal that — even at a healthy-looking level — warranted qualitative follow-up specifically with the users the survey's own distribution method was excluding.
-3. **The Survey Validity Chain broke at the distribution link**, and no amount of clean-looking, statistically stable NPS numbers in subsequent quarters could correct for that initial, structural flaw — the numbers remained clean precisely because the same excluded population kept being excluded, quarter after quarter.
+2. **A single quantitative score (NPS) was treated as a complete, self-sufficient answer**, rather than as a signal that even at a healthy-looking level warranted qualitative follow-up specifically with the users the survey's own distribution method was excluding.
+3. **The Survey Validity Chain broke at the distribution link**, and no amount of clean-looking, statistically stable NPS numbers in subsequent quarters could correct for that initial, structural flaw the numbers remained clean precisely because the same excluded population kept being excluded, quarter after quarter.
 
-A team applying this lesson's checklist would have asked, before trusting the stable NPS trend: who is systematically excluded by requiring ten active minutes to trigger the survey, and does that exclusion matter for the specific question (overall customer health) being asked? This question alone would likely have prompted a supplementary, more inclusive research effort — reaching disengaging users through a different channel, such as targeted outreach to accounts showing declining usage — well before the churn increase made the gap unavoidably visible.
+A team applying this lesson's checklist would have asked, before trusting the stable NPS trend: who is systematically excluded by requiring ten active minutes to trigger the survey, and does that exclusion matter for the specific question (overall customer health) being asked? This question alone would likely have prompted a supplementary, more inclusive research effort reaching disengaging users through a different channel, such as targeted outreach to accounts showing declining usage well before the churn increase made the gap unavoidably visible.
 
 This case will be revisited in **Lesson 18 (Customer Segmentation)**, where we discuss stratified sampling approaches designed specifically to avoid this kind of engagement-correlated exclusion.
 
@@ -271,19 +271,19 @@ The consistent discipline across this table: **choose the question type based on
 ## Interview Perspective: How Interviewers Think About This
 
 **Typical question 1: "How would you design a survey to measure customer satisfaction?"**
-*What the interviewer is actually evaluating:* Whether the candidate considers distribution method (who gets excluded), question design (leading, double-barreled, ambiguous), and pairs any quantitative score with a mechanism for understanding the underlying why — versus simply naming a metric like NPS without engaging with its known limitations.
+*What the interviewer is actually evaluating:* Whether the candidate considers distribution method (who gets excluded), question design (leading, double-barreled, ambiguous), and pairs any quantitative score with a mechanism for understanding the underlying why versus simply naming a metric like NPS without engaging with its known limitations.
 
 **Typical question 2: "Your survey shows 90% satisfaction, but churn is rising. How do you reconcile that?"**
 *What the interviewer is actually evaluating:* Whether the candidate immediately suspects a sampling or distribution bias (echoing this lesson's Detailed Case Study) rather than accepting the two numbers as simply contradictory or dismissing the churn data. A strong answer specifically asks who was excluded from the survey's sample.
 
 **Typical question 3: "When would you use a survey instead of interviews, or vice versa?"**
-*What the interviewer is actually evaluating:* Fluency with Lesson 11's complementary-methods framework as applied specifically to surveys — recognizing that surveys test known hypotheses at scale, while interviews generate and explore hypotheses in depth, and that neither substitutes fully for the other.
+*What the interviewer is actually evaluating:* Fluency with Lesson 11's complementary-methods framework as applied specifically to surveys recognizing that surveys test known hypotheses at scale, while interviews generate and explore hypotheses in depth, and that neither substitutes fully for the other.
 
 ---
 
 ## Summary
 
-Surveys are the primary quantitative research instrument for answering how-many/how-much questions at scale, and work best when testing a specific hypothesis already generated through qualitative research (Lesson 12), rather than for open-ended exploration. Good survey questions avoid leading phrasing, double-barreled framing, and ambiguous terms, and use balanced answer scales. Common scales like Likert and NPS are useful for tracking directional sentiment but have well-documented limitations — NPS measures a hypothetical future action (a stated-preference concern directly tied to Lesson 11) and provides no insight into why, while Likert scales carry individual-level noise from inconsistent scale usage. Sampling bias in survey distribution — reaching only currently active users, existing customer lists, or engaged community members — can silently exclude the exact population segment most relevant to a given question, producing a large but misleading sample, as shown in this lesson's Detailed Case Study. The Survey Validity Chain (distribution, question design, scale choice, sample/response rate, interpretation) can break at any single link regardless of how clean the final numbers appear, making a full-chain check essential before treating survey findings as trustworthy.
+Surveys are the primary quantitative research instrument for answering how-many/how-much questions at scale, and work best when testing a specific hypothesis already generated through qualitative research (Lesson 12), rather than for open-ended exploration. Good survey questions avoid leading phrasing, double-barreled framing, and ambiguous terms, and use balanced answer scales. Common scales like Likert and NPS are useful for tracking directional sentiment but have well-documented limitations NPS measures a hypothetical future action (a stated-preference concern directly tied to Lesson 11) and provides no insight into why, while Likert scales carry individual-level noise from inconsistent scale usage. Sampling bias in survey distribution reaching only currently active users, existing customer lists, or engaged community members can silently exclude the exact population segment most relevant to a given question, producing a large but misleading sample, as shown in this lesson's Detailed Case Study. The Survey Validity Chain (distribution, question design, scale choice, sample/response rate, interpretation) can break at any single link regardless of how clean the final numbers appear, making a full-chain check essential before treating survey findings as trustworthy.
 
 ---
 
@@ -291,11 +291,11 @@ Surveys are the primary quantitative research instrument for answering how-many/
 
 - Surveys answer how-many/how-much questions at scale and work best testing a hypothesis already generated qualitatively, not for open-ended exploration.
 - Avoid leading, double-barreled, and ambiguous questions, and use balanced answer scales.
-- Likert scales and NPS are useful for tracking directional sentiment but have known limitations — NPS is a stated-preference measure with no built-in "why," and Likert scales carry individual response-style noise.
+- Likert scales and NPS are useful for tracking directional sentiment but have known limitations NPS is a stated-preference measure with no built-in "why," and Likert scales carry individual response-style noise.
 - Survey distribution method determines who can even respond, and can silently exclude the exact population most relevant to a given question (e.g., churned or disengaging users).
-- A large sample does not correct for a biased distribution method — it produces a false sense of confidence at a larger scale, not a more trustworthy result.
+- A large sample does not correct for a biased distribution method it produces a false sense of confidence at a larger scale, not a more trustworthy result.
 - The Survey Validity Chain (distribution, question design, scale, sample/response rate, interpretation) can break at any single link, invalidating an otherwise clean-looking result.
-- Always pair a quantitative score with a mechanism for understanding the why behind it — an open-ended follow-up question, or planned qualitative research.
+- Always pair a quantitative score with a mechanism for understanding the why behind it an open-ended follow-up question, or planned qualitative research.
 
 ---
 
@@ -306,9 +306,9 @@ Surveys are the primary quantitative research instrument for answering how-many/
 - **Surveys test known hypotheses at scale; interviews generate them.** Don't use a survey for open-ended exploration.
 - **Avoid:** leading questions, double-barreled questions, ambiguous terms, unbalanced scales.
 - **NPS = stated preference, no "why."** Always pair it with an open-ended follow-up.
-- **Likert scales carry individual noise** — don't over-interpret small average differences (e.g., 3.8 vs. 4.1).
-- **Distribution method determines who's excluded** — in-app pop-ups, existing customer lists, and community channels all skew toward the already-engaged.
-- **A large biased sample ≠ trustworthy** — it's just confident-looking noise at scale.
+- **Likert scales carry individual noise** don't over-interpret small average differences (e.g., 3.8 vs. 4.1).
+- **Distribution method determines who's excluded** in-app pop-ups, existing customer lists, and community channels all skew toward the already-engaged.
+- **A large biased sample ≠ trustworthy** it's just confident-looking noise at scale.
 - **Survey Validity Chain:** distribution → question design → scale → sample/response rate → interpretation. Any broken link invalidates the result.
 
 ---
@@ -329,8 +329,8 @@ Surveys are the primary quantitative research instrument for answering how-many/
 ## Further Reading / Resources
 
 - Jared M. Spool and various UX research practitioners' widely cited public writing on survey question design pitfalls (leading, double-barreled, and ambiguous phrasing).
-- Fred Reichheld, *The Ultimate Question 2.0* — the origin of the Net Promoter Score methodology, alongside its intended use and documented limitations.
-- Erika Hall, *Just Enough Research* — extends the qualitative/quantitative complementary-methods framework introduced in Lesson 11 directly into practical survey design guidance.
+- Fred Reichheld, *The Ultimate Question 2.0* the origin of the Net Promoter Score methodology, alongside its intended use and documented limitations.
+- Erika Hall, *Just Enough Research* extends the qualitative/quantitative complementary-methods framework introduced in Lesson 11 directly into practical survey design guidance.
 
 ---
 
@@ -356,7 +356,7 @@ Surveys are the primary quantitative research instrument for answering how-many/
 
 **Card 4**
 - Front: Why can a large survey sample still produce misleading results?
-- Back: If the distribution method excludes a relevant population (e.g., churned users), a large sample simply produces a confident-looking result at scale — it does not correct for the underlying sampling bias.
+- Back: If the distribution method excludes a relevant population (e.g., churned users), a large sample simply produces a confident-looking result at scale it does not correct for the underlying sampling bias.
 - Difficulty: 3
 - Tags: sampling-bias
 
@@ -374,7 +374,7 @@ Surveys are the primary quantitative research instrument for answering how-many/
 
 **Card 7**
 - Front: What should always accompany a quantitative score like NPS or a Likert average, according to this lesson?
-- Back: A mechanism for understanding the why behind the number — an open-ended follow-up question, or planned qualitative research (interviews, per Lesson 12) — since the quantitative score alone doesn't explain the underlying reasoning.
+- Back: A mechanism for understanding the why behind the number an open-ended follow-up question, or planned qualitative research (interviews, per Lesson 12) since the quantitative score alone doesn't explain the underlying reasoning.
 - Difficulty: 2
 - Tags: quantitative-qualitative-pairing
 
@@ -466,7 +466,7 @@ D) The ten-minute session gate excluded the disengaging users
 A) An immediate product change, whatever the score
 B) A requirement that respondents also sit a long in-person interview
 C) A mechanism for understanding the reasoning behind the score
-D) Nothing further — a single tracked score is sufficient on its own
+D) Nothing further a single tracked score is sufficient on its own
 
 *Correct answer: C*
 *Explanation: An open-ended follow-up, or planned qualitative work, is what turns a moving number into something a team can act on. The score says that something changed, not what.*
@@ -516,7 +516,7 @@ D) No research at all; decide from internal opinion about the flow
 
 **10. (Product Thinking) A survey shows a small average difference between two feature versions (3.8 vs. 4.1 on a 5-point Likert scale). According to this lesson, what should a team be cautious about before treating this as a meaningful, decision-worthy difference?**
 A) Individual scale-use variation can produce noise of this size
-B) Nothing — any numeric difference should be treated as decisive
+B) Nothing any numeric difference should be treated as decisive
 C) Likert scales cannot compare two feature versions in any case
 D) The team should discard both versions and start the work again
 
@@ -579,7 +579,7 @@ D) Non-response bias, since respondents may differ systematically
 
 ---
 
-**15. (Highest Difficulty) A survey uses neutral, single-barreled, well-defined questions and a large, representative sample distributed across active users, recent churned users, and prospects who never converted — but reports only a single aggregated NPS-style score with no open-ended follow-up. Applying the full Survey Validity Chain, what specific weakness remains?**
+**15. (Highest Difficulty) A survey uses neutral, single-barreled, well-defined questions and a large, representative sample distributed across active users, recent churned users, and prospects who never converted but reports only a single aggregated NPS-style score with no open-ended follow-up. Applying the full Survey Validity Chain, what specific weakness remains?**
 A) No weakness remains; the survey is fully valid and complete
 B) The interpretation link stays weak, since an aggregated score carries no why
 C) The distribution link is the weakness, despite the broad sampling described
@@ -596,10 +596,10 @@ D) The question design link is weak, despite the neutral wording described
 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
-| **Previous Lesson** | Lesson 12 — Customer Interviews | Provides the qualitative hypothesis-generation step that a well-designed survey is typically built to test at scale |
-| **Current Lesson** | Lesson 13 — Surveys | Question design pitfalls; Likert and NPS limitations; sampling bias in distribution; the Survey Validity Chain |
-| **Next Lesson** | Lesson 14 — Personas | Often synthesizes combined interview and survey data into a structured, evidence-based representation of user segments |
+| **Previous Lesson** | Lesson 12 Customer Interviews | Provides the qualitative hypothesis-generation step that a well-designed survey is typically built to test at scale |
+| **Current Lesson** | Lesson 13 Surveys | Question design pitfalls; Likert and NPS limitations; sampling bias in distribution; the Survey Validity Chain |
+| **Next Lesson** | Lesson 14 Personas | Often synthesizes combined interview and survey data into a structured, evidence-based representation of user segments |
 | **Future Concepts Unlocked** | Lesson 18 (Customer Segmentation) | Uses stratified, bias-aware survey sampling techniques to validate segment definitions at scale |
 | | Lesson 19 (Opportunity Identification) | Uses survey-validated prevalence data to help size and prioritize identified opportunities |
 
-This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to survey data or a quantitative score assumes the Survey Validity Chain has been checked — this will not be re-explained, only re-applied.
+This curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to survey data or a quantitative score assumes the Survey Validity Chain has been checked this will not be re-explained, only re-applied.
