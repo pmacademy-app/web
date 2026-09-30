@@ -205,6 +205,8 @@ export type Database = {
           id: string
           is_public: boolean
           module_slug: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           submitted_at: string
           user_id: string | null
@@ -214,6 +216,8 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           submitted_at?: string
           user_id?: string | null
@@ -223,6 +227,8 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           submitted_at?: string
           user_id?: string | null
@@ -231,6 +237,13 @@ export type Database = {
           {
             foreignKeyName: "capstone_submissions_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capstone_submissions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]

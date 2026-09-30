@@ -10,6 +10,7 @@ import { AdminEmptyState } from './AdminEmptyState'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { useAdminToast } from './admin-toast'
 import { apiPost } from '@/lib/api/client'
+import { computeReviewAge } from '@/lib/admin/capstone-review-aging'
 import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
 
 interface CapstoneReviewDrawerProps {
@@ -99,6 +100,21 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
               <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border">
                 Submitted {new Date(capstone.submittedAt).toLocaleDateString()}
               </span>
+              {(() => {
+                const age = computeReviewAge(capstone.submittedAt, capstone.reviewedAt)
+                return (
+                  <span
+                    className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border"
+                    title={
+                      age.awaitingReview
+                        ? 'Elapsed time since submission (not a review deadline).'
+                        : 'Time from submission to first review.'
+                    }
+                  >
+                    {age.label}
+                  </span>
+                )
+              })()}
             </div>
 
             {/* Learner */}

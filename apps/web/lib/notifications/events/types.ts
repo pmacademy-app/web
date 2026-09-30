@@ -91,6 +91,15 @@ export interface CapstoneSubmittedPayload {
   submittedAt: string
 }
 
+export interface CapstoneReviewedPayload {
+  submissionId: string
+  moduleSlug: string
+  moduleTitle: string
+  /** Whether the review published the capstone to the learner's public portfolio. */
+  isPublished: boolean
+  reviewedAt: string
+}
+
 export interface UserRegisteredPayload {
   userId: string
   email: string

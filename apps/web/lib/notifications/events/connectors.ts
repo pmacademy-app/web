@@ -29,6 +29,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     'lesson.completed',
     'srs.review_due',
     'capstone.submitted',
+    'capstone.reviewed',
     'quiz.completed',
     'streak.updated',
     'review.completed',

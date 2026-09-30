@@ -10,6 +10,7 @@ import {
   Activity,
   Gauge,
   Filter,
+  FlaskConical,
   Settings,
   type LucideIcon,
 } from 'lucide-react'
@@ -67,6 +68,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
       { name: 'Activation Funnel', href: '/admin/analytics/funnel', icon: Filter, built: true },
+      { name: 'Experiment Readout', href: '/admin/analytics/experiments', icon: FlaskConical, built: true },
     ],
   },
   {
