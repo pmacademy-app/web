@@ -137,11 +137,14 @@ async function generateBrandingAssets() {
 </svg>`;
   fs.writeFileSync(path.join(publicBrandDir, 'logo-full.svg'), logoFullSvg);
 
-  // favicon.svg — square browser-tab icon: two-tone mark centered on a canvas.
+  // favicon.svg — square browser-tab icon: two-tone mark centered on solid white canvas.
   const ICON_CANVAS = 512;
-  const ICON_PADDING = 32;
   const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ICON_CANVAS} ${ICON_CANVAS}" width="${ICON_CANVAS}" height="${ICON_CANVAS}">
-  ${markGroupSquare(ICON_CANVAS, ICON_PADDING)}
+  <rect width="${ICON_CANVAS}" height="${ICON_CANVAS}" fill="#FFFFFF"/>
+  <g transform="translate(103.21, 76) scale(0.723342) translate(${-MARK_ORIGIN.x}, ${-MARK_ORIGIN.y})">
+    <path d="${MARK_RING_PATH}" fill="${MARK_COLORS.ring}" fill-rule="evenodd"/>
+    <path d="${MARK_GEM_PATH}" fill="${MARK_COLORS.gem}"/>
+  </g>
 </svg>`;
   fs.writeFileSync(path.join(publicRootDir, 'favicon.svg'), faviconSvg);
 
