@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { AlertTriangle, Award, CheckCircle2, Globe, Lock, X } from 'lucide-react'
-import type { CapstoneValidationResult } from '@/lib/capstones'
+import { AlertTriangle, Award, CheckCircle2, Clock, Globe, Lock, X } from 'lucide-react'
+import { CAPSTONE_REVIEW_EXPECTATION, type CapstoneValidationResult } from '@/lib/capstones'
 
 interface SubmitConfirmationModalProps {
   isOpen: boolean
@@ -139,6 +139,19 @@ export function SubmitConfirmationModal({
               />
               <span>Show this deliverable in my portfolio</span>
             </label>
+          </div>
+        )}
+
+        {/* Honest review expectation (Phase 7, 7.3) — set before the learner commits. */}
+        {validation.isValid && (
+          <div className="rounded-xl border border-border/70 bg-secondary/30 p-3.5 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{CAPSTONE_REVIEW_EXPECTATION.heading}</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              {CAPSTONE_REVIEW_EXPECTATION.outcome} {CAPSTONE_REVIEW_EXPECTATION.reviewNote}
+            </p>
           </div>
         )}
 

@@ -45,6 +45,12 @@ export const GET = withRoute(
       submission: result.submission,
       reflection: result.reflection,
       status: result.status,
+      // Phase 7 (7.1): progress toward eligibility so the workspace can render an honest, locked
+      // *preview* for non-eligible learners instead of a bare wall. These are display values only —
+      // the submit/draft endpoints re-derive and enforce the gate server-side.
+      lessonsCompleted: result.lessonsCompleted,
+      totalLessons: result.totalLessons,
+      requiredLessons: result.requiredLessons,
       userProfile,
     })
   }

@@ -21,10 +21,10 @@
 | **Phase 4** — Re-cut the unit of work | **DONE** | PR #42, PR #43 (`18dd100`) | Core/Deep-dive split, 5-of-15 quiz, honest time estimates, A/B flag |
 | **Phase 5** — Reduce the surface | **DONE** | PR #42, PR #43 (`18dd100`) | 5.1 one-screen onboarding, 5.2 tour deferred, 5.3 shipped with Phase 4 integration |
 | **Phase 6** — Make the path real | **IMPLEMENTED (flag off; not deployed)** | branch `prodily-phase-6-module-entry-unlock` | Code + tests + ADR-008 complete; module-entry unlock behind `MODULE_ENTRY_UNLOCK_ENABLED` (defaults control); cohort experiment not yet run |
-| **Phase 7** — Make the payoff visible | **NOT STARTED** | — | Depends on Phase 6 |
+| **Phase 7** — Make the payoff visible | **IMPLEMENTED (flag off; not deployed)** | branch `prodily-phase-7-payoff` (base `3fa67c4`) | Code + tests + ADR-009 complete; capstone surfaced from lesson 1, honest review expectation, `/progress/{badges,capstones}` consolidated (308), feedback length+churn tags, real reminder due count. Threshold experiment behind `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` (defaults control 8-of-10); enabling needs product sign-off (plan vs blueprint divergence — see ADR-009) |
 | **Phase 8** — Reduce auth friction | **NOT STARTED** | — | Conditional; requires Phase 2 data gate |
 
-**Current position: Phases 0–5 complete. Phase 6 is next.**
+**Current position: Phases 0–5 complete. Phase 6 implemented (flag off). Phase 7 implemented (flag off).**
 
 ---
 
@@ -950,6 +950,24 @@ CI green; flag defaults to control; grandfathering logic tested; no-access-lost 
 ---
 
 ## Phase 7 — Make the payoff visible
+
+> **STATUS: IMPLEMENTED on branch `prodily-phase-7-payoff` (base `3fa67c4`); flag off; NOT deployed.**
+> Code + tests + [ADR-009](decisions/ADR-009-phase-7-make-payoff-visible.md) complete. What shipped:
+> - **7.1 Surface the capstone from lesson 1** — `LessonCapstonePreview` in the lesson experience;
+>   the locked capstone workspace is now an honest *preview* (scenario, requirements, progress), not a
+>   wall; `CapstoneCard` shows progress. Visibility is strictly separate from eligibility.
+> - **7.2 Threshold experiment** *(from blueprint §7.2; the plan's own 7.2 is the review SLA below —
+>   see the divergence note in ADR-009)*. Control **8 of 10** (default), treatment **4 of 10**, behind
+>   `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` (env, defaults control), new-signup cohort via
+>   `users.created_at`, deterministic SHA-256 assignment (`lib/capstone-threshold-experiment.ts`),
+>   server-enforced through one `resolveCapstoneThreshold` gate. Pure measurement aggregator in
+>   `lib/admin/capstone-threshold-experiment.ts`. **Enabling needs product sign-off.**
+> - **7.3 Review expectation** — honest, centralised `CAPSTONE_REVIEW_EXPECTATION` (best-effort, no
+>   invented SLA), shown at submission and after. Submission gating unchanged in the control default.
+> - **7.4 Removals** — `dueCount: 5` fixed in the admin run-now reminder path (real SRS count, suppress
+>   at zero); `/progress/{badges,capstones}` 308-redirect to canonical `/badges` & `/capstones`,
+>   duplicate nav removed; feedback widget gained a `too_long` length tag + a one-question churn survey
+>   (additive tags, no migration). "Explore Prodily" was already resolved in Phase 3/6.
 
 ### Objective
 Make the capstone → portfolio → certificate outcome a visible destination from the first session rather than an unreachable rumour.
