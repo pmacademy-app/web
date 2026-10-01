@@ -24,6 +24,7 @@ interface CapstoneSubmissionRow {
   status: string
   is_public: boolean
   submitted_at: string
+  reviewed_at: string | null
 }
 
 interface DBChain {
@@ -100,6 +101,7 @@ export class ModerationService {
           status: s.status,
           isPublic: s.is_public,
           submittedAt: s.submitted_at,
+          reviewedAt: s.reviewed_at ?? null,
           wordCount: s.content.trim().split(/\s+/).filter(Boolean).length,
         }
       })
@@ -115,12 +117,25 @@ export class ModerationService {
   }
 
   /**
-   * Reviews a capstone submission (spec §5.7, gap G3).
+   * Reviews a capstone submission (spec §5.7, gap G3; review lifecycle closed in Phase 8.2).
    *
    * The schema has no `rejected` status, so approve/reject maps onto the
    * existing columns: approve → `status: 'reviewed'` + `is_public: true`;
    * reject → `status: 'reviewed'` + `is_public: false` (kept private, not
    * surfaced on the public portfolio). Every action is audit-logged.
+   *
+   * Phase 8.2 closes the loop: the first review stamps `reviewed_at`/`reviewed_by` (preserved on
+   * any later approve/reject change so turnaround measures the *first* decision) and dispatches a
+   * `capstone.reviewed` in-app notification to the submitting learner. Both effects are idempotent:
+   *   - `reviewed_at`/`reviewed_by` are only written when currently null, so repeating the action
+   *     never moves the timestamp.
+   *   - the notification is dispatched only on the first transition into reviewed (the row was not
+   *     previously reviewed), and the dispatch itself carries a stable idempotency key, so a
+   *     repeated review never produces a duplicate notification.
+   *
+   * This method performs the server-side authorization boundary's *work*; authorization itself is
+   * enforced upstream (the `/api/admin/capstones/[id]/review` route is admin-gated via `withRoute`),
+   * so a learner can never reach this path for their own submission.
    */
   public static async reviewCapstone(
     adminUserId: string,
@@ -131,11 +146,44 @@ export class ModerationService {
   ): Promise<boolean> {
     const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
     try {
+      // 1. Read the current row so we can (a) detect whether this is the FIRST review — which drives
+      //    both the timestamp write and the single notification — and (b) resolve the recipient.
+      const { data: current, error: readError } = (await (supabase
+        .from('capstone_submissions') as unknown as DBChain)
+        .select('id, user_id, module_slug, status, reviewed_at')
+        .eq('id', submissionId)
+        .maybeSingle()) as unknown as {
+        data:
+          | { id: string; user_id: string | null; module_slug: string; status: string; reviewed_at: string | null }
+          | null
+        error: unknown
+      }
+
+      if (readError) {
+        console.error('[ModerationService] Error reading capstone before review:', readError)
+        return false
+      }
+      if (!current) {
+        console.warn(`[ModerationService] reviewCapstone: no submission matched id "${submissionId}"`)
+        return false
+      }
+
+      const alreadyReviewed = Boolean(current.reviewed_at)
+      const reviewedAtIso = new Date().toISOString()
+
+      // 2. Always set status + visibility. Stamp reviewed_at/reviewed_by only on the first review so
+      //    the turnaround clock is not reset by a later approve↔reject change.
+      const updatePayload: Record<string, unknown> = {
+        status: 'reviewed',
+        is_public: action === 'approve',
+      }
+      if (!alreadyReviewed) {
+        updatePayload.reviewed_at = reviewedAtIso
+        updatePayload.reviewed_by = adminUserId
+      }
+
       const { data, error } = await (supabase.from('capstone_submissions') as unknown as DBChain)
-        .update({
-          status: 'reviewed',
-          is_public: action === 'approve',
-        })
+        .update(updatePayload)
         .eq('id', submissionId)
         .select('id')
 
@@ -155,6 +203,17 @@ export class ModerationService {
         action,
       })
 
+      // 3. Notify the learner — only on the first review, and only when we know who to notify.
+      if (!alreadyReviewed && current.user_id) {
+        await this.dispatchCapstoneReviewedNotification({
+          submissionId,
+          userId: current.user_id,
+          moduleSlug: current.module_slug,
+          isPublished: action === 'approve',
+          reviewedAt: reviewedAtIso,
+        })
+      }
+
       try {
         const { revalidatePath } = await import('next/cache')
         revalidatePath('/admin/moderation')
@@ -168,6 +227,51 @@ export class ModerationService {
     } catch (err) {
       console.error('[ModerationService] reviewCapstone failed:', err)
       return false
+    }
+  }
+
+  /**
+   * Dispatches the `capstone.reviewed` in-app notification to the submitting learner.
+   *
+   * In-app only (Phase 8.2 scope): the notification is added to the in-app connector set, not the
+   * email connectors — the agreed review loop is an in-app close, and email is deliberately out of
+   * scope. The event id is derived from the submission id, so the in-app write path deduplicates a
+   * repeated review by its idempotency key even if the domain-level first-review guard is ever
+   * bypassed. Failures are swallowed: a notification problem must never fail the review itself.
+   */
+  private static async dispatchCapstoneReviewedNotification(input: {
+    submissionId: string
+    userId: string
+    moduleSlug: string
+    isPublished: boolean
+    reviewedAt: string
+  }): Promise<void> {
+    try {
+      const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
+      const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
+      initializeNotificationConnectors()
+
+      const definition = getCapstoneDefinition(input.moduleSlug)
+      await globalNotificationDispatcher.dispatch({
+        id: `capstone-reviewed-${input.submissionId}`,
+        event: 'capstone.reviewed',
+        userId: input.userId,
+        userEmail: '',
+        userName: 'Learner',
+        userTimezone: 'UTC',
+        priority: 'medium',
+        category: 'portfolio',
+        occurredAt: input.reviewedAt,
+        payload: {
+          submissionId: input.submissionId,
+          moduleSlug: input.moduleSlug,
+          moduleTitle: definition?.moduleTitle || input.moduleSlug,
+          isPublished: input.isPublished,
+          reviewedAt: input.reviewedAt,
+        },
+      })
+    } catch (err) {
+      console.error('[ModerationService] capstone.reviewed dispatch failed:', err)
     }
   }
 

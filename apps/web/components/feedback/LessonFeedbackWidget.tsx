@@ -31,8 +31,16 @@ const TAG_OPTIONS: TagOption[] = [
   { id: 'too_technical', label: 'Too Technical', category: 'critical' },
   { id: 'confusing_example', label: 'Confusing Example', category: 'critical' },
   { id: 'pacing_too_fast', label: 'Pacing Too Fast', category: 'critical' },
+  // Phase 7 (7.4) — the length dimension the widget was missing.
+  { id: 'too_long', label: 'Too Long', category: 'critical' },
   { id: 'outdated', label: 'Outdated Info', category: 'critical' },
 ]
+
+// Phase 7 (7.4) — the one-question churn survey. These live in the same tags array but are managed
+// separately in the UI so they read as a distinct yes/no question rather than another chip.
+const CHURN_YES_TAG = 'length_would_churn'
+const CHURN_NO_TAG = 'length_would_not_churn'
+const CHURN_TAGS = [CHURN_YES_TAG, CHURN_NO_TAG]
 
 function LessonFeedbackFormContent({
   lessonId,
@@ -51,10 +59,16 @@ function LessonFeedbackFormContent({
   endpoint: string
   onSaveSuccess: () => void
 }) {
+  const initialTags = Array.isArray(initialFeedback?.tags) ? initialFeedback.tags : []
   const [rating, setRating] = useState<number | null>(initialFeedback?.rating ?? null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
+  // Chip tags exclude the churn-survey answers, which are managed by their own control below.
   const [selectedTags, setSelectedTags] = useState<string[]>(
-    Array.isArray(initialFeedback?.tags) ? initialFeedback.tags : []
+    initialTags.filter((t) => !CHURN_TAGS.includes(t))
+  )
+  // Phase 7 (7.4) — churn answer: 'yes' | 'no' | null, seeded from any saved churn tag.
+  const [churnAnswer, setChurnAnswer] = useState<'yes' | 'no' | null>(
+    initialTags.includes(CHURN_YES_TAG) ? 'yes' : initialTags.includes(CHURN_NO_TAG) ? 'no' : null
   )
   const [comment, setComment] = useState(initialFeedback?.comment ?? '')
   const [showCommentBox, setShowCommentBox] = useState(Boolean(initialFeedback?.comment))
@@ -80,10 +94,14 @@ function LessonFeedbackFormContent({
     setSubmitting(true)
     setErrorMsg(null)
 
+    // Merge the churn-survey answer (if any) into the tags array the API persists.
+    const churnTag = churnAnswer === 'yes' ? CHURN_YES_TAG : churnAnswer === 'no' ? CHURN_NO_TAG : null
+    const tagsToSubmit = churnTag ? [...selectedTags, churnTag] : selectedTags
+
     try {
       const res = await apiPost<{ success: boolean; error?: string }>(endpoint, {
         rating,
-        tags: selectedTags,
+        tags: tagsToSubmit,
         comment: comment.trim() || null,
       })
 
@@ -105,7 +123,7 @@ function LessonFeedbackFormContent({
       trackLessonFeedbackSubmitted(
         lessonId,
         rating,
-        selectedTags.length,
+        tagsToSubmit.length,
         Boolean(comment.trim())
       )
     } catch (err: unknown) {
@@ -114,7 +132,7 @@ function LessonFeedbackFormContent({
     } finally {
       setSubmitting(false)
     }
-  }, [endpoint, lessonId, rating, selectedTags, comment, onSaveSuccess])
+  }, [endpoint, lessonId, rating, selectedTags, churnAnswer, comment, onSaveSuccess])
 
   return (
     <div
@@ -205,6 +223,38 @@ function LessonFeedbackFormContent({
                     }`}
                   >
                     {tag.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* One-question churn survey (Phase 7, 7.4) */}
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Was this lesson long enough to make you want to stop?
+            </span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Would the lesson length make you stop?">
+              {([
+                { value: 'no' as const, label: 'No, felt fine' },
+                { value: 'yes' as const, label: 'Yes, too long' },
+              ]).map((opt) => {
+                const isSelected = churnAnswer === opt.value
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => setChurnAnswer((prev) => (prev === opt.value ? null : opt.value))}
+                    className={`text-xs px-2.5 py-1 rounded-lg font-medium border transition-all ${
+                      isSelected
+                        ? opt.value === 'yes'
+                          ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+                          : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                        : 'bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground'
+                    }`}
+                  >
+                    {opt.label}
                   </button>
                 )
               })}

@@ -174,6 +174,18 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     case 'capstone.submitted': {
       return { title: 'Capstone submitted', body: `Your ${String(payload.moduleTitle || 'module')} capstone has been submitted for review.`, actionUrl: '/capstones' }
     }
+    case 'capstone.reviewed': {
+      const moduleTitle = String(payload.moduleTitle || 'module')
+      const moduleSlug = String(payload.moduleSlug || '')
+      const published = payload.isPublished === true
+      return {
+        title: 'Capstone reviewed',
+        body: published
+          ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
+          : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
+        actionUrl: moduleSlug ? `/capstones/${moduleSlug}` : '/capstones',
+      }
+    }
     case 'user.registered': {
       return { title: 'Welcome to Prodily', body: `Thanks for joining, ${userName || 'learner'}! Start your first lesson now.`, actionUrl: '/academy' }
     }

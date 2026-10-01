@@ -20,7 +20,11 @@ export function CapstoneCard({ item }: CapstoneCardProps) {
     estimatedHours,
     status,
     unlocked,
+    lessonsCompleted,
+    requiredLessons,
   } = item
+
+  const remaining = Math.max(0, requiredLessons - lessonsCompleted)
 
   const getStatusBadge = () => {
     switch (status) {
@@ -123,14 +127,32 @@ export function CapstoneCard({ item }: CapstoneCardProps) {
             <ChevronRight className="w-4 h-4" />
           </Link>
         ) : (
-          <button
-            type="button"
-            disabled
-            className="inline-flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-xs font-medium bg-muted text-muted-foreground cursor-not-allowed border border-border/50"
-          >
-            <span>Complete Module Lessons to Unlock</span>
-            <Lock className="w-3.5 h-3.5" />
-          </button>
+          <div className="space-y-2">
+            <div
+              className="w-full h-1.5 rounded-full bg-secondary overflow-hidden"
+              role="progressbar"
+              aria-valuenow={lessonsCompleted}
+              aria-valuemin={0}
+              aria-valuemax={requiredLessons}
+              aria-label={`${lessonsCompleted} of ${requiredLessons} required lessons completed`}
+            >
+              <div
+                className="h-full bg-primary/60 transition-all"
+                style={{ width: `${Math.min(100, Math.round((lessonsCompleted / Math.max(1, requiredLessons)) * 100))}%` }}
+              />
+            </div>
+            <Link
+              href={`/capstones/${moduleSlug}`}
+              className="inline-flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-xs font-medium bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors border border-border/50"
+            >
+              <span>
+                {remaining > 0
+                  ? `Preview · ${remaining} lesson${remaining === 1 ? '' : 's'} to unlock`
+                  : 'Preview capstone'}
+              </span>
+              <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+            </Link>
+          </div>
         )}
       </div>
     </div>

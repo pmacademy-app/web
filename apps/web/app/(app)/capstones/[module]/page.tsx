@@ -19,7 +19,11 @@ import {
   Eye,
 } from 'lucide-react'
 import { getCapstoneDefinition } from '@/config/capstones'
-import { validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
+import {
+  validateCapstoneSubmission,
+  CAPSTONE_REVIEW_EXPECTATION,
+  type CapstoneStatus,
+} from '@/lib/capstones'
 import { useCapstoneAutosave } from '@/hooks/useCapstoneAutosave'
 import { RichEditor } from '@/components/capstones/RichEditor'
 import { CapstoneReflection } from '@/components/capstones/CapstoneReflection'
@@ -57,6 +61,13 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   // Initial fetched draft content
   const [serverInitialContent, setServerInitialContent] = useState<string>('')
 
+  // Phase 7 (7.1): progress toward eligibility, for the locked-state preview.
+  const [progress, setProgress] = useState<{
+    lessonsCompleted: number
+    totalLessons: number
+    requiredLessons: number
+  }>({ lessonsCompleted: 0, totalLessons: 10, requiredLessons: 8 })
+
   // Fetch initial submission & reflection state on mount
   useEffect(() => {
     async function loadData() {
@@ -79,6 +90,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
           if (data.userProfile) {
             setUserProfile(data.userProfile)
           }
+          setProgress({
+            lessonsCompleted: Number(data.lessonsCompleted ?? 0),
+            totalLessons: Number(data.totalLessons ?? 10),
+            requiredLessons: Number(data.requiredLessons ?? 8),
+          })
         }
       } catch (err) {
         console.error('Error loading capstone data:', err)
@@ -162,23 +178,99 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   }
 
   if (submissionStatus === 'locked') {
+    // Phase 7 (7.1): a locked capstone is a *visible destination*, not a blank wall. Show the real
+    // deliverable, scenario, requirements and progress toward eligibility so the learner knows what
+    // they are working toward — while the editor and submission stay gated (server-enforced).
+    const remaining = Math.max(0, progress.requiredLessons - progress.lessonsCompleted)
+    const pct = Math.min(
+      100,
+      Math.round((progress.lessonsCompleted / Math.max(1, progress.requiredLessons)) * 100)
+    )
     return (
-      <div className="container mx-auto px-4 py-16 max-w-lg text-center space-y-5">
-        <div className="w-14 h-14 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto text-muted-foreground shadow-sm">
-          <Lock className="w-7 h-7" />
+      <div className="container mx-auto px-4 py-8 max-w-3xl space-y-6">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/capstones"
+            className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+            aria-label="Back to capstones"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+              Module {String(capstoneDef.moduleNumber).padStart(2, '0')} Capstone
+            </span>
+            <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+              <Clock className="w-3 h-3" /> {capstoneDef.estimatedHours}
+            </span>
+          </div>
         </div>
-        <div className="space-y-2">
-          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-            Module {String(capstoneDef.moduleNumber).padStart(2, '0')} Capstone
-          </span>
-          <h1 className="text-2xl font-bold font-serif text-foreground">
-            {capstoneDef.title} is Locked
+
+        {/* What you'll build */}
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-3 shadow-xs">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/50 text-[11px] font-medium text-foreground">
+            <Award className="w-3.5 h-3.5 text-primary" />
+            <span>Deliverable: {capstoneDef.deliverableType}</span>
+          </div>
+          <h1 className="text-2xl font-bold font-serif text-foreground leading-snug">
+            {capstoneDef.title}
           </h1>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            To unlock this capstone workspace and submit your deliverable, you must complete at least 8 lessons in {capstoneDef.moduleTitle}.
+          <p className="text-sm text-muted-foreground leading-relaxed">{capstoneDef.tagline}</p>
+          <div className="pt-1 space-y-1.5">
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-primary">Your scenario</h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">{capstoneDef.scenario}</p>
+          </div>
+        </div>
+
+        {/* Progress toward eligibility */}
+        <div
+          className="rounded-2xl border border-border bg-card/70 p-6 space-y-3"
+          aria-label={`Capstone progress: ${progress.lessonsCompleted} of ${progress.requiredLessons} required lessons completed`}
+        >
+          <div className="flex items-center justify-between text-sm font-semibold">
+            <span className="text-foreground flex items-center gap-2">
+              <Lock className="w-4 h-4 text-muted-foreground" aria-hidden="true" /> Unlocks after{' '}
+              {progress.requiredLessons} lessons in {capstoneDef.moduleTitle}
+            </span>
+            <span className="text-muted-foreground font-mono text-xs">
+              {progress.lessonsCompleted}/{progress.requiredLessons}
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {remaining > 0 ? (
+              <>
+                <strong className="text-foreground">{remaining} more lesson{remaining === 1 ? '' : 's'}</strong>{' '}
+                in this module and the workspace opens — then you submit for{' '}
+                <strong className="text-foreground">+150 XP</strong> and a portfolio artifact.
+              </>
+            ) : (
+              <>You&apos;re eligible — reopen this page to start your deliverable.</>
+            )}
           </p>
         </div>
-        <div className="flex items-center justify-center gap-3 pt-2">
+
+        {/* What you'll be assessed on (visible, not gated) */}
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-3 shadow-xs">
+          <h2 className="text-sm font-bold font-serif text-foreground flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-primary" /> What your deliverable will include
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {capstoneDef.requirements.map((req) => (
+              <div key={req.id} className="p-2.5 rounded-lg border border-border/60 bg-background/60 space-y-0.5">
+                <span className="font-bold text-foreground text-xs block">{req.label}</span>
+                <span className="text-muted-foreground/80 text-[11px] leading-tight block">{req.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center gap-3">
           <Link
             href="/capstones"
             className="px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-card text-foreground hover:bg-secondary transition-colors"
@@ -324,6 +416,15 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
                 <ArrowRight className="w-3 h-3 text-muted-foreground" />
               </Link>
             </div>
+          </div>
+
+          {/* Honest review expectation (Phase 7, 7.3) */}
+          <div className="flex items-start gap-2 rounded-xl border border-border/60 bg-background/60 p-3.5">
+            <Clock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              <span className="font-semibold text-foreground">{CAPSTONE_REVIEW_EXPECTATION.heading}:</span>{' '}
+              {CAPSTONE_REVIEW_EXPECTATION.reviewNote}
+            </p>
           </div>
         </div>
       )}

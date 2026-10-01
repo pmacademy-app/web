@@ -6,6 +6,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
+import { getDueCardsCount } from '@/lib/flashcards-service'
 
 export const runtime = 'nodejs'
 
@@ -92,6 +93,19 @@ export const POST = withRoute(
 
         for (const user of users) {
           if (!user.email) continue
+
+          // Phase 7 (7.4) — use the REAL due-card count from the SRS engine, never a hardcoded
+          // placeholder. Mirrors the cron daily-reminder path (Phase 1.6): a learner with zero due
+          // cards has nothing to review, so "you have cards waiting" would be a lie — suppress it.
+          let dueCount = 0
+          try {
+            dueCount = await getDueCardsCount(supabase, user.id)
+          } catch (dueErr) {
+            console.warn('[admin/run-now] due-card count failed; suppressing daily reminder', user.id, dueErr)
+            continue
+          }
+          if (dueCount <= 0) continue
+
           const result = await enqueueNotificationItem({
             userId: user.id,
             toEmail: user.email,
@@ -101,7 +115,7 @@ export const POST = withRoute(
             templateVariables: {
               userName: user.name || user.email.split('@')[0],
               currentStreak: user.current_streak || 1,
-              dueCount: 5,
+              dueCount,
             },
             eventId: `manual-daily-reminder-${user.id}-${todayDate}`,
             eventType: 'learning.daily_reminder',

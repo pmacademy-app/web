@@ -181,9 +181,12 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // write the completion flag with a browser-held Supabase session, which B13-A
   // removed, so the write needed a server route. It uses `withRoute` like the rest.
   // 129 since Phase 1.5 added `cron/lifecycle/route.ts` (also on `withRoute`).
-  it('accounts for all 129 routes', () => {
-    expect(files).toHaveLength(129)
-    expect(migrated).toHaveLength(126)
+  // 130 since Phase 6 added `user/curriculum-access/route.ts`: the public search index is
+  // edge-cached, so per-learner lesson lock state is served by this authenticated route
+  // (also on `withRoute`).
+  it('accounts for all 130 routes', () => {
+    expect(files).toHaveLength(130)
+    expect(migrated).toHaveLength(127)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {

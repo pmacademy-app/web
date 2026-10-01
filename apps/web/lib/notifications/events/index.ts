@@ -10,6 +10,7 @@ import type {
   PortfolioPublishedPayload,
   CertificateGeneratedPayload,
   CapstoneSubmittedPayload,
+  CapstoneReviewedPayload,
   UserRegisteredPayload,
   UserVerifiedPayload,
   PasswordResetRequestedPayload,
@@ -100,6 +101,14 @@ export const EVENT_DEFINITIONS: Record<string, NotificationEventDefinition> = {
     defaultPriority: 'medium',
     description: 'Triggered when a capstone deliverable is submitted',
     validatePayload: (p): p is CapstoneSubmittedPayload =>
+      isObject(p) && typeof p.submissionId === 'string',
+  },
+  'capstone.reviewed': {
+    eventName: 'capstone.reviewed',
+    category: 'portfolio',
+    defaultPriority: 'medium',
+    description: 'Triggered when an admin reviews a submitted capstone deliverable',
+    validatePayload: (p): p is CapstoneReviewedPayload =>
       isObject(p) && typeof p.submissionId === 'string',
   },
   'user.registered': {

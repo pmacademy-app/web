@@ -21,6 +21,47 @@ import { updateUserStreak } from '@/lib/streaks-db'
 
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
+import {
+  CONTROL_REQUIRED_LESSONS,
+  getCapstoneThresholdConfig,
+  getCapstoneThresholdVariant,
+  getRequiredLessonsForVariant,
+  type CapstoneThresholdVariant,
+} from '@/lib/capstone-threshold-experiment'
+
+/**
+ * Resolves the capstone eligibility gate (required completed lessons) for a learner, applying the
+ * Phase 7 threshold experiment server-side.
+ *
+ * When the experiment flag is OFF (the default, and every test/prod baseline) this returns the
+ * unchanged control gate WITHOUT issuing any query — so existing behaviour and existing test
+ * mocks are untouched. Only when the flag is enabled does it read `users.created_at` to place the
+ * learner in a deterministic, stable variant; any read failure falls back to control, so the gate
+ * can never fail *open* to a lower threshold by accident.
+ */
+export async function resolveCapstoneThreshold(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<{ requiredLessons: number; variant: CapstoneThresholdVariant }> {
+  const config = getCapstoneThresholdConfig()
+  if (!config.enabled) {
+    return { requiredLessons: CONTROL_REQUIRED_LESSONS, variant: 'control' }
+  }
+
+  try {
+    const { data } = await supabase
+      .from('users')
+      .select('created_at')
+      .eq('id', userId)
+      .maybeSingle()
+    const createdAt = (data as { created_at?: string | null } | null)?.created_at ?? null
+    const variant = getCapstoneThresholdVariant({ id: userId, createdAt }, config)
+    return { requiredLessons: getRequiredLessonsForVariant(variant, config), variant }
+  } catch (err) {
+    console.warn('[capstones-db] Threshold variant resolution failed; defaulting to control:', err)
+    return { requiredLessons: CONTROL_REQUIRED_LESSONS, variant: 'control' }
+  }
+}
 
 type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
@@ -36,6 +77,8 @@ export interface ModuleCapstoneOverviewItem {
   submission: CapstoneSubmissionRow | null
   lessonsCompleted: number
   totalLessons: number
+  /** Completed lessons required for eligibility (8 control / lower under the Phase 7 treatment). */
+  requiredLessons: number
   unlocked: boolean
 }
 
@@ -48,6 +91,9 @@ export async function getModuleCapstonesOverview(
   userId: string
 ): Promise<ModuleCapstoneOverviewItem[]> {
   const definitions = getAllCapstoneDefinitions()
+
+  // Resolve the Phase 7 eligibility gate once for this learner (control 8-of-10 by default).
+  const { requiredLessons } = await resolveCapstoneThreshold(supabase, userId)
 
   // 1. Fetch user's capstone submissions
   const { data: submissions, error: subError } = await supabase
@@ -96,8 +142,8 @@ export async function getModuleCapstonesOverview(
     
     let status: CapstoneStatus = 'locked'
     if (sub) {
-      status = deriveCapstoneStatus(sub.status, lessonsCompleted)
-    } else if (lessonsCompleted >= 8) {
+      status = deriveCapstoneStatus(sub.status, lessonsCompleted, requiredLessons)
+    } else if (lessonsCompleted >= requiredLessons) {
       status = 'unlocked'
     } else {
       status = 'locked'
@@ -114,6 +160,7 @@ export async function getModuleCapstonesOverview(
       submission: sub,
       lessonsCompleted,
       totalLessons,
+      requiredLessons,
       unlocked: status !== 'locked',
     }
   })
@@ -130,6 +177,9 @@ export async function loadCapstoneSubmission(
   submission: CapstoneSubmissionRow | null
   reflection: ReflectionRow | null
   status: CapstoneStatus
+  lessonsCompleted: number
+  totalLessons: number
+  requiredLessons: number
 }> {
   const { data: submissions, error: subError } = await supabase
     .from('capstone_submissions')
@@ -159,6 +209,7 @@ export async function loadCapstoneSubmission(
 
   // Authoritatively derive capstone status based on module lesson completion
   const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+  const totalLessons = moduleLessonIds.length > 0 ? moduleLessonIds.length : 10
   let lessonsCompleted = 0
   if (moduleLessonIds.length > 0) {
     const { data: progressRows } = await supabase
@@ -170,12 +221,16 @@ export async function loadCapstoneSubmission(
     lessonsCompleted = progressRows?.length ?? 0
   }
 
-  const status = deriveCapstoneStatus(submission?.status ?? null, lessonsCompleted)
+  const { requiredLessons } = await resolveCapstoneThreshold(supabase, userId)
+  const status = deriveCapstoneStatus(submission?.status ?? null, lessonsCompleted, requiredLessons)
 
   return {
     submission,
     reflection,
     status,
+    lessonsCompleted,
+    totalLessons,
+    requiredLessons,
   }
 }
 
@@ -199,7 +254,9 @@ export async function saveDraftAction(
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
 
-  // If creating new draft (no existing row), ensure module is unlocked (>= 8 lessons completed)
+  // If creating new draft (no existing row), ensure the module is unlocked. The gate is the
+  // Phase 7 threshold resolved server-side (control 8-of-10 by default; lower under treatment) —
+  // never a client-supplied value, so visibility can never grant submission access.
   if (!existing) {
     const moduleLessonIds = getLessonIdsForModule(moduleSlug)
     let lessonsCompleted = 0
@@ -212,8 +269,9 @@ export async function saveDraftAction(
         .in('lesson_id', moduleLessonIds)
       lessonsCompleted = progressRows?.length ?? 0
     }
-    if (lessonsCompleted < 8) {
-      throw new PublicError(`Cannot save draft. Capstone is locked until at least 8 lessons in this module are completed (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
+    const { requiredLessons } = await resolveCapstoneThreshold(supabase, userId)
+    if (lessonsCompleted < requiredLessons) {
+      throw new PublicError(`Cannot save draft. Capstone is locked until at least ${requiredLessons} lessons in this module are completed (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
     }
   }
 
@@ -303,7 +361,9 @@ export async function submitCapstoneAction(
     }
   }
 
-  // 3. If creating new submission, ensure module is unlocked (>= 8 lessons completed)
+  // 3. If creating new submission, ensure the module is unlocked. Same server-resolved Phase 7
+  // gate as the draft path — the eligibility threshold is authoritative here and cannot be
+  // bypassed by a direct API request from an ineligible learner.
   if (!existing) {
     const moduleLessonIds = getLessonIdsForModule(moduleSlug)
     let lessonsCompleted = 0
@@ -316,8 +376,9 @@ export async function submitCapstoneAction(
         .in('lesson_id', moduleLessonIds)
       lessonsCompleted = progressRows?.length ?? 0
     }
-    if (lessonsCompleted < 8) {
-      throw new PublicError(`Cannot submit capstone. You must complete at least 8 lessons in this module first (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
+    const { requiredLessons } = await resolveCapstoneThreshold(supabase, userId)
+    if (lessonsCompleted < requiredLessons) {
+      throw new PublicError(`Cannot submit capstone. You must complete at least ${requiredLessons} lessons in this module first (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
     }
   }
 

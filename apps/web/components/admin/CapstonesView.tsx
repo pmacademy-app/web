@@ -7,6 +7,7 @@ import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminEmptyState } from './AdminEmptyState'
 import { CapstoneReviewDrawer } from './CapstoneReviewDrawer'
+import { computeReviewAge, type ReviewAgeTier } from '@/lib/admin/capstone-review-aging'
 import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
 
 interface CapstonesViewProps {
@@ -36,6 +37,26 @@ function capstoneStatusVariant(c: AdminCapstoneRow): string {
   return 'draft'
 }
 
+/** Tailwind classes per aging tier. Descriptive emphasis only — not an SLA/deadline. */
+const AGE_TIER_CLASS: Record<ReviewAgeTier, string> = {
+  fresh: 'text-admin-fg-muted',
+  waiting: 'text-admin-warning',
+  aging: 'text-admin-danger font-bold',
+  reviewed: 'text-admin-success',
+}
+
+/**
+ * Sorts the queue so the longest-WAITING unreviewed submissions come first (aging visibility),
+ * then everything already reviewed, newest-first. Uses only real submitted_at timestamps.
+ */
+function sortForReviewAging(rows: AdminCapstoneRow[]): AdminCapstoneRow[] {
+  const awaiting = rows.filter((c) => c.status === 'submitted' && !c.reviewedAt)
+  const rest = rows.filter((c) => !(c.status === 'submitted' && !c.reviewedAt))
+  awaiting.sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime())
+  rest.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+  return [...awaiting, ...rest]
+}
+
 export function CapstonesView({
   initialCapstones,
   initialStatusFilter,
@@ -56,10 +77,12 @@ export function CapstonesView({
     router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
   }
 
-  const filtered = initialCapstones.filter((c) => {
-    if (statusFilter === 'all') return true
-    return c.status === statusFilter
-  })
+  const filtered = sortForReviewAging(
+    initialCapstones.filter((c) => {
+      if (statusFilter === 'all') return true
+      return c.status === statusFilter
+    })
+  )
 
   const handleSelect = (id: string) => pushParams({ capstone: id })
 
@@ -110,6 +133,21 @@ export function CapstonesView({
           {new Date(c.submittedAt).toLocaleDateString()}
         </span>
       ),
+    },
+    {
+      header: 'Review age',
+      cell: (c) => {
+        const age = computeReviewAge(c.submittedAt, c.reviewedAt)
+        return (
+          <span className={`font-mono text-[11px] ${AGE_TIER_CLASS[age.tier]}`} title={
+            age.awaitingReview
+              ? 'Elapsed time since submission (not a review deadline).'
+              : 'Time from submission to first review.'
+          }>
+            {age.label}
+          </span>
+        )
+      },
     },
   ]
 

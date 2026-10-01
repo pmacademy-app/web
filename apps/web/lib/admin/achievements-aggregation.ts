@@ -44,6 +44,8 @@ export interface AdminCapstoneRow {
   status: string
   isPublic: boolean
   submittedAt: string
+  /** First-review timestamp (Phase 8.2). Null while the submission is still awaiting review. */
+  reviewedAt: string | null
   wordCount: number
 }
 

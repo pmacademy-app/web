@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useReducer, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Search,
@@ -13,10 +13,17 @@ import {
   Trophy,
   Zap,
   BarChart3,
-  Settings,
   Sparkles,
+  Lock,
+  Check,
 } from 'lucide-react'
 import { useSearch } from './SearchOverlayProvider'
+import {
+  buildCurriculumModuleIndex,
+  resolveLessonAccess,
+  type CurriculumModuleIndex,
+  type LessonAccessInfo,
+} from '@/lib/curriculum-access'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -102,6 +109,75 @@ function loadSearchIndex(): Promise<SearchEntry[]> {
         _indexCallbacks = []
       })
   })
+}
+
+// ─── Per-learner access state (Phase 6) ─────────────────────────────────────
+//
+// The search index is public and edge-cached, so it cannot carry per-user lock state. We
+// fetch the learner's private access inputs once per session and compute each result's state
+// client-side with the SAME pure resolver used server-side, so Search and the lesson gate can
+// never disagree.
+
+interface AccessData {
+  completedIds: Set<string>
+  openedIds: Set<string>
+  treatment: boolean
+  override: boolean
+}
+
+let _accessCache: AccessData | null = null
+let _accessLoaded = false
+
+/** Loads the learner's access inputs. Resolves to null when unauthenticated / on error, in
+ * which case Search renders without lock affordances (no worse than the pre-Phase-6 behaviour). */
+async function loadCurriculumAccess(): Promise<AccessData | null> {
+  if (_accessLoaded) return _accessCache
+  try {
+    const res = await fetch('/api/user/curriculum-access')
+    if (!res.ok) {
+      _accessLoaded = true
+      _accessCache = null
+      return null
+    }
+    const data = (await res.json()) as {
+      completedIds: string[]
+      openedIds: string[]
+      treatment: boolean
+      override: boolean
+    }
+    _accessCache = {
+      completedIds: new Set(data.completedIds ?? []),
+      openedIds: new Set(data.openedIds ?? []),
+      treatment: Boolean(data.treatment),
+      override: Boolean(data.override),
+    }
+    _accessLoaded = true
+    return _accessCache
+  } catch (err) {
+    console.error('[SearchOverlay] Failed to load curriculum access:', err)
+    _accessLoaded = true
+    _accessCache = null
+    return null
+  }
+}
+
+/** Derives the canonical curriculum order (id + module + global order) from the search index,
+ * deduping to one entry per lesson, so the pure access resolver can find module boundaries. */
+function buildModuleIndexFromEntries(entries: SearchEntry[]): {
+  index: CurriculumModuleIndex
+  lessonNumberById: Map<string, number>
+} {
+  const seen = new Map<string, { id: string; module: string; order: number }>()
+  const lessonNumberById = new Map<string, number>()
+  for (const e of entries) {
+    if (!e.lessonId) continue
+    if (!seen.has(e.lessonId)) {
+      seen.set(e.lessonId, { id: e.lessonId, module: e.moduleName, order: e.lessonNumber })
+    }
+    if (!lessonNumberById.has(e.lessonId)) lessonNumberById.set(e.lessonId, e.lessonNumber)
+  }
+  const curriculum = [...seen.values()].sort((a, b) => a.order - b.order)
+  return { index: buildCurriculumModuleIndex(curriculum), lessonNumberById }
 }
 
 // ─── Simple client-side search ───────────────────────────────────────────────
@@ -196,7 +272,27 @@ export function SearchOverlay() {
   const inputRef = useRef<HTMLInputElement>(null)
   const prevOpenRef = useRef(false)
 
+  // Phase 6: the learner's private access inputs (null until loaded / when unauthenticated).
+  const [access, setAccess] = useState<AccessData | null>(null)
+
   const isLoading = isOpen && index === null
+
+  // Precompute module boundaries + lesson-number lookup from the loaded index.
+  const derived = useMemo(() => (index ? buildModuleIndexFromEntries(index) : null), [index])
+
+  const accessInfoFor = useCallback(
+    (entry: SearchEntry): LessonAccessInfo | null => {
+      if (!entry.lessonId || !derived || !access) return null
+      return resolveLessonAccess(entry.lessonId, {
+        index: derived.index,
+        completedIds: access.completedIds,
+        openedIds: access.openedIds,
+        treatment: access.treatment,
+        override: access.override,
+      })
+    },
+    [derived, access]
+  )
 
   // Lazy-load search index on open
   useEffect(() => {
@@ -209,6 +305,18 @@ export function SearchOverlay() {
       cancelled = true
     }
   }, [isOpen, index])
+
+  // Phase 6: lazy-load the learner's access inputs on open (once per session).
+  useEffect(() => {
+    if (!isOpen || access !== null) return
+    let cancelled = false
+    loadCurriculumAccess().then((data) => {
+      if (!cancelled && data) setAccess(data)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen, access])
 
   // Focus and reset when opening
   useEffect(() => {
@@ -419,12 +527,34 @@ export function SearchOverlay() {
             <ul role="listbox" aria-label="Search results" className="py-1 divide-y divide-border/40">
               {results.map((entry, idx) => {
                 const isSelected = idx === selectedIdx
+                // Phase 6: per-result access state (null until access loads / when unauthenticated).
+                const info = accessInfoFor(entry)
+                const isLocked = info?.state === 'locked'
+                const isCompleted = info?.state === 'completed'
+                const isInProgress = info?.state === 'in_progress'
+                const prereqNumber =
+                  isLocked && info?.prerequisiteLessonId && derived
+                    ? derived.lessonNumberById.get(info.prerequisiteLessonId) ?? null
+                    : null
+
+                // A11y: describe the state in the accessible name so it is never colour-only.
+                const stateText = isCompleted
+                  ? 'Completed'
+                  : isLocked
+                    ? prereqNumber
+                      ? `Locked. Complete Lesson ${prereqNumber} first`
+                      : 'Locked'
+                    : isInProgress
+                      ? 'In progress'
+                      : 'Available'
+
                 return (
                   <li key={entry.id} role="option" aria-selected={isSelected}>
                     <button
                       type="button"
                       onClick={() => navigateTo(entry)}
                       onMouseEnter={() => dispatch({ type: 'SELECT_IDX', idx })}
+                      aria-label={`${entry.title}. Lesson ${entry.lessonNumber}, ${MODULE_NAMES[entry.moduleName] ?? entry.moduleName}. ${stateText}.`}
                       className={`w-full flex items-start gap-3.5 px-4 sm:px-5 py-3 text-left transition-colors cursor-pointer border-l-2 ${
                         isSelected
                           ? 'bg-primary/10 border-primary'
@@ -432,7 +562,11 @@ export function SearchOverlay() {
                       }`}
                     >
                       <div className="mt-0.5 w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0">
-                        {entry.type === 'lesson' ? (
+                        {isLocked ? (
+                          <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                        ) : isCompleted ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        ) : entry.type === 'lesson' ? (
                           <BookOpen className="w-3.5 h-3.5 text-primary" />
                         ) : entry.type === 'glossary' ? (
                           <FileText className="w-3.5 h-3.5 text-blue-500" />
@@ -443,12 +577,28 @@ export function SearchOverlay() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs sm:text-sm font-semibold text-foreground truncate">
+                          <span className={`text-xs sm:text-sm font-semibold truncate ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>
                             {entry.title}
                           </span>
                           <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-muted/80 text-muted-foreground">
                             Lesson {entry.lessonNumber} · {MODULE_NAMES[entry.moduleName] ?? entry.moduleName}
                           </span>
+                          {isCompleted && (
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              Completed
+                            </span>
+                          )}
+                          {isInProgress && (
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                              In progress
+                            </span>
+                          )}
+                          {isLocked && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              <Lock className="w-2.5 h-2.5" />
+                              {prereqNumber ? `Locked · complete Lesson ${prereqNumber}` : 'Locked'}
+                            </span>
+                          )}
                         </div>
                         {entry.snippet && (
                           <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
@@ -457,7 +607,9 @@ export function SearchOverlay() {
                         )}
                       </div>
 
-                      {isSelected ? (
+                      {isLocked ? (
+                        <Lock className="w-3.5 h-3.5 text-muted-foreground/50 mt-1 shrink-0" />
+                      ) : isSelected ? (
                         <kbd className="hidden sm:inline-flex items-center text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/20 text-primary shrink-0 mt-0.5">
                           ↵ Open
                         </kbd>

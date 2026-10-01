@@ -17,9 +17,9 @@ import {
   getLessonMeta,
 } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
-import { isLessonUnlocked } from '@/lib/lessons-completion-service'
-import { getCanonicalPrerequisiteRange } from '@/lib/curriculum-access'
+import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { resolveLessonAccessForUser } from '@/lib/lessons-completion-service'
+import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { getRecutVariant } from '@/lib/academy/experiment'
 import { withSampledQuiz } from '@/lib/academy/lesson-structure'
 import { BRAND } from '@/lib/brand'
@@ -142,10 +142,9 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   let isLocked = false
 
-  // Prerequisite range for the locked-screen message — computed from actual
-  // completed lesson IDs so Lesson 1 is never incorrectly omitted.
-  let firstIncompletePrereqIndex: number | null = null
-  let lastPrereqIndex: number = globalIndex - 1 // = targetIndex - 1
+  // Prerequisite for the locked-screen message — a concrete lesson id from the access
+  // resolver (module-scoped under treatment, first incomplete global lesson under control).
+  const lastPrereqIndex: number = globalIndex - 1 // = targetIndex - 1
   let firstIncompletePrereqMeta: typeof prevMeta | null = null
   let firstIncompletePrereqGlobalOrder: number | null = null
   let firstIncompletePrereqUrl: string | null = null
@@ -161,48 +160,45 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   if (user) {
     const serviceSupabase = createServiceRoleClient()
-    const [unlocked, progressResult, allProgressResult] = await Promise.all([
-      prevId ? isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId) : true,
+
+    // Phase 6: resolve the experiment variant (control unless the flag is enabled for this
+    // learner's new-signup cohort) and the access decision under the module-entry unlock model.
+    // Control reproduces the pre-Phase-6 global-sequential gate exactly; opened lessons stay
+    // accessible under both arms (grandfathering).
+    const profile = await getCurrentUserProfile()
+    const treatment = isModuleEntryUnlockTreatment({ id: user.id, createdAt: profile?.created_at })
+
+    const [access, progressResult] = await Promise.all([
+      resolveLessonAccessForUser(serviceSupabase, user.id, lessonId, {
+        curriculum: lessons,
+        treatment,
+      }),
       serviceSupabase
         .from('user_lesson_progress')
         .select('status, theory_read_at, quiz_score, quiz_attempts, xp_earned, completed_at')
         .eq('user_id', user.id)
         .eq('lesson_id', lessonId)
         .maybeSingle(),
-      // Fetch all completed lesson IDs once to power the canonical prerequisite check
-      serviceSupabase
-        .from('user_lesson_progress')
-        .select('lesson_id')
-        .eq('user_id', user.id)
-        .eq('status', 'completed'),
     ])
 
-    if (!unlocked) {
+    if (!access.isAccessible) {
       isLocked = true
 
-      // Build the completed set from ACTUAL lesson IDs — never use a count alone
-      const completedRows = (allProgressResult?.data ?? []) as { lesson_id: string }[]
-      const completedIds = new Set(completedRows.map((r) => r.lesson_id))
-      const curriculumIds = lessons.map((l) => l.id)
-
-      // Canonical prerequisite range: scans from index 0 so Lesson 1 is always
-      // included when incomplete (fixes the "Complete Lesson 2–10" bug).
-      const prereqRange = getCanonicalPrerequisiteRange(completedIds, curriculumIds, globalIndex)
-      firstIncompletePrereqIndex = prereqRange.firstIncompleteIndex
-      lastPrereqIndex = prereqRange.lastPrerequisiteIndex
-
-      // Resolve metadata for the first incomplete prerequisite lesson
-      if (firstIncompletePrereqIndex !== null) {
-        const firstIncompleteLesson = lessons[firstIncompletePrereqIndex]
-        if (firstIncompleteLesson) {
-          firstIncompletePrereqMeta = await getLessonMeta(firstIncompleteLesson.id)
-          firstIncompletePrereqGlobalOrder = firstIncompletePrereqIndex + 1
-          firstIncompletePrereqUrl = firstIncompletePrereqMeta
-            ? `/academy/${firstIncompletePrereqMeta.module}/${firstIncompletePrereqMeta.id}`
-            : null
-        }
+      // The prerequisite lesson to complete: the module-scoped previous lesson under treatment,
+      // or the first incomplete lesson in the global sequence under control. Either way it is a
+      // concrete, existing lesson. `lastPrereqIndex` stays the immediately-previous global lesson
+      // so the control arm still renders the familiar "Lessons X–Y" range, while treatment (where
+      // the prerequisite IS the previous lesson) collapses to a single-lesson message.
+      const prereqId = access.prerequisiteLessonId
+      if (prereqId) {
+        const prereqGlobalIdx = lessons.findIndex((l) => l.id === prereqId)
+        firstIncompletePrereqMeta = await getLessonMeta(prereqId)
+        firstIncompletePrereqGlobalOrder = prereqGlobalIdx >= 0 ? prereqGlobalIdx + 1 : null
+        firstIncompletePrereqUrl = firstIncompletePrereqMeta
+          ? `/academy/${firstIncompletePrereqMeta.module}/${firstIncompletePrereqMeta.id}`
+          : null
       } else {
-        // All prerequisites are complete but isLocked is true — fall back to prevMeta
+        // No specific prerequisite id (defensive) — fall back to the previous global lesson.
         firstIncompletePrereqMeta = prevMeta
         firstIncompletePrereqGlobalOrder = prevGlobalOrder
         firstIncompletePrereqUrl = prevLessonUrl

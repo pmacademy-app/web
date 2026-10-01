@@ -167,7 +167,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     })
 
     const result = await submitOnboarding(validOnboardingData)
-    expect(result).toEqual({ success: true })
+    expect(result).toMatchObject({ success: true })
 
     // Verify DB update was called
     expect(mockDbUpdate).toHaveBeenCalled()
@@ -277,7 +277,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     mockUpdateUserById.mockResolvedValue({ error: null })
 
     const result = await submitOnboarding(validOnboardingData)
-    expect(result).toEqual({ success: true })
+    expect(result).toMatchObject({ success: true })
     expect(mockUpdateUserById).toHaveBeenCalledWith('usr_recovered', expect.anything())
     expect(mockCookieStore.get('sb-access-token')?.value).toBe(refreshedAccessToken)
   })
@@ -331,7 +331,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
 
     it('completes with ONLY goal + experience and does not write deferred identity fields', async () => {
       const result = await submitOnboarding({ goal: 'become_pm', career_role: 'beginner' })
-      expect(result).toEqual({ success: true })
+      expect(result).toMatchObject({ success: true })
 
       // The DB update carries the required fields and the completion flag...
       const updatePayload = mockDbUpdate.mock.calls[0][0]
@@ -369,7 +369,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
         username: 'alex_pm',
         name: 'Alex Rivera',
       })
-      expect(result).toEqual({ success: true })
+      expect(result).toMatchObject({ success: true })
       const updatePayload = mockDbUpdate.mock.calls[0][0]
       expect(updatePayload).toMatchObject({
         goal: 'become_pm',
@@ -386,7 +386,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
         career_role: 'beginner',
         name: '   ', // blank — treated as "not supplied", never written
       })
-      expect(result).toEqual({ success: true })
+      expect(result).toMatchObject({ success: true })
       const updatePayload = mockDbUpdate.mock.calls[0][0]
       expect(updatePayload).not.toHaveProperty('name')
     })

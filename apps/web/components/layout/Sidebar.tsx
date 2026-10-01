@@ -30,11 +30,13 @@ interface SidebarProps {
   onToggleCollapse?: () => void
 }
 
+// Phase 7 (7.4) — Badges and Capstones are canonically the top-level `/badges` and `/capstones`
+// destinations (their own primary-nav entries below). The duplicate `/progress/badges` and
+// `/progress/capstones` routes now 308-redirect there, so they are removed from this submenu to
+// leave a single canonical home per concept. Radar/Metrics/Certificates remain progress-only.
 const PROGRESS_SUBSECTIONS = [
   { label: 'Skill Radar', href: '/progress/radar' },
   { label: 'Core Metrics', href: '/progress/metrics' },
-  { label: 'Badge Showcase', href: '/progress/badges' },
-  { label: 'Capstones', href: '/progress/capstones' },
   { label: 'Certificates', href: '/progress/certificates' },
 ]
 

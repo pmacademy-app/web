@@ -8,6 +8,16 @@ export const ALLOWED_FEEDBACK_TAGS = [
   'confusing_example',
   'outdated',
   'pacing_too_fast',
+  // Phase 7 (7.4) — length dimension. The widget measured clarity but had no way to report that a
+  // lesson was *too long*, the exact churn signal this whole plan is trying to detect after the
+  // Phase 4 recut. `too_long` is an issue tag (it flags the lesson for review like other issues).
+  'too_long',
+  // Phase 7 (7.4) — one-question churn survey. Mutually-exclusive answers to "would the length make
+  // you stop?". Deliberately NOT issue tags: they measure churn intent, not lesson quality, so they
+  // never pollute the clarity/needs-review metric. Stored in the same `tags` array — additive, no
+  // schema migration, existing rows stay valid.
+  'length_would_churn',
+  'length_would_not_churn',
 ] as const
 
 export type FeedbackTag = (typeof ALLOWED_FEEDBACK_TAGS)[number]
@@ -17,7 +27,11 @@ export const ISSUE_TAGS = new Set<FeedbackTag>([
   'confusing_example',
   'outdated',
   'pacing_too_fast',
+  'too_long',
 ])
+
+/** Phase 7 (7.4) — the churn-survey answers, kept out of the clarity/issue metric. */
+export const CHURN_TAGS = new Set<FeedbackTag>(['length_would_churn', 'length_would_not_churn'])
 
 export interface LessonFeedbackInput {
   rating: number // 1 to 5

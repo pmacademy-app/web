@@ -51,6 +51,7 @@ import {
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
+import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
 import {
   getCoreBlocks,
@@ -1010,6 +1011,10 @@ export default function LessonPageContent({
           </div>
         )}
       </div>
+
+      {/* Capstone destination surface (Phase 7, 7.1) — the module's real PM artifact, visible from
+          lesson 1. Visibility only; submission stays server-gated by eligibility. */}
+      {lesson.module && <LessonCapstonePreview moduleSlug={lesson.module} className="mt-6" />}
 
       {/* Lesson Clarity Feedback Loop (Phase 6) */}
       <LessonFeedbackWidget lessonId={lesson.id} className="mt-6" />

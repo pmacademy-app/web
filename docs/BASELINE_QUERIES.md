@@ -1,6 +1,6 @@
 # Phase 0.B — Baseline Queries
 
-**Purpose:** the SQL behind the Phase 0.B baseline defined in [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md).
+**Purpose:** the SQL behind the Phase 0.B baseline (see [`PHASE_HISTORY.md`](PHASE_HISTORY.md); the original `IMPLEMENTATION_PLAN.md` was retired 2026-10-01).
 **Status:** read-only. Nothing here inserts, updates or deletes.
 **Implementation:** `apps/web/lib/admin/baseline-aggregation.ts` (pure functions, unit-tested) + `apps/web/scripts/baseline-report.ts` (runner).
 
@@ -245,7 +245,7 @@ Recorded as absences rather than filled with proxies. None of these is instrumen
 | **Cookie-consent acceptance rate** (how unrepresentative is GA4?) | `lib/legal/cookie-consent.ts` stores the decision only in the client-readable `prodily_cookie_consent` cookie. No server-side row records it. | A counter where the proxy already reads the cookie, or a cookieless aggregate from Vercel Analytics. **Phase 2 decision.** |
 | **Signup → first lesson *open*** | `user_lesson_progress` has no creation timestamp — only `theory_read_at` and `completed_at`. | A `started_at` column written by `markInProgress()`. Additive and cheap, but it belongs with the Phase 2 funnel so the funnel is instrumented once. |
 | **Email verification rate** | `email_confirmed_at` lives in the Supabase `auth.users` schema, not `public.users`, so it is not reachable from a PostgREST table read. | Nothing — it *is* measurable. `baseline-report.ts` reads it via the auth admin API and reports it separately. |
-| **Per-onboarding-step drop-off** | The wizard is a client component that writes only the final `onboarding_completed` flag. | The step marker in `IMPLEMENTATION_PLAN.md` §Phase 2 item 3. Phase 5 depends on it; Phase 0.B does not. |
+| **Per-onboarding-step drop-off** | The wizard is a client component that writes only the final `onboarding_completed` flag. | The `onboarding_step_reached` marker added in Phase 2 (see [`PHASE_HISTORY.md`](PHASE_HISTORY.md)). Phase 5 depends on it; Phase 0.B does not. |
 | **Sessions / page views / time-on-page for learners** | No session table. XP events are the only durable activity record. | Out of scope. Return metrics here are a floor and are labelled as such. |
 
 ---
