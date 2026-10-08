@@ -11,6 +11,8 @@ import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
 import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
 import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
+import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
+import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 
@@ -42,6 +44,7 @@ export default async function DashboardPage() {
     reviewQueue,
     { data: capstoneRows },
     { data: recentXpEvents },
+    certificateResult,
   ] = await Promise.all([
     getCurrentUserProfile(),
     (supabase
@@ -67,6 +70,16 @@ export default async function DashboardPage() {
       .limit(5) as unknown as Promise<{
       data: Array<{ id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }> | null
     }>,
+    // Read-only existence check for the full-curriculum certificate (never issues one).
+    (supabase
+      .from('certificates') as unknown as DBChain)
+      .select('id')
+      .eq('user_id', authUser.id)
+      .eq('type', 'full_curriculum')
+      .limit(1) as unknown as Promise<{
+      data: Array<{ id: string }> | null
+      error: unknown
+    }>,
   ])
 
   let profile = dbProfile
@@ -85,6 +98,9 @@ export default async function DashboardPage() {
       .map((p) => p.lesson_id) ?? []
   )
   const completedLessonsCount = completedLessonIds.size
+
+  // A failed or empty certificate lookup reads as "not earned yet".
+  const hasCertificate = hasFullCurriculumCertificate(certificateResult)
 
   // 3. Determine Next Lesson CTA
   let nextLesson: NextLessonData | null = null
@@ -208,7 +224,15 @@ export default async function DashboardPage() {
         <StreakCard streakStatus={streakStatus} />
       </div>
 
-      {/* 3. Small Recent-XP Activity Ticker */}
+      {/* 3. Portfolio & Proof: primitives only, never the profile row */}
+      <PortfolioProofCard
+        username={profile.username ?? null}
+        isPortfolioPublic={profile.is_portfolio_public === true}
+        completedLessons={completedLessonsCount}
+        hasCertificate={hasCertificate}
+      />
+
+      {/* 4. Small Recent-XP Activity Ticker */}
       <RecentActivityCard activities={recentActivities} />
     </div>
   )
