@@ -59,7 +59,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
     <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Left: Avatar + Details */}
-        <div className="flex items-start gap-4 md:gap-5">
+        <div className="flex items-start gap-4 md:gap-5 min-w-0 md:flex-1">
           {/* Avatar Image or Initials Circle */}
           <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/20 bg-primary/10 flex items-center justify-center shrink-0 shadow-sm">
             {avatarUrl ? (
@@ -119,7 +119,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
 
         {/* Right: Share Button */}
         <div className="self-start md:self-auto shrink-0">
-          <ShareButton username={username} />
+          <ShareButton username={username} name={name} />
         </div>
       </div>
 
