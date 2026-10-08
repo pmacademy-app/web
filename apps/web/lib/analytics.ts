@@ -21,6 +21,8 @@ type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'fin
 
 type QuickStartMode = 'auto' | 'manual'
 
+export type PortfolioSharePlatform = 'linkedin' | 'x' | 'native' | 'copy'
+
 type EventMap = {
   waitlist_signup:          Record<string, never>
   hero_cta_click:           { location: HeroCTALocation }
@@ -77,6 +79,7 @@ type EventMap = {
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
   referral_signup_completed:       Record<string, never>
+  portfolio_share_clicked:         { platform: PortfolioSharePlatform }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -296,6 +299,11 @@ export function trackReferralShared(platform: 'linkedin' | 'twitter' | 'whatsapp
 /** Fired when a learner successfully completes registration via a referral link. */
 export function trackReferralSignupCompleted() {
   trackEvent('referral_signup_completed')
+}
+
+/** Fired when anyone (owner or visitor) uses a share control on a public portfolio page. */
+export function trackPortfolioShareClicked(platform: PortfolioSharePlatform) {
+  trackEvent('portfolio_share_clicked', { platform })
 }
 
 

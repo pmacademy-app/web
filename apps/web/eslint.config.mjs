@@ -147,7 +147,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "notifications/NotificationToast.tsx",
   "portfolio/FeaturedCapstoneCard.tsx",
   "portfolio/PortfolioCapstones.tsx",
-  "portfolio/ShareButton.tsx",
   "progress/ProgressSectionDropdown.tsx",
   "quick-start/QuickStartModal.tsx",
   "quiz/QuizOption.tsx",
