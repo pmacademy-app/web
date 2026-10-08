@@ -140,6 +140,54 @@ export function formatPortfolioShareUrl(siteOrigin: string, username: string): s
   return `${origin}/p/${encodeURIComponent(username)}`
 }
 
+/** Where a learner turns their portfolio public (Settings → Portfolio tab). */
+export const PORTFOLIO_SETTINGS_HREF = '/settings?tab=portfolio'
+
+export type PortfolioNavState = 'public' | 'private'
+
+export interface PortfolioNavItem {
+  label: string
+  /** Relative path: `/p/<encoded username>` when public, the settings tab when private. */
+  href: string
+  /** True when the item should open in a new tab (the public page sits outside the app shell). */
+  external: boolean
+  state: PortfolioNavState
+}
+
+/**
+ * Derives the app-nav "My Portfolio" entry from the learner's profile.
+ *
+ * - No usable username (null, empty, whitespace) → `null`: there is nothing to link to yet.
+ * - Public portfolio → links to the public page, opened in a new tab.
+ * - Private portfolio → points at the settings tab where it can be published.
+ */
+export function getPortfolioNavItem({
+  username,
+  isPortfolioPublic,
+}: {
+  username?: string | null
+  isPortfolioPublic?: boolean | null
+}): PortfolioNavItem | null {
+  const trimmed = typeof username === 'string' ? username.trim() : ''
+  if (!trimmed) return null
+
+  if (isPortfolioPublic === true) {
+    return {
+      label: 'My Portfolio',
+      href: `/p/${encodeURIComponent(trimmed)}`,
+      external: true,
+      state: 'public',
+    }
+  }
+
+  return {
+    label: 'Publish portfolio',
+    href: PORTFOLIO_SETTINGS_HREF,
+    external: false,
+    state: 'private',
+  }
+}
+
 /**
  * Generates schema.org ProfilePage + Person JSON-LD for public portfolio SEO.
  * Conforms to Schema.org ProfilePage standard with nested mainEntity Person.

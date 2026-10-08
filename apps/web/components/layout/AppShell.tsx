@@ -18,6 +18,8 @@ interface AppShellProps {
     level: number
     cohort_id?: string | null
     avatar_url?: string | null
+    username?: string | null
+    is_portfolio_public?: boolean
   }
 }
 
@@ -74,6 +76,8 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
           onClose={() => setIsSidebarOpen(false)}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={handleToggleCollapse}
+          username={userProfile.username}
+          isPortfolioPublic={userProfile.is_portfolio_public}
         />
 
         {/* Main Content Pane */}

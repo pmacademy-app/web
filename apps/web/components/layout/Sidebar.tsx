@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
@@ -17,17 +17,35 @@ import {
   ChevronRight,
   LogOut,
   Search,
+  Briefcase,
+  ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily, BrandIcon } from '@/components/brand/BrandLogo'
 import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
+import { getPortfolioNavItem, type PortfolioNavItem } from '@/lib/portfolio'
+import { trackNavPortfolioClicked, type NavPortfolioClickedParams } from '@/lib/analytics'
 
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  /** Learner's portfolio username; the portfolio nav item is hidden when absent. */
+  username?: string | null
+  /** Whether the learner's portfolio is public ("My Portfolio") or private ("Publish portfolio"). */
+  isPortfolioPublic?: boolean
+}
+
+/** Which rendering of the sidebar content a click came from (analytics `surface`). */
+type SidebarVariant = 'desktop' | 'drawer'
+
+type PortfolioNavSurface = NavPortfolioClickedParams['surface']
+
+function getPortfolioNavSurface(variant: SidebarVariant, collapsed: boolean): PortfolioNavSurface {
+  if (variant === 'drawer') return 'mobile_drawer'
+  return collapsed ? 'sidebar_collapsed' : 'sidebar'
 }
 
 // Phase 7 (7.4) — Badges and Capstones are canonically the top-level `/badges` and `/capstones`
@@ -51,10 +69,37 @@ const SIDEBAR_LINKS = [
   { label: 'Settings', href: '/settings', icon: Settings, quickStartTarget: 'settings' },
 ]
 
-export default function Sidebar({ isOpen, onClose, isCollapsed = false, onToggleCollapse }: SidebarProps) {
+type SidebarLink = (typeof SIDEBAR_LINKS)[number]
+
+/**
+ * The portfolio entry's href depends on the learner, so it cannot live in the static
+ * SIDEBAR_LINKS array; it is spliced in after Capstones at render time instead. It
+ * deliberately has no quick-start target (the tour's step/target count is fixed).
+ */
+type SidebarEntry = { kind: 'link'; link: SidebarLink } | { kind: 'portfolio'; item: PortfolioNavItem }
+
+const PORTFOLIO_INSERT_AFTER_HREF = '/capstones'
+
+export default function Sidebar({
+  isOpen,
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse,
+  username,
+  isPortfolioPublic,
+}: SidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { openSearch } = useSearch()
+
+  const navEntries = useMemo<SidebarEntry[]>(() => {
+    const portfolioItem = getPortfolioNavItem({ username, isPortfolioPublic })
+    return SIDEBAR_LINKS.flatMap<SidebarEntry>((link) =>
+      link.href === PORTFOLIO_INSERT_AFTER_HREF && portfolioItem
+        ? [{ kind: 'link', link }, { kind: 'portfolio', item: portfolioItem }]
+        : [{ kind: 'link', link }]
+    )
+  }, [username, isPortfolioPublic])
   const isProgressRoute = pathname === '/progress' || pathname.startsWith('/progress')
   const [progressExpanded, setProgressExpanded] = useState(isProgressRoute)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -76,7 +121,66 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false, onToggle
     }
   }
 
-  const renderSidebarContent = (collapsed: boolean) => (
+  const renderPortfolioItem = (item: PortfolioNavItem, collapsed: boolean, variant: SidebarVariant) => {
+    const surface = getPortfolioNavSurface(variant, collapsed)
+    const handleClick = () => {
+      trackNavPortfolioClicked(item.state, surface)
+      onClose()
+    }
+    // The public page lives outside the app shell, so the item is never shown as active;
+    // the private state defers active styling to the Settings item it points into.
+    const newTabProps = item.external
+      ? { target: '_blank', rel: 'noopener noreferrer', prefetch: false as const }
+      : {}
+    const accessibleName = item.external ? `${item.label} (opens in a new tab)` : item.label
+
+    if (collapsed) {
+      return (
+        <div key="portfolio-nav" className="w-full flex justify-center group relative">
+          <Link
+            href={item.href}
+            onClick={handleClick}
+            {...newTabProps}
+            data-portfolio-nav={item.state}
+            className="w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+            aria-label={accessibleName}
+          >
+            <Briefcase className="w-5 h-5 shrink-0" aria-hidden="true" />
+          </Link>
+          <div
+            role="tooltip"
+            className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-md bg-foreground text-background text-xs font-medium shadow-md whitespace-nowrap z-50 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150"
+          >
+            {item.label}
+            {item.external && <ExternalLink className="inline w-3 h-3 ml-1" aria-hidden="true" />}
+            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-foreground" />
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <Link
+        key="portfolio-nav"
+        href={item.href}
+        onClick={handleClick}
+        {...newTabProps}
+        data-portfolio-nav={item.state}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+      >
+        <Briefcase className="w-5 h-5 shrink-0" aria-hidden="true" />
+        <span className="truncate">{item.label}</span>
+        {item.external && (
+          <>
+            <span className="sr-only"> (opens in a new tab)</span>
+            <ExternalLink className="ml-auto w-3.5 h-3.5 shrink-0 opacity-70" aria-hidden="true" />
+          </>
+        )}
+      </Link>
+    )
+  }
+
+  const renderSidebarContent = (collapsed: boolean, variant: SidebarVariant) => (
     <div
       className={cn(
         'flex flex-col h-full max-h-screen bg-card border-r border-border py-4 transition-[width,padding] duration-200 ease-out-quint overflow-hidden select-none',
@@ -195,7 +299,12 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false, onToggle
         className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden space-y-1.5 py-1 pr-1 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent]"
         aria-label="Main Navigation"
       >
-        {SIDEBAR_LINKS.map((link) => {
+        {navEntries.map((entry) => {
+          if (entry.kind === 'portfolio') {
+            return renderPortfolioItem(entry.item, collapsed, variant)
+          }
+
+          const { link } = entry
           const Icon = link.icon
           const isActive =
             pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href))
@@ -377,7 +486,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false, onToggle
           isCollapsed ? 'w-[72px]' : 'w-64'
         )}
       >
-        {renderSidebarContent(isCollapsed)}
+        {renderSidebarContent(isCollapsed, 'desktop')}
       </aside>
 
       {/* Mobile Drawer Sidebar Overlay */}
@@ -391,7 +500,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false, onToggle
           />
           {/* Drawer container with rounded edge and shadow */}
           <div className="relative flex flex-col w-72 max-w-[85vw] h-full bg-card border-r border-border shadow-2xl animate-in slide-in-from-left duration-200 z-10 overflow-hidden">
-            {renderSidebarContent(false)}
+            {renderSidebarContent(false, 'drawer')}
           </div>
         </div>
       )}
