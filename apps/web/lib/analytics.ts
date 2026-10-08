@@ -52,6 +52,10 @@ type EventMap = {
 
   // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
   goal_context_viewed:      { goal_id?: string; recommended_module?: string }
+  dashboard_proof_card_clicked: {
+    action: 'view_portfolio' | 'share_portfolio' | 'publish_portfolio' | 'setup_portfolio' | 'view_certificates'
+    portfolio_state: 'public' | 'private' | 'none'
+  }
 
   // ─── Capstone & Proof-of-Work Events (Phase 4) ───────────────────────────
   portfolio_artifact_created:     { module_slug: string; is_public: boolean }
@@ -214,6 +218,14 @@ export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) 
 /** Fired when personalized goal context is displayed on the learner dashboard. */
 export function trackGoalContextViewed(goalId?: string, recommendedModule?: string) {
   trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
+}
+
+/** Fired when a learner clicks an action on the dashboard Portfolio & Proof card (no PII). */
+export function trackDashboardProofCardClicked(
+  action: EventMap['dashboard_proof_card_clicked']['action'],
+  portfolioState: EventMap['dashboard_proof_card_clicked']['portfolio_state'],
+) {
+  trackEvent('dashboard_proof_card_clicked', { action, portfolio_state: portfolioState })
 }
 
 // ─── Capstone & Proof-of-Work Trackers (Phase 4) ───────────────────────────
