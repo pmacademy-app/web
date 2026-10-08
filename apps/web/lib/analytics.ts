@@ -7,6 +7,8 @@
  * - All wrappers are null-safe: no-ops if GA is not loaded.
  */
 
+import type { PortfolioNavState } from '@/lib/portfolio'
+
 // Extend Window type so TypeScript knows about gtag
 declare global {
   interface Window {
@@ -77,7 +79,11 @@ type EventMap = {
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
   referral_signup_completed:       Record<string, never>
+  nav_portfolio_clicked:           { state: PortfolioNavState; surface: 'sidebar' | 'sidebar_collapsed' | 'mobile_drawer' }
 }
+
+/** Payload of `nav_portfolio_clicked`; the single source for its `state`/`surface` unions. */
+export type NavPortfolioClickedParams = EventMap['nav_portfolio_clicked']
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
 
@@ -296,6 +302,14 @@ export function trackReferralShared(platform: 'linkedin' | 'twitter' | 'whatsapp
 /** Fired when a learner successfully completes registration via a referral link. */
 export function trackReferralSignupCompleted() {
   trackEvent('referral_signup_completed')
+}
+
+/** Fired when a learner clicks the app-nav portfolio item ("My Portfolio" when public, "Publish portfolio" when private). No username is sent. */
+export function trackNavPortfolioClicked(
+  state: NavPortfolioClickedParams['state'],
+  surface: NavPortfolioClickedParams['surface'],
+) {
+  trackEvent('nav_portfolio_clicked', { state, surface })
 }
 
 

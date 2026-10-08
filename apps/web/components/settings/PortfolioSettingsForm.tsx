@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type {
   PortfolioSettingsData,
   PortfolioSectionId,
@@ -627,6 +628,7 @@ function PortfolioSettingsFormContent({
 }
 
 export function PortfolioSettingsForm() {
+  const router = useRouter()
   const { data, isLoading, mutate } = useApiQuery<{
     settings: PortfolioSettingsData
     submittedCapstones: LearnerSubmittedCapstoneSummary[]
@@ -646,7 +648,13 @@ export function PortfolioSettingsForm() {
       key={data?.settings?.username ?? 'loaded'}
       initialSettings={data?.settings}
       initialSubmittedCapstones={data?.submittedCapstones}
-      onSaveSuccess={() => void mutate()}
+      onSaveSuccess={() => {
+        void mutate()
+        // The (app) layout persists across client navigation, so the sidebar's portfolio
+        // item (label/href derived from username + visibility) would otherwise stay stale
+        // until a hard reload. Re-render the server layout with the saved profile.
+        router.refresh()
+      }}
     />
   )
 }
