@@ -50,6 +50,7 @@ import {
   trackDeepDiveOpened,
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
+import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
@@ -568,6 +569,9 @@ export default function LessonPageContent({
   }, [])
 
   const { setBreadcrumbs } = useBreadcrumbs()
+  // Growth R1 / Task 5: closing the first-lesson celebration queues the Quick Start tour for
+  // the next non-lesson page.
+  const quickStart = useQuickStartOptional()
 
   // Sync breadcrumbs with topbar — use globalOrder for correct display
   useEffect(() => {
@@ -1055,7 +1059,10 @@ export default function LessonPageContent({
 
       <FirstSessionCelebrationModal
         isOpen={showFirstSessionCelebration}
-        onClose={() => setShowFirstSessionCelebration(false)}
+        onClose={() => {
+          setShowFirstSessionCelebration(false)
+          quickStart?.requestDeferredLaunch()
+        }}
         lessonId={lesson.id}
         xpEarned={celebrationXp}
         nextLessonUrl={nextLessonUrl}

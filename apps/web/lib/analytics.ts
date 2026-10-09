@@ -21,7 +21,11 @@ declare global {
 
 type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'final_cta'
 
-type QuickStartMode = 'auto' | 'manual'
+/**
+ * `auto` = entrance auto-launch (gated off), `manual` = reopened by the learner,
+ * `post_first_lesson` = deferred open after the first completed lesson (Growth R1).
+ */
+export type QuickStartMode = 'auto' | 'manual' | 'post_first_lesson'
 
 export type PortfolioSharePlatform = 'linkedin' | 'x' | 'native' | 'copy'
 
