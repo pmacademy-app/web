@@ -64,10 +64,10 @@ function getCopy(celebration: AchievementCelebration): CelebrationCopy {
       }
       return {
         Icon: Award,
-        title: 'Certificate earned',
+        title: 'You finished the curriculum',
         subject: careerTitle,
         description:
-          'Your certificate is issued and anyone with the link can verify it. Add it to your LinkedIn profile next.',
+          'You completed every lesson. Your certificate is issued and anyone with the link can verify it. Add it to your LinkedIn profile, then share your portfolio.',
       }
     }
     case 'capstone':
@@ -177,10 +177,13 @@ function PortfolioCta({
   portfolio,
   onShare,
   onPublish,
+  secondary = false,
 }: {
   portfolio: CelebrationPortfolio
   onShare: () => void
   onPublish: () => void
+  /** Rendered below another primary CTA: the publish link is an outline button. */
+  secondary?: boolean
 }) {
   if (portfolio.isPublic && portfolio.username) {
     // ShareButton owns its controls and its own `portfolio_share_clicked` event. A click that
@@ -196,7 +199,11 @@ function PortfolioCta({
   }
 
   return (
-    <Link href={PORTFOLIO_SETTINGS_HREF} onClick={onPublish} className={buttonVariants({ size: 'lg' })}>
+    <Link
+      href={PORTFOLIO_SETTINGS_HREF}
+      onClick={onPublish}
+      className={secondary ? buttonVariants({ variant: 'outline' }) : buttonVariants({ size: 'lg' })}
+    >
       Publish portfolio
     </Link>
   )
@@ -239,11 +246,25 @@ function CelebrationContent({
 
       <div className="flex flex-col gap-2.5 pt-2">
         {celebration.kind === 'certificate' ? (
-          <CertificateCtas
-            certificate={celebration.certificate}
-            onAddToLinkedIn={() => trackCta('add_to_linkedin')}
-            onClose={onClose}
-          />
+          <>
+            <CertificateCtas
+              certificate={celebration.certificate}
+              onAddToLinkedIn={() => trackCta('add_to_linkedin')}
+              onClose={onClose}
+            />
+            {/* Graduation is the moment to show the portfolio, not only the certificate. */}
+            {celebration.certificate.type === 'full_curriculum' && (
+              <PortfolioCta
+                portfolio={celebration.portfolio}
+                secondary
+                onShare={() => trackCta('share_portfolio')}
+                onPublish={() => {
+                  trackCta('publish_portfolio')
+                  onClose()
+                }}
+              />
+            )}
+          </>
         ) : celebration.kind === 'module' ? (
           <ModuleCta
             capstone={celebration.capstone}

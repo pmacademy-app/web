@@ -156,7 +156,7 @@ describe('AchievementCelebrationModal — certificate', () => {
     const el = dialog()!
     const title = document.getElementById(el.getAttribute('aria-labelledby') ?? '')
     const description = document.getElementById(el.getAttribute('aria-describedby') ?? '')
-    expect(title?.textContent).toBe('Certificate earned')
+    expect(title?.textContent).toBe('You finished the curriculum')
     expect(description?.textContent?.length).toBeGreaterThan(0)
     expect(dialogText()).toContain('Associate Product Manager')
   })
@@ -178,7 +178,7 @@ describe('AchievementCelebrationModal — certificate', () => {
       'Module credential earned',
     )
     expect(dialogText()).toContain('Product Discovery')
-    expect(dialogText()).not.toContain('Certificate earned')
+    expect(dialogText()).not.toContain('You finished the curriculum')
     // Still a LinkedIn-eligible credential.
     expect(linkByText('Add to LinkedIn Profile')?.getAttribute('href')).toContain('linkedin.com/profile/add')
   })
@@ -187,7 +187,39 @@ describe('AchievementCelebrationModal — certificate', () => {
     await render(certificate({ type: 'module', moduleSlug: null, moduleTitle: null }))
 
     expect(dialogText()).toContain('Module credential earned')
-    expect(dialogText()).not.toContain('Certificate earned')
+    expect(dialogText()).not.toContain('You finished the curriculum')
+  })
+})
+
+// Growth R4 / A3: graduation also points at the portfolio.
+describe('AchievementCelebrationModal — graduation portfolio CTA', () => {
+  it('shows the share controls for a full-curriculum certificate with a public portfolio', async () => {
+    await render(certificate())
+    expect(shareGroup()).not.toBeNull()
+    expect(linkByText('Add to LinkedIn Profile')).not.toBeNull()
+  })
+
+  it('asks a private portfolio to publish, as a secondary action that closes the modal', async () => {
+    await render({ ...certificate(), portfolio: privatePortfolio })
+    const publish = linkByText('Publish portfolio')
+    expect(publish?.getAttribute('href')).toBe(PORTFOLIO_SETTINGS_HREF)
+    expect(shareGroup()).toBeNull()
+
+    await click(publish)
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('certificate', 'publish_portfolio')
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('tracks share_portfolio with kind certificate', async () => {
+    await render(certificate())
+    await click(shareGroup()!.querySelector('button'))
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('certificate', 'share_portfolio')
+  })
+
+  it('leaves a module certificate without a portfolio CTA', async () => {
+    await render(certificate({ type: 'module', moduleSlug: 'discovery', moduleTitle: 'Product Discovery' }))
+    expect(shareGroup()).toBeNull()
+    expect(linkByText('Publish portfolio')).toBeNull()
   })
 })
 
