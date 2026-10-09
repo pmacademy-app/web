@@ -30,7 +30,6 @@ export type QuickStartMode = 'auto' | 'manual' | 'post_first_lesson'
 
 export type PortfolioSharePlatform = 'linkedin' | 'x' | 'native' | 'copy'
 
-/** `invite_peers` is reserved for the peer-invite CTA; nothing fires it yet. */
 export type AchievementCelebrationCtaAction =
   | 'add_to_linkedin'
   | 'share_portfolio'
@@ -94,6 +93,7 @@ type EventMap = {
   deep_dive_opened:          { lesson_id: string }
 
   // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
+  referral_modal_opened:           { source: string }
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
   referral_signup_completed:       Record<string, never>
@@ -319,6 +319,11 @@ export function trackDeepDiveOpened(lessonId: string) {
 }
 
 // ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────
+
+/** Fired each time the referral share modal opens, with the surface that opened it. */
+export function trackReferralModalOpened(source: string) {
+  trackEvent('referral_modal_opened', { source })
+}
 
 /** Fired when a learner copies their personal referral invitation link. */
 export function trackReferralLinkCopied(channel = 'direct') {

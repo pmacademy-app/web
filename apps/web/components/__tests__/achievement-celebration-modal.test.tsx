@@ -248,23 +248,66 @@ describe('AchievementCelebrationModal — fellow', () => {
   })
 })
 
+// Growth R1 / Task 11: only the Fellow celebration invites peers. The host swaps the dialogs,
+// so the modal reports the click and leaves closing to the host.
+describe('AchievementCelebrationModal — invite peers', () => {
+  const inviteControl = () =>
+    Array.from(dialog()?.querySelectorAll('button') ?? []).find((b) => b.textContent?.trim() === 'Invite peers') ??
+    null
+
+  async function renderWithInvite(celebration: AchievementCelebration, onInvitePeers: () => void) {
+    await act(async () => {
+      root.render(
+        <AchievementCelebrationModal celebration={celebration} onClose={onClose} onInvitePeers={onInvitePeers} />,
+      )
+    })
+  }
+
+  it.each([
+    ['public', publicPortfolio],
+    ['private', privatePortfolio],
+  ])('shows "Invite peers" on the Fellow celebration (%s portfolio)', async (_label, portfolio) => {
+    await renderWithInvite(fellow(portfolio), vi.fn())
+    expect(inviteControl()).not.toBeNull()
+  })
+
+  it.each([
+    ['certificate', certificate()],
+    ['capstone', capstone()],
+  ])('shows no invite control on a %s celebration', async (_label, celebration) => {
+    await renderWithInvite(celebration, vi.fn())
+    expect(dialog()).not.toBeNull()
+    expect(dialogText()).not.toMatch(/invite/i)
+  })
+
+  it('shows no invite control when onInvitePeers is not passed', async () => {
+    await render(fellow())
+    expect(inviteControl()).toBeNull()
+  })
+
+  it('tracks invite_peers and calls onInvitePeers, without closing itself', async () => {
+    const onInvitePeers = vi.fn()
+    await renderWithInvite(fellow(), onInvitePeers)
+
+    await click(inviteControl())
+
+    expect(onInvitePeers).toHaveBeenCalledTimes(1)
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('fellow', 'invite_peers')
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('keeps the Fellow rule with the invite control present', async () => {
+    await renderWithInvite(fellow(), vi.fn())
+    expect(dialog()!.outerHTML).not.toMatch(/certif|credential|profile\/add/i)
+  })
+})
+
 describe('AchievementCelebrationModal — open state', () => {
   it('renders nothing for a null celebration', async () => {
     await render(null)
 
     expect(dialog()).toBeNull()
     expect(analytics.trackAchievementCelebrationViewed).not.toHaveBeenCalled()
-  })
-
-  it('renders no "Invite peers" control yet, even when onInvitePeers is passed', async () => {
-    await act(async () => {
-      root.render(
-        <AchievementCelebrationModal celebration={capstone()} onClose={onClose} onInvitePeers={() => {}} />,
-      )
-    })
-
-    expect(dialog()).not.toBeNull()
-    expect(dialogText()).not.toMatch(/invite/i)
   })
 
   it('the close control calls onClose', async () => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import Link from 'next/link'
-import { Award, ExternalLink, Sparkles, Trophy, type LucideIcon } from 'lucide-react'
+import { Award, ExternalLink, Sparkles, Trophy, UserPlus, type LucideIcon } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { ShareButton } from '@/components/portfolio/ShareButton'
 import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
@@ -29,7 +29,7 @@ interface AchievementCelebrationModalProps {
   /** Open while non-null. */
   celebration: AchievementCelebration | null
   onClose: () => void
-  /** Reserved for the peer-invite CTA. Nothing renders for it yet. */
+  /** Shows "Invite peers" on the Fellow variant. The modal does not close itself for it. */
   onInvitePeers?: () => void
 }
 
@@ -163,9 +163,11 @@ function PortfolioCta({
 function CelebrationContent({
   celebration,
   onClose,
+  onInvitePeers,
 }: {
   celebration: AchievementCelebration
   onClose: () => void
+  onInvitePeers?: () => void
 }) {
   const { Icon, title, subject, description } = getCopy(celebration)
   const trackCta = (action: AchievementCelebrationCtaAction) =>
@@ -210,12 +212,25 @@ function CelebrationContent({
             }}
           />
         )}
+        {celebration.kind === 'fellow' && onInvitePeers && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              trackCta('invite_peers')
+              onInvitePeers()
+            }}
+          >
+            <UserPlus aria-hidden="true" />
+            Invite peers
+          </Button>
+        )}
       </div>
     </DialogContent>
   )
 }
 
-export function AchievementCelebrationModal({ celebration, onClose }: AchievementCelebrationModalProps) {
+export function AchievementCelebrationModal({ celebration, onClose, onInvitePeers }: AchievementCelebrationModalProps) {
   // The last celebration stays rendered while the dialog animates out.
   const [shown, setShown] = useState(celebration)
   if (celebration && celebration !== shown) setShown(celebration)
@@ -233,7 +248,7 @@ export function AchievementCelebrationModal({ celebration, onClose }: Achievemen
 
   return (
     <Dialog open={celebration !== null} onOpenChange={(open) => !open && onClose()}>
-      {shown && <CelebrationContent celebration={shown} onClose={onClose} />}
+      {shown && <CelebrationContent celebration={shown} onClose={onClose} onInvitePeers={onInvitePeers} />}
     </Dialog>
   )
 }
