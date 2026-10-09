@@ -69,7 +69,17 @@ type EventMap = {
   // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
   goal_context_viewed:      { goal_id?: string; recommended_module?: string }
   dashboard_proof_card_clicked: {
-    action: 'view_portfolio' | 'share_portfolio' | 'publish_portfolio' | 'setup_portfolio' | 'view_certificates'
+    action:
+      | 'view_portfolio'
+      | 'share_portfolio'
+      | 'publish_portfolio'
+      | 'setup_portfolio'
+      | 'view_certificates'
+      | 'view_fellow_readiness'
+      | 'request_fellow'
+      | 'view_badges'
+      | 'invite_peers'
+      | 'view_progress'
     portfolio_state: 'public' | 'private' | 'none'
   }
 

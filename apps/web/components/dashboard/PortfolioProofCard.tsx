@@ -13,6 +13,7 @@ import {
   type CertificateState,
   type PortfolioState,
 } from '@/lib/dashboard/proof-card'
+import { ProofExtrasRow, type ProofExtras } from './ProofExtrasRow'
 
 /**
  * ShareButton picks its icon from `navigator` during render, so server and client
@@ -39,6 +40,8 @@ interface PortfolioProofCardProps {
   isPortfolioPublic: boolean
   completedLessons: number
   hasCertificate: boolean
+  /** Fellow, badges and level (Growth R4). Omitted: the lower row is not rendered. */
+  extras?: ProofExtras
 }
 
 const PILL_BASE = 'text-[9px] font-bold uppercase px-2 py-0.5 rounded border shrink-0'
@@ -65,6 +68,7 @@ export function PortfolioProofCard({
   isPortfolioPublic,
   completedLessons,
   hasCertificate,
+  extras,
 }: PortfolioProofCardProps) {
   const headingId = useId()
   const portfolioState = derivePortfolioState(username, isPortfolioPublic)
@@ -90,6 +94,8 @@ export function PortfolioProofCard({
           hasCertificate={hasCertificate}
         />
       </div>
+
+      {extras && <ProofExtrasRow extras={extras} portfolioState={portfolioState} />}
     </section>
   )
 }

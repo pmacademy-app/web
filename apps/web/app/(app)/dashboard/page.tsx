@@ -15,6 +15,8 @@ import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardRevie
 import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
 import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
 import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
+import { summarizeLevel } from '@/lib/dashboard/proof-extras'
+import { loadBadgeSummary, loadFellowSummary } from '@/lib/dashboard/proof-extras-db'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
@@ -58,6 +60,8 @@ export default async function DashboardPage() {
     { data: capstoneRows },
     { data: recentXpEvents },
     certificateResult,
+    fellowSummary,
+    badgeSummary,
   ] = await Promise.all([
     getCurrentUserProfile(),
     (supabase
@@ -95,6 +99,9 @@ export default async function DashboardPage() {
       data: Array<{ id: string }> | null
       error: unknown
     }>,
+    // Proof card lower row (Growth R4). Both resolve to null on failure; the card hides the cell.
+    loadFellowSummary(supabase, authUser.id),
+    loadBadgeSummary(supabase, authUser.id),
   ])
 
   let profile = dbProfile
@@ -245,6 +252,7 @@ export default async function DashboardPage() {
         isPortfolioPublic={profile.is_portfolio_public === true}
         completedLessons={completedLessonsCount}
         hasCertificate={hasCertificate}
+        extras={{ fellow: fellowSummary, badges: badgeSummary, level: summarizeLevel(profile.total_xp) }}
       />
 
       {/* 4. Recent-XP Activity Ticker + weekly leaderboard summary */}
