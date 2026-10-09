@@ -98,6 +98,9 @@ export interface CapstoneReviewedPayload {
   /** Whether the review published the capstone to the learner's public portfolio. */
   isPublished: boolean
   reviewedAt: string
+  /** Learner's portfolio handle, when known — lets a published review deep-link to `/p/<username>`. */
+  username?: string | null
+  isPortfolioPublic?: boolean
 }
 
 export interface FellowGrantedPayload {

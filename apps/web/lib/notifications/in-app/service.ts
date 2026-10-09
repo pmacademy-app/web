@@ -186,12 +186,16 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       const moduleTitle = String(payload.moduleTitle || 'module')
       const moduleSlug = String(payload.moduleSlug || '')
       const published = payload.isPublished === true
+      const capstoneUrl = moduleSlug ? `/capstones/${moduleSlug}` : '/capstones'
+      // A published review is now visible on the public portfolio, so send the learner there
+      // when we know it is public; otherwise (or when not published) keep the capstone page.
+      const portfolioPath = published ? publicPortfolioPath(payload) : null
       return {
         title: 'Capstone reviewed',
         body: published
           ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
           : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
-        actionUrl: moduleSlug ? `/capstones/${moduleSlug}` : '/capstones',
+        actionUrl: portfolioPath ?? capstoneUrl,
       }
     }
     case 'fellow.granted': {

@@ -194,7 +194,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
             <div className="space-y-3 text-xs">
               <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-admin-fg">In-App Only (`lesson.completed`, `streak.updated`, `quiz.completed`, `review.completed`, `srs.review_due`, `capstone.submitted`)</p>
+                  <p className="font-bold text-admin-fg">In-App Only (`lesson.completed`, `streak.updated`, `quiz.completed`, `review.completed`, `srs.review_due`, `capstone.submitted`, `capstone.reviewed`)</p>
                   <p className="text-admin-fg-muted">Routed exclusively to the In-App Notification Center.</p>
                 </div>
                 <AdminStatusBadge status="published" label="In-App Only" />
