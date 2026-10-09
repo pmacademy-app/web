@@ -10,6 +10,7 @@ import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
+import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
 import { PublicError } from '@/lib/errors/public-error'
 
 /**
@@ -399,7 +400,10 @@ export async function recordQuizAttemptAction(
       .select('lesson_id, status')
       .eq('user_id', userId)
 
-    totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
+    const completedLessonIds = new Set(
+      (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
+    )
+    totalCompletedLessons = completedLessonIds.size
 
     // Phase 7: Check and activate referral reward if this is the learner's first completed lesson
     if (totalCompletedLessons === 1) {
@@ -411,11 +415,13 @@ export async function recordQuizAttemptAction(
       }
     }
 
-    if (totalCompletedLessons > 0 && totalCompletedLessons % 10 === 0) {
-      const moduleIndex = Math.floor(totalCompletedLessons / 10)
-
+    // Growth R4: a module is complete when its last open lesson is completed, in any order.
+    // Only a first attempt can newly complete a lesson, so later attempts skip the check. The
+    // stable id makes a replay (or a race between two tabs) a no-op in the dispatcher.
+    const completedModule = isFirstAttempt ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
+    if (completedModule) {
       await globalNotificationDispatcher.dispatch({
-        id: `module-complete-${userId}-${moduleIndex}`,
+        id: moduleCompletedEventId(userId, completedModule.slug),
         event: 'module.completed',
         userId,
         userEmail: userRec?.email || '',
@@ -426,9 +432,10 @@ export async function recordQuizAttemptAction(
         occurredAt: new Date().toISOString(),
         payload: {
           userId,
-          moduleName: `Module ${moduleIndex}`,
-          moduleSlug: `module-${moduleIndex}`,
-          xpBonusEarned: 200,
+          moduleName: completedModule.name,
+          moduleSlug: completedModule.slug,
+          totalLessonsCompleted: totalCompletedLessons,
+          completedAt: new Date().toISOString(),
         },
       })
     }

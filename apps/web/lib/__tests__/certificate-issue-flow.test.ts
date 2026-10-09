@@ -185,6 +185,12 @@ function completedLessons(n: number, userId = 'user-1'): Row[] {
   return Array.from({ length: n }, (_, i) => ({ user_id: userId, lesson_id: `les_mock_${i}`, status: 'completed' }))
 }
 
+/** All 90 real lesson ids, so module completion can be detected (fake ids belong to no module). */
+function realCurriculumLessons(userId = 'user-1'): Row[] {
+  const canonical = ['foundations', 'discovery', 'design', 'execution', 'growth', 'leadership', 'technical', 'strategy', 'capstone']
+  return canonical.flatMap((slug) => getLessonIdsForModule(slug)).map((id) => ({ user_id: userId, lesson_id: id, status: 'completed' }))
+}
+
 function certRow(overrides: Row): Row {
   return {
     id: 'cert-existing',
@@ -720,8 +726,9 @@ describe('recordQuizAttemptAction full-curriculum hook', () => {
   })
 
   it('a failing issuance never breaks quiz submission or the module notification', async () => {
+    // Real curriculum ids, so the 90th lesson also closes its module.
     const fake = createFakeSupabase({
-      progress: completedLessons(90),
+      progress: realCurriculumLessons(),
       onCertificateInsert: () => ({ code: '42501', message: 'permission denied' }),
     })
 
@@ -742,5 +749,48 @@ describe('recordQuizAttemptAction full-curriculum hook', () => {
 
     expect(certificateDispatches(dispatchSpy)).toHaveLength(1)
     expect(fake.tables.certificates).toHaveLength(1)
+  })
+})
+
+// ─── Growth R4 / A1: real module completion ──────────────────────────────────
+
+describe('recordQuizAttemptAction module.completed hook', () => {
+  const foundations = getLessonIdsForModule('foundations')
+  const discovery = getLessonIdsForModule('discovery')
+  const lastLesson = foundations[9]
+  const attempts = [{ question_id: `q-${lastLesson}-1`, selected_option: 0 }]
+  const moduleDispatches = () =>
+    dispatchSpy.mock.calls
+      .map((c: unknown[]) => c[0] as { id: string; event: string; payload: Record<string, unknown> })
+      .filter((e: { event: string }) => e.event === 'module.completed')
+  const rows = (ids: string[]) => ids.map((id) => ({ user_id: 'user-1', lesson_id: id, status: 'completed' }))
+
+  it('fires once, with the real module name and a stable id, when the last lesson closes the module', async () => {
+    const fake = createFakeSupabase({ progress: rows(foundations) })
+
+    await recordQuizAttemptAction(fake.client, 'user-1', lastLesson, attempts)
+
+    const events = moduleDispatches()
+    expect(events).toHaveLength(1)
+    expect(events[0].id).toBe('module-completed-user-1-foundations')
+    expect(events[0].payload).toMatchObject({ moduleSlug: 'foundations', moduleName: 'Product Thinking Foundations' })
+    expect(events[0].payload).not.toHaveProperty('xpBonusEarned')
+  })
+
+  it('does not fire on a 10th completed lesson that leaves every module open', async () => {
+    const fake = createFakeSupabase({ progress: rows([...foundations.slice(0, 5), ...discovery.slice(0, 4), lastLesson]) })
+
+    const result = await recordQuizAttemptAction(fake.client, 'user-1', lastLesson, attempts)
+
+    expect(result.totalCompletedLessons).toBe(10)
+    expect(moduleDispatches()).toHaveLength(0)
+  })
+
+  it('does not fire on a resubmission of an already completed lesson', async () => {
+    const fake = createFakeSupabase({ progress: rows(foundations), rpcIsFirstAttempt: false })
+
+    await recordQuizAttemptAction(fake.client, 'user-1', lastLesson, attempts)
+
+    expect(moduleDispatches()).toHaveLength(0)
   })
 })

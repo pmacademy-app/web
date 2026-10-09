@@ -148,7 +148,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     }
     case 'module.completed': {
       const name = String(payload.moduleName || 'Module')
-      return { title: `Module complete: ${name}`, body: `You completed the ${name} module. ${payload.xpBonusEarned || 0} bonus XP earned.`, actionUrl: '/academy' }
+      return { title: `Module complete: ${name}`, body: `You completed every lesson in ${name}.`, actionUrl: '/academy' }
     }
     case 'quiz.completed': {
       const rawTitle = String(payload.lessonTitle || '')

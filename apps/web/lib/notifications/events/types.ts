@@ -17,9 +17,7 @@ export interface LessonCompletedPayload {
 export interface ModuleCompletedPayload {
   moduleSlug: string
   moduleName: string
-  moduleOrder: number
   totalLessonsCompleted: number
-  xpBonusEarned: number
   completedAt: string
 }
 

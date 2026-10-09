@@ -114,7 +114,6 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         userName: event.userName || 'Learner',
         moduleName: event.payload.moduleName || 'Module',
         moduleSlug: event.payload.moduleSlug || 'foundations',
-        xpBonus: event.payload.xpBonusEarned || 200,
       },
       eventId: event.id,
       eventType: event.event,
