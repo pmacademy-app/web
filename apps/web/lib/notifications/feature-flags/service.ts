@@ -22,6 +22,10 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
   // published capstone). Off = nothing is claimed; the notifications stay in the bell.
   ACHIEVEMENT_CELEBRATIONS_ENABLED: true,
 
+  // Growth R4: also celebrate each completed curriculum module. Off until measured; the
+  // module notification and email are unaffected. Needs ACHIEVEMENT_CELEBRATIONS_ENABLED.
+  MODULE_CELEBRATIONS_ENABLED: false,
+
   // Email scope: Only major achievement milestones (module completed, certificate, portfolio)
   // Per-lesson/badge/XP events are In-App only
   ACHIEVEMENT_EMAIL_ENABLED: true,

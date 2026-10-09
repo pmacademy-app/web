@@ -17,6 +17,7 @@ import type { Database } from '@/lib/supabase'
 import * as authLib from '../auth'
 import * as supabaseLib from '../supabase'
 import { ACHIEVEMENT_CELEBRATIONS_PATH } from '../api/contracts/achievement-celebration'
+import { getLessonIdsForModule } from '../curriculum-registry'
 import { DEFAULT_FEATURE_FLAGS, globalFeatureFlagService } from '../notifications/feature-flags/service'
 import {
   ACHIEVEMENT_CELEBRATION_KEY_PREFIXES,
@@ -39,7 +40,7 @@ const ahead = (ms: number) => new Date(NOW.getTime() + ms).toISOString()
 // ─── The fake ────────────────────────────────────────────────────────────────
 
 type Row = Record<string, unknown>
-type TableName = 'in_app_notifications' | 'users' | 'certificates' | 'capstone_submissions'
+type TableName = 'in_app_notifications' | 'users' | 'certificates' | 'capstone_submissions' | 'user_lesson_progress'
 
 /** The real columns (types/database.ts). Selecting or filtering on anything else throws. */
 const COLUMNS: Record<TableName, readonly string[]> = {
@@ -56,6 +57,7 @@ const COLUMNS: Record<TableName, readonly string[]> = {
     'id', 'user_id', 'module_slug', 'status', 'is_public', 'content', 'submitted_at',
     'reviewed_at', 'reviewed_by',
   ],
+  user_lesson_progress: ['user_id', 'lesson_id', 'status', 'quiz_score', 'quiz_attempts', 'completed_at'],
 }
 
 interface Filter {
@@ -80,6 +82,7 @@ function createFakeSupabase(seed: Partial<Record<TableName, Row[]>> = {}) {
     users: [],
     certificates: [],
     capstone_submissions: [],
+    user_lesson_progress: [],
   }
   for (const [name, rows] of Object.entries(seed)) {
     tables[name as TableName] = rows.map((row) => ({ ...row }))
@@ -860,6 +863,124 @@ describe('claimNextAchievementCelebration — a query error is never a verificat
 
 // ─── The route ───────────────────────────────────────────────────────────────
 
+// ─── Modules (Growth R4 / A2) ─────────────────────────────────────────────────
+
+const moduleKey = (slug: string, userId = USER) => `module-completed-${userId}-${slug}`
+const progressRows = (slug: string, overrides: Row = {}) =>
+  getLessonIdsForModule(slug).map((lessonId) => ({ user_id: USER, lesson_id: lessonId, status: 'completed', ...overrides }))
+const claimWithModules = (fake: FakeDb) =>
+  claimNextAchievementCelebration(fake.client, USER, { now: NOW, siteOrigin: 'https://example.test/', includeModules: true })
+
+describe('claimNextAchievementCelebration — modules', () => {
+  it('ignores module notifications unless modules are included', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery'),
+    })
+
+    expect(await claim(db)).toBeNull()
+    expect(db.notification('n-mod')).toMatchObject({ is_read: false })
+    expect(db.queriesOn('user_lesson_progress')).toHaveLength(0)
+  })
+
+  it('celebrates a module whose lessons are all completed, with its capstone', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery'),
+    })
+
+    const celebration = await claimWithModules(db)
+
+    expect(celebration).toMatchObject({
+      kind: 'module',
+      notificationId: 'n-mod',
+      module: { slug: 'discovery', title: 'Users, Problems & Discovery' },
+      capstone: { slug: 'discovery', submitted: false },
+    })
+    expect(db.notification('n-mod')).toMatchObject({ is_read: true })
+  })
+
+  it.each([
+    ['submitted', true],
+    ['reviewed', true],
+    ['draft', false],
+  ])('marks the capstone submitted for a %s submission: %s', async (status, submitted) => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery'),
+      capstone_submissions: [capstoneRow(SUBMISSION, { module_slug: 'discovery', status, is_public: false })],
+    })
+
+    expect(await claimWithModules(db)).toMatchObject({ capstone: { slug: 'discovery', submitted } })
+  })
+
+  it('still celebrates when the capstone read fails, without the submitted hint', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery'),
+    })
+    db.failures.set('capstone_submissions:select', { message: 'boom', code: 'XX000' })
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    expect(await claimWithModules(db)).toMatchObject({ kind: 'module', capstone: { submitted: false } })
+  })
+
+  it('points the Growth & Metrics module at its metrics capstone', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('growth'))],
+      user_lesson_progress: progressRows('growth'),
+    })
+
+    expect(await claimWithModules(db)).toMatchObject({ module: { slug: 'growth' }, capstone: { slug: 'metrics' } })
+  })
+
+  it('does not celebrate a module that is no longer complete (reset since the event)', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery').slice(1),
+    })
+
+    expect(await claimWithModules(db)).toBeNull()
+    expect(db.notification('n-mod')).toMatchObject({ is_read: false })
+  })
+
+  it.each([
+    ['another learner', moduleKey('discovery', OTHER_USER)],
+    ['an unknown module', moduleKey('not-a-module')],
+    ['a registry alias', moduleKey('tech_ai')],
+  ])('ignores a key naming %s', async (_label, key) => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', key)],
+      user_lesson_progress: [...progressRows('discovery'), ...progressRows('technical')],
+    })
+
+    expect(await claimWithModules(db)).toBeNull()
+    expect(db.notification('n-mod')).toMatchObject({ is_read: false })
+  })
+
+  it('celebrates the certificate before a module that completed at the same moment', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-mod', moduleKey('capstone'), { created_at: ago(2 * HOUR_MS) }),
+        notificationRow('n-cert', 'certificate-generated-PMA-2026-AAAA1111'),
+      ],
+      certificates: [certificateRow('PMA-2026-AAAA1111')],
+      user_lesson_progress: progressRows('capstone'),
+    })
+
+    expect(await claimWithModules(db)).toMatchObject({ kind: 'certificate' })
+    expect(await claimWithModules(db)).toMatchObject({ kind: 'module', module: { slug: 'capstone' } })
+  })
+})
+
 describe('POST /api/notifications/celebrations', () => {
   const request = (body?: unknown) =>
     new Request(`https://prodily.app${ACHIEVEMENT_CELEBRATIONS_PATH}`, {
@@ -939,6 +1060,28 @@ describe('POST /api/notifications/celebrations', () => {
     expect(db.notification('n-cert')).toMatchObject({ is_read: false, read_at: null })
   })
 
+  it.each([
+    [false, null],
+    [true, 'module'],
+  ])('follows MODULE_CELEBRATIONS_ENABLED=%s for module claims', async (moduleFlag, expectedKind) => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
+      user_lesson_progress: progressRows('discovery'),
+    })
+    signIn(USER)
+    useDb(db)
+    const flag = vi
+      .spyOn(globalFeatureFlagService, 'isEnabledAsync')
+      .mockImplementation(async (key) => (key === 'MODULE_CELEBRATIONS_ENABLED' ? moduleFlag : true))
+    const { POST } = await import('../../app/api/notifications/celebrations/route')
+
+    const json = await (await POST(request())).json()
+
+    expect(flag).toHaveBeenCalledWith('MODULE_CELEBRATIONS_ENABLED', false)
+    expect(json.celebration?.kind ?? null).toBe(expectedKind)
+  })
+
   it('takes the user from the session and ignores any id in the body', async () => {
     db = createFakeSupabase({
       users: [userRow(), userRow({ id: OTHER_USER, username: 'grace' })],
@@ -996,12 +1139,14 @@ describe('achievement celebration wiring', () => {
       certificate: 'lib/certificates/issue-flow.ts',
       capstone: 'lib/admin/moderation-service.ts',
       fellow: 'lib/admin/service.ts',
+      module: 'lib/academy/module-completion.ts',
     }
 
     expect(ACHIEVEMENT_CELEBRATION_KEY_PREFIXES).toEqual({
       certificate: 'certificate-generated-',
       capstone: 'capstone-reviewed-',
       fellow: 'fellow-granted-',
+      module: 'module-completed-',
     })
     for (const [kind, file] of Object.entries(emitters)) {
       const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind as keyof typeof emitters]
@@ -1018,6 +1163,11 @@ describe('achievement celebration wiring', () => {
     expect(source).not.toMatch(
       /(from|import\()\s*['"][^'"]*(certificates\/issue-flow|notifications\/dispatcher|events\/connectors|admin\/)[^'"]*['"]/
     )
+  })
+
+  it('ships module celebrations off by default', () => {
+    expect(DEFAULT_FEATURE_FLAGS.MODULE_CELEBRATIONS_ENABLED).toBe(false)
+    expect(readSource('lib/notifications/feature-flags/types.ts')).toContain("'MODULE_CELEBRATIONS_ENABLED'")
   })
 
   it('ships the kill switch enabled by default', () => {

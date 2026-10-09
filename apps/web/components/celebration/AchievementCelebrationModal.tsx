@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import Link from 'next/link'
-import { Award, ExternalLink, Sparkles, Trophy, UserPlus, type LucideIcon } from 'lucide-react'
+import { Award, BookOpenCheck, ExternalLink, Sparkles, Trophy, UserPlus, type LucideIcon } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ import type {
   AchievementCelebration,
   CelebrationPortfolio,
   CertificateCelebration,
+  ModuleCelebration,
 } from '@/lib/api/contracts/achievement-celebration'
 
 interface AchievementCelebrationModalProps {
@@ -87,6 +88,16 @@ function getCopy(celebration: AchievementCelebration): CelebrationCopy {
           ? 'Your Fellow badge is live on your public portfolio. Share it with your network.'
           : 'Make your portfolio public to show your Fellow badge.',
       }
+    case 'module':
+      return {
+        Icon: BookOpenCheck,
+        title: 'Module complete',
+        subject: celebration.module.title,
+        description:
+          celebration.capstone && !celebration.capstone.submitted
+            ? 'You finished every lesson in this module. Its capstone turns what you learned into proof on your portfolio.'
+            : 'You finished every lesson in this module. Keep the momentum going.',
+      }
   }
 }
 
@@ -128,6 +139,37 @@ function CertificateCtas({
         View certificate
       </Link>
     </>
+  )
+}
+
+// A lighter moment than the other kinds: one next step, no share or invite.
+function ModuleCta({
+  capstone,
+  onStartCapstone,
+  onViewCapstone,
+  onContinue,
+}: {
+  capstone: ModuleCelebration['capstone']
+  onStartCapstone: () => void
+  onViewCapstone: () => void
+  onContinue: () => void
+}) {
+  if (capstone) {
+    // Capstones unlock before a module's last lesson, so it may already be submitted.
+    return capstone.submitted ? (
+      <Link href={`/capstones/${capstone.slug}`} onClick={onViewCapstone} className={buttonVariants({ size: 'lg' })}>
+        View capstone
+      </Link>
+    ) : (
+      <Link href={`/capstones/${capstone.slug}`} onClick={onStartCapstone} className={buttonVariants({ size: 'lg' })}>
+        Start the capstone
+      </Link>
+    )
+  }
+  return (
+    <Link href="/academy" onClick={onContinue} className={buttonVariants({ size: 'lg' })}>
+      Continue learning
+    </Link>
   )
 }
 
@@ -201,6 +243,22 @@ function CelebrationContent({
             certificate={celebration.certificate}
             onAddToLinkedIn={() => trackCta('add_to_linkedin')}
             onClose={onClose}
+          />
+        ) : celebration.kind === 'module' ? (
+          <ModuleCta
+            capstone={celebration.capstone}
+            onStartCapstone={() => {
+              trackCta('start_capstone')
+              onClose()
+            }}
+            onViewCapstone={() => {
+              trackCta('view_capstone')
+              onClose()
+            }}
+            onContinue={() => {
+              trackCta('continue_learning')
+              onClose()
+            }}
           />
         ) : (
           <PortfolioCta

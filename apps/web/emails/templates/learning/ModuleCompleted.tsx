@@ -7,6 +7,8 @@ export interface ModuleCompletedEmailProps {
   userName?: string
   moduleName?: string
   moduleSlug?: string
+  /** The module's capstone (config/capstones key); null or absent links to the capstone list. */
+  capstoneSlug?: string | null
   appUrl?: string
   unsubscribeToken?: string
 }
@@ -15,6 +17,7 @@ export const ModuleCompletedEmail: React.FC<ModuleCompletedEmailProps> = ({
   userName = 'Learner',
   moduleName = 'Foundations of Product Management',
   moduleSlug = 'foundations',
+  capstoneSlug,
   appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
@@ -31,7 +34,7 @@ export const ModuleCompletedEmail: React.FC<ModuleCompletedEmailProps> = ({
         <li><strong>Capstone Project</strong>: Apply what you learned to build a portfolio project.</li>
         <li><strong>Next Curriculum Module</strong>: Keep your momentum going into the next module.</li>
       </ul>
-      <Button href={`${appUrl}/capstones?module=${moduleSlug}`}>Start Capstone Project</Button>
+      <Button href={capstoneSlug ? `${appUrl}/capstones/${capstoneSlug}` : `${appUrl}/capstones?module=${moduleSlug}`}>Start Capstone Project</Button>
     </EmailWrapper>
   )
 }

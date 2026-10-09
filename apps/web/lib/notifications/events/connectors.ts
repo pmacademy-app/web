@@ -4,6 +4,7 @@ import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
 import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { getCapstoneForModule } from '@/lib/academy/module-completion'
 
 let isConnectorsInitialized = false
 
@@ -114,6 +115,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         userName: event.userName || 'Learner',
         moduleName: event.payload.moduleName || 'Module',
         moduleSlug: event.payload.moduleSlug || 'foundations',
+        capstoneSlug: getCapstoneForModule(String(event.payload.moduleSlug || ''))?.slug ?? null,
       },
       eventId: event.id,
       eventType: event.event,

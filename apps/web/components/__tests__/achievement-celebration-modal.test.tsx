@@ -48,6 +48,7 @@ import type {
   CelebrationPortfolio,
   CertificateCelebration,
   FellowCelebration,
+  ModuleCelebration,
 } from '@/lib/api/contracts/achievement-celebration'
 
 const CODE = 'PRD-2026-ABC123'
@@ -299,6 +300,67 @@ describe('AchievementCelebrationModal — invite peers', () => {
   it('keeps the Fellow rule with the invite control present', async () => {
     await renderWithInvite(fellow(), vi.fn())
     expect(dialog()!.outerHTML).not.toMatch(/certif|credential|profile\/add/i)
+  })
+})
+
+// Growth R4 / A2: a completed module is a lighter celebration with one next step.
+describe('AchievementCelebrationModal — module', () => {
+  const moduleDone = (capstone: ModuleCelebration['capstone']): ModuleCelebration => ({
+    kind: 'module',
+    notificationId: 'ntf-module-1',
+    portfolio: publicPortfolio,
+    module: { slug: 'discovery', title: 'Users, Problems & Discovery' },
+    capstone,
+  })
+  const withCapstone = moduleDone({ slug: 'discovery', title: 'Problem Discovery Brief', submitted: false })
+
+  it('names the module and links to its capstone', async () => {
+    await render(withCapstone)
+
+    expect(dialogText()).toContain('Module complete')
+    expect(dialogText()).toContain('Users, Problems & Discovery')
+    expect(linkByText('Start the capstone')?.getAttribute('href')).toBe('/capstones/discovery')
+  })
+
+  it('tracks start_capstone and closes when the learner starts it', async () => {
+    await render(withCapstone)
+    await click(linkByText('Start the capstone'))
+
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('module', 'start_capstone')
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('offers to view a capstone the learner already submitted', async () => {
+    await render(moduleDone({ slug: 'discovery', title: 'Problem Discovery Brief', submitted: true }))
+
+    expect(linkByText('Start the capstone')).toBeNull()
+    expect(linkByText('View capstone')?.getAttribute('href')).toBe('/capstones/discovery')
+    await click(linkByText('View capstone'))
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('module', 'view_capstone')
+  })
+
+  it('falls back to continue learning when the module has no capstone', async () => {
+    await render(moduleDone(null))
+    await click(linkByText('Continue learning'))
+
+    expect(linkByText('Continue learning')?.getAttribute('href')).toBe('/academy')
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('module', 'continue_learning')
+  })
+
+  it('offers no share, invite, LinkedIn or credential wording', async () => {
+    await act(async () => {
+      root.render(<AchievementCelebrationModal celebration={withCapstone} onClose={onClose} onInvitePeers={vi.fn()} />)
+    })
+
+    expect(shareGroup()).toBeNull()
+    expect(dialogText()).not.toMatch(/invite/i)
+    expect(hrefs().some((href) => href.includes('linkedin.com'))).toBe(false)
+    expect(dialog()!.outerHTML).not.toMatch(/certif|credential/i)
+  })
+
+  it('tracks the view with kind module', async () => {
+    await render(withCapstone)
+    expect(analytics.trackAchievementCelebrationViewed).toHaveBeenCalledWith('module')
   })
 })
 

@@ -4,7 +4,7 @@
  */
 export const ACHIEVEMENT_CELEBRATIONS_PATH = '/api/notifications/celebrations'
 
-export const ACHIEVEMENT_CELEBRATION_KINDS = ['certificate', 'capstone', 'fellow'] as const
+export const ACHIEVEMENT_CELEBRATION_KINDS = ['certificate', 'capstone', 'fellow', 'module'] as const
 export type AchievementCelebrationKind = (typeof ACHIEVEMENT_CELEBRATION_KINDS)[number]
 
 /** The caller's own portfolio state, read at claim time. */
@@ -44,10 +44,19 @@ export interface FellowCelebration extends CelebrationBase {
   kind: 'fellow'
 }
 
+/** Every lesson in a curriculum module completed. Behind MODULE_CELEBRATIONS_ENABLED (default off). */
+export interface ModuleCelebration extends CelebrationBase {
+  kind: 'module'
+  module: { slug: string; title: string }
+  /** The module's capstone, or null when it has none. `submitted`: already submitted or reviewed. */
+  capstone: { slug: string; title: string; submitted: boolean } | null
+}
+
 export type AchievementCelebration =
   | CertificateCelebration
   | CapstoneCelebration
   | FellowCelebration
+  | ModuleCelebration
 
 /** `celebration` is null when nothing is claimable or the kill switch is off. */
 export interface AchievementCelebrationClaimResponse {

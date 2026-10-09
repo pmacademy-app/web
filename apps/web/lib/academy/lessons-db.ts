@@ -395,10 +395,14 @@ export async function recordQuizAttemptAction(
       },
     })
 
-    const { data: userProgress } = await supabase
+    const { data: userProgress, error: progressError } = await supabase
       .from('user_lesson_progress')
       .select('lesson_id, status')
       .eq('user_id', userId)
+    if (progressError) {
+      // Without it no module (or certificate) can be detected for this completion.
+      console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
+    }
 
     const completedLessonIds = new Set(
       (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
@@ -416,7 +420,8 @@ export async function recordQuizAttemptAction(
     }
 
     // Growth R4: a module is complete when its last open lesson is completed, in any order.
-    // Only a first attempt can newly complete a lesson, so later attempts skip the check. The
+    // Only a first attempt can newly complete a lesson (every attempt upserts status 'completed'
+    // and quiz_attempts starts at 0), so later attempts skip the check. The
     // stable id makes a replay (or a race between two tabs) a no-op in the dispatcher.
     const completedModule = isFirstAttempt ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
     if (completedModule) {

@@ -1,8 +1,8 @@
 /**
  * Achievement celebration claim (server-only).
  *
- * A certificate, a published capstone or a Fellow grant earns the learner a one-time
- * celebration. The source of truth for "has it been shown" is the achievement's own
+ * A certificate, a published capstone, a Fellow grant or (behind its own flag) a completed
+ * module earns the learner a one-time celebration. The source of truth for "has it been shown" is the achievement's own
  * in-app notification: claiming it marks that row read with a compare-and-set, so when
  * several tabs or devices ask at once exactly one of them is told to celebrate.
  *
@@ -19,26 +19,34 @@ import type {
   AchievementCelebration,
   AchievementCelebrationKind,
   CelebrationPortfolio,
+  ModuleCelebration,
 } from '@/lib/api/contracts/achievement-celebration'
 import { BRAND } from '@/lib/brand'
 import { isTestCertificateCode } from '@/lib/certificates-db'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { describeDbError } from '@/lib/monitoring/db-error'
+import { getLessonIdsForModule } from '@/lib/curriculum-registry'
+import { getCapstoneForModule, getModuleTitle, isCanonicalModuleSlug } from '@/lib/academy/module-completion'
 
 /**
  * Event-id prefixes written by the emitters: `certificate.generated`
- * (lib/certificates/issue-flow.ts), `capstone.reviewed` (lib/admin/moderation-service.ts)
- * and `fellow.granted` (lib/admin/service.ts). Restated rather than imported because
+ * (lib/certificates/issue-flow.ts), `capstone.reviewed` (lib/admin/moderation-service.ts),
+ * `fellow.granted` (lib/admin/service.ts) and `module.completed` (lib/academy/module-completion.ts). Restated rather than imported because
  * those modules pull in the notification dispatcher; a test pins them to the sources.
  */
 export const ACHIEVEMENT_CELEBRATION_KEY_PREFIXES: Record<AchievementCelebrationKind, string> = {
   certificate: 'certificate-generated-',
   capstone: 'capstone-reviewed-',
   fellow: 'fellow-granted-',
+  module: 'module-completed-',
 }
 
-/** Claim priority: the rarest achievement first. Within a kind, oldest first. */
-const CLAIM_ORDER: readonly AchievementCelebrationKind[] = ['fellow', 'certificate', 'capstone']
+/**
+ * Claim priority: the rarest achievement first. Within a kind, oldest first. A module is the
+ * most common, so when the last lesson completes a module and the curriculum at once, the
+ * certificate is celebrated first and the module on a later call.
+ */
+const CLAIM_ORDER: readonly AchievementCelebrationKind[] = ['fellow', 'certificate', 'capstone', 'module']
 
 /** An achievement older than this is no longer worth interrupting the learner for. */
 const CELEBRATION_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
@@ -53,12 +61,17 @@ export interface ClaimAchievementCelebrationOptions {
   now?: Date
   /** Origin for the certificate verification link. Defaults to the configured site url. */
   siteOrigin?: string
+  /** Also consider completed modules (MODULE_CELEBRATIONS_ENABLED). Off unless set. */
+  includeModules?: boolean
 }
 
 interface Candidate {
   notificationId: string
   kind: AchievementCelebrationKind
-  /** The idempotency key with its prefix removed: a certificate code, submission id or user id. */
+  /**
+   * The idempotency key with its prefix removed: a certificate code, a submission id, a user id,
+   * or `<user id>-<module slug>`.
+   */
   subject: string
   createdAt: string
 }
@@ -81,10 +94,13 @@ function warnReadFailed(step: string, error: unknown): void {
   console.warn(`[achievement-celebrations] ${step} failed:`, describeDbError(error))
 }
 
-function toCandidate(row: { id: string; idempotency_key: string | null; created_at: string }): Candidate | null {
+function toCandidate(
+  row: { id: string; idempotency_key: string | null; created_at: string },
+  kinds: readonly AchievementCelebrationKind[]
+): Candidate | null {
   const key = row.idempotency_key
   if (!key) return null
-  for (const kind of CLAIM_ORDER) {
+  for (const kind of kinds) {
     const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind]
     if (key.startsWith(prefix) && key.length > prefix.length) {
       return { notificationId: row.id, kind, subject: key.slice(prefix.length), createdAt: row.created_at }
@@ -94,8 +110,13 @@ function toCandidate(row: { id: string; idempotency_key: string | null; created_
 }
 
 /** The caller's unread, recent, unexpired achievement notifications; null when the read failed. */
-async function loadCandidates(supabase: Client, userId: string, now: Date): Promise<Candidate[] | null> {
-  const prefixFilter = CLAIM_ORDER.map(
+async function loadCandidates(
+  supabase: Client,
+  userId: string,
+  now: Date,
+  kinds: readonly AchievementCelebrationKind[]
+): Promise<Candidate[] | null> {
+  const prefixFilter = kinds.map(
     (kind) => `idempotency_key.like.${ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind]}%`
   ).join(',')
 
@@ -116,7 +137,7 @@ async function loadCandidates(supabase: Client, userId: string, now: Date): Prom
   }
 
   // The prefix is re-checked here rather than trusted from the filter alone.
-  return (data || []).flatMap((row) => toCandidate(row) ?? [])
+  return (data || []).flatMap((row) => toCandidate(row, kinds) ?? [])
 }
 
 async function verifyCertificates(
@@ -213,6 +234,77 @@ async function verifyCapstones(
   })
 }
 
+function capstoneFor(slug: string, submitted: ReadonlySet<string>): ModuleCelebration['capstone'] {
+  const capstone = getCapstoneForModule(slug)
+  return capstone ? { ...capstone, submitted: submitted.has(capstone.slug) } : null
+}
+
+async function verifyModules(
+  supabase: Client,
+  userId: string,
+  candidates: Candidate[],
+  portfolio: CelebrationPortfolio
+): Promise<VerifiedCandidate[]> {
+  // The key must name the caller and a real module: `module-completed-<user id>-<slug>`.
+  const ownPrefix = `${userId}-`
+  const bySlug = new Map<string, Candidate[]>()
+  for (const candidate of candidates) {
+    if (!candidate.subject.startsWith(ownPrefix)) continue
+    const slug = candidate.subject.slice(ownPrefix.length)
+    if (!isCanonicalModuleSlug(slug)) continue
+    bySlug.set(slug, [...(bySlug.get(slug) ?? []), candidate])
+  }
+  if (bySlug.size === 0) return []
+
+  // Re-verified against progress: a module reset since the event no longer celebrates.
+  const lessonIds = [...bySlug.keys()].flatMap((slug) => getLessonIdsForModule(slug))
+  const { data, error } = await supabase
+    .from('user_lesson_progress')
+    .select('lesson_id')
+    .eq('user_id', userId)
+    .eq('status', 'completed')
+    .in('lesson_id', lessonIds)
+
+  if (error) {
+    warnReadFailed('module verification', error)
+    return []
+  }
+
+  const completed = new Set((data || []).map((row) => row.lesson_id))
+
+  // Capstones unlock before the module's last lesson, so one may already be in. A failed read
+  // only costs the 'already submitted' hint, never the celebration.
+  const capstoneSlugs = [...bySlug.keys()].flatMap((slug) => getCapstoneForModule(slug)?.slug ?? [])
+  const submittedCapstones = new Set<string>()
+  if (capstoneSlugs.length > 0) {
+    const { data: submissions, error: submissionsError } = await supabase
+      .from('capstone_submissions')
+      .select('module_slug, status')
+      .eq('user_id', userId)
+      .in('module_slug', capstoneSlugs)
+    if (submissionsError) warnReadFailed('module capstone read', submissionsError)
+    for (const row of submissions || []) {
+      if (row.status === 'submitted' || row.status === 'reviewed') submittedCapstones.add(row.module_slug)
+    }
+  }
+  return candidates.flatMap((candidate) => {
+    const slug = candidate.subject.slice(ownPrefix.length)
+    if (!bySlug.get(slug)?.includes(candidate)) return []
+    if (!getLessonIdsForModule(slug).every((id) => completed.has(id))) return []
+
+    return {
+      notificationId: candidate.notificationId,
+      celebration: {
+        kind: 'module',
+        notificationId: candidate.notificationId,
+        portfolio,
+        module: { slug, title: getModuleTitle(slug) },
+        capstone: capstoneFor(slug, submittedCapstones),
+      },
+    }
+  })
+}
+
 /**
  * Marks one notification read if — and only if — it is still unread.
  *
@@ -258,7 +350,8 @@ export async function claimNextAchievementCelebration(
   if (!userId) return null
   const now = opts.now ?? new Date()
 
-  const candidates = await loadCandidates(supabase, userId, now)
+  const kinds = opts.includeModules ? CLAIM_ORDER : CLAIM_ORDER.filter((kind) => kind !== 'module')
+  const candidates = await loadCandidates(supabase, userId, now, kinds)
   if (!candidates || candidates.length === 0) return null
 
   const { data: user, error: userError } = await supabase
@@ -279,7 +372,7 @@ export async function claimNextAchievementCelebration(
     isPublic: user.is_portfolio_public === true,
   }
 
-  for (const kind of CLAIM_ORDER) {
+  for (const kind of kinds) {
     // Already oldest-first from the read; the filter keeps that order.
     const ofKind = candidates.filter((candidate) => candidate.kind === kind)
     if (ofKind.length === 0) continue
@@ -295,8 +388,10 @@ export async function claimNextAchievementCelebration(
         }))
     } else if (kind === 'certificate') {
       verified = await verifyCertificates(supabase, userId, ofKind, portfolio, resolveSiteOrigin(opts.siteOrigin))
-    } else {
+    } else if (kind === 'capstone') {
       verified = await verifyCapstones(supabase, userId, ofKind, portfolio)
+    } else {
+      verified = await verifyModules(supabase, userId, ofKind, portfolio)
     }
 
     for (const entry of verified) {

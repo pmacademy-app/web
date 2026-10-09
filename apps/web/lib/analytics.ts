@@ -35,6 +35,9 @@ export type AchievementCelebrationCtaAction =
   | 'share_portfolio'
   | 'publish_portfolio'
   | 'invite_peers'
+  | 'start_capstone'
+  | 'view_capstone'
+  | 'continue_learning'
 
 type EventMap = {
   waitlist_signup:          Record<string, never>
