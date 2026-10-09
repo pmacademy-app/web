@@ -202,7 +202,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
 
               <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-admin-fg">In-App + Email (`user.registered`, `user.verified`, `password.reset_requested`, `module.completed`, `badge.earned`, `xp.level_up`, `certificate.generated`, `portfolio.published`)</p>
+                  <p className="font-bold text-admin-fg">In-App + Email (`user.registered`, `user.verified`, `password.reset_requested`, `module.completed`, `badge.earned`, `xp.level_up`, `certificate.generated`, `portfolio.published`, `fellow.granted`)</p>
                   <p className="text-admin-fg-muted">Routed to both In-App and the Email Queue (respecting user preferences and automation toggles).</p>
                 </div>
                 <AdminStatusBadge status="healthy" label="In-App + Email" />
