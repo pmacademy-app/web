@@ -8,6 +8,7 @@
  */
 
 import type { PortfolioNavState } from '@/lib/portfolio'
+import type { AchievementCelebrationKind } from '@/lib/api/contracts/achievement-celebration'
 
 // Extend Window type so TypeScript knows about gtag
 declare global {
@@ -28,6 +29,13 @@ type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'fin
 export type QuickStartMode = 'auto' | 'manual' | 'post_first_lesson'
 
 export type PortfolioSharePlatform = 'linkedin' | 'x' | 'native' | 'copy'
+
+/** `invite_peers` is reserved for the peer-invite CTA; nothing fires it yet. */
+export type AchievementCelebrationCtaAction =
+  | 'add_to_linkedin'
+  | 'share_portfolio'
+  | 'publish_portfolio'
+  | 'invite_peers'
 
 type EventMap = {
   waitlist_signup:          Record<string, never>
@@ -91,6 +99,10 @@ type EventMap = {
   referral_signup_completed:       Record<string, never>
   portfolio_share_clicked:         { platform: PortfolioSharePlatform }
   nav_portfolio_clicked:           { state: PortfolioNavState; surface: 'sidebar' | 'sidebar_collapsed' | 'mobile_drawer' }
+
+  // ─── Achievement Celebration Events (Growth R1) ───────────────────────────
+  achievement_celebration_viewed:      { kind: AchievementCelebrationKind }
+  achievement_celebration_cta_clicked: { kind: AchievementCelebrationKind; action: AchievementCelebrationCtaAction }
 }
 
 /** Payload of `nav_portfolio_clicked`; the single source for its `state`/`surface` unions. */
@@ -334,6 +346,21 @@ export function trackNavPortfolioClicked(
   surface: NavPortfolioClickedParams['surface'],
 ) {
   trackEvent('nav_portfolio_clicked', { state, surface })
+}
+
+// ─── Achievement Celebration Trackers (Growth R1) ────────────────────────────
+
+/** Fired once when the celebration modal for a certificate, published capstone or Fellow grant is shown. */
+export function trackAchievementCelebrationViewed(kind: AchievementCelebrationKind) {
+  trackEvent('achievement_celebration_viewed', { kind })
+}
+
+/** Fired when a learner uses a CTA in the celebration modal. No certificate code, username or notification id is sent. */
+export function trackAchievementCelebrationCtaClicked(
+  kind: AchievementCelebrationKind,
+  action: AchievementCelebrationCtaAction,
+) {
+  trackEvent('achievement_celebration_cta_clicked', { kind, action })
 }
 
 

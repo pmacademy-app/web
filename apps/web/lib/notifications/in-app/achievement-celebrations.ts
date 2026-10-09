@@ -1,0 +1,312 @@
+/**
+ * Achievement celebration claim (server-only).
+ *
+ * A certificate, a published capstone or a Fellow grant earns the learner a one-time
+ * celebration. The source of truth for "has it been shown" is the achievement's own
+ * in-app notification: claiming it marks that row read with a compare-and-set, so when
+ * several tabs or devices ask at once exactly one of them is told to celebrate.
+ *
+ * `in_app_notifications` has no event-type column — the idempotency key (the event id) is
+ * the only type signal, so the three emitters' id prefixes are restated here. A key alone
+ * is never trusted: every candidate is re-verified against its source row, scoped to the
+ * caller, before anything is written. That is what keeps a rejected capstone, an admin
+ * TEST- certificate or a revoked Fellow from celebrating. A candidate that fails
+ * verification is left unread and untouched, so it still shows in the bell.
+ */
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/supabase'
+import type {
+  AchievementCelebration,
+  AchievementCelebrationKind,
+  CelebrationPortfolio,
+} from '@/lib/api/contracts/achievement-celebration'
+import { BRAND } from '@/lib/brand'
+import { isTestCertificateCode } from '@/lib/certificates-db'
+import { getCapstoneDefinition } from '@/config/capstones'
+import { describeDbError } from '@/lib/monitoring/db-error'
+
+/**
+ * Event-id prefixes written by the emitters: `certificate.generated`
+ * (lib/certificates/issue-flow.ts), `capstone.reviewed` (lib/admin/moderation-service.ts)
+ * and `fellow.granted` (lib/admin/service.ts). Restated rather than imported because
+ * those modules pull in the notification dispatcher; a test pins them to the sources.
+ */
+export const ACHIEVEMENT_CELEBRATION_KEY_PREFIXES: Record<AchievementCelebrationKind, string> = {
+  certificate: 'certificate-generated-',
+  capstone: 'capstone-reviewed-',
+  fellow: 'fellow-granted-',
+}
+
+/** Claim priority: the rarest achievement first. Within a kind, oldest first. */
+const CLAIM_ORDER: readonly AchievementCelebrationKind[] = ['fellow', 'certificate', 'capstone']
+
+/** An achievement older than this is no longer worth interrupting the learner for. */
+const CELEBRATION_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
+
+/** Unread achievement rows considered per call. One learner never has more than a handful. */
+const MAX_CANDIDATES = 25
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export interface ClaimAchievementCelebrationOptions {
+  /** Injected clock, for tests. */
+  now?: Date
+  /** Origin for the certificate verification link. Defaults to the configured site url. */
+  siteOrigin?: string
+}
+
+interface Candidate {
+  notificationId: string
+  kind: AchievementCelebrationKind
+  /** The idempotency key with its prefix removed: a certificate code, submission id or user id. */
+  subject: string
+  createdAt: string
+}
+
+/** A candidate that passed verification, with the celebration it would produce. */
+interface VerifiedCandidate {
+  notificationId: string
+  celebration: AchievementCelebration
+}
+
+type Client = SupabaseClient<Database>
+
+/** Mirrors `resolveSiteOrigin` in lib/certificates/issue-flow.ts, which is not importable here. */
+function resolveSiteOrigin(siteOrigin?: string): string {
+  return (siteOrigin || process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
+}
+
+/** Never logs ids, codes or names — only which read failed and the redacted database error. */
+function warnReadFailed(step: string, error: unknown): void {
+  console.warn(`[achievement-celebrations] ${step} failed:`, describeDbError(error))
+}
+
+function toCandidate(row: { id: string; idempotency_key: string | null; created_at: string }): Candidate | null {
+  const key = row.idempotency_key
+  if (!key) return null
+  for (const kind of CLAIM_ORDER) {
+    const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind]
+    if (key.startsWith(prefix) && key.length > prefix.length) {
+      return { notificationId: row.id, kind, subject: key.slice(prefix.length), createdAt: row.created_at }
+    }
+  }
+  return null
+}
+
+/** The caller's unread, recent, unexpired achievement notifications; null when the read failed. */
+async function loadCandidates(supabase: Client, userId: string, now: Date): Promise<Candidate[] | null> {
+  const prefixFilter = CLAIM_ORDER.map(
+    (kind) => `idempotency_key.like.${ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind]}%`
+  ).join(',')
+
+  const { data, error } = await supabase
+    .from('in_app_notifications')
+    .select('id, idempotency_key, created_at')
+    .eq('user_id', userId)
+    .eq('is_read', false)
+    .gte('created_at', new Date(now.getTime() - CELEBRATION_WINDOW_MS).toISOString())
+    .gt('expires_at', now.toISOString())
+    .or(prefixFilter)
+    .order('created_at', { ascending: true })
+    .limit(MAX_CANDIDATES)
+
+  if (error) {
+    warnReadFailed('candidate read', error)
+    return null
+  }
+
+  // The prefix is re-checked here rather than trusted from the filter alone.
+  return (data || []).flatMap((row) => toCandidate(row) ?? [])
+}
+
+async function verifyCertificates(
+  supabase: Client,
+  userId: string,
+  candidates: Candidate[],
+  portfolio: CelebrationPortfolio,
+  siteOrigin: string
+): Promise<VerifiedCandidate[]> {
+  // Admin dev TEST- certificates are never a learner's real credential.
+  const real = candidates.filter((candidate) => !isTestCertificateCode(candidate.subject))
+  if (real.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('certificates')
+    .select('certificate_code, type, module_slug, issued_at, career_title')
+    .eq('user_id', userId)
+    .in('certificate_code', [...new Set(real.map((candidate) => candidate.subject))])
+
+  if (error) {
+    warnReadFailed('certificate verification', error)
+    return []
+  }
+
+  const byCode = new Map((data || []).map((row) => [row.certificate_code, row]))
+  return real.flatMap((candidate) => {
+    const row = byCode.get(candidate.subject)
+    if (!row) return []
+
+    const isFullCurriculum = row.type === 'full_curriculum'
+    const moduleSlug = isFullCurriculum ? null : row.module_slug || null
+    return {
+      notificationId: candidate.notificationId,
+      celebration: {
+        kind: 'certificate',
+        notificationId: candidate.notificationId,
+        portfolio,
+        certificate: {
+          code: row.certificate_code,
+          type: isFullCurriculum ? 'full_curriculum' : 'module',
+          moduleSlug,
+          moduleTitle: moduleSlug ? getCapstoneDefinition(moduleSlug)?.moduleTitle ?? null : null,
+          issuedAt: row.issued_at,
+          careerTitle: row.career_title,
+          verificationUrl: `${siteOrigin}/verify/${encodeURIComponent(row.certificate_code)}`,
+        },
+      },
+    }
+  })
+}
+
+async function verifyCapstones(
+  supabase: Client,
+  userId: string,
+  candidates: Candidate[],
+  portfolio: CelebrationPortfolio
+): Promise<VerifiedCandidate[]> {
+  // Shape-checked before it reaches the query: `id` is a uuid column.
+  const wellFormed = candidates.filter((candidate) => UUID_PATTERN.test(candidate.subject))
+  if (wellFormed.length === 0) return []
+
+  // `capstone.reviewed` also fires for a rejection (status 'reviewed', is_public false),
+  // so only a reviewed AND published submission is something to celebrate.
+  const { data, error } = await supabase
+    .from('capstone_submissions')
+    .select('id, module_slug')
+    .eq('user_id', userId)
+    .eq('status', 'reviewed')
+    .eq('is_public', true)
+    .in('id', [...new Set(wellFormed.map((candidate) => candidate.subject.toLowerCase()))])
+
+  if (error) {
+    warnReadFailed('capstone verification', error)
+    return []
+  }
+
+  const byId = new Map((data || []).map((row) => [row.id.toLowerCase(), row]))
+  return wellFormed.flatMap((candidate) => {
+    const row = byId.get(candidate.subject.toLowerCase())
+    if (!row) return []
+
+    return {
+      notificationId: candidate.notificationId,
+      celebration: {
+        kind: 'capstone',
+        notificationId: candidate.notificationId,
+        portfolio,
+        capstone: {
+          moduleSlug: row.module_slug,
+          moduleTitle: getCapstoneDefinition(row.module_slug)?.moduleTitle || row.module_slug,
+        },
+      },
+    }
+  })
+}
+
+/**
+ * Marks one notification read if — and only if — it is still unread.
+ *
+ * `is_read = false` is part of the write's own predicate, so the database decides the
+ * winner: a second tab's update matches zero rows and reports `lost`.
+ */
+async function claimNotification(
+  supabase: Client,
+  userId: string,
+  notificationId: string,
+  readAt: string
+): Promise<'claimed' | 'lost' | 'error'> {
+  const { data, error } = await supabase
+    .from('in_app_notifications')
+    .update({ is_read: true, read_at: readAt })
+    .eq('id', notificationId)
+    .eq('user_id', userId)
+    .eq('is_read', false)
+    .select('id')
+
+  if (error) {
+    warnReadFailed('claim write', error)
+    return 'error'
+  }
+  return Array.isArray(data) && data.length > 0 ? 'claimed' : 'lost'
+}
+
+/**
+ * Claims the caller's next unseen achievement and returns what to celebrate, or null.
+ *
+ * At most one celebration per call, and at most one notification row written. `userId`
+ * must come from the authenticated session: every read and the claiming write are scoped
+ * to it, so the result only ever describes the caller's own achievements.
+ *
+ * "Nothing to celebrate" is null, never a throw. A failed read is never treated as a
+ * verification: the candidates it covers stay unread and are retried on the next call.
+ */
+export async function claimNextAchievementCelebration(
+  supabase: Client,
+  userId: string,
+  opts: ClaimAchievementCelebrationOptions = {}
+): Promise<AchievementCelebration | null> {
+  if (!userId) return null
+  const now = opts.now ?? new Date()
+
+  const candidates = await loadCandidates(supabase, userId, now)
+  if (!candidates || candidates.length === 0) return null
+
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('username, name, is_portfolio_public, is_fellow')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (userError) {
+    warnReadFailed('caller profile read', userError)
+    return null
+  }
+  if (!user) return null
+
+  const portfolio: CelebrationPortfolio = {
+    username: user.username || null,
+    displayName: user.name || null,
+    isPublic: user.is_portfolio_public === true,
+  }
+
+  for (const kind of CLAIM_ORDER) {
+    // Already oldest-first from the read; the filter keeps that order.
+    const ofKind = candidates.filter((candidate) => candidate.kind === kind)
+    if (ofKind.length === 0) continue
+
+    let verified: VerifiedCandidate[]
+    if (kind === 'fellow') {
+      // The key must name the caller, and the grant must still stand.
+      verified = ofKind
+        .filter((candidate) => candidate.subject === userId && user.is_fellow === true)
+        .map((candidate) => ({
+          notificationId: candidate.notificationId,
+          celebration: { kind: 'fellow', notificationId: candidate.notificationId, portfolio },
+        }))
+    } else if (kind === 'certificate') {
+      verified = await verifyCertificates(supabase, userId, ofKind, portfolio, resolveSiteOrigin(opts.siteOrigin))
+    } else {
+      verified = await verifyCapstones(supabase, userId, ofKind, portfolio)
+    }
+
+    for (const entry of verified) {
+      const outcome = await claimNotification(supabase, userId, entry.notificationId, now.toISOString())
+      if (outcome === 'claimed') return entry.celebration
+      // The write path is failing, so stop rather than work through the rest of the list.
+      if (outcome === 'error') return null
+      // 'lost': another tab or device claimed it first — try the next candidate.
+    }
+  }
+
+  return null
+}

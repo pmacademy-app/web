@@ -184,9 +184,11 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // 130 since Phase 6 added `user/curriculum-access/route.ts`: the public search index is
   // edge-cached, so per-learner lesson lock state is served by this authenticated route
   // (also on `withRoute`).
-  it('accounts for all 130 routes', () => {
-    expect(files).toHaveLength(130)
-    expect(migrated).toHaveLength(127)
+  // 131 since Growth R1 added `notifications/celebrations/route.ts`: the learner's one-time
+  // achievement celebration is claimed server-side with a compare-and-set (also on `withRoute`).
+  it('accounts for all 131 routes', () => {
+    expect(files).toHaveLength(131)
+    expect(migrated).toHaveLength(128)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {

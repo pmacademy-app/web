@@ -9,9 +9,23 @@ import { FeatureFlagToggle } from './FeatureFlagToggle'
 import type { FeatureFlagRecord } from '@/lib/notifications/feature-flags/types'
 
 // Category mapping for feature flags
-const FLAG_CATEGORIES: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+interface FlagCategory {
+  label: string
+  icon: React.ElementType
+  color: string
+  /** Shown when the stored flag record carries no description of its own. */
+  description?: string
+}
+
+const FLAG_CATEGORIES: Record<string, FlagCategory> = {
   EMAIL_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   IN_APP_NOTIFICATIONS_ENABLED: { label: 'Communication', icon: Bell, color: 'text-admin-warning' },
+  ACHIEVEMENT_CELEBRATIONS_ENABLED: {
+    label: 'Communication',
+    icon: Bell,
+    color: 'text-admin-warning',
+    description: 'One-time celebration modal for a new certificate, published capstone or Fellow grant',
+  },
   ACHIEVEMENT_EMAIL_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   PORTFOLIO_EMAILS_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   WEEKLY_RECAP_ENABLED: { label: 'Scheduled', icon: Calendar, color: 'text-admin-accent' },
@@ -19,6 +33,9 @@ const FLAG_CATEGORIES: Record<string, { label: string; icon: React.ElementType; 
   QUEUE_PROCESSING_ENABLED: { label: 'Infrastructure', icon: Zap, color: 'text-admin-success' },
   SCHEDULER_ENABLED: { label: 'Infrastructure', icon: Shield, color: 'text-admin-success' },
 }
+
+// A flag that reaches this page without an entry above is grouped under "Other".
+const FALLBACK_CATEGORY: FlagCategory = { label: 'Other', icon: Flag, color: 'text-admin-fg-muted' }
 
 export interface FeatureFlagsSectionProps {
   data: FeatureFlagRecord[]
@@ -57,7 +74,7 @@ export function FeatureFlagsSection({
       header: 'Description',
       cell: (flag) => (
         <span className="text-sm text-admin-fg-muted max-w-xs truncate block">
-          {flag.description || 'No description available'}
+          {flag.description || FLAG_CATEGORIES[flag.key]?.description || 'No description available'}
         </span>
       ),
     },
@@ -94,7 +111,7 @@ export function FeatureFlagsSection({
         const flags = groupedFlags[category]
         if (!flags || flags.length === 0) return null
 
-        const categoryConfig = flags[0] ? FLAG_CATEGORIES[flags[0].key] : { icon: Flag, color: 'text-admin-fg-muted' }
+        const categoryConfig = FLAG_CATEGORIES[flags[0].key] ?? FALLBACK_CATEGORY
         const Icon = categoryConfig.icon
 
         return (
