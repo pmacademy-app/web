@@ -307,8 +307,27 @@ describe('AchievementCelebrationModal — invite peers', () => {
   it.each([
     ['certificate', certificate()],
     ['capstone', capstone()],
-  ])('shows no invite control on a %s celebration', async (_label, celebration) => {
-    await renderWithInvite(celebration, vi.fn())
+  ])('shows a quieter invite control on a %s celebration and passes its kind', async (kind, celebration) => {
+    const onInvitePeers = vi.fn()
+    await renderWithInvite(celebration, onInvitePeers)
+
+    await click(inviteControl())
+
+    expect(onInvitePeers).toHaveBeenCalledWith(kind)
+    expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith(kind, 'invite_peers')
+  })
+
+  it('shows no invite control on a module celebration', async () => {
+    await renderWithInvite(
+      {
+        kind: 'module',
+        notificationId: 'ntf-module-1',
+        portfolio: publicPortfolio,
+        module: { slug: 'discovery', title: 'Users, Problems & Discovery' },
+        capstone: null,
+      },
+      vi.fn(),
+    )
     expect(dialog()).not.toBeNull()
     expect(dialogText()).not.toMatch(/invite/i)
   })
@@ -325,6 +344,7 @@ describe('AchievementCelebrationModal — invite peers', () => {
     await click(inviteControl())
 
     expect(onInvitePeers).toHaveBeenCalledTimes(1)
+    expect(onInvitePeers).toHaveBeenCalledWith('fellow')
     expect(analytics.trackAchievementCelebrationCtaClicked).toHaveBeenCalledWith('fellow', 'invite_peers')
     expect(onClose).not.toHaveBeenCalled()
   })

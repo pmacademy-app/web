@@ -29,7 +29,7 @@ const analytics = vi.hoisted(() => ({
 }))
 const api = vi.hoisted(() => ({ apiPost: vi.fn(), apiGet: vi.fn() }))
 // The last onInvitePeers the modal received, so a test can click it again mid-animation.
-const lastInvite = vi.hoisted(() => ({ fn: null as null | (() => void) }))
+const lastInvite = vi.hoisted(() => ({ fn: null as null | ((kind: string) => void) }))
 // Stands in for the bell's SWR query: the test sets `data` and re-renders.
 const bell = vi.hoisted(() => ({
   data: undefined as { success: boolean; unreadCount: number } | undefined,
@@ -52,15 +52,15 @@ vi.mock('@/components/celebration/AchievementCelebrationModal', () => ({
     onClose,
     onInvitePeers,
   }: {
-    celebration: { notificationId: string } | null
+    celebration: { notificationId: string; kind: string } | null
     onClose: () => void
-    onInvitePeers?: () => void
+    onInvitePeers?: (kind: string) => void
   }) => {
     lastInvite.fn = onInvitePeers ?? null
     return celebration ? (
       <>
         <div data-testid="celebration" data-notification-id={celebration.notificationId} onClick={onClose} />
-        {onInvitePeers && <span data-testid="invite" onClick={onInvitePeers} />}
+        {onInvitePeers && <span data-testid="invite" onClick={() => onInvitePeers(celebration.kind)} />}
       </>
     ) : null
   },
@@ -437,7 +437,7 @@ describe('AchievementCelebrationHost — invite peers', () => {
     await clickInvite()
     // The real dialog keeps its content clickable while it animates out.
     await act(async () => {
-      invite?.()
+      invite?.('fellow')
     })
 
     expect(referralFetches()).toBe(1)
@@ -469,6 +469,21 @@ describe('AchievementCelebrationHost — invite peers', () => {
 
     expect(analytics.trackReferralModalOpened).toHaveBeenCalledTimes(1)
     expect(analytics.trackReferralModalOpened).toHaveBeenCalledWith('fellow_celebration')
+  })
+
+  it('reports the celebration kind as the source for a capstone invite', async () => {
+    api.apiPost.mockReset().mockResolvedValueOnce(
+      answer({
+        kind: 'capstone',
+        notificationId: 'ntf-capstone-1',
+        portfolio,
+        capstone: { moduleSlug: 'discovery', moduleTitle: 'Discovery' },
+      }),
+    )
+    await render()
+    await clickInvite()
+
+    expect(analytics.trackReferralModalOpened).toHaveBeenCalledWith('capstone_celebration')
   })
 
   it('reports a copied link with channel fellow_celebration', async () => {

@@ -19,6 +19,7 @@ import {
   trackAchievementCelebrationCtaClicked,
   type AchievementCelebrationCtaAction,
 } from '@/lib/analytics'
+import type { AchievementCelebrationKind } from '@/lib/api/contracts/achievement-celebration'
 import type {
   AchievementCelebration,
   CelebrationPortfolio,
@@ -30,8 +31,11 @@ interface AchievementCelebrationModalProps {
   /** Open while non-null. */
   celebration: AchievementCelebration | null
   onClose: () => void
-  /** Shows "Invite peers" on the Fellow variant. The modal does not close itself for it. */
-  onInvitePeers?: () => void
+  /**
+   * Shows "Invite peers" on the Fellow, certificate and capstone variants (not module). Called
+   * with the kind so the referral flow can report its source. The modal does not close itself.
+   */
+  onInvitePeers?: (kind: AchievementCelebrationKind) => void
 }
 
 interface CelebrationCopy {
@@ -216,7 +220,7 @@ function CelebrationContent({
 }: {
   celebration: AchievementCelebration
   onClose: () => void
-  onInvitePeers?: () => void
+  onInvitePeers?: (kind: AchievementCelebrationKind) => void
 }) {
   const { Icon, title, subject, description } = getCopy(celebration)
   const trackCta = (action: AchievementCelebrationCtaAction) =>
@@ -291,13 +295,15 @@ function CelebrationContent({
             }}
           />
         )}
-        {celebration.kind === 'fellow' && onInvitePeers && (
+        {/* Fellow invites as a peer CTA; certificate and capstone as a quiet third option. */}
+        {celebration.kind !== 'module' && onInvitePeers && (
           <Button
             type="button"
-            variant="outline"
+            variant={celebration.kind === 'fellow' ? 'outline' : 'ghost'}
+            size={celebration.kind === 'fellow' ? 'default' : 'sm'}
             onClick={() => {
               trackCta('invite_peers')
-              onInvitePeers()
+              onInvitePeers(celebration.kind)
             }}
           >
             <UserPlus aria-hidden="true" />

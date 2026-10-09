@@ -274,6 +274,7 @@ export function ReferralSettingsTab() {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         referralLink={referralLink}
+        source="settings_tab"
       />
     </div>
   )

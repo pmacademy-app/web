@@ -7,6 +7,7 @@ import { useApiQuery } from '@/lib/api/hooks'
 import {
   ACHIEVEMENT_CELEBRATIONS_PATH,
   type AchievementCelebration,
+  type AchievementCelebrationKind,
   type AchievementCelebrationClaimResponse,
 } from '@/lib/api/contracts/achievement-celebration'
 import { isLessonPath, shouldLaunchDeferredQuickStart } from '@/lib/quick-start/deferred-launch'
@@ -19,8 +20,11 @@ import { ReferralShareModal } from '@/components/referral/ReferralShareModal'
 const NOTIFICATIONS_SUMMARY_KEY = '/api/notifications?limit=1'
 const REFERRALS_PATH = '/api/referrals'
 
-/** The Fellow celebration's "Invite peers" flow: closed, fetching the link, or showing it. */
-type ReferralState = { phase: 'idle' } | { phase: 'loading' } | { phase: 'open'; link: string }
+/** A celebration's "Invite peers" flow: closed, fetching the link, or showing it. */
+type ReferralState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'open'; link: string; source: string }
 
 interface NotificationsSummaryResponse {
   success: boolean
@@ -96,7 +100,7 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
   // Swap, never stack: the celebration closes first, and the referral modal opens only once
   // the link has loaded. The link is fetched on click, not on mount. A failed fetch just ends
   // the flow.
-  const handleInvitePeers = useCallback(async () => {
+  const handleInvitePeers = useCallback(async (kind: AchievementCelebrationKind) => {
     if (inviteStarted.current) return
     inviteStarted.current = true
     setCelebration(null)
@@ -109,7 +113,7 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
       // Treated like a failed response.
     }
     if (!link) inviteStarted.current = false
-    setReferral(link ? { phase: 'open', link } : { phase: 'idle' })
+    setReferral(link ? { phase: 'open', link, source: `${kind}_celebration` } : { phase: 'idle' })
   }, [])
 
   const handleReferralClose = useCallback(() => {
@@ -128,7 +132,7 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
         isOpen={referral.phase === 'open'}
         onClose={handleReferralClose}
         referralLink={referral.phase === 'open' ? referral.link : ''}
-        source="fellow_celebration"
+        source={referral.phase === 'open' ? referral.source : undefined}
       />
     </>
   )
