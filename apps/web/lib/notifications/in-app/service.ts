@@ -177,7 +177,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     }
     case 'certificate.generated': {
       const code = String(payload.certificateCode || '')
-      return { title: 'Certificate issued', body: `Your official certificate is ready. Verify it online with code ${code}.`, actionUrl: code ? `/verify/${code}` : '/progress' }
+      return { title: 'Certificate issued', body: `Your official certificate is ready. Verify it online with code ${code}.`, actionUrl: '/progress/certificates' }
     }
     case 'capstone.submitted': {
       return { title: 'Capstone submitted', body: `Your ${String(payload.moduleTitle || 'module')} capstone has been submitted for review.`, actionUrl: '/capstones' }

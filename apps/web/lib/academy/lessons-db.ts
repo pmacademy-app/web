@@ -432,6 +432,25 @@ export async function recordQuizAttemptAction(
         },
       })
     }
+
+    // Growth R1: issue (and announce once) the full-curriculum certificate as soon as
+    // the learner completes every lesson. Gated on `isFirstAttempt`: the first quiz
+    // attempt is the one that marks a lesson completed (later attempts cannot change the
+    // completed count), so post-90 resubmissions skip the extra queries. Learners who
+    // finished before this hook existed, or whose issuance failed here, are repaired by
+    // the certificates page. The helper is idempotent and only dispatches when it
+    // created the row; isolated so a failure never breaks quiz submission.
+    if (isFirstAttempt && totalCompletedLessons >= 90) {
+      try {
+        const { issueFullCurriculumCertificateIfEligible } = await import('../certificates/issue-flow')
+        await issueFullCurriculumCertificateIfEligible(supabase, userId, {
+          email: userRec?.email,
+          name: userRec?.name,
+        })
+      } catch (certErr) {
+        console.warn('[lessons-db] Full-curriculum certificate issuance warning:', certErr)
+      }
+    }
   } catch (modErr) {
     console.warn('[lessons-db] Notification dispatch warning:', modErr)
   }

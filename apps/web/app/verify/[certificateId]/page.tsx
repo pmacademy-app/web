@@ -8,6 +8,11 @@ import { VerificationBadge } from '@/components/certificates/VerificationBadge'
 import { Award, AlertCircle, ArrowLeft, BookOpen, Layers, Zap, User } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import {
+  TEST_CERTIFICATE_EXPLANATION,
+  TEST_CERTIFICATE_LABEL,
+  getVerifyPageCopy,
+} from '@/lib/certificates/presentation'
 
 interface PageProps {
   params: Promise<{ certificateId: string }>
@@ -23,8 +28,11 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
  * validity column — its columns are career_title, certificate_code, id, issued_at,
  * learner_name, lessons_completed, level, module_slug, modules_completed, total_xp,
  * type and user_id — and no migration adds one. Nothing in the app updates a
- * certificate after issuance except an admin dev-only test-certificate generator.
- * There is consequently no revocation to propagate.
+ * certificate after issuance: the admin dev test-certificate generator only inserts
+ * its own `TEST-` rows. There is consequently no revocation to propagate.
+ *
+ * A `TEST-` row resolves here like any other, so the page words it as a test
+ * certificate (see `getVerifyPageCopy`) rather than as a verified credential.
  *
  * The one genuinely live part is the display join: `verifyCertificate()` resolves the
  * holder's current `name`, `username` and `avatar_url`. An hour bounds how long a
@@ -63,8 +71,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const metaTitle = `Verified Certificate: ${cert.learnerName} | ${cert.levelInfo.title}`
-  const metaDesc = `Official ${BRAND.fullName} Certificate of Completion for ${cert.learnerName} (${cert.levelInfo.title}, ${cert.lessonsCompleted} lessons completed). Certificate ID: ${cert.certificateCode}.`
+  const copy = getVerifyPageCopy({
+    certificateCode: cert.certificateCode,
+    learnerName: cert.learnerName,
+    careerTitle: cert.levelInfo.title,
+    lessonsCompleted: cert.lessonsCompleted,
+  })
+  const metaTitle = copy.metaTitle
+  const metaDesc = copy.metaDescription
+
+  // A test certificate is never indexed, canonicalised or previewed as a credential.
+  if (!copy.indexable) {
+    return {
+      title: metaTitle,
+      description: metaDesc,
+      robots: { index: false, follow: false },
+      openGraph: { type: 'website', title: metaTitle, description: metaDesc },
+      twitter: { card: 'summary', title: metaTitle, description: metaDesc },
+    }
+  }
 
   return {
     title: metaTitle,
@@ -118,6 +143,13 @@ export default async function CertificateVerificationPage({ params }: PageProps)
     )
   }
 
+  const copy = getVerifyPageCopy({
+    certificateCode: cert.certificateCode,
+    learnerName: cert.learnerName,
+    careerTitle: cert.levelInfo.title,
+    lessonsCompleted: cert.lessonsCompleted,
+  })
+
   const credentialJsonLd = generateCredentialJsonLd({
     certificateCode: cert.certificateCode,
     learnerName: cert.learnerName,
@@ -130,28 +162,55 @@ export default async function CertificateVerificationPage({ params }: PageProps)
 
   return (
     <div className="min-h-screen bg-background text-foreground py-8 md:py-12 px-4">
-      {/* Schema.org Credential JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(credentialJsonLd) }}
-      />
+      {/* Schema.org Credential JSON-LD (real credentials only) */}
+      {copy.isShareableCredential && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(credentialJsonLd) }}
+        />
+      )}
 
       <div className="max-w-5xl mx-auto space-y-8">
-        {/* Verification Status Badge */}
-        <VerificationBadge
-          certificateCode={cert.certificateCode}
-          issuedAt={cert.issuedAt}
-        />
+        {/* Verification Status Badge, or the test-certificate notice. Print shows only the
+            certificate card, so the card carries its own test marking (CertificateCard). */}
+        {copy.isTest ? (
+          <div
+            role="alert"
+            className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-center justify-between gap-4 text-amber-700 dark:text-amber-400"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/20 shrink-0">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm">{TEST_CERTIFICATE_LABEL}</p>
+                <p className="text-[11px] opacity-90 mt-0.5 font-sans">{TEST_CERTIFICATE_EXPLANATION}</p>
+              </div>
+            </div>
 
-        {/* Action Bar (Print, Share, Download PDF, Copy Link, Add to LinkedIn) */}
-        <CertificateActions
-          verificationUrl={cert.verificationUrl}
-          portfolioUrl={cert.portfolioUrl}
-          certificateCode={cert.certificateCode}
-          careerTitle={cert.levelInfo.title}
-          type={cert.type}
-          issuedAt={cert.issuedAt}
-        />
+            <div className="text-right font-mono text-[11px] font-bold shrink-0 hidden sm:block">
+              Code: {cert.certificateCode}
+            </div>
+          </div>
+        ) : (
+          <VerificationBadge
+            certificateCode={cert.certificateCode}
+            issuedAt={cert.issuedAt}
+          />
+        )}
+
+        {/* Action Bar (Print, Share, Download PDF, Copy Link, Add to LinkedIn).
+            Not offered for a test certificate: it must not be shared as a credential. */}
+        {copy.isShareableCredential && (
+          <CertificateActions
+            verificationUrl={cert.verificationUrl}
+            portfolioUrl={cert.portfolioUrl}
+            certificateCode={cert.certificateCode}
+            careerTitle={cert.levelInfo.title}
+            type={cert.type}
+            issuedAt={cert.issuedAt}
+          />
+        )}
 
         {/* Official Printable Certificate Layout */}
         <CertificateCard certificate={cert} />
@@ -221,7 +280,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
         {/* Footer Branding */}
         <div className="no-print text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">
           <p>
-            Official Verified Credential. {BRAND.certificateIssuerLine}.
+            {copy.footerLine}
           </p>
           <p className="text-[11px] text-muted-foreground/60">
             Immutable Verification Code: {cert.certificateCode} · 0 dark patterns.

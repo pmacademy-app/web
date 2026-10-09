@@ -84,11 +84,13 @@ export default async function DashboardPage() {
       data: Array<{ id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }> | null
     }>,
     // Read-only existence check for the full-curriculum certificate (never issues one).
+    // Admin-generated TEST- rows are not credentials and must not count as earned.
     (supabase
       .from('certificates') as unknown as DBChain)
       .select('id')
       .eq('user_id', authUser.id)
       .eq('type', 'full_curriculum')
+      .not('certificate_code', 'like', 'TEST-%')
       .limit(1) as unknown as Promise<{
       data: Array<{ id: string }> | null
       error: unknown

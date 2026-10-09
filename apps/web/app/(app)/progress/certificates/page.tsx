@@ -3,7 +3,11 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { getUserCertificates, issueCertificate } from '@/lib/certificates-db'
+import { getUserCertificates, isTestCertificateCode } from '@/lib/certificates-db'
+import {
+  FULL_CURRICULUM_LESSON_COUNT,
+  issueFullCurriculumCertificateIfEligible,
+} from '@/lib/certificates/issue-flow'
 import { CertificatesCard } from '@/components/progress/CertificatesCard'
 import { GraduationCap } from 'lucide-react'
 
@@ -38,13 +42,28 @@ export default async function CertificatesProgressPage() {
   ])
 
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
-  const completedPercentage = Math.min(100, Math.round((completedLessons / 90) * 100))
+  const completedPercentage = Math.min(
+    100,
+    Math.round((completedLessons / FULL_CURRICULUM_LESSON_COUNT) * 100)
+  )
 
+  // Repair: a learner who finished every lesson before issuance moved into the
+  // lesson-completion path (or whose issuance failed there) gets their real
+  // full-curriculum certificate here. Module and admin TEST- certificates do not count.
+  // Idempotent and announced only when this render created the row; never throws.
   let certificates = userCertificates
-  if (completedLessons >= 90 && userCertificates.length === 0) {
+  const hasFullCurriculumCertificate = userCertificates.some(
+    (c) => c.type === 'full_curriculum' && !isTestCertificateCode(c.certificate_code)
+  )
+  if (completedLessons >= FULL_CURRICULUM_LESSON_COUNT && !hasFullCurriculumCertificate) {
     try {
-      const issued = await issueCertificate(supabase, user.id, 'full_curriculum')
-      certificates = [issued]
+      const { certificate } = await issueFullCurriculumCertificateIfEligible(supabase, user.id, {
+        email: user.email,
+        name: user.user_metadata?.full_name || user.email?.split('@')[0],
+      })
+      if (certificate && !userCertificates.some((c) => c.id === certificate.id)) {
+        certificates = [certificate, ...userCertificates]
+      }
     } catch (e) {
       console.warn('Failed to auto-issue certificate:', e)
     }

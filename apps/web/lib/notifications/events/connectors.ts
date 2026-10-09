@@ -167,6 +167,15 @@ export function initializeNotificationConnectors(force: boolean = false): void {
 
   // 7. Achievement: certificate.generated -> achievement.certificate
   d.registerHandler('certificate.generated', 'connector.achievement.certificate', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // One email per certificate, decided by the email_queue unique index. Without a key
+    // the processor falls back to a (user, template, event type) SELECT, which lets an
+    // earlier module-certificate email suppress the full-curriculum one and is not
+    // race-safe.
+    const certificateCode = event.payload.certificateCode
+    const idempotencyKey =
+      typeof certificateCode === 'string' && certificateCode.length > 0
+        ? `certificate:${certificateCode}`
+        : undefined
     await enqueueNotificationItem({
       userId: event.userId,
       toEmail: event.userEmail,
@@ -182,6 +191,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'certificates',
       priorityLevel: 'high',
+      idempotencyKey,
     })
   })
 
