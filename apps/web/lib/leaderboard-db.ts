@@ -20,6 +20,11 @@ export interface WeeklyLeaderboardPayload {
   isOptedIn: boolean
   entries: LeaderboardEntry[]
   personalEntry: LeaderboardEntry | null
+  /**
+   * Present (and `true`) only when one of the weekly aggregation queries failed, so the
+   * metrics it feeds were zeroed rather than loaded. Absent on a complete board.
+   */
+  degraded?: boolean
 }
 
 export interface CohortItemPayload {
@@ -72,10 +77,30 @@ interface LeaderboardCacheEntry {
   users: LeaderboardUserRow[]
   optedOutUserIds: Set<string>
   rawMetrics: RawLeaderboardUserMetric[]
+  // True when an aggregation query failed. Such an entry is handed back to the callers
+  // of that rebuild but never stored in LEADERBOARD_CACHE.
+  degraded: boolean
 }
 
 const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
 const CACHE_TTL_MS = 45 * 1000
+
+// Rebuilds currently running, keyed like the cache. Concurrent cache misses (the
+// dashboard widget and the leaderboard page both drive this) share one rebuild instead
+// of each running the four full paged scans.
+const LEADERBOARD_INFLIGHT = new Map<string, Promise<LeaderboardCacheEntry>>()
+
+// Short negative cache for rebuilds that failed outright (the opt-out query throws, so
+// the board is suppressed). During an outage this stops every request re-running the
+// scans; callers still get the original error, never a board that looks like a quiet week.
+// Partially degraded boards are deliberately NOT negative-cached: they are returned but
+// never cached, so the next request retries and recovers as soon as the query does.
+interface LeaderboardFailureEntry {
+  timestamp: number
+  error: unknown
+}
+const LEADERBOARD_FAILURES = new Map<string, LeaderboardFailureEntry>()
+const FAILURE_CACHE_TTL_MS = 10 * 1000
 
 /**
  * Records a failed weekly-aggregation query as a structured incident.
@@ -120,166 +145,203 @@ async function reportLeaderboardQueryFailure(
  * Shared by global, cohort-scoped, and friend-scoped ranking views so the expensive
  * aggregation queries run at most once per week per 45-second window, regardless of
  * how many scopes/cohorts are viewed.
+ *
+ * Concurrent misses share a single in-flight rebuild, and a rebuild that failed outright
+ * is remembered for FAILURE_CACHE_TTL_MS so an outage is not re-scanned on every request.
  */
-async function getOrBuildWeeklyRawMetrics(
+function getOrBuildWeeklyRawMetrics(
   supabase: SupabaseClient<Database>,
   weekStart: string
 ): Promise<LeaderboardCacheEntry> {
   const now = Date.now()
-  let cached = LEADERBOARD_CACHE.get(weekStart)
-  if (!cached || now - cached.timestamp > CACHE_TTL_MS) {
-    // Tracks whether any of the four aggregation queries failed. A partial board is
-    // still returned, but it must not be cached as if it were complete — see the
-    // cache write at the end of this block.
-    let aggregationDegraded = false
+  const cached = LEADERBOARD_CACHE.get(weekStart)
+  if (cached && now - cached.timestamp <= CACHE_TTL_MS) {
+    return Promise.resolve(cached)
+  }
 
-    // 1. Fetch users with total_xp > 0.
-    //
-    // Paged rather than issued as one unbounded select: PostgREST truncates at its row
-    // cap without reporting an error, which silently drops everyone past it from the
-    // board. F-COR-4.
-    let userList: LeaderboardUserRow[] = []
-    try {
-      userList = await db.selectRankedUsers(supabase)
-    } catch (usersError) {
-      aggregationDegraded = true
-      await reportLeaderboardQueryFailure(
-        'leaderboard.weekly_users',
-        'Weekly leaderboard user roster query failed',
-        usersError
-      )
+  const failure = LEADERBOARD_FAILURES.get(weekStart)
+  if (failure) {
+    if (now - failure.timestamp <= FAILURE_CACHE_TTL_MS) {
+      return Promise.reject(failure.error)
     }
+    LEADERBOARD_FAILURES.delete(weekStart)
+  }
 
-    const userIds = new Set(userList.map((u) => u.id))
+  const inFlight = LEADERBOARD_INFLIGHT.get(weekStart)
+  if (inFlight) return inFlight
 
-    // 2. Fetch opted-out users so we can exclude them.
-    let optedOutRows: { user_id: string }[] = []
-    try {
-      optedOutRows = await db.selectOptedOutUserIds(supabase)
-    } catch (optOutError) {
-      aggregationDegraded = true
-      // Failing open here would publish users who opted OUT of the leaderboard, so the
-      // board is suppressed rather than shown without the exclusion list.
-      await reportLeaderboardQueryFailure(
-        'leaderboard.weekly_opt_outs',
-        'Weekly leaderboard opt-out query failed',
-        optOutError
-      )
-      throw optOutError
-    }
-
-    const optedOutUserIds = new Set<string>(optedOutRows.map((r) => r.user_id))
-
-    // 3. Fetch lesson progress in current week for consistency metric
-    const weekStartDate = new Date(weekStart)
-    //
-    // The `.in('user_id', <every qualifying id>)` filter this used to carry put the
-    // entire user roster into a query string, which fails on URL length as the user
-    // base grows. The week bound already limits the row set to recent activity, and the
-    // rows are matched against `userIds` in JS below, so the filter bought nothing that
-    // the client-side join does not. F-COR-4.
-    let lessonProgress: db.WeeklyLessonRow[] = []
-    try {
-      lessonProgress = await db.selectWeeklyLessonProgress(supabase, weekStartDate.toISOString())
-    } catch (lessonProgressError) {
-      aggregationDegraded = true
-      await reportLeaderboardQueryFailure(
-        'leaderboard.weekly_lesson_progress',
-        'Weekly leaderboard lesson-progress query failed',
-        lessonProgressError
-      )
-    }
-
-    // 4. Fetch xp events in current week.
-    //
-    // The column is `xp_amount`, not `amount`. This selected `amount` until B8-A, which
-    // PostgREST rejects as an unknown column — and because only `data` was destructured,
-    // the error went nowhere, `data` came back null, and every user's weekly XP reduced
-    // to 0 with no signal anywhere. Hence the check below: a failed read here must never
-    // be indistinguishable from a week in which nobody earned XP. See F-COR-1.
-    let xpEvents: db.WeeklyXpRow[] = []
-    try {
-      xpEvents = await db.selectWeeklyXpEvents(supabase, weekStartDate.toISOString())
-    } catch (xpEventsError) {
-      aggregationDegraded = true
-      await reportLeaderboardQueryFailure(
-        'leaderboard.weekly_xp_events',
-        'Weekly leaderboard XP events query failed',
-        xpEventsError
-      )
-    }
-
-    // Group once by user rather than re-scanning both arrays per user. The previous
-    // per-user `.filter()` was O(users × events); now that the two queries are paged to
-    // completion and no longer pre-filtered by user id, that cost would compound.
-    // Rows belonging to users who are not on the board are dropped here — this is the
-    // client-side join that replaces the old `.in()` filter.
-    const lessonDaysByUser = new Map<string, Set<string>>()
-    const lessonCountByUser = new Map<string, number>()
-    for (const lp of lessonProgress) {
-      // `user_id` is nullable in the schema. The local row shape this module used to
-      // declare said otherwise, so the null case was invisible; a null here would have
-      // keyed the maps under "null" and inflated one phantom learner's metrics.
-      const progressUserId = lp.user_id
-      if (!progressUserId || !userIds.has(progressUserId)) continue
-      lessonCountByUser.set(progressUserId, (lessonCountByUser.get(progressUserId) ?? 0) + 1)
-      if (lp.completed_at) {
-        let days = lessonDaysByUser.get(progressUserId)
-        if (!days) {
-          days = new Set<string>()
-          lessonDaysByUser.set(progressUserId, days)
-        }
-        days.add(lp.completed_at.split('T')[0])
-      }
-    }
-
-    const xpByUser = new Map<string, number>()
-    for (const xe of xpEvents) {
-      // Nullable for the same reason as above.
-      const xpUserId = xe.user_id
-      if (!xpUserId || !userIds.has(xpUserId)) continue
-      xpByUser.set(xpUserId, (xpByUser.get(xpUserId) ?? 0) + (xe.xp_amount || 0))
-    }
-
-    // Aggregate user weekly metrics
-    const rawMetrics: RawLeaderboardUserMetric[] = userList.map((u) => {
-      const lessonsCompleted = lessonCountByUser.get(u.id) ?? 0
-      const daysStudied = lessonDaysByUser.get(u.id)?.size ?? 0
-      const xpEarned = xpByUser.get(u.id) ?? 0
-
-      const levelInfo = calculateLevel(u.total_xp || 0)
-
-      return {
-        userId: u.id,
-        username: u.username ?? null,
-        name: u.name ?? null,
-        avatarUrl: u.avatar_url ?? null,
-        levelTitle: levelInfo.title,
-        level: levelInfo.level,
-        daysStudied,
-        lessonsCompleted,
-        xpEarned,
-        currentStreak: u.current_streak || 0,
-        totalXp: u.total_xp || 0,
+  const rebuild = buildWeeklyRawMetrics(supabase, weekStart)
+    .catch((error: unknown) => {
+      LEADERBOARD_FAILURES.set(weekStart, { timestamp: Date.now(), error })
+      throw error
+    })
+    .finally(() => {
+      if (LEADERBOARD_INFLIGHT.get(weekStart) === rebuild) {
+        LEADERBOARD_INFLIGHT.delete(weekStart)
       }
     })
+  LEADERBOARD_INFLIGHT.set(weekStart, rebuild)
+  return rebuild
+}
 
-    cached = {
-      timestamp: now,
-      users: userList,
-      optedOutUserIds,
-      rawMetrics,
-    }
+/** Runs the four weekly aggregation queries and caches the result when it is complete. */
+async function buildWeeklyRawMetrics(
+  supabase: SupabaseClient<Database>,
+  weekStart: string
+): Promise<LeaderboardCacheEntry> {
+  const now = Date.now()
+  // Tracks whether any of the four aggregation queries failed. A partial board is
+  // still returned, but it must not be cached as if it were complete — see the
+  // cache write at the end of this function.
+  let aggregationDegraded = false
 
-    // Only cache a complete result. Caching a degraded board would pin the wrong
-    // numbers for the full TTL and suppress recovery on the next request — the same
-    // "a wrong answer looks like a quiet week" failure mode as F-COR-1, one layer up.
-    if (!aggregationDegraded) {
-      LEADERBOARD_CACHE.set(weekStart, cached)
+  // 1. Fetch users with total_xp > 0.
+  //
+  // Paged rather than issued as one unbounded select: PostgREST truncates at its row
+  // cap without reporting an error, which silently drops everyone past it from the
+  // board. F-COR-4.
+  let userList: LeaderboardUserRow[] = []
+  try {
+    userList = await db.selectRankedUsers(supabase)
+  } catch (usersError) {
+    aggregationDegraded = true
+    await reportLeaderboardQueryFailure(
+      'leaderboard.weekly_users',
+      'Weekly leaderboard user roster query failed',
+      usersError
+    )
+  }
+
+  const userIds = new Set(userList.map((u) => u.id))
+
+  // 2. Fetch opted-out users so we can exclude them.
+  let optedOutRows: { user_id: string }[] = []
+  try {
+    optedOutRows = await db.selectOptedOutUserIds(supabase)
+  } catch (optOutError) {
+    aggregationDegraded = true
+    // Failing open here would publish users who opted OUT of the leaderboard, so the
+    // board is suppressed rather than shown without the exclusion list.
+    await reportLeaderboardQueryFailure(
+      'leaderboard.weekly_opt_outs',
+      'Weekly leaderboard opt-out query failed',
+      optOutError
+    )
+    throw optOutError
+  }
+
+  const optedOutUserIds = new Set<string>(optedOutRows.map((r) => r.user_id))
+
+  // 3. Fetch lesson progress in current week for consistency metric
+  const weekStartDate = new Date(weekStart)
+  //
+  // The `.in('user_id', <every qualifying id>)` filter this used to carry put the
+  // entire user roster into a query string, which fails on URL length as the user
+  // base grows. The week bound already limits the row set to recent activity, and the
+  // rows are matched against `userIds` in JS below, so the filter bought nothing that
+  // the client-side join does not. F-COR-4.
+  let lessonProgress: db.WeeklyLessonRow[] = []
+  try {
+    lessonProgress = await db.selectWeeklyLessonProgress(supabase, weekStartDate.toISOString())
+  } catch (lessonProgressError) {
+    aggregationDegraded = true
+    await reportLeaderboardQueryFailure(
+      'leaderboard.weekly_lesson_progress',
+      'Weekly leaderboard lesson-progress query failed',
+      lessonProgressError
+    )
+  }
+
+  // 4. Fetch xp events in current week.
+  //
+  // The column is `xp_amount`, not `amount`. This selected `amount` until B8-A, which
+  // PostgREST rejects as an unknown column — and because only `data` was destructured,
+  // the error went nowhere, `data` came back null, and every user's weekly XP reduced
+  // to 0 with no signal anywhere. Hence the check below: a failed read here must never
+  // be indistinguishable from a week in which nobody earned XP. See F-COR-1.
+  let xpEvents: db.WeeklyXpRow[] = []
+  try {
+    xpEvents = await db.selectWeeklyXpEvents(supabase, weekStartDate.toISOString())
+  } catch (xpEventsError) {
+    aggregationDegraded = true
+    await reportLeaderboardQueryFailure(
+      'leaderboard.weekly_xp_events',
+      'Weekly leaderboard XP events query failed',
+      xpEventsError
+    )
+  }
+
+  // Group once by user rather than re-scanning both arrays per user. The previous
+  // per-user `.filter()` was O(users × events); now that the two queries are paged to
+  // completion and no longer pre-filtered by user id, that cost would compound.
+  // Rows belonging to users who are not on the board are dropped here — this is the
+  // client-side join that replaces the old `.in()` filter.
+  const lessonDaysByUser = new Map<string, Set<string>>()
+  const lessonCountByUser = new Map<string, number>()
+  for (const lp of lessonProgress) {
+    // `user_id` is nullable in the schema. The local row shape this module used to
+    // declare said otherwise, so the null case was invisible; a null here would have
+    // keyed the maps under "null" and inflated one phantom learner's metrics.
+    const progressUserId = lp.user_id
+    if (!progressUserId || !userIds.has(progressUserId)) continue
+    lessonCountByUser.set(progressUserId, (lessonCountByUser.get(progressUserId) ?? 0) + 1)
+    if (lp.completed_at) {
+      let days = lessonDaysByUser.get(progressUserId)
+      if (!days) {
+        days = new Set<string>()
+        lessonDaysByUser.set(progressUserId, days)
+      }
+      days.add(lp.completed_at.split('T')[0])
     }
   }
 
-  return cached
+  const xpByUser = new Map<string, number>()
+  for (const xe of xpEvents) {
+    // Nullable for the same reason as above.
+    const xpUserId = xe.user_id
+    if (!xpUserId || !userIds.has(xpUserId)) continue
+    xpByUser.set(xpUserId, (xpByUser.get(xpUserId) ?? 0) + (xe.xp_amount || 0))
+  }
+
+  // Aggregate user weekly metrics
+  const rawMetrics: RawLeaderboardUserMetric[] = userList.map((u) => {
+    const lessonsCompleted = lessonCountByUser.get(u.id) ?? 0
+    const daysStudied = lessonDaysByUser.get(u.id)?.size ?? 0
+    const xpEarned = xpByUser.get(u.id) ?? 0
+
+    const levelInfo = calculateLevel(u.total_xp || 0)
+
+    return {
+      userId: u.id,
+      username: u.username ?? null,
+      name: u.name ?? null,
+      avatarUrl: u.avatar_url ?? null,
+      levelTitle: levelInfo.title,
+      level: levelInfo.level,
+      daysStudied,
+      lessonsCompleted,
+      xpEarned,
+      currentStreak: u.current_streak || 0,
+      totalXp: u.total_xp || 0,
+    }
+  })
+
+  const built: LeaderboardCacheEntry = {
+    timestamp: now,
+    users: userList,
+    optedOutUserIds,
+    rawMetrics,
+    degraded: aggregationDegraded,
+  }
+
+  // Only cache a complete result. Caching a degraded board would pin the wrong
+  // numbers for the full TTL and suppress recovery on the next request — the same
+  // "a wrong answer looks like a quiet week" failure mode as F-COR-1, one layer up.
+  if (!aggregationDegraded) {
+    LEADERBOARD_CACHE.set(weekStart, built)
+  }
+
+  return built
 }
 
 /**
@@ -342,6 +404,9 @@ export async function getWeeklyLeaderboard(
     isOptedIn,
     entries: publicEntries,
     personalEntry,
+    // Only set on a degraded board, so a complete payload keeps its existing shape.
+    // Without it a zeroed metric is indistinguishable from a learner who did nothing.
+    ...(cached.degraded ? { degraded: true } : {}),
   }
 }
 

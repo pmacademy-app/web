@@ -23,7 +23,13 @@ const ShareButton = dynamic(
   () => import('@/components/portfolio/ShareButton').then((mod) => mod.ShareButton),
   {
     ssr: false,
-    loading: () => <span aria-hidden="true" className="inline-block min-h-[38px] w-[150px]" />,
+    loading: () => (
+      <span aria-hidden="true" className="inline-flex items-center gap-2">
+        <span className="h-10 w-28 rounded-lg bg-muted/40" />
+        <span className="size-10 rounded-lg bg-muted/40" />
+        <span className="size-10 rounded-lg bg-muted/40" />
+      </span>
+    ),
   },
 )
 

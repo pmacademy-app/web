@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserStreakStatus } from '@/lib/streaks-db'
+import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
@@ -15,6 +17,8 @@ import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
 import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
+import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
+import { LeaderboardWidgetSlot } from './LeaderboardWidgetSlot'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -32,6 +36,15 @@ export default async function DashboardPage() {
   }
 
   const supabase = createServiceRoleClient()
+
+  // Started now so it runs alongside the page's own data, but awaited only inside the
+  // widget's <Suspense> boundary below: the roster-wide aggregation never blocks the page.
+  // The catch is attached immediately so a failure can never become an unhandled
+  // rejection; the widget renders its "unavailable" state for `null`.
+  const leaderboardPromise = getWeeklyLeaderboard(supabase, authUser.id).catch((error: unknown) => {
+    console.error('[dashboard] weekly leaderboard widget failed to load', error)
+    return null
+  })
 
   // Parallel data fetching with lean column projection.
   // The users profile comes from the request-memoized resolver so it reuses the
@@ -232,8 +245,17 @@ export default async function DashboardPage() {
         hasCertificate={hasCertificate}
       />
 
-      {/* 4. Small Recent-XP Activity Ticker */}
-      <RecentActivityCard activities={recentActivities} />
+      {/* 4. Recent-XP Activity Ticker + weekly leaderboard summary */}
+      {/* Flex, not grid: if the widget renders nothing (opted out), the activity card fills the row. */}
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
+        <div className="min-w-0 flex-1">
+          <RecentActivityCard activities={recentActivities} />
+        </div>
+        {/* Streamed: the roster-wide leaderboard aggregation must not block the page. */}
+        <Suspense fallback={<LeaderboardWidgetSkeleton />}>
+          <LeaderboardWidgetSlot payloadPromise={leaderboardPromise} />
+        </Suspense>
+      </div>
     </div>
   )
 }
