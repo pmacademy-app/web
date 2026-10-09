@@ -182,12 +182,14 @@ function PortfolioCta({
   onShare,
   onPublish,
   secondary = false,
+  shareContext = 'portfolio',
 }: {
   portfolio: CelebrationPortfolio
   onShare: () => void
   onPublish: () => void
   /** Rendered below another primary CTA: the publish link is an outline button. */
   secondary?: boolean
+  shareContext?: 'portfolio' | 'fellow'
 }) {
   if (portfolio.isPublic && portfolio.username) {
     // ShareButton owns its controls and its own `portfolio_share_clicked` event. A click that
@@ -197,7 +199,7 @@ function PortfolioCta({
     }
     return (
       <div className="flex justify-center" onClick={handleClick}>
-        <ShareButton username={portfolio.username} name={portfolio.displayName} />
+        <ShareButton username={portfolio.username} name={portfolio.displayName} context={shareContext} />
       </div>
     )
   }
@@ -288,6 +290,7 @@ function CelebrationContent({
         ) : (
           <PortfolioCta
             portfolio={celebration.portfolio}
+            shareContext={celebration.kind === 'fellow' ? 'fellow' : 'portfolio'}
             onShare={() => trackCta('share_portfolio')}
             onPublish={() => {
               trackCta('publish_portfolio')

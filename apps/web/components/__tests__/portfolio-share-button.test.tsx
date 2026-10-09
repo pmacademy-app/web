@@ -120,6 +120,39 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+// Growth R4 / A5: owner-only Fellow wording. Fellow is a distinction, never a credential.
+describe('ShareButton — fellow context', () => {
+  it('announces the Fellow selection in the X text, with the canonical portfolio URL', async () => {
+    render(<ShareButton username={USERNAME} name="Jane Doe" context="fellow" />)
+
+    await click(byLabel('Share on X (opens in a new window)'))
+
+    const url = new URL(openedUrl())
+    expect(url.searchParams.get('url')).toBe(CANONICAL_URL)
+    expect(url.searchParams.get('text')).toBe(
+      'I was selected as a PM Fellow at Prodily PM Academy. Here is my Product Management portfolio:',
+    )
+  })
+
+  it('keeps the LinkedIn intent to the portfolio URL only', async () => {
+    render(<ShareButton username={USERNAME} name="Jane Doe" context="fellow" />)
+
+    await click(byLabel('Share on LinkedIn (opens in a new window)'))
+
+    expect(openedUrl()).toBe(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(CANONICAL_URL)}`)
+  })
+
+  it('never calls Fellow a certificate or credential, nor links to LinkedIn add-to-profile', async () => {
+    const el = render(<ShareButton username={USERNAME} name="Jane Doe" context="fellow" />)
+
+    await click(byLabel('Share on X (opens in a new window)'))
+    await click(byLabel('Share on LinkedIn (opens in a new window)'))
+
+    const everything = [el.innerHTML, ...openSpy.mock.calls.map((call) => String(call[0]))].join(' ')
+    expect(decodeURIComponent(everything)).not.toMatch(/certif|credential|profile\/add/i)
+  })
+})
+
 describe('ShareButton — social intents', () => {
   it('opens the LinkedIn share-offsite intent with the canonical portfolio URL', async () => {
     render(<ShareButton username={USERNAME} name="Jane Doe" />)

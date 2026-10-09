@@ -270,6 +270,15 @@ describe('AchievementCelebrationModal — fellow', () => {
     expect(dialog()!.outerHTML).not.toMatch(/certif|credential/i)
   })
 
+  it('shares with Fellow wording (X text announces the selection)', async () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null)
+    await render(fellow(publicPortfolio))
+
+    await click(shareGroup()!.querySelector('[aria-label="Share on X (opens in a new window)"]'))
+
+    expect(decodeURIComponent(String(open.mock.calls[0]?.[0]))).toContain('selected as a PM Fellow')
+  })
+
   it('shares a public portfolio and asks to publish a private one', async () => {
     await render(fellow(publicPortfolio))
     expect(shareGroup()).not.toBeNull()

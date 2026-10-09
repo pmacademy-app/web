@@ -12,6 +12,13 @@ interface ShareButtonProps {
   username: string
   /** Display name of the portfolio owner. Falls back to `username`. */
   name?: string | null
+  /**
+   * 'fellow' switches the X and native-share text to the owner announcing their PM Fellow
+   * selection. Owner-only surfaces only: the text is first person. LinkedIn takes just the URL
+   * (its card comes from the portfolio's OG tags), so it is the same for both.
+   * Fellow is a distinction, never a certificate or credential.
+   */
+  context?: 'portfolio' | 'fellow'
 }
 
 const STATUS_RESET_MS = 2500
@@ -51,7 +58,7 @@ function errorName(error: unknown): string | undefined {
   return undefined
 }
 
-export function ShareButton({ username, name }: ShareButtonProps) {
+export function ShareButton({ username, name, context = 'portfolio' }: ShareButtonProps) {
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
   // Bumped on every status flash so the live region re-announces a repeated message.
   const [announcementId, setAnnouncementId] = useState(0)
@@ -80,7 +87,10 @@ export function ShareButton({ username, name }: ShareButtonProps) {
     process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl,
     username,
   )
-  const shareText = `${displayName}'s Product Management portfolio on ${BRAND.fullName}`
+  const shareText =
+    context === 'fellow'
+      ? `I was selected as a PM Fellow at ${BRAND.fullName}. Here is my Product Management portfolio:`
+      : `${displayName}'s Product Management portfolio on ${BRAND.fullName}`
 
   const flashStatus = (status: CopyStatus) => {
     setCopyStatus(status)
