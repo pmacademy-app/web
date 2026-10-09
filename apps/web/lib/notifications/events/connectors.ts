@@ -30,6 +30,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     'srs.review_due',
     'capstone.submitted',
     'capstone.reviewed',
+    'fellow.granted',
     'quiz.completed',
     'streak.updated',
     'review.completed',

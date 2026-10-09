@@ -100,6 +100,15 @@ export interface CapstoneReviewedPayload {
   reviewedAt: string
 }
 
+export interface FellowGrantedPayload {
+  /** Null only if the learner has no handle yet; a grant normally requires a public portfolio. */
+  username: string | null
+  isPortfolioPublic: boolean
+  /** Absolute public portfolio URL, or null when there is no username to build it from. */
+  portfolioUrl: string | null
+  grantedAt: string
+}
+
 export interface UserRegisteredPayload {
   userId: string
   email: string

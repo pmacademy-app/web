@@ -8,6 +8,14 @@ import {
 import type { UserNotificationPreferences } from '../preferences/types'
 import { PRIORITY_MATRIX } from '../constants'
 import type { EventEnvelope } from '../types'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+
+/** `/p/<username>` when the payload names a public portfolio, otherwise null. */
+function publicPortfolioPath(payload: Record<string, unknown>): string | null {
+  const username = typeof payload.username === 'string' ? payload.username.trim() : ''
+  if (!username || payload.isPortfolioPublic !== true) return null
+  return `/p/${encodeURIComponent(username)}`
+}
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -184,6 +192,13 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
           ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
           : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
         actionUrl: moduleSlug ? `/capstones/${moduleSlug}` : '/capstones',
+      }
+    }
+    case 'fellow.granted': {
+      return {
+        title: 'You are now a PM Fellow!',
+        body: 'Congratulations! Your PM Fellow badge is now live on your public portfolio.',
+        actionUrl: publicPortfolioPath(payload) ?? PORTFOLIO_SETTINGS_HREF,
       }
     }
     case 'user.registered': {

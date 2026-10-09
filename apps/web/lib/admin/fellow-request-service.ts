@@ -2,6 +2,7 @@ import { createServiceRoleClient } from '../supabase'
 import { logAdminAction } from './guard'
 import { AdminConsoleService } from './service'
 import { createInAppNotification } from '../notifications/in-app/service'
+import { PORTFOLIO_SETTINGS_HREF } from '../portfolio'
 import { calculatePortfolioReadiness } from '../portfolio-readiness'
 import { isFellowEligible, type FellowRequestRowStatus } from '../fellow'
 
@@ -17,6 +18,13 @@ interface FellowRequestRow {
   reviewed_by: string | null
   reviewed_at: string | null
   rejection_reason: string | null
+}
+
+/** The learner's `users` columns read just before a grant (see `readLearnerBeforeGrant`). */
+interface LearnerBeforeGrant {
+  is_fellow: boolean | null
+  username: string | null
+  is_portfolio_public: boolean | null
 }
 
 export interface AdminFellowRequestItem {
@@ -165,6 +173,11 @@ export class FellowRequestAdminService {
     }
 
     if (decision === 'approved') {
+      // `toggleUserFellowStatus` only reports that the learner is a Fellow afterwards, not whether
+      // this call flipped them, so snapshot the flag first. A grant landing between this read and
+      // the toggle is tolerated: the fallback below is idempotent per request.
+      const learnerBefore = await FellowRequestAdminService.readLearnerBeforeGrant(supabase, requestRow.user_id)
+
       try {
         const ok = await AdminConsoleService.toggleUserFellowStatus(requestRow.user_id, true)
         if (!ok) {
@@ -172,6 +185,13 @@ export class FellowRequestAdminService {
         }
       } catch (err) {
         return { success: false, error: err instanceof Error ? err.message : 'Failed to grant Fellow status.' }
+      }
+
+      // Announced here, next to the grant, rather than after the request-status update below: the
+      // learner is a Fellow from this point even if that update fails, and a retry would then see
+      // an existing Fellow and stay silent.
+      if (learnerBefore?.is_fellow === false) {
+        await FellowRequestAdminService.announceReapproval(supabase, requestRow, learnerBefore)
       }
     }
 
@@ -194,23 +214,108 @@ export class FellowRequestAdminService {
       decision,
     })
 
+    // A first approval is announced by the `fellow.granted` event that `toggleUserFellowStatus`
+    // dispatches (in-app + email), so only a rejection needs its own message here — writing one
+    // on approval too would give the learner two "You are now a PM Fellow!" notifications. The
+    // one exception is a re-approval after a revoke, where that event is deduplicated against
+    // the first grant: `announceReapproval` (called above, right after the grant) covers it
+    // in-app; the email stays deduplicated.
     // Best-effort notification — never block the admin decision on notification delivery.
-    try {
-      await createInAppNotification({
-        userId: requestRow.user_id,
-        category: 'achievements',
-        title: decision === 'approved' ? 'You are now a PM Fellow!' : 'Fellow request update',
-        body:
-          decision === 'approved'
-            ? 'Congratulations! Your PM Fellow request has been approved. Your Fellow badge is now live on your portfolio.'
-            : `Your PM Fellow request was not approved${cleanReason ? `: ${cleanReason}` : '.'}`,
-        actionUrl: '/settings',
-        priority: 'medium',
-      })
-    } catch {
-      // Non-fatal
+    if (decision === 'rejected') {
+      try {
+        await createInAppNotification({
+          userId: requestRow.user_id,
+          category: 'achievements',
+          title: 'Fellow request update',
+          body: `Your PM Fellow request was not approved${cleanReason ? `: ${cleanReason}` : '.'}`,
+          actionUrl: '/settings',
+          priority: 'medium',
+        })
+      } catch {
+        // Non-fatal
+      }
     }
 
     return { success: true }
+  }
+
+  /**
+   * Reads the learner's Fellow flag (plus what the fallback deep link needs) before a grant.
+   * Returns null when it cannot be read — the caller then treats the prior state as unknown
+   * and writes no fallback, so a read problem never fails or changes the approval.
+   */
+  private static async readLearnerBeforeGrant(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    userId: string
+  ): Promise<LearnerBeforeGrant | null> {
+    try {
+      const { data, error } = (await (supabase.from('users') as unknown as DBChain)
+        .select('is_fellow, username, is_portfolio_public')
+        .eq('id', userId)
+        .maybeSingle()) as unknown as { data: LearnerBeforeGrant | null; error: unknown }
+
+      if (error) {
+        console.error('[FellowRequestAdminService] pre-grant learner read failed:', error)
+        return null
+      }
+      return data
+    } catch (err) {
+      console.error('[FellowRequestAdminService] pre-grant learner read failed:', err)
+      return null
+    }
+  }
+
+  /**
+   * In-app fallback for a re-approval (request submitted after an earlier grant was revoked).
+   *
+   * `fellow.granted` uses a per-user id, so on a second grant its in-app row is deduplicated
+   * against the first grant's and the learner would hear nothing. That case is recognised by
+   * a `fellow-granted-<userId>` row created BEFORE this request was submitted; a missing row,
+   * or one created after (this approval's own event), means the event announced it and nothing
+   * is written — a first approval must never produce two messages.
+   *
+   * Keyed by request id, so each approved request yields at most one message and a retried or
+   * double-clicked approval adds none. Best-effort: never throws.
+   */
+  private static async announceReapproval(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    requestRow: FellowRequestRow,
+    learner: LearnerBeforeGrant
+  ): Promise<void> {
+    try {
+      const { data: grantRow, error } = (await (supabase.from('in_app_notifications') as unknown as DBChain)
+        .select('id, created_at')
+        .eq('user_id', requestRow.user_id)
+        .eq('idempotency_key', `fellow-granted-${requestRow.user_id}`)
+        .maybeSingle()) as unknown as { data: { id: string; created_at: string } | null; error: unknown }
+
+      if (error) {
+        console.error('[FellowRequestAdminService] earlier-grant lookup failed:', error)
+        return
+      }
+
+      // An unparseable timestamp compares false, i.e. stays silent.
+      if (!grantRow || !(Date.parse(grantRow.created_at) < Date.parse(requestRow.requested_at))) {
+        return
+      }
+
+      // Same deep-link rule as the `fellow.granted` in-app content: the public portfolio when
+      // there is one to show, otherwise the portfolio settings tab.
+      const username = typeof learner.username === 'string' ? learner.username.trim() : ''
+      const portfolioPath =
+        username && learner.is_portfolio_public === true ? `/p/${encodeURIComponent(username)}` : null
+
+      await createInAppNotification({
+        userId: requestRow.user_id,
+        idempotencyKey: `fellow-request-approved-${requestRow.id}`,
+        category: 'achievements',
+        title: 'You are now a PM Fellow!',
+        body: 'Congratulations! Your PM Fellow request was approved and your badge is live on your public portfolio.',
+        actionUrl: portfolioPath ?? PORTFOLIO_SETTINGS_HREF,
+        priority: 'high',
+      })
+    } catch (err) {
+      console.error('[FellowRequestAdminService] re-approval notification failed:', err)
+    }
   }
 }

@@ -26,6 +26,20 @@ vi.mock('@/lib/supabase', () => ({
   createAuthenticatedServerClient: vi.fn(),
 }))
 
+// A grant now dispatches `fellow.granted`; keep the real dispatcher/connectors (which would
+// write in-app rows and queue email through the mocked client) out of these route tests.
+// The event itself is covered by fellow-granted-event.test.ts.
+const mockDispatch = vi.fn(async (event: unknown) => {
+  void event
+  return { dispatched: true, handlerCount: 0, errors: [] as unknown[] }
+})
+vi.mock('@/lib/notifications/dispatcher', () => ({
+  globalNotificationDispatcher: { dispatch: (e: unknown) => mockDispatch(e) },
+}))
+vi.mock('@/lib/notifications/events/connectors', () => ({
+  initializeNotificationConnectors: vi.fn(),
+}))
+
 // Import route handlers
 import { POST as fellowStatusPost } from '../../app/api/admin/users/[id]/fellow-status/route'
 
@@ -118,8 +132,13 @@ describe('Admin Portfolio Verification & Queue Test Suite', () => {
                   })),
                 })),
               })),
+              // A grant is conditional: update → eq('id') → eq('is_fellow', false) → select('id').
               update: vi.fn(() => ({
-                eq: vi.fn(async () => ({ error: null })),
+                eq: vi.fn(() => ({
+                  eq: vi.fn(() => ({
+                    select: vi.fn(async () => ({ data: [{ id: 'usr-pub' }], error: null })),
+                  })),
+                })),
               })),
             }
           }
