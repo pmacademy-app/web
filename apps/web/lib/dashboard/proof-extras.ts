@@ -31,6 +31,13 @@ export interface LevelSummary {
   isMaxLevel: boolean
 }
 
+/** The proof card lower row's data. null in any field: could not load, so that cell is hidden. */
+export interface ProofExtras {
+  fellow: FellowSummary | null
+  badges: BadgeSummary | null
+  level: LevelSummary | null
+}
+
 export function summarizeFellow(input: {
   state: FellowRequestUiState
   readiness: Pick<PortfolioReadinessSummary, 'completedCount' | 'totalCount'>

@@ -13,7 +13,6 @@ import {
   type CertificateState,
   type PortfolioState,
 } from '@/lib/dashboard/proof-card'
-import { ProofExtrasRow, type ProofExtras } from './ProofExtrasRow'
 
 /**
  * ShareButton picks its icon from `navigator` during render, so server and client
@@ -40,8 +39,8 @@ interface PortfolioProofCardProps {
   isPortfolioPublic: boolean
   completedLessons: number
   hasCertificate: boolean
-  /** Fellow, badges and level (Growth R4). Omitted: the lower row is not rendered. */
-  extras?: ProofExtras
+  /** Lower row (Growth R4): the dashboard streams ProofExtrasSlot in here. */
+  children?: React.ReactNode
 }
 
 const PILL_BASE = 'text-[9px] font-bold uppercase px-2 py-0.5 rounded border shrink-0'
@@ -68,7 +67,7 @@ export function PortfolioProofCard({
   isPortfolioPublic,
   completedLessons,
   hasCertificate,
-  extras,
+  children,
 }: PortfolioProofCardProps) {
   const headingId = useId()
   const portfolioState = derivePortfolioState(username, isPortfolioPublic)
@@ -95,7 +94,7 @@ export function PortfolioProofCard({
         />
       </div>
 
-      {extras && <ProofExtrasRow extras={extras} portfolioState={portfolioState} />}
+      {children}
     </section>
   )
 }

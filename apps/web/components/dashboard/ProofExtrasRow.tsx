@@ -10,18 +10,14 @@ import type { ReferralStatsResponse } from '@/lib/api/contracts/settings'
 import { trackDashboardProofCardClicked } from '@/lib/analytics'
 import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 import type { PortfolioState } from '@/lib/dashboard/proof-card'
-import type { BadgeSummary, FellowSummary, LevelSummary } from '@/lib/dashboard/proof-extras'
+import type { FellowSummary, ProofExtras } from '@/lib/dashboard/proof-extras'
 
-export interface ProofExtras {
-  /** null: could not load, so the cell is hidden. */
-  fellow: FellowSummary | null
-  badges: BadgeSummary | null
-  level: LevelSummary | null
-}
+export type { ProofExtras }
 
 type Action = Parameters<typeof trackDashboardProofCardClicked>[0]
 
 const FELLOW_HREF = '/settings?tab=portfolio'
+const ROW = 'mt-5 pt-4 border-t border-border/60 grid grid-cols-2 md:grid-cols-4 gap-4'
 const CELL = 'min-w-0 flex flex-col gap-1'
 const LABEL = 'text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5'
 const VALUE = 'text-xs font-semibold text-foreground leading-snug'
@@ -95,6 +91,21 @@ function InvitePeers({ portfolioState }: { portfolioState: PortfolioState }) {
   )
 }
 
+/** Reserves the row's footprint while ProofExtrasSlot streams in. */
+export function ProofExtrasSkeleton() {
+  return (
+    <div aria-hidden="true" data-testid="proof-extras-skeleton" className={ROW}>
+      {[0, 1, 2, 3].map((cell) => (
+        <div key={cell} className={CELL}>
+          <span className="h-2.5 w-16 rounded bg-muted/50" />
+          <span className="h-3.5 w-28 rounded bg-muted/40" />
+          <span className="h-3 w-20 rounded bg-muted/30" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** The proof card's lower row: PM Fellow, badges, level, and an invite entry point. */
 export function ProofExtrasRow({ extras, portfolioState }: { extras: ProofExtras; portfolioState: PortfolioState }) {
   const { fellow, badges, level } = extras
@@ -104,7 +115,7 @@ export function ProofExtrasRow({ extras, portfolioState }: { extras: ProofExtras
   return (
     <div
       data-testid="proof-extras"
-      className="mt-5 pt-4 border-t border-border/60 grid grid-cols-2 md:grid-cols-4 gap-4"
+      className={ROW}
     >
       {fellow && fellowView && (
         <div className={CELL} data-testid="proof-extras-fellow" data-state={fellow.state}>

@@ -15,8 +15,10 @@ import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardRevie
 import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
 import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
 import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
-import { summarizeLevel } from '@/lib/dashboard/proof-extras'
-import { loadBadgeSummary, loadFellowSummary } from '@/lib/dashboard/proof-extras-db'
+import { derivePortfolioState } from '@/lib/dashboard/proof-card'
+import { loadProofExtras } from '@/lib/dashboard/proof-extras-db'
+import { ProofExtrasSkeleton } from '@/components/dashboard/ProofExtrasRow'
+import { ProofExtrasSlot } from './ProofExtrasSlot'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
@@ -48,37 +50,50 @@ export default async function DashboardPage() {
     return null
   })
 
+  // Read once, shared. The page's own sections and the proof card's lower row await the same
+  // requests instead of each issuing their own. A Supabase builder re-runs its request every time
+  // it is awaited, so each is wrapped once in a real Promise (Promise.resolve calls then() once).
+  const profilePromise = getCurrentUserProfile()
+  const progressPromise = Promise.resolve(
+    supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', authUser.id),
+  ).then(({ data }) => data ?? [])
+  const capstonesPromise = Promise.resolve(
+    supabase.from('capstone_submissions').select('id, module_slug, status, is_public').eq('user_id', authUser.id),
+  ).then(({ data }) => data ?? [])
+
+  // Streamed like the leaderboard: started now, awaited only inside its <Suspense> boundary, so
+  // the badge and Fellow reads never block the page. Never rejects (cells resolve to null).
+  const proofExtrasPromise = loadProofExtras(supabase, authUser.id, {
+    profile: profilePromise,
+    progressRows: progressPromise,
+    capstoneRows: capstonesPromise,
+  }).catch((error: unknown) => {
+    console.error('[dashboard] proof card extras failed to load', error)
+    return null
+  })
+
   // Parallel data fetching with lean column projection.
   // The users profile comes from the request-memoized resolver so it reuses the
   // SELECT already issued by the (app) layout instead of duplicating it.
   const [
     dbProfile,
-    { data: progressRows },
+    progressRows,
     curriculum,
     streakStatus,
     reviewQueue,
-    { data: capstoneRows },
+    capstoneRows,
     { data: recentXpEvents },
     certificateResult,
-    fellowSummary,
-    badgeSummary,
   ] = await Promise.all([
-    getCurrentUserProfile(),
-    (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
-      .select('lesson_id, status')
-      .eq('user_id', authUser.id) as unknown as Promise<{
-      data: Array<{ lesson_id: string; status: string }> | null
-    }>,
+    profilePromise,
+    progressPromise,
     fetchCurriculumData(),
     getUserStreakStatus(supabase, authUser.id),
     getReviewQueueData(supabase, authUser.id),
-    (supabase
-      .from('capstone_submissions') as unknown as DBChain)
-      .select('module_slug, status')
-      .eq('user_id', authUser.id) as unknown as Promise<{
-      data: Array<{ module_slug: string; status: string }> | null
-    }>,
+    capstonesPromise,
     (supabase
       .from('xp_events') as unknown as DBChain)
       .select('id, source_type, xp_amount, source_id, created_at')
@@ -99,9 +114,6 @@ export default async function DashboardPage() {
       data: Array<{ id: string }> | null
       error: unknown
     }>,
-    // Proof card lower row (Growth R4). Both resolve to null on failure; the card hides the cell.
-    loadFellowSummary(supabase, authUser.id),
-    loadBadgeSummary(supabase, authUser.id),
   ])
 
   let profile = dbProfile
@@ -252,8 +264,15 @@ export default async function DashboardPage() {
         isPortfolioPublic={profile.is_portfolio_public === true}
         completedLessons={completedLessonsCount}
         hasCertificate={hasCertificate}
-        extras={{ fellow: fellowSummary, badges: badgeSummary, level: summarizeLevel(profile.total_xp) }}
-      />
+      >
+        {/* Streamed: badges and Fellow state must not block the page. */}
+        <Suspense fallback={<ProofExtrasSkeleton />}>
+          <ProofExtrasSlot
+            extrasPromise={proofExtrasPromise}
+            portfolioState={derivePortfolioState(profile.username, profile.is_portfolio_public === true)}
+          />
+        </Suspense>
+      </PortfolioProofCard>
 
       {/* 4. Recent-XP Activity Ticker + weekly leaderboard summary */}
       {/* Flex, not grid: if the widget renders nothing (opted out), the activity card fills the row. */}
