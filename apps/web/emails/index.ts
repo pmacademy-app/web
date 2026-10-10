@@ -9,6 +9,7 @@ import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
 import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
+import { FellowGranted } from './templates/achievement/FellowGranted'
 import { DirectMessageEmail } from './templates/admin/DirectMessage'
 import { BRAND } from '@/lib/brand'
 
@@ -60,6 +61,10 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'achievement.portfolio_published': {
     component: PortfolioPublished,
     subjectLine: 'Your Public Portfolio is Live!',
+  },
+  'achievement.fellow_granted': {
+    component: FellowGranted,
+    subjectLine: `You're now a ${BRAND.company} PM Fellow!`,
   },
 
   // Scheduled Digests & Reminders

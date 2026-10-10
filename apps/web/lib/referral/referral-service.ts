@@ -7,10 +7,10 @@
  * References: PRD.md §4.10, Architecture.md §5, Master Plan Phase 7
  */
 
+import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
-import { XP_VALUES } from '@/lib/xp/xp'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { BRAND } from '@/lib/brand'
 
@@ -56,7 +56,7 @@ export interface UserReferralStats {
 }
 
 const MAX_REFERRALS_PER_24H = 10
-export const REFERRAL_ACTIVATION_XP = XP_VALUES.REFERRAL_ACTIVATION
+export const REFERRAL_ACTIVATION_XP = REFERRAL_REWARD_XP
 
 /**
  * Resolves a referral code or handle to a valid referrer user.

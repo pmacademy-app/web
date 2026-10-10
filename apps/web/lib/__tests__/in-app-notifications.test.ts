@@ -4,6 +4,7 @@ import {
   createDefaultNotificationPreferences,
   isChannelEnabledByPreferences,
 } from '../notifications'
+import { buildInAppContentFromEvent } from '../notifications/in-app/service'
 
 describe('In-App Notification System Unit Test Suite', () => {
   it('Feature flag IN_APP_NOTIFICATIONS_ENABLED is active by default', () => {
@@ -30,7 +31,7 @@ describe('In-App Notification System Unit Test Suite', () => {
         case 'xp.level_up':
           return '/progress'
         case 'certificate.generated':
-          return typeof meta?.certificateCode === 'string' ? `/verify/${meta.certificateCode}` : '/progress'
+          return '/progress/certificates'
         case 'portfolio.published':
           return typeof meta?.username === 'string' ? `/p/${meta.username}` : '/settings'
         case 'srs.review_due':
@@ -43,8 +44,26 @@ describe('In-App Notification System Unit Test Suite', () => {
     expect(getDeepLink('badge.earned')).toBe('/badges')
     expect(getDeepLink('lesson.completed')).toBe('/academy')
     expect(getDeepLink('srs.review_due')).toBe('/review')
-    expect(getDeepLink('certificate.generated', { certificateCode: 'PMA-123' })).toBe('/verify/PMA-123')
+    expect(getDeepLink('certificate.generated', { certificateCode: 'PMA-123' })).toBe('/progress/certificates')
     expect(getDeepLink('portfolio.published', { username: 'alex' })).toBe('/p/alex')
+  })
+
+  it('certificate.generated deep-links to the learner certificates page, not the public verify page', () => {
+    const content = buildInAppContentFromEvent({
+      id: 'certificate-generated-PMA-2026-ABCDEF12',
+      event: 'certificate.generated',
+      userId: 'usr-1',
+      userEmail: 'usr@test.com',
+      userName: 'Learner',
+      userTimezone: 'UTC',
+      priority: 'high',
+      category: 'certificates',
+      occurredAt: new Date().toISOString(),
+      payload: { certificateCode: 'PMA-2026-ABCDEF12', certificateType: 'full_curriculum' },
+    })
+
+    expect(content.actionUrl).toBe('/progress/certificates')
+    expect(content.body).toContain('PMA-2026-ABCDEF12')
   })
 
   it('Notification date grouping categorizes items by relative time', () => {

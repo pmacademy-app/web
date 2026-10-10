@@ -3,6 +3,8 @@ import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { getCapstoneForModule } from '@/lib/academy/module-completion'
 
 let isConnectorsInitialized = false
 
@@ -30,6 +32,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     'srs.review_due',
     'capstone.submitted',
     'capstone.reviewed',
+    'fellow.granted',
     'quiz.completed',
     'streak.updated',
     'review.completed',
@@ -112,7 +115,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         userName: event.userName || 'Learner',
         moduleName: event.payload.moduleName || 'Module',
         moduleSlug: event.payload.moduleSlug || 'foundations',
-        xpBonus: event.payload.xpBonusEarned || 200,
+        capstoneSlug: getCapstoneForModule(String(event.payload.moduleSlug || ''))?.slug ?? null,
       },
       eventId: event.id,
       eventType: event.event,
@@ -165,6 +168,15 @@ export function initializeNotificationConnectors(force: boolean = false): void {
 
   // 7. Achievement: certificate.generated -> achievement.certificate
   d.registerHandler('certificate.generated', 'connector.achievement.certificate', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // One email per certificate, decided by the email_queue unique index. Without a key
+    // the processor falls back to a (user, template, event type) SELECT, which lets an
+    // earlier module-certificate email suppress the full-curriculum one and is not
+    // race-safe.
+    const certificateCode = event.payload.certificateCode
+    const idempotencyKey =
+      typeof certificateCode === 'string' && certificateCode.length > 0
+        ? `certificate:${certificateCode}`
+        : undefined
     await enqueueNotificationItem({
       userId: event.userId,
       toEmail: event.userEmail,
@@ -180,6 +192,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'certificates',
       priorityLevel: 'high',
+      idempotencyKey,
     })
   })
 
@@ -200,6 +213,34 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'portfolio',
       priorityLevel: 'medium',
+    })
+  })
+
+  // 9. Achievement: fellow.granted -> achievement.fellow_granted
+  d.registerHandler('fellow.granted', 'connector.achievement.fellow_granted', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // The grant path tolerates a users row without an email; there is no one to send to then.
+    if (!event.userEmail) return
+    const username = typeof event.payload.username === 'string' ? event.payload.username : null
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
+    await enqueueNotificationItem({
+      userId: event.userId,
+      toEmail: event.userEmail,
+      toName: event.userName,
+      channel: 'email',
+      templateKey: 'achievement.fellow_granted',
+      templateVariables: {
+        userName: event.userName || 'Learner',
+        username,
+        portfolioUrl:
+          event.payload.portfolioUrl ||
+          (username ? `${origin}/p/${encodeURIComponent(username)}` : `${origin}${PORTFOLIO_SETTINGS_HREF}`),
+      },
+      eventId: event.id,
+      eventType: event.event,
+      category: 'achievements',
+      priorityLevel: 'high',
+      // One Fellow email per learner, decided by the email_queue unique index.
+      idempotencyKey: `fellow-granted:${event.userId}`,
     })
   })
 }

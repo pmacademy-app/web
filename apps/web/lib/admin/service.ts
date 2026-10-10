@@ -23,6 +23,8 @@ import type {
   AdminEmailQueueOverview,
 } from './types'
 import type { CurriculumEntry } from '@/types'
+import type { FellowGrantedPayload } from '@/lib/notifications/events/types'
+import { BRAND } from '@/lib/brand'
 
 /** Live counts surfaced to the console shell (sidebar badges + header status). */
 export interface AdminConsoleShellContext {
@@ -941,20 +943,34 @@ export class AdminConsoleService {
    *
    * Note: the `users` table has no `updated_at` column, so the update payload
    * only touches `is_fellow`.
+   *
+   * A real false → true transition dispatches `fellow.granted` (in-app + email). Every grant
+   * path — the fellow-status route, the user action route and Fellow request approval — runs
+   * through here, so this is the single place that announces a grant. The transition is
+   * detected atomically by the grant's conditional update (`WHERE is_fellow = false`), not by
+   * the earlier read, so concurrent or retried grants announce it exactly once.
    */
   public static async toggleUserFellowStatus(targetUserId: string, isFellow: boolean): Promise<boolean> {
     const supabase = createServiceRoleClient()
 
     // Enforce public portfolio invariant: only public portfolios can be verified
+    type FellowUserRow = {
+      id: string
+      username: string | null
+      is_portfolio_public: boolean
+      is_fellow?: boolean | null
+      email?: string | null
+      name?: string | null
+    }
     type UserQueryChain = {
       select: (cols: string) => {
         eq: (col: string, val: string) => {
-          maybeSingle: () => Promise<{ data: { id: string; username: string | null; is_portfolio_public: boolean } | null; error: unknown }>
+          maybeSingle: () => Promise<{ data: FellowUserRow | null; error: unknown }>
         }
       }
     }
     const { data: userRow } = await (supabase.from('users') as unknown as UserQueryChain)
-      .select('id, username, is_portfolio_public')
+      .select('id, username, is_portfolio_public, is_fellow, email, name')
       .eq('id', targetUserId)
       .maybeSingle()
 
@@ -966,13 +982,43 @@ export class AdminConsoleService {
       throw new Error('Cannot verify a private portfolio. The user portfolio must be public.')
     }
 
-    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
-    const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
-      .update({ is_fellow: isFellow })
-      .eq('id', targetUserId)
+    // `userRow.is_fellow` above is only a snapshot: two concurrent grants (a double click, a
+    // retry) can both read `false`. So the transition itself is decided by the database — a
+    // grant only updates a row that is still `is_fellow = false` (the column is NOT NULL) and
+    // returns it, which makes exactly one caller the one that performed the false → true flip.
+    let grantedNow = false
+    if (isFellow) {
+      type DBGrantChain = {
+        update: (data: Record<string, unknown>) => {
+          eq: (col: string, val: string) => {
+            eq: (col: string, val: boolean) => {
+              select: (cols: string) => Promise<{ data: Array<{ id: string }> | null; error: unknown }>
+            }
+          }
+        }
+      }
+      const { data: grantedRows, error } = await (supabase.from('users') as unknown as DBGrantChain)
+        .update({ is_fellow: true })
+        .eq('id', targetUserId)
+        .eq('is_fellow', false)
+        .select('id')
 
-    if (error) {
-      return false
+      if (error) {
+        return false
+      }
+
+      // Zero rows is not a failure: the user is already a Fellow (or a concurrent grant won),
+      // so the requested end state holds and the action stays an idempotent success.
+      grantedNow = Array.isArray(grantedRows) && grantedRows.length > 0
+    } else {
+      type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
+      const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
+        .update({ is_fellow: false })
+        .eq('id', targetUserId)
+
+      if (error) {
+        return false
+      }
     }
 
     // Proactively revalidate public portfolio and OG social preview cards
@@ -985,7 +1031,63 @@ export class AdminConsoleService {
       }
     }
 
+    if (grantedNow) {
+      await this.dispatchFellowGrantedNotification(userRow)
+    }
+
     return true
+  }
+
+  /**
+   * Dispatches `fellow.granted` to the newly granted learner. Failures are swallowed: a
+   * notification problem must never fail the admin action.
+   *
+   * Only called by the caller whose conditional update performed the false → true flip, so
+   * racing grants dispatch once. The event id is also stable per user, so the in-app row
+   * (keyed by event id) and the email (`fellow-granted:<userId>`) stay deduplicated downstream.
+   * Consequence, accepted: a re-grant after a revoke does not re-notify — except that a re-grant
+   * made by approving a new Fellow request gets a request-scoped in-app fallback
+   * (`FellowRequestAdminService.announceReapproval`); the email stays deduplicated.
+   */
+  private static async dispatchFellowGrantedNotification(user: {
+    id: string
+    username: string | null
+    is_portfolio_public: boolean
+    email?: string | null
+    name?: string | null
+  }): Promise<void> {
+    try {
+      const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
+      const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
+      initializeNotificationConnectors()
+
+      const origin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
+      const grantedAt = new Date().toISOString()
+      const payload: FellowGrantedPayload = {
+        username: user.username,
+        isPortfolioPublic: Boolean(user.is_portfolio_public),
+        portfolioUrl: user.username ? `${origin}/p/${encodeURIComponent(user.username)}` : null,
+        grantedAt,
+      }
+
+      const result = await globalNotificationDispatcher.dispatch({
+        id: `fellow-granted-${user.id}`,
+        event: 'fellow.granted',
+        userId: user.id,
+        userEmail: user.email || '',
+        userName: user.name || user.username || 'Learner',
+        userTimezone: 'UTC',
+        priority: 'high',
+        category: 'achievements',
+        occurredAt: grantedAt,
+        payload,
+      })
+      if (!result?.dispatched || (result.errors?.length ?? 0) > 0) {
+        console.error('[AdminConsoleService] fellow.granted dispatch incomplete:', result?.errors)
+      }
+    } catch (err) {
+      console.error('[AdminConsoleService] fellow.granted dispatch failed:', err)
+    }
   }
 
   /**

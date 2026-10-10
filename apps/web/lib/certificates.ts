@@ -18,6 +18,13 @@ export interface CredentialJsonLdOptions {
   siteOrigin: string
 }
 
+/** Prefix of admin dev test certificates; never a learner's real credential. */
+export const TEST_CERTIFICATE_PREFIX = 'TEST-'
+
+export function isTestCertificateCode(code: string): boolean {
+  return code.startsWith(TEST_CERTIFICATE_PREFIX)
+}
+
 /**
  * Generates a clean, unique certificate code (e.g., PMA-2026-8F2A7B9C).
  */

@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserStreakStatus } from '@/lib/streaks-db'
+import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
@@ -11,8 +13,16 @@ import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
 import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
 import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
+import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
+import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
+import { derivePortfolioState } from '@/lib/dashboard/proof-card'
+import { loadProofExtras } from '@/lib/dashboard/proof-extras-db'
+import { ProofExtrasSkeleton } from '@/components/dashboard/ProofExtrasRow'
+import { ProofExtrasSlot } from './ProofExtrasSlot'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
+import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
+import { LeaderboardWidgetSlot } from './LeaderboardWidgetSlot'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -31,34 +41,59 @@ export default async function DashboardPage() {
 
   const supabase = createServiceRoleClient()
 
+  // Started now so it runs alongside the page's own data, but awaited only inside the
+  // widget's <Suspense> boundary below: the roster-wide aggregation never blocks the page.
+  // The catch is attached immediately so a failure can never become an unhandled
+  // rejection; the widget renders its "unavailable" state for `null`.
+  const leaderboardPromise = getWeeklyLeaderboard(supabase, authUser.id).catch((error: unknown) => {
+    console.error('[dashboard] weekly leaderboard widget failed to load', error)
+    return null
+  })
+
+  // Read once, shared. The page's own sections and the proof card's lower row await the same
+  // requests instead of each issuing their own. A Supabase builder re-runs its request every time
+  // it is awaited, so each is wrapped once in a real Promise (Promise.resolve calls then() once).
+  const profilePromise = getCurrentUserProfile()
+  const progressPromise = Promise.resolve(
+    supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', authUser.id),
+  ).then(({ data }) => data ?? [])
+  const capstonesPromise = Promise.resolve(
+    supabase.from('capstone_submissions').select('id, module_slug, status, is_public').eq('user_id', authUser.id),
+  ).then(({ data }) => data ?? [])
+
+  // Streamed like the leaderboard: started now, awaited only inside its <Suspense> boundary, so
+  // the badge and Fellow reads never block the page. Never rejects (cells resolve to null).
+  const proofExtrasPromise = loadProofExtras(supabase, authUser.id, {
+    profile: profilePromise,
+    progressRows: progressPromise,
+    capstoneRows: capstonesPromise,
+  }).catch((error: unknown) => {
+    console.error('[dashboard] proof card extras failed to load', error)
+    return null
+  })
+
   // Parallel data fetching with lean column projection.
   // The users profile comes from the request-memoized resolver so it reuses the
   // SELECT already issued by the (app) layout instead of duplicating it.
   const [
     dbProfile,
-    { data: progressRows },
+    progressRows,
     curriculum,
     streakStatus,
     reviewQueue,
-    { data: capstoneRows },
+    capstoneRows,
     { data: recentXpEvents },
+    certificateResult,
   ] = await Promise.all([
-    getCurrentUserProfile(),
-    (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
-      .select('lesson_id, status')
-      .eq('user_id', authUser.id) as unknown as Promise<{
-      data: Array<{ lesson_id: string; status: string }> | null
-    }>,
+    profilePromise,
+    progressPromise,
     fetchCurriculumData(),
     getUserStreakStatus(supabase, authUser.id),
     getReviewQueueData(supabase, authUser.id),
-    (supabase
-      .from('capstone_submissions') as unknown as DBChain)
-      .select('module_slug, status')
-      .eq('user_id', authUser.id) as unknown as Promise<{
-      data: Array<{ module_slug: string; status: string }> | null
-    }>,
+    capstonesPromise,
     (supabase
       .from('xp_events') as unknown as DBChain)
       .select('id, source_type, xp_amount, source_id, created_at')
@@ -66,6 +101,18 @@ export default async function DashboardPage() {
       .order('created_at', { ascending: false })
       .limit(5) as unknown as Promise<{
       data: Array<{ id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }> | null
+    }>,
+    // Read-only existence check for the full-curriculum certificate (never issues one).
+    // Admin-generated TEST- rows are not credentials and must not count as earned.
+    (supabase
+      .from('certificates') as unknown as DBChain)
+      .select('id')
+      .eq('user_id', authUser.id)
+      .eq('type', 'full_curriculum')
+      .not('certificate_code', 'like', 'TEST-%')
+      .limit(1) as unknown as Promise<{
+      data: Array<{ id: string }> | null
+      error: unknown
     }>,
   ])
 
@@ -85,6 +132,9 @@ export default async function DashboardPage() {
       .map((p) => p.lesson_id) ?? []
   )
   const completedLessonsCount = completedLessonIds.size
+
+  // A failed or empty certificate lookup reads as "not earned yet".
+  const hasCertificate = hasFullCurriculumCertificate(certificateResult)
 
   // 3. Determine Next Lesson CTA
   let nextLesson: NextLessonData | null = null
@@ -208,8 +258,33 @@ export default async function DashboardPage() {
         <StreakCard streakStatus={streakStatus} />
       </div>
 
-      {/* 3. Small Recent-XP Activity Ticker */}
-      <RecentActivityCard activities={recentActivities} />
+      {/* 3. Portfolio & Proof: primitives only, never the profile row */}
+      <PortfolioProofCard
+        username={profile.username ?? null}
+        isPortfolioPublic={profile.is_portfolio_public === true}
+        completedLessons={completedLessonsCount}
+        hasCertificate={hasCertificate}
+      >
+        {/* Streamed: badges and Fellow state must not block the page. */}
+        <Suspense fallback={<ProofExtrasSkeleton />}>
+          <ProofExtrasSlot
+            extrasPromise={proofExtrasPromise}
+            portfolioState={derivePortfolioState(profile.username, profile.is_portfolio_public === true)}
+          />
+        </Suspense>
+      </PortfolioProofCard>
+
+      {/* 4. Recent-XP Activity Ticker + weekly leaderboard summary */}
+      {/* Flex, not grid: if the widget renders nothing (opted out), the activity card fills the row. */}
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
+        <div className="min-w-0 flex-1">
+          <RecentActivityCard activities={recentActivities} />
+        </div>
+        {/* Streamed: the roster-wide leaderboard aggregation must not block the page. */}
+        <Suspense fallback={<LeaderboardWidgetSkeleton />}>
+          <LeaderboardWidgetSlot payloadPromise={leaderboardPromise} />
+        </Suspense>
+      </div>
     </div>
   )
 }

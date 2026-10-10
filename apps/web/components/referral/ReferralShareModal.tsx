@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { Copy, Check, X, Share2, MessageCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Copy, Check, Share2, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { trackReferralLinkCopied, trackReferralShared } from '@/lib/analytics'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { trackReferralLinkCopied, trackReferralModalOpened, trackReferralShared } from '@/lib/analytics'
 import { BRAND } from '@/lib/brand'
+import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 
 function LinkedInIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -26,16 +28,29 @@ interface ReferralShareModalProps {
   isOpen: boolean
   onClose: () => void
   referralLink: string
+  /** The surface that opened the modal; sent with its analytics events. */
+  source?: string
 }
 
 export function ReferralShareModal({
   isOpen,
   onClose,
   referralLink,
+  source = 'modal',
 }: ReferralShareModalProps) {
   const [copied, setCopied] = useState(false)
 
-  if (!isOpen) return null
+  // One event per open: a StrictMode effect re-run or a re-render is not a second open.
+  const openTracked = useRef(false)
+  useEffect(() => {
+    if (!isOpen) {
+      openTracked.current = false
+      return
+    }
+    if (openTracked.current) return
+    openTracked.current = true
+    trackReferralModalOpened(source)
+  }, [isOpen, source])
 
   const shareText = `Master Product Management for free with ${BRAND.product}! 90 practical lessons, interactive quizzes, and real-world capstones.`
 
@@ -43,7 +58,7 @@ export function ReferralShareModal({
     try {
       await navigator.clipboard.writeText(referralLink)
       setCopied(true)
-      trackReferralLinkCopied('modal')
+      trackReferralLinkCopied(source)
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // Fallback
@@ -68,29 +83,19 @@ export function ReferralShareModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6 animate-scale-in relative">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={onClose}
-          aria-label="Close dialog"
-          className="absolute top-4 right-4"
-        >
-          <X className="w-5 h-5" />
-        </Button>
-
+    // A real dialog: it traps and restores focus, closes on Escape, and is announced as one.
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="block sm:max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6">
         <div className="space-y-2">
           <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <Share2 className="w-5 h-5" />
           </div>
-          <h3 className="text-xl font-bold font-serif text-foreground">
+          <DialogTitle className="text-xl font-bold font-serif text-foreground">
             Invite Peers to {BRAND.product}
-          </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +50 XP!
-          </p>
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +{REFERRAL_REWARD_XP} XP!
+          </DialogDescription>
         </div>
 
         {/* Copyable Link Box */}
@@ -174,7 +179,7 @@ export function ReferralShareModal({
             Done
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

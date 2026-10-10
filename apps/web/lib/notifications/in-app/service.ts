@@ -8,6 +8,14 @@ import {
 import type { UserNotificationPreferences } from '../preferences/types'
 import { PRIORITY_MATRIX } from '../constants'
 import type { EventEnvelope } from '../types'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+
+/** `/p/<username>` when the payload names a public portfolio, otherwise null. */
+function publicPortfolioPath(payload: Record<string, unknown>): string | null {
+  const username = typeof payload.username === 'string' ? payload.username.trim() : ''
+  if (!username || payload.isPortfolioPublic !== true) return null
+  return `/p/${encodeURIComponent(username)}`
+}
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -140,7 +148,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     }
     case 'module.completed': {
       const name = String(payload.moduleName || 'Module')
-      return { title: `Module complete: ${name}`, body: `You completed the ${name} module. ${payload.xpBonusEarned || 0} bonus XP earned.`, actionUrl: '/academy' }
+      return { title: `Module complete: ${name}`, body: `You completed every lesson in ${name}.`, actionUrl: '/academy' }
     }
     case 'quiz.completed': {
       const rawTitle = String(payload.lessonTitle || '')
@@ -169,7 +177,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     }
     case 'certificate.generated': {
       const code = String(payload.certificateCode || '')
-      return { title: 'Certificate issued', body: `Your official certificate is ready. Verify it online with code ${code}.`, actionUrl: code ? `/verify/${code}` : '/progress' }
+      return { title: 'Certificate issued', body: `Your official certificate is ready. Verify it online with code ${code}.`, actionUrl: '/progress/certificates' }
     }
     case 'capstone.submitted': {
       return { title: 'Capstone submitted', body: `Your ${String(payload.moduleTitle || 'module')} capstone has been submitted for review.`, actionUrl: '/capstones' }
@@ -178,12 +186,23 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       const moduleTitle = String(payload.moduleTitle || 'module')
       const moduleSlug = String(payload.moduleSlug || '')
       const published = payload.isPublished === true
+      const capstoneUrl = moduleSlug ? `/capstones/${moduleSlug}` : '/capstones'
+      // A published review is now visible on the public portfolio, so send the learner there
+      // when we know it is public; otherwise (or when not published) keep the capstone page.
+      const portfolioPath = published ? publicPortfolioPath(payload) : null
       return {
         title: 'Capstone reviewed',
         body: published
           ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
           : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
-        actionUrl: moduleSlug ? `/capstones/${moduleSlug}` : '/capstones',
+        actionUrl: portfolioPath ?? capstoneUrl,
+      }
+    }
+    case 'fellow.granted': {
+      return {
+        title: 'You are now a PM Fellow!',
+        body: 'Congratulations! Your PM Fellow badge is now live on your public portfolio.',
+        actionUrl: publicPortfolioPath(payload) ?? PORTFOLIO_SETTINGS_HREF,
       }
     }
     case 'user.registered': {

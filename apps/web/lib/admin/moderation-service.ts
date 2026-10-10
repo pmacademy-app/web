@@ -205,7 +205,7 @@ export class ModerationService {
 
       // 3. Notify the learner — only on the first review, and only when we know who to notify.
       if (!alreadyReviewed && current.user_id) {
-        await this.dispatchCapstoneReviewedNotification({
+        await this.dispatchCapstoneReviewedNotification(supabase, {
           submissionId,
           userId: current.user_id,
           moduleSlug: current.module_slug,
@@ -238,26 +238,46 @@ export class ModerationService {
    * scope. The event id is derived from the submission id, so the in-app write path deduplicates a
    * repeated review by its idempotency key even if the domain-level first-review guard is ever
    * bypassed. Failures are swallowed: a notification problem must never fail the review itself.
+   *
+   * The learner's email/name/portfolio handle come from one extra `users` lookup so the envelope
+   * names the real recipient and a published review can deep-link to the public portfolio. That
+   * lookup is best-effort: if it fails, the notification still goes out with placeholders.
    */
-  private static async dispatchCapstoneReviewedNotification(input: {
-    submissionId: string
-    userId: string
-    moduleSlug: string
-    isPublished: boolean
-    reviewedAt: string
-  }): Promise<void> {
+  private static async dispatchCapstoneReviewedNotification(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    input: {
+      submissionId: string
+      userId: string
+      moduleSlug: string
+      isPublished: boolean
+      reviewedAt: string
+    }
+  ): Promise<void> {
     try {
       const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
       const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
       initializeNotificationConnectors()
 
+      type LearnerRow = { email?: string | null; name?: string | null; username?: string | null; is_portfolio_public?: boolean | null }
+      let learner: LearnerRow | null = null
+      try {
+        const { data } = (await (supabase.from('users') as unknown as DBChain)
+          .select('email, name, username, is_portfolio_public')
+          .eq('id', input.userId)
+          .maybeSingle()) as unknown as { data: LearnerRow | null }
+        learner = data ?? null
+      } catch (lookupErr) {
+        console.error('[ModerationService] capstone.reviewed recipient lookup failed:', lookupErr)
+      }
+
+      const username = typeof learner?.username === 'string' && learner.username ? learner.username : null
       const definition = getCapstoneDefinition(input.moduleSlug)
       await globalNotificationDispatcher.dispatch({
         id: `capstone-reviewed-${input.submissionId}`,
         event: 'capstone.reviewed',
         userId: input.userId,
-        userEmail: '',
-        userName: 'Learner',
+        userEmail: typeof learner?.email === 'string' ? learner.email : '',
+        userName: (typeof learner?.name === 'string' && learner.name) || username || 'Learner',
         userTimezone: 'UTC',
         priority: 'medium',
         category: 'portfolio',
@@ -268,6 +288,8 @@ export class ModerationService {
           moduleTitle: definition?.moduleTitle || input.moduleSlug,
           isPublished: input.isPublished,
           reviewedAt: input.reviewedAt,
+          username,
+          isPortfolioPublic: learner?.is_portfolio_public === true,
         },
       })
     } catch (err) {

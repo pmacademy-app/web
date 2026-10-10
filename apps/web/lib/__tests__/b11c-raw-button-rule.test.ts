@@ -125,7 +125,6 @@ const EXEMPT_COMPONENTS = [
   'notifications/NotificationToast.tsx',
   'portfolio/FeaturedCapstoneCard.tsx',
   'portfolio/PortfolioCapstones.tsx',
-  'portfolio/ShareButton.tsx',
   'progress/ProgressSectionDropdown.tsx',
   'quick-start/QuickStartModal.tsx',
   'quiz/QuizOption.tsx',

@@ -2,9 +2,13 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { ShieldCheck, Award, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, Award, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
 import { generateQrCodeSvg } from '@/lib/certificates'
+import {
+  getCertificatePresentation,
+  TEST_CERTIFICATE_EXPLANATION,
+} from '@/lib/certificates/presentation'
 import { StaticBrandLogo } from '@/components/brand/BrandLogo'
 import { BRAND } from '@/lib/brand'
 
@@ -23,6 +27,8 @@ interface CertificateCardProps {
  * - Verification QR code encoding the exact /verify/[certificateId] URL.
  * - Print-safe: the whole card is wrapped in `.certificate-print-container`
  *   so the global print stylesheet prints only this element.
+ * - Because only this element prints, an admin TEST- certificate is marked as
+ *   such inside the card itself and makes no credential claim.
  */
 export function CertificateCard({ certificate }: CertificateCardProps) {
   const {
@@ -43,6 +49,8 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
 
   // QR Code encodes the direct verification URL for online scanning
   const qrCodeSvg = generateQrCodeSvg(verificationUrl, 96)
+
+  const { isTest, statusLabel } = getCertificatePresentation(certificateCode)
 
   return (
     <div className="certificate-print-container relative w-full bg-card text-foreground rounded-2xl border border-border shadow-lg overflow-hidden select-none">
@@ -65,9 +73,15 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </div>
 
         <div className="sm:text-right space-y-1.5 shrink-0">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Verified Credential
-          </span>
+          {isTest ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/40 text-[11px] font-semibold">
+              <AlertCircle className="w-3.5 h-3.5" /> {statusLabel}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" /> {statusLabel}
+            </span>
+          )}
           <p className="text-xs font-mono text-muted-foreground">
             Credential ID: <strong className="text-foreground">{certificateCode}</strong>
           </p>
@@ -78,7 +92,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       <div className="relative text-center px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-10 space-y-6">
         <div className="space-y-2">
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary block">
-            Certificate of Completion
+            {isTest ? 'Test Certificate' : 'Certificate of Completion'}
           </span>
           <div className="flex items-center justify-center gap-3">
             <span className="h-px w-14 bg-primary/30" />
@@ -86,7 +100,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             <span className="h-px w-14 bg-primary/30" />
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            This credential certifies that
+            {isTest ? 'This test certificate was generated for' : 'This credential certifies that'}
           </p>
         </div>
 
@@ -107,8 +121,14 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </h1>
 
         <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          has successfully fulfilled all curriculum requirements, demonstrating mastery in product
-          strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
+          {isTest ? (
+            TEST_CERTIFICATE_EXPLANATION
+          ) : (
+            <>
+              has successfully fulfilled all curriculum requirements, demonstrating mastery in product
+              strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
+            </>
+          )}
         </p>
 
         {/* Level & Milestone Pill */}
@@ -139,7 +159,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             {BRAND.fullName} Academic Board
           </div>
           <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
-            Official Credential Verification Signatory
+            {isTest ? 'Not a valid credential' : 'Official Credential Verification Signatory'}
           </span>
         </div>
 
@@ -154,9 +174,15 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
               QR Verification
             </span>
-            <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="w-3.5 h-3.5" /> Scan to Verify
-            </div>
+            {isTest ? (
+              <div className="flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+                <AlertCircle className="w-3.5 h-3.5" /> Test only
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="w-3.5 h-3.5" /> Scan to Verify
+              </div>
+            )}
             <span className="text-[9px] text-muted-foreground font-mono truncate block max-w-[130px]">
               {verificationUrl.replace(/^https?:\/\//, '')}
             </span>

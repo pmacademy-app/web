@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { BRAND } from '@/lib/brand'
-import { issueCertificate, getUserCertificates } from '@/lib/certificates-db'
+import { issueCertificateWithStatus, getUserCertificates } from '@/lib/certificates-db'
+import { dispatchCertificateGenerated } from '@/lib/certificates/issue-flow'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
-import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(
@@ -40,37 +38,19 @@ export const POST = withRoute(
     const type = body.type || 'full_curriculum'
     const moduleSlug = body.moduleSlug || null
 
-    const certificate = await issueCertificate(supabase, userId, type, moduleSlug)
+    const { certificate, created } = await issueCertificateWithStatus(supabase, userId, type, moduleSlug)
 
-    // Dispatch certificate.generated event -> in-app notification (primary channel) + email queue
-    try {
-      initializeNotificationConnectors()
+    // Announce (in-app + email) only when this request created the certificate. A
+    // repeated POST returns the existing row and stays silent; the dispatch never throws.
+    if (created) {
       // Re-read for profile metadata only — authorization is already settled by the
       // actor policy above. The call is memoized on this Request, so it is the same
       // resolution `resolveActor` performed and costs nothing.
-      const user = await getAuthenticatedUserFromRequest(request)
-      const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
-      await globalNotificationDispatcher.dispatch({
-        id: `cert-event-${Date.now()}`,
-        event: 'certificate.generated',
-        userId,
-        userEmail: user?.email || '',
-        userName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Learner',
-        userTimezone: 'UTC',
-        priority: 'high',
-        category: 'certificates',
-        occurredAt: new Date().toISOString(),
-        payload: {
-          certificateCode: certificate.certificate_code,
-          certificateType: type,
-          learnerName: certificate.learner_name,
-          verificationUrl: `${siteOrigin}/verify/${encodeURIComponent(certificate.certificate_code)}`,
-          issuedAt: certificate.issued_at,
-        },
-        metadata: { sourceRoute: '/api/certificates' },
+      const user = await getAuthenticatedUserFromRequest(request).catch(() => null)
+      await dispatchCertificateGenerated(certificate, {
+        email: user?.email,
+        name: user?.user_metadata?.full_name || user?.email?.split('@')[0],
       })
-    } catch (err) {
-      console.warn('[API:certificates] Notification dispatch failed:', err)
     }
 
     return NextResponse.json({ success: true, certificate })

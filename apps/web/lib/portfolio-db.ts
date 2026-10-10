@@ -20,7 +20,12 @@ import {
   VALID_PORTFOLIO_SECTIONS,
   type PortfolioSectionId,
 } from '@/lib/portfolio'
-import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
+import {
+  calculatePortfolioReadiness,
+  calculatePortfolioVerification,
+  type PortfolioReadinessInput,
+  type PortfolioVerificationOverride,
+} from '@/lib/portfolio-readiness'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -434,6 +439,42 @@ export class PortfolioValidationError extends Error {
   }
 }
 
+/** The username Settings shows (and readiness counts) when the learner has not chosen one. */
+export function portfolioFallbackUsername(name: string | null | undefined, userId: string): string {
+  return name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : `user_${userId.substring(0, 8)}`
+}
+
+/**
+ * Readiness input from a users row, mapped exactly as getPortfolioSettings maps it, so a caller
+ * that already holds the row (the dashboard) computes the same readiness as Settings.
+ */
+export function portfolioReadinessInputFromUserRow(
+  user: {
+    username: string | null
+    name: string | null
+    bio: string | null
+    avatar_url: string | null
+    linkedin_url: string | null
+    github_url: string | null
+    website_url: string | null
+    is_portfolio_public: boolean | null
+  },
+  userId: string,
+  publicCapstonesCount: number,
+): PortfolioReadinessInput {
+  return {
+    name: user.name || '',
+    username: user.username || portfolioFallbackUsername(user.name, userId),
+    bio: user.bio || '',
+    avatarUrl: user.avatar_url || '',
+    linkedinUrl: user.linkedin_url || '',
+    githubUrl: user.github_url || '',
+    websiteUrl: user.website_url || '',
+    isPortfolioPublic: user.is_portfolio_public ?? true,
+    publicCapstonesCount,
+  }
+}
+
 export async function getPortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string
@@ -448,10 +489,7 @@ export async function getPortfolioSettings(
     throw new Error('User profile not found.')
   }
 
-  // Auto-generate username from name or id if not set
-  const fallbackUsername = user.name
-    ? user.name.toLowerCase().replace(/[^a-z0-9]/g, '')
-    : `user_${userId.substring(0, 8)}`
+  const fallbackUsername = portfolioFallbackUsername(user.name, userId)
 
   const rawLayout = user.portfolio_layout
   const portfolioLayout: PortfolioSectionId[] = Array.isArray(rawLayout) && rawLayout.length > 0

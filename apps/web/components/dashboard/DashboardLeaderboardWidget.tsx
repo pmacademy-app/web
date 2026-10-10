@@ -1,51 +1,134 @@
-'use client'
-
-import React from 'react'
 import Link from 'next/link'
 import { Trophy, ArrowRight } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
-interface DashboardLeaderboardWidgetProps {
-  rank: number | null
-  daysStudied: number
+type DashboardLeaderboardWidgetProps =
+  | {
+      /** The weekly leaderboard could not be loaded; show that instead of fake numbers. */
+      unavailable: true
+    }
+  | {
+      unavailable?: false
+      /** Weekly consistency rank; null/0 means the learner is not ranked yet. */
+      rank: number | null
+      /** Distinct days with a completed lesson this week (Monday-start, UTC). */
+      daysStudied: number
+      /** Optional nudge shown under "Unranked" (e.g. no activity yet this week). */
+      hint?: string | null
+    }
+
+const DAYS_IN_WEEK = 7
+
+// The width matches one column of the 3-column dashboard grid above (gap-6 = 1.5rem), so
+// the card lines up with it while the activity card can still fill the row on its own.
+const CARD =
+  'rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4 md:w-[calc((100%_-_3rem)/3)] md:shrink-0'
+const STATS = 'rounded-xl border border-border/50 bg-secondary/30 divide-y divide-border/50'
+const STAT_ROW = 'flex flex-wrap items-baseline justify-between gap-x-3 px-3.5 py-3'
+const STAT_LABEL = 'text-[11px] font-semibold text-muted-foreground uppercase tracking-wider'
+const STAT_NOTE = 'basis-full text-[11px] leading-tight text-muted-foreground'
+
+/** Clamps to a whole number of days within a single week (0–7). */
+export function clampDaysStudied(days: number): number {
+  if (!Number.isFinite(days)) return 0
+  return Math.min(DAYS_IN_WEEK, Math.max(0, Math.floor(days)))
 }
 
-export function DashboardLeaderboardWidget({
-  rank,
-  daysStudied,
-}: DashboardLeaderboardWidgetProps) {
+function WidgetHeader() {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 space-y-4 shadow-xs">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <div className="flex items-center gap-2 text-primary font-bold text-xs">
-          <Trophy className="w-4 h-4" /> Consistency Leaderboard
-        </div>
-
-        <Link
-          href="/leaderboard"
-          className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
-        >
-          <span>View All</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+      <div className="flex items-center gap-2">
+        <Trophy className="w-5 h-5 text-primary" aria-hidden="true" />
+        <h3 className="text-sm font-bold font-serif text-foreground">Weekly Leaderboard</h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-center">
-        <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 space-y-0.5">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground block">
-            Weekly Rank
-          </span>
-          <div className="text-xl font-bold font-serif text-foreground">
-            {rank ? `#${rank}` : 'Unranked'}
-          </div>
+      <Link
+        href="/leaderboard"
+        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+      >
+        View All<span className="sr-only"> leaderboard</span>
+        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+      </Link>
+    </div>
+  )
+}
+
+/**
+ * Compact dashboard summary of the learner's weekly consistency ranking.
+ * Server-renderable: no client state, just a link through to the full leaderboard.
+ */
+export function DashboardLeaderboardWidget(props: DashboardLeaderboardWidgetProps) {
+  if (props.unavailable) {
+    return (
+      <div className={CARD}>
+        <WidgetHeader />
+        {/* Same height as the stats block so the fallback-to-content swap does not shift. */}
+        <div className={`${STATS} flex min-h-32 flex-col items-center justify-center gap-1 px-3.5 py-3 text-center`}>
+          <p className="text-sm font-semibold text-foreground">Leaderboard unavailable right now</p>
+          <p className="text-[11px] leading-tight text-muted-foreground">Check back in a moment.</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { rank, daysStudied, hint } = props
+  const isRanked = typeof rank === 'number' && Number.isFinite(rank) && rank > 0
+  const days = clampDaysStudied(daysStudied)
+
+  return (
+    <div className={CARD}>
+      <WidgetHeader />
+
+      <dl className={STATS}>
+        <div className={STAT_ROW}>
+          <dt className={STAT_LABEL}>Weekly Rank</dt>
+          <dd className="ml-auto leading-8">
+            {isRanked ? (
+              <span className="text-2xl font-extrabold font-mono text-foreground">#{rank}</span>
+            ) : (
+              <span className="text-base font-bold text-muted-foreground">Unranked</span>
+            )}
+          </dd>
+          {!isRanked && hint ? <dd className={STAT_NOTE}>{hint}</dd> : null}
         </div>
 
-        <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 space-y-0.5">
-          <span className="text-[10px] uppercase font-bold text-muted-foreground block">
-            Days Studied
-          </span>
-          <div className="text-xl font-bold font-serif text-emerald-500">
-            {daysStudied} / 7
+        <div className={STAT_ROW}>
+          <dt className={STAT_LABEL}>Days Studied</dt>
+          <dd className="ml-auto leading-8">
+            <span className="text-2xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">{days}</span>
+            <span aria-hidden="true" className="text-xs font-medium text-muted-foreground">{` / ${DAYS_IN_WEEK}`}</span>
+            <span className="sr-only">{` of ${DAYS_IN_WEEK}`}</span>
+          </dd>
+          <dd className={STAT_NOTE}>days you completed a lesson this week</dd>
+        </div>
+      </dl>
+    </div>
+  )
+}
+
+/** Suspense fallback with the same footprint as the widget, so streaming in causes no layout shift. */
+export function LeaderboardWidgetSkeleton() {
+  return (
+    <div aria-hidden="true" data-testid="leaderboard-widget-skeleton" className={CARD}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-5 rounded-md" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-3.5 w-14" />
+      </div>
+
+      <div className={STATS}>
+        <div className="flex items-center justify-between gap-3 px-3.5 py-3">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-8 w-12" />
+        </div>
+        <div className="space-y-1 px-3.5 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-8 w-14" />
           </div>
+          <Skeleton className="h-3 w-36 max-w-full" />
         </div>
       </div>
     </div>

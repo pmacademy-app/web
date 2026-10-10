@@ -17,9 +17,7 @@ export interface LessonCompletedPayload {
 export interface ModuleCompletedPayload {
   moduleSlug: string
   moduleName: string
-  moduleOrder: number
   totalLessonsCompleted: number
-  xpBonusEarned: number
   completedAt: string
 }
 
@@ -98,6 +96,18 @@ export interface CapstoneReviewedPayload {
   /** Whether the review published the capstone to the learner's public portfolio. */
   isPublished: boolean
   reviewedAt: string
+  /** Learner's portfolio handle, when known — lets a published review deep-link to `/p/<username>`. */
+  username?: string | null
+  isPortfolioPublic?: boolean
+}
+
+export interface FellowGrantedPayload {
+  /** Null only if the learner has no handle yet; a grant normally requires a public portfolio. */
+  username: string | null
+  isPortfolioPublic: boolean
+  /** Absolute public portfolio URL, or null when there is no username to build it from. */
+  portfolioUrl: string | null
+  grantedAt: string
 }
 
 export interface UserRegisteredPayload {

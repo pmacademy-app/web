@@ -35,6 +35,8 @@ export interface BadgeStatsPreloadedData {
   >[]
   /** Already-fetched `capstone_submissions` rows (any status) for this user — filtered internally to submitted/reviewed. */
   capstoneRows?: Selected<'capstone_submissions', 'status'>[]
+  /** The user's own users row, already loaded (the dashboard's profile) — skips that query. */
+  user?: Database['public']['Tables']['users']['Row'] | null
 }
 
 /**
@@ -50,7 +52,7 @@ async function fetchUserStatsForBadges(
   preloaded?: BadgeStatsPreloadedData
 ): Promise<UserStatsForBadges> {
   // 1. Fetch user record
-  const { data: user } = await supabase.from('users').select('*').eq('id', userId).single()
+  const user = preloaded?.user ?? (await supabase.from('users').select('*').eq('id', userId).single()).data
 
   // 2. Completed lesson progress
   let progressRows = preloaded?.progressRows

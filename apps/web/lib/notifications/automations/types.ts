@@ -8,6 +8,7 @@ export type EmailAutomationKey =
   | 'achievement.level_up'
   | 'achievement.certificate'
   | 'achievement.portfolio_published'
+  | 'achievement.fellow_granted'
   | 'learning.weekly_recap'
   | 'learning.daily_reminder'
   | 'inactive.resume_learning'
