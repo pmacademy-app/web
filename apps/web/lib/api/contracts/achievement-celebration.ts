@@ -44,7 +44,7 @@ export interface FellowCelebration extends CelebrationBase {
   kind: 'fellow'
 }
 
-/** Every lesson in a curriculum module completed. Behind MODULE_CELEBRATIONS_ENABLED (default off). */
+/** Every lesson in a curriculum module completed. */
 export interface ModuleCelebration extends CelebrationBase {
   kind: 'module'
   module: { slug: string; title: string }

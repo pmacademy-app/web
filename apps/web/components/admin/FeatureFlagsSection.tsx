@@ -20,17 +20,11 @@ interface FlagCategory {
 const FLAG_CATEGORIES: Record<string, FlagCategory> = {
   EMAIL_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   IN_APP_NOTIFICATIONS_ENABLED: { label: 'Communication', icon: Bell, color: 'text-admin-warning' },
-  MODULE_CELEBRATIONS_ENABLED: {
-    label: 'Communication',
-    icon: Bell,
-    color: 'text-admin-warning',
-    description: 'Also celebrate each completed curriculum module (needs achievement celebrations on)',
-  },
   ACHIEVEMENT_CELEBRATIONS_ENABLED: {
     label: 'Communication',
     icon: Bell,
     color: 'text-admin-warning',
-    description: 'One-time celebration modal for a new certificate, published capstone or Fellow grant',
+    description: 'One-time celebration modal for a new certificate, published capstone, Fellow grant or completed module',
   },
   ACHIEVEMENT_EMAIL_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   PORTFOLIO_EMAILS_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },

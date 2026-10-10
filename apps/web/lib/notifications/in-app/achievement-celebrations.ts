@@ -1,8 +1,7 @@
 /**
  * Achievement celebration claim (server-only).
  *
- * A certificate, a published capstone, a Fellow grant or (behind its own flag) a completed
- * module earns the learner a one-time celebration. The source of truth for "has it been shown" is the achievement's own
+ * A certificate, a published capstone, a Fellow grant or a completed module earns the learner a one-time celebration. The source of truth for "has it been shown" is the achievement's own
  * in-app notification: claiming it marks that row read with a compare-and-set, so when
  * several tabs or devices ask at once exactly one of them is told to celebrate.
  *
@@ -61,8 +60,6 @@ export interface ClaimAchievementCelebrationOptions {
   now?: Date
   /** Origin for the certificate verification link. Defaults to the configured site url. */
   siteOrigin?: string
-  /** Also consider completed modules (MODULE_CELEBRATIONS_ENABLED). Off unless set. */
-  includeModules?: boolean
 }
 
 interface Candidate {
@@ -350,8 +347,7 @@ export async function claimNextAchievementCelebration(
   if (!userId) return null
   const now = opts.now ?? new Date()
 
-  const kinds = opts.includeModules ? CLAIM_ORDER : CLAIM_ORDER.filter((kind) => kind !== 'module')
-  const candidates = await loadCandidates(supabase, userId, now, kinds)
+  const candidates = await loadCandidates(supabase, userId, now, CLAIM_ORDER)
   if (!candidates || candidates.length === 0) return null
 
   const { data: user, error: userError } = await supabase
@@ -372,7 +368,7 @@ export async function claimNextAchievementCelebration(
     isPublic: user.is_portfolio_public === true,
   }
 
-  for (const kind of kinds) {
+  for (const kind of CLAIM_ORDER) {
     // Already oldest-first from the read; the filter keeps that order.
     const ofKind = candidates.filter((candidate) => candidate.kind === kind)
     if (ofKind.length === 0) continue

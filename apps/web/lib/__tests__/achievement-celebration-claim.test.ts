@@ -868,22 +868,8 @@ describe('claimNextAchievementCelebration — a query error is never a verificat
 const moduleKey = (slug: string, userId = USER) => `module-completed-${userId}-${slug}`
 const progressRows = (slug: string, overrides: Row = {}) =>
   getLessonIdsForModule(slug).map((lessonId) => ({ user_id: USER, lesson_id: lessonId, status: 'completed', ...overrides }))
-const claimWithModules = (fake: FakeDb) =>
-  claimNextAchievementCelebration(fake.client, USER, { now: NOW, siteOrigin: 'https://example.test/', includeModules: true })
 
 describe('claimNextAchievementCelebration — modules', () => {
-  it('ignores module notifications unless modules are included', async () => {
-    db = createFakeSupabase({
-      users: [userRow()],
-      in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
-      user_lesson_progress: progressRows('discovery'),
-    })
-
-    expect(await claim(db)).toBeNull()
-    expect(db.notification('n-mod')).toMatchObject({ is_read: false })
-    expect(db.queriesOn('user_lesson_progress')).toHaveLength(0)
-  })
-
   it('celebrates a module whose lessons are all completed, with its capstone', async () => {
     db = createFakeSupabase({
       users: [userRow()],
@@ -891,7 +877,7 @@ describe('claimNextAchievementCelebration — modules', () => {
       user_lesson_progress: progressRows('discovery'),
     })
 
-    const celebration = await claimWithModules(db)
+    const celebration = await claim(db)
 
     expect(celebration).toMatchObject({
       kind: 'module',
@@ -914,7 +900,7 @@ describe('claimNextAchievementCelebration — modules', () => {
       capstone_submissions: [capstoneRow(SUBMISSION, { module_slug: 'discovery', status, is_public: false })],
     })
 
-    expect(await claimWithModules(db)).toMatchObject({ capstone: { slug: 'discovery', submitted } })
+    expect(await claim(db)).toMatchObject({ capstone: { slug: 'discovery', submitted } })
   })
 
   it('still celebrates when the capstone read fails, without the submitted hint', async () => {
@@ -926,7 +912,7 @@ describe('claimNextAchievementCelebration — modules', () => {
     db.failures.set('capstone_submissions:select', { message: 'boom', code: 'XX000' })
     vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    expect(await claimWithModules(db)).toMatchObject({ kind: 'module', capstone: { submitted: false } })
+    expect(await claim(db)).toMatchObject({ kind: 'module', capstone: { submitted: false } })
   })
 
   it('points the Growth & Metrics module at its metrics capstone', async () => {
@@ -936,7 +922,7 @@ describe('claimNextAchievementCelebration — modules', () => {
       user_lesson_progress: progressRows('growth'),
     })
 
-    expect(await claimWithModules(db)).toMatchObject({ module: { slug: 'growth' }, capstone: { slug: 'metrics' } })
+    expect(await claim(db)).toMatchObject({ module: { slug: 'growth' }, capstone: { slug: 'metrics' } })
   })
 
   it('does not celebrate a module that is no longer complete (reset since the event)', async () => {
@@ -946,7 +932,7 @@ describe('claimNextAchievementCelebration — modules', () => {
       user_lesson_progress: progressRows('discovery').slice(1),
     })
 
-    expect(await claimWithModules(db)).toBeNull()
+    expect(await claim(db)).toBeNull()
     expect(db.notification('n-mod')).toMatchObject({ is_read: false })
   })
 
@@ -961,7 +947,7 @@ describe('claimNextAchievementCelebration — modules', () => {
       user_lesson_progress: [...progressRows('discovery'), ...progressRows('technical')],
     })
 
-    expect(await claimWithModules(db)).toBeNull()
+    expect(await claim(db)).toBeNull()
     expect(db.notification('n-mod')).toMatchObject({ is_read: false })
   })
 
@@ -976,8 +962,8 @@ describe('claimNextAchievementCelebration — modules', () => {
       user_lesson_progress: progressRows('capstone'),
     })
 
-    expect(await claimWithModules(db)).toMatchObject({ kind: 'certificate' })
-    expect(await claimWithModules(db)).toMatchObject({ kind: 'module', module: { slug: 'capstone' } })
+    expect(await claim(db)).toMatchObject({ kind: 'certificate' })
+    expect(await claim(db)).toMatchObject({ kind: 'module', module: { slug: 'capstone' } })
   })
 })
 
@@ -1060,10 +1046,7 @@ describe('POST /api/notifications/celebrations', () => {
     expect(db.notification('n-cert')).toMatchObject({ is_read: false, read_at: null })
   })
 
-  it.each([
-    [false, null],
-    [true, 'module'],
-  ])('follows MODULE_CELEBRATIONS_ENABLED=%s for module claims', async (moduleFlag, expectedKind) => {
+  it('claims a completed module with no flag of its own (only the master kill switch)', async () => {
     db = createFakeSupabase({
       users: [userRow()],
       in_app_notifications: [notificationRow('n-mod', moduleKey('discovery'))],
@@ -1071,15 +1054,13 @@ describe('POST /api/notifications/celebrations', () => {
     })
     signIn(USER)
     useDb(db)
-    const flag = vi
-      .spyOn(globalFeatureFlagService, 'isEnabledAsync')
-      .mockImplementation(async (key) => (key === 'MODULE_CELEBRATIONS_ENABLED' ? moduleFlag : true))
+    const flag = vi.spyOn(globalFeatureFlagService, 'isEnabledAsync').mockResolvedValue(true)
     const { POST } = await import('../../app/api/notifications/celebrations/route')
 
     const json = await (await POST(request())).json()
 
-    expect(flag).toHaveBeenCalledWith('MODULE_CELEBRATIONS_ENABLED', false)
-    expect(json.celebration?.kind ?? null).toBe(expectedKind)
+    expect(flag.mock.calls.map(([key]) => key)).toEqual(['ACHIEVEMENT_CELEBRATIONS_ENABLED'])
+    expect(json.celebration?.kind).toBe('module')
   })
 
   it('takes the user from the session and ignores any id in the body', async () => {
@@ -1165,9 +1146,9 @@ describe('achievement celebration wiring', () => {
     )
   })
 
-  it('ships module celebrations off by default', () => {
-    expect(DEFAULT_FEATURE_FLAGS.MODULE_CELEBRATIONS_ENABLED).toBe(false)
-    expect(readSource('lib/notifications/feature-flags/types.ts')).toContain("'MODULE_CELEBRATIONS_ENABLED'")
+  it('has no separate module celebration flag', () => {
+    expect(Object.keys(DEFAULT_FEATURE_FLAGS)).not.toContain('MODULE_CELEBRATIONS_ENABLED')
+    expect(readSource('lib/notifications/feature-flags/types.ts')).not.toContain('MODULE_CELEBRATIONS_ENABLED')
   })
 
   it('ships the kill switch enabled by default', () => {

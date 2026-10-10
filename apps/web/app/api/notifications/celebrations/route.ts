@@ -11,7 +11,7 @@ import { claimNextAchievementCelebration } from '@/lib/notifications/in-app/achi
  * POST /api/notifications/celebrations
  *
  * Claims the calling learner's next unseen achievement (Fellow grant, certificate,
- * published capstone) so the client can show its celebration exactly once. The claim
+ * published capstone, completed module) so the client can show its celebration exactly once. The claim
  * marks that achievement's in-app notification read with a compare-and-set, so when
  * several tabs or devices ask at the same moment only one receives it.
  *
@@ -24,7 +24,6 @@ import { claimNextAchievementCelebration } from '@/lib/notifications/in-app/achi
  *
  * `ACHIEVEMENT_CELEBRATIONS_ENABLED` is the kill switch. Off means a null celebration
  * and no database access at all, so the notifications stay unread in the bell.
- * `MODULE_CELEBRATIONS_ENABLED` (default off) additionally lets completed modules celebrate.
  */
 export const POST = withRoute(
   {
@@ -42,8 +41,7 @@ export const POST = withRoute(
       return NextResponse.json(disabled)
     }
 
-    const includeModules = await globalFeatureFlagService.isEnabledAsync('MODULE_CELEBRATIONS_ENABLED', false)
-    const celebration = await claimNextAchievementCelebration(createServiceRoleClient(), userId, { includeModules })
+    const celebration = await claimNextAchievementCelebration(createServiceRoleClient(), userId)
     const claimed: AchievementCelebrationClaimResponse = { success: true, celebration }
     return NextResponse.json(claimed)
   }
