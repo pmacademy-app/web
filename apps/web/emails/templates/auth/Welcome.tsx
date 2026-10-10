@@ -26,8 +26,15 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
       <ul style={{ fontSize: '14px', color: '#70685A', paddingLeft: '20px', lineHeight: 1.8 }}>
         <li><strong>9 Structured Modules</strong>: From PM foundations to product strategy &amp; execution.</li>
         <li><strong>Interactive Quizzes &amp; Spaced Repetition</strong>: Retain core concepts.</li>
-        <li><strong>Real-World Capstones &amp; Portfolio</strong>: Build verifiable PM project credentials.</li>
+        <li><strong>Real-World Capstones &amp; Portfolio</strong>: Turn your work into proof on a public PM portfolio.</li>
       </ul>
+      {/* Growth R5 B12a: frame the outcome from day one. */}
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        You&apos;re building a public PM portfolio recruiters can see.{' '}
+        <a href={`${appUrl}/settings?tab=portfolio`} style={{ color: '#1F6B4E', fontWeight: 600 }}>
+          Set up your portfolio
+        </a>
+      </p>
       <Button href={`${appUrl}/dashboard`}>Start Lesson 1</Button>
     </EmailWrapper>
   )
