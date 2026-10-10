@@ -149,7 +149,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
       case 'progress':
         return <PortfolioProgress key="progress" progress={progress} />
       case 'capstones':
-        return <PortfolioCapstones key="capstones" capstones={capstones} />
+        return <PortfolioCapstones key="capstones" capstones={capstones} username={username} />
       case 'achievements':
         return (
           <PortfolioAchievements

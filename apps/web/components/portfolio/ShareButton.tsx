@@ -5,7 +5,13 @@ import { Share2, Copy, Check, CircleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BRAND } from '@/lib/brand'
-import { badgeShareText, formatPortfolioShareUrl, portfolioShareText } from '@/lib/portfolio'
+import {
+  badgeShareText,
+  capstoneShareText,
+  formatCapstoneShareUrl,
+  formatPortfolioShareUrl,
+  portfolioShareText,
+} from '@/lib/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
 
 interface ShareButtonProps {
@@ -18,9 +24,14 @@ interface ShareButtonProps {
    * (its card comes from the portfolio's OG tags), so it is the same for both.
    * Fellow is a distinction, never a certificate or credential.
    */
-  context?: 'portfolio' | 'fellow' | 'badge'
+  context?: 'portfolio' | 'fellow' | 'badge' | 'capstone'
   /** With context 'badge': the badge being shared (first person, owner-only surfaces). */
   badgeName?: string
+  /**
+   * With context 'capstone': the capstone page being shared (Growth R5 B13). Its own URL and a
+   * third-person text, so a visitor can share it too.
+   */
+  capstone?: { moduleSlug: string; title: string }
 }
 
 const STATUS_RESET_MS = 2500
@@ -60,7 +71,7 @@ function errorName(error: unknown): string | undefined {
   return undefined
 }
 
-export function ShareButton({ username, name, context = 'portfolio', badgeName }: ShareButtonProps) {
+export function ShareButton({ username, name, context = 'portfolio', badgeName, capstone }: ShareButtonProps) {
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
   // Bumped on every status flash so the live region re-announces a repeated message.
   const [announcementId, setAnnouncementId] = useState(0)
@@ -85,12 +96,14 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName }
 
   const displayName = name?.trim() || username
   // Matches the page's canonical/OG URL, so every shared link unfurls the same card.
-  const shareUrl = formatPortfolioShareUrl(
-    process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl,
-    username,
-  )
-  const shareText =
-    context === 'fellow'
+  const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
+  const sharingCapstone = context === 'capstone' && capstone
+  const shareUrl = sharingCapstone
+    ? formatCapstoneShareUrl(siteOrigin, username, capstone.moduleSlug)
+    : formatPortfolioShareUrl(siteOrigin, username)
+  const shareText = sharingCapstone
+    ? capstoneShareText(displayName, capstone.title, BRAND.fullName)
+    : context === 'fellow'
       ? `I was selected as a PM Fellow at ${BRAND.fullName}. Here is my Product Management portfolio:`
       : context === 'badge' && badgeName
         ? badgeShareText(badgeName, BRAND.fullName)
@@ -183,7 +196,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName }
     : failed
       ? 'Copy failed'
       : canNativeShare
-        ? 'Share Portfolio'
+        ? (sharingCapstone ? 'Share Case Study' : 'Share Portfolio')
         : 'Copy Link'
 
   const primaryIcon = copied ? (
@@ -197,14 +210,14 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName }
   )
 
   const announcement = copied
-    ? 'Portfolio link copied to clipboard'
+    ? `${sharingCapstone ? 'Case study' : 'Portfolio'} link copied to clipboard`
     : failed
       ? 'Could not copy the link. Select the link shown below the share buttons to copy it.'
       : ''
 
   return (
     <div className="flex flex-col gap-2">
-      <div role="group" aria-label="Share this portfolio" className="flex flex-wrap items-center gap-2">
+      <div role="group" aria-label={sharingCapstone ? "Share this case study" : "Share this portfolio"} className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
           onClick={handlePrimary}
@@ -244,7 +257,11 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName }
             variant="outline"
             size="icon"
             onClick={() => copyLink(true)}
-            aria-label={failed ? 'Copy failed. Try copying the portfolio link again' : 'Copy portfolio link'}
+            aria-label={
+              failed
+                ? `Copy failed. Try copying the ${sharingCapstone ? 'case study' : 'portfolio'} link again`
+                : `Copy ${sharingCapstone ? 'case study' : 'portfolio'} link`
+            }
             title={failed ? shareUrl : 'Copy link'}
           >
             {copied ? (

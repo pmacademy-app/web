@@ -391,3 +391,26 @@ describe('ShareButton — hydration', () => {
     expect(byLabel('Copy portfolio link')).not.toBeNull()
   })
 })
+
+// Growth R5 / B13b: a capstone page shares its own URL with third-person text.
+describe('ShareButton — capstone context', () => {
+  it('shares the capstone page, not the portfolio, with a visitor-safe text', async () => {
+    render(
+      <ShareButton
+        username={USERNAME}
+        name="Jane Doe"
+        context="capstone"
+        capstone={{ moduleSlug: 'discovery', title: 'Problem Discovery Brief' }}
+      />,
+    )
+
+    await click(byLabel('Share on X (opens in a new window)'))
+
+    const url = new URL(openedUrl())
+    expect(url.searchParams.get('url')).toBe(`${CANONICAL_URL}/capstones/discovery`)
+    expect(url.searchParams.get('text')).toBe(
+      'Jane Doe\'s "Problem Discovery Brief" product management case study on Prodily PM Academy',
+    )
+    expect(url.searchParams.get('text')).not.toMatch(/\bmy\b/i)
+  })
+})

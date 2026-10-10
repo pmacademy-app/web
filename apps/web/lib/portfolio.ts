@@ -148,6 +148,21 @@ export function portfolioShareText(displayName: string, productName: string): st
   return `${displayName}'s Product Management portfolio on ${productName}`
 }
 
+/** App path of one public capstone page (Growth R5 B13): `/p/<username>/capstones/<module>`. */
+export function capstoneSharePath(username: string, moduleSlug: string): string {
+  return `/p/${encodeURIComponent(username)}/capstones/${encodeURIComponent(moduleSlug)}`
+}
+
+/** Absolute URL of one public capstone page. */
+export function formatCapstoneShareUrl(siteOrigin: string, username: string, moduleSlug: string): string {
+  return `${siteOrigin.replace(/\/$/, '')}${capstoneSharePath(username, moduleSlug)}`
+}
+
+/** Third-person share text for one capstone, safe for visitors to share too. */
+export function capstoneShareText(displayName: string, capstoneTitle: string, productName: string): string {
+  return `${displayName}'s "${capstoneTitle}" product management case study on ${productName}`
+}
+
 /** First-person share text for one earned badge (owner-only surfaces). */
 export function badgeShareText(badgeName: string, productName: string): string {
   return `I just earned the "${badgeName}" badge on ${productName}. Here is my Product Management portfolio:`
