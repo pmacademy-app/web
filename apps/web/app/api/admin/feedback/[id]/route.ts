@@ -5,6 +5,7 @@ import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const PATCH = withRoute(
   {
@@ -36,6 +37,7 @@ export const PATCH = withRoute(
 
         revalidatePath('/admin/feedback')
         revalidatePath('/admin/moderation')
+        revalidateAdminShell()
         return NextResponse.json({ success: true, newStatus: targetStatus })
       }
 
@@ -58,6 +60,7 @@ export const PATCH = withRoute(
 
       revalidatePath('/admin/feedback')
       revalidatePath('/admin/moderation')
+      revalidateAdminShell()
       return NextResponse.json({ success: true })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Error moderating feedback item.')

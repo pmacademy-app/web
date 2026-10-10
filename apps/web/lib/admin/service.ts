@@ -1,4 +1,5 @@
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, unstable_cache } from 'next/cache'
+import { ADMIN_CACHE_TAGS } from './cache-tags'
 import { revalidateCapstoneOgCards } from '@/lib/og/revalidate-capstone-cards'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
@@ -113,26 +114,53 @@ export class AdminConsoleService {
 
   /**
    * Fetches the live counts the console shell needs for the sidebar attention
-   * badges and the header system-status chip. Runs once per layout render.
+   * badges and the header system-status chip. Runs on every console layout render, so
+   * the six head counts are cached for 30s under the `admin-shell` tag; the mutation
+   * routes that change one of these counts expire the tag (`revalidateAdminShell`).
+   *
+   * There is no separate reachability probe: `systemOnline` is "the count batch
+   * succeeded" and `databaseLatencyMs` is how long that batch took, both measured inside
+   * the cached function (so they are as fresh as the counts). A failed batch throws out
+   * of the cached function, which keeps the failure out of the cache; the counts that
+   * did come back are still shown.
    */
   public static async getConsoleShellContext(): Promise<AdminConsoleShellContext> {
-    try {
+    const emptyAttention: AdminConsoleShellContext['attention'] = {
+      contactMessages: 0,
+      pendingTestimonials: 0,
+      systemErrors: 0,
+      failedEmails: 0,
+      pendingCapstones: 0,
+      newFeedback: 0,
+    }
+    const sum = (a: AdminConsoleShellContext['attention']) =>
+      a.contactMessages + a.pendingTestimonials + a.systemErrors + a.failedEmails + a.pendingCapstones + a.newFeedback
+
+    class ShellCountBatchError extends Error {
+      constructor(readonly attention: AdminConsoleShellContext['attention']) {
+        super('One or more console shell counts failed')
+      }
+    }
+
+    // Must not read cookies or headers: unstable_cache forbids request-scoped APIs, so
+    // this uses the service-role client and nothing user-specific.
+    const loadCounts = async (): Promise<AdminConsoleShellContext> => {
       const supabase = createServiceRoleClient()
+      const head = { count: 'exact', head: true } as const
 
       const startTime = Date.now()
-      const { error } = await supabase.from('users').select('id').limit(1)
+      const results = await Promise.all([
+        supabase.from('contact_messages').select('id', head).eq('status', 'new'),
+        supabase.from('testimonials').select('id', head).eq('status', 'pending'),
+        supabase.from('system_errors').select('id', head).eq('status', 'new'),
+        supabase.from('email_queue').select('id', head).eq('status', 'failed'),
+        supabase.from('capstone_submissions').select('id', head).eq('status', 'submitted'),
+        supabase.from('user_feedback').select('id', head).eq('status', 'new'),
+      ])
       const latency = Date.now() - startTime
 
       const [contactMessages, pendingTestimonials, systemErrors, failedEmails, pendingCapstones, newFeedback] =
-        await Promise.all([
-          supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-          supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-          supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-          supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
-          supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('status', 'submitted'),
-          supabase.from('user_feedback').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-        ])
-
+        results
       const attention = {
         contactMessages: contactMessages.count || 0,
         pendingTestimonials: pendingTestimonials.count || 0,
@@ -141,32 +169,23 @@ export class AdminConsoleService {
         pendingCapstones: pendingCapstones.count || 0,
         newFeedback: newFeedback.count || 0,
       }
-      const attentionTotal =
-        attention.contactMessages +
-        attention.pendingTestimonials +
-        attention.systemErrors +
-        attention.failedEmails +
-        attention.pendingCapstones +
-        attention.newFeedback
 
-      return {
-        attention,
-        attentionTotal,
-        systemOnline: !error,
-        databaseLatencyMs: error ? null : latency,
-      }
+      if (results.some((r) => r.error)) throw new ShellCountBatchError(attention)
+
+      return { attention, attentionTotal: sum(attention), systemOnline: true, databaseLatencyMs: latency }
+    }
+
+    try {
+      return await unstable_cache(loadCounts, ['admin-console-shell-context'], {
+        revalidate: 30,
+        tags: [ADMIN_CACHE_TAGS.shell],
+      })()
     } catch (err) {
+      const attention = err instanceof ShellCountBatchError ? err.attention : emptyAttention
       console.warn('[AdminConsoleService] getConsoleShellContext failed:', err)
       return {
-        attention: {
-          contactMessages: 0,
-          pendingTestimonials: 0,
-          systemErrors: 0,
-          failedEmails: 0,
-          pendingCapstones: 0,
-          newFeedback: 0,
-        },
-        attentionTotal: 0,
+        attention,
+        attentionTotal: sum(attention),
         systemOnline: false,
         databaseLatencyMs: null,
       }

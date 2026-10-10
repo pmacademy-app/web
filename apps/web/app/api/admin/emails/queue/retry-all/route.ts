@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const runtime = 'nodejs'
 
@@ -165,6 +166,9 @@ export const POST = withRoute(
           statusFilter,
         }
       )
+
+      // Suppressions and requeues both move rows out of `failed`.
+      revalidateAdminShell()
 
       // Matched rows but requeued none: the rows changed status underneath us. Report
       // that rather than a green "requeued 0".

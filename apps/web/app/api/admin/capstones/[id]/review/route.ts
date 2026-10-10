@@ -4,6 +4,7 @@ import { ModerationService } from '@/lib/admin/moderation-service'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const POST = withRoute(
   {
@@ -44,6 +45,7 @@ export const POST = withRoute(
         return NextResponse.json({ error: 'Failed to review capstone submission.' }, { status: 500 })
       }
 
+      revalidateAdminShell()
       return NextResponse.json({ success: true })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Error reviewing capstone submission.')

@@ -5,6 +5,7 @@ import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const runtime = 'nodejs'
 
@@ -143,6 +144,7 @@ export const POST = withRoute(
         }
       )
 
+      revalidateAdminShell()
       return NextResponse.json({
         success: true,
         message: `Email to ${item.to_email} requeued for delivery.`,

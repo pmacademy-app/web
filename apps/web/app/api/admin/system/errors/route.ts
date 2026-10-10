@@ -5,6 +5,7 @@ import { SystemService } from '@/lib/admin/system-service'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const runtime = 'nodejs'
 
@@ -67,6 +68,7 @@ export const PATCH = withRoute(
         { newStatus, updatedCount: result.updatedCount }
       )
 
+      revalidateAdminShell()
       return NextResponse.json({ ...result })
     } catch (err) {
       const message = adminErrorMessage(err, 'Failed to update system error')

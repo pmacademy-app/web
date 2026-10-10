@@ -6,6 +6,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { clampPagination, paginated, toRange } from '@/lib/api/pagination'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const GET = withRoute(
   {
@@ -93,6 +94,7 @@ export const PATCH = withRoute(
         adminNotes: Boolean(adminNotes),
       })
 
+      revalidateAdminShell()
       return NextResponse.json({ success: true, messageId })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Failed to update contact message.')
