@@ -50,6 +50,8 @@ import {
   trackDeepDiveOpened,
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
+import { ReferralInviteLauncher } from '@/components/referral/ReferralInviteLauncher'
+import { deferQuickStartToNextSession } from '@/lib/quick-start/deferred-launch'
 import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
@@ -528,6 +530,8 @@ export default function LessonPageContent({
   const [theorySubmitting, setTheorySubmitting] = useState(false)
   const [theoryError, setTheoryError] = useState<string | null>(null)
   const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
+  // Growth R5 B11: the first-lesson celebration can hand off to the referral modal.
+  const [firstLessonInviteOpen, setFirstLessonInviteOpen] = useState(false)
   const [celebrationXp, setCelebrationXp] = useState(50)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
@@ -1067,6 +1071,18 @@ export default function LessonPageContent({
         lessonId={lesson.id}
         xpEarned={celebrationXp}
         nextLessonUrl={nextLessonUrl}
+        onInvitePeers={() => {
+          // Swap, never chain: the celebration closes, the referral modal opens, and Quick Start
+          // waits for the next session instead of following this dialog.
+          setShowFirstSessionCelebration(false)
+          deferQuickStartToNextSession()
+          setFirstLessonInviteOpen(true)
+        }}
+      />
+      <ReferralInviteLauncher
+        open={firstLessonInviteOpen}
+        onClose={() => setFirstLessonInviteOpen(false)}
+        source="first_lesson_celebration"
       />
     </div>
   )

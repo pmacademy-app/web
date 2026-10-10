@@ -101,3 +101,12 @@ export function consumeDeferredQuickStart(): void {
 export function clearDeferredQuickStart(): void {
   removeItem('localStorage', QUICK_START_PENDING_KEY)
 }
+
+/**
+ * Queue the tour but keep it for the learner's next browser session (Growth R5 B11): used when the
+ * first-lesson celebration hands off to the referral modal instead, so the two never chain.
+ */
+export function deferQuickStartToNextSession(): void {
+  queueDeferredQuickStart()
+  writeItem('sessionStorage', QUICK_START_AUTO_SHOWN_KEY, '1')
+}
