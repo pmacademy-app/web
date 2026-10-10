@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Globe,
@@ -20,46 +20,55 @@ import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { useAdminToast } from './admin-toast'
 import { apiPost } from '@/lib/api/client'
 import type { AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
+import type { AdminPortfolioCounts } from '@/lib/admin/moderation-service'
+import type { ModerationParamsPatch } from './ModerationWorkspace'
 
 interface PortfoliosViewProps {
+  /** One server page, already filtered by `status` and `q` (getPortfoliosPage). */
   initialPortfolios: AdminPortfolioRow[]
+  /** KPI counts over every public portfolio, ignoring the tab and the search. */
+  counts: AdminPortfolioCounts
+  /** Raw `status` URL param; unknown or absent means 'pending'. */
+  status: string | null
+  /** Raw `q` URL param. */
+  q: string
+  onParamsChange: (patch: ModerationParamsPatch) => void
 }
 
 type TabFilter = 'pending' | 'verified' | 'all'
 
-export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
+const TAB_FILTERS: TabFilter[] = ['pending', 'verified', 'all']
+const SEARCH_DEBOUNCE_MS = 350
+
+export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsChange }: PortfoliosViewProps) {
   const { toast } = useAdminToast()
   const [portfolios, setPortfolios] = useState<AdminPortfolioRow[]>(initialPortfolios)
-  const [activeTab, setActiveTab] = useState<TabFilter>('pending')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [kpis, setKpis] = useState<AdminPortfolioCounts>(counts)
+  // Re-seed the local (optimistic) copies when the server sends a new page. Not done
+  // with a remounting `key`, because a remount would drop focus from the search box.
+  const [seed, setSeed] = useState({ initialPortfolios, counts })
+  if (seed.initialPortfolios !== initialPortfolios || seed.counts !== counts) {
+    setSeed({ initialPortfolios, counts })
+    setPortfolios(initialPortfolios)
+    setKpis(counts)
+  }
+  const activeTab: TabFilter = TAB_FILTERS.includes(status as TabFilter) ? (status as TabFilter) : 'pending'
+  const setActiveTab = (tab: TabFilter) => onParamsChange({ status: tab === 'pending' ? undefined : tab })
+  const [searchQuery, setSearchQuery] = useState(q)
   const [loadingUserId, setLoadingUserId] = useState<string | null>(null)
   const [unverifyTarget, setUnverifyTarget] = useState<AdminPortfolioRow | null>(null)
 
-  // Compute live KPIs
-  const pendingCount = useMemo(() => portfolios.filter((p) => !p.isFellow).length, [portfolios])
-  const verifiedCount = useMemo(() => portfolios.filter((p) => p.isFellow).length, [portfolios])
-  const totalCount = portfolios.length
+  // The search runs on the server: push `q` to the URL once typing pauses.
+  useEffect(() => {
+    const next = searchQuery.trim()
+    if (next === q.trim()) return
+    const timer = setTimeout(() => onParamsChange({ q: next || undefined }), SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timer)
+  }, [searchQuery, q, onParamsChange])
 
-  // Filtered dataset
-  const filteredPortfolios = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
-    return portfolios.filter((p) => {
-      // Tab filter
-      if (activeTab === 'pending' && p.isFellow) return false
-      if (activeTab === 'verified' && !p.isFellow) return false
-
-      // Search query
-      if (q) {
-        const matchesName = p.learnerName.toLowerCase().includes(q)
-        const matchesUsername = p.username ? p.username.toLowerCase().includes(q) : false
-        const matchesEmail = p.email.toLowerCase().includes(q)
-        const matchesBio = p.bio ? p.bio.toLowerCase().includes(q) : false
-        return matchesName || matchesUsername || matchesEmail || matchesBio
-      }
-
-      return true
-    })
-  }, [portfolios, activeTab, searchQuery])
+  const pendingCount = kpis.pending
+  const verifiedCount = kpis.verified
+  const totalCount = kpis.all
 
   // Execute verification / unverification action
   const handleToggleVerification = async (targetUser: AdminPortfolioRow, nextFellowState: boolean) => {
@@ -78,6 +87,14 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
             item.userId === targetUser.userId ? { ...item, isFellow: nextFellowState } : item
           )
         )
+        if (targetUser.isFellow !== nextFellowState) {
+          const delta = nextFellowState ? 1 : -1
+          setKpis((prev) => ({
+            ...prev,
+            pending: Math.max(0, prev.pending - delta),
+            verified: Math.max(0, prev.verified + delta),
+          }))
+        }
         toast(
           nextFellowState
             ? `Verified portfolio for ${targetUser.learnerName} (@${targetUser.username || 'user'}).`
@@ -222,7 +239,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
         {/* Pending Verification */}
         <div
           onClick={() => setActiveTab('pending')}
-          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
             activeTab === 'pending'
               ? 'bg-amber-500/10 border-amber-500/40 ring-1 ring-amber-500/30'
               : 'bg-admin-surface border-admin-border hover:border-amber-500/30'
@@ -243,7 +260,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
         {/* Verified Portfolios */}
         <div
           onClick={() => setActiveTab('verified')}
-          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
             activeTab === 'verified'
               ? 'bg-emerald-500/10 border-emerald-500/40 ring-1 ring-emerald-500/30'
               : 'bg-admin-surface border-admin-border hover:border-emerald-500/30'
@@ -264,7 +281,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
         {/* Total Public Portfolios */}
         <div
           onClick={() => setActiveTab('all')}
-          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
             activeTab === 'all'
               ? 'bg-admin-accent-soft/40 border-admin-accent/40 ring-1 ring-admin-accent/30'
               : 'bg-admin-surface border-admin-border hover:border-admin-accent/30'
@@ -290,7 +307,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
           <button
             type="button"
             onClick={() => setActiveTab('pending')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'pending'
                 ? 'bg-amber-500/15 text-amber-500 border border-amber-500/25 shadow-xs'
                 : 'text-admin-fg-muted hover:text-admin-fg'
@@ -306,7 +323,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
           <button
             type="button"
             onClick={() => setActiveTab('verified')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'verified'
                 ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/25 shadow-xs'
                 : 'text-admin-fg-muted hover:text-admin-fg'
@@ -322,7 +339,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-admin-surface-raised text-admin-fg border border-admin-border shadow-xs'
                 : 'text-admin-fg-muted hover:text-admin-fg'
@@ -344,24 +361,29 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search learner, handle, bio..."
+            aria-label="Search portfolios"
             className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-admin-surface border border-admin-border text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 transition-colors"
           />
         </div>
       </div>
 
       {/* Portfolios Table */}
-      {filteredPortfolios.length === 0 ? (
+      {portfolios.length === 0 ? (
         <AdminEmptyState
           icon={activeTab === 'pending' ? CheckCircle2 : Globe}
           title={
-            activeTab === 'pending'
+            q.trim()
+              ? 'No portfolios match your search'
+              : activeTab === 'pending'
               ? 'No pending portfolio verifications'
               : activeTab === 'verified'
               ? 'No verified portfolios found'
               : 'No public portfolios found'
           }
           description={
-            activeTab === 'pending'
+            q.trim()
+              ? 'Try a different search or switch filters.'
+              : activeTab === 'pending'
               ? 'All public portfolios have been reviewed! New public portfolios will appear here for verification.'
               : activeTab === 'verified'
               ? 'No learners are currently verified as PM Fellows.'
@@ -371,7 +393,7 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
       ) : (
         <AdminDataTable
           columns={columns}
-          data={filteredPortfolios}
+          data={portfolios}
           keyExtractor={(p) => p.userId}
           rowActions={(p) => (
             <Link

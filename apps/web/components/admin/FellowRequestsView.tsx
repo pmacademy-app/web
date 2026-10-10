@@ -7,14 +7,22 @@ import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { apiPatch } from '@/lib/api/client'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
+import type { ModerationParamsPatch } from './ModerationWorkspace'
+import { FellowRequestHistory } from './FellowRequestHistory'
 
 interface FellowRequestsViewProps {
+  /** One server page, already filtered by `status` (getQueuePage). */
   initialQueue: AdminFellowRequestItem[]
+  /** Raw `status` URL param; unknown or absent means 'pending'. */
+  status: string | null
+  onParamsChange: (patch: ModerationParamsPatch) => void
 }
 
-export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
+const STATUS_FILTERS = ['pending', 'approved', 'rejected', 'all']
+
+export function FellowRequestsView({ initialQueue, status, onParamsChange }: FellowRequestsViewProps) {
   const [queue, setQueue] = useState<AdminFellowRequestItem[]>(initialQueue)
-  const [statusFilter, setStatusFilter] = useState<string>('pending')
+  const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'pending'
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
@@ -38,7 +46,17 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
       setQueue((prev) =>
         prev.map((item) =>
           item.id === id
-            ? { ...item, status: decision, rejectionReason: reason || null, isFellow: decision === 'approved' ? true : item.isFellow }
+            ? {
+                ...item,
+                status: decision,
+                rejectionReason: reason || null,
+                isFellow: decision === 'approved' ? true : item.isFellow,
+                history: (item.history ?? []).map((event) =>
+                  event.kind === 'request' && event.requestId === id
+                    ? { ...event, status: decision, reviewedAt: new Date().toISOString(), rejectionReason: reason || null }
+                    : event
+                ),
+              }
             : item
         )
       )
@@ -50,8 +68,6 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
       setLoadingId(null)
     }
   }
-
-  const filteredQueue = queue.filter((item) => statusFilter === 'all' || item.status === statusFilter)
 
   const columns: Column<AdminFellowRequestItem>[] = [
     {
@@ -123,9 +139,12 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
     {
       header: 'Requested',
       cell: (item) => (
-        <span className="text-admin-fg-muted font-mono text-[11px]">
-          {new Date(item.requestedAt).toLocaleDateString()}
-        </span>
+        <div>
+          <span className="text-admin-fg-muted font-mono text-[11px]">
+            {new Date(item.requestedAt).toLocaleDateString()}
+          </span>
+          <FellowRequestHistory history={item.history} currentRequestId={item.id} />
+        </div>
       ),
     },
     {
@@ -182,10 +201,12 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
       )}
 
       <div className="flex items-center gap-2">
-        {['pending', 'approved', 'rejected', 'all'].map((f) => (
+        {STATUS_FILTERS.map((f) => (
           <button
             key={f}
-            onClick={() => setStatusFilter(f)}
+            type="button"
+            onClick={() => onParamsChange({ status: f === 'pending' ? undefined : f })}
+            aria-pressed={statusFilter === f}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
               statusFilter === f
                 ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25'
@@ -199,7 +220,7 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
 
       <AdminDataTable
         columns={columns}
-        data={filteredQueue}
+        data={queue}
         keyExtractor={(item) => item.id}
         emptyTitle="No Fellow requests found"
         emptyDescription="Requests submitted by eligible learners will appear here for review."

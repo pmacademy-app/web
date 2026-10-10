@@ -14,7 +14,141 @@ import { createServiceRoleClient } from '../supabase'
 import { fetchAllRows } from './fetch-all'
 import { logAdminAction } from './guard'
 import { getCapstoneDefinition } from '@/config/capstones'
+import { MAX_OFFSET, MAX_PAGE_SIZE } from '@/lib/api/pagination'
+import { capstoneSharePath } from '@/lib/portfolio'
 import type { AdminCapstoneRow, AdminPortfolioRow } from './achievements-aggregation'
+
+// ---------------------------------------------------------------------------
+// Server-side paging for the Moderation tabs (admin R6 B7).
+//
+// Every moderation list used to load the whole table and filter in the client. The
+// paged variants below push the client's status/search filters into the query and
+// return one page plus the exact total. The filter semantics deliberately mirror the
+// client views (CapstonesView, PortfoliosView, FellowRequestsView,
+// FeedbackModerationView, FeedbackListView) so moving a filter server-side never
+// changes what it returns.
+// ---------------------------------------------------------------------------
+
+/** Rows per moderation page (decision 5). */
+export const MODERATION_PAGE_SIZE = 25
+
+export interface ModerationPageParams {
+  /** Status filter; an unknown value falls back to the list's default (as the views do). */
+  status?: string | null
+  /** 1-based page number. */
+  page?: number | string | null
+  pageSize?: number | string | null
+}
+
+export interface ModerationPage<T> {
+  items: T[]
+  /** Exact number of rows matching the filters (not just this page). */
+  total: number
+  page: number
+  pageSize: number
+  /** True when the database read failed; `items` is then empty. */
+  failed: boolean
+}
+
+/**
+ * Clamps caller-supplied paging to the server's bounds and converts it to the inclusive
+ * PostgREST range. A malformed value falls back to the default rather than erroring.
+ */
+export function normalizeModerationPaging(
+  page?: number | string | null,
+  pageSize?: number | string | null
+): { page: number; pageSize: number; from: number; to: number } {
+  const asInt = (value: number | string | null | undefined): number | null => {
+    if (value === null || value === undefined || value === '') return null
+    const parsed = Math.floor(Number(value))
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  const size = Math.min(MAX_PAGE_SIZE, Math.max(1, asInt(pageSize) ?? MODERATION_PAGE_SIZE))
+  const maxPage = Math.floor(MAX_OFFSET / size) + 1
+  const p = Math.min(maxPage, Math.max(1, asInt(page) ?? 1))
+  const from = (p - 1) * size
+  return { page: p, pageSize: size, from, to: from + size - 1 }
+}
+
+/** Returns `status` when it is one of `allowed`, else `fallback`. */
+export function normalizeModerationStatus<S extends string>(
+  status: string | null | undefined,
+  allowed: readonly S[],
+  fallback: S
+): S {
+  return status && (allowed as readonly string[]).includes(status) ? (status as S) : fallback
+}
+
+/** Escapes LIKE wildcards (`%`, `_`) and the escape character so a term matches literally. */
+export function escapeIlikeTerm(term: string): string {
+  return term.replace(/[\\%_]/g, (char) => `\\${char}`)
+}
+
+/** Longest search term accepted; anything longer is truncated before it reaches the query. */
+const MAX_SEARCH_LENGTH = 100
+
+/**
+ * Builds a PostgREST `or` filter matching `term` as a case-insensitive substring of any
+ * column. The pattern is double-quoted so commas, parentheses and dots in the term are
+ * not parsed as filter syntax; inside the quotes `\` and `"` are backslash-escaped.
+ */
+export function buildIlikeOrFilter(columns: readonly string[], term: string): string {
+  const pattern = `%${escapeIlikeTerm(term.trim().slice(0, MAX_SEARCH_LENGTH))}%`
+  const quoted = `"${pattern.replace(/[\\"]/g, (char) => `\\${char}`)}"`
+  return columns.map((column) => `${column}.ilike.${quoted}`).join(',')
+}
+
+type PageQueryResult = {
+  data: unknown
+  error: { code?: string; message?: string } | null
+  count: number | null
+}
+
+/** A PostgREST select that was built with `{ count: 'exact' }` and can still take a range. */
+export interface RangeableCountQuery {
+  range(from: number, to: number): PromiseLike<PageQueryResult>
+}
+
+/**
+ * Runs one page of a counted query. A page past the end makes PostgREST answer 416
+ * (PGRST103) instead of an empty page, so that case re-reads the first row only to learn
+ * the total and returns no items. Any other error is thrown for the caller to degrade.
+ */
+export async function runCountedPage<R>(
+  build: () => RangeableCountQuery,
+  from: number,
+  to: number
+): Promise<{ rows: R[]; total: number }> {
+  const res = await build().range(from, to)
+  if (res.error) {
+    if (res.error.code !== 'PGRST103') throw res.error
+    const head = await build().range(0, 0)
+    if (head.error) throw head.error
+    return { rows: [], total: head.count ?? 0 }
+  }
+  return { rows: (res.data || []) as R[], total: res.count ?? 0 }
+}
+
+/** Status values the Capstones tab offers (CapstonesView STATUS_FILTERS). */
+export const CAPSTONE_STATUS_FILTERS = ['all', 'submitted', 'reviewed', 'draft'] as const
+export type CapstoneStatusFilter = (typeof CAPSTONE_STATUS_FILTERS)[number]
+
+/** Tabs the Portfolios view offers: pending = not yet Fellow, verified = Fellow. */
+export const PORTFOLIO_STATUS_FILTERS = ['pending', 'verified', 'all'] as const
+export type PortfolioStatusFilter = (typeof PORTFOLIO_STATUS_FILTERS)[number]
+
+export interface AdminPortfolioCounts {
+  /** All public portfolios, ignoring the tab and the search (the view's KPI row). */
+  all: number
+  pending: number
+  verified: number
+}
+
+const CAPSTONE_COLUMNS = 'id, user_id, module_slug, content, status, is_public, submitted_at, reviewed_at'
+const PORTFOLIO_USER_COLUMNS = 'id, name, username, email, avatar_url, bio, is_fellow, is_portfolio_public, created_at'
+/** Columns the Portfolios search matches (PortfoliosView: learner name, handle, email, bio). */
+const PORTFOLIO_SEARCH_COLUMNS = ['name', 'username', 'email', 'bio'] as const
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 interface CapstoneSubmissionRow {
   id: string
@@ -39,7 +173,27 @@ interface UserRow {
   avatar_url?: string | null
   bio?: string | null
   is_fellow?: boolean
+  is_portfolio_public?: boolean | null
   created_at?: string
+}
+
+/**
+ * The public-page fields of an admin capstone row (admin R6 C4). The page at
+ * `capstoneSharePath` 404s unless the capstone is reviewed and public AND the owner has a
+ * username and a public portfolio, so `publicPath` is only set when all four hold.
+ */
+export function capstonePublicLink(
+  s: { module_slug: string; status: string; is_public: boolean },
+  user: { username?: string | null; is_portfolio_public?: boolean | null } | undefined
+): Pick<AdminCapstoneRow, 'username' | 'portfolioPublic' | 'publicPath'> {
+  const username = typeof user?.username === 'string' && user.username ? user.username : null
+  const portfolioPublic = user?.is_portfolio_public === true
+  const linkable = s.status === 'reviewed' && s.is_public === true && username !== null && portfolioPublic
+  return {
+    username,
+    portfolioPublic,
+    publicPath: linkable ? capstoneSharePath(username, s.module_slug) : null,
+  }
 }
 
 export class ModerationService {
@@ -55,7 +209,10 @@ export class ModerationService {
     const CHUNK = 500
     for (let i = 0; i < uniqueIds.length; i += CHUNK) {
       const chunk = uniqueIds.slice(i, i + CHUNK)
-      const { data } = await supabase.from('users').select('id, name, username, email').in('id', chunk)
+      const { data } = await supabase
+        .from('users')
+        .select('id, name, username, email, is_portfolio_public')
+        .in('id', chunk)
       for (const row of (data || []) as unknown as UserRow[]) {
         userMap.set(row.id, row)
       }
@@ -87,24 +244,7 @@ export class ModerationService {
         submissions.map((s) => s.user_id).filter((id): id is string => Boolean(id))
       )
 
-      const all: AdminCapstoneRow[] = submissions.map((s) => {
-        const user = s.user_id ? userMap.get(s.user_id) : undefined
-        const definition = getCapstoneDefinition(s.module_slug)
-        return {
-          id: s.id,
-          userId: s.user_id,
-          learnerName: this.resolveLearnerName(user, 'Learner'),
-          moduleSlug: s.module_slug,
-          moduleTitle: definition?.moduleTitle || s.module_slug,
-          capstoneTitle: definition?.title || s.module_slug,
-          content: s.content,
-          status: s.status,
-          isPublic: s.is_public,
-          submittedAt: s.submitted_at,
-          reviewedAt: s.reviewed_at ?? null,
-          wordCount: s.content.trim().split(/\s+/).filter(Boolean).length,
-        }
-      })
+      const all: AdminCapstoneRow[] = submissions.map((s) => this.toCapstoneRow(s, userMap))
 
       const filtered =
         statusFilter && statusFilter !== 'all' ? all.filter((c) => c.status === statusFilter) : all
@@ -113,6 +253,142 @@ export class ModerationService {
     } catch (err) {
       console.warn('[ModerationService] getCapstones failed:', err)
       return { capstones: [], failed: true }
+    }
+  }
+
+  /** Maps a submission row onto the admin capstone shape (learner name + module titles). */
+  private static toCapstoneRow(s: CapstoneSubmissionRow, userMap: Map<string, UserRow>): AdminCapstoneRow {
+    const user = s.user_id ? userMap.get(s.user_id) : undefined
+    const definition = getCapstoneDefinition(s.module_slug)
+    return {
+      id: s.id,
+      userId: s.user_id,
+      learnerName: this.resolveLearnerName(user, 'Learner'),
+      moduleSlug: s.module_slug,
+      moduleTitle: definition?.moduleTitle || s.module_slug,
+      capstoneTitle: definition?.title || s.module_slug,
+      content: s.content,
+      status: s.status,
+      isPublic: s.is_public,
+      submittedAt: s.submitted_at,
+      reviewedAt: s.reviewed_at ?? null,
+      wordCount: s.content.trim().split(/\s+/).filter(Boolean).length,
+      ...capstonePublicLink(s, user),
+    }
+  }
+
+  /**
+   * One page of the capstone queue (admin R6 B7).
+   *
+   * Filter: `status` is one of CAPSTONE_STATUS_FILTERS ('all' when absent or unknown, as
+   * CapstonesView does) and is an exact `status` match.
+   *
+   * Order: the view sorts awaiting-review submissions (status 'submitted', no reviewed_at)
+   * first, oldest first, then everything else newest first. PostgREST cannot order by
+   * that expression, so the list is read as two segments — awaiting, then the rest — and
+   * the page window is split across them. Both segments are counted up front, so no slice
+   * is ever requested past its end. Learner names come from one batched `users` lookup.
+   */
+  public static async getCapstonesPage(
+    params: ModerationPageParams = {}
+  ): Promise<ModerationPage<AdminCapstoneRow>> {
+    const { page, pageSize, from, to } = normalizeModerationPaging(params.page, params.pageSize)
+    const status = normalizeModerationStatus(params.status, CAPSTONE_STATUS_FILTERS, 'all')
+    const supabase = createServiceRoleClient()
+    const table = () => supabase.from('capstone_submissions')
+
+    // Awaiting review only exists in 'all' and 'submitted'.
+    const hasAwaiting = status === 'all' || status === 'submitted'
+    const awaiting = (columns: string, head: boolean) =>
+      table()
+        .select(columns, { count: 'exact', head })
+        .eq('status', 'submitted')
+        .is('reviewed_at', null)
+    const rest = (columns: string, head: boolean) => {
+      const q = table().select(columns, { count: 'exact', head })
+      if (status === 'all') return q.or('status.neq.submitted,reviewed_at.not.is.null')
+      if (status === 'submitted') return q.eq('status', 'submitted').not('reviewed_at', 'is', null)
+      return q.eq('status', status)
+    }
+
+    try {
+      const [awaitingCount, restCount] = await Promise.all([
+        hasAwaiting ? awaiting('id', true) : Promise.resolve({ count: 0, error: null }),
+        rest('id', true),
+      ])
+      if (awaitingCount.error) throw awaitingCount.error
+      if (restCount.error) throw restCount.error
+      const awaitingTotal = awaitingCount.count ?? 0
+      const restTotal = restCount.count ?? 0
+
+      // Split the [from, to] window across the two segments.
+      const awaitingTo = Math.min(to, awaitingTotal - 1)
+      const restFrom = Math.max(0, from - awaitingTotal)
+      const restTo = Math.min(to - awaitingTotal, restTotal - 1)
+
+      const [awaitingRows, restRows] = await Promise.all([
+        from <= awaitingTo
+          ? awaiting(CAPSTONE_COLUMNS, false)
+              .order('submitted_at', { ascending: true })
+              .order('id', { ascending: true })
+              .range(from, awaitingTo)
+          : Promise.resolve({ data: [], error: null }),
+        restFrom <= restTo
+          ? rest(CAPSTONE_COLUMNS, false)
+              .order('submitted_at', { ascending: false })
+              .order('id', { ascending: false })
+              .range(restFrom, restTo)
+          : Promise.resolve({ data: [], error: null }),
+      ])
+      if (awaitingRows.error) throw awaitingRows.error
+      if (restRows.error) throw restRows.error
+
+      const rows = [
+        ...((awaitingRows.data || []) as unknown as CapstoneSubmissionRow[]),
+        ...((restRows.data || []) as unknown as CapstoneSubmissionRow[]),
+      ]
+      const userMap = await this.fetchUsersByIds(
+        supabase,
+        rows.map((s) => s.user_id).filter((id): id is string => Boolean(id))
+      )
+
+      return {
+        items: rows.map((s) => this.toCapstoneRow(s, userMap)),
+        total: awaitingTotal + restTotal,
+        page,
+        pageSize,
+        failed: false,
+      }
+    } catch (err) {
+      console.warn('[ModerationService] getCapstonesPage failed:', err)
+      return { items: [], total: 0, page, pageSize, failed: true }
+    }
+  }
+
+  /**
+   * One capstone submission by id, for the review drawer (admin R6 B7: the drawer no
+   * longer depends on the row being on the current page). A malformed id or a missing
+   * row returns `capstone: null` without failing.
+   */
+  public static async getCapstoneById(
+    id: string
+  ): Promise<{ capstone: AdminCapstoneRow | null; failed: boolean }> {
+    if (typeof id !== 'string' || !UUID_RE.test(id)) return { capstone: null, failed: false }
+    const supabase = createServiceRoleClient()
+    try {
+      const { data, error } = await supabase
+        .from('capstone_submissions')
+        .select(CAPSTONE_COLUMNS)
+        .eq('id', id)
+        .maybeSingle()
+      if (error) throw error
+      if (!data) return { capstone: null, failed: false }
+      const row = data as unknown as CapstoneSubmissionRow
+      const userMap = await this.fetchUsersByIds(supabase, row.user_id ? [row.user_id] : [])
+      return { capstone: this.toCapstoneRow(row, userMap), failed: false }
+    } catch (err) {
+      console.warn('[ModerationService] getCapstoneById failed:', err)
+      return { capstone: null, failed: true }
     }
   }
 
@@ -330,46 +606,126 @@ export class ModerationService {
           .range(from, to)
       )
 
-      // Query capstone counts for public portfolios
-      const userIds = users.map((u) => u.id).filter(Boolean)
-      const capstoneCountMap = new Map<string, number>()
-
-      if (userIds.length > 0) {
-        const CHUNK = 500
-        for (let i = 0; i < userIds.length; i += CHUNK) {
-          const chunk = userIds.slice(i, i + CHUNK)
-          const { data: capstoneData } = await supabase
-            .from('capstone_submissions')
-            .select('user_id')
-            .in('user_id', chunk)
-            .in('status', ['submitted', 'reviewed'])
-            .neq('is_public', false)
-
-          for (const row of (capstoneData || []) as unknown as { user_id: string }[]) {
-            if (row.user_id) {
-              capstoneCountMap.set(row.user_id, (capstoneCountMap.get(row.user_id) || 0) + 1)
-            }
-          }
-        }
-      }
-
-      const portfolios: AdminPortfolioRow[] = users.map((u) => ({
-        userId: u.id,
-        learnerName: this.resolveLearnerName(u, 'Learner'),
-        email: u.email || '',
-        username: u.username || null,
-        avatarUrl: u.avatar_url || null,
-        bio: u.bio || null,
-        isPublic: true,
-        isFellow: Boolean(u.is_fellow),
-        joinedAt: u.created_at || '',
-        capstoneCount: capstoneCountMap.get(u.id) || 0,
-      }))
+      const capstoneCountMap = await this.fetchPublicCapstoneCounts(
+        supabase,
+        users.map((u) => u.id).filter(Boolean)
+      )
+      const portfolios: AdminPortfolioRow[] = users.map((u) => this.toPortfolioRow(u, capstoneCountMap))
 
       return { portfolios, failed: false }
     } catch (err) {
       console.warn('[ModerationService] getPortfolios failed:', err)
       return { portfolios: [], failed: true }
+    }
+  }
+
+  /** Counts each user's visible capstones (submitted/reviewed, not private), in chunked `.in()` reads. */
+  private static async fetchPublicCapstoneCounts(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    userIds: string[]
+  ): Promise<Map<string, number>> {
+    const capstoneCountMap = new Map<string, number>()
+    const uniqueIds = [...new Set(userIds)]
+    const CHUNK = 500
+    for (let i = 0; i < uniqueIds.length; i += CHUNK) {
+      const chunk = uniqueIds.slice(i, i + CHUNK)
+      const { data: capstoneData } = await supabase
+        .from('capstone_submissions')
+        .select('user_id')
+        .in('user_id', chunk)
+        .in('status', ['submitted', 'reviewed'])
+        .neq('is_public', false)
+
+      for (const row of (capstoneData || []) as unknown as { user_id: string }[]) {
+        if (row.user_id) {
+          capstoneCountMap.set(row.user_id, (capstoneCountMap.get(row.user_id) || 0) + 1)
+        }
+      }
+    }
+    return capstoneCountMap
+  }
+
+  private static toPortfolioRow(u: UserRow, capstoneCountMap: Map<string, number>): AdminPortfolioRow {
+    return {
+      userId: u.id,
+      learnerName: this.resolveLearnerName(u, 'Learner'),
+      email: u.email || '',
+      username: u.username || null,
+      avatarUrl: u.avatar_url || null,
+      bio: u.bio || null,
+      isPublic: true,
+      isFellow: Boolean(u.is_fellow),
+      joinedAt: u.created_at || '',
+      capstoneCount: capstoneCountMap.get(u.id) || 0,
+    }
+  }
+
+  /**
+   * One page of the public portfolio directory (admin R6 B7).
+   *
+   * Filters (PortfoliosView): `status` 'pending' = not a Fellow, 'verified' = Fellow,
+   * 'all' = both; absent or unknown → 'pending', the view's default tab. `q` is a trimmed,
+   * case-insensitive substring match on name, username, email or bio (the view matched
+   * the resolved learner name, which is name → username → email local part, so these
+   * four columns cover it). `%` and `_` in `q` match literally.
+   *
+   * `counts` carries the view's KPI row — all/pending/verified over every public
+   * portfolio, ignoring tab and search — so it no longer has to be derived from the page.
+   */
+  public static async getPortfoliosPage(
+    params: ModerationPageParams & { q?: string | null } = {}
+  ): Promise<ModerationPage<AdminPortfolioRow> & { counts: AdminPortfolioCounts }> {
+    const { page, pageSize, from, to } = normalizeModerationPaging(params.page, params.pageSize)
+    const status = normalizeModerationStatus(params.status, PORTFOLIO_STATUS_FILTERS, 'pending')
+    const q = typeof params.q === 'string' ? params.q.trim() : ''
+    const supabase = createServiceRoleClient()
+    const emptyCounts: AdminPortfolioCounts = { all: 0, pending: 0, verified: 0 }
+
+    const build = () => {
+      let query = supabase
+        .from('users')
+        .select(PORTFOLIO_USER_COLUMNS, { count: 'exact' })
+        .eq('is_portfolio_public', true)
+      if (status === 'pending') query = query.eq('is_fellow', false)
+      if (status === 'verified') query = query.eq('is_fellow', true)
+      if (q) query = query.or(buildIlikeOrFilter(PORTFOLIO_SEARCH_COLUMNS, q))
+      return query.order('created_at', { ascending: false }).order('id', { ascending: false })
+    }
+    const headCount = (fellowOnly: boolean) => {
+      const query = supabase
+        .from('users')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_portfolio_public', true)
+      return fellowOnly ? query.eq('is_fellow', true) : query
+    }
+
+    try {
+      const [pageResult, allRes, verifiedRes] = await Promise.all([
+        runCountedPage<UserRow>(() => build() as unknown as RangeableCountQuery, from, to),
+        headCount(false),
+        headCount(true),
+      ])
+      if (allRes.error) throw allRes.error
+      if (verifiedRes.error) throw verifiedRes.error
+
+      const capstoneCountMap = await this.fetchPublicCapstoneCounts(
+        supabase,
+        pageResult.rows.map((u) => u.id).filter(Boolean)
+      )
+      const all = allRes.count ?? 0
+      const verified = verifiedRes.count ?? 0
+
+      return {
+        items: pageResult.rows.map((u) => this.toPortfolioRow(u, capstoneCountMap)),
+        total: pageResult.total,
+        page,
+        pageSize,
+        failed: false,
+        counts: { all, verified, pending: Math.max(0, all - verified) },
+      }
+    } catch (err) {
+      console.warn('[ModerationService] getPortfoliosPage failed:', err)
+      return { items: [], total: 0, page, pageSize, failed: true, counts: emptyCounts }
     }
   }
 }

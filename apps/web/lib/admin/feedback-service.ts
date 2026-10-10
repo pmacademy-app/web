@@ -1,6 +1,14 @@
 import { unstable_cache, revalidateTag } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import { logAdminAction } from './guard'
+import {
+  normalizeModerationPaging,
+  normalizeModerationStatus,
+  runCountedPage,
+  type ModerationPage,
+  type ModerationPageParams,
+  type RangeableCountQuery,
+} from './moderation-service'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -32,7 +40,132 @@ interface TestimonialRow {
   created_at: string
 }
 
+/** Status tabs the testimonials view offers (FeedbackModerationView). */
+export const TESTIMONIAL_STATUS_FILTERS = ['all', 'pending', 'approved', 'rejected'] as const
+/** Statuses an admin can set on private feedback (FeedbackListView). */
+export const PRIVATE_FEEDBACK_STATUS_FILTERS = ['all', 'new', 'reviewed', 'planned', 'resolved', 'dismissed'] as const
+
+export interface AdminPrivateFeedbackItem {
+  id: string
+  userId: string | null
+  authorName: string
+  authorEmail: string | null
+  userExists: boolean
+  category: string
+  sourceEvent: string
+  content: string
+  rating: number | null
+  status: string
+  createdAt: string
+}
+
+interface PrivateFeedbackRow {
+  id: string
+  user_id: string | null
+  category: string
+  source_event: string
+  content: string
+  rating: number | null
+  status: string
+  created_at: string
+}
+
+type FeedbackUserRow = { id: string; name?: string | null; username?: string | null; email?: string | null }
+
+const PRIVATE_FEEDBACK_COLUMNS = 'id, user_id, category, source_event, content, rating, status, created_at'
+
 export class FeedbackAdminService {
+  /** Looks up author rows for a set of user ids in chunked `.in()` reads (no per-row queries). */
+  private static async fetchAuthors(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    userIds: string[]
+  ): Promise<FeedbackUserRow[]> {
+    const uniqueIds = [...new Set(userIds)]
+    const rows: FeedbackUserRow[] = []
+    const CHUNK = 500
+    for (let i = 0; i < uniqueIds.length; i += CHUNK) {
+      const { data } = await supabase
+        .from('users')
+        .select('id, name, username, email')
+        .in('id', uniqueIds.slice(i, i + CHUNK))
+      if (data) rows.push(...(data as unknown as FeedbackUserRow[]))
+    }
+    return rows
+  }
+
+  /** Attributes testimonial rows to their authors (one batched users lookup). */
+  private static async toTestimonialItems(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    rows: TestimonialRow[]
+  ): Promise<TestimonialItem[]> {
+    const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
+    const userMap = new Map<string, { name: string; username: string }>()
+
+    if (userIds.length > 0) {
+      const uList = await this.fetchAuthors(supabase, userIds)
+      uList.forEach((u) => {
+        userMap.set(u.id, {
+          name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
+          username: u.username?.trim() || `user_${u.id.substring(0, 6)}`,
+        })
+      })
+    }
+
+    return rows.map((item) => {
+      const itemExt = item as unknown as TestimonialRow & { author_name?: string; author_role?: string }
+      const userMeta = item.user_id ? userMap.get(item.user_id) : null
+      return {
+        id: item.id,
+        userId: item.user_id,
+        authorName: itemExt.author_name || userMeta?.name || (item.user_id ? 'Deleted Learner' : 'PM Academy Learner'),
+        authorRole: itemExt.author_role || 'PM Academy Learner',
+        sourceEvent: item.source_event,
+        content: item.content,
+        status: item.status as 'pending' | 'approved' | 'rejected',
+        isPublished: item.is_published,
+        reviewedBy: item.reviewed_by,
+        reviewedAt: item.reviewed_at,
+        createdAt: item.created_at,
+      }
+    })
+  }
+
+  /** Attributes private feedback rows to their authors (one batched users lookup). */
+  private static async toPrivateFeedbackItems(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    rows: PrivateFeedbackRow[]
+  ): Promise<AdminPrivateFeedbackItem[]> {
+    const userIds = rows.map((f) => f.user_id).filter(Boolean) as string[]
+    const userMap = new Map<string, { name: string; email: string }>()
+
+    if (userIds.length > 0) {
+      const uList = await this.fetchAuthors(supabase, userIds)
+      uList.forEach((u) => {
+        userMap.set(u.id, {
+          name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
+          email: u.email || '',
+        })
+      })
+    }
+
+    return rows.map((f) => {
+      const userInfo = f.user_id ? userMap.get(f.user_id) : null
+      return {
+        id: f.id,
+        userId: f.user_id,
+        authorName: userInfo ? userInfo.name : (f.user_id ? 'Deleted Learner' : 'Anonymous Learner'),
+        authorEmail: userInfo ? userInfo.email : null,
+        userExists: Boolean(userInfo),
+        category: f.category,
+        sourceEvent: f.source_event,
+        content: f.content,
+        rating: f.rating,
+        status: f.status,
+        createdAt: f.created_at,
+      }
+    })
+  }
+
   /**
    * Submits learner feedback into testimonials queue (status: pending, is_published: false).
    */
@@ -94,46 +227,40 @@ export class FeedbackAdminService {
     const { data, error } = await query
     if (error || !data) return []
 
-    const rows = data as TestimonialRow[]
+    return this.toTestimonialItems(supabase, data as TestimonialRow[])
+  }
 
-    // Fetch user profiles for author attribution
-    const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
-    const userMap = new Map<string, { name: string; username: string }>()
+  /**
+   * One page of the testimonials queue (admin R6 B7).
+   *
+   * Filter (FeedbackModerationView): `status` is 'all', 'pending', 'approved' or
+   * 'rejected'; absent or unknown -> 'all', the view's default. Exact `status` match;
+   * newest first. The view has no search, so none is offered here.
+   */
+  public static async getModerationQueuePage(
+    params: ModerationPageParams = {}
+  ): Promise<ModerationPage<TestimonialItem>> {
+    const { page, pageSize, from, to } = normalizeModerationPaging(params.page, params.pageSize)
+    const status = normalizeModerationStatus(params.status, TESTIMONIAL_STATUS_FILTERS, 'all')
+    const supabase = createServiceRoleClient()
 
-    if (userIds.length > 0) {
-      const { data: usersData } = await supabase
-        .from('users')
-        .select('id, name, username, email')
-        .in('id', userIds)
-
-      if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; name?: string | null; username?: string | null; email?: string | null }>
-        uList.forEach((u) => {
-          userMap.set(u.id, {
-            name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
-            username: u.username?.trim() || `user_${u.id.substring(0, 6)}`,
-          })
-        })
-      }
+    const build = () => {
+      let query = supabase.from('testimonials').select('*', { count: 'exact' })
+      if (status !== 'all') query = query.eq('status', status)
+      return query.order('created_at', { ascending: false }).order('id', { ascending: false })
     }
 
-    return rows.map((item) => {
-      const itemExt = item as unknown as TestimonialRow & { author_name?: string; author_role?: string }
-      const userMeta = item.user_id ? userMap.get(item.user_id) : null
-      return {
-        id: item.id,
-        userId: item.user_id,
-        authorName: itemExt.author_name || userMeta?.name || (item.user_id ? 'Deleted Learner' : 'PM Academy Learner'),
-        authorRole: itemExt.author_role || 'PM Academy Learner',
-        sourceEvent: item.source_event,
-        content: item.content,
-        status: item.status as 'pending' | 'approved' | 'rejected',
-        isPublished: item.is_published,
-        reviewedBy: item.reviewed_by,
-        reviewedAt: item.reviewed_at,
-        createdAt: item.created_at,
-      }
-    })
+    try {
+      const { rows, total } = await runCountedPage<TestimonialRow>(
+        () => build() as unknown as RangeableCountQuery,
+        from,
+        to
+      )
+      return { items: await this.toTestimonialItems(supabase, rows), total, page, pageSize, failed: false }
+    } catch (err) {
+      console.warn('[FeedbackAdminService] getModerationQueuePage failed:', err)
+      return { items: [], total: 0, page, pageSize, failed: true }
+    }
   }
 
   /**
@@ -275,19 +402,7 @@ export class FeedbackAdminService {
   /**
    * Fetches private product feedback items for Admin Console with author email resolution.
    */
-  public static async getPrivateFeedbackList(): Promise<Array<{
-    id: string
-    userId: string | null
-    authorName: string
-    authorEmail: string | null
-    userExists: boolean
-    category: string
-    sourceEvent: string
-    content: string
-    rating: number | null
-    status: string
-    createdAt: string
-  }>> {
+  public static async getPrivateFeedbackList(): Promise<AdminPrivateFeedbackItem[]> {
     const supabase = createServiceRoleClient()
 
     const { data, error } = await supabase
@@ -298,54 +413,40 @@ export class FeedbackAdminService {
 
     if (error || !data) return []
 
-    type FeedbackRow = {
-      id: string
-      user_id: string | null
-      category: string
-      source_event: string
-      content: string
-      rating: number | null
-      status: string
-      created_at: string
+    return this.toPrivateFeedbackItems(supabase, data as PrivateFeedbackRow[])
+  }
+
+  /**
+   * One page of private product feedback (admin R6 B7).
+   *
+   * Filter: FeedbackListView has no filter today, so `status` defaults to 'all'; a known
+   * status ('new', 'reviewed', 'planned', 'resolved', 'dismissed') is an exact match and
+   * an unknown one falls back to 'all'. Newest first. No search, matching the view.
+   */
+  public static async getPrivateFeedbackPage(
+    params: ModerationPageParams = {}
+  ): Promise<ModerationPage<AdminPrivateFeedbackItem>> {
+    const { page, pageSize, from, to } = normalizeModerationPaging(params.page, params.pageSize)
+    const status = normalizeModerationStatus(params.status, PRIVATE_FEEDBACK_STATUS_FILTERS, 'all')
+    const supabase = createServiceRoleClient()
+
+    const build = () => {
+      let query = supabase.from('user_feedback').select(PRIVATE_FEEDBACK_COLUMNS, { count: 'exact' })
+      if (status !== 'all') query = query.eq('status', status)
+      return query.order('created_at', { ascending: false }).order('id', { ascending: false })
     }
 
-    const rows = data as FeedbackRow[]
-    const userIds = rows.map((f) => f.user_id).filter(Boolean) as string[]
-    const userMap = new Map<string, { name: string; email: string }>()
-
-    if (userIds.length > 0) {
-      const { data: usersData } = await supabase
-        .from('users')
-        .select('id, name, username, email')
-        .in('id', userIds)
-
-      if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; name?: string | null; username?: string | null; email?: string | null }>
-        uList.forEach((u) => {
-          userMap.set(u.id, {
-            name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
-            email: u.email || '',
-          })
-        })
-      }
+    try {
+      const { rows, total } = await runCountedPage<PrivateFeedbackRow>(
+        () => build() as unknown as RangeableCountQuery,
+        from,
+        to
+      )
+      return { items: await this.toPrivateFeedbackItems(supabase, rows), total, page, pageSize, failed: false }
+    } catch (err) {
+      console.warn('[FeedbackAdminService] getPrivateFeedbackPage failed:', err)
+      return { items: [], total: 0, page, pageSize, failed: true }
     }
-
-    return rows.map((f) => {
-      const userInfo = f.user_id ? userMap.get(f.user_id) : null
-      return {
-        id: f.id,
-        userId: f.user_id,
-        authorName: userInfo ? userInfo.name : (f.user_id ? 'Deleted Learner' : 'Anonymous Learner'),
-        authorEmail: userInfo ? userInfo.email : null,
-        userExists: Boolean(userInfo),
-        category: f.category,
-        sourceEvent: f.source_event,
-        content: f.content,
-        rating: f.rating,
-        status: f.status,
-        createdAt: f.created_at,
-      }
-    })
   }
 
   /**

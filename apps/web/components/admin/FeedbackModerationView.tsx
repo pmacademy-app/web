@@ -8,14 +8,26 @@ import { AdminStatusBadge } from './AdminStatusBadge'
 import { useAdminToast } from './admin-toast'
 import { apiPatch } from '@/lib/api/client'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
+import type { ModerationParamsPatch } from './ModerationWorkspace'
 
 interface FeedbackModerationViewProps {
+  /** One server page, already filtered by `status` (getModerationQueuePage). */
   initialQueue: TestimonialItem[]
+  /** Raw `status` URL param; unknown or absent means 'all'. */
+  status: string | null
+  onParamsChange: (patch: ModerationParamsPatch) => void
   /** When embedded in a parent workspace (e.g. Moderation tabs), hide the page header. */
   embedded?: boolean
 }
 
-export function FeedbackModerationView({ initialQueue, embedded = false }: FeedbackModerationViewProps) {
+const STATUS_FILTERS = ['all', 'pending', 'approved', 'rejected']
+
+export function FeedbackModerationView({
+  initialQueue,
+  status,
+  onParamsChange,
+  embedded = false,
+}: FeedbackModerationViewProps) {
   // Schema note (spec §5.8 "Featured" display/action): testimonials have no
   // `featured` column — the schema only supports `is_published`. The spec's
   // "Featured" concept is mapped to the published state: the "Published on
@@ -23,7 +35,7 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
   // No "Feature" action is offered because the data model cannot represent it.
   const { toast } = useAdminToast()
   const [queue, setQueue] = useState<TestimonialItem[]>(initialQueue)
-  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'all'
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedText, setEditedText] = useState<string>('')
@@ -79,11 +91,6 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
       setEditingId(null)
     }
   }
-
-  const filteredQueue = queue.filter((item) => {
-    if (statusFilter === 'all') return true
-    return item.status === statusFilter
-  })
 
   const columns: Column<TestimonialItem>[] = [
     {
@@ -254,10 +261,12 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-2">
-        {['all', 'pending', 'approved', 'rejected'].map((f) => (
+        {STATUS_FILTERS.map((f) => (
           <button
             key={f}
-            onClick={() => setStatusFilter(f)}
+            type="button"
+            onClick={() => onParamsChange({ status: f === 'all' ? undefined : f })}
+            aria-pressed={statusFilter === f}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
               statusFilter === f
                 ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25'
@@ -271,7 +280,7 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
 
       <AdminDataTable
         columns={columns}
-        data={filteredQueue}
+        data={queue}
         keyExtractor={(item) => item.id}
         emptyTitle="No feedback submissions found"
         emptyDescription="Feedback submitted by learners will appear here for moderation."

@@ -1,18 +1,21 @@
 'use client'
 
 import React from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminEmptyState } from './AdminEmptyState'
 import { CapstoneReviewDrawer } from './CapstoneReviewDrawer'
 import { computeReviewAge, type ReviewAgeTier } from '@/lib/admin/capstone-review-aging'
 import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
+import type { ModerationParamsPatch } from './ModerationWorkspace'
 
 interface CapstonesViewProps {
-  initialCapstones: AdminCapstoneRow[]
-  initialStatusFilter: string
+  /** One server page, already filtered and in review-aging order (getCapstonesPage). */
+  capstones: AdminCapstoneRow[]
+  /** Raw `status` URL param; unknown or absent means 'all'. */
+  status: string | null
+  onParamsChange: (patch: ModerationParamsPatch) => void
   selectedCapstoneId: string | null
   selectedCapstoneDetail: AdminCapstoneRow | null
 }
@@ -45,44 +48,15 @@ const AGE_TIER_CLASS: Record<ReviewAgeTier, string> = {
   reviewed: 'text-admin-success',
 }
 
-/**
- * Sorts the queue so the longest-WAITING unreviewed submissions come first (aging visibility),
- * then everything already reviewed, newest-first. Uses only real submitted_at timestamps.
- */
-function sortForReviewAging(rows: AdminCapstoneRow[]): AdminCapstoneRow[] {
-  const awaiting = rows.filter((c) => c.status === 'submitted' && !c.reviewedAt)
-  const rest = rows.filter((c) => !(c.status === 'submitted' && !c.reviewedAt))
-  awaiting.sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime())
-  rest.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-  return [...awaiting, ...rest]
-}
-
 export function CapstonesView({
-  initialCapstones,
-  initialStatusFilter,
+  capstones,
+  status,
+  onParamsChange,
   selectedCapstoneId,
   selectedCapstoneDetail,
 }: CapstonesViewProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const statusFilter = STATUS_FILTERS.includes(initialStatusFilter) ? initialStatusFilter : 'all'
-
-  const pushParams = (patch: Record<string, string | undefined>) => {
-    const next = new URLSearchParams(searchParams.toString())
-    for (const [key, value] of Object.entries(patch)) {
-      if (value === undefined || value === '') next.delete(key)
-      else next.set(key, value)
-    }
-    router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
-  }
-
-  const filtered = sortForReviewAging(
-    initialCapstones.filter((c) => {
-      if (statusFilter === 'all') return true
-      return c.status === statusFilter
-    })
-  )
+  const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'all'
+  const pushParams = onParamsChange
 
   const handleSelect = (id: string) => pushParams({ capstone: id })
 
@@ -121,6 +95,28 @@ export function CapstonesView({
           label={c.isPublic ? 'Public' : 'Private'}
         />
       ),
+    },
+    {
+      header: 'Public page',
+      cell: (c) =>
+        c.publicPath ? (
+          <a
+            href={c.publicPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-admin-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50 rounded"
+          >
+            View public page
+            <ExternalLink className="w-3 h-3" aria-hidden="true" />
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+        ) : (
+          <span className="text-[11px] text-admin-fg-muted" title="Shown once the capstone is reviewed and public and the learner's portfolio is public.">
+            —
+          </span>
+        ),
     },
     {
       header: 'Words',
@@ -172,7 +168,11 @@ export function CapstonesView({
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      <p className="text-[11px] text-admin-fg-muted">
+        Publishing refreshes the share card for the learner&apos;s public capstone page.
+      </p>
+
+      {capstones.length === 0 ? (
         <AdminEmptyState
           icon={AlertTriangle}
           title="No capstone submissions found"
@@ -181,7 +181,7 @@ export function CapstonesView({
       ) : (
         <AdminDataTable
           columns={columns}
-          data={filtered}
+          data={capstones}
           keyExtractor={(c) => c.id}
           onRowClick={(c) => handleSelect(c.id)}
           rowAriaLabel={(c) => `Open review for ${c.learnerName}'s capstone`}

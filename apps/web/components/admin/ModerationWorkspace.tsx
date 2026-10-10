@@ -10,25 +10,38 @@ import { FeedbackListView } from './FeedbackListView'
 import { CapstonesView } from './CapstonesView'
 import { PortfoliosView } from './PortfoliosView'
 import { FellowRequestsView } from './FellowRequestsView'
+import { AdminPagination } from './AdminPagination'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
 import type { AdminFeedbackItem } from './FeedbackListView'
 import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
+import type { AdminPortfolioCounts, ModerationPage } from '@/lib/admin/moderation-service'
 
 export type ModerationTab = 'testimonials' | 'feedback' | 'capstones' | 'portfolios' | 'fellow-requests'
 
+/** The active tab's server-paged list (admin R6 B7: only the active tab is loaded). */
+export type ModerationListData =
+  | { tab: 'testimonials'; list: ModerationPage<TestimonialItem> }
+  | { tab: 'feedback'; list: ModerationPage<AdminFeedbackItem> }
+  | {
+      tab: 'capstones'
+      list: ModerationPage<AdminCapstoneRow>
+      capstone: AdminCapstoneRow | null
+      capstoneFailed: boolean
+    }
+  | { tab: 'portfolios'; list: ModerationPage<AdminPortfolioRow> & { counts: AdminPortfolioCounts } }
+  | { tab: 'fellow-requests'; list: ModerationPage<AdminFellowRequestItem> }
+
+/** A URL change: `undefined` or '' removes the param. */
+export type ModerationParamsPatch = Partial<Record<'status' | 'q' | 'page' | 'capstone', string | undefined>>
+
 interface ModerationWorkspaceProps {
-  initialTab: string
-  initialTestimonials: TestimonialItem[]
-  initialFeedback: AdminFeedbackItem[]
-  initialCapstones: AdminCapstoneRow[]
-  capstonesLoadFailed: boolean
-  initialPortfolios: AdminPortfolioRow[]
-  portfoliosLoadFailed: boolean
-  initialCapstoneStatus: string
+  data: ModerationListData
+  /** Raw `status` URL param; each view applies its own default. */
+  status: string | null
+  /** Raw `q` URL param (only the Portfolios tab searches). */
+  q: string
   selectedCapstoneId: string | null
-  selectedCapstoneDetail: AdminCapstoneRow | null
-  initialFellowRequests: AdminFellowRequestItem[]
 }
 
 const TABS: { id: ModerationTab; label: string; icon: React.ElementType }[] = [
@@ -39,34 +52,50 @@ const TABS: { id: ModerationTab; label: string; icon: React.ElementType }[] = [
   { id: 'fellow-requests', label: 'Fellow Requests', icon: Award },
 ]
 
-export function ModerationWorkspace({
-  initialTab,
-  initialTestimonials,
-  initialFeedback,
-  initialCapstones,
-  capstonesLoadFailed,
-  initialPortfolios,
-  portfoliosLoadFailed,
-  initialCapstoneStatus,
-  selectedCapstoneId,
-  selectedCapstoneDetail,
-  initialFellowRequests,
-}: ModerationWorkspaceProps) {
+export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: ModerationWorkspaceProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
-  const activeTab: ModerationTab = TABS.some((t) => t.id === initialTab) ? (initialTab as ModerationTab) : 'testimonials'
+  const activeTab: ModerationTab = data.tab
+  const { list } = data
 
-  const handleTabChange = useCallback(
-    (tab: ModerationTab) => {
+  /**
+   * Applies a URL change. Changing the status or the search resets to page 1 (decision 5);
+   * opening a capstone or changing the page keeps the rest of the query.
+   */
+  const updateParams = useCallback(
+    (patch: ModerationParamsPatch) => {
       const next = new URLSearchParams(searchParams.toString())
-      next.set('tab', tab)
-      next.delete('capstone')
+      if ('status' in patch || 'q' in patch) next.delete('page')
+      for (const [key, value] of Object.entries(patch)) {
+        if (value === undefined || value === '') next.delete(key)
+        else next.set(key, value)
+      }
       router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
     },
     [router, searchParams]
   )
+
+  const handleTabChange = useCallback(
+    (tab: ModerationTab) => {
+      // Status values and search differ per tab, so a tab change starts from a clean list.
+      const next = new URLSearchParams()
+      next.set('tab', tab)
+      router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
+    },
+    [router]
+  )
+
+  const handlePageChange = useCallback(
+    (page: number) => updateParams({ page: page > 1 ? String(page) : undefined }),
+    [updateParams]
+  )
+
+  const totalPages = Math.max(1, Math.ceil(list.total / list.pageSize))
+  // Remount the view when the page of data changes so its local (optimistic) copy of
+  // the rows is re-seeded from the server instead of keeping the previous page.
+  const listKey = `${activeTab}|${status ?? ''}|${q}|${list.page}`
 
   const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, tab: ModerationTab) => {
     const index = TABS.findIndex((t) => t.id === tab)
@@ -130,9 +159,23 @@ export function ModerationWorkspace({
         aria-labelledby={`moderation-tab-${activeTab}`}
         className="space-y-4"
       >
-        {activeTab === 'testimonials' && <FeedbackModerationView initialQueue={initialTestimonials} embedded />}
+        {list.failed && (
+          <AdminLoadWarning
+            message={`Live ${TABS.find((t) => t.id === activeTab)?.label.toLowerCase() ?? 'moderation data'} could not be loaded. Showing an empty page.`}
+          />
+        )}
 
-        {activeTab === 'feedback' && (
+        {data.tab === 'testimonials' && (
+          <FeedbackModerationView
+            key={listKey}
+            initialQueue={data.list.items}
+            status={status}
+            onParamsChange={updateParams}
+            embedded
+          />
+        )}
+
+        {data.tab === 'feedback' && (
           <>
             {/* Schema note (spec §5.9): product feedback has no moderation
                 status column, so approve/reject actions are not offered (G2).
@@ -142,34 +185,53 @@ export function ModerationWorkspace({
               <AlertTriangle className="w-4 h-4 text-admin-warning shrink-0" />
               Product feedback is read-only this phase. Approve/reject actions require a backend status column.
             </div>
-            <FeedbackListView initialFeedback={initialFeedback} />
+            <FeedbackListView key={listKey} initialFeedback={data.list.items} />
           </>
         )}
 
-        {activeTab === 'capstones' && (
+        {data.tab === 'capstones' && (
           <>
-            {capstonesLoadFailed && (
-              <AdminLoadWarning message="Live capstone submissions could not be loaded. Showing cached or empty values." />
+            {data.capstoneFailed && (
+              <AdminLoadWarning message="This capstone submission could not be loaded." />
             )}
             <CapstonesView
-              initialCapstones={initialCapstones}
-              initialStatusFilter={initialCapstoneStatus}
+              capstones={data.list.items}
+              status={status}
+              onParamsChange={updateParams}
               selectedCapstoneId={selectedCapstoneId}
-              selectedCapstoneDetail={selectedCapstoneDetail}
+              selectedCapstoneDetail={data.capstone}
             />
           </>
         )}
 
-        {activeTab === 'portfolios' && (
-          <>
-            {portfoliosLoadFailed && (
-              <AdminLoadWarning message="Live portfolio data could not be loaded. Showing cached or empty values." />
-            )}
-            <PortfoliosView initialPortfolios={initialPortfolios} />
-          </>
+        {data.tab === 'portfolios' && (
+          <PortfoliosView
+            initialPortfolios={data.list.items}
+            counts={data.list.counts}
+            status={status}
+            q={q}
+            onParamsChange={updateParams}
+          />
         )}
 
-        {activeTab === 'fellow-requests' && <FellowRequestsView initialQueue={initialFellowRequests} />}
+        {data.tab === 'fellow-requests' && (
+          <FellowRequestsView
+            key={listKey}
+            initialQueue={data.list.items}
+            status={status}
+            onParamsChange={updateParams}
+          />
+        )}
+
+        {totalPages > 1 && (
+          <AdminPagination
+            currentPage={list.page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            pageSize={list.pageSize}
+            totalItems={list.total}
+          />
+        )}
       </div>
     </AdminPageShell>
   )
