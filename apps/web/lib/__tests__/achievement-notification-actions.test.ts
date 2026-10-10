@@ -48,10 +48,10 @@ describe('certificate.generated', () => {
 })
 
 describe('capstone.reviewed', () => {
-  it('shares the portfolio when the capstone is published on a public portfolio', () => {
+  it("shares the capstone's own page when it is published on a public portfolio", () => {
     expect(
       action('capstone.reviewed', { moduleSlug: 'discovery', isPublished: true, username: 'ada', isPortfolioPublic: true }),
-    ).toEqual({ kind: 'share_portfolio', label: 'Share portfolio', username: 'ada', context: 'portfolio' })
+    ).toMatchObject({ kind: 'share_portfolio', label: 'Share case study', username: 'ada', context: 'capstone', moduleSlug: 'discovery' })
   })
 
   it.each([

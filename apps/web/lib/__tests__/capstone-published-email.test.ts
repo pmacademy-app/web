@@ -127,3 +127,25 @@ describe('CapstonePublished template', () => {
     expect(text).toContain('Make your portfolio public')
   })
 })
+
+// Growth R5 / B13b: the email opens and shares the capstone's own page when it is public.
+describe('CapstonePublished case-study link', () => {
+  it('passes the case-study page for a public portfolio', async () => {
+    await globalNotificationDispatcher.dispatch(envelope(published))
+    expect((capstoneEmails()[0].templateVariables as Record<string, unknown>).casePageUrl).toMatch(
+      /\/p\/jordanpm\/capstones\/discovery$/,
+    )
+  })
+
+  it('renders "View your case study" and shares that page', async () => {
+    const { html, text } = await renderEmailTemplate('achievement.capstone_published', {
+      userName: 'Jordan PM',
+      moduleTitle: 'Discovery',
+      portfolioUrl: 'https://prodily.example/p/jordanpm',
+      casePageUrl: 'https://prodily.example/p/jordanpm/capstones/discovery',
+      capstoneUrl: 'https://prodily.example/capstones/discovery',
+    })
+    expect(text).toContain('View your case study')
+    expect(html).toContain(encodeURIComponent('https://prodily.example/p/jordanpm/capstones/discovery'))
+  })
+})

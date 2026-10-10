@@ -19,6 +19,13 @@ describe('parseNotificationSecondaryAction', () => {
     ).toMatchObject({ context: 'fellow' })
   })
 
+  it('accepts a capstone share and validates its slug and title', () => {
+    const ok = { kind: 'share_portfolio', label: 'Share case study', username: 'ada', context: 'capstone', moduleSlug: 'discovery', capstoneTitle: 'Brief' }
+    expect(parseNotificationSecondaryAction(ok)).toEqual(ok)
+    expect(parseNotificationSecondaryAction({ ...ok, moduleSlug: '../x' })).toBeNull()
+    expect(parseNotificationSecondaryAction({ ...ok, capstoneTitle: '' })).toBeNull()
+  })
+
   it('accepts a badge share and requires its badge name', () => {
     expect(
       parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username: 'ada', context: 'badge', badgeName: 'Module Master' }),

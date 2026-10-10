@@ -228,6 +228,9 @@ function SecondaryActionRow({
             username={action.username}
             context={action.context}
             badgeName={action.context === 'badge' ? action.badgeName : undefined}
+            capstone={
+              action.context === 'capstone' ? { moduleSlug: action.moduleSlug, title: action.capstoneTitle } : undefined
+            }
           />
         </div>
       )}

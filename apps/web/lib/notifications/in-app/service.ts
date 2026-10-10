@@ -9,10 +9,10 @@ import {
 import type { UserNotificationPreferences } from '../preferences/types'
 import { PRIORITY_MATRIX } from '../constants'
 import type { EventEnvelope } from '../types'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
 import { isTestCertificateCode } from '@/lib/certificates'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
-import { getCapstoneForModule, getCapstoneHref } from '@/config/capstones'
+import { getCapstoneDefinition, getCapstoneForModule, getCapstoneHref } from '@/config/capstones'
 
 /** Spreads a second action into in-app content only when there is a valid one (Growth R5 B2). */
 function withAction(action: NotificationSecondaryAction | null): { secondaryAction?: NotificationSecondaryAction } {
@@ -260,13 +260,24 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       // A published review is now visible on the public portfolio, so send the learner there
       // when we know it is public; otherwise (or when not published) keep the capstone page.
       const portfolioPath = published ? publicPortfolioPath(payload) : null
+      // Growth R5 B13b: a published capstone on a public portfolio has its own page; open and
+      // share that page rather than the whole portfolio.
+      const username = String(payload.username || '').trim()
+      const capstoneTitle = moduleSlug ? getCapstoneDefinition(moduleSlug)?.title : undefined
+      const pagePath = portfolioPath && username && moduleSlug ? capstoneSharePath(username, moduleSlug) : null
       return {
         title: 'Capstone reviewed',
         body: published
           ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
           : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
-        actionUrl: portfolioPath ?? capstoneUrl,
-        ...withAction(portfolioPath ? shareAction(String(payload.username || ''), 'portfolio') : null),
+        actionUrl: pagePath ?? portfolioPath ?? capstoneUrl,
+        ...withAction(
+          pagePath && capstoneTitle
+            ? { kind: 'share_portfolio', label: 'Share case study', username, context: 'capstone', moduleSlug, capstoneTitle }
+            : portfolioPath
+              ? shareAction(username, 'portfolio')
+              : null,
+        ),
       }
     }
     case 'fellow.granted': {

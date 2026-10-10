@@ -116,9 +116,10 @@ describe('capstone.reviewed in-app deep link', () => {
   const build = (payload: Record<string, unknown>) =>
     buildInAppContentFromEvent({ event: 'capstone.reviewed', payload } as any)
 
-  it('links a published review to the public portfolio', () => {
+  // Growth R5 B13b: the published capstone has its own public page, which the notification opens.
+  it('links a published review to its public case-study page', () => {
     const content = build({ moduleTitle: 'Foundations', moduleSlug: 'foundations', isPublished: true, username: 'riyapm', isPortfolioPublic: true })
-    expect(content.actionUrl).toBe('/p/riyapm')
+    expect(content.actionUrl).toBe('/p/riyapm/capstones/foundations')
     expect(content.body).toBe('The Prodily team reviewed your Foundations capstone and published it to your portfolio.')
   })
 

@@ -11,6 +11,8 @@ export type NotificationSecondaryAction =
   | { kind: 'share_portfolio'; label: string; username: string; context: 'portfolio' | 'fellow' }
   /** Share the public portfolio with wording about one earned badge. */
   | { kind: 'share_portfolio'; label: string; username: string; context: 'badge'; badgeName: string }
+  /** Share one public capstone page (Growth R5 B13b). */
+  | { kind: 'share_portfolio'; label: string; username: string; context: 'capstone'; moduleSlug: string; capstoneTitle: string }
   /** An in-app page, e.g. "Publish portfolio". Always a same-origin path. */
   | { kind: 'link'; label: string; href: string }
   /** LinkedIn "Add to profile" for a certificate. Only https links on linkedin.com. */
@@ -18,6 +20,8 @@ export type NotificationSecondaryAction =
 
 const MAX_LABEL = 40
 const MAX_BADGE_NAME = 60
+const MAX_CAPSTONE_TITLE = 120
+const SLUG = /^[a-z0-9_-]{1,64}$/
 const USERNAME = /^[a-z0-9_.-]{1,64}$/i
 
 const isLabel = (value: unknown): value is string =>
@@ -51,6 +55,12 @@ export function parseNotificationSecondaryAction(value: unknown): NotificationSe
   switch (action.kind) {
     case 'share_portfolio':
       if (typeof action.username !== 'string' || !USERNAME.test(action.username)) return null
+      if (action.context === 'capstone') {
+        const moduleSlug = typeof action.moduleSlug === 'string' ? action.moduleSlug : ''
+        const capstoneTitle = typeof action.capstoneTitle === 'string' ? action.capstoneTitle.trim() : ''
+        if (!SLUG.test(moduleSlug) || !capstoneTitle || capstoneTitle.length > MAX_CAPSTONE_TITLE) return null
+        return { kind: 'share_portfolio', label: action.label, username: action.username, context: 'capstone', moduleSlug, capstoneTitle }
+      }
       if (action.context === 'badge') {
         const badgeName = typeof action.badgeName === 'string' ? action.badgeName.trim() : ''
         if (!badgeName || badgeName.length > MAX_BADGE_NAME) return null

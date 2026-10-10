@@ -3,7 +3,7 @@ import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
 
 let isConnectorsInitialized = false
 
@@ -269,6 +269,11 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         moduleTitle: event.payload.moduleTitle || 'your module',
         portfolioUrl:
           username && event.payload.isPortfolioPublic === true ? `${origin}/p/${encodeURIComponent(username)}` : null,
+        // Growth R5 B13b: the capstone's own public page, shared and opened from the email.
+        casePageUrl:
+          username && moduleSlug && event.payload.isPortfolioPublic === true
+            ? `${origin}${capstoneSharePath(username, moduleSlug)}`
+            : null,
         capstoneUrl: moduleSlug ? `${origin}/capstones/${encodeURIComponent(moduleSlug)}` : `${origin}/capstones`,
       },
       eventId: event.id,

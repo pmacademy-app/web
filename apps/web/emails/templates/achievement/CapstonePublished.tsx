@@ -2,13 +2,15 @@ import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
 import { BRAND } from '@/lib/brand'
-import { buildPortfolioShareIntents, portfolioShareText } from '@/lib/portfolio'
+import { buildPortfolioShareIntents, capstoneShareText, portfolioShareText } from '@/lib/portfolio'
 
 export interface CapstonePublishedProps {
   userName?: string
   moduleTitle?: string
   /** The learner's public portfolio; null or absent when it is private (no share links). */
   portfolioUrl?: string | null
+  /** The capstone's own public page (Growth R5 B13b); preferred over the portfolio when set. */
+  casePageUrl?: string | null
   /** The capstone workspace, the fallback destination. */
   capstoneUrl?: string
   appUrl?: string
@@ -36,11 +38,20 @@ export const CapstonePublished: React.FC<CapstonePublishedProps> = ({
   userName = 'Learner',
   moduleTitle = 'your module',
   portfolioUrl = null,
+  casePageUrl = null,
   capstoneUrl = `${BRAND.siteUrl}/capstones`,
   unsubscribeToken,
 }) => {
-  const intents = portfolioUrl
-    ? buildPortfolioShareIntents(portfolioUrl, portfolioShareText(userName, BRAND.fullName), CAPSTONE_PUBLISHED_SHARE_CAMPAIGN)
+  // Share the case study page when there is one, else the portfolio.
+  const sharedUrl = casePageUrl || portfolioUrl
+  const intents = sharedUrl
+    ? buildPortfolioShareIntents(
+        sharedUrl,
+        casePageUrl
+          ? capstoneShareText(userName, moduleTitle, BRAND.fullName)
+          : portfolioShareText(userName, BRAND.fullName),
+        CAPSTONE_PUBLISHED_SHARE_CAMPAIGN,
+      )
     : null
 
   return (
@@ -64,7 +75,7 @@ export const CapstonePublished: React.FC<CapstonePublishedProps> = ({
               Share on X
             </a>
           </p>
-          <Button href={portfolioUrl!}>View on your portfolio</Button>
+          <Button href={casePageUrl || portfolioUrl!}>{casePageUrl ? 'View your case study' : 'View on your portfolio'}</Button>
         </>
       ) : (
         <>
