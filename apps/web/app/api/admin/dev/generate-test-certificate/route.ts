@@ -57,14 +57,17 @@ export const POST = withRoute(
     const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
     const verificationUrl = `${siteOrigin}/verify/${encodeURIComponent(testCertCode)}`
 
-    // 3. Trigger Notification Event (reuses production event & email queue pipeline)
+    // 3. Trigger Notification Event (reuses production event & email queue pipeline).
+    // Delivered to the admin who ran the test, never to the learner: admin test data must
+    // not reach a learner's inbox or bell (Growth R5 P3). The certificate row still belongs
+    // to the learner so its verify page can be checked.
     initializeNotificationConnectors()
     await globalNotificationDispatcher.dispatch({
       id: `dev-cert-event-${Date.now()}`,
       event: 'certificate.generated',
-      userId: targetUserId,
-      userEmail: typedUser.email,
-      userName: typedUser.name || typedUser.username || 'Learner',
+      userId: authGuard.userId,
+      userEmail: authGuard.email,
+      userName: 'Admin (test delivery)',
       userTimezone: 'UTC',
       priority: 'high',
       category: 'certificates',

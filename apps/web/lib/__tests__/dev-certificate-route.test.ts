@@ -228,6 +228,23 @@ describe('POST /api/admin/dev/generate-test-certificate', () => {
     expect(ids).toEqual([first.certificateCode, second.certificateCode])
   })
 
+  // Growth R5 / P3: admin test data never reaches the learner's bell or inbox.
+  it('delivers the test notification to the admin who ran it, never to the learner', async () => {
+    const fake = createFakeSupabase()
+    fakeHolder.current = fake.client
+
+    const body = await (await post()).json()
+
+    expect(dispatchSpy).toHaveBeenCalledTimes(1)
+    const event = dispatchSpy.mock.calls[0][0] as { userId: string; userEmail: string; payload: Record<string, unknown> }
+    expect(event.userId).toBe('admin-1')
+    expect(event.userEmail).toBe('admin@prodily.app')
+    expect(JSON.stringify(event)).not.toContain('grad@example.com')
+    expect(event.payload).toMatchObject({ certificateCode: body.certificateCode, isTestCertificate: true })
+    // The certificate itself still belongs to the learner, for verify-page QA.
+    expect(fake.tables.certificates[0]).toMatchObject({ user_id: 'grad-1' })
+  })
+
   it('returns an error response and dispatches nothing when the insert fails', async () => {
     const fake = createFakeSupabase({ insertError: { code: '42501', message: 'permission denied' } })
     fakeHolder.current = fake.client
