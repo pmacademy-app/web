@@ -374,7 +374,7 @@ describe('Fellow request review notifications', () => {
       vi.useRealTimers()
     }
 
-    const ids = dispatchSpy.mock.calls.map((call) => (call[0] as any).id)
+    const ids = dispatchSpy.mock.calls.map((call: unknown[]) => (call[0] as any).id)
     expect(ids).toHaveLength(2)
     expect(ids[0]).toMatch(GRANT_ID)
     expect(ids[1]).toMatch(GRANT_ID)
