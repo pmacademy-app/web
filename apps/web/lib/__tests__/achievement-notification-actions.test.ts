@@ -121,3 +121,17 @@ describe('badge.earned', () => {
     expect(action('badge.earned', { badgeName: 'Module Master' })).toBeNull()
   })
 })
+
+// Growth R5 / B8: a finished module points at its own capstone.
+describe('module.completed', () => {
+  it('names the module capstone and opens it (Growth maps to metrics)', () => {
+    const content = buildInAppContentFromEvent(envelope('module.completed', { moduleName: 'Growth & Metrics', moduleSlug: 'growth' }))
+    expect(content.actionUrl).toBe('/capstones/metrics')
+    expect(content.body).toMatch(/Its capstone, ".+", is now one step closer to your portfolio\./)
+  })
+
+  it('falls back to the academy for a module without a capstone', () => {
+    const content = buildInAppContentFromEvent(envelope('module.completed', { moduleName: 'Mystery', moduleSlug: 'nope' }))
+    expect(content.actionUrl).toBe('/academy')
+  })
+})

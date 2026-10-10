@@ -91,3 +91,16 @@ describe('proof nudge emails', () => {
     expect(first.text).not.toMatch(/certif|credential/i)
   })
 })
+
+// Growth R5 / B8: the module email names the module's capstone and links to it.
+describe('ModuleCompleted email', () => {
+  it('names the capstone and links to its workspace', async () => {
+    const { html, text } = await renderEmailTemplate('learning.module_complete', {
+      userName: 'Jordan',
+      moduleName: 'Growth & Metrics',
+      moduleSlug: 'growth',
+    })
+    expect(html).toContain('/capstones/metrics')
+    expect(text).toContain('one step closer')
+  })
+})

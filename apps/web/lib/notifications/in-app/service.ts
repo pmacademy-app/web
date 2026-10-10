@@ -12,6 +12,7 @@ import type { EventEnvelope } from '../types'
 import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
 import { isTestCertificateCode } from '@/lib/certificates'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
+import { getCapstoneForModule, getCapstoneHref } from '@/config/capstones'
 
 /** Spreads a second action into in-app content only when there is a valid one (Growth R5 B2). */
 function withAction(action: NotificationSecondaryAction | null): { secondaryAction?: NotificationSecondaryAction } {
@@ -182,7 +183,16 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
     }
     case 'module.completed': {
       const name = String(payload.moduleName || 'Module')
-      return { title: `Module complete: ${name}`, body: `You completed every lesson in ${name}.`, actionUrl: '/academy' }
+      // "One capstone closer" (Growth R5 B8): name the module's capstone and open it.
+      const moduleSlug = typeof payload.moduleSlug === 'string' ? payload.moduleSlug : ''
+      const capstone = moduleSlug ? getCapstoneForModule(moduleSlug) : null
+      return capstone
+        ? {
+            title: `Module complete: ${name}`,
+            body: `You completed every lesson in ${name}. Its capstone, "${capstone.title}", is now one step closer to your portfolio.`,
+            actionUrl: getCapstoneHref(moduleSlug),
+          }
+        : { title: `Module complete: ${name}`, body: `You completed every lesson in ${name}.`, actionUrl: '/academy' }
     }
     case 'quiz.completed': {
       const rawTitle = String(payload.lessonTitle || '')
