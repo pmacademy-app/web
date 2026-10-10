@@ -2,28 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withRoute } from '@/lib/api/with-route'
-import { EmailAutomationsService } from '@/lib/notifications/automations/service'
-import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
-import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
-import { isLifecycleHoldout } from '@/lib/notifications/lifecycle/holdout'
-import {
-  resolveLifecycleSequence,
-  type LifecycleSequenceKey,
-  type LifecycleUserSnapshot,
-} from '@/lib/notifications/lifecycle/segments'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { runProofNudgesForPage, type NudgeCandidate } from '@/lib/growth/proof-nudges-run'
-import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
-import { loadProofStates } from '@/lib/growth/proof-state-db'
-import { selectProofNextStep } from '@/lib/growth/proof-state'
-import { BRAND } from '@/lib/brand'
-
-/** Keyset pagination batch size for lifecycle processing (mirrors T3 crons). */
-const BATCH_SIZE = 100
-/** Safety bound on total pages processed per cron invocation. */
-const MAX_PAGES = 50
-/** Maximum execution duration per cron run to respect serverless deadlines (50s). */
-const MAX_EXECUTION_MS = 50_000
+import { runLifecycle } from '@/lib/growth/lifecycle-run'
 
 /**
  * `force=true` bypasses the per-user local-hour schedule window, matching the daily
@@ -39,12 +18,9 @@ const forceQuerySchema = z.object({
 /**
  * Phase 1.5 — Lifecycle reactivation cron.
  *
- * Evaluates every user against the three lifecycle sequences (D+1 never-started,
- * D+3 started-not-finished, streak-broken → quiet), assigns each qualifying user to at
- * most one sequence, applies a deterministic 30% holdout, and enqueues the treatment
- * email through the standard notification pipeline (`enqueueNotificationItem`) so that
- * feature flags, per-template automation toggles, the global pause, suppression /
- * unsubscribe, preference resolution, daily quota, and idempotency all apply unchanged.
+ * Evaluates every user against the three lifecycle sequences and the proof nudges; the
+ * logic lives in `runLifecycle` (lib/growth/lifecycle-run.ts), which the admin dry-run
+ * preview shares.
  *
  * Runs hourly on the shared '30 * * * *' scheduler trigger; the per-user local-hour
  * gate plus a local-date idempotency key make delivery exactly-once per user per day.
@@ -67,280 +43,40 @@ export const POST = withRoute(
     },
   },
   async ({ query }) => {
-    // Global pause short-circuits the whole run (per-template toggles are still enforced
-    // by enqueueNotificationItem for finer control). Digest schedule reuse: lifecycle
-    // sends land in the user's daily-reminder local window.
-    const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
-    const schedules = await EmailAutomationsService.getDigestSchedules()
-    const dailySched = schedules.dailyReminder
+    // Growth R5 B6/B7: a dry run counts who would get a lifecycle email or a proof nudge, and
+    // writes nothing at all. Counts cover learners in their delivery hour this run (add
+    // force=true to count everyone; still nothing is written).
+    const run = await runLifecycle({
+      dryRun: query.dryRun === 'true' || query.nudgeDryRun === 'true',
+      force: query.force === 'true',
+    })
 
-    if (isGlobalPause) {
+    if (run.paused) {
       return NextResponse.json({
         success: true,
         message: 'Lifecycle sequences suppressed by Global Pause',
-        isGlobalPause,
+        isGlobalPause: true,
         lifecycleQueued: 0,
-      })
-    }
-
-    const isForced = query.force === 'true'
-    // Growth R5 B6/B7: count who would get a lifecycle email or a proof nudge, and write nothing
-    // at all: no email, no in-app, no holdout record. Counts cover learners in their delivery
-    // hour this run (add force=true to count everyone; still nothing is written).
-    const nudgeDryRun = query.dryRun === 'true' || query.nudgeDryRun === 'true'
-    const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
-    const nudgesSent: Record<ProofNudgeKey, number> = { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }
-    let nudgesHeldOut = 0
-    let nudgePagesSkipped = 0
-    const supabase = createServiceRoleClient()
-    const nowUtc = new Date()
-
-    let lifecycleQueued = 0
-    let skippedTimezone = 0
-    let skippedNoSegment = 0
-    let heldOut = 0
-    const queuedBySequence: Record<LifecycleSequenceKey, number> = {
-      'lifecycle.d1_never_started': 0,
-      'lifecycle.d3_started_not_finished': 0,
-      'lifecycle.streak_broken': 0,
-    }
-
-    const startTime = Date.now()
-
-    try {
-      let lastSeenId: string | null = null
-
-      for (let page = 0; page < MAX_PAGES; page++) {
-        if (Date.now() - startTime > MAX_EXECUTION_MS) {
-          console.warn('[cron/lifecycle] Reached execution deadline, stopping pagination')
-          break
-        }
-
-        let queryBuilder = supabase
-          .from('users')
-          .select('id, email, name, created_at, current_streak, longest_streak, last_streak_date, timezone')
-          .not('email', 'is', null)
-
-        if (lastSeenId) {
-          queryBuilder = queryBuilder.gt('id', lastSeenId)
-        }
-
-        const { data: rawUsers, error: queryErr } = await queryBuilder
-          .order('id', { ascending: true })
-          .limit(BATCH_SIZE)
-
-        if (queryErr) {
-          const { logSystemError } = await import('@/lib/monitoring/logger')
-          void logSystemError({
-            severity: 'error',
-            category: 'cron',
-            operation: 'cron_lifecycle_query',
-            message: `Database query failure in /api/cron/lifecycle: ${queryErr.message}`,
-          })
-          break
-        }
-
-        const users = (rawUsers || []) as Array<{
-          id: string
-          email: string
-          name?: string
-          created_at: string
-          current_streak?: number
-          longest_streak?: number
-          last_streak_date?: string | null
-          timezone?: string | null
-        }>
-        if (users.length === 0) break
-
-        const userIds = users.map((u) => u.id)
-
-        // Batch-resolve, for this page only: notification preferences, and the two
-        // learning-progress signals the segments need (has any progress row; has a
-        // completed lesson). Two lightweight queries per page — no N+1.
-        const [prefMap, progressRes] = await Promise.all([
-          getBatchUserNotificationPreferences(supabase, userIds),
-          supabase
-            .from('user_lesson_progress')
-            .select('user_id, status')
-            .in('user_id', userIds),
-        ])
-
-        const hasAnyProgress = new Set<string>()
-        const hasCompletedLesson = new Set<string>()
-        for (const row of (progressRes.data || []) as Array<{ user_id: string; status: string }>) {
-          if (!row.user_id) continue
-          hasAnyProgress.add(row.user_id)
-          if (row.status === 'completed') hasCompletedLesson.add(row.user_id)
-        }
-
-        const { getUserLocalTime } = await import('@/lib/notifications/timezone')
-        // In their delivery hour and sent no lifecycle email this run: eligible for a proof nudge.
-        const nudgeCandidates: NudgeCandidate[] = []
-        const lifecycleDue: Array<{
-          user: (typeof users)[number]
-          sequenceKey: LifecycleSequenceKey
-          userPref: ReturnType<typeof prefMap.get>
-          localDate: string
-          nudgeCandidate: NudgeCandidate
-        }> = []
-
-        for (const user of users) {
-          if (!user.email) continue
-
-          const userPref = prefMap.get(user.id)
-          const timezone = userPref?.timezone || user.timezone || 'UTC'
-          const userLocalTime = getUserLocalTime(timezone, nowUtc)
-          const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
-
-          // Local-hour delivery gate (bypassed with force=true) — keeps lifecycle mail
-          // in the learner's morning window and makes the hourly cron send once/day.
-          if (!isForced && userLocalTime.localHour !== targetHour) {
-            skippedTimezone++
-            continue
-          }
-
-          const snapshot: LifecycleUserSnapshot = {
-            createdAt: user.created_at,
-            currentStreak: user.current_streak ?? 0,
-            longestStreak: user.longest_streak ?? 0,
-            lastStreakDate: user.last_streak_date ?? null,
-            hasAnyProgress: hasAnyProgress.has(user.id),
-            hasCompletedLesson: hasCompletedLesson.has(user.id),
-            localDate: userLocalTime.localDate,
-          }
-
-          const nudgeCandidate: NudgeCandidate = { id: user.id, email: user.email, name: user.name, preferences: userPref }
-          const sequenceKey = resolveLifecycleSequence(snapshot, nowUtc)
-          if (!sequenceKey) {
-            skippedNoSegment++
-            nudgeCandidates.push(nudgeCandidate)
-            continue
-          }
-
-          // Step 8 — deterministic 30% holdout per sequence. Held-out users remain
-          // eligible for all other product behaviour; only this sequence is withheld.
-          // Recorded as an auditable notification_events row so the treatment/holdout
-          // split is queryable for D14 measurement.
-          if (isLifecycleHoldout(user.id, sequenceKey)) {
-            heldOut++
-            if (!nudgeDryRun) await recordHoldoutEvent(supabase, user.id, sequenceKey)
-            nudgeCandidates.push(nudgeCandidate)
-            continue
-          }
-
-          lifecycleDue.push({ user, sequenceKey, userPref, localDate: userLocalTime.localDate, nudgeCandidate })
-        }
-
-        // Growth R5 B10: the comeback emails carry the learner's own next step. Proof state loads
-        // once for this page's lifecycle sends; a failed read only drops the line.
-        const proofStates =
-          lifecycleDue.length > 0
-            ? await loadProofStates(supabase, lifecycleDue.map((d) => d.user.id)).catch(() => null)
-            : null
-
-        for (const { user, sequenceKey, userPref, localDate, nudgeCandidate } of lifecycleDue) {
-          if (nudgeDryRun) {
-            // Counted as it would be sent; the learner is then not a nudge candidate either.
-            lifecycleQueued++
-            queuedBySequence[sequenceKey]++
-            continue
-          }
-          const idempotencyKey = `${sequenceKey}-${user.id}-${localDate}`
-          const proofState = proofStates?.get(user.id)
-          const nextStep = proofState ? selectProofNextStep(proofState) : null
-          const hasStep = nextStep !== null && nextStep.kind !== 'none'
-          const result = await enqueueNotificationItem({
-            userId: user.id,
-            toEmail: user.email,
-            toName: user.name || user.email.split('@')[0],
-            channel: 'email',
-            templateKey: sequenceKey,
-            templateVariables: {
-              userName: user.name || user.email.split('@')[0],
-              sequence: sequenceKey,
-              proofStepText: hasStep ? nextStep.text : null,
-              proofStepUrl: hasStep ? `${siteOrigin}${nextStep.path}` : null,
-            },
-            eventId: idempotencyKey,
-            idempotencyKey,
-            eventType: sequenceKey,
-            category: 'learning',
-            priorityLevel: 'medium',
-            preloadedPreferences: userPref,
-          })
-          if (result.success) {
-            lifecycleQueued++
-            queuedBySequence[sequenceKey]++
-          } else if (!result.duplicate) {
-            // A genuine skip (preference, toggle, suppression): the learner may get a nudge instead.
-            // A duplicate means today's lifecycle email already went out (an earlier run), so no
-            // nudge on top of it.
-            nudgeCandidates.push(nudgeCandidate)
-          }
-        }
-
-        // Proof nudges for this page. A failure here never stops the lifecycle run.
-        try {
-          const nudges = await runProofNudgesForPage(supabase, nudgeCandidates, { now: nowUtc, dryRun: nudgeDryRun })
-          nudgesSent['nudge.portfolio_ready'] += nudges.sent['nudge.portfolio_ready']
-          nudgesSent['nudge.fellow_eligible'] += nudges.sent['nudge.fellow_eligible']
-          nudgesHeldOut += nudges.heldOut
-          if (nudges.skipped) nudgePagesSkipped++
-        } catch (nudgeErr) {
-          nudgePagesSkipped++
-          console.error('[cron/lifecycle] Proof nudges failed for a page:', nudgeErr)
-        }
-
-        lastSeenId = users[users.length - 1].id
-        if (users.length < BATCH_SIZE) break
-      }
-    } catch (err) {
-      console.error('[cron/lifecycle] Failed to process lifecycle sequences:', err)
-      const { logSystemError } = await import('@/lib/monitoring/logger')
-      void logSystemError({
-        severity: 'error',
-        category: 'cron',
-        operation: 'cron_lifecycle_exception',
-        message: `Unhandled exception in /api/cron/lifecycle: ${err instanceof Error ? err.message : String(err)}`,
       })
     }
 
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      lifecycleQueued,
-      queuedBySequence,
-      heldOut,
-      skippedTimezone,
-      skippedNoSegment,
-      dryRun: nudgeDryRun,
-      proofNudges: { dryRun: nudgeDryRun, sent: nudgesSent, heldOut: nudgesHeldOut, pagesSkipped: nudgePagesSkipped },
+      lifecycleQueued: run.lifecycleQueued,
+      queuedBySequence: run.queuedBySequence,
+      heldOut: run.heldOut,
+      skippedTimezone: run.skippedTimezone,
+      skippedNoSegment: run.skippedNoSegment,
+      dryRun: run.dryRun,
+      proofNudges: {
+        dryRun: run.dryRun,
+        sent: run.proofNudges.sent,
+        heldOut: run.proofNudges.heldOut,
+        pagesSkipped: run.proofNudges.pagesSkipped,
+      },
     })
   }
 )
 
 export const GET = POST
-
-/**
- * Records a holdout assignment as an auditable `notification_events` row so the
- * treatment/holdout split can be measured server-side without a separate platform.
- * Non-fatal: a logging failure never blocks the run.
- */
-async function recordHoldoutEvent(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  userId: string,
-  sequenceKey: LifecycleSequenceKey
-): Promise<void> {
-  try {
-    await supabase.from('notification_events').insert({
-      event_type: sequenceKey,
-      user_id: userId,
-      payload: { sequence: sequenceKey } as unknown as import('@/lib/supabase').Json,
-      channels_notified: [],
-      skipped_reason: `lifecycle_holdout:${sequenceKey}`,
-      created_at: new Date().toISOString(),
-    })
-  } catch {
-    // Non-fatal audit helper
-  }
-}

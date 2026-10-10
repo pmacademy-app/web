@@ -186,9 +186,11 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // (also on `withRoute`).
   // 131 since Growth R1 added `notifications/celebrations/route.ts`: the learner's one-time
   // achievement celebration is claimed server-side with a compare-and-set (also on `withRoute`).
-  it('accounts for all 131 routes', () => {
-    expect(files).toHaveLength(131)
-    expect(migrated).toHaveLength(128)
+  // 133 since Admin R6 added `admin/automations/lifecycle-preview/route.ts` (an admin dry run of
+  // the lifecycle job) and `admin/cache/revalidate/route.ts` (admin cache refresh), both on `withRoute`.
+  it('accounts for all 133 routes', () => {
+    expect(files).toHaveLength(133)
+    expect(migrated).toHaveLength(130)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {
@@ -198,7 +200,7 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     expect(inGroup('cron/')).toBe(7)
     expect(inGroup('auth/')).toBe(8)
     expect(inGroup('settings/')).toBe(11)
-    expect(inGroup('admin/')).toBe(61)
+    expect(inGroup('admin/')).toBe(63)
   })
 
   it('leaves no route resolving admin authorization by hand', () => {

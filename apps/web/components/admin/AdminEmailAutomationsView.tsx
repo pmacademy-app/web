@@ -13,6 +13,7 @@ import {
   Loader2,
   Repeat,
   FlaskConical,
+  PauseCircle,
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
 import { apiPost } from '@/lib/api/client'
@@ -22,6 +23,8 @@ import type {
   EmailDigestSchedules,
 } from '@/lib/notifications/automations/types'
 import type { AdminLifecycleMetrics } from '@/lib/admin/communications-service'
+import { AdminNudgeReadoutCard } from './AdminNudgeReadoutCard'
+import { AdminLifecyclePreviewButton } from './AdminLifecyclePreviewButton'
 
 interface AdminEmailAutomationsViewProps {
   initialState: EmailAutomationsState
@@ -178,6 +181,8 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
   const lifecycleSequences = state.automations.filter((a) => a.key.startsWith('lifecycle.'))
   const metricByKey = new Map((lifecycleMetrics?.sequences || []).map((m) => [m.key, m]))
   const holdoutPercent = lifecycleMetrics?.holdoutPercent ?? 30
+  const automationNames = Object.fromEntries(state.automations.map((a) => [a.key, a.name]))
+  for (const n of lifecycleMetrics?.nudges ?? []) automationNames[n.key] = n.name
 
   return (
     <div className="space-y-8">
@@ -189,11 +194,15 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
       )}
 
       {/* Global Master Control Banner */}
-      <div className={`p-6 rounded-2xl border transition-all shadow-xl ${state.globalPause ? 'bg-admin-warning-soft border-admin-warning/25' : 'bg-admin-surface border-admin-border'}`}>
+      <div className={`p-6 rounded-2xl border transition-colors shadow-xl ${state.globalPause ? 'bg-admin-warning-soft border-admin-warning/25' : 'bg-admin-surface border-admin-border'}`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className={`w-3 h-3 rounded-full ${state.globalPause ? 'bg-admin-warning animate-pulse' : 'bg-admin-success'}`} />
+              {state.globalPause ? (
+                <PauseCircle className="w-4 h-4 text-admin-warning shrink-0" aria-hidden="true" />
+              ) : (
+                <span className="w-3 h-3 rounded-full bg-admin-success" aria-hidden="true" />
+              )}
               <h2 className="text-base font-bold text-admin-fg">Global Non-Critical Email Master Switch</h2>
             </div>
             <p className="text-xs text-admin-fg-muted max-w-xl">
@@ -207,7 +216,7 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
             type="button"
             disabled={loadingKey === 'global_pause'}
             onClick={handleToggleGlobalPause}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-[color,background-color,border-color,box-shadow] flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
               state.globalPause
                 ? 'bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg shadow-lg shadow-admin-accent/20'
                 : 'bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger border border-admin-danger/25'
@@ -554,6 +563,8 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
             </div>
           </div>
 
+          <AdminLifecyclePreviewButton names={automationNames} />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {lifecycleSequences.map((item) => (
               <AutomationCard
@@ -620,6 +631,10 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
               </div>
             </div>
           )}
+
+          {lifecycleMetrics?.nudges && lifecycleMetrics.nudges.length > 0 && (
+            <AdminNudgeReadoutCard nudges={lifecycleMetrics.nudges} retireReady={lifecycleMetrics.retireReady} />
+          )}
         </div>
       )}
     </div>
@@ -638,7 +653,7 @@ function AutomationCard({
   const isLoading = loadingKey === item.key
 
   return (
-    <div className={`p-5 rounded-xl border transition-all flex items-start justify-between gap-4 ${
+    <div className={`p-5 rounded-xl border transition-[background-color,border-color,opacity] flex items-start justify-between gap-4 ${
       item.isDeferred
         ? 'bg-admin-bg/40 border-admin-border/60 opacity-60'
         : item.enabled

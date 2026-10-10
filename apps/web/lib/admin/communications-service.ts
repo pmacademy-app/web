@@ -7,12 +7,23 @@
  * (defensive try/catch with empty fallbacks so the UI degrades gracefully).
  */
 
+import { unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EMAIL_TEMPLATE_MAP, renderEmailTemplate } from '@/emails'
 import { AUTOMATION_METADATA, EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { DEFAULT_LIFECYCLE_HOLDOUT_PERCENT } from '@/lib/notifications/lifecycle/holdout'
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
+import { fetchAllRows } from './fetch-all'
+import {
+  computeNudgeReadout,
+  emptyNudgeReadout,
+  NUDGE_READOUT_EVENT_TYPES,
+  type AdminNudgeReadout,
+  type FellowRequestRow,
+  type NudgeEventRow,
+} from './nudge-readout'
+import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 import {
   TEMPLATE_SAMPLE_VARIABLES,
   TEMPLATE_VARIABLE_CATALOG,
@@ -109,6 +120,13 @@ export interface AdminLifecycleMetrics {
   /** Configured holdout share (read-only; code-controlled, not editable from Admin). */
   holdoutPercent: number
   sequences: AdminLifecycleSequenceMetric[]
+  /**
+   * Proof-nudge readout (treated vs holdout, distinct users). portfolio_ready's outcome is
+   * "currently public" (not time-bound); fellow_eligible's is a request within 14 days.
+   */
+  nudges: AdminNudgeReadout[]
+  /** Both nudges have ≥ NUDGE_RETIRE_MIN_TREATED treated users and positive lift. */
+  retireReady: boolean
 }
 
 export interface AdminCommunicationsOverview {
@@ -548,10 +566,88 @@ export class CommunicationsService {
    *
    * The `holdoutPercent` is the code-controlled constant, surfaced read-only so an
    * admin can see the experiment design without being able to alter it here.
+   *
+   * It also carries the proof-nudge readout (see `nudge-readout.ts`): sent / held out /
+   * reminded per nudge, treated vs holdout outcome rates and lift, cached 120s under the
+   * `admin-automations` tag.
    */
   public static async getLifecycleMetrics(): Promise<AdminLifecycleMetrics> {
     const supabase = createServiceRoleClient()
     const sequencesMeta = AUTOMATION_METADATA.filter((a) => a.key.startsWith('lifecycle.'))
+    const nudgeNames: Partial<Record<ProofNudgeKey, string>> = {}
+    for (const meta of AUTOMATION_METADATA) {
+      if (meta.key.startsWith('nudge.')) nudgeNames[meta.key as ProofNudgeKey] = meta.name
+    }
+
+    // The nudge readout is loaded and cached on its own so a failure there (or a cold cache)
+    // never blanks the lifecycle sequence counts. It degrades to zeros, never throws.
+    const nudgeReadoutPromise = (async () => {
+      try {
+        return await unstable_cache(
+          async () => {
+            const db = createServiceRoleClient()
+            // Bounded: only the nudge rows (two initial + two reminder event types).
+            const events = await fetchAllRows<NudgeEventRow>((from, to) =>
+              db
+                .from('notification_events')
+                .select('user_id, event_type, skipped_reason, created_at')
+                .in('event_type', NUDGE_READOUT_EVENT_TYPES)
+                .order('id', { ascending: true })
+                .range(from, to)
+            )
+
+            const usersFor = (key: ProofNudgeKey) => [
+              ...new Set(events.filter((e) => e.event_type === key).map((e) => e.user_id)),
+            ]
+            const chunks = (ids: string[]) => {
+              const out: string[][] = []
+              for (let i = 0; i < ids.length; i += 200) out.push(ids.slice(i, i + 200))
+              return out
+            }
+
+            // Outcome rows only for the nudged users, in batched `in` lookups.
+            const [publicRows, fellowRequests] = await Promise.all([
+              Promise.all(
+                chunks(usersFor('nudge.portfolio_ready')).map((ids) =>
+                  fetchAllRows<{ id: string }>((from, to) =>
+                    db
+                      .from('users')
+                      .select('id')
+                      .in('id', ids)
+                      .eq('is_portfolio_public', true)
+                      .order('id', { ascending: true })
+                      .range(from, to)
+                  )
+                )
+              ).then((pages) => pages.flat()),
+              Promise.all(
+                chunks(usersFor('nudge.fellow_eligible')).map((ids) =>
+                  fetchAllRows<FellowRequestRow>((from, to) =>
+                    db
+                      .from('fellow_requests')
+                      .select('user_id, requested_at')
+                      .in('user_id', ids)
+                      .order('id', { ascending: true })
+                      .range(from, to)
+                  )
+                )
+              ).then((pages) => pages.flat()),
+            ])
+
+            return computeNudgeReadout({
+              events,
+              publicUserIds: publicRows.map((r) => r.id),
+              fellowRequests,
+              names: nudgeNames,
+            })
+          },
+          ['admin-nudge-readout'],
+          { revalidate: 120, tags: ['admin-automations'] }
+        )()
+      } catch {
+        return emptyNudgeReadout(nudgeNames)
+      }
+    })()
 
     const emptyResult: AdminLifecycleMetrics = {
       holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT,
@@ -563,6 +659,7 @@ export class CommunicationsService {
         failed: 0,
         holdout: 0,
       })),
+      ...emptyNudgeReadout(nudgeNames),
     }
 
     try {
@@ -595,9 +692,10 @@ export class CommunicationsService {
           }
         })
       )
-      return { holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT, sequences }
+      const readout = await nudgeReadoutPromise
+      return { holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT, sequences, ...readout }
     } catch {
-      return emptyResult
+      return { ...emptyResult, ...(await nudgeReadoutPromise) }
     }
   }
 
