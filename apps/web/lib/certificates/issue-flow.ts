@@ -76,6 +76,8 @@ export async function dispatchCertificateGenerated(
         certificateCode: code,
         certificateType: certificate.type,
         ...(certificate.module_slug ? { moduleSlug: certificate.module_slug } : {}),
+        // For the notification's LinkedIn add-to-profile action (Growth R5 B2).
+        careerTitle: certificate.career_title,
         learnerName: certificate.learner_name,
         verificationUrl: `${origin}/verify/${encodeURIComponent(code)}`,
         issuedAt: certificate.issued_at,

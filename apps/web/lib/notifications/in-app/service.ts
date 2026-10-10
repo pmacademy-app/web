@@ -10,6 +10,35 @@ import type { UserNotificationPreferences } from '../preferences/types'
 import { PRIORITY_MATRIX } from '../constants'
 import type { EventEnvelope } from '../types'
 import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { isTestCertificateCode } from '@/lib/certificates'
+import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
+
+/** Spreads a second action into in-app content only when there is a valid one (Growth R5 B2). */
+function withAction(action: NotificationSecondaryAction | null): { secondaryAction?: NotificationSecondaryAction } {
+  const valid = parseNotificationSecondaryAction(action)
+  return valid ? { secondaryAction: valid } : {}
+}
+
+/** Share the learner's portfolio; null without a usable username (the parser rejects it). */
+function shareAction(username: string, context: 'portfolio' | 'fellow'): NotificationSecondaryAction | null {
+  const trimmed = username.trim()
+  return trimmed ? { kind: 'share_portfolio', label: 'Share portfolio', username: trimmed, context } : null
+}
+
+/** LinkedIn add-to-profile for a real certificate, from the certificate.generated payload. */
+function linkedInAction(payload: Record<string, unknown>, code: string): NotificationSecondaryAction {
+  return {
+    kind: 'linkedin_add_to_profile',
+    label: 'Add to LinkedIn',
+    url: buildLinkedInCertificationUrl({
+      certificateCode: code,
+      careerTitle: typeof payload.careerTitle === 'string' ? payload.careerTitle : '',
+      type: payload.certificateType === 'full_curriculum' ? 'full_curriculum' : 'module',
+      issuedAt: typeof payload.issuedAt === 'string' ? payload.issuedAt : undefined,
+      verificationUrl: typeof payload.verificationUrl === 'string' ? payload.verificationUrl : '',
+    }),
+  }
+}
 
 /** `/p/<username>` when the payload names a public portfolio, otherwise null. */
 function publicPortfolioPath(payload: Record<string, unknown>): string | null {
@@ -178,11 +207,22 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: `Welcome back: Day ${payload.currentStreak || 1}!`, body: 'Your study streak continues. Keep the momentum going.', actionUrl: '/dashboard' }
     }
     case 'portfolio.published': {
-      return { title: 'Public portfolio published', body: `Your public portfolio is live at /${String(payload.username || '')}.`, actionUrl: `/p/${String(payload.username || '')}` }
+      return {
+        title: 'Public portfolio published',
+        body: `Your public portfolio is live at /${String(payload.username || '')}.`,
+        actionUrl: `/p/${String(payload.username || '')}`,
+        ...withAction(shareAction(String(payload.username || ''), 'portfolio')),
+      }
     }
     case 'certificate.generated': {
       const code = String(payload.certificateCode || '')
-      return { title: 'Certificate issued', body: `Your official certificate is ready. Verify it online with code ${code}.`, actionUrl: '/progress/certificates' }
+      return {
+        title: 'Certificate issued',
+        body: `Your official certificate is ready. Verify it online with code ${code}.`,
+        actionUrl: '/progress/certificates',
+        // Admin TEST- certificates are never a learner's credential.
+        ...withAction(code && !isTestCertificateCode(code) ? linkedInAction(payload, code) : null),
+      }
     }
     case 'capstone.submitted': {
       return { title: 'Capstone submitted', body: `Your ${String(payload.moduleTitle || 'module')} capstone has been submitted for review.`, actionUrl: '/capstones' }
@@ -201,13 +241,22 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
           ? `The Prodily team reviewed your ${moduleTitle} capstone and published it to your portfolio.`
           : `The Prodily team reviewed your ${moduleTitle} capstone. It stays in your portfolio; the public listing is off for now.`,
         actionUrl: portfolioPath ?? capstoneUrl,
+        ...withAction(portfolioPath ? shareAction(String(payload.username || ''), 'portfolio') : null),
       }
     }
     case 'fellow.granted': {
+      // Fellow shares the portfolio (Fellow wording) when it is public, otherwise asks to publish
+      // it. Never a LinkedIn add-to-profile action: Fellow is not a credential (ADR-011).
+      const portfolioPath = publicPortfolioPath(payload)
       return {
         title: 'You are now a PM Fellow!',
         body: 'Congratulations! Your PM Fellow badge is now live on your public portfolio.',
-        actionUrl: publicPortfolioPath(payload) ?? PORTFOLIO_SETTINGS_HREF,
+        actionUrl: portfolioPath ?? PORTFOLIO_SETTINGS_HREF,
+        ...withAction(
+          portfolioPath
+            ? shareAction(String(payload.username || ''), 'fellow')
+            : { kind: 'link', label: 'Publish portfolio', href: PORTFOLIO_SETTINGS_HREF },
+        ),
       }
     }
     case 'user.registered': {
