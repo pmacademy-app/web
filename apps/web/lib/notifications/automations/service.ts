@@ -38,6 +38,8 @@ export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = 
   { key: 'achievement.certificate', name: 'Certificate Generated', description: 'Triggered when a digital completion certificate is issued.', category: 'Transactional', isCritical: false },
   { key: 'achievement.portfolio_published', name: 'Portfolio Published', description: 'Triggered when a user publishes their portfolio.', category: 'Transactional', isCritical: false },
   { key: 'achievement.fellow_granted', name: 'PM Fellow Granted', description: 'Triggered when a learner is granted PM Fellow status.', category: 'Transactional', isCritical: false },
+  { key: 'nudge.portfolio_ready', name: 'Portfolio Ready Nudge', description: 'Asks learners whose portfolio is ready but private to publish it (once, plus one reminder after 7 days; 30% holdout).', category: 'Scheduled', isCritical: false },
+  { key: 'nudge.fellow_eligible', name: 'Fellow Eligible Nudge', description: 'Tells learners who qualify for PM Fellow (and were never rejected) to request it (once, plus one reminder; 30% holdout).', category: 'Scheduled', isCritical: false },
   { key: 'achievement.capstone_published', name: 'Capstone Published', description: 'Triggered when a reviewed capstone is published to the learner\'s portfolio.', category: 'Transactional', isCritical: false },
 
   // Scheduled Digests
@@ -65,6 +67,8 @@ export const DEFAULT_AUTOMATION_TOGGLES: Record<EmailAutomationKey, boolean> = {
   'achievement.portfolio_published': true,
   'achievement.fellow_granted': true,
   'achievement.capstone_published': true,
+  'nudge.portfolio_ready': true,
+  'nudge.fellow_eligible': true,
   'learning.weekly_recap': true,
   'learning.daily_reminder': true,
   'inactive.resume_learning': false,

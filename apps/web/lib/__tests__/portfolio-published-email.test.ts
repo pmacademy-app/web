@@ -76,3 +76,18 @@ describe('BadgeEarned email', () => {
     expect(text).toContain('Make your portfolio public')
   })
 })
+
+// Growth R5 / B6, B7: proof nudge emails.
+describe('proof nudge emails', () => {
+  it.each([
+    ['nudge.portfolio_ready', 'portfolio_ready', 'Publish my portfolio'],
+    ['nudge.fellow_eligible', 'fellow_eligible', 'Request PM Fellow'],
+  ])('%s renders its call to action and a reminder variant', async (key, nudge, cta) => {
+    const first = await renderEmailTemplate(key, { userName: 'Jordan', nudge, isReminder: false, ctaUrl: 'https://prodily.example/settings?tab=portfolio' })
+    expect(first.text).toContain(cta)
+    expect(first.text).not.toContain('a quick reminder')
+    const reminder = await renderEmailTemplate(key, { userName: 'Jordan', nudge, isReminder: true, ctaUrl: 'https://prodily.example/settings?tab=portfolio' })
+    expect(reminder.text).toContain('a quick reminder')
+    expect(first.text).not.toMatch(/certif|credential/i)
+  })
+})

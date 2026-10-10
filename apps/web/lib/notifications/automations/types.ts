@@ -10,6 +10,8 @@ export type EmailAutomationKey =
   | 'achievement.portfolio_published'
   | 'achievement.fellow_granted'
   | 'achievement.capstone_published'
+  | 'nudge.portfolio_ready'
+  | 'nudge.fellow_eligible'
   | 'learning.weekly_recap'
   | 'learning.daily_reminder'
   | 'inactive.resume_learning'

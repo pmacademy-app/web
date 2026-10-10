@@ -11,6 +11,7 @@ import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
 import { FellowGranted } from './templates/achievement/FellowGranted'
 import { CapstonePublished } from './templates/achievement/CapstonePublished'
+import { ProofNudgeEmail } from './templates/nudges/ProofNudge'
 import { DirectMessageEmail } from './templates/admin/DirectMessage'
 import { BRAND } from '@/lib/brand'
 
@@ -70,6 +71,15 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'achievement.capstone_published': {
     component: CapstonePublished,
     subjectLine: 'Your capstone is published',
+  },
+  // Growth R5 B6/B7 proof nudges (one component; the nudge variable picks the copy).
+  'nudge.portfolio_ready': {
+    component: ProofNudgeEmail,
+    subjectLine: 'Your portfolio is ready to share',
+  },
+  'nudge.fellow_eligible': {
+    component: ProofNudgeEmail,
+    subjectLine: 'You qualify for PM Fellow',
   },
 
   // Scheduled Digests & Reminders

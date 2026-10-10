@@ -12,6 +12,8 @@ import {
   type LifecycleUserSnapshot,
 } from '@/lib/notifications/lifecycle/segments'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { runProofNudgesForPage, type NudgeCandidate } from '@/lib/growth/proof-nudges-run'
+import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 
 /** Keyset pagination batch size for lifecycle processing (mirrors T3 crons). */
 const BATCH_SIZE = 100
@@ -24,7 +26,7 @@ const MAX_EXECUTION_MS = 50_000
  * `force=true` bypasses the per-user local-hour schedule window, matching the daily
  * reminder / weekly recap crons. Only the literal string 'true' has an effect.
  */
-const forceQuerySchema = z.object({ force: z.string().optional() })
+const forceQuerySchema = z.object({ force: z.string().optional(), nudgeDryRun: z.string().optional() })
 
 /**
  * Phase 1.5 — Lifecycle reactivation cron.
@@ -74,6 +76,11 @@ export const POST = withRoute(
     }
 
     const isForced = query.force === 'true'
+    // Growth R5 B6/B7: count who would get a proof nudge, send none (volume sign-off).
+    const nudgeDryRun = query.nudgeDryRun === 'true'
+    const nudgesSent: Record<ProofNudgeKey, number> = { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }
+    let nudgesHeldOut = 0
+    let nudgePagesSkipped = 0
     const supabase = createServiceRoleClient()
     const nowUtc = new Date()
 
@@ -156,6 +163,8 @@ export const POST = withRoute(
         }
 
         const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+        // In their delivery hour and sent no lifecycle email this run: eligible for a proof nudge.
+        const nudgeCandidates: NudgeCandidate[] = []
 
         for (const user of users) {
           if (!user.email) continue
@@ -182,9 +191,11 @@ export const POST = withRoute(
             localDate: userLocalTime.localDate,
           }
 
+          const nudgeCandidate: NudgeCandidate = { id: user.id, email: user.email, name: user.name, preferences: userPref }
           const sequenceKey = resolveLifecycleSequence(snapshot, nowUtc)
           if (!sequenceKey) {
             skippedNoSegment++
+            nudgeCandidates.push(nudgeCandidate)
             continue
           }
 
@@ -195,6 +206,7 @@ export const POST = withRoute(
           if (isLifecycleHoldout(user.id, sequenceKey)) {
             heldOut++
             await recordHoldoutEvent(supabase, user.id, sequenceKey)
+            nudgeCandidates.push(nudgeCandidate)
             continue
           }
 
@@ -218,7 +230,21 @@ export const POST = withRoute(
           if (result.success) {
             lifecycleQueued++
             queuedBySequence[sequenceKey]++
+          } else {
+            nudgeCandidates.push(nudgeCandidate)
           }
+        }
+
+        // Proof nudges for this page. A failure here never stops the lifecycle run.
+        try {
+          const nudges = await runProofNudgesForPage(supabase, nudgeCandidates, { now: nowUtc, dryRun: nudgeDryRun })
+          nudgesSent['nudge.portfolio_ready'] += nudges.sent['nudge.portfolio_ready']
+          nudgesSent['nudge.fellow_eligible'] += nudges.sent['nudge.fellow_eligible']
+          nudgesHeldOut += nudges.heldOut
+          if (nudges.skipped) nudgePagesSkipped++
+        } catch (nudgeErr) {
+          nudgePagesSkipped++
+          console.error('[cron/lifecycle] Proof nudges failed for a page:', nudgeErr)
         }
 
         lastSeenId = users[users.length - 1].id
@@ -243,6 +269,7 @@ export const POST = withRoute(
       heldOut,
       skippedTimezone,
       skippedNoSegment,
+      proofNudges: { dryRun: nudgeDryRun, sent: nudgesSent, heldOut: nudgesHeldOut, pagesSkipped: nudgePagesSkipped },
     })
   }
 )

@@ -39,6 +39,8 @@ export interface ProofState {
     readinessPercent: number
   }
   fellowState: FellowRequestUiState
+  /** The learner's most recent Fellow request, if any. */
+  latestFellowRequestStatus: FellowRequestRowStatus | null
   /** The first capstone whose module is finished and that has not been submitted. */
   nextCapstone: { slug: string; title: string; href: string } | null
   certificate: { completedLessons: number; totalLessons: number; earned: boolean }
@@ -76,6 +78,7 @@ export function deriveProofState(input: ProofStateInput): ProofState {
       readinessPercent: readiness.totalCount > 0 ? Math.round((readiness.completedCount / readiness.totalCount) * 100) : 0,
     },
     fellowState,
+    latestFellowRequestStatus: input.latestFellowRequestStatus,
     nextCapstone: next
       ? { slug: next.moduleSlug, title: next.title, href: getCapstoneHref(getCurriculumModuleForCapstone(next.moduleSlug)) }
       : null,
