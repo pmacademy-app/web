@@ -24,7 +24,7 @@ const REFERRALS_PATH = '/api/referrals'
 type ReferralState =
   | { phase: 'idle' }
   | { phase: 'loading' }
-  | { phase: 'open'; link: string; source: string }
+  | { phase: 'open'; link: string; source: string; rewardXp?: number }
 
 interface NotificationsSummaryResponse {
   success: boolean
@@ -106,14 +106,18 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
     setCelebration(null)
     setReferral({ phase: 'loading' })
     let link: string | null = null
+    let rewardXp: number | undefined
     try {
       const result = await apiGet<ReferralStatsResponse>(REFERRALS_PATH)
-      if (result.ok) link = result.data?.stats?.referralLink || null
+      if (result.ok) {
+        link = result.data?.stats?.referralLink || null
+        rewardXp = result.data?.stats?.rewardXp
+      }
     } catch {
       // Treated like a failed response.
     }
     if (!link) inviteStarted.current = false
-    setReferral(link ? { phase: 'open', link, source: `${kind}_celebration` } : { phase: 'idle' })
+    setReferral(link ? { phase: 'open', link, source: `${kind}_celebration`, rewardXp } : { phase: 'idle' })
   }, [])
 
   const handleReferralClose = useCallback(() => {
@@ -133,6 +137,7 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
         onClose={handleReferralClose}
         referralLink={referral.phase === 'open' ? referral.link : ''}
         source={referral.phase === 'open' ? referral.source : undefined}
+        rewardXp={referral.phase === 'open' ? referral.rewardXp : undefined}
       />
     </>
   )

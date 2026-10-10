@@ -90,6 +90,20 @@ export function LearningSettingsSection({
             disabled={isSaving}
           />
         </SettingRow>
+
+        <SettingRow
+          label="XP per Referral"
+          description="XP the referrer earns when an invited learner completes their first lesson. Shown wherever the reward is described."
+        >
+          <NumberInput
+            value={data.xpReferralReward}
+            onChange={(e) => handleInputChange('xpReferralReward', parseInt(e.target.value) || 0)}
+            min={1}
+            max={10000}
+            step={5}
+            disabled={isSaving}
+          />
+        </SettingRow>
       </AdminSection>
 
 

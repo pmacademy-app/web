@@ -5,6 +5,7 @@ import { getUserBadgesData } from '@/lib/badges-db'
 import { deriveFellowRequestState, type FellowRequestRowStatus } from '@/lib/fellow'
 import { calculatePortfolioReadiness } from '@/lib/portfolio-readiness'
 import { portfolioReadinessInputFromUserRow } from '@/lib/portfolio-db'
+import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
 import {
   summarizeBadges,
   summarizeFellow,
@@ -86,18 +87,19 @@ export async function loadProofExtras(
 ): Promise<ProofExtras> {
   const settle = <T>(promise: Promise<T | null>) => promise.catch(() => null)
 
-  const [profile, progressRows, capstoneRows] = await Promise.all([
+  const [profile, progressRows, capstoneRows, referralRewardXp] = await Promise.all([
     settle(shared.profile),
     settle(shared.progressRows),
     settle(shared.capstoneRows),
+    resolveReferralRewardXp(),
   ])
   if (!profile || !progressRows || !capstoneRows) {
-    return { fellow: null, badges: null, level: profile ? summarizeLevel(profile.total_xp) : null }
+    return { fellow: null, badges: null, level: profile ? summarizeLevel(profile.total_xp) : null, referralRewardXp }
   }
 
   const [fellow, badges] = await Promise.all([
     settle(fellowSummary(supabase, userId, profile, capstoneRows)),
     settle(badgeSummary(supabase, userId, profile, progressRows, capstoneRows)),
   ])
-  return { fellow, badges, level: summarizeLevel(profile.total_xp) }
+  return { fellow, badges, level: summarizeLevel(profile.total_xp), referralRewardXp }
 }

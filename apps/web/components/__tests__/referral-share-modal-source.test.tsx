@@ -110,6 +110,13 @@ describe('ReferralShareModal — source', () => {
     expect(document.body.textContent).toContain(`you earn +${REFERRAL_REWARD_XP} XP`)
   })
 
+  it('states a configured reward when one is passed', async () => {
+    await act(async () => {
+      root.render(<ReferralShareModal isOpen onClose={() => {}} referralLink={LINK} rewardXp={75} />)
+    })
+    expect(document.body.textContent).toContain('you earn +75 XP')
+  })
+
   it('sends only the source, never the link', async () => {
     await render(true, 'fellow_celebration')
     await copy()

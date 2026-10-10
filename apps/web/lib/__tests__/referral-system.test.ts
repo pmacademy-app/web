@@ -136,6 +136,16 @@ describe('Phase 7: Referral & Organic Growth System', () => {
               }),
             }
           }
+          if (table === 'xp_events') {
+            // Two referral awards of the standard 50 XP.
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({ data: [{ xp_amount: 50 }, { xp_amount: 50 }], error: null }),
+                }),
+              }),
+            }
+          }
           return {}
         }),
       } as unknown as SupabaseClient<Database>
@@ -202,6 +212,16 @@ describe('Phase 7: Referral & Organic Growth System', () => {
               }),
             }
           }
+          if (table === 'xp_events') {
+            // Two referral awards of the standard 50 XP.
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({ data: [{ xp_amount: 50 }, { xp_amount: 50 }], error: null }),
+                }),
+              }),
+            }
+          }
           return {}
         }),
       } as unknown as SupabaseClient<Database>
@@ -240,6 +260,16 @@ describe('Phase 7: Referral & Organic Growth System', () => {
                     data: Array(10).fill({ id: 'some-id' }), // 10 signups in last 24h
                     error: null,
                   }),
+                }),
+              }),
+            }
+          }
+          if (table === 'xp_events') {
+            // Two referral awards of the standard 50 XP.
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({ data: [{ xp_amount: 50 }, { xp_amount: 50 }], error: null }),
                 }),
               }),
             }
@@ -456,6 +486,16 @@ describe('Phase 7: Referral & Organic Growth System', () => {
               }),
             }
           }
+          if (table === 'xp_events') {
+            // Two referral awards of the standard 50 XP.
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({ data: [{ xp_amount: 50 }, { xp_amount: 50 }], error: null }),
+                }),
+              }),
+            }
+          }
           return {}
         }),
       } as unknown as SupabaseClient<Database>
@@ -508,6 +548,16 @@ describe('Phase 7: Referral & Organic Growth System', () => {
                     data: mockReferrals,
                     error: null,
                   }),
+                }),
+              }),
+            }
+          }
+          if (table === 'xp_events') {
+            // Two referral awards of the standard 50 XP.
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockResolvedValue({ data: [{ xp_amount: 50 }, { xp_amount: 50 }], error: null }),
                 }),
               }),
             }

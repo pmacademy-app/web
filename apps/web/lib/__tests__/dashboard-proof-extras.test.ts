@@ -170,6 +170,7 @@ describe('loadProofExtras', () => {
       fellow: null,
       badges: null,
       level: null,
+      referralRewardXp: 50,
     })
   })
 })

@@ -86,6 +86,7 @@ function InvitePeers({ portfolioState }: { portfolioState: PortfolioState }) {
         onClose={() => setRequested(false)}
         referralLink={link ?? ''}
         source="dashboard"
+        rewardXp={data?.stats?.rewardXp}
       />
     </>
   )
@@ -173,7 +174,7 @@ export function ProofExtrasRow({ extras, portfolioState }: { extras: ProofExtras
           <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Peers
         </span>
         <span className={VALUE}>
-          Earn +{REFERRAL_REWARD_XP} XP when a peer you invite finishes their first lesson
+          Earn +{extras.referralRewardXp ?? REFERRAL_REWARD_XP} XP when a peer you invite finishes their first lesson
         </span>
         <InvitePeers portfolioState={portfolioState} />
       </div>

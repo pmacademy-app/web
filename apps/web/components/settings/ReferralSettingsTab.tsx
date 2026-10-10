@@ -41,6 +41,7 @@ export function ReferralSettingsTab() {
 
   const { data, isLoading } = useApiQuery<ReferralStatsResponse>('/api/referrals')
   const stats = data?.stats ?? null
+  const rewardXp = stats?.rewardXp ?? REFERRAL_REWARD_XP
   const loading = isLoading && !data
 
   const referralLink = stats?.referralLink || `${typeof window !== 'undefined' ? window.location.origin : ''}/signup`
@@ -89,7 +90,7 @@ export function ReferralSettingsTab() {
                 Invite Peers & Earn XP
               </h2>
               <p className="text-xs text-muted-foreground max-w-lg leading-relaxed">
-                Invite fellow aspiring product managers and colleagues to {BRAND.product}. When they complete their first lesson, you earn <strong className="text-primary font-semibold">+{REFERRAL_REWARD_XP} XP</strong>!
+                Invite fellow aspiring product managers and colleagues to {BRAND.product}. When they complete their first lesson, you earn <strong className="text-primary font-semibold">+{rewardXp} XP</strong>!
               </p>
             </div>
           </div>
@@ -257,7 +258,7 @@ export function ReferralSettingsTab() {
                   {item.status === 'rewarded' || item.status === 'activated' ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                       <Check className="w-3 h-3" />
-                      Activated (+{REFERRAL_REWARD_XP} XP)
+                      Activated (+{rewardXp} XP)
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-secondary text-muted-foreground border border-border">
@@ -276,6 +277,7 @@ export function ReferralSettingsTab() {
         onClose={() => setIsShareModalOpen(false)}
         referralLink={referralLink}
         source="settings_tab"
+        rewardXp={rewardXp}
       />
     </div>
   )

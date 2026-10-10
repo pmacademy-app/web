@@ -9,6 +9,7 @@ import type {
   SettingsSectionKey,
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
+import { REFERRAL_REWARD_XP } from '../referral/reward'
 
 /**
  * Settings Service (Phase 8).
@@ -43,6 +44,7 @@ const DEFAULT_LEARNING_SETTINGS: LearningSettings = {
   xpPerQuizPass: 100,
   xpPerFlashcardReview: 10,
   xpPerReflection: 25,
+  xpReferralReward: REFERRAL_REWARD_XP,
   streakFreezeEnabled: true,
   streakFreezeCostXp: 500,
   certificateAutoIssue: true,

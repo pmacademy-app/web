@@ -688,6 +688,8 @@ export interface LearningSettings {
   xpPerQuizPass: number
   xpPerFlashcardReview: number
   xpPerReflection: number
+  /** XP the referrer earns when an invited learner completes their first lesson. */
+  xpReferralReward: number
   // Streaks
   streakFreezeEnabled: boolean
   streakFreezeCostXp: number

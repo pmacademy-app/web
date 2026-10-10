@@ -80,6 +80,8 @@ export interface UserReferralStats {
   totalInvited: number
   activatedCount: number
   totalXpEarned: number
+  /** The reward currently paid per activated referral (admin-configurable). */
+  rewardXp: number
   referrals: ReferredUserSummary[]
 }
 

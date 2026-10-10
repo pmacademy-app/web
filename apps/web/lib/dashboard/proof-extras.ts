@@ -36,6 +36,8 @@ export interface ProofExtras {
   fellow: FellowSummary | null
   badges: BadgeSummary | null
   level: LevelSummary | null
+  /** The live referral reward (admin-configurable); absent means the standard reward. */
+  referralRewardXp?: number
 }
 
 export function summarizeFellow(input: {

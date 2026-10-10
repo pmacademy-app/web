@@ -7,7 +7,8 @@
  * References: PRD.md §4.10, Architecture.md §5, Master Plan Phase 7
  */
 
-import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
+import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '@/lib/referral/reward'
+import { SettingsService } from '@/lib/admin/settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
@@ -52,11 +53,27 @@ export interface UserReferralStats {
   totalInvited: number
   activatedCount: number
   totalXpEarned: number
+  /** The reward currently paid per activated referral. */
+  rewardXp: number
   referrals: ReferredUserSummary[]
 }
 
 const MAX_REFERRALS_PER_24H = 10
+/** The default reward; the live value comes from resolveReferralRewardXp(). */
 export const REFERRAL_ACTIVATION_XP = REFERRAL_REWARD_XP
+
+/**
+ * The reward an admin configured (Settings → Learning), validated, or the default. Never throws:
+ * SettingsService already falls back to defaults when the settings row cannot be read.
+ */
+export async function resolveReferralRewardXp(): Promise<number> {
+  try {
+    const settings = await SettingsService.getLearningSettings()
+    return normalizeReferralRewardXp(settings.xpReferralReward)
+  } catch {
+    return REFERRAL_REWARD_XP
+  }
+}
 
 /**
  * Resolves a referral code or handle to a valid referrer user.
@@ -255,6 +272,7 @@ export async function onFirstLessonCompletedReferralCheck(
   }
 
   // 3. Award referral XP to referrer (idempotent with hasXpEvent check)
+  const rewardXp = await resolveReferralRewardXp()
   try {
     const alreadyAwarded = await hasXpEvent(
       supabase,
@@ -267,7 +285,7 @@ export async function onFirstLessonCompletedReferralCheck(
         supabase,
         referral.referrer_id,
         'referral',
-        REFERRAL_ACTIVATION_XP,
+        rewardXp,
         referral.id
       )
     }
@@ -290,7 +308,7 @@ export async function onFirstLessonCompletedReferralCheck(
       userId: referral.referrer_id,
       category: 'achievement',
       title: 'Referral Reward Earned! 🎁',
-      body: `${learnerName} completed their first lesson! You received +${REFERRAL_ACTIVATION_XP} XP for introducing them to ${BRAND.product}.`,
+      body: `${learnerName} completed their first lesson! You received +${rewardXp} XP for introducing them to ${BRAND.product}.`,
       actionUrl: '/settings?tab=referrals',
       priority: 'high',
       idempotencyKey: `referral-reward-${referral.id}`,
@@ -302,7 +320,7 @@ export async function onFirstLessonCompletedReferralCheck(
   return {
     rewarded: true,
     referrerId: referral.referrer_id,
-    xpAwarded: REFERRAL_ACTIVATION_XP,
+    xpAwarded: rewardXp,
   }
 }
 
@@ -371,6 +389,16 @@ export async function getUserReferralStats(
     }
   })
 
+  // What was actually awarded, so a changed reward never rewrites past earnings.
+  const [{ data: referralXpRows }, rewardXp] = await Promise.all([
+    (supabase.from('xp_events') as unknown as DBChain)
+      .select('xp_amount')
+      .eq('user_id', userId)
+      .eq('source_type', 'referral') as unknown as Promise<{ data: { xp_amount: number }[] | null }>,
+    resolveReferralRewardXp(),
+  ])
+  const totalXpEarned = (referralXpRows ?? []).reduce((sum, row) => sum + (row.xp_amount || 0), 0)
+
   const activatedCount = formattedReferrals.filter(
     (r) => r.status === 'rewarded' || r.status === 'activated'
   ).length
@@ -380,7 +408,8 @@ export async function getUserReferralStats(
     referralLink,
     totalInvited: formattedReferrals.length,
     activatedCount,
-    totalXpEarned: activatedCount * REFERRAL_ACTIVATION_XP,
+    totalXpEarned,
+    rewardXp,
     referrals: formattedReferrals,
   }
 }

@@ -30,6 +30,8 @@ interface ReferralShareModalProps {
   referralLink: string
   /** The surface that opened the modal; sent with its analytics events. */
   source?: string
+  /** The live reward from the referral stats; defaults to the standard reward. */
+  rewardXp?: number
 }
 
 export function ReferralShareModal({
@@ -37,6 +39,7 @@ export function ReferralShareModal({
   onClose,
   referralLink,
   source = 'modal',
+  rewardXp = REFERRAL_REWARD_XP,
 }: ReferralShareModalProps) {
   const [copied, setCopied] = useState(false)
 
@@ -94,7 +97,7 @@ export function ReferralShareModal({
             Invite Peers to {BRAND.product}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +{REFERRAL_REWARD_XP} XP!
+            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +{rewardXp} XP!
           </DialogDescription>
         </div>
 
