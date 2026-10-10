@@ -131,3 +131,32 @@ describe('WeeklyRecap email', () => {
     expect(text).toContain('0 / 7')
   })
 })
+
+// Growth R5 / B10: lifecycle emails have their own copy and the learner's own next step.
+describe('lifecycle emails', () => {
+  const step = {
+    proofStepText: 'You finished the lessons for "Problem Brief". Submit the capstone to add it to your portfolio.',
+    proofStepUrl: 'https://prodily.example/capstones/discovery',
+  }
+
+  it.each([
+    ['lifecycle.d3_started_not_finished', 'Pick up where you left off'],
+    ['lifecycle.streak_broken', 'Your streak is waiting for you'],
+  ])('%s shows its own heading and the next proof step', async (key, heading) => {
+    const { html, text } = await renderEmailTemplate(key, { userName: 'Jordan', sequence: key, ...step })
+    expect(text).toContain(heading)
+    expect(text).toContain('Where you are:')
+    expect(html).toContain('https://prodily.example/capstones/discovery')
+    expect(text).not.toContain('Welcome to')
+  })
+
+  it('keeps the never-started email focused on the first lesson (no proof step)', async () => {
+    const { text } = await renderEmailTemplate('lifecycle.d1_never_started', {
+      userName: 'Jordan',
+      sequence: 'lifecycle.d1_never_started',
+      ...step,
+    })
+    expect(text).toContain('Start your first lesson')
+    expect(text).not.toContain('Where you are:')
+  })
+})

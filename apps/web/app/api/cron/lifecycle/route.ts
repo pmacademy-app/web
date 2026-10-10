@@ -14,6 +14,9 @@ import {
 import { createServiceRoleClient } from '@/lib/supabase'
 import { runProofNudgesForPage, type NudgeCandidate } from '@/lib/growth/proof-nudges-run'
 import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
+import { loadProofStates } from '@/lib/growth/proof-state-db'
+import { selectProofNextStep } from '@/lib/growth/proof-state'
+import { BRAND } from '@/lib/brand'
 
 /** Keyset pagination batch size for lifecycle processing (mirrors T3 crons). */
 const BATCH_SIZE = 100
@@ -78,6 +81,7 @@ export const POST = withRoute(
     const isForced = query.force === 'true'
     // Growth R5 B6/B7: count who would get a proof nudge, send none (volume sign-off).
     const nudgeDryRun = query.nudgeDryRun === 'true'
+    const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
     const nudgesSent: Record<ProofNudgeKey, number> = { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }
     let nudgesHeldOut = 0
     let nudgePagesSkipped = 0
@@ -165,6 +169,13 @@ export const POST = withRoute(
         const { getUserLocalTime } = await import('@/lib/notifications/timezone')
         // In their delivery hour and sent no lifecycle email this run: eligible for a proof nudge.
         const nudgeCandidates: NudgeCandidate[] = []
+        const lifecycleDue: Array<{
+          user: (typeof users)[number]
+          sequenceKey: LifecycleSequenceKey
+          userPref: ReturnType<typeof prefMap.get>
+          localDate: string
+          nudgeCandidate: NudgeCandidate
+        }> = []
 
         for (const user of users) {
           if (!user.email) continue
@@ -210,7 +221,21 @@ export const POST = withRoute(
             continue
           }
 
-          const idempotencyKey = `${sequenceKey}-${user.id}-${userLocalTime.localDate}`
+          lifecycleDue.push({ user, sequenceKey, userPref, localDate: userLocalTime.localDate, nudgeCandidate })
+        }
+
+        // Growth R5 B10: the comeback emails carry the learner's own next step. Proof state loads
+        // once for this page's lifecycle sends; a failed read only drops the line.
+        const proofStates =
+          lifecycleDue.length > 0
+            ? await loadProofStates(supabase, lifecycleDue.map((d) => d.user.id)).catch(() => null)
+            : null
+
+        for (const { user, sequenceKey, userPref, localDate, nudgeCandidate } of lifecycleDue) {
+          const idempotencyKey = `${sequenceKey}-${user.id}-${localDate}`
+          const proofState = proofStates?.get(user.id)
+          const nextStep = proofState ? selectProofNextStep(proofState) : null
+          const hasStep = nextStep !== null && nextStep.kind !== 'none'
           const result = await enqueueNotificationItem({
             userId: user.id,
             toEmail: user.email,
@@ -219,6 +244,9 @@ export const POST = withRoute(
             templateKey: sequenceKey,
             templateVariables: {
               userName: user.name || user.email.split('@')[0],
+              sequence: sequenceKey,
+              proofStepText: hasStep ? nextStep.text : null,
+              proofStepUrl: hasStep ? `${siteOrigin}${nextStep.path}` : null,
             },
             eventId: idempotencyKey,
             idempotencyKey,
