@@ -1,6 +1,7 @@
 # ADR-011: Fellow on LinkedIn — feed share now, no "Add to profile" credential
 
-- **Status:** Accepted for option B. Option A is **blocked pending an issuer-policy decision**.
+- **Status:** Accepted for option B. Option A is **deferred** until Prodily is a registered legal entity (decided 2026-10-10).
+- **Owner:** the product owner (currently the founder). There is no legal or compliance function yet.
 - **Date:** 2026-10-10
 - **Builds on:** Growth R3 (achievement celebrations). Plan: `tasks/plan-r4-finish-partial.md`, task A5.
 
@@ -30,7 +31,22 @@ The first-person wording is never used on the public portfolio page, because vis
 
 Option A stays out until the policy questions below are answered. The tests that ban `profile/add`, "certif" and "credential" in Fellow output stay in place until then. They are the guard, and lifting them is part of accepting option A.
 
-## Open questions for option A (policy owner: product, with legal review)
+## Why option A waits for registration
+
+A LinkedIn certification names an *issuing organisation*. Prodily is not yet registered as a company anywhere, so there is no legal entity to stand behind a credential, answer a verification request, or be accountable if a claim is disputed. Issuing one now would mean an unregistered brand vouching for people on a professional network. That reputational and legal exposure is avoidable by waiting, and option B gives Fellows a share today.
+
+## When option A is reconsidered
+
+Only after registration. At that point, get advice from a lawyer in the country of registration (this ADR is not legal advice). The plain-language questions to bring:
+
+1. **Entity:** Is the registered company the issuer of record, and does its name match the LinkedIn company page?
+2. **Claims:** What exactly does "PM Fellow" attest to, and can every word of that be defended (no implied accreditation or employment endorsement)?
+3. **Consumer protection:** Do local advertising or consumer laws restrict calling an unaccredited programme outcome a "credential" or "certification"?
+4. **Personal data:** What does a public verification page show, and is publishing it covered by the privacy policy and the learner's consent (GDPR or local equivalent)?
+5. **Revocation:** If Fellow is revoked, what does the verification page say? A LinkedIn entry cannot be removed by us.
+6. **Terms:** Do the terms of service cover Fellow (criteria, review, revocation, no guarantee of outcomes)?
+
+## Original open questions for option A (policy owner: product, with legal review)
 
 1. What does Fellow attest to, and is that stable enough to call a credential?
 2. Who is the issuer of record, and does the LinkedIn organisation page match it?
