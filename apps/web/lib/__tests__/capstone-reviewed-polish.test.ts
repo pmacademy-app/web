@@ -76,7 +76,9 @@ describe('capstone.reviewed dispatch carries the real recipient', () => {
 
     expect(await ModerationService.reviewCapstone('admin-1', 'admin@prodily.app', 's1', 'approve', c)).toBe(true)
 
-    expect(userSelects).toEqual(['email, name, username, is_portfolio_public'])
+    // One lookup for the notification; the review also reads the username alone to drop the
+    // capstone's cached OG card (Growth R5 B13b), which is a separate concern.
+    expect(userSelects.filter((cols) => cols.includes('email'))).toEqual(['email, name, username, is_portfolio_public'])
     expect(dispatchMock).toHaveBeenCalledTimes(1)
     const event = dispatchMock.mock.calls[0][0] as any
     expect(event.id).toBe('capstone-reviewed-s1')

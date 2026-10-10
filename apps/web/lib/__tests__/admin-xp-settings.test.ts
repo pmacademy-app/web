@@ -113,3 +113,12 @@ describe('admin learning settings', () => {
     expect(xp.THEORY_READ).toBe(15)
   })
 })
+
+describe('referral reward on an older record', () => {
+  it('keeps the stored referral reward, which was always the one paid', async () => {
+    db.rows.learning_settings = { ...STALE_ADMIN_RECORD, xpReferralReward: 100 }
+    const settings = await SettingsService.getLearningSettings()
+    expect(settings.xpReferralReward).toBe(100)
+    expect(settings.xpPerLessonComplete).toBe(XP_VALUES.THEORY_READ)
+  })
+})

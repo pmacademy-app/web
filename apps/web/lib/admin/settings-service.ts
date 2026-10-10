@@ -281,11 +281,16 @@ export class SettingsService {
     if (settings.xpSettingsVersion === XP_SETTINGS_VERSION) return settings
     let live: XpValuesConfig = XP_VALUES
     try {
-      live = await getRuntimeXpValues(createServiceRoleClient(), true)
+      // The runtime's own 30s cache: this runs on dashboard loads and referral awards.
+      live = await getRuntimeXpValues(createServiceRoleClient())
     } catch {
       // No database client (e.g. env not configured): the static defaults are what is in effect.
     }
-    return { ...settings, ...xpFieldsFromRuntime(live) }
+    // The referral reward is the exception: it was always read from this admin record (the
+    // referral service resolves it here), so it stays as stored rather than being replaced.
+    const { xpReferralReward: _referralFromRuntime, ...liveXp } = xpFieldsFromRuntime(live)
+    void _referralFromRuntime
+    return { ...settings, ...liveXp }
   }
 
   public static async getEmailSettings(): Promise<EmailSettings> {

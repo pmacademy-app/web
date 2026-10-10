@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache'
+import { revalidateCapstoneOgCards } from '@/lib/og/revalidate-capstone-cards'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -1034,6 +1035,7 @@ export class AdminConsoleService {
       try {
         revalidatePath(`/p/${userRow.username}`)
         revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments
       }
@@ -1138,6 +1140,7 @@ export class AdminConsoleService {
       try {
         revalidatePath(`/p/${userRow.username}`)
         revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments
       }

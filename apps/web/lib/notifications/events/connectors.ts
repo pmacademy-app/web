@@ -4,6 +4,7 @@ import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
 import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
+import { getCapstoneDefinition } from '@/config/capstones'
 
 let isConnectorsInitialized = false
 
@@ -267,6 +268,8 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       templateVariables: {
         userName: event.userName || 'Learner',
         moduleTitle: event.payload.moduleTitle || 'your module',
+        // The case study's own title, for the share text (the page and notification quote it too).
+        capstoneTitle: (moduleSlug && getCapstoneDefinition(moduleSlug)?.title) || null,
         portfolioUrl:
           username && event.payload.isPortfolioPublic === true ? `${origin}/p/${encodeURIComponent(username)}` : null,
         // Growth R5 B13b: the capstone's own public page, shared and opened from the email.

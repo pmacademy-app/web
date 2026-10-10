@@ -95,7 +95,7 @@ export async function GET(request: Request, { params }: RouteProps) {
           <div style={{ display: 'flex', fontSize: '26px', fontWeight: 600 }}>by {portfolio.user.name}</div>
         </Frame>
       ),
-      { ...SIZE, headers: { 'Cache-Control': 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400' } },
+      { ...SIZE, headers: { 'Cache-Control': 'public, max-age=60, s-maxage=3600, stale-while-revalidate=600' } },
     )
   } catch (err) {
     console.error('[og/capstone] render failed:', err instanceof Error ? err.message : err)

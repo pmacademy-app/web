@@ -98,7 +98,7 @@ describe('loadProofStates', () => {
         tables.push(table)
         const result = table === failTable ? { data: null, error: { message: 'down' } } : { data: rows[table], error: null }
         const chain: Record<string, unknown> = {}
-        for (const method of ['select', 'in', 'eq', 'order', 'not']) chain[method] = () => chain
+        for (const method of ['select', 'in', 'eq', 'order', 'not', 'range']) chain[method] = () => chain
         chain.then = (resolve: (value: unknown) => unknown) => Promise.resolve(result).then(resolve)
         return chain
       },

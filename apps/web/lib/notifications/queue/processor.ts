@@ -77,7 +77,7 @@ export interface EnqueueNotificationParams {
  */
 export async function enqueueNotificationItem(
   params: EnqueueNotificationParams
-): Promise<{ success: boolean; queueId?: string; reason?: string }> {
+): Promise<{ success: boolean; queueId?: string; reason?: string; duplicate?: true }> {
   const priorityLevel = params.priorityLevel || 'medium'
   const priorityDef = PRIORITY_MATRIX[priorityLevel]
   const supabase = createServiceRoleClient()
@@ -156,7 +156,7 @@ export async function enqueueNotificationItem(
       const existingB = rawExistingBroadcast as { id: string } | null
       if (existingB && existingB.id) {
         await recordSkippedEvent(supabase, params, 'duplicate_broadcast_user')
-        return { success: false, reason: 'Duplicate notification for broadcast already queued or delivered', queueId: existingB.id }
+        return { success: false, duplicate: true, reason: 'Duplicate notification for broadcast already queued or delivered', queueId: existingB.id }
       }
     } catch {
       // Fall through to insert
@@ -175,7 +175,7 @@ export async function enqueueNotificationItem(
       const existing = rawExisting as { id: string } | null
       if (existing && existing.id) {
         await recordSkippedEvent(supabase, params, 'duplicate_event_id')
-        return { success: false, reason: 'Duplicate notification event already queued or delivered', queueId: existing.id }
+        return { success: false, duplicate: true, reason: 'Duplicate notification event already queued or delivered', queueId: existing.id }
       }
     } catch {
       // Fall through to insert if table query has temporary glitch
@@ -212,7 +212,7 @@ export async function enqueueNotificationItem(
     if (error || !rawInserted) {
       if (error?.code === '23505' || error?.message?.includes('duplicate') || error?.message?.includes('unique')) {
         await recordSkippedEvent(supabase, params, 'duplicate_db_constraint')
-        return { success: false, reason: 'Duplicate notification prevented by database unique constraint' }
+        return { success: false, duplicate: true, reason: 'Duplicate notification prevented by database unique constraint' }
       }
       return { success: false, reason: `Failed to insert queue record: ${error?.message || 'Unknown error'}` }
     }

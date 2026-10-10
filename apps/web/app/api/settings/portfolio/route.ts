@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { revalidateCapstoneOgCards } from '@/lib/og/revalidate-capstone-cards'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
@@ -48,6 +49,7 @@ export const POST = withRoute(
       if (result.settings.username) {
         revalidatePath(`/p/${result.settings.username}`)
         revalidatePath(`/api/og/portfolio/${result.settings.username}`)
+        revalidateCapstoneOgCards(result.settings.username)
       }
       revalidatePath('/settings')
 

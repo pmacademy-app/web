@@ -223,6 +223,23 @@ export class ModerationService {
         // Revalidation error is non-fatal
       }
 
+      // A review can publish or unpublish the capstone: its public page renders per request, but
+      // its OG card is cached, so drop it (Growth R5 B13b).
+      if (current.user_id) {
+        try {
+          const { data: owner } = await (supabase.from('users') as unknown as DBChain)
+            .select('username')
+            .eq('id', current.user_id)
+            .maybeSingle() as unknown as { data: { username: string | null } | null }
+          if (owner?.username) {
+            const { revalidateCapstoneOgCards } = await import('@/lib/og/revalidate-capstone-cards')
+            revalidateCapstoneOgCards(owner.username, [current.module_slug])
+          }
+        } catch {
+          // Non-fatal, like the revalidation above.
+        }
+      }
+
       return true
     } catch (err) {
       console.error('[ModerationService] reviewCapstone failed:', err)

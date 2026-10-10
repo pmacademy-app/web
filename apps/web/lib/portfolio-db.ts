@@ -133,7 +133,9 @@ export async function getPublicPortfolioData(
   const { data: users, error: userError } = await supabase
     .from('users')
     .select('*')
-    .ilike('username', sanitizedUsername)
+    // Escaped: in ILIKE, `_` and `%` are wildcards, and usernames may contain `_`. Unescaped,
+    // /p/a_b could resolve to another learner's public portfolio.
+    .ilike('username', sanitizedUsername.replace(/[\\%_]/g, (char) => `\\${char}`))
     .limit(1)
 
   if (userError || !users || users.length === 0) {

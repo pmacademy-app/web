@@ -2,10 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import type { FellowRequestRowStatus } from '@/lib/fellow'
 import { deriveProofState, type ProofState, type ProofUserRow } from './proof-state'
+import { fetchAllRows } from './fetch-all-rows'
 
 /**
  * Batch loader for proof state (Growth R5 / B1), for the scheduled jobs (nudges, weekly recap,
- * lifecycle). A fixed five queries per call, whatever the number of learners: callers page their
+ * lifecycle). Five queries per call (more only when a read exceeds one 1000-row page): callers page their
  * learner list (`PROOF_STATE_BATCH_SIZE`) and call this once per page.
  *
  * A failed read fails the whole call (returns null): a partial picture could tell a learner to
@@ -36,20 +37,35 @@ export async function loadProofStates(
     from('users')
       .select('id, username, name, bio, avatar_url, linkedin_url, github_url, website_url, is_portfolio_public, is_fellow')
       .in('id', ids) as unknown as Rows<ProofUserRow & { id: string }>,
-    from('capstone_submissions').select('user_id, module_slug, status, is_public').in('user_id', ids) as unknown as Rows<{
-      user_id: string
-      module_slug: string
-      status: string
-      is_public: boolean | null
-    }>,
-    from('fellow_requests')
-      .select('user_id, status, requested_at')
-      .in('user_id', ids)
-      .order('requested_at', { ascending: false }) as unknown as Rows<{ user_id: string; status: string }>,
-    from('user_lesson_progress')
-      .select('user_id, lesson_id')
-      .in('user_id', ids)
-      .eq('status', 'completed') as unknown as Rows<{ user_id: string; lesson_id: string }>,
+    // Multi-row reads are paged (fetchAllRows): one learner can have ~90 progress rows, and a
+    // response is capped at 1000 rows without an error.
+    fetchAllRows<{ user_id: string; module_slug: string; status: string; is_public: boolean | null }>(
+      (lo, hi) =>
+        from('capstone_submissions')
+          .select('user_id, module_slug, status, is_public')
+          .in('user_id', ids)
+          .order('user_id')
+          .order('module_slug')
+          .range(lo, hi) as unknown as Rows<{ user_id: string; module_slug: string; status: string; is_public: boolean | null }>,
+    ),
+    fetchAllRows<{ user_id: string; status: string }>(
+      (lo, hi) =>
+        from('fellow_requests')
+          .select('user_id, status, requested_at')
+          .in('user_id', ids)
+          .order('requested_at', { ascending: false })
+          .range(lo, hi) as unknown as Rows<{ user_id: string; status: string }>,
+    ),
+    fetchAllRows<{ user_id: string; lesson_id: string }>(
+      (lo, hi) =>
+        from('user_lesson_progress')
+          .select('user_id, lesson_id')
+          .in('user_id', ids)
+          .eq('status', 'completed')
+          .order('user_id')
+          .order('lesson_id')
+          .range(lo, hi) as unknown as Rows<{ user_id: string; lesson_id: string }>,
+    ),
     // Admin TEST- certificates are not credentials.
     from('certificates')
       .select('user_id')

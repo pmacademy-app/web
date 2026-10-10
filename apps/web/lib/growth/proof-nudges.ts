@@ -33,14 +33,20 @@ export const nudgeIdempotencyKey = (key: ProofNudgeKey, userId: string, round: '
   round === 'initial' ? `${key}-${userId}` : `${key}-${userId}-r1`
 
 /**
- * The nudges that apply to a learner now, in priority order. A learner whose Fellow request was
- * ever rejected is not nudged about Fellow: they can see and re-request in Settings, and an
- * unprompted "you qualify" after a rejection reads badly.
+ * The nudges that apply to a learner now, in priority order. The Fellow nudge is only for learners
+ * who never had a request decided: not after a rejection (they can see and re-request in Settings,
+ * and an unprompted "you qualify" reads badly), and not after an approval (that learner was a
+ * Fellow; if they are not one now, the status was revoked). A Fellow granted and revoked by an
+ * admin with no request leaves no trace here, so that rare case can still be nudged.
  */
 export function applicableNudges(state: ProofState): ProofNudgeKey[] {
   const nudges: ProofNudgeKey[] = []
   if (state.portfolio.readyButPrivate) nudges.push('nudge.portfolio_ready')
-  if (state.fellowState === 'eligible' && state.latestFellowRequestStatus !== 'rejected') {
+  if (
+    state.fellowState === 'eligible' &&
+    state.latestFellowRequestStatus !== 'rejected' &&
+    state.latestFellowRequestStatus !== 'approved'
+  ) {
     nudges.push('nudge.fellow_eligible')
   }
   return nudges

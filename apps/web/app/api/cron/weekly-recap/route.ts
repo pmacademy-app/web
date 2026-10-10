@@ -7,6 +7,7 @@ import { getBatchUserNotificationPreferences } from '@/lib/notifications/prefere
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { loadProofStates } from '@/lib/growth/proof-state-db'
+import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
 import { BRAND } from '@/lib/brand'
@@ -114,11 +115,16 @@ export const POST = withRoute(
 
         // Batch fetch in parallel: weekly XP events, weekly completed lessons, and notification preferences
         const [xpRes, lessonRes, prefMap] = await Promise.all([
-          supabase
-            .from('xp_events')
-            .select('user_id, xp_amount, created_at')
-            .in('user_id', userIds)
-            .gte('created_at', weekStartDate),
+          // Paged: a week of XP events for a whole page of learners can pass the 1000-row cap.
+          fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((lo, hi) =>
+            supabase
+              .from('xp_events')
+              .select('user_id, xp_amount, created_at')
+              .in('user_id', userIds)
+              .gte('created_at', weekStartDate)
+              .order('id')
+              .range(lo, hi),
+          ),
           supabase
             .from('user_lesson_progress')
             .select('user_id')
@@ -206,7 +212,8 @@ export const POST = withRoute(
               lessonsCompletedThisWeek: lessonsCompletedCount,
               xpEarnedThisWeek,
               currentStreak: user.current_streak || 0,
-              daysStudiedThisWeek: studyDays.get(user.id)?.size ?? 0,
+              // A rolling 7x24h window can touch 8 calendar dates.
+              daysStudiedThisWeek: Math.min(7, studyDays.get(user.id)?.size ?? 0),
               weekNumber,
               proofStepText: nextStep && nextStep.kind !== 'none' ? nextStep.text : null,
               proofStepUrl: nextStep && nextStep.kind !== 'none' ? `${siteOrigin}${nextStep.path}` : null,

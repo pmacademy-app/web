@@ -29,7 +29,12 @@ const MAX_EXECUTION_MS = 50_000
  * `force=true` bypasses the per-user local-hour schedule window, matching the daily
  * reminder / weekly recap crons. Only the literal string 'true' has an effect.
  */
-const forceQuerySchema = z.object({ force: z.string().optional(), nudgeDryRun: z.string().optional() })
+const forceQuerySchema = z.object({
+  force: z.string().optional(),
+  dryRun: z.string().optional(),
+  /** Older name for dryRun. */
+  nudgeDryRun: z.string().optional(),
+})
 
 /**
  * Phase 1.5 — Lifecycle reactivation cron.
@@ -79,8 +84,10 @@ export const POST = withRoute(
     }
 
     const isForced = query.force === 'true'
-    // Growth R5 B6/B7: count who would get a proof nudge, send none (volume sign-off).
-    const nudgeDryRun = query.nudgeDryRun === 'true'
+    // Growth R5 B6/B7: count who would get a lifecycle email or a proof nudge, and write nothing
+    // at all: no email, no in-app, no holdout record. Counts cover learners in their delivery
+    // hour this run (add force=true to count everyone; still nothing is written).
+    const nudgeDryRun = query.dryRun === 'true' || query.nudgeDryRun === 'true'
     const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
     const nudgesSent: Record<ProofNudgeKey, number> = { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }
     let nudgesHeldOut = 0
@@ -216,7 +223,7 @@ export const POST = withRoute(
           // split is queryable for D14 measurement.
           if (isLifecycleHoldout(user.id, sequenceKey)) {
             heldOut++
-            await recordHoldoutEvent(supabase, user.id, sequenceKey)
+            if (!nudgeDryRun) await recordHoldoutEvent(supabase, user.id, sequenceKey)
             nudgeCandidates.push(nudgeCandidate)
             continue
           }
@@ -232,6 +239,12 @@ export const POST = withRoute(
             : null
 
         for (const { user, sequenceKey, userPref, localDate, nudgeCandidate } of lifecycleDue) {
+          if (nudgeDryRun) {
+            // Counted as it would be sent; the learner is then not a nudge candidate either.
+            lifecycleQueued++
+            queuedBySequence[sequenceKey]++
+            continue
+          }
           const idempotencyKey = `${sequenceKey}-${user.id}-${localDate}`
           const proofState = proofStates?.get(user.id)
           const nextStep = proofState ? selectProofNextStep(proofState) : null
@@ -258,7 +271,10 @@ export const POST = withRoute(
           if (result.success) {
             lifecycleQueued++
             queuedBySequence[sequenceKey]++
-          } else {
+          } else if (!result.duplicate) {
+            // A genuine skip (preference, toggle, suppression): the learner may get a nudge instead.
+            // A duplicate means today's lifecycle email already went out (an earlier run), so no
+            // nudge on top of it.
             nudgeCandidates.push(nudgeCandidate)
           }
         }
@@ -297,6 +313,7 @@ export const POST = withRoute(
       heldOut,
       skippedTimezone,
       skippedNoSegment,
+      dryRun: nudgeDryRun,
       proofNudges: { dryRun: nudgeDryRun, sent: nudgesSent, heldOut: nudgesHeldOut, pagesSkipped: nudgePagesSkipped },
     })
   }

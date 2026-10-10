@@ -7,6 +7,8 @@ import { buildPortfolioShareIntents, capstoneShareText, portfolioShareText } fro
 export interface CapstonePublishedProps {
   userName?: string
   moduleTitle?: string
+  /** The capstone's own title, quoted when sharing the case study page. */
+  capstoneTitle?: string | null
   /** The learner's public portfolio; null or absent when it is private (no share links). */
   portfolioUrl?: string | null
   /** The capstone's own public page (Growth R5 B13b); preferred over the portfolio when set. */
@@ -37,6 +39,7 @@ const shareLinkStyle: React.CSSProperties = {
 export const CapstonePublished: React.FC<CapstonePublishedProps> = ({
   userName = 'Learner',
   moduleTitle = 'your module',
+  capstoneTitle = null,
   portfolioUrl = null,
   casePageUrl = null,
   capstoneUrl = `${BRAND.siteUrl}/capstones`,
@@ -48,7 +51,7 @@ export const CapstonePublished: React.FC<CapstonePublishedProps> = ({
     ? buildPortfolioShareIntents(
         sharedUrl,
         casePageUrl
-          ? capstoneShareText(userName, moduleTitle, BRAND.fullName)
+          ? capstoneShareText(userName, capstoneTitle || moduleTitle, BRAND.fullName)
           : portfolioShareText(userName, BRAND.fullName),
         CAPSTONE_PUBLISHED_SHARE_CAMPAIGN,
       )

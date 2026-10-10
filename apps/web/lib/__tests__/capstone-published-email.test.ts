@@ -149,3 +149,18 @@ describe('CapstonePublished case-study link', () => {
     expect(html).toContain(encodeURIComponent('https://prodily.example/p/jordanpm/capstones/discovery'))
   })
 })
+
+describe('CapstonePublished share text', () => {
+  it("quotes the capstone's own title", async () => {
+    await globalNotificationDispatcher.dispatch(envelope(published))
+    expect((capstoneEmails()[0].templateVariables as Record<string, unknown>).capstoneTitle).toEqual(expect.any(String))
+    const { html } = await renderEmailTemplate('achievement.capstone_published', {
+      userName: 'Jordan',
+      moduleTitle: 'Users, Problems & Discovery',
+      capstoneTitle: 'Problem Discovery Brief',
+      portfolioUrl: 'https://prodily.example/p/jordanpm',
+      casePageUrl: 'https://prodily.example/p/jordanpm/capstones/discovery',
+    })
+    expect(html).toContain(encodeURIComponent('"Problem Discovery Brief"'))
+  })
+})

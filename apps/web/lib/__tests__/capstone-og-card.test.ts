@@ -35,7 +35,7 @@ describe('capstone OG card', () => {
     const res = await get('discovery')
     expect(res.status).toBe(200)
     expect(res.headers.get('content-type')).toContain('image/png')
-    expect(res.headers.get('cache-control')).toBe('public, max-age=60, s-maxage=3600, stale-while-revalidate=86400')
+    expect(res.headers.get('cache-control')).toBe('public, max-age=60, s-maxage=3600, stale-while-revalidate=600')
   })
 
   it.each([
