@@ -102,6 +102,14 @@ describe('ReferralShareModal — source', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
+  it('states the reward from the same constant the referral service awards', async () => {
+    const { REFERRAL_REWARD_XP } = await import('@/lib/referral/reward')
+    const { REFERRAL_ACTIVATION_XP } = await import('@/lib/referral/referral-service')
+    expect(REFERRAL_ACTIVATION_XP).toBe(REFERRAL_REWARD_XP)
+    await render(true)
+    expect(document.body.textContent).toContain(`you earn +${REFERRAL_REWARD_XP} XP`)
+  })
+
   it('sends only the source, never the link', async () => {
     await render(true, 'fellow_celebration')
     await copy()

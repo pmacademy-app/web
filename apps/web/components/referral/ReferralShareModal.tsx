@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { trackReferralLinkCopied, trackReferralModalOpened, trackReferralShared } from '@/lib/analytics'
 import { BRAND } from '@/lib/brand'
+import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 
 function LinkedInIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -93,7 +94,7 @@ export function ReferralShareModal({
             Invite Peers to {BRAND.product}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +50 XP!
+            Share your unique invite link with friends and colleagues. When they join and finish their first lesson, you earn +{REFERRAL_REWARD_XP} XP!
           </DialogDescription>
         </div>
 

@@ -8,6 +8,7 @@ import { ReferralShareModal } from '@/components/referral/ReferralShareModal'
 import { useApiQuery } from '@/lib/api/hooks'
 import type { ReferralStatsResponse } from '@/lib/api/contracts/settings'
 import { trackDashboardProofCardClicked } from '@/lib/analytics'
+import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 import type { PortfolioState } from '@/lib/dashboard/proof-card'
 import type { BadgeSummary, FellowSummary, LevelSummary } from '@/lib/dashboard/proof-extras'
 
@@ -160,7 +161,9 @@ export function ProofExtrasRow({ extras, portfolioState }: { extras: ProofExtras
         <span className={LABEL}>
           <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Peers
         </span>
-        <span className={VALUE}>Earn XP when a peer you invite finishes their first lesson</span>
+        <span className={VALUE}>
+          Earn +{REFERRAL_REWARD_XP} XP when a peer you invite finishes their first lesson
+        </span>
         <InvitePeers portfolioState={portfolioState} />
       </div>
     </div>

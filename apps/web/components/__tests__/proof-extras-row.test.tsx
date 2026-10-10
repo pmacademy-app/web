@@ -194,8 +194,8 @@ describe('ProofExtrasRow — invite peers', () => {
     expect(referralModal()).toBe(true)
   })
 
-  it('says how the referral reward works without a hardcoded amount', async () => {
+  it('states the referral reward the service actually awards', async () => {
     await render()
-    expect(document.body.textContent).toContain('Earn XP when a peer you invite finishes their first lesson')
+    expect(document.body.textContent).toContain('Earn +50 XP when a peer you invite finishes their first lesson')
   })
 })
