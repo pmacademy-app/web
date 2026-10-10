@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Send, Plus, Play, XCircle, Clock, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react'
 import { AdminCreateBroadcastModal } from './AdminCreateBroadcastModal'
 import { useApiQuery } from '@/lib/api/hooks'
+import { ADMIN_LIST_SWR_CONFIG } from './admin-swr-config'
 import { apiPost } from '@/lib/api/client'
 import type { AdminBroadcastsResponse } from '@/lib/api/contracts/admin'
 import type { BroadcastListResult } from '@/lib/admin/broadcast-service'
@@ -40,7 +41,7 @@ function ProgressBar({ sent, total }: { sent: number; total: number | null }) {
   return (
     <div className="flex items-center gap-2">
       <div className="w-24 h-1.5 rounded-full bg-admin-surface-raised overflow-hidden">
-        <div className="h-full bg-admin-success rounded-full transition-all" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-admin-success rounded-full transition-[width]" style={{ width: `${pct}%` }} />
       </div>
       <span className="text-[11px] text-admin-fg-muted font-mono">{sent}/{total}</span>
     </div>
@@ -57,8 +58,7 @@ export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsV
     '/api/admin/emails/broadcasts',
     {
       fallbackData: initialData ? { success: true, data: initialData } : undefined,
-      revalidateOnMount: false,
-      dedupingInterval: 5_000,
+      ...ADMIN_LIST_SWR_CONFIG,
     }
   )
 

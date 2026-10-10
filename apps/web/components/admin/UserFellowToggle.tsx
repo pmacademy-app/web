@@ -82,7 +82,7 @@ export function UserFellowToggle({ userId, initialIsFellow, userEmail }: UserFel
           type="button"
           onClick={() => setConfirmOpen(true)}
           disabled={loading}
-          className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 ${
+          className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-colors inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 ${
             isFellow
               ? 'bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted border-admin-border'
               : 'bg-admin-accent-soft hover:bg-admin-accent/20 text-admin-accent border-admin-accent/25'

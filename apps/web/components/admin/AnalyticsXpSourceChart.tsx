@@ -47,7 +47,7 @@ export function AnalyticsXpSourceChart({ data }: AnalyticsXpSourceChartProps) {
               return (
                 <div
                   key={item.source}
-                  className={`h-full ${colorClass} transition-all`}
+                  className={`h-full ${colorClass} transition-[width] duration-500 motion-reduce:transition-none`}
                   style={{ width: `${item.percentage}%` }}
                   title={`${item.label}: ${item.xp.toLocaleString()} XP (${item.percentage}%)`}
                 />

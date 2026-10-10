@@ -6,6 +6,7 @@ import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import { AdminErrorState } from './AdminErrorState'
 import { AdminEmptyState } from './AdminEmptyState'
 import { useApiQuery } from '@/lib/api/hooks'
+import { ADMIN_ALERTS_SWR_CONFIG } from './admin-swr-config'
 import { apiPatch } from '@/lib/api/client'
 import type { AdminSystemAlertsResponse } from '@/lib/api/contracts/admin'
 
@@ -90,10 +91,7 @@ export function AdminSystemAlertsView() {
   const swrKey = `/api/admin/system/alerts?${query.toString()}`
   const { data, error: queryError, isLoading, mutate: revalidateAlerts } = useApiQuery<AdminSystemAlertsResponse>(
     swrKey,
-    {
-      refreshInterval: 30_000,
-      dedupingInterval: 5_000,
-    }
+    ADMIN_ALERTS_SWR_CONFIG
   )
 
   const alerts = data?.success ? (data.alerts || []) : []
@@ -162,7 +160,7 @@ export function AdminSystemAlertsView() {
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-admin-fg">System Errors &amp; Alerts</h2>
               {unackCriticalCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-fg text-[10px] font-extrabold animate-pulse">
+                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-fg text-[10px] font-extrabold motion-safe:animate-pulse">
                   {unackCriticalCount} Critical
                 </span>
               )}

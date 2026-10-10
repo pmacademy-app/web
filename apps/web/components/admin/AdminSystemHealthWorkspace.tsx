@@ -109,7 +109,7 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealt
                 <span className="text-[10px] font-mono text-admin-fg-subtle">
                   {mounted && service.lastChecked ? `Checked ${formatTime(service.lastChecked)}` : 'Live telemetry'}
                 </span>
-                <span className="text-[11px] font-semibold text-admin-accent inline-flex items-center gap-0.5 group-hover:gap-1 transition-all">
+                <span className="text-[11px] font-semibold text-admin-accent inline-flex items-center gap-0.5 group-hover:gap-1 transition-[gap]">
                   View Details <ChevronRight className="w-3 h-3" />
                 </span>
               </div>

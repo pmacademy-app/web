@@ -286,7 +286,7 @@ export function AdminCreateInAppNotificationModal({
                   key={p.key}
                   type="button"
                   onClick={() => setPriority(p.key)}
-                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                  className={`p-2.5 rounded-lg border text-left transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
                     priority === p.key
                       ? `${p.color} ring-1 ring-admin-accent font-semibold`
                       : 'border-admin-border bg-admin-surface-raised/40 text-admin-fg-muted hover:border-admin-border-strong'

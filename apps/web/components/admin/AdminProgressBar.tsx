@@ -44,7 +44,7 @@ export function AdminProgressBar({
       >
         <div
           className={cn(
-            'h-full rounded-full bg-gradient-to-r from-admin-accent to-admin-info transition-all duration-500',
+            'h-full rounded-full bg-gradient-to-r from-admin-accent to-admin-info transition-[width] duration-500',
             barClassName
           )}
           style={{ width: `${clamped}%` }}

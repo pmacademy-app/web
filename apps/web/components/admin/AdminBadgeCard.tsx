@@ -43,7 +43,7 @@ export function AdminBadgeCard({
       type="button"
       onClick={onSelect}
       aria-label={`Open details for ${badge.name}`}
-      className="group flex flex-col gap-3 rounded-xl bg-admin-surface border border-admin-border p-5 text-left shadow-xl transition-all hover:border-admin-border-strong hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50 cursor-pointer"
+      className="group flex flex-col gap-3 rounded-xl bg-admin-surface border border-admin-border p-5 text-left shadow-xl transition-[border-color,box-shadow] hover:border-admin-border-strong hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
         <div

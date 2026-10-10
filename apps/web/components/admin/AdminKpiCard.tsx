@@ -29,7 +29,7 @@ export function AdminKpiCard({
   return (
     <div
       className={cn(
-        'p-5 rounded-xl bg-admin-surface border border-admin-border space-y-2 shadow-xl hover:border-admin-border-strong transition-all group relative overflow-hidden',
+        'p-5 rounded-xl bg-admin-surface border border-admin-border space-y-2 shadow-xl hover:border-admin-border-strong transition-colors group relative overflow-hidden',
         className
       )}
     >

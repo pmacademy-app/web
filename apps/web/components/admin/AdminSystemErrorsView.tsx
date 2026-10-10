@@ -9,6 +9,7 @@ import { AdminErrorSeverityBadge, AdminErrorStatusBadge } from './AdminErrorBadg
 import { AdminErrorDetailDrawer } from './AdminErrorDetailDrawer'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import { useApiQuery } from '@/lib/api/hooks'
+import { ADMIN_LIST_SWR_CONFIG } from './admin-swr-config'
 import type { AdminErrorGroup, AdminErrorGroupResult } from '@/lib/admin/types'
 import type { AdminSystemErrorsResponse } from '@/lib/api/contracts/admin'
 import type { ErrorCategory } from '@/lib/monitoring/logger'
@@ -49,8 +50,7 @@ export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
     mutate: revalidateErrors,
   } = useApiQuery<AdminSystemErrorsResponse>(swrKey, {
     fallbackData: initial,
-    revalidateOnMount: false,
-    dedupingInterval: 5_000,
+    ...ADMIN_LIST_SWR_CONFIG,
   })
 
   const data = queryData || initial

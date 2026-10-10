@@ -19,6 +19,7 @@ import { AdminSection } from './AdminSection'
 import { AdminAnnouncementEditorModal } from './AdminAnnouncementEditorModal'
 import { useAdminToast } from './admin-toast'
 import { useApiQuery } from '@/lib/api/hooks'
+import { ADMIN_LIST_SWR_CONFIG } from './admin-swr-config'
 import { apiPost, apiDelete } from '@/lib/api/client'
 import type { AdminAnnouncementsResponse } from '@/lib/api/contracts/admin'
 import type { SystemAnnouncementItem } from '@/lib/admin/announcements-service'
@@ -41,8 +42,7 @@ export function AdminAnnouncementsView({ initialAnnouncements }: AdminAnnounceme
     '/api/admin/announcements',
     {
       fallbackData: { success: true, announcements: initialAnnouncements },
-      revalidateOnMount: false,
-      dedupingInterval: 5_000,
+      ...ADMIN_LIST_SWR_CONFIG,
     }
   )
   const announcements = data?.announcements ?? initialAnnouncements
@@ -206,7 +206,7 @@ export function AdminAnnouncementsView({ initialAnnouncements }: AdminAnnounceme
               setSelectedItem(null)
               setEditorOpen(true)
             }}
-            className="px-3 py-1.5 rounded-lg bg-admin-accent text-admin-accent-contrast hover:bg-admin-accent/90 text-xs font-bold transition-all shadow-md inline-flex items-center gap-1.5 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-admin-accent text-admin-accent-contrast hover:bg-admin-accent/90 text-xs font-bold transition-colors shadow-md inline-flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             New Announcement

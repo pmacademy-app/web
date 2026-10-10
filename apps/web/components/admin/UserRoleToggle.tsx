@@ -63,7 +63,7 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
       <button
         onClick={() => setConfirmOpen(true)}
         disabled={loading}
-        className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-all inline-flex items-center gap-1 ${
+        className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-colors inline-flex items-center gap-1 ${
           isAdmin
             ? 'bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted border-admin-border'
             : 'bg-admin-info-soft hover:bg-admin-info/20 text-admin-info border-admin-info/25'

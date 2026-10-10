@@ -15,7 +15,7 @@ export function AdminModuleCard({ module, href }: { module: AdminModuleOverview;
   return (
     <Link
       href={href}
-      className="group relative flex flex-col gap-4 rounded-xl bg-admin-surface border border-admin-border p-5 shadow-xl transition-all hover:border-admin-border-strong hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
+      className="group relative flex flex-col gap-4 rounded-xl bg-admin-surface border border-admin-border p-5 shadow-xl transition-[border-color,box-shadow] hover:border-admin-border-strong hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">

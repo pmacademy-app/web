@@ -255,7 +255,7 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-all"
+              className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               {isSubmitting ? 'Creating…' : 'Create Template'}

@@ -110,7 +110,7 @@ export function UserPortfolioVerificationToggle({
               onClick={() => applyOverride(null, 'auto')}
               disabled={loading !== null}
               title="Restore automatic evaluation"
-              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted border-admin-border transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted border-admin-border transition-colors inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
             >
               {loading === 'auto' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
               Reset to Auto
@@ -122,7 +122,7 @@ export function UserPortfolioVerificationToggle({
               onClick={() => applyOverride('verified', 'verified')}
               disabled={loading !== null}
               title="Manually verify this portfolio"
-              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border-admin-success/25 transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border-admin-success/25 transition-colors inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
             >
               {loading === 'verified' ? <Loader2 className="w-3 h-3 animate-spin" /> : success && loading === null ? <Check className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
               Verify
@@ -134,7 +134,7 @@ export function UserPortfolioVerificationToggle({
               onClick={() => applyOverride('rejected', 'rejected')}
               disabled={loading !== null}
               title="Manually remove verification from this portfolio"
-              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger border-admin-danger/25 transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              className="px-2 py-1 rounded text-[11px] font-semibold border bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger border-admin-danger/25 transition-colors inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
             >
               {loading === 'rejected' ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldX className="w-3 h-3" />}
               Reject

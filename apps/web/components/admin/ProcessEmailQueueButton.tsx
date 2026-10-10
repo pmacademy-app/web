@@ -37,7 +37,7 @@ export function ProcessEmailQueueButton() {
       <button
         onClick={handleProcessQueue}
         disabled={loading}
-        className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-lg disabled:opacity-50"
+        className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-lg disabled:opacity-50"
       >
         {loading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin fill-admin-accent-fg" />

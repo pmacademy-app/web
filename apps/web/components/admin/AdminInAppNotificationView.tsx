@@ -307,7 +307,7 @@ export function AdminInAppNotificationView({
           {item.totalDelivered > 0 && (
             <div className="w-full bg-admin-surface-raised h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-admin-accent h-full rounded-full transition-all"
+                className="bg-admin-accent h-full rounded-full transition-[width]"
                 style={{ width: `${Math.min(100, item.readRate)}%` }}
               />
             </div>

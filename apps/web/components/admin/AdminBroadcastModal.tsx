@@ -223,7 +223,7 @@ export function AdminBroadcastModal({ open, onClose }: AdminBroadcastModalProps)
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer transition-all"
+                className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer transition-colors"
               >
                 Review & Confirm Send
               </button>
@@ -273,7 +273,7 @@ export function AdminBroadcastModal({ open, onClose }: AdminBroadcastModalProps)
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleExecuteBroadcast}
-                className="px-4 py-2 text-xs font-bold text-white bg-admin-danger hover:bg-admin-danger/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-all"
+                className="px-4 py-2 text-xs font-bold text-white bg-admin-danger hover:bg-admin-danger/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
                 {isSubmitting ? 'Dispatching…' : 'Confirm & Push Notification'}

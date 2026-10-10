@@ -155,7 +155,7 @@ export function AdminAnnouncementEditorModal({
               {/* Exact user banner component visual representation */}
               <div className="border border-admin-border rounded-xl overflow-hidden shadow-lg bg-black/40">
                 <div
-                  className={`relative w-full border-b py-3 px-4 sm:px-6 transition-all ${
+                  className={`relative w-full border-b py-3 px-4 sm:px-6 transition-colors ${
                     type === 'warning'
                       ? 'bg-gradient-to-r from-amber-950/80 via-orange-950/80 to-amber-950/80 border-amber-500/30 text-amber-100'
                       : type === 'critical'
@@ -378,7 +378,7 @@ export function AdminAnnouncementEditorModal({
               type="button"
               disabled={isSubmitting}
               onClick={() => handleSubmit('active')}
-              className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-all"
+              className="px-4 py-2 text-xs font-bold text-admin-accent-contrast bg-admin-accent hover:bg-admin-accent/90 rounded-lg inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50 transition-colors"
             >
               <Send className="w-3.5 h-3.5" />
               {isSubmitting ? 'Saving…' : 'Publish Immediately'}

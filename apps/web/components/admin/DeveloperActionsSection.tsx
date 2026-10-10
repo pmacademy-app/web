@@ -84,7 +84,7 @@ export function DeveloperActionsSection({ targetUserId, targetUserEmail }: Devel
         <button
           onClick={handleGenerateTestCertificate}
           disabled={loading}
-          className="flex items-center justify-between p-3 rounded-lg bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg hover:text-admin-fg border border-admin-border hover:border-admin-accent/40 text-xs font-semibold transition-all disabled:opacity-50 text-left group"
+          className="flex items-center justify-between p-3 rounded-lg bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg hover:text-admin-fg border border-admin-border hover:border-admin-accent/40 text-xs font-semibold transition-colors disabled:opacity-50 text-left group"
         >
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded bg-admin-accent-soft text-admin-accent border border-admin-accent/25">
@@ -106,7 +106,7 @@ export function DeveloperActionsSection({ targetUserId, targetUserEmail }: Devel
         <button
           type="button"
           onClick={() => setProdModalOpen(true)}
-          className="flex items-center justify-between p-3 rounded-lg bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border border-admin-success/25 text-xs font-semibold transition-all text-left group cursor-pointer col-span-1 md:col-span-2"
+          className="flex items-center justify-between p-3 rounded-lg bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border border-admin-success/25 text-xs font-semibold transition-colors text-left group cursor-pointer col-span-1 md:col-span-2"
         >
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded bg-admin-success/20 text-admin-success border border-admin-success/25">

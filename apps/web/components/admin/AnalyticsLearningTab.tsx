@@ -4,7 +4,7 @@ import React from 'react'
 import { BookOpen, GraduationCap, TrendingUp, HelpCircle } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminSection } from './AdminSection'
-import { AdminLearningActivityChart } from './AdminLearningActivityChart'
+import { AdminLearningActivityChartLazy as AdminLearningActivityChart } from './charts-lazy'
 import type { AdminLearningDeepAnalytics } from '@/lib/admin/types'
 
 
@@ -134,7 +134,7 @@ export function AnalyticsLearningTab({ data }: AnalyticsLearningTabProps) {
                     <span className="w-20 text-admin-fg-muted font-mono">{bucket.range}</span>
                     <div className="flex-1 h-2 rounded-full bg-admin-surface-raised border border-admin-border overflow-hidden">
                       <div
-                        className="h-full bg-admin-info rounded-full transition-all"
+                        className="h-full bg-admin-info rounded-full transition-[width] duration-500 motion-reduce:transition-none"
                         style={{ width: `${(bucket.count / max) * 100}%` }}
                       />
                     </div>
