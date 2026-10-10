@@ -400,23 +400,6 @@ export class FeedbackAdminService {
   }
 
   /**
-   * Fetches private product feedback items for Admin Console with author email resolution.
-   */
-  public static async getPrivateFeedbackList(): Promise<AdminPrivateFeedbackItem[]> {
-    const supabase = createServiceRoleClient()
-
-    const { data, error } = await supabase
-      .from('user_feedback')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100)
-
-    if (error || !data) return []
-
-    return this.toPrivateFeedbackItems(supabase, data as PrivateFeedbackRow[])
-  }
-
-  /**
    * One page of private product feedback (admin R6 B7).
    *
    * Filter: FeedbackListView has no filter today, so `status` defaults to 'all'; a known

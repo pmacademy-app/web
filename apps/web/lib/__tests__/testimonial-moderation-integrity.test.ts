@@ -84,8 +84,9 @@ describe('Phase 3 — Final Admin Panel End-to-End Integrity', () => {
 
   it('correctly attributes feedback to active learners, deleted accounts, and anonymous submitters', async () => {
     const { FeedbackAdminService } = await import('@/lib/admin/feedback-service')
-    const list = await FeedbackAdminService.getPrivateFeedbackList()
-    expect(Array.isArray(list)).toBe(true)
+    const page = await FeedbackAdminService.getPrivateFeedbackPage()
+    expect(page.failed).toBe(false)
+    expect(Array.isArray(page.items)).toBe(true)
   })
 
   it('supports acknowledging and resolving system error groups with audit logging', async () => {

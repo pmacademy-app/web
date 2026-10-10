@@ -11,7 +11,6 @@
  */
 
 import { createServiceRoleClient } from '../supabase'
-import { fetchAllRows } from './fetch-all'
 import { logAdminAction } from './guard'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { MAX_OFFSET, MAX_PAGE_SIZE } from '@/lib/api/pagination'
@@ -223,37 +222,6 @@ export class ModerationService {
   /** Resolves a learner display name from a user row (or a fallback). */
   private static resolveLearnerName(user: UserRow | undefined, fallback: string): string {
     return user?.name || user?.username || user?.email?.split('@')[0] || fallback
-  }
-
-  /**
-   * Capstone submissions for the Moderation queue (spec §5.6).
-   * `statusFilter` is one of 'all' | 'submitted' | 'reviewed' | 'draft'.
-   * Learner names come from the `users` table; module titles from config.
-   */
-  public static async getCapstones(
-    statusFilter: string = 'all'
-  ): Promise<{ capstones: AdminCapstoneRow[]; failed: boolean }> {
-    const supabase = createServiceRoleClient()
-    try {
-      const submissions = await fetchAllRows<CapstoneSubmissionRow>((from, to) =>
-        supabase.from('capstone_submissions').select('*').order('submitted_at', { ascending: false }).range(from, to)
-      )
-
-      const userMap = await this.fetchUsersByIds(
-        supabase,
-        submissions.map((s) => s.user_id).filter((id): id is string => Boolean(id))
-      )
-
-      const all: AdminCapstoneRow[] = submissions.map((s) => this.toCapstoneRow(s, userMap))
-
-      const filtered =
-        statusFilter && statusFilter !== 'all' ? all.filter((c) => c.status === statusFilter) : all
-
-      return { capstones: filtered, failed: false }
-    } catch (err) {
-      console.warn('[ModerationService] getCapstones failed:', err)
-      return { capstones: [], failed: true }
-    }
   }
 
   /** Maps a submission row onto the admin capstone shape (learner name + module titles). */
@@ -587,35 +555,6 @@ export class ModerationService {
       })
     } catch (err) {
       console.error('[ModerationService] capstone.reviewed dispatch failed:', err)
-    }
-  }
-
-  /**
-   * Public portfolio directory & verification queue:
-   * Retrieves all users with public portfolios, enriched with project count and verification status.
-   */
-  public static async getPortfolios(): Promise<{ portfolios: AdminPortfolioRow[]; failed: boolean }> {
-    const supabase = createServiceRoleClient()
-    try {
-      const users = await fetchAllRows<UserRow>((from, to) =>
-        supabase
-          .from('users')
-          .select('id, name, username, email, avatar_url, bio, is_fellow, is_portfolio_public, created_at')
-          .eq('is_portfolio_public', true)
-          .order('created_at', { ascending: false })
-          .range(from, to)
-      )
-
-      const capstoneCountMap = await this.fetchPublicCapstoneCounts(
-        supabase,
-        users.map((u) => u.id).filter(Boolean)
-      )
-      const portfolios: AdminPortfolioRow[] = users.map((u) => this.toPortfolioRow(u, capstoneCountMap))
-
-      return { portfolios, failed: false }
-    } catch (err) {
-      console.warn('[ModerationService] getPortfolios failed:', err)
-      return { portfolios: [], failed: true }
     }
   }
 
