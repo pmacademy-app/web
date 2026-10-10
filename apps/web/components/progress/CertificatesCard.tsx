@@ -1,7 +1,11 @@
 import Link from 'next/link'
 import { Award as CertIcon, ExternalLink } from 'lucide-react'
 import type { CertificateRow } from '@/lib/certificates-db'
-import { TEST_CERTIFICATE_EXPLANATION, getCertificatePresentation } from '@/lib/certificates/presentation'
+import {
+  TEST_CERTIFICATE_EXPLANATION,
+  getCertificatePresentation,
+  getCertificateRowCopy,
+} from '@/lib/certificates/presentation'
 
 interface CertificatesCardProps {
   certificates: CertificateRow[]
@@ -61,6 +65,7 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
               return <TestCertificateRow key={cert.id} cert={cert} statusLabel={statusLabel} />
             }
 
+            const copy = getCertificateRowCopy(cert)
             return (
               <div
                 key={cert.id}
@@ -71,10 +76,10 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
                     {statusLabel} • {cert.certificate_code}
                   </span>
                   <h3 className="text-lg font-bold font-serif text-foreground">
-                    Prodily PM Academy Full Curriculum Completion Certificate
+                    {copy.title}
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Issued on {new Date(cert.issued_at).toLocaleDateString()} for mastering 90 lessons and achieving Level {cert.level} ({cert.career_title}).
+                    {copy.detail}
                   </p>
                 </div>
 

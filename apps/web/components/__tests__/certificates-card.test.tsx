@@ -115,7 +115,7 @@ describe('CertificatesCard', () => {
     expect(row.querySelector('span')?.textContent).toBe(`Verified Credential • ${REAL_CODE}`)
     expect(row.querySelector('h3')?.textContent).toBe('Prodily PM Academy Full Curriculum Completion Certificate')
     expect(row.querySelector('p')?.textContent).toMatch(
-      /^Issued on .+ for mastering 90 lessons and achieving Level 9 \(Principal PM\)\.$/
+      /^Issued on .+ for completing all 90 lessons and reaching Level 9 \(Principal PM\)\.$/
     )
     const link = row.querySelector('a')
     expect(link?.textContent).toBe('View Verified Certificate')
@@ -124,6 +124,16 @@ describe('CertificatesCard', () => {
 
     expect(container.textContent).not.toContain(TEST_LABEL)
     expect(container.textContent).not.toContain('Admin Test Certificate')
+  })
+
+  // Growth R5 / F4: a module certificate is titled by its module, not as the full curriculum.
+  it('titles a module certificate by its module', () => {
+    render([certificate({ id: 'cert-mod', type: 'module', module_slug: 'discovery', lessons_completed: 10 })])
+    const row = rowFor(REAL_CODE)
+
+    expect(row.querySelector('h3')?.textContent).toBe('Users, Problems & Discovery Module Certificate')
+    expect(row.querySelector('p')?.textContent).toMatch(/for completing every lesson in Users, Problems & Discovery\.$/)
+    expect(container.textContent).not.toContain('Full Curriculum')
   })
 
   it('labels each row by its own code when a learner has both', () => {

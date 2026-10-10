@@ -8,6 +8,7 @@
  */
 import { BRAND } from '@/lib/brand'
 import { isTestCertificateCode } from '@/lib/certificates'
+import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
 
 export const VERIFIED_CREDENTIAL_LABEL = 'Verified Credential'
 export const TEST_CERTIFICATE_LABEL = 'Test certificate — not a valid credential'
@@ -72,5 +73,33 @@ export function getVerifyPageCopy({
     metaDescription: `Official ${BRAND.fullName} Certificate of Completion for ${learnerName} (${careerTitle}, ${lessonsCompleted} lessons completed). Certificate ID: ${certificateCode}.`,
     indexable: true,
     footerLine: `Official Verified Credential. ${BRAND.certificateIssuerLine}.`,
+  }
+}
+
+export interface CertificateRowCopyInput {
+  type: string
+  module_slug: string | null
+  lessons_completed: number
+  level: number
+  career_title: string
+  issued_at: string
+}
+
+/**
+ * Title and detail line for a real certificate in a list. A module certificate is titled by its
+ * module; only the full-curriculum certificate is called a curriculum completion certificate.
+ */
+export function getCertificateRowCopy(cert: CertificateRowCopyInput): { title: string; detail: string } {
+  const issued = new Date(cert.issued_at).toLocaleDateString()
+  if (cert.type !== 'full_curriculum') {
+    const moduleName = (cert.module_slug && CURRICULUM_MODULE_META[cert.module_slug]?.name) || 'Module'
+    return {
+      title: `${moduleName} Module Certificate`,
+      detail: `Issued on ${issued} for completing every lesson in ${moduleName}.`,
+    }
+  }
+  return {
+    title: `${BRAND.fullName} Full Curriculum Completion Certificate`,
+    detail: `Issued on ${issued} for completing all ${cert.lessons_completed} lessons and reaching Level ${cert.level} (${cert.career_title}).`,
   }
 }
