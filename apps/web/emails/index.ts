@@ -10,6 +10,7 @@ import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
 import { FellowGranted } from './templates/achievement/FellowGranted'
+import { CapstonePublished } from './templates/achievement/CapstonePublished'
 import { DirectMessageEmail } from './templates/admin/DirectMessage'
 import { BRAND } from '@/lib/brand'
 
@@ -65,6 +66,10 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'achievement.fellow_granted': {
     component: FellowGranted,
     subjectLine: `You're now a ${BRAND.company} PM Fellow!`,
+  },
+  'achievement.capstone_published': {
+    component: CapstonePublished,
+    subjectLine: 'Your capstone is published',
   },
 
   // Scheduled Digests & Reminders

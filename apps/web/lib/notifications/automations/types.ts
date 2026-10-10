@@ -9,6 +9,7 @@ export type EmailAutomationKey =
   | 'achievement.certificate'
   | 'achievement.portfolio_published'
   | 'achievement.fellow_granted'
+  | 'achievement.capstone_published'
   | 'learning.weekly_recap'
   | 'learning.daily_reminder'
   | 'inactive.resume_learning'

@@ -248,4 +248,35 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       idempotencyKey: `fellow-granted:${event.id}`,
     })
   })
+
+  // Growth R5 B5: capstone.reviewed (published) -> achievement.capstone_published
+  d.registerHandler('capstone.reviewed', 'connector.achievement.capstone_published', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // A rejection or unpublished review is not news worth an email.
+    if (event.payload.isPublished !== true || !event.userEmail) return
+    const submissionId = typeof event.payload.submissionId === 'string' ? event.payload.submissionId : ''
+    if (!submissionId) return
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
+    const username = typeof event.payload.username === 'string' ? event.payload.username : ''
+    const moduleSlug = typeof event.payload.moduleSlug === 'string' ? event.payload.moduleSlug : ''
+    await enqueueNotificationItem({
+      userId: event.userId,
+      toEmail: event.userEmail,
+      toName: event.userName,
+      channel: 'email',
+      templateKey: 'achievement.capstone_published',
+      templateVariables: {
+        userName: event.userName || 'Learner',
+        moduleTitle: event.payload.moduleTitle || 'your module',
+        portfolioUrl:
+          username && event.payload.isPortfolioPublic === true ? `${origin}/p/${encodeURIComponent(username)}` : null,
+        capstoneUrl: moduleSlug ? `${origin}/capstones/${encodeURIComponent(moduleSlug)}` : `${origin}/capstones`,
+      },
+      eventId: event.id,
+      eventType: event.event,
+      category: 'achievements',
+      priorityLevel: 'medium',
+      // One email per published submission, however often the review is retried.
+      idempotencyKey: `capstone-published-email-${submissionId}`,
+    })
+  })
 }
