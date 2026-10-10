@@ -15,6 +15,7 @@ import { UsersFilterBar } from './UsersFilterBar'
 import { UserDetailDrawer } from './UserDetailDrawer'
 import { serializeUserFilters } from '@/lib/admin/users-aggregation'
 import type { AdminUserOverview, AdminUserDetail, AdminUserFilters } from '@/lib/admin/types'
+import type { AdminUserProofSummary } from '@/lib/admin/user-proof-service'
 
 export interface UsersWorkspaceKpis {
   totalUsers: number
@@ -29,6 +30,8 @@ interface UsersWorkspaceProps {
   /** True when the server-side list query failed (renders an error state). */
   initialLoadFailed?: boolean
   initialSelectedUser: AdminUserDetail | null
+  /** Proof state for the selected user; null when none is selected or the load failed. */
+  initialProof?: AdminUserProofSummary | null
   initialSearch: string
   initialPage: number
   initialFilters: AdminUserFilters
@@ -42,6 +45,7 @@ export function UsersWorkspace({
   initialTotal,
   initialLoadFailed = false,
   initialSelectedUser,
+  initialProof,
   initialSearch,
   initialPage,
   initialFilters,
@@ -344,6 +348,7 @@ export function UsersWorkspace({
       <UserDetailDrawer
         userId={activeUserId}
         user={initialSelectedUser}
+        proof={initialProof}
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
       />

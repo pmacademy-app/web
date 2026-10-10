@@ -2,6 +2,7 @@ import React from 'react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { UsersWorkspace } from '@/components/admin/UsersWorkspace'
 import { parseUserFilters } from '@/lib/admin/users-aggregation'
+import { getUserProofSummary, type AdminUserProofSummary } from '@/lib/admin/user-proof-service'
 import type { AdminUserDetail } from '@/lib/admin/types'
 
 export const revalidate = 0
@@ -30,8 +31,13 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   ])
 
   let selectedUserDetail: AdminUserDetail | null = null
+  // Proof state is a separate loader (Admin R6 / C3); null means it failed and the drawer says so.
+  let selectedUserProof: AdminUserProofSummary | null = null
   if (userId) {
-    selectedUserDetail = await AdminConsoleService.getUserDetailData(userId)
+    ;[selectedUserDetail, selectedUserProof] = await Promise.all([
+      AdminConsoleService.getUserDetailData(userId),
+      getUserProofSummary(userId),
+    ])
   }
 
   return (
@@ -40,6 +46,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       initialTotal={total}
       initialLoadFailed={Boolean(failed)}
       initialSelectedUser={selectedUserDetail}
+      initialProof={selectedUserProof}
       initialSearch={search}
       initialPage={page}
       initialFilters={filters}

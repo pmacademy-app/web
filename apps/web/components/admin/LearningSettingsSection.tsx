@@ -1,12 +1,25 @@
 'use client'
 
 import React from 'react'
-import { Zap, RotateCcw, Save } from 'lucide-react'
+import { Zap, RotateCcw, Save, Info } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { SettingRow } from './SettingRow'
 import { NumberInput } from './NumberInput'
 import type { LearningSettings } from '@/lib/admin/types'
 import type { SettingsSectionKey } from '@/lib/admin/types'
+
+/**
+ * Stored LearningSettings fields that no runtime code reads yet. They have no inputs here;
+ * the panel lists them so admins know they exist but change nothing.
+ */
+const UNUSED_LEARNING_SETTINGS: ReadonlyArray<string> = [
+  'streak freezes',
+  'streak freeze cost',
+  'certificate auto-issue',
+  'certificate expiry',
+  'lesson completion required for progress',
+  'quiz pass threshold',
+]
 
 interface LearningSettingsSectionProps {
   sectionKey: SettingsSectionKey
@@ -35,6 +48,7 @@ export function LearningSettingsSection({
     <div className="space-y-6">
       {/* XP Group */}
       <AdminSection title="XP Rewards" icon={Zap} meta="Experience points for learning activities">
+        <p className="pb-2 text-xs text-admin-fg-muted">Changes apply within a minute on all servers.</p>
         <SettingRow
           label="XP for reading a lesson"
           description="XP awarded when a learner reads a lesson's theory (once per lesson)."
@@ -148,8 +162,14 @@ export function LearningSettingsSection({
         </SettingRow>
       </AdminSection>
 
-
-
+      <div className="flex items-start gap-2 rounded-lg border border-admin-border bg-admin-surface-raised/40 px-4 py-3 text-xs text-admin-fg-muted">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        <p>
+          <span className="font-semibold text-admin-fg">Not used by the app yet:</span>{' '}
+          {UNUSED_LEARNING_SETTINGS.join(', ')}. These are stored with the settings but nothing
+          reads them, so they have no controls here.
+        </p>
+      </div>
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-admin-border pt-4">
