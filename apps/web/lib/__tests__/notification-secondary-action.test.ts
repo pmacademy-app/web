@@ -64,3 +64,28 @@ describe('B0 migration', () => {
     )
   })
 })
+
+describe('P2 migration (celebrated_at)', () => {
+  const dir = path.resolve(__dirname, '../../../../supabase/migrations')
+  const code = (file: string) => fs.readFileSync(path.join(dir, file), 'utf8').replace(/--.*$/gm, '')
+  const up = code('20261011000002_in_app_notification_celebrated_at.sql')
+
+  it('adds a nullable celebrated_at column and a partial index for the claim', () => {
+    expect(up).toMatch(/ADD COLUMN IF NOT EXISTS celebrated_at timestamptz;/)
+    expect(up).toMatch(/WHERE celebrated_at IS NULL AND idempotency_key IS NOT NULL/)
+  })
+
+  it('treats every already-read achievement row as celebrated, for each claimable prefix', () => {
+    expect(up).toMatch(/SET celebrated_at = coalesce\(read_at, created_at\)/)
+    expect(up).toMatch(/WHERE is_read = true/)
+    for (const prefix of ['certificate-generated-', 'capstone-reviewed-', 'fellow-granted-', 'module-completed-']) {
+      expect(up).toContain(`idempotency_key LIKE '${prefix}%'`)
+    }
+  })
+
+  it('ships a rollback', () => {
+    expect(code('rollback/20261011000002_in_app_notification_celebrated_at.down.sql')).toMatch(
+      /DROP COLUMN IF EXISTS celebrated_at/,
+    )
+  })
+})

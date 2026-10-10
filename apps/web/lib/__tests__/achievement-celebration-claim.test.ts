@@ -46,7 +46,7 @@ type TableName = 'in_app_notifications' | 'users' | 'certificates' | 'capstone_s
 const COLUMNS: Record<TableName, readonly string[]> = {
   in_app_notifications: [
     'id', 'user_id', 'event_id', 'category', 'title', 'body', 'action_url', 'priority',
-    'is_read', 'read_at', 'expires_at', 'created_at', 'idempotency_key',
+    'is_read', 'read_at', 'expires_at', 'created_at', 'idempotency_key', 'celebrated_at',
   ],
   users: ['id', 'username', 'name', 'email', 'is_portfolio_public', 'is_fellow'],
   certificates: [
@@ -61,7 +61,7 @@ const COLUMNS: Record<TableName, readonly string[]> = {
 }
 
 interface Filter {
-  op: 'eq' | 'gte' | 'gt' | 'in' | 'or'
+  op: 'eq' | 'gte' | 'gt' | 'in' | 'or' | 'is'
   column: string
   value: unknown
 }
@@ -74,7 +74,7 @@ interface QueryRecord {
   filters: Filter[]
 }
 
-const BUILDER_METHODS = ['select', 'update', 'eq', 'gte', 'gt', 'in', 'or', 'order', 'limit', 'maybeSingle', 'then']
+const BUILDER_METHODS = ['select', 'update', 'eq', 'is', 'gte', 'gt', 'in', 'or', 'order', 'limit', 'maybeSingle', 'then']
 
 function createFakeSupabase(seed: Partial<Record<TableName, Row[]>> = {}) {
   const tables: Record<TableName, Row[]> = {
@@ -109,6 +109,10 @@ function createFakeSupabase(seed: Partial<Record<TableName, Row[]>> = {}) {
     switch (filter.op) {
       case 'eq':
         return row[filter.column] === filter.value
+      case 'is':
+        // Only the shape the claim uses: `.is(column, null)`.
+        if (filter.value !== null) return violate(`unsupported is() value on ${filter.column}`)
+        return row[filter.column] === null || row[filter.column] === undefined
       case 'gte':
         return Date.parse(String(row[filter.column])) >= Date.parse(String(filter.value))
       case 'gt':
@@ -223,6 +227,7 @@ function createFakeSupabase(seed: Partial<Record<TableName, Row[]>> = {}) {
         return builder
       },
       eq: (column: string, value: unknown) => addFilter('eq', column, value),
+      is: (column: string, value: unknown) => addFilter('is', column, value),
       gte: (column: string, value: unknown) => addFilter('gte', column, value),
       gt: (column: string, value: unknown) => addFilter('gt', column, value),
       in: (column: string, values: unknown[]) => addFilter('in', column, values),
@@ -298,6 +303,7 @@ function notificationRow(id: string, idempotencyKey: string, overrides: Row = {}
     priority: 2,
     is_read: false,
     read_at: null,
+    celebrated_at: null,
     created_at: ago(HOUR_MS),
     expires_at: ahead(44 * DAY_MS),
     ...overrides,
@@ -617,13 +623,32 @@ describe('claimNextAchievementCelebration — selection and ordering', () => {
     expect(db.queriesOn('users')).toEqual([])
   })
 
-  it('ignores already-read achievement notifications', async () => {
+  // Growth R5 P2: reading a notification in the bell no longer uses up its celebration.
+  it('still celebrates a notification already read in the bell, keeping its read_at', async () => {
     db = createFakeSupabase({
       users: [userRow()],
       in_app_notifications: [
         notificationRow('n-cert', 'certificate-generated-PMA-2026-AAAA1111', {
           is_read: true,
           read_at: ago(HOUR_MS),
+        }),
+      ],
+      certificates: [certificateRow('PMA-2026-AAAA1111')],
+    })
+
+    expect(await claim(db)).toMatchObject({ kind: 'certificate', notificationId: 'n-cert' })
+    expect(db.updates()[0].payload).toEqual({ celebrated_at: NOW.toISOString(), is_read: true })
+    expect(db.notification('n-cert')).toMatchObject({ read_at: ago(HOUR_MS), celebrated_at: NOW.toISOString() })
+  })
+
+  it('ignores already-celebrated achievement notifications', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-cert', 'certificate-generated-PMA-2026-AAAA1111', {
+          is_read: true,
+          read_at: ago(HOUR_MS),
+          celebrated_at: ago(HOUR_MS),
         }),
       ],
       certificates: [certificateRow('PMA-2026-AAAA1111')],
@@ -715,7 +740,7 @@ describe('claimNextAchievementCelebration — selection and ordering', () => {
     }
   })
 
-  it('claims with a compare-and-set on id, user and is_read = false', async () => {
+  it('claims with a compare-and-set on id, user and celebrated_at IS NULL', async () => {
     db = createFakeSupabase({
       users: [userRow()],
       in_app_notifications: [notificationRow('n-cert', 'certificate-generated-PMA-2026-AAAA1111')],
@@ -729,11 +754,11 @@ describe('claimNextAchievementCelebration — selection and ordering', () => {
         table: 'in_app_notifications',
         kind: 'update',
         columns: 'id',
-        payload: { is_read: true, read_at: NOW.toISOString() },
+        payload: { celebrated_at: NOW.toISOString(), is_read: true, read_at: NOW.toISOString() },
         filters: [
           { op: 'eq', column: 'id', value: 'n-cert' },
           { op: 'eq', column: 'user_id', value: USER },
-          { op: 'eq', column: 'is_read', value: false },
+          { op: 'is', column: 'celebrated_at', value: null },
         ],
       },
     ])
@@ -745,14 +770,14 @@ describe('claimNextAchievementCelebration — selection and ordering', () => {
       in_app_notifications: [notificationRow('n-cert', 'certificate-generated-PMA-2026-AAAA1111')],
       certificates: [certificateRow('PMA-2026-AAAA1111')],
     })
-    // Another tab marks the row read after this call selected it but before it wrote.
+    // Another tab celebrates the row after this call selected it but before it wrote.
     db.hooks.beforeUpdate = () => {
-      Object.assign(db.notification('n-cert') as Row, { is_read: true, read_at: 'other-tab' })
+      Object.assign(db.notification('n-cert') as Row, { celebrated_at: 'other-tab' })
     }
 
     expect(await claim(db)).toBeNull()
     expect(db.updates()).toHaveLength(1)
-    expect(db.notification('n-cert')).toMatchObject({ read_at: 'other-tab' })
+    expect(db.notification('n-cert')).toMatchObject({ celebrated_at: 'other-tab' })
   })
 
   it('falls through to the next candidate when another tab wins the first', async () => {
@@ -767,7 +792,7 @@ describe('claimNextAchievementCelebration — selection and ordering', () => {
     })
     db.hooks.beforeUpdate = (query) => {
       const targetsCertificate = query.filters.some((f) => f.column === 'id' && f.value === 'n-cert')
-      if (targetsCertificate) Object.assign(db.notification('n-cert') as Row, { is_read: true })
+      if (targetsCertificate) Object.assign(db.notification('n-cert') as Row, { celebrated_at: 'other-tab' })
     }
 
     expect(await claim(db)).toMatchObject({ kind: 'capstone', notificationId: 'n-cap' })

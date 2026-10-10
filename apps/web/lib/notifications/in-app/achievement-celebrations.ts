@@ -1,16 +1,19 @@
 /**
  * Achievement celebration claim (server-only).
  *
- * A certificate, a published capstone, a Fellow grant or a completed module earns the learner a one-time celebration. The source of truth for "has it been shown" is the achievement's own
- * in-app notification: claiming it marks that row read with a compare-and-set, so when
- * several tabs or devices ask at once exactly one of them is told to celebrate.
+ * A certificate, a published capstone, a Fellow grant or a completed module earns the learner a
+ * one-time celebration. The source of truth for "has it been shown" is the achievement's own
+ * in-app notification: claiming it sets that row's `celebrated_at` with a compare-and-set, so
+ * when several tabs or devices ask at once exactly one of them is told to celebrate. Reading the
+ * notification in the bell only sets `is_read`, so it no longer uses up the celebration
+ * (Growth R5 P2); a claim also marks the row read.
  *
  * `in_app_notifications` has no event-type column — the idempotency key (the event id) is
  * the only type signal, so the three emitters' id prefixes are restated here. A key alone
  * is never trusted: every candidate is re-verified against its source row, scoped to the
  * caller, before anything is written. That is what keeps a rejected capstone, an admin
  * TEST- certificate or a revoked Fellow from celebrating. A candidate that fails
- * verification is left unread and untouched, so it still shows in the bell.
+ * verification is left uncelebrated and untouched, so it still shows in the bell.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
@@ -50,7 +53,7 @@ const CLAIM_ORDER: readonly AchievementCelebrationKind[] = ['fellow', 'certifica
 /** An achievement older than this is no longer worth interrupting the learner for. */
 const CELEBRATION_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
 
-/** Unread achievement rows considered per call. One learner never has more than a handful. */
+/** Uncelebrated achievement rows considered per call. One learner never has more than a handful. */
 const MAX_CANDIDATES = 25
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -71,6 +74,8 @@ interface Candidate {
    */
   subject: string
   createdAt: string
+  /** Already read in the bell: the claim then keeps its read_at. */
+  isRead: boolean
 }
 
 /** A candidate that passed verification, with the celebration it would produce. */
@@ -92,7 +97,7 @@ function warnReadFailed(step: string, error: unknown): void {
 }
 
 function toCandidate(
-  row: { id: string; idempotency_key: string | null; created_at: string },
+  row: { id: string; idempotency_key: string | null; created_at: string; is_read: boolean },
   kinds: readonly AchievementCelebrationKind[]
 ): Candidate | null {
   const key = row.idempotency_key
@@ -100,13 +105,19 @@ function toCandidate(
   for (const kind of kinds) {
     const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind]
     if (key.startsWith(prefix) && key.length > prefix.length) {
-      return { notificationId: row.id, kind, subject: key.slice(prefix.length), createdAt: row.created_at }
+      return {
+        notificationId: row.id,
+        kind,
+        subject: key.slice(prefix.length),
+        createdAt: row.created_at,
+        isRead: row.is_read === true,
+      }
     }
   }
   return null
 }
 
-/** The caller's unread, recent, unexpired achievement notifications; null when the read failed. */
+/** The caller's uncelebrated, recent, unexpired achievement notifications; null when the read failed. */
 async function loadCandidates(
   supabase: Client,
   userId: string,
@@ -119,9 +130,9 @@ async function loadCandidates(
 
   const { data, error } = await supabase
     .from('in_app_notifications')
-    .select('id, idempotency_key, created_at')
+    .select('id, idempotency_key, created_at, is_read')
     .eq('user_id', userId)
-    .eq('is_read', false)
+    .is('celebrated_at', null)
     .gte('created_at', new Date(now.getTime() - CELEBRATION_WINDOW_MS).toISOString())
     .gt('expires_at', now.toISOString())
     .or(prefixFilter)
@@ -311,23 +322,24 @@ function isOwnFellowGrantSubject(subject: string, userId: string): boolean {
 }
 
 /**
- * Marks one notification read if — and only if — it is still unread.
+ * Marks one notification celebrated if — and only if — it is not celebrated yet, and read.
  *
- * `is_read = false` is part of the write's own predicate, so the database decides the
- * winner: a second tab's update matches zero rows and reports `lost`.
+ * `celebrated_at IS NULL` is part of the write's own predicate, so the database decides the
+ * winner: a second tab's update matches zero rows and reports `lost`. A row the learner already
+ * read in the bell keeps its original read_at.
  */
 async function claimNotification(
   supabase: Client,
   userId: string,
-  notificationId: string,
-  readAt: string
+  candidate: Pick<Candidate, 'notificationId' | 'isRead'>,
+  now: string
 ): Promise<'claimed' | 'lost' | 'error'> {
   const { data, error } = await supabase
     .from('in_app_notifications')
-    .update({ is_read: true, read_at: readAt })
-    .eq('id', notificationId)
+    .update(candidate.isRead ? { celebrated_at: now, is_read: true } : { celebrated_at: now, is_read: true, read_at: now })
+    .eq('id', candidate.notificationId)
     .eq('user_id', userId)
-    .eq('is_read', false)
+    .is('celebrated_at', null)
     .select('id')
 
   if (error) {
@@ -345,7 +357,7 @@ async function claimNotification(
  * to it, so the result only ever describes the caller's own achievements.
  *
  * "Nothing to celebrate" is null, never a throw. A failed read is never treated as a
- * verification: the candidates it covers stay unread and are retried on the next call.
+ * verification: the candidates it covers stay uncelebrated and are retried on the next call.
  */
 export async function claimNextAchievementCelebration(
   supabase: Client,
@@ -399,7 +411,13 @@ export async function claimNextAchievementCelebration(
     }
 
     for (const entry of verified) {
-      const outcome = await claimNotification(supabase, userId, entry.notificationId, now.toISOString())
+      const isRead = ofKind.find((candidate) => candidate.notificationId === entry.notificationId)?.isRead ?? false
+      const outcome = await claimNotification(
+        supabase,
+        userId,
+        { notificationId: entry.notificationId, isRead },
+        now.toISOString()
+      )
       if (outcome === 'claimed') return entry.celebration
       // The write path is failing, so stop rather than work through the rest of the list.
       if (outcome === 'error') return null

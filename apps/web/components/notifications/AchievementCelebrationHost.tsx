@@ -64,7 +64,12 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
 
   useEffect(() => {
     if (blocked || celebration !== null) return
-    if (unreadCount <= 0 || unreadCount === emptyAtUnreadCount) return
+    // Wait for the bell's count, so the first ask is not repeated as soon as it arrives.
+    if (!data) return
+    // The first ask happens whatever the count: a celebration survives the learner reading its
+    // notification in the bell (Growth R5 P2), which leaves nothing unread. After an empty
+    // answer, only a changed, non-zero unread count is worth asking about again.
+    if (emptyAtUnreadCount !== null && (unreadCount <= 0 || unreadCount === emptyAtUnreadCount)) return
     if (claimInFlight.current) return
     // A queued Quick Start is about to open on this page; let it have the screen first.
     // Storage is read here, in the effect, never during render.
@@ -92,7 +97,7 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
         setEmptyAtUnreadCount(unreadCount)
       }
     })()
-  }, [blocked, celebration, unreadCount, emptyAtUnreadCount, pathname, quickStartOpen, quickStartCompleted, mutate])
+  }, [blocked, celebration, data, unreadCount, emptyAtUnreadCount, pathname, quickStartOpen, quickStartCompleted, mutate])
 
   // Closing clears the held celebration, which lets the effect claim the next one.
   const handleClose = useCallback(() => setCelebration(null), [])

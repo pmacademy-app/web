@@ -216,13 +216,15 @@ describe('AchievementCelebrationHost — when it claims', () => {
   it('does not claim while Quick Start is open, and claims when it closes', async () => {
     bell.data = { success: true, unreadCount: 0 }
     const { setUnread } = await render()
+    // The first ask on load (Growth R5 P2) comes back empty.
+    expect(claims()).toBe(1)
     act(() => ctx!.openQuickStart('manual'))
 
     await setUnread(1)
-    expect(claims()).toBe(0)
+    expect(claims()).toBe(1)
 
     await act(async () => ctx!.closeQuickStart())
-    expect(claims()).toBe(1)
+    expect(claims()).toBe(2)
   })
 
   it('does not claim while a deferred Quick Start is about to open, and claims after it closes', async () => {
@@ -245,14 +247,20 @@ describe('AchievementCelebrationHost — when it claims', () => {
     expect(claims()).toBe(1)
   })
 
-  it('does not claim when nothing is unread, or before the bell has loaded', async () => {
+  // Growth R5 P2: a celebration read in the bell leaves nothing unread, so the host asks once on
+  // load whatever the count, and after that only when the unread count changes.
+  it('waits for the bell, asks once even with nothing unread, then not again until the count changes', async () => {
     bell.data = undefined
     const { setUnread, navigate } = await render()
     expect(claims()).toBe(0)
 
     await setUnread(0)
+    expect(claims()).toBe(1)
     await navigate('/progress')
-    expect(claims()).toBe(0)
+    expect(claims()).toBe(1)
+
+    await setUnread(1)
+    expect(claims()).toBe(2)
   })
 
   it('claims once under StrictMode and while a request is in flight', async () => {

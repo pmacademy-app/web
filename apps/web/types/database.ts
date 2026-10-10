@@ -776,6 +776,7 @@ export type Database = {
           action_url: string | null
           body: string
           category: string
+          celebrated_at: string | null
           created_at: string
           event_id: string | null
           expires_at: string
@@ -792,6 +793,7 @@ export type Database = {
           action_url?: string | null
           body: string
           category: string
+          celebrated_at?: string | null
           created_at?: string
           event_id?: string | null
           expires_at?: string
@@ -808,6 +810,7 @@ export type Database = {
           action_url?: string | null
           body?: string
           category?: string
+          celebrated_at?: string | null
           created_at?: string
           event_id?: string | null
           expires_at?: string
