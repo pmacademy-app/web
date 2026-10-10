@@ -1,3 +1,4 @@
+import { CURRICULUM_LESSON_COUNT, countCompletedModules } from '@/lib/curriculum-registry'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
 import { getTotalXp } from '../xp/xp-service'
@@ -154,7 +155,8 @@ export async function synchronizeProgressBadges(
 
     const completed = (progressRows || []).filter((p) => p.status === 'completed')
     const lessonsCount = completed.length
-    const modulesCount = Math.floor(lessonsCount / 10)
+    // Real modules (every registry lesson done), not lessons / 10.
+    const modulesCount = countCompletedModules(completed.map((p) => p.lesson_id))
     const perfectFirstAttempt = completed.filter(
       (p) => p.quiz_attempts === 1 && (p.quiz_score ?? 0) === 100
     ).length
@@ -171,7 +173,7 @@ export async function synchronizeProgressBadges(
     if (lessonsCount < 1) revokedKeys.push('first_lesson')
     if (modulesCount < 1) revokedKeys.push('module_complete')
     if (lessonsCount < 30) revokedKeys.push('curriculum_explorer')
-    if (lessonsCount < 90 || capstonesCount < 9) revokedKeys.push('pm_academy_graduate')
+    if (lessonsCount < CURRICULUM_LESSON_COUNT || capstonesCount < 9) revokedKeys.push('pm_academy_graduate')
     if (perfectFirstAttempt < 1) revokedKeys.push('first_perfect_quiz')
     if (perfectQuiz < 10) revokedKeys.push('quiz_master')
     if (capstonesCount < 1) revokedKeys.push('first_capstone')

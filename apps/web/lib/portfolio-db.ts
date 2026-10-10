@@ -7,6 +7,7 @@
  * Enforces strict privacy rules: private portfolios and private reflections are never exposed.
  */
 
+import { CURRICULUM_LESSON_COUNT, countCompletedModules } from '@/lib/curriculum-registry'
 import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, TablesUpdate } from '@/lib/supabase'
@@ -159,8 +160,8 @@ export async function getPublicPortfolioData(
     .eq('status', 'completed')
 
   const completedLessonsCount = progressRows?.length ?? 0
-  const totalLessonsCount = 90
-  const completedModulesCount = Math.min(9, Math.floor(completedLessonsCount / 10))
+  const totalLessonsCount = CURRICULUM_LESSON_COUNT
+  const completedModulesCount = countCompletedModules((progressRows ?? []).map((p) => p.lesson_id))
   const progressPercentage = Math.min(100, Math.round((completedLessonsCount / totalLessonsCount) * 100))
 
   // 4. Fetch public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)

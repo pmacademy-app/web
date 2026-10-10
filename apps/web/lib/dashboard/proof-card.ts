@@ -3,13 +3,15 @@
  *
  * Framework-agnostic and side-effect free so it can be unit-tested without a DOM
  * and imported from client components without pulling in any server module.
- */
+ */
+import { CURRICULUM_LESSON_COUNT } from '@/lib/curriculum-registry'
+
 
 /**
- * Lessons required for the full-curriculum certificate. Mirrors the issuance rule in
- * `lib/certificates-db.ts` (`lessonsCompleted < 90` rejects a `full_curriculum` issue).
+ * Lessons required for the full-curriculum certificate: the same registry count the issuance
+ * rule in `lib/certificates-db.ts` uses.
  */
-export const FULL_CURRICULUM_LESSON_COUNT = 90
+export const FULL_CURRICULUM_LESSON_COUNT = CURRICULUM_LESSON_COUNT
 
 export type PortfolioState = 'public' | 'private' | 'none'
 

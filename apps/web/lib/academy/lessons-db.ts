@@ -11,6 +11,7 @@ import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
 import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
+import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
 
 /**
@@ -452,7 +453,7 @@ export async function recordQuizAttemptAction(
     // finished before this hook existed, or whose issuance failed here, are repaired by
     // the certificates page. The helper is idempotent and only dispatches when it
     // created the row; isolated so a failure never breaks quiz submission.
-    if (isFirstAttempt && totalCompletedLessons >= 90) {
+    if (isFirstAttempt && totalCompletedLessons >= CURRICULUM_LESSON_COUNT) {
       try {
         const { issueFullCurriculumCertificateIfEligible } = await import('../certificates/issue-flow')
         await issueFullCurriculumCertificateIfEligible(supabase, userId, {

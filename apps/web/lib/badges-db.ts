@@ -9,6 +9,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Selected } from '@/lib/db'
 import type { Database } from '@/lib/supabase'
 import { BADGE_DEFINITIONS, type BadgeDefinition } from '@/config/badges'
+import { countCompletedModules } from '@/lib/curriculum-registry'
 import {
   calculateBadgeProgress,
   evaluateEligibleBadges,
@@ -66,7 +67,8 @@ async function fetchUserStatsForBadges(
 
   const completedLessons = (progressRows || []).filter((p) => p.status === 'completed')
   const lessonsCompletedCount = completedLessons.length
-  const modulesCompletedCount = Math.min(9, Math.floor(lessonsCompletedCount / 10))
+  // Real modules (every registry lesson done), not lessons / 10.
+  const modulesCompletedCount = countCompletedModules(completedLessons.map((p) => p.lesson_id))
 
   const perfectFirstAttemptQuizCount = completedLessons.filter(
     (p) => p.quiz_attempts === 1 && (p.quiz_score ?? 0) === 100

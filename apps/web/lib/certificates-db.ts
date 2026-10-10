@@ -10,7 +10,7 @@ import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { TEST_CERTIFICATE_PREFIX, generateCertificateCode, isTestCertificateCode } from '@/lib/certificates'
-import { getLessonIdsForModule } from '@/lib/curriculum-registry'
+import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
 
 // Defined in the client-safe module so UI can ask without importing this data layer.
@@ -53,7 +53,7 @@ type UserRow = Database['public']['Tables']['users']['Row']
 const UNIQUE_VIOLATION = '23505'
 
 /** Lessons required for the full-curriculum certificate. */
-export const FULL_CURRICULUM_LESSON_COUNT = 90
+export const FULL_CURRICULUM_LESSON_COUNT = CURRICULUM_LESSON_COUNT
 
 function normalizeCertificateType(type: string): string {
   return type === 'module' ? 'module_completion' : type
