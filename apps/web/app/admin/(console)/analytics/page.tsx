@@ -7,6 +7,15 @@ import type { AdminAnalyticsTab, AdminDateRangeKey } from '@/lib/admin/types'
 
 export const revalidate = 0
 
+/** Known tabs. `?tab=` is validated against this so cache keys stay bounded. */
+const ANALYTICS_TABS = ['overview', 'learners', 'learning', 'engagement', 'outcomes', 'growth'] as const satisfies readonly AdminAnalyticsTab[]
+
+function parseTab(value: string | string[] | undefined): AdminAnalyticsTab {
+  return typeof value === 'string' && (ANALYTICS_TABS as readonly string[]).includes(value)
+    ? (value as AdminAnalyticsTab)
+    : 'overview'
+}
+
 interface AdminAnalyticsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
@@ -16,7 +25,7 @@ export default async function AdminAnalyticsPage({ searchParams }: AdminAnalytic
   const range = (params.range as AdminDateRangeKey) || '30d'
   const from = typeof params.from === 'string' ? params.from : null
   const to = typeof params.to === 'string' ? params.to : null
-  const tab = (typeof params.tab === 'string' ? params.tab : 'overview') as AdminAnalyticsTab
+  const tab = parseTab(params.tab)
 
   const data = await AnalyticsService.getAnalyticsWorkspaceData({
     rangeKey: range,

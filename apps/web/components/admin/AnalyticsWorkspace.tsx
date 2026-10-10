@@ -10,14 +10,18 @@ import {
   Zap,
   Award,
   Download,
+  TrendingUp,
 } from 'lucide-react'
 import { AdminRangeSelector } from './AdminRangeSelector'
 import { AdminLoadWarning } from './AdminLoadWarning'
 import { AnalyticsOverviewTab } from './AnalyticsOverviewTab'
 import { AnalyticsLearnersTab } from './AnalyticsLearnersTab'
 import { AnalyticsLearningTab } from './AnalyticsLearningTab'
-import { AnalyticsEngagementTab } from './AnalyticsEngagementTab'
-import { AnalyticsOutcomesTab } from './AnalyticsOutcomesTab'
+import { AnalyticsGrowthTab } from './AnalyticsGrowthTab'
+import {
+  AnalyticsEngagementTabLazy as AnalyticsEngagementTab,
+  AnalyticsOutcomesTabLazy as AnalyticsOutcomesTab,
+} from './charts-lazy'
 import type { AdminAnalyticsTab, AdminAnalyticsWorkspaceData } from '@/lib/admin/types'
 
 interface AnalyticsWorkspaceProps {
@@ -60,14 +64,27 @@ const TABS: Array<{
     icon: Award,
     description: 'Certificate issuance velocity, capstone reviews and portfolio adoption',
   },
+  {
+    key: 'growth',
+    label: 'Growth',
+    icon: TrendingUp,
+    description: 'Celebrations, referrals, public capstone pages and Fellow requests',
+  },
 ]
+
+function isKnownTab(value: string | null | undefined): value is AdminAnalyticsTab {
+  return !!value && TABS.some((t) => t.key === value)
+}
 
 export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-
-
-  const currentTab = (searchParams.get('tab') as AdminAnalyticsTab) || data.tab || 'overview'
+  const tabParam = searchParams.get('tab')
+  const currentTab: AdminAnalyticsTab = isKnownTab(tabParam)
+    ? tabParam
+    : isKnownTab(data.tab)
+      ? data.tab
+      : 'overview'
 
   const handleExportCsv = () => {
     // Generate simple CSV payload for current tab data
@@ -151,6 +168,7 @@ export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
       {currentTab === 'learning' && <AnalyticsLearningTab data={data.learning} />}
       {currentTab === 'engagement' && <AnalyticsEngagementTab data={data.engagement} />}
       {currentTab === 'outcomes' && <AnalyticsOutcomesTab data={data.outcomes} />}
+      {currentTab === 'growth' && <AnalyticsGrowthTab data={data.growth} />}
     </div>
   )
 }

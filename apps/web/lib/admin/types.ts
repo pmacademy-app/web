@@ -779,7 +779,7 @@ export interface SettingsResponse<T> {
 
 /* ─── Phase 9 — Analytics & Insights Workspace ────────────────────────────── */
 
-export type AdminAnalyticsTab = 'overview' | 'learners' | 'learning' | 'engagement' | 'outcomes'
+export type AdminAnalyticsTab = 'overview' | 'learners' | 'learning' | 'engagement' | 'outcomes' | 'growth'
 
 export interface AdminXpSourceDistribution {
   source: string
@@ -878,6 +878,47 @@ export interface AdminExecutiveOverview {
   consolidatedSeries: AdminTimeSeriesPoint[]
 }
 
+/**
+ * Growth tab (C6): database-backed head counts only. Share-by-context clicks live in GA,
+ * not the database, so they are not here. Every count except `publicCapstonePages` is
+ * bounded by the selected date range.
+ */
+export interface AdminAnalyticsGrowthData {
+  celebrations: {
+    /** Celebratable achievement notifications (certificate, capstone, Fellow, module) created in range. */
+    created: number
+    /** Notifications whose celebration was claimed (celebrated_at) in range. */
+    claimed: number
+  }
+  referrals: {
+    /** Referral rows created in range. */
+    created: number
+    /**
+     * Created in range with a referred user. referrals.referred_user_id is NOT NULL (a row is
+     * written at signup), so this always equals `created`.
+     */
+    signedUp: number
+    /** Created in range and now 'activated' or 'rewarded'. */
+    activated: number
+    /** Rewarded (rewarded_at) in range. */
+    rewarded: number
+  }
+  /**
+   * Reviewed, public capstones whose owner's portfolio is public. A CURRENT count, not
+   * bounded by the date range: neither is_public nor is_portfolio_public has a timestamp.
+   */
+  publicCapstonePages: number
+  /** Fellow requests requested in range, by current status. */
+  fellowRequests: {
+    total: number
+    pending: number
+    approved: number
+    rejected: number
+  }
+  /** True when any growth count failed; failed counts are 0. */
+  failed?: boolean
+}
+
 export interface AdminAnalyticsWorkspaceData {
   range: AdminDateRange
   tab: AdminAnalyticsTab
@@ -886,6 +927,8 @@ export interface AdminAnalyticsWorkspaceData {
   learning: AdminLearningDeepAnalytics
   engagement: AdminEngagementAnalytics
   outcomes: AdminOutcomesAnalytics
+  /** Present only when tab === 'growth'. */
+  growth?: AdminAnalyticsGrowthData
   failed?: boolean
 }
 

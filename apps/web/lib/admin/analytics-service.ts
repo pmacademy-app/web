@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache'
+
 import { createServiceRoleClient } from '../supabase'
 import { fetchCurriculumData } from '../lesson-loader'
 import {
@@ -12,22 +14,37 @@ import {
 import {
   buildCertificateSeries,
   buildDailyXpSeries,
-  buildStreakDistribution,
   computeActiveUserMetrics,
-  computeLevelDistribution,
   computeModuleCompletionPct,
-  computeModuleDropOffs,
   computeNewVsReturning,
   computeQuizPerformanceStats,
   computeXpBySource,
 } from './analytics-aggregation'
+import {
+  courseCompletionsFromStats,
+  fetchActiveUsers,
+  fetchCapstoneStats,
+  fetchFlashcardStats,
+  fetchLessonCompletionStats,
+  fetchUserStats,
+  levelDistributionFromStats,
+  moduleDropOffsFromStats,
+  streakDistributionFromStats,
+  type AdminModuleDef,
+} from './analytics-rpc'
+import { ADMIN_CACHE_TAGS } from './cache-tags'
 import { getOrderedModuleSlugs } from './curriculum-aggregation'
 import { CURRICULUM_MODULE_META } from './curriculum-meta'
 import { fetchAllRows } from './fetch-all'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+import type { Database } from '../supabase'
 import type {
+  AdminAnalyticsGrowthData,
   AdminAnalyticsTab,
   AdminAnalyticsWorkspaceData,
+  AdminDateRange,
   AdminDateRangeKey,
   AdminExecutiveOverview,
   AdminLearnerDemographics,
@@ -36,9 +53,154 @@ import type {
   AdminOutcomesAnalytics,
 } from './types'
 
+/** How long a computed analytics workspace is served from the Next.js data cache. */
+export const ANALYTICS_CACHE_SECONDS = 90
+
+/**
+ * idempotency_key prefixes of celebratable achievement notifications. Restated from
+ * ACHIEVEMENT_CELEBRATION_KEY_PREFIXES (lib/notifications/in-app/achievement-celebrations.ts)
+ * so analytics does not import the notification stack; analytics-growth.test.ts pins them.
+ */
+export const GROWTH_CELEBRATION_KEY_PREFIXES = [
+  'certificate-generated-',
+  'capstone-reviewed-',
+  'fellow-granted-',
+  'module-completed-',
+] as const
+
+const FELLOW_REQUEST_STATUSES = ['pending', 'approved', 'rejected'] as const
+
+type HeadCountResult = { count: number | null; error: { message: string } | null }
+
+/** All-zero growth payload, marked failed. */
+export function emptyGrowthData(): AdminAnalyticsGrowthData {
+  return {
+    celebrations: { created: 0, claimed: 0 },
+    referrals: { created: 0, signedUp: 0, activated: 0, rewarded: 0 },
+    publicCapstonePages: 0,
+    fellowRequests: { total: 0, pending: 0, approved: 0, rejected: 0 },
+    failed: true,
+  }
+}
+
+/**
+ * Growth tab counts (C6). Head counts only (`count: 'exact', head: true`): no rows are
+ * transferred. Bounded by [startIso, endIso] wherever the table has a timestamp; the public
+ * capstone page count is current. Never throws: a failed count is 0 and `failed` is set.
+ */
+export async function fetchGrowthData(
+  supabase: SupabaseClient<Database>,
+  startIso: string,
+  endIso: string
+): Promise<AdminAnalyticsGrowthData> {
+  const head = { count: 'exact' as const, head: true }
+  const celebratableFilter = GROWTH_CELEBRATION_KEY_PREFIXES.map((p) => `idempotency_key.like.${p}%`).join(',')
+
+  const queries: Array<PromiseLike<HeadCountResult>> = [
+    // Celebratable achievement notifications created in range
+    supabase
+      .from('in_app_notifications')
+      .select('id', head)
+      .or(celebratableFilter)
+      .gte('created_at', startIso)
+      .lte('created_at', endIso),
+    // Celebrations claimed in range
+    supabase
+      .from('in_app_notifications')
+      .select('id', head)
+      .gte('celebrated_at', startIso)
+      .lte('celebrated_at', endIso),
+    // Referrals created in range (referred_user_id is NOT NULL, so these are signups)
+    supabase.from('referrals').select('id', head).gte('created_at', startIso).lte('created_at', endIso),
+    // Referrals created in range that have since activated
+    supabase
+      .from('referrals')
+      .select('id', head)
+      .in('status', ['activated', 'rewarded'])
+      .gte('created_at', startIso)
+      .lte('created_at', endIso),
+    // Referrals rewarded in range
+    supabase.from('referrals').select('id', head).gte('rewarded_at', startIso).lte('rewarded_at', endIso),
+    // Public capstone pages right now: reviewed + public, owner's portfolio public
+    supabase
+      .from('capstone_submissions')
+      .select('id, users!capstone_submissions_user_id_fkey!inner(id)', head)
+      .eq('status', 'reviewed')
+      .eq('is_public', true)
+      .eq('users.is_portfolio_public', true),
+    // Fellow requests in range, one count per status
+    ...FELLOW_REQUEST_STATUSES.map((status) =>
+      supabase
+        .from('fellow_requests')
+        .select('id', head)
+        .eq('status', status)
+        .gte('requested_at', startIso)
+        .lte('requested_at', endIso)
+    ),
+  ]
+
+  let failed = false
+  const counts = await Promise.all(
+    queries.map(async (query) => {
+      try {
+        const { count, error } = await query
+        if (error) {
+          failed = true
+          console.error('[AnalyticsService] growth count failed:', error.message)
+          return 0
+        }
+        return count ?? 0
+      } catch (err) {
+        failed = true
+        console.error('[AnalyticsService] growth count threw:', err)
+        return 0
+      }
+    })
+  )
+
+  const [celebrationsCreated, celebrationsClaimed, referralsCreated, referralsActivated, referralsRewarded, publicCapstonePages, pending, approved, rejected] = counts
+
+  return {
+    celebrations: { created: celebrationsCreated, claimed: celebrationsClaimed },
+    referrals: {
+      created: referralsCreated,
+      signedUp: referralsCreated,
+      activated: referralsActivated,
+      rewarded: referralsRewarded,
+    },
+    publicCapstonePages,
+    fellowRequests: { total: pending + approved + rejected, pending, approved, rejected },
+    ...(failed ? { failed: true } : {}),
+  }
+}
+
+/**
+ * Thrown inside the cached function when a computed workspace is marked `failed`.
+ * unstable_cache does not store a rejection, so a partial result is never served for the
+ * next 90s; the caller unwraps it and returns the uncached payload for this request.
+ */
+class UncachedAnalyticsFailure extends Error {
+  constructor(readonly data: AdminAnalyticsWorkspaceData) {
+    super('analytics workspace computed with failed sections; not cached')
+    this.name = 'UncachedAnalyticsFailure'
+  }
+}
+
+/**
+ * unstable_cache JSON-serializes its result, so on a cache hit the range's Date fields come
+ * back as ISO strings. Rebuild them so callers always get real Date instances.
+ */
+export function reviveAnalyticsWorkspaceData(data: AdminAnalyticsWorkspaceData): AdminAnalyticsWorkspaceData {
+  return { ...data, range: { ...data.range, start: new Date(data.range.start), end: new Date(data.range.end) } }
+}
+
 export class AnalyticsService {
   /**
-   * Fetches and aggregates complete analytics workspace data across all 5 domains.
+   * Returns the analytics workspace, cached for 90s under the `admin-analytics` tag and
+   * keyed by rangeKey/from/to/tab. A result with `failed: true` is never cached.
+   *
+   * The cached function uses the service-role client only; it must never read request
+   * cookies or headers (next/headers), which unstable_cache forbids.
    */
   public static async getAnalyticsWorkspaceData(params?: {
     rangeKey?: AdminDateRangeKey
@@ -47,8 +209,46 @@ export class AnalyticsService {
     tab?: AdminAnalyticsTab
   }): Promise<AdminAnalyticsWorkspaceData> {
     const rangeKey = params?.rangeKey || '30d'
+    const from = params?.from ?? null
+    const to = params?.to ?? null
     const tab = params?.tab || 'overview'
-    const range = resolveRange(rangeKey, params?.from, params?.to)
+    const compute = () => this.computeWorkspaceData({ rangeKey, from, to, tab })
+
+    try {
+      const cached = unstable_cache(
+        async () => {
+          const data = await compute()
+          if (data.failed) throw new UncachedAnalyticsFailure(data)
+          return data
+        },
+        ['admin-analytics', rangeKey, from ?? '', to ?? '', tab],
+        { revalidate: ANALYTICS_CACHE_SECONDS, tags: [ADMIN_CACHE_TAGS.analytics] }
+      )
+      return reviveAnalyticsWorkspaceData(await cached())
+    } catch (err) {
+      if (err instanceof UncachedAnalyticsFailure) return err.data
+      // The data cache itself failed (not the queries): serve this request uncached.
+      console.warn('[AnalyticsService] analytics cache unavailable, computing uncached:', err)
+      return compute()
+    }
+  }
+
+  /**
+   * Fetches and aggregates complete analytics workspace data across all 5 domains.
+   *
+   * Whole-table reductions run in Postgres via the admin analytics RPCs
+   * (supabase/migrations/20261012000001_admin_analytics_rpc.sql, see
+   * ./analytics-rpc.ts). Every row fetch left here is bounded by a date range.
+   * Never throws: a failed section is zeroed and the payload marked `failed`.
+   */
+  private static async computeWorkspaceData(params: {
+    rangeKey: AdminDateRangeKey
+    from: string | null
+    to: string | null
+    tab: AdminAnalyticsTab
+  }): Promise<AdminAnalyticsWorkspaceData> {
+    const { rangeKey, tab } = params
+    const range = resolveRange(rangeKey, params.from, params.to)
     const rangeStartIso = range.start.toISOString()
     const rangeEndIso = range.end.toISOString()
 
@@ -68,41 +268,44 @@ export class AnalyticsService {
       const lessons = curriculum?.lessons || []
       const totalLessonsCount = lessons.length
 
+      // Map module lessons in curriculum order. The curriculum is static JSON,
+      // so the lesson stats RPC is told which lessons make up each module.
+      const orderedSlugs = getOrderedModuleSlugs(lessons)
+      const moduleDefs: AdminModuleDef[] = orderedSlugs.map((slug, idx) => {
+        const meta = CURRICULUM_MODULE_META[slug]
+        return {
+          slug,
+          title: meta?.name || slug,
+          order: idx + 1,
+          lessonIds: lessons.filter((l) => l.module === slug).map((l) => l.id),
+        }
+      })
 
       // ── Parallel batch queries ──────────────────────────────────────────────
+      // An RPC that errors resolves to null: its section is zeroed and the
+      // payload is marked `failed`, but the rest of the page still renders.
       const [
-        allUsersRows,
+        userStats,
         usersInRange,
         usersInPrevRange,
         xpEventsInRange,
         xpEventsInPrevRange,
-        xpEventsBeforeRange,
+        activeUsers,
         xpEventsTrailing30d,
         lessonProgressInRange,
         lessonProgressInPrevRange,
-        allCompletedLessons,
+        lessonStats,
         quizAttemptsInRange,
-        capstoneSubmissionsAll,
-
+        capstoneStats,
         certificatesInRange,
         certificatesInPrevRange,
-        allCertificates,
+        certificatesTotalRes,
         badgesAwardedRes,
-        flashcardSrsRows,
+        flashcardStats,
+        growth,
       ] = await Promise.all([
-        // All users (for levels, streaks, total, portfolios)
-        fetchAllRows<{
-          id: string
-          created_at: string
-          level?: number | null
-          current_streak?: number | null
-          is_portfolio_public?: boolean | null
-        }>((from, to) =>
-          supabase
-            .from('users')
-            .select('id, created_at, level, current_streak, is_portfolio_public')
-            .range(from, to)
-        ),
+        // #1 Levels, streaks, total users, public portfolios
+        fetchUserStats(supabase),
         // Users joined in current range
         fetchAllRows<{ id: string; created_at: string }>((from, to) =>
           supabase
@@ -139,10 +342,8 @@ export class AnalyticsService {
             .lte('created_at', prevEndIso)
             .range(from, to)
         ),
-        // XP users before range (for returning learners)
-        fetchAllRows<{ user_id: string | null }>((from, to) =>
-          supabase.from('xp_events').select('user_id').lt('created_at', rangeStartIso).range(from, to)
-        ),
+        // #6 Users active in range, and whether each was active before it
+        fetchActiveUsers(supabase, rangeStartIso, rangeEndIso),
         // XP events trailing 30d (for DAU/WAU/MAU)
         fetchAllRows<{ user_id: string | null; created_at: string }>((from, to) =>
           supabase
@@ -171,10 +372,8 @@ export class AnalyticsService {
             .lte('completed_at', prevEndIso)
             .range(from, to)
         ),
-        // All lesson completions
-        fetchAllRows<{ user_id: string; lesson_id: string }>((from, to) =>
-          supabase.from('user_lesson_progress').select('user_id, lesson_id').eq('status', 'completed').range(from, to)
-        ),
+        // #10 Module drop-offs, course completion, first-lesson funnel
+        fetchLessonCompletionStats(supabase, moduleDefs),
         // Quiz attempts in range
         fetchAllRows<{ user_id: string | null; is_correct: boolean; attempted_at: string }>((from, to) =>
           supabase
@@ -184,11 +383,8 @@ export class AnalyticsService {
             .lte('attempted_at', rangeEndIso)
             .range(from, to)
         ),
-        // Capstone submissions
-
-        fetchAllRows<{ id: string; user_id: string | null; status: string; submitted_at: string }>((from, to) =>
-          supabase.from('capstone_submissions').select('id, user_id, status, submitted_at').range(from, to)
-        ),
+        // #12 Capstone submissions in range
+        fetchCapstoneStats(supabase, rangeStartIso, rangeEndIso),
         // Certificates in range
         fetchAllRows<{ id: string; user_id: string; issued_at: string }>((from, to) =>
           supabase
@@ -207,34 +403,46 @@ export class AnalyticsService {
             .lte('issued_at', prevEndIso)
             .range(from, to)
         ),
-        // All certificates
-        fetchAllRows<{ id: string; user_id: string; issued_at: string }>((from, to) =>
-          supabase.from('certificates').select('id, user_id, issued_at').range(from, to)
-        ),
+        // #15 All certificates (count only, for the funnel)
+        supabase.from('certificates').select('id', { count: 'exact', head: true }),
         // Badges count
         supabase.from('user_badges').select('id', { count: 'exact', head: true }),
-        // Flashcard SRS rows
-        fetchAllRows<{ user_id: string }>((from, to) =>
-          supabase.from('user_flashcard_srs').select('user_id').range(from, to)
-        ),
+        // #17 Flashcard SRS rows and distinct learners
+        fetchFlashcardStats(supabase),
+        // C6 growth head counts, only for the growth tab
+        tab === 'growth' ? fetchGrowthData(supabase, rangeStartIso, rangeEndIso) : Promise.resolve(undefined),
       ])
+
+      if (certificatesTotalRes.error) {
+        console.error('[AnalyticsService] Certificate count failed:', certificatesTotalRes.error.message)
+      }
+      const failed =
+        !userStats ||
+        !activeUsers ||
+        !lessonStats ||
+        !capstoneStats ||
+        !flashcardStats ||
+        Boolean(certificatesTotalRes.error) ||
+        Boolean(growth?.failed)
 
       // ── Process Learner Demographics ─────────────────────────────────────────
       const activeUserMetrics = computeActiveUserMetrics(
         xpEventsTrailing30d.filter((e): e is { user_id: string; created_at: string } => e.user_id !== null),
         now
       )
-      const usersActiveBeforeSet = new Set(xpEventsBeforeRange.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+      // Only learners active in range are ever looked up in this set, so the
+      // RPC flags exactly those learners rather than every earlier learner.
+      const usersActiveBeforeSet = activeUsers?.activeBefore ?? new Set<string>()
       const activeUsersInRangeSet = new Set(xpEventsInRange.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
       const newVsReturning = computeNewVsReturning({
         activeUserIds: activeUsersInRangeSet,
         usersActiveBeforeWindow: usersActiveBeforeSet,
       })
 
-      const totalUsersCount = allUsersRows.length
+      const totalUsersCount = userStats?.total ?? 0
       const verifiedUsersCount = totalUsersCount
-      const levelDistribution = computeLevelDistribution(allUsersRows)
-      const streakDistribution = buildStreakDistribution(allUsersRows)
+      const levelDistribution = userStats ? levelDistributionFromStats(userStats) : []
+      const streakDistribution = userStats ? streakDistributionFromStats(userStats) : []
 
       // Time series: Learner Activity & Learning Activity
       const learnerSeries = buildLearnerSeries({
@@ -248,9 +456,7 @@ export class AnalyticsService {
         range,
         lessonsCompleted: lessonProgressInRange.map((l) => ({ completed_at: l.completed_at || rangeStartIso })),
         quizAttempts: quizAttemptsInRange.filter((q): q is { user_id: string; is_correct: boolean; attempted_at: string } => q.user_id !== null),
-        capstonesSubmitted: capstoneSubmissionsAll
-          .filter((c): c is { id: string; user_id: string; status: string; submitted_at: string } => c.user_id !== null && Boolean(c.submitted_at) && c.submitted_at! >= rangeStartIso && c.submitted_at! <= rangeEndIso)
-          .map((c) => ({ submitted_at: c.submitted_at! })),
+        capstonesSubmitted: (capstoneStats?.submittedAt ?? []).map((submitted_at) => ({ submitted_at })),
       })
 
       const consolidatedSeries = mergeSeries(learnerSeries, learningSeries)
@@ -273,31 +479,11 @@ export class AnalyticsService {
       const totalLessonsCompleted = lessonProgressInRange.length
       const quizStats = computeQuizPerformanceStats(quizAttemptsInRange)
 
-      // Map module lessons in curriculum order
-      const orderedSlugs = getOrderedModuleSlugs(lessons)
-      const moduleDefs = orderedSlugs.map((slug, idx) => {
-        const meta = CURRICULUM_MODULE_META[slug]
-        return {
-          slug,
-          title: meta?.name || slug,
-          order: idx + 1,
-          lessonIds: lessons.filter((l) => l.module === slug).map((l) => l.id),
-        }
-      })
-
-
       // Module drop-offs and completion
-      const moduleDropOffs = computeModuleDropOffs(moduleDefs, allCompletedLessons, totalUsersCount)
+      const moduleDropOffs = lessonStats ? moduleDropOffsFromStats(moduleDefs, lessonStats, totalUsersCount) : []
 
       // Overall course completion: learners who completed all published lessons
-      const userCompletionsMap = new Map<string, number>()
-      for (const row of allCompletedLessons) {
-        userCompletionsMap.set(row.user_id, (userCompletionsMap.get(row.user_id) || 0) + 1)
-      }
-      let courseCompletionsCount = 0
-      for (const count of userCompletionsMap.values()) {
-        if (totalLessonsCount > 0 && count >= totalLessonsCount) courseCompletionsCount++
-      }
+      const courseCompletionsCount = lessonStats ? courseCompletionsFromStats(lessonStats, totalLessonsCount) : 0
       const courseCompletionPct =
         totalUsersCount > 0 ? Math.round((courseCompletionsCount / totalUsersCount) * 1000) / 10 : 0
       const moduleCompletionPct = computeModuleCompletionPct(
@@ -318,29 +504,24 @@ export class AnalyticsService {
       const xpBySource = computeXpBySource(xpEventsInRange)
       const dailyXpSeries = buildDailyXpSeries(xpEventsInRange, range)
 
-      const distinctFlashcardLearners = new Set(flashcardSrsRows.map((r) => r.user_id)).size
       const engagement: AdminEngagementAnalytics = {
         streakDistribution,
         xpEarned: xpEarnedInRange,
         xpBySource,
-        srsReviews: flashcardSrsRows.length,
-        activeFlashcardLearners: distinctFlashcardLearners,
+        srsReviews: flashcardStats?.total ?? 0,
+        activeFlashcardLearners: flashcardStats?.distinctUsers ?? 0,
         dailyXpSeries,
       }
 
       // ── Process Outcomes & Achievements ──────────────────────────────────────
-      const capstonesInRange = capstoneSubmissionsAll.filter(
-        (c) => c.submitted_at && c.submitted_at >= rangeStartIso && c.submitted_at <= rangeEndIso
-      )
-      const capstonesReviewedInRange = capstonesInRange.filter((c) => c.status === 'reviewed').length
-      const publicPortfoliosCount = allUsersRows.filter((u) => u.is_portfolio_public).length
+      const publicPortfoliosCount = userStats?.publicPortfolios ?? 0
       const badgesAwardedCount = badgesAwardedRes.count || 0
       const certificateSeries = buildCertificateSeries(certificatesInRange, range)
 
       const outcomes: AdminOutcomesAnalytics = {
         certificatesIssued: certificatesInRange.length,
-        capstonesSubmitted: capstonesInRange.length,
-        capstonesReviewed: capstonesReviewedInRange,
+        capstonesSubmitted: capstoneStats?.submitted ?? 0,
+        capstonesReviewed: capstoneStats?.reviewed ?? 0,
         badgesAwarded: badgesAwardedCount,
         publicPortfolios: publicPortfoliosCount,
         certificateSeries,
@@ -351,7 +532,7 @@ export class AnalyticsService {
       const prevActiveLearners = new Set(xpEventsInPrevRange.map((e) => e.user_id)).size
 
       // Funnel stages (Registered -> First Lesson -> First Quiz -> Module 1 Complete -> Course Complete -> Certificate)
-      const usersWithAtLeastOneLesson = new Set(allCompletedLessons.map((r) => r.user_id)).size
+      const usersWithAtLeastOneLesson = lessonStats?.distinctUsers ?? 0
       const usersWithAtLeastOneQuiz = new Set(quizAttemptsInRange.map((r) => r.user_id)).size
       const firstModuleCompletedCount = moduleDropOffs[0]?.learnersCompleted || 0
 
@@ -361,7 +542,7 @@ export class AnalyticsService {
         { key: 'first_quiz', label: 'First Quiz', count: usersWithAtLeastOneQuiz },
         { key: 'module_complete', label: 'Module Complete', count: firstModuleCompletedCount },
         { key: 'course_complete', label: 'Course Complete', count: courseCompletionsCount },
-        { key: 'certificate', label: 'Certificate Issued', count: allCertificates.length },
+        { key: 'certificate', label: 'Certificate Issued', count: certificatesTotalRes.count || 0 },
       ])
 
       const overview: AdminExecutiveOverview = {
@@ -397,6 +578,8 @@ export class AnalyticsService {
         learning,
         engagement,
         outcomes,
+        ...(growth ? { growth } : {}),
+        ...(failed ? { failed: true } : {}),
       }
     } catch (err) {
       console.error('[AnalyticsService] Error aggregating analytics workspace data:', err)
@@ -406,7 +589,7 @@ export class AnalyticsService {
 
   /** Safe empty fallback structure if DB queries fail. */
   private static getFallbackWorkspaceData(
-    range: import('./types').AdminDateRange,
+    range: AdminDateRange,
     tab: AdminAnalyticsTab
   ): AdminAnalyticsWorkspaceData {
     return {
@@ -480,6 +663,7 @@ export class AnalyticsService {
         publicPortfolios: 0,
         certificateSeries: [],
       },
+      ...(tab === 'growth' ? { growth: emptyGrowthData() } : {}),
     }
   }
 }
