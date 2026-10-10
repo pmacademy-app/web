@@ -1,6 +1,6 @@
 import { getLessonIdsForModule, getModuleSlugForLessonId } from '../curriculum-registry'
 import { CURRICULUM_MODULE_META } from '../admin/curriculum-meta'
-import { getCapstoneDefinition } from '@/config/capstones'
+import { getCapstoneForModule as getCapstoneDefinitionForModule } from '@/config/capstones'
 
 export interface CompletedModule {
   slug: string
@@ -8,14 +8,11 @@ export interface CompletedModule {
 }
 
 /**
- * Curriculum modules whose capstone is keyed differently in config/capstones.ts.
- * The Growth & Metrics module's capstone is `metrics`.
+ * The capstone that belongs to a curriculum module, if it has one. The module-to-capstone slug
+ * mapping (Growth & Metrics -> `metrics`) lives in config/capstones.ts.
  */
-const CAPSTONE_SLUG_BY_MODULE: Readonly<Record<string, string>> = { growth: 'metrics' }
-
-/** The capstone that belongs to a curriculum module, if it has one. */
 export function getCapstoneForModule(moduleSlug: string): { slug: string; title: string } | null {
-  const definition = getCapstoneDefinition(CAPSTONE_SLUG_BY_MODULE[moduleSlug] ?? moduleSlug)
+  const definition = getCapstoneDefinitionForModule(moduleSlug)
   return definition ? { slug: definition.moduleSlug, title: definition.title } : null
 }
 

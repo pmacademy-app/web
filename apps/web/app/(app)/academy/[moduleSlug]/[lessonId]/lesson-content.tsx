@@ -53,6 +53,7 @@ import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSess
 import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
+import { getCapstoneHref } from '@/config/capstones'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
 import {
   getCoreBlocks,
@@ -747,7 +748,7 @@ export default function LessonPageContent({
               Apply what you learned across Module {moduleNumber} by building a real-world product deliverable for your public portfolio.
             </p>
             <Link
-              href={`/capstones/${lesson.module}`}
+              href={getCapstoneHref(lesson.module)}
               className="inline-flex items-center justify-center w-full rounded-xl bg-primary px-5 py-3 text-xs font-bold text-primary-foreground shadow hover:bg-primary/90 transition-all"
             >
               Start Capstone Project →

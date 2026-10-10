@@ -7,7 +7,7 @@ import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserStreakStatus } from '@/lib/streaks-db'
 import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
-import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
+import { CAPSTONE_DEFINITIONS, getCurriculumModuleForCapstone } from '@/config/capstones'
 import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
 
     if (!isDone) {
       // Check if all lessons in this module are completed
-      const moduleLessons = curriculumLessons.filter((l) => l.module === cap.moduleSlug)
+      const moduleLessons = curriculumLessons.filter((l) => l.module === getCurriculumModuleForCapstone(cap.moduleSlug))
       const allModuleLessonsDone = moduleLessons.length > 0 && moduleLessons.every((l) => completedLessonIds.has(l.id))
 
       if (allModuleLessonsDone) {
