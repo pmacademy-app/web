@@ -784,6 +784,7 @@ export type Database = {
           is_read: boolean
           priority: number
           read_at: string | null
+          secondary_action: Json | null
           title: string
           user_id: string
         }
@@ -799,6 +800,7 @@ export type Database = {
           is_read?: boolean
           priority?: number
           read_at?: string | null
+          secondary_action?: Json | null
           title: string
           user_id: string
         }
@@ -814,6 +816,7 @@ export type Database = {
           is_read?: boolean
           priority?: number
           read_at?: string | null
+          secondary_action?: Json | null
           title?: string
           user_id?: string
         }

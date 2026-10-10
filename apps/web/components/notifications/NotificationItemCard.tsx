@@ -2,6 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import type { NotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
+import { trackNotificationActionClicked } from '@/lib/analytics'
 import {
   Clock,
   ExternalLink,
@@ -32,6 +35,8 @@ export interface NotificationItem {
   priority?: string
   isRead: boolean
   deepLink?: string
+  /** Optional second action (share, add to LinkedIn), already validated by the API. */
+  secondaryAction?: NotificationSecondaryAction | null
   icon?: string
   createdAt: string
 }
@@ -146,8 +151,7 @@ export function NotificationItemCard({
       : 'bg-primary/5 border-primary/20 text-foreground shadow-xs hover:border-primary/40 hover:bg-primary/10'
   }`
 
-  if (item.deepLink) {
-    return (
+  const card = item.deepLink ? (
       <Link
         href={item.deepLink}
         onClick={() => {
@@ -158,10 +162,7 @@ export function NotificationItemCard({
       >
         {cardInner}
       </Link>
-    )
-  }
-
-  return (
+  ) : (
     <div
       onClick={handleInteraction}
       className={`block w-full cursor-pointer ${cardClassName}`}
@@ -174,6 +175,57 @@ export function NotificationItemCard({
       }}
     >
       {cardInner}
+    </div>
+  )
+
+  // Rendered beside the card, never inside it: the card is itself a link, and interactive
+  // controls must not nest.
+  if (!item.secondaryAction) return card
+  return (
+    <div className="space-y-1.5">
+      {card}
+      <SecondaryActionRow action={item.secondaryAction} onUse={handleInteraction} />
+    </div>
+  )
+}
+
+/**
+ * ShareButton picks its icon from `navigator` during render, so it is client-only (as on the
+ * dashboard proof card) to avoid a hydration mismatch.
+ */
+const ShareButton = dynamic(
+  () => import('@/components/portfolio/ShareButton').then((mod) => mod.ShareButton),
+  { ssr: false, loading: () => <span aria-hidden="true" className="inline-block h-8 w-24 rounded-lg bg-muted/40" /> },
+)
+
+const ACTION_LINK =
+  'inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary'
+
+function SecondaryActionRow({ action, onUse }: { action: NotificationSecondaryAction; onUse: () => void }) {
+  const use = () => {
+    trackNotificationActionClicked(action.kind)
+    onUse()
+  }
+
+  return (
+    <div className="flex items-center justify-end gap-2 px-1" data-testid="notification-secondary-action">
+      {action.kind === 'share_portfolio' && (
+        <div className="inline-flex" onClickCapture={use}>
+          <ShareButton username={action.username} context={action.context} />
+        </div>
+      )}
+      {action.kind === 'link' && (
+        <Link href={action.href} onClick={use} className={ACTION_LINK}>
+          {action.label}
+        </Link>
+      )}
+      {action.kind === 'linkedin_add_to_profile' && (
+        <a href={action.url} target="_blank" rel="noopener noreferrer" onClick={use} className={ACTION_LINK}>
+          {action.label}
+          <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      )}
     </div>
   )
 }

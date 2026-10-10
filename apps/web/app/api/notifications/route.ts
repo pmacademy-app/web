@@ -4,6 +4,7 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
+import { parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
 import { clampPagination, paginated, toRange, DEFAULT_PAGE_SIZE } from '@/lib/api/pagination'
 
@@ -18,6 +19,7 @@ interface InAppNotificationRow {
   title: string
   body: string
   action_url?: string | null
+  secondary_action?: unknown
   priority: number
   is_read: boolean
   created_at: string
@@ -64,7 +66,7 @@ export const GET = withRoute(
 
     let query = supabase
       .from('in_app_notifications')
-      .select('id, user_id, category, title, body, action_url, priority, is_read, created_at', { count: 'exact' })
+      .select('id, user_id, category, title, body, action_url, secondary_action, priority, is_read, created_at', { count: 'exact' })
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -106,6 +108,8 @@ export const GET = withRoute(
       priority: priorityLevelFromNumber(item.priority),
       isRead: Boolean(item.is_read),
       deepLink: item.action_url || getDeepLinkForCategory(item.category),
+      // Validated on read: a malformed stored value renders no action.
+      secondaryAction: parseNotificationSecondaryAction(item.secondary_action),
       icon: item.category ? getIconForCategory(item.category) : 'bell',
       createdAt: item.created_at,
     }))

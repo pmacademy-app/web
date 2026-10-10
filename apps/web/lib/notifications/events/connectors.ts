@@ -51,6 +51,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
           title: content.title,
           body: content.body,
           actionUrl: content.actionUrl,
+          secondaryAction: content.secondaryAction,
           priority: event.priority,
         })
       }

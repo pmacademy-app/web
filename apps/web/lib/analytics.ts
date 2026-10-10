@@ -107,6 +107,7 @@ type EventMap = {
 
   // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
   referral_modal_opened:           { source: string }
+  notification_action_clicked:     { kind: 'share_portfolio' | 'link' | 'linkedin_add_to_profile' }
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
   referral_signup_completed:       Record<string, never>
@@ -332,6 +333,11 @@ export function trackDeepDiveOpened(lessonId: string) {
 }
 
 // ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────
+
+/** Fired when a notification's second action (share, add to LinkedIn, link) is used. */
+export function trackNotificationActionClicked(kind: EventMap['notification_action_clicked']['kind']) {
+  trackEvent('notification_action_clicked', { kind })
+}
 
 /** Fired each time the referral share modal opens, with the surface that opened it. */
 export function trackReferralModalOpened(source: string) {

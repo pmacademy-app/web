@@ -1,3 +1,4 @@
+import { parseNotificationSecondaryAction, type NotificationSecondaryAction } from './secondary-action'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '../feature-flags/service'
 import {
@@ -35,6 +36,8 @@ export interface InAppNotificationWriteParams {
   title: string
   body: string
   actionUrl?: string
+  /** Optional second action (e.g. share); dropped unless it is a valid shape. */
+  secondaryAction?: NotificationSecondaryAction | null
   priority?: keyof typeof PRIORITY_MATRIX
   preloadedPreferences?: UserNotificationPreferences
 }
@@ -111,6 +114,7 @@ export async function createInAppNotification(params: InAppNotificationWritePara
         title: params.title,
         body: params.body,
         action_url: params.actionUrl || null,
+        secondary_action: parseNotificationSecondaryAction(params.secondaryAction),
         priority: priorityNumber,
         is_read: false,
       })
@@ -137,6 +141,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
   title: string
   body: string
   actionUrl?: string
+  secondaryAction?: NotificationSecondaryAction
 } {
   const payload = event.payload || {}
   const { userName } = event
