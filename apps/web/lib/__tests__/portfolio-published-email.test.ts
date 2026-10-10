@@ -104,3 +104,30 @@ describe('ModuleCompleted email', () => {
     expect(text).toContain('one step closer')
   })
 })
+
+// Growth R5 / B9: the weekly recap shows real stats, one proof next step and an invite line.
+describe('WeeklyRecap email', () => {
+  it('shows the next step and the live referral reward', async () => {
+    const { html, text } = await renderEmailTemplate('learning.weekly_recap', {
+      userName: 'Jordan',
+      lessonsCompletedThisWeek: 3,
+      xpEarnedThisWeek: 90,
+      currentStreak: 2,
+      daysStudiedThisWeek: 2,
+      proofStepText: 'Your portfolio is ready. Make it public so recruiters and peers can see your work.',
+      proofStepUrl: 'https://prodily.example/settings?tab=portfolio',
+      referralRewardXp: 75,
+    })
+    expect(text).toContain('Your next step:')
+    expect(html).toContain('https://prodily.example/settings?tab=portfolio')
+    expect(text).toContain('+75 XP')
+    expect(text).toContain('2 / 7')
+  })
+
+  it('never invents numbers and omits the optional lines when absent', async () => {
+    const { text } = await renderEmailTemplate('learning.weekly_recap', { userName: 'Jordan' })
+    expect(text).not.toContain('Your next step:')
+    expect(text).not.toContain('Invite them')
+    expect(text).toContain('0 / 7')
+  })
+})

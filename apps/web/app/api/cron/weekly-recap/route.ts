@@ -6,6 +6,10 @@ import { EmailAutomationsService } from '@/lib/notifications/automations/service
 import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { loadProofStates } from '@/lib/growth/proof-state-db'
+import { selectProofNextStep } from '@/lib/growth/proof-state'
+import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
+import { BRAND } from '@/lib/brand'
 
 /** Keyset pagination batch size for weekly recap processing */
 const BATCH_SIZE = 100
@@ -65,6 +69,9 @@ export const POST = withRoute(
     const startTime = Date.now()
     const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
     const weekNumber = Math.ceil(new Date().getDate() / 7)
+    const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
+    // Growth R5 B9: the referral line states the live reward (once per run).
+    const referralRewardXp = await resolveReferralRewardXp()
 
     try {
       let lastSeenId: string | null = null
@@ -109,7 +116,7 @@ export const POST = withRoute(
         const [xpRes, lessonRes, prefMap] = await Promise.all([
           supabase
             .from('xp_events')
-            .select('user_id, xp_amount')
+            .select('user_id, xp_amount, created_at')
             .in('user_id', userIds)
             .gte('created_at', weekStartDate),
           supabase
@@ -122,9 +129,16 @@ export const POST = withRoute(
         ])
 
         const xpMap = new Map<string, number>()
-        for (const row of (xpRes.data || []) as Array<{ user_id: string; xp_amount: number }>) {
+        // Distinct UTC days with any XP this week: the recap's "days studied".
+        const studyDays = new Map<string, Set<string>>()
+        for (const row of (xpRes.data || []) as Array<{ user_id: string; xp_amount: number; created_at?: string }>) {
           if (!row.user_id) continue
           xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.xp_amount || 0))
+          if (row.created_at) {
+            const days = studyDays.get(row.user_id) ?? new Set<string>()
+            days.add(row.created_at.slice(0, 10))
+            studyDays.set(row.user_id, days)
+          }
         }
 
         const lessonMap = new Map<string, number>()
@@ -133,6 +147,14 @@ export const POST = withRoute(
         }
 
         const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+        // Learners due a recap this run, collected first so their proof state loads in one batch.
+        const due: Array<{
+          user: (typeof users)[number]
+          userPref: ReturnType<typeof prefMap.get>
+          localDate: string
+          xpEarnedThisWeek: number
+          lessonsCompletedCount: number
+        }> = []
 
         for (const user of users) {
           if (!user.email) continue
@@ -162,7 +184,16 @@ export const POST = withRoute(
             continue
           }
 
-          const idempotencyKey = `weekly-recap-${user.id}-${userLocalTime.localDate}`
+          due.push({ user, userPref, localDate: userLocalTime.localDate, xpEarnedThisWeek, lessonsCompletedCount })
+        }
+
+        // Growth R5 B9: one proof next-step line per recap. A failed read only drops the line.
+        const proofStates = due.length > 0 ? await loadProofStates(supabase, due.map((d) => d.user.id)).catch(() => null) : null
+
+        for (const { user, userPref, localDate, xpEarnedThisWeek, lessonsCompletedCount } of due) {
+          const idempotencyKey = `weekly-recap-${user.id}-${localDate}`
+          const proofState = proofStates?.get(user.id)
+          const nextStep = proofState ? selectProofNextStep(proofState) : null
 
           const result = await enqueueNotificationItem({
             userId: user.id,
@@ -172,10 +203,14 @@ export const POST = withRoute(
             templateKey: 'learning.weekly_recap',
             templateVariables: {
               userName: user.name || user.email.split('@')[0],
-              lessonsCompletedCount,
+              lessonsCompletedThisWeek: lessonsCompletedCount,
               xpEarnedThisWeek,
               currentStreak: user.current_streak || 0,
+              daysStudiedThisWeek: studyDays.get(user.id)?.size ?? 0,
               weekNumber,
+              proofStepText: nextStep && nextStep.kind !== 'none' ? nextStep.text : null,
+              proofStepUrl: nextStep && nextStep.kind !== 'none' ? `${siteOrigin}${nextStep.path}` : null,
+              referralRewardXp,
             },
             eventId: idempotencyKey,
             idempotencyKey,
