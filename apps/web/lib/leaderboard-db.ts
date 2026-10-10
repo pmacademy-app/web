@@ -382,14 +382,23 @@ async function ensureUserPresent(
 
 /**
  * Fetches weekly consistency rankings for opted-in users (global scope).
+ *
+ * `skipIfOptedOut` (the dashboard widget) returns an empty payload for a learner who opted out,
+ * before the roster-wide aggregation runs: the widget renders nothing for them, so building the
+ * board would be wasted work. The leaderboard page leaves it off and still shows the learner
+ * their own entry.
  */
 export async function getWeeklyLeaderboard(
   supabase: SupabaseClient<Database>,
   userId: string,
-  targetWeekStart?: string
+  targetWeekStart?: string,
+  options: { skipIfOptedOut?: boolean } = {}
 ): Promise<WeeklyLeaderboardPayload> {
   const weekStart = targetWeekStart || calculateWeekStart()
   const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+  if (options.skipIfOptedOut && !isOptedIn) {
+    return { weekStart, isOptedIn, entries: [], personalEntry: null }
+  }
   const cached = await getOrBuildWeeklyRawMetrics(supabase, weekStart)
 
   const rawMetrics = await ensureUserPresent(supabase, cached.rawMetrics, userId)

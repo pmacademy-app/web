@@ -234,3 +234,29 @@ describe('weekly leaderboard negative cache for failed rebuilds', () => {
     expect(dbMocks.selectRankedUsers).toHaveBeenCalledTimes(1)
   })
 })
+
+// Growth R5 / F2: the dashboard widget renders nothing for an opted-out learner, so it must not
+// trigger the roster-wide aggregation for them.
+describe('weekly leaderboard skipIfOptedOut', () => {
+  it('returns an empty opted-out payload without aggregating', async () => {
+    dbMocks.selectLeaderboardSettings.mockImplementation(async () => ({ is_opted_in: false, allow_friend_requests: true }))
+    const { getWeeklyLeaderboard } = await loadModule()
+
+    const payload = await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START, { skipIfOptedOut: true })
+
+    expect(payload).toEqual({ weekStart: WEEK_START, isOptedIn: false, entries: [], personalEntry: null })
+    expect(dbMocks.selectRankedUsers).not.toHaveBeenCalled()
+    expect(dbMocks.selectWeeklyLessonProgress).not.toHaveBeenCalled()
+  })
+
+  it('still aggregates for an opted-in learner, and for opted-out callers that do not skip', async () => {
+    const { getWeeklyLeaderboard } = await loadModule()
+    await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START, { skipIfOptedOut: true })
+    expect(dbMocks.selectRankedUsers).toHaveBeenCalledTimes(1)
+
+    dbMocks.selectLeaderboardSettings.mockImplementation(async () => ({ is_opted_in: false, allow_friend_requests: true }))
+    const fresh = await loadModule()
+    const payload = await fresh.getWeeklyLeaderboard(supabase, USER_ID, '2026-10-12')
+    expect(payload.personalEntry).not.toBeNull()
+  })
+})

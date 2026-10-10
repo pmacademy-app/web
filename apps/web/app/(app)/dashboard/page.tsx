@@ -45,7 +45,7 @@ export default async function DashboardPage() {
   // widget's <Suspense> boundary below: the roster-wide aggregation never blocks the page.
   // The catch is attached immediately so a failure can never become an unhandled
   // rejection; the widget renders its "unavailable" state for `null`.
-  const leaderboardPromise = getWeeklyLeaderboard(supabase, authUser.id).catch((error: unknown) => {
+  const leaderboardPromise = getWeeklyLeaderboard(supabase, authUser.id, undefined, { skipIfOptedOut: true }).catch((error: unknown) => {
     console.error('[dashboard] weekly leaderboard widget failed to load', error)
     return null
   })
