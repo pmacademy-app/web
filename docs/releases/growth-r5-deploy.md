@@ -29,8 +29,14 @@ psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v deployed_at="'<time from step 2, ISO 
 It marks celebrations that the old code claimed between steps 1 and 2 as celebrated, so they are
 not shown twice. It never touches rows read after the new code went live.
 
-## 4. Smoke checks
+## 4. Before the nudges go live: dry run
+
+Run the lifecycle cron once with `?dryRun=true&force=true` (cron secret or an admin session). It writes nothing (no email, no in-app, no holdout record) and returns `lifecycleQueued`, `heldOut` and `proofNudges.sent` per nudge: the volume to sign off. Without `force=true` it counts only learners in their delivery hour.
+
+## 5. Smoke checks
 
 - The bell loads and shows notifications.
 - A test learner who completes a module sees the module celebration once.
 - Opening a new achievement notification in the bell, then reloading, still shows its celebration once.
+- A published capstone opens at `/p/<username>/capstones/<module>`; its link preview shows the case-study card; making the portfolio private turns both into a 404 / the generic card.
+- Admin Settings → Learning shows the live XP values (10 / 5 / 2 / 15 by default) before any save.
