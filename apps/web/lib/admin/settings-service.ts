@@ -10,6 +10,16 @@ import type {
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
 import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '../referral/reward'
+import {
+  XP_SETTINGS_VERSION,
+  XP_VALUES,
+  getRuntimeXpValues,
+  invalidateRuntimeXpCache,
+  type XpValuesConfig,
+} from '../xp/xp'
+
+/** Upper bound for any admin XP setting; anything above keeps the current value. */
+const MAX_XP_SETTING = 10_000
 
 /**
  * Settings Service (Phase 8).
@@ -39,11 +49,34 @@ const DEFAULT_PRODUCT_SETTINGS: ProductSettings = {
   sessionTimeoutMinutes: 10080, // 7 days
 }
 
-const DEFAULT_LEARNING_SETTINGS: LearningSettings = {
-  xpPerLessonComplete: 50,
-  xpPerQuizPass: 100,
-  xpPerFlashcardReview: 10,
-  xpPerReflection: 25,
+/** Admin XP fields from runtime XP values (the inverse of resolveXpValues in lib/xp/xp.ts). */
+export function xpFieldsFromRuntime(xp: XpValuesConfig): Pick<
+  LearningSettings,
+  | 'xpPerLessonComplete'
+  | 'xpPerQuizPass'
+  | 'xpPerFlashcardReview'
+  | 'xpPerReflection'
+  | 'xpReferralReward'
+  | 'xpQuizPerfectBonus'
+  | 'xpPerCapstoneSubmitted'
+  | 'xpStreakBaseReward'
+> {
+  return {
+    xpPerLessonComplete: xp.THEORY_READ,
+    xpPerQuizPass: xp.QUIZ_CORRECT,
+    xpPerFlashcardReview: xp.FLASHCARD_REVIEW,
+    xpPerReflection: xp.REFLECTION_SUBMITTED,
+    xpReferralReward: xp.REFERRAL_ACTIVATION,
+    xpQuizPerfectBonus: xp.QUIZ_PERFECT_BONUS,
+    xpPerCapstoneSubmitted: xp.CAPSTONE_SUBMITTED,
+    xpStreakBaseReward: xp.DAILY_STREAK_BASE,
+  }
+}
+
+// XP defaults ARE the live defaults (XP_VALUES): saving the form unchanged changes nobody's XP.
+// (They used to be 50/100/10/25, which never applied because the runtime read another key.)
+export const DEFAULT_LEARNING_SETTINGS: LearningSettings = {
+  ...xpFieldsFromRuntime(XP_VALUES),
   xpReferralReward: REFERRAL_REWARD_XP,
   streakFreezeEnabled: true,
   streakFreezeCostXp: 500,
@@ -238,8 +271,21 @@ export class SettingsService {
     return this.getSettings<ProductSettings>('product')
   }
 
+  /**
+   * Learning settings as they are in effect. A record not yet saved by the reconciled form
+   * (xpSettingsVersion !== 2) never drove runtime XP, so its XP numbers are replaced by the values
+   * actually in effect: the admin sees, and a first save keeps, what learners really earn.
+   */
   public static async getLearningSettings(): Promise<LearningSettings> {
-    return this.getSettings<LearningSettings>('learning')
+    const settings = await this.getSettings<LearningSettings>('learning')
+    if (settings.xpSettingsVersion === XP_SETTINGS_VERSION) return settings
+    let live: XpValuesConfig = XP_VALUES
+    try {
+      live = await getRuntimeXpValues(createServiceRoleClient(), true)
+    } catch {
+      // No database client (e.g. env not configured): the static defaults are what is in effect.
+    }
+    return { ...settings, ...xpFieldsFromRuntime(live) }
   }
 
   public static async getEmailSettings(): Promise<EmailSettings> {
@@ -320,10 +366,30 @@ export class SettingsService {
   ): Promise<LearningSettings> {
     const current = await this.getLearningSettings()
     const updated = { ...current, ...partial }
-    // Store the reward that will actually be paid, so the admin never sees a value (0, too large,
-    // fractional) that the referral service would silently replace with the default.
+    // Store only values the runtime will actually use: an invalid number keeps the current one
+    // instead of being silently replaced by a default at award time.
+    const positive = (value: unknown, fallback: number) =>
+      typeof value === 'number' && Number.isInteger(value) && value > 0 && value <= MAX_XP_SETTING ? value : fallback
+    updated.xpPerLessonComplete = positive(updated.xpPerLessonComplete, current.xpPerLessonComplete)
+    updated.xpPerQuizPass = positive(updated.xpPerQuizPass, current.xpPerQuizPass)
+    updated.xpPerFlashcardReview = positive(updated.xpPerFlashcardReview, current.xpPerFlashcardReview)
+    updated.xpPerReflection = positive(updated.xpPerReflection, current.xpPerReflection)
+    updated.xpPerCapstoneSubmitted = positive(updated.xpPerCapstoneSubmitted, current.xpPerCapstoneSubmitted)
+    updated.xpStreakBaseReward = positive(updated.xpStreakBaseReward, current.xpStreakBaseReward)
+    updated.xpQuizPerfectBonus =
+      typeof updated.xpQuizPerfectBonus === 'number' &&
+      Number.isInteger(updated.xpQuizPerfectBonus) &&
+      updated.xpQuizPerfectBonus >= 0 &&
+      updated.xpQuizPerfectBonus <= MAX_XP_SETTING
+        ? updated.xpQuizPerfectBonus
+        : current.xpQuizPerfectBonus
     updated.xpReferralReward = normalizeReferralRewardXp(updated.xpReferralReward)
-    return this.upsertSettings('learning', updated)
+    // From now on this record drives runtime XP (lib/xp/xp.ts).
+    updated.xpSettingsVersion = XP_SETTINGS_VERSION
+    const saved = await this.upsertSettings('learning', updated)
+    // This instance picks the change up at once; others within their 30s runtime cache.
+    invalidateRuntimeXpCache()
+    return saved
   }
 
   public static async updateEmailSettings(

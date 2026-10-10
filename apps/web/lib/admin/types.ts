@@ -690,6 +690,16 @@ export interface LearningSettings {
   xpPerReflection: number
   /** XP the referrer earns when an invited learner completes their first lesson. */
   xpReferralReward: number
+  /** Bonus for a perfect first quiz attempt (0 turns it off). */
+  xpQuizPerfectBonus: number
+  xpPerCapstoneSubmitted: number
+  /** Base XP for keeping the daily streak going. */
+  xpStreakBaseReward: number
+  /**
+   * Set to 2 when saved by the reconciled admin form. Only such a record drives runtime XP
+   * (lib/xp/xp.ts); older records are ignored. Written by the server, never by the form.
+   */
+  xpSettingsVersion?: number
   // Streaks
   streakFreezeEnabled: boolean
   streakFreezeCostXp: number

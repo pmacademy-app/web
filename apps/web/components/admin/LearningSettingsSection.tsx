@@ -36,13 +36,13 @@ export function LearningSettingsSection({
       {/* XP Group */}
       <AdminSection title="XP Rewards" icon={Zap} meta="Experience points for learning activities">
         <SettingRow
-          label="XP per Lesson Complete"
-          description="XP awarded when a learner completes a lesson."
+          label="XP for reading a lesson"
+          description="XP awarded when a learner reads a lesson's theory (once per lesson)."
         >
           <NumberInput
             value={data.xpPerLessonComplete}
             onChange={(e) => handleInputChange('xpPerLessonComplete', parseInt(e.target.value) || 0)}
-            min={0}
+            min={1}
             max={1000}
             step={5}
             disabled={isSaving}
@@ -50,13 +50,13 @@ export function LearningSettingsSection({
         </SettingRow>
 
         <SettingRow
-          label="XP per Quiz Pass"
-          description="XP awarded when a learner passes a quiz."
+          label="XP per correct quiz answer"
+          description="XP awarded for each correct answer in a lesson quiz."
         >
           <NumberInput
             value={data.xpPerQuizPass}
             onChange={(e) => handleInputChange('xpPerQuizPass', parseInt(e.target.value) || 0)}
-            min={0}
+            min={1}
             max={1000}
             step={5}
             disabled={isSaving}
@@ -70,7 +70,7 @@ export function LearningSettingsSection({
           <NumberInput
             value={data.xpPerFlashcardReview}
             onChange={(e) => handleInputChange('xpPerFlashcardReview', parseInt(e.target.value) || 0)}
-            min={0}
+            min={1}
             max={100}
             step={1}
             disabled={isSaving}
@@ -84,9 +84,51 @@ export function LearningSettingsSection({
           <NumberInput
             value={data.xpPerReflection}
             onChange={(e) => handleInputChange('xpPerReflection', parseInt(e.target.value) || 0)}
-            min={0}
+            min={1}
             max={500}
             step={5}
+            disabled={isSaving}
+          />
+        </SettingRow>
+
+        <SettingRow
+          label="Perfect quiz bonus"
+          description="Extra XP for answering every question right on the first attempt. 0 turns it off."
+        >
+          <NumberInput
+            value={data.xpQuizPerfectBonus}
+            onChange={(e) => handleInputChange('xpQuizPerfectBonus', parseInt(e.target.value) || 0)}
+            min={0}
+            max={1000}
+            step={5}
+            disabled={isSaving}
+          />
+        </SettingRow>
+
+        <SettingRow
+          label="XP per capstone submitted"
+          description="XP awarded when a learner submits a capstone."
+        >
+          <NumberInput
+            value={data.xpPerCapstoneSubmitted}
+            onChange={(e) => handleInputChange('xpPerCapstoneSubmitted', parseInt(e.target.value) || 0)}
+            min={1}
+            max={10000}
+            step={10}
+            disabled={isSaving}
+          />
+        </SettingRow>
+
+        <SettingRow
+          label="Daily streak XP"
+          description="Base XP for keeping the daily learning streak going."
+        >
+          <NumberInput
+            value={data.xpStreakBaseReward}
+            onChange={(e) => handleInputChange('xpStreakBaseReward', parseInt(e.target.value) || 0)}
+            min={1}
+            max={1000}
+            step={1}
             disabled={isSaving}
           />
         </SettingRow>
