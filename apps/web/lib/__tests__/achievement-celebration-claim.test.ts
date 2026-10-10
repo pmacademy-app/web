@@ -509,6 +509,27 @@ describe('claimNextAchievementCelebration — capstones', () => {
 // ─── Fellow ──────────────────────────────────────────────────────────────────
 
 describe('claimNextAchievementCelebration — fellow', () => {
+  // Growth R5 P1: grants since R5 carry the grant time, so a re-grant celebrates again.
+  it('claims a per-grant key that names the caller', async () => {
+    db = createFakeSupabase({
+      users: [userRow({ is_fellow: true })],
+      in_app_notifications: [notificationRow('n-regrant', `fellow-granted-${USER}-1791590400000`)],
+    })
+    expect(await claim(db)).toMatchObject({ kind: 'fellow', notificationId: 'n-regrant' })
+  })
+
+  it.each([
+    ['another learner', `fellow-granted-${OTHER_USER}-1791590400000`],
+    ['a non-numeric suffix', `fellow-granted-${USER}-abc`],
+  ])('rejects a per-grant key naming %s', async (_label, key) => {
+    db = createFakeSupabase({
+      users: [userRow({ is_fellow: true })],
+      in_app_notifications: [notificationRow('n-bad', key)],
+    })
+    expect(await claim(db)).toBeNull()
+    expect(db.notification('n-bad')).toMatchObject({ is_read: false })
+  })
+
   it('claims the fellow grant for a current fellow', async () => {
     db = createFakeSupabase({
       users: [userRow({ is_fellow: true, username: null, name: null })],

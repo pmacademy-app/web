@@ -303,6 +303,14 @@ async function verifyModules(
 }
 
 /**
+ * A Fellow key names the caller: `<userId>` (grants before Growth R5) or `<userId>-<grant epoch>`.
+ */
+function isOwnFellowGrantSubject(subject: string, userId: string): boolean {
+  if (subject === userId) return true
+  return subject.startsWith(`${userId}-`) && /^\d+$/.test(subject.slice(userId.length + 1))
+}
+
+/**
  * Marks one notification read if — and only if — it is still unread.
  *
  * `is_read = false` is part of the write's own predicate, so the database decides the
@@ -377,7 +385,7 @@ export async function claimNextAchievementCelebration(
     if (kind === 'fellow') {
       // The key must name the caller, and the grant must still stand.
       verified = ofKind
-        .filter((candidate) => candidate.subject === userId && user.is_fellow === true)
+        .filter((candidate) => isOwnFellowGrantSubject(candidate.subject, userId) && user.is_fellow === true)
         .map((candidate) => ({
           notificationId: candidate.notificationId,
           celebration: { kind: 'fellow', notificationId: candidate.notificationId, portfolio },

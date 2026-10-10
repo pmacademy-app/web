@@ -150,6 +150,9 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+/** One event per grant: `fellow-granted-<userId>-<grant epoch ms>` (Growth R5 P1). */
+const GRANT_ID = /^fellow-granted-user-1-\d+$/
+
 describe('toggleUserFellowStatus → fellow.granted', () => {
   it('dispatches fellow.granted once on a false → true grant, with real recipient details', async () => {
     const { client, updates } = usersClient(publicLearner)
@@ -161,7 +164,7 @@ describe('toggleUserFellowStatus → fellow.granted', () => {
     expect(updates).toEqual([{ is_fellow: true }])
     expect(dispatchSpy).toHaveBeenCalledTimes(1)
     const event = dispatchSpy.mock.calls[0][0] as any
-    expect(event.id).toBe('fellow-granted-user-1')
+    expect(event.id).toMatch(GRANT_ID)
     expect(event.event).toBe('fellow.granted')
     expect(event.userId).toBe('user-1')
     expect(event.userEmail).toBe('jordan@example.com')
@@ -205,7 +208,7 @@ describe('toggleUserFellowStatus → fellow.granted', () => {
     expect(updates).toEqual([{ is_fellow: true }, { is_fellow: true }])
     expect(state?.is_fellow).toBe(true)
     expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect((dispatchSpy.mock.calls[0][0] as any).id).toBe('fellow-granted-user-1')
+    expect((dispatchSpy.mock.calls[0][0] as any).id).toMatch(GRANT_ID)
   })
 
   it('a retried grant succeeds without dispatching again', async () => {
@@ -272,8 +275,6 @@ describe('toggleUserFellowStatus → fellow.granted', () => {
 
 describe('Fellow request review notifications', () => {
   const REQUESTED_AT = '2026-10-01T00:00:00Z'
-  const BEFORE_REQUEST = '2026-09-01T00:00:00Z'
-  const AFTER_REQUEST = '2026-10-02T00:00:00Z'
 
   /**
    * Table-aware client for `reviewRequest`, which runs the real `toggleUserFellowStatus`.
@@ -345,170 +346,62 @@ describe('Fellow request review notifications', () => {
 
   const approve = () => FellowRequestAdminService.reviewRequest('admin-1', 'admin@prodily.app', 'req-1', 'approved')
 
-  it('first-time approval is announced by the event alone (no row yet → no fallback)', async () => {
-    const { client, users, requestUpdates } = reviewClient({ grantRowAt: null })
+  it('approval is announced by the fellow.granted event alone, with no extra in-app row', async () => {
+    const { client, users, requestUpdates } = reviewClient()
     clientHolder.current = client
 
     expect(await approve()).toEqual({ success: true })
 
     expect(users.state?.is_fellow).toBe(true)
-    expect(requestUpdates).toHaveLength(1)
     expect(requestUpdates[0].status).toBe('approved')
     expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect((dispatchSpy.mock.calls[0][0] as any).id).toBe('fellow-granted-user-1')
+    expect((dispatchSpy.mock.calls[0][0] as any).id).toMatch(GRANT_ID)
     expect(createInAppSpy).not.toHaveBeenCalled()
   })
 
-  it("first-time approval writes no fallback when the grant row is this approval's own (created after the request)", async () => {
-    const { client, grantLookups } = reviewClient({ grantRowAt: AFTER_REQUEST })
-    clientHolder.current = client
+  // Growth R5 P1: a re-approval after a revoke is a new grant, announced in full again.
+  it('a re-approval after a revoke is announced again, under a new event id', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    try {
+      const users = usersClient(publicLearner)
+      clientHolder.current = users.client
+      vi.setSystemTime(new Date('2026-09-01T00:00:00Z'))
+      expect(await AdminConsoleService.toggleUserFellowStatus('user-1', true)).toBe(true)
+      expect(await AdminConsoleService.toggleUserFellowStatus('user-1', false)).toBe(true)
+      vi.setSystemTime(new Date('2026-10-02T00:00:00Z'))
+      expect(await AdminConsoleService.toggleUserFellowStatus('user-1', true)).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
 
-    expect(await approve()).toEqual({ success: true })
-
-    expect(grantLookups).toEqual([
-      [
-        ['user_id', 'user-1'],
-        ['idempotency_key', 'fellow-granted-user-1'],
-      ],
-    ])
-    expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect(createInAppSpy).not.toHaveBeenCalled()
+    const ids = dispatchSpy.mock.calls.map((call) => (call[0] as any).id)
+    expect(ids).toHaveLength(2)
+    expect(ids[0]).toMatch(GRANT_ID)
+    expect(ids[1]).toMatch(GRANT_ID)
+    expect(ids[0]).not.toBe(ids[1])
   })
 
-  it('re-approval after an earlier grant writes exactly one request-scoped fallback', async () => {
-    const { client, users } = reviewClient({ grantRowAt: BEFORE_REQUEST })
-    clientHolder.current = client
+  it('a double-clicked approval announces the grant once', async () => {
+    clientHolder.current = reviewClient().client
 
-    expect(await approve()).toEqual({ success: true })
-
-    expect(users.state?.is_fellow).toBe(true)
-    // The event still dispatches (its in-app row and email are the ones that get deduped).
-    expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect(createInAppSpy).toHaveBeenCalledTimes(1)
-    const params = createInAppSpy.mock.calls[0][0] as any
-    expect(params.idempotencyKey).toBe('fellow-request-approved-req-1')
-    expect(params.userId).toBe('user-1')
-    expect(params.category).toBe('achievements')
-    expect(params.priority).toBe('high')
-    expect(params.title).toBe('You are now a PM Fellow!')
-    expect(params.body).toMatch(/PM Fellow/)
-    expect(params.actionUrl).toBe('/p/jordanpm')
-  })
-
-  it('the fallback links to portfolio settings when the learner has no username', async () => {
-    clientHolder.current = reviewClient({ learner: { ...publicLearner, username: null }, grantRowAt: BEFORE_REQUEST }).client
-
-    expect(await approve()).toEqual({ success: true })
-
-    expect(createInAppSpy).toHaveBeenCalledTimes(1)
-    expect((createInAppSpy.mock.calls[0][0] as any).actionUrl).toBe('/settings?tab=portfolio')
-  })
-
-  it('a double-clicked re-approval reuses one idempotency key, so at most one fallback row', async () => {
-    clientHolder.current = reviewClient({ grantRowAt: BEFORE_REQUEST }).client
-    // Stand in for the `(user_id, idempotency_key)` de-duplication of the real write path.
-    const rows = new Set<string>()
-    createInAppSpy.mockImplementation(async (params: any) => {
-      const key = `${params.userId}:${params.idempotencyKey}`
-      if (rows.has(key)) return { success: true, id: 'n-1', reason: 'duplicate_idempotent' }
-      rows.add(key)
-      return { success: true, id: 'n-1' }
-    })
-
-    // Both reviews read the request as pending and the learner as a non-Fellow before either grant lands.
     const results = await Promise.all([approve(), approve()])
 
     expect(results).toEqual([{ success: true }, { success: true }])
     expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect(createInAppSpy).toHaveBeenCalledTimes(2)
-    expect(createInAppSpy.mock.calls.map((call) => (call[0] as any).idempotencyKey)).toEqual([
-      'fellow-request-approved-req-1',
-      'fellow-request-approved-req-1',
-    ])
-    expect([...rows]).toEqual(['user-1:fellow-request-approved-req-1'])
+    expect(createInAppSpy).not.toHaveBeenCalled()
   })
 
-  it('a retried approval after the grant landed writes no further fallback', async () => {
-    clientHolder.current = reviewClient({ grantRowAt: BEFORE_REQUEST }).client
-
-    expect(await approve()).toEqual({ success: true })
-    // e.g. the request-status update failed the first time and the admin clicks Approve again.
-    expect(await approve()).toEqual({ success: true })
-
-    expect(dispatchSpy).toHaveBeenCalledTimes(1)
-    expect(createInAppSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('writes no fallback when the learner was already a Fellow at approval time', async () => {
-    const { client, grantLookups } = reviewClient({
-      learner: { ...publicLearner, is_fellow: true },
-      grantRowAt: BEFORE_REQUEST,
-    })
-    clientHolder.current = client
+  it('announces nothing when the learner was already a Fellow at approval time', async () => {
+    clientHolder.current = reviewClient({ learner: { ...publicLearner, is_fellow: true } }).client
 
     expect(await approve()).toEqual({ success: true })
 
     expect(dispatchSpy).not.toHaveBeenCalled()
-    expect(grantLookups).toEqual([])
     expect(createInAppSpy).not.toHaveBeenCalled()
   })
 
-  it('approval still succeeds when the pre-grant learner read throws (and the grant is not attempted twice)', async () => {
-    const { client, requestUpdates } = reviewClient({ usersThrow: true, grantRowAt: BEFORE_REQUEST })
-    clientHolder.current = client
-    const toggleSpy = vi.spyOn(AdminConsoleService, 'toggleUserFellowStatus').mockResolvedValueOnce(true)
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    expect(await approve()).toEqual({ success: true })
-
-    expect(toggleSpy).toHaveBeenCalledTimes(1)
-    expect(toggleSpy).toHaveBeenCalledWith('user-1', true)
-    expect(requestUpdates[0].status).toBe('approved')
-    // Unknown prior state → stay silent rather than risk a second message.
-    expect(createInAppSpy).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('approval still succeeds when the earlier-grant lookup throws', async () => {
-    const { client, users, requestUpdates } = reviewClient({ grantLookupThrows: true })
-    clientHolder.current = client
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    expect(await approve()).toEqual({ success: true })
-
-    expect(users.state?.is_fellow).toBe(true)
-    expect(requestUpdates[0].status).toBe('approved')
-    expect(logAdminActionSpy).toHaveBeenCalledTimes(1)
-    expect(createInAppSpy).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('writes no fallback when the earlier-grant lookup returns an error', async () => {
-    clientHolder.current = reviewClient({ grantLookupError: { message: 'boom' } }).client
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    expect(await approve()).toEqual({ success: true })
-
-    expect(createInAppSpy).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('approval still succeeds when the fallback write throws', async () => {
-    const { client, requestUpdates } = reviewClient({ grantRowAt: BEFORE_REQUEST })
-    clientHolder.current = client
-    createInAppSpy.mockRejectedValueOnce(new Error('in-app down'))
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    expect(await approve()).toEqual({ success: true })
-
-    expect(createInAppSpy).toHaveBeenCalledTimes(1)
-    expect(requestUpdates[0].status).toBe('approved')
-    expect(logAdminActionSpy).toHaveBeenCalledTimes(1)
-    expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('a failed grant writes no fallback and leaves the request pending', async () => {
-    const { client, requestUpdates } = reviewClient({ grantRowAt: BEFORE_REQUEST })
+  it('a failed grant announces nothing and leaves the request pending', async () => {
+    const { client, requestUpdates } = reviewClient()
     clientHolder.current = client
     vi.spyOn(AdminConsoleService, 'toggleUserFellowStatus').mockResolvedValueOnce(false)
 
@@ -519,7 +412,7 @@ describe('Fellow request review notifications', () => {
   })
 
   it('rejection still sends the rejection in-app message', async () => {
-    const { client, users, grantLookups } = reviewClient({ grantRowAt: BEFORE_REQUEST })
+    const { client, users, grantLookups } = reviewClient()
     clientHolder.current = client
 
     const result = await FellowRequestAdminService.reviewRequest(
@@ -591,18 +484,18 @@ describe('fellow.granted in-app connector', () => {
     expect(ids).toContain('connector.in_app.fellow.granted')
   })
 
-  it('writes the in-app row under the stable event id', async () => {
+  it('writes the in-app row under the per-grant event id', async () => {
     dispatchSpy.mockRestore()
     initializeNotificationConnectors(true)
 
     const result = await globalNotificationDispatcher.dispatch(
-      envelope('fellow.granted', payload, { id: 'fellow-granted-user-1' })
+      envelope('fellow.granted', payload, { id: 'fellow-granted-user-1-1791590400000' })
     )
     expect(result.errors).toEqual([])
 
     expect(createInAppSpy).toHaveBeenCalledTimes(1)
     const inApp = createInAppSpy.mock.calls[0][0] as any
-    expect(inApp.idempotencyKey).toBe('fellow-granted-user-1')
+    expect(inApp.idempotencyKey).toBe('fellow-granted-user-1-1791590400000')
     expect(inApp.category).toBe('achievements')
     expect(inApp.actionUrl).toBe('/p/jordanpm')
   })

@@ -47,6 +47,14 @@ interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown; count?: number | null }>
 }
 
+/**
+ * The `fellow.granted` event id for one grant: `fellow-granted-<userId>-<grant epoch ms>`. One per
+ * grant, so a re-grant after a revoke is a new event; the in-app row, the email and the
+ * celebration are all keyed by it.
+ */
+export const fellowGrantedEventId = (userId: string, grantedAt: string): string =>
+  `fellow-granted-${userId}-${Date.parse(grantedAt)}`
+
 export class AdminConsoleService {
   /**
    * Evaluates overall system health, DB latency, and queue latency.
@@ -1043,11 +1051,9 @@ export class AdminConsoleService {
    * notification problem must never fail the admin action.
    *
    * Only called by the caller whose conditional update performed the false → true flip, so
-   * racing grants dispatch once. The event id is also stable per user, so the in-app row
-   * (keyed by event id) and the email (`fellow-granted:<userId>`) stay deduplicated downstream.
-   * Consequence, accepted: a re-grant after a revoke does not re-notify — except that a re-grant
-   * made by approving a new Fellow request gets a request-scoped in-app fallback
-   * (`FellowRequestAdminService.announceReapproval`); the email stays deduplicated.
+   * racing grants dispatch once. Each grant has its own event id (user + grant time), so a
+   * re-grant after a revoke is announced again (in-app, email and celebration) while a retried
+   * dispatch of the same grant stays deduplicated downstream (Growth R5 P1).
    */
   private static async dispatchFellowGrantedNotification(user: {
     id: string
@@ -1071,7 +1077,7 @@ export class AdminConsoleService {
       }
 
       const result = await globalNotificationDispatcher.dispatch({
-        id: `fellow-granted-${user.id}`,
+        id: fellowGrantedEventId(user.id, grantedAt),
         event: 'fellow.granted',
         userId: user.id,
         userEmail: user.email || '',

@@ -237,8 +237,9 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'achievements',
       priorityLevel: 'high',
-      // One Fellow email per learner, decided by the email_queue unique index.
-      idempotencyKey: `fellow-granted:${event.userId}`,
+      // One Fellow email per grant (the event id is per grant), decided by the email_queue unique
+      // index: a retried dispatch is deduplicated, a re-grant after a revoke is emailed again.
+      idempotencyKey: `fellow-granted:${event.id}`,
     })
   })
 }

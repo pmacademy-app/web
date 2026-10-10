@@ -72,7 +72,7 @@ describe('fellow.granted email connector', () => {
     initializeNotificationConnectors(true)
 
     const result = await globalNotificationDispatcher.dispatch(
-      envelope('fellow.granted', payload, { id: 'fellow-granted-user-1' })
+      envelope('fellow.granted', payload, { id: 'fellow-granted-user-1-1791590400000' })
     )
     expect(result.errors).toEqual([])
 
@@ -85,8 +85,9 @@ describe('fellow.granted email connector', () => {
       channel: 'email',
       category: 'achievements',
       priorityLevel: 'high',
-      idempotencyKey: 'fellow-granted:user-1',
-      eventId: 'fellow-granted-user-1',
+      // Keyed by the per-grant event id: a retry is deduplicated, a re-grant is emailed again.
+      idempotencyKey: 'fellow-granted:fellow-granted-user-1-1791590400000',
+      eventId: 'fellow-granted-user-1-1791590400000',
       eventType: 'fellow.granted',
       templateVariables: { userName: 'Jordan PM', username: 'jordanpm', portfolioUrl: payload.portfolioUrl },
     })
