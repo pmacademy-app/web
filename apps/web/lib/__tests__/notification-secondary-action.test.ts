@@ -45,6 +45,7 @@ describe('parseNotificationSecondaryAction', () => {
     ['a javascript: href', { kind: 'link', label: 'Go', href: 'javascript:alert(1)' }],
     ['a non-LinkedIn add-to-profile host', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://linkedin.com.evil.example/profile/add' }],
     ['an http LinkedIn url', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'http://www.linkedin.com/profile/add' }],
+    ['a LinkedIn url other than add-to-profile', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://www.linkedin.com/feed/' }],
     ['a username with a slash', { kind: 'share_portfolio', label: 'Share', username: '../admin' }],
   ])('rejects %s', (_label, value) => {
     expect(parseNotificationSecondaryAction(value)).toBeNull()

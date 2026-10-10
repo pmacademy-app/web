@@ -184,7 +184,12 @@ export function NotificationItemCard({
   return (
     <div className="space-y-1.5">
       {card}
-      <SecondaryActionRow action={item.secondaryAction} onUse={handleInteraction} />
+      <SecondaryActionRow
+        action={item.secondaryAction}
+        onUse={handleInteraction}
+        // An in-app link leaves the page, so a drawer must close like it does for the card link.
+        onNavigate={onNavigate}
+      />
     </div>
   )
 }
@@ -201,7 +206,15 @@ const ShareButton = dynamic(
 const ACTION_LINK =
   'inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary'
 
-function SecondaryActionRow({ action, onUse }: { action: NotificationSecondaryAction; onUse: () => void }) {
+function SecondaryActionRow({
+  action,
+  onUse,
+  onNavigate,
+}: {
+  action: NotificationSecondaryAction
+  onUse: () => void
+  onNavigate?: () => void
+}) {
   const use = () => {
     trackNotificationActionClicked(action.kind)
     onUse()
@@ -215,7 +228,14 @@ function SecondaryActionRow({ action, onUse }: { action: NotificationSecondaryAc
         </div>
       )}
       {action.kind === 'link' && (
-        <Link href={action.href} onClick={use} className={ACTION_LINK}>
+        <Link
+          href={action.href}
+          onClick={() => {
+            use()
+            onNavigate?.()
+          }}
+          className={ACTION_LINK}
+        >
           {action.label}
         </Link>
       )}

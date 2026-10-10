@@ -136,6 +136,11 @@ describe('CertificatesCard', () => {
     expect(container.textContent).not.toContain('Full Curriculum')
   })
 
+  it('falls back to a plain module title for an unknown module slug', () => {
+    render([certificate({ id: 'cert-mod', type: 'module', module_slug: 'tech_ai', lessons_completed: 10 })])
+    expect(rowFor(REAL_CODE).querySelector('h3')?.textContent).toBe('Module Certificate')
+  })
+
   it('labels each row by its own code when a learner has both', () => {
     render([testCertificate(), certificate()])
 

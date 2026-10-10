@@ -11,9 +11,10 @@ import { claimNextAchievementCelebration } from '@/lib/notifications/in-app/achi
  * POST /api/notifications/celebrations
  *
  * Claims the calling learner's next unseen achievement (Fellow grant, certificate,
- * published capstone, completed module) so the client can show its celebration exactly once. The claim
- * marks that achievement's in-app notification read with a compare-and-set, so when
- * several tabs or devices ask at the same moment only one receives it.
+ * published capstone, completed module) so the client can show its celebration exactly once. The
+ * claim sets that achievement notification's `celebrated_at` with a compare-and-set (and marks it
+ * read), so when several tabs or devices ask at the same moment only one receives it. Reading the
+ * notification in the bell does not use the celebration up.
  *
  * POST rather than GET because a successful call writes. It is safe to retry: a repeat
  * returns the next unclaimed achievement or `celebration: null`, never the same one twice.
@@ -23,7 +24,7 @@ import { claimNextAchievementCelebration } from '@/lib/notifications/in-app/achi
  * *which* one, so there is nothing for a caller to supply.
  *
  * `ACHIEVEMENT_CELEBRATIONS_ENABLED` is the kill switch. Off means a null celebration
- * and no database access at all, so the notifications stay unread in the bell.
+ * and no database access at all; the notifications stay in the bell, uncelebrated.
  */
 export const POST = withRoute(
   {

@@ -9,7 +9,7 @@ import type {
   SettingsSectionKey,
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
-import { REFERRAL_REWARD_XP } from '../referral/reward'
+import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '../referral/reward'
 
 /**
  * Settings Service (Phase 8).
@@ -320,6 +320,9 @@ export class SettingsService {
   ): Promise<LearningSettings> {
     const current = await this.getLearningSettings()
     const updated = { ...current, ...partial }
+    // Store the reward that will actually be paid, so the admin never sees a value (0, too large,
+    // fractional) that the referral service would silently replace with the default.
+    updated.xpReferralReward = normalizeReferralRewardXp(updated.xpReferralReward)
     return this.upsertSettings('learning', updated)
   }
 

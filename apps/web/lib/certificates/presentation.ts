@@ -92,11 +92,13 @@ export interface CertificateRowCopyInput {
 export function getCertificateRowCopy(cert: CertificateRowCopyInput): { title: string; detail: string } {
   const issued = new Date(cert.issued_at).toLocaleDateString()
   if (cert.type !== 'full_curriculum') {
-    const moduleName = (cert.module_slug && CURRICULUM_MODULE_META[cert.module_slug]?.name) || 'Module'
-    return {
-      title: `${moduleName} Module Certificate`,
-      detail: `Issued on ${issued} for completing every lesson in ${moduleName}.`,
-    }
+    const moduleName = cert.module_slug ? CURRICULUM_MODULE_META[cert.module_slug]?.name : undefined
+    return moduleName
+      ? {
+          title: `${moduleName} Module Certificate`,
+          detail: `Issued on ${issued} for completing every lesson in ${moduleName}.`,
+        }
+      : { title: 'Module Certificate', detail: `Issued on ${issued} for completing every lesson in a module.` }
   }
   return {
     title: `${BRAND.fullName} Full Curriculum Completion Certificate`,

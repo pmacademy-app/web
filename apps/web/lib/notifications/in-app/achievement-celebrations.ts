@@ -322,6 +322,27 @@ function isOwnFellowGrantSubject(subject: string, userId: string): boolean {
 }
 
 /**
+ * Marks older Fellow grant rows celebrated once the newest one has been, so the same status never
+ * celebrates twice. Best-effort: if it fails, an older row could still celebrate on a later call,
+ * so the failure is logged.
+ */
+async function retireSupersededFellowRows(
+  supabase: Client,
+  userId: string,
+  notificationIds: string[],
+  now: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('in_app_notifications')
+    .update({ celebrated_at: now })
+    .eq('user_id', userId)
+    .in('id', notificationIds)
+    .is('celebrated_at', null)
+    .select('id')
+  if (error) warnReadFailed('retire superseded fellow rows', error)
+}
+
+/**
  * Marks one notification celebrated if — and only if — it is not celebrated yet, and read.
  *
  * `celebrated_at IS NULL` is part of the write's own predicate, so the database decides the
@@ -394,14 +415,19 @@ export async function claimNextAchievementCelebration(
     if (ofKind.length === 0) continue
 
     let verified: VerifiedCandidate[]
+    let supersededFellowIds: string[] = []
     if (kind === 'fellow') {
-      // The key must name the caller, and the grant must still stand.
-      verified = ofKind
-        .filter((candidate) => isOwnFellowGrantSubject(candidate.subject, userId) && user.is_fellow === true)
-        .map((candidate) => ({
-          notificationId: candidate.notificationId,
-          celebration: { kind: 'fellow', notificationId: candidate.notificationId, portfolio },
-        }))
+      // The key must name the caller, and the grant must still stand. One Fellow status is one
+      // celebration: only the newest grant row is celebrated, even when a revoke and re-grant (or
+      // a pre-R5 row) left several. The older ones are retired once it is claimed.
+      const grants = ofKind.filter(
+        (candidate) => isOwnFellowGrantSubject(candidate.subject, userId) && user.is_fellow === true
+      )
+      const newest = grants[grants.length - 1]
+      verified = newest
+        ? [{ notificationId: newest.notificationId, celebration: { kind: 'fellow', notificationId: newest.notificationId, portfolio } }]
+        : []
+      supersededFellowIds = grants.slice(0, -1).map((candidate) => candidate.notificationId)
     } else if (kind === 'certificate') {
       verified = await verifyCertificates(supabase, userId, ofKind, portfolio, resolveSiteOrigin(opts.siteOrigin))
     } else if (kind === 'capstone') {
@@ -418,7 +444,12 @@ export async function claimNextAchievementCelebration(
         { notificationId: entry.notificationId, isRead },
         now.toISOString()
       )
-      if (outcome === 'claimed') return entry.celebration
+      if (outcome === 'claimed') {
+        if (supersededFellowIds.length > 0) {
+          await retireSupersededFellowRows(supabase, userId, supersededFellowIds, now.toISOString())
+        }
+        return entry.celebration
+      }
       // The write path is failing, so stop rather than work through the rest of the list.
       if (outcome === 'error') return null
       // 'lost': another tab or device claimed it first — try the next candidate.

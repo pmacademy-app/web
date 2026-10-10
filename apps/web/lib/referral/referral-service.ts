@@ -390,18 +390,25 @@ export async function getUserReferralStats(
   })
 
   // What was actually awarded, so a changed reward never rewrites past earnings.
-  const [{ data: referralXpRows }, rewardXp] = await Promise.all([
+  const [{ data: referralXpRows, error: referralXpError }, rewardXp] = await Promise.all([
     (supabase.from('xp_events') as unknown as DBChain)
       .select('xp_amount')
       .eq('user_id', userId)
-      .eq('source_type', 'referral') as unknown as Promise<{ data: { xp_amount: number }[] | null }>,
+      .eq('source_type', 'referral') as unknown as Promise<{ data: { xp_amount: number }[] | null; error: unknown }>,
     resolveReferralRewardXp(),
   ])
-  const totalXpEarned = (referralXpRows ?? []).reduce((sum, row) => sum + (row.xp_amount || 0), 0)
 
   const activatedCount = formattedReferrals.filter(
     (r) => r.status === 'rewarded' || r.status === 'activated'
   ).length
+
+  // A failed read must not show "0 XP earned": estimate from the current reward instead.
+  if (referralXpError) {
+    console.warn('[referral-service] referral XP read failed; estimating from the current reward')
+  }
+  const totalXpEarned = referralXpError
+    ? activatedCount * rewardXp
+    : (referralXpRows ?? []).reduce((sum, row) => sum + (row.xp_amount || 0), 0)
 
   return {
     referralCode,

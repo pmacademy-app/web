@@ -98,10 +98,27 @@ describe('NotificationItemCard — secondary action', () => {
     expect(analytics.trackNotificationActionClicked).toHaveBeenCalledWith('linkedin_add_to_profile')
   })
 
-  it('renders an in-app link action', () => {
-    render({ ...base, secondaryAction: { kind: 'link', label: 'Publish portfolio', href: '/settings?tab=portfolio' } })
+  it('renders an in-app link action that closes the drawer it is in', () => {
+    const onNavigate = vi.fn()
+    act(() => {
+      root.render(
+        <NotificationItemCard
+          item={{ ...base, secondaryAction: { kind: 'link', label: 'Publish portfolio', href: '/settings?tab=portfolio' } }}
+          onMarkRead={onMarkRead}
+          onNavigate={onNavigate}
+        />,
+      )
+    })
     const link = row()!.querySelector('a')!
     expect(link.textContent).toBe('Publish portfolio')
     expect(link.getAttribute('href')).toBe('/settings?tab=portfolio')
+
+    const stop = (event: Event) => event.preventDefault()
+    document.addEventListener('click', stop)
+    act(() => {
+      link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+    document.removeEventListener('click', stop)
+    expect(onNavigate).toHaveBeenCalledTimes(1)
   })
 })

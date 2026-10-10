@@ -39,8 +39,9 @@ interface AchievementCelebrationHostProps {
 /**
  * Claims the learner's next unseen achievement celebration and shows it (Growth R1, Task 10).
  *
- * A claim is consumed server-side: the endpoint marks the achievement's notification read
- * and will not return it again. So the host only asks when it could show the answer, and a
+ * A claim is consumed server-side: the endpoint sets the achievement notification's
+ * `celebrated_at` (and marks it read) and will not return it again. Reading the notification in
+ * the bell does not consume it. So the host only asks when it could show the answer, and a
  * claimed celebration is held in state until the learner closes it — hidden while a lesson
  * or Quick Start has the screen, never dropped.
  */

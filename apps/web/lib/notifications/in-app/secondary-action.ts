@@ -28,7 +28,12 @@ function isLinkedInHttpsUrl(value: unknown): value is string {
   if (typeof value !== 'string' || value.length > 2048) return false
   try {
     const url = new URL(value)
-    return url.protocol === 'https:' && (url.hostname === 'linkedin.com' || url.hostname === 'www.linkedin.com')
+    // Only the add-to-profile endpoint: this kind exists for certificates and nothing else.
+    return (
+      url.protocol === 'https:' &&
+      (url.hostname === 'linkedin.com' || url.hostname === 'www.linkedin.com') &&
+      url.pathname === '/profile/add'
+    )
   } catch {
     return false
   }

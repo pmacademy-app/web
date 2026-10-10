@@ -45,3 +45,18 @@ describe('resolveReferralRewardXp', () => {
     await expect(resolveReferralRewardXp()).resolves.toBe(REFERRAL_REWARD_XP)
   })
 })
+
+describe('admin learning settings', () => {
+  it('stores the reward that will be paid, never a value the service would replace', async () => {
+    vi.spyOn(SettingsService, 'getLearningSettings').mockResolvedValue({ xpReferralReward: 50 } as unknown as LearningSettings)
+    const upsert = vi
+      .spyOn(SettingsService as unknown as { upsertSettings: (s: string, v: unknown) => Promise<unknown> }, 'upsertSettings')
+      .mockImplementation(async (_section, value) => value)
+
+    await SettingsService.updateLearningSettings({ xpReferralReward: 0 })
+    expect((upsert.mock.calls[0][1] as LearningSettings).xpReferralReward).toBe(REFERRAL_REWARD_XP)
+
+    await SettingsService.updateLearningSettings({ xpReferralReward: 80 })
+    expect((upsert.mock.calls[1][1] as LearningSettings).xpReferralReward).toBe(80)
+  })
+})

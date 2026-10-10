@@ -524,6 +524,23 @@ describe('claimNextAchievementCelebration — fellow', () => {
     expect(await claim(db)).toMatchObject({ kind: 'fellow', notificationId: 'n-regrant' })
   })
 
+  it('celebrates one Fellow status once, even with several uncelebrated grant rows', async () => {
+    db = createFakeSupabase({
+      users: [userRow({ is_fellow: true })],
+      in_app_notifications: [
+        notificationRow('n-old', `fellow-granted-${USER}`, { created_at: ago(3 * DAY_MS) }),
+        notificationRow('n-mid', `fellow-granted-${USER}-1791000000000`, { created_at: ago(2 * DAY_MS) }),
+        notificationRow('n-new', `fellow-granted-${USER}-1791590400000`, { created_at: ago(HOUR_MS) }),
+      ],
+    })
+
+    expect(await claim(db)).toMatchObject({ kind: 'fellow', notificationId: 'n-new' })
+    // The older grants are retired with it, so a later call celebrates nothing more.
+    expect(db.notification('n-old')?.celebrated_at).toBe(NOW.toISOString())
+    expect(db.notification('n-mid')?.celebrated_at).toBe(NOW.toISOString())
+    expect(await claim(db)).toBeNull()
+  })
+
   it.each([
     ['another learner', `fellow-granted-${OTHER_USER}-1791590400000`],
     ['a non-numeric suffix', `fellow-granted-${USER}-abc`],
