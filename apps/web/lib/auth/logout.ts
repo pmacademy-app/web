@@ -25,6 +25,8 @@
  * the credential revokes it, and the step names below reflect where the work happens.
  */
 
+import { clearDeferredQuickStart } from '@/lib/quick-start/deferred-launch'
+
 /** Learner-facing destination after logout. */
 export const LEARNER_LOGIN_PATH = '/login'
 
@@ -118,6 +120,9 @@ export async function logout(
       failures.push({ step: 'session_cookie_clear', reason: describe(err) })
     }
   } finally {
+    // Per-user browser state must not outlive the session: a queued Quick Start would otherwise
+    // open for the next person who signs in on this browser. Never throws.
+    clearDeferredQuickStart()
     router.push(safeDestination(redirectTo))
     router.refresh()
   }
