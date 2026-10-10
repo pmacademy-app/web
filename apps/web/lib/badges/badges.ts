@@ -14,6 +14,8 @@ export interface UserStatsForBadges {
   usedStreakFreeze?: boolean
   email?: string
   name?: string
+  /** Portfolio handle, for the badge notification's share action. */
+  username?: string | null
 }
 
 export interface BadgeProgressItem {

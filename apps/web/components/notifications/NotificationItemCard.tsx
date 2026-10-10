@@ -224,7 +224,11 @@ function SecondaryActionRow({
     <div className="flex items-center justify-end gap-2 px-1" data-testid="notification-secondary-action">
       {action.kind === 'share_portfolio' && (
         <div className="inline-flex" onClickCapture={use}>
-          <ShareButton username={action.username} context={action.context} />
+          <ShareButton
+            username={action.username}
+            context={action.context}
+            badgeName={action.context === 'badge' ? action.badgeName : undefined}
+          />
         </div>
       )}
       {action.kind === 'link' && (

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getCurrentUserProfile, getServerUser } from '@/lib/auth'
 import { getUserBadgesData } from '@/lib/badges-db'
 import { BadgeCard } from '@/components/badges/BadgeCard'
 import { Trophy, Award, Sparkles } from 'lucide-react'
@@ -19,8 +19,14 @@ export default async function BadgesGalleryPage() {
   }
 
   const supabase = createServiceRoleClient()
-  const { totalEarned, totalAvailable, completionPercentage, allBadges, recentBadge } =
-    await getUserBadgesData(supabase, user.id)
+  const [{ totalEarned, totalAvailable, completionPercentage, allBadges, recentBadge }, profile] = await Promise.all([
+    getUserBadgesData(supabase, user.id),
+    // Request-memoized: reuses the (app) layout's users read.
+    getCurrentUserProfile(),
+  ])
+  // Earned badges can be shared from the owner's portfolio (Growth R5 B4).
+  const username = profile?.username?.trim()
+  const portfolio = username ? { username, isPublic: profile?.is_portfolio_public === true } : null
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-12">
@@ -100,7 +106,7 @@ export default async function BadgesGalleryPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {allBadges.map((badge) => (
-            <BadgeCard key={badge.definition.key} badge={badge} />
+            <BadgeCard key={badge.definition.key} badge={badge} portfolio={portfolio} />
           ))}
         </div>
       </div>

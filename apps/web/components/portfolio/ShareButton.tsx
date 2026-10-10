@@ -5,7 +5,7 @@ import { Share2, Copy, Check, CircleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BRAND } from '@/lib/brand'
-import { formatPortfolioShareUrl, portfolioShareText } from '@/lib/portfolio'
+import { badgeShareText, formatPortfolioShareUrl, portfolioShareText } from '@/lib/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
 
 interface ShareButtonProps {
@@ -18,7 +18,9 @@ interface ShareButtonProps {
    * (its card comes from the portfolio's OG tags), so it is the same for both.
    * Fellow is a distinction, never a certificate or credential.
    */
-  context?: 'portfolio' | 'fellow'
+  context?: 'portfolio' | 'fellow' | 'badge'
+  /** With context 'badge': the badge being shared (first person, owner-only surfaces). */
+  badgeName?: string
 }
 
 const STATUS_RESET_MS = 2500
@@ -58,7 +60,7 @@ function errorName(error: unknown): string | undefined {
   return undefined
 }
 
-export function ShareButton({ username, name, context = 'portfolio' }: ShareButtonProps) {
+export function ShareButton({ username, name, context = 'portfolio', badgeName }: ShareButtonProps) {
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle')
   // Bumped on every status flash so the live region re-announces a repeated message.
   const [announcementId, setAnnouncementId] = useState(0)
@@ -90,7 +92,9 @@ export function ShareButton({ username, name, context = 'portfolio' }: ShareButt
   const shareText =
     context === 'fellow'
       ? `I was selected as a PM Fellow at ${BRAND.fullName}. Here is my Product Management portfolio:`
-      : portfolioShareText(displayName, BRAND.fullName)
+      : context === 'badge' && badgeName
+        ? badgeShareText(badgeName, BRAND.fullName)
+        : portfolioShareText(displayName, BRAND.fullName)
 
   const flashStatus = (status: CopyStatus) => {
     setCopyStatus(status)

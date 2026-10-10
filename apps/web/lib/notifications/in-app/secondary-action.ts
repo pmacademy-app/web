@@ -9,12 +9,15 @@
 export type NotificationSecondaryAction =
   /** Share the learner's public portfolio (LinkedIn, X, native, copy). */
   | { kind: 'share_portfolio'; label: string; username: string; context: 'portfolio' | 'fellow' }
+  /** Share the public portfolio with wording about one earned badge. */
+  | { kind: 'share_portfolio'; label: string; username: string; context: 'badge'; badgeName: string }
   /** An in-app page, e.g. "Publish portfolio". Always a same-origin path. */
   | { kind: 'link'; label: string; href: string }
   /** LinkedIn "Add to profile" for a certificate. Only https links on linkedin.com. */
   | { kind: 'linkedin_add_to_profile'; label: string; url: string }
 
 const MAX_LABEL = 40
+const MAX_BADGE_NAME = 60
 const USERNAME = /^[a-z0-9_.-]{1,64}$/i
 
 const isLabel = (value: unknown): value is string =>
@@ -48,6 +51,11 @@ export function parseNotificationSecondaryAction(value: unknown): NotificationSe
   switch (action.kind) {
     case 'share_portfolio':
       if (typeof action.username !== 'string' || !USERNAME.test(action.username)) return null
+      if (action.context === 'badge') {
+        const badgeName = typeof action.badgeName === 'string' ? action.badgeName.trim() : ''
+        if (!badgeName || badgeName.length > MAX_BADGE_NAME) return null
+        return { kind: 'share_portfolio', label: action.label, username: action.username, context: 'badge', badgeName }
+      }
       return {
         kind: 'share_portfolio',
         label: action.label,

@@ -198,7 +198,22 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: 'Review session finished', body: `${payload.cardsReviewedCount || 0} cards reviewed with +${payload.xpEarned || 0} XP.`, actionUrl: '/review' }
     }
     case 'badge.earned': {
-      return { title: `Badge earned: ${String(payload.badgeName || 'New badge')}`, body: String(payload.badgeDescription || 'Congratulations on your new achievement!'), actionUrl: '/badges' }
+      const badgeName = String(payload.badgeName || 'New badge')
+      const username = typeof payload.username === 'string' ? payload.username.trim() : ''
+      // Share the portfolio with this badge's wording when it is public; otherwise ask to
+      // publish it, since there is nothing public to share yet (Growth R5 B4).
+      const share: NotificationSecondaryAction | null =
+        username && payload.isPortfolioPublic === true
+          ? { kind: 'share_portfolio', label: 'Share', username, context: 'badge', badgeName }
+          : username
+            ? { kind: 'link', label: 'Publish portfolio', href: PORTFOLIO_SETTINGS_HREF }
+            : null
+      return {
+        title: `Badge earned: ${badgeName}`,
+        body: String(payload.badgeDescription || 'Congratulations on your new achievement!'),
+        actionUrl: '/badges',
+        ...withAction(share),
+      }
     }
     case 'xp.level_up': {
       return { title: `Level ${payload.newLevel} reached!`, body: `You advanced to level ${payload.newLevel} (${String(payload.levelTitle || 'PM')}). Keep it up!`, actionUrl: '/progress' }

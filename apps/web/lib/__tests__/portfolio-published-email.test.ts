@@ -50,3 +50,29 @@ describe('PortfolioPublished email', () => {
     expect(text).not.toContain('Share your public portfolio link on LinkedIn, Twitter')
   })
 })
+
+// Growth R5 / B4: the badge email shares only a public portfolio.
+describe('BadgeEarned email', () => {
+  it('offers LinkedIn and X shares with the badge wording for a public portfolio', async () => {
+    const { html, text } = await renderEmailTemplate('achievement.badge_earned', {
+      userName: 'Jordan',
+      badgeName: 'Module Master',
+      badgeDescription: 'Finished a module',
+      portfolioUrl: PORTFOLIO,
+    })
+    expect(text).toContain('Share on LinkedIn')
+    expect(html).toContain(encodeURIComponent('I just earned the "Module Master" badge'))
+    expect(html).toContain(encodeURIComponent('utm_campaign=badge_earned_email'))
+  })
+
+  it('asks to publish instead when the portfolio is private', async () => {
+    const { text } = await renderEmailTemplate('achievement.badge_earned', {
+      userName: 'Jordan',
+      badgeName: 'Module Master',
+      badgeDescription: 'Finished a module',
+      portfolioUrl: null,
+    })
+    expect(text).not.toContain('Share on LinkedIn')
+    expect(text).toContain('Make your portfolio public')
+  })
+})

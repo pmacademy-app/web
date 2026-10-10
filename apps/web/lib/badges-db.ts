@@ -105,6 +105,7 @@ async function fetchUserStatsForBadges(
     usedStreakFreeze: (user?.streak_freezes_available ?? 0) > 0,
     email: user?.email || '',
     name: user?.name || '',
+    username: user?.username ?? null,
   }
 }
 
@@ -251,6 +252,9 @@ export async function evaluateAndAwardBadges(
             badgeId: badgeDef.key,
             badgeName: badgeDef.name,
             badgeDescription: badgeDef.description,
+            // For the share action (Growth R5 B4): only a public portfolio can be shared.
+            username: stats.username ?? null,
+            isPortfolioPublic: stats.isPortfolioPublic === true,
           },
         })
       } catch (dispatchErr) {

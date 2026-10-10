@@ -19,6 +19,16 @@ describe('parseNotificationSecondaryAction', () => {
     ).toMatchObject({ context: 'fellow' })
   })
 
+  it('accepts a badge share and requires its badge name', () => {
+    expect(
+      parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username: 'ada', context: 'badge', badgeName: 'Module Master' }),
+    ).toEqual({ kind: 'share_portfolio', label: 'Share', username: 'ada', context: 'badge', badgeName: 'Module Master' })
+    expect(parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username: 'ada', context: 'badge' })).toBeNull()
+    expect(
+      parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username: 'ada', context: 'badge', badgeName: 'x'.repeat(61) }),
+    ).toBeNull()
+  })
+
   it('accepts an in-app link and an https LinkedIn add-to-profile link', () => {
     expect(parseNotificationSecondaryAction({ kind: 'link', label: 'Publish portfolio', href: '/settings?tab=portfolio' })).toEqual({
       kind: 'link',

@@ -148,6 +148,11 @@ export function portfolioShareText(displayName: string, productName: string): st
   return `${displayName}'s Product Management portfolio on ${productName}`
 }
 
+/** First-person share text for one earned badge (owner-only surfaces). */
+export function badgeShareText(badgeName: string, productName: string): string {
+  return `I just earned the "${badgeName}" badge on ${productName}. Here is my Product Management portfolio:`
+}
+
 /**
  * LinkedIn and X share links for a portfolio, for surfaces that cannot run ShareButton (email).
  * The shared URL carries UTM tags so visits from those posts can be attributed.

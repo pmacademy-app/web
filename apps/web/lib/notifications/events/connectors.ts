@@ -136,6 +136,11 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         badgeName: event.payload.badgeName,
         badgeDescription: event.payload.badgeDescription,
         badgeIcon: event.payload.badgeIcon || '🏅',
+        // Share links only for a public portfolio (Growth R5 B4).
+        portfolioUrl:
+          event.payload.isPortfolioPublic === true && typeof event.payload.username === 'string' && event.payload.username
+            ? `${(process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')}/p/${encodeURIComponent(event.payload.username)}`
+            : null,
       },
       eventId: event.id,
       eventType: event.event,

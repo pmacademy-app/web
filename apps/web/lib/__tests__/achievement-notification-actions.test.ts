@@ -100,3 +100,24 @@ describe('portfolio.published', () => {
     expect(action('portfolio.published', {})).toBeNull()
   })
 })
+
+// Growth R5 / B4: an earned badge is shared via the portfolio, with the badge's own wording.
+describe('badge.earned', () => {
+  it('shares a public portfolio with the badge name', () => {
+    expect(action('badge.earned', { badgeName: 'Module Master', username: 'ada', isPortfolioPublic: true })).toEqual({
+      kind: 'share_portfolio',
+      label: 'Share',
+      username: 'ada',
+      context: 'badge',
+      badgeName: 'Module Master',
+    })
+  })
+
+  it('asks to publish a private portfolio, and offers nothing without a username', () => {
+    expect(action('badge.earned', { badgeName: 'Module Master', username: 'ada', isPortfolioPublic: false })).toMatchObject({
+      kind: 'link',
+      href: '/settings?tab=portfolio',
+    })
+    expect(action('badge.earned', { badgeName: 'Module Master' })).toBeNull()
+  })
+})
