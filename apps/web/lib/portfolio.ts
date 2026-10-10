@@ -140,6 +140,36 @@ export function formatPortfolioShareUrl(siteOrigin: string, username: string): s
   return `${origin}/p/${encodeURIComponent(username)}`
 }
 
+/**
+ * Third-person share text for a portfolio. Neutral and always true, so a visitor can share it
+ * too. The product name is passed in so this module stays free of imports.
+ */
+export function portfolioShareText(displayName: string, productName: string): string {
+  return `${displayName}'s Product Management portfolio on ${productName}`
+}
+
+/**
+ * LinkedIn and X share links for a portfolio, for surfaces that cannot run ShareButton (email).
+ * The shared URL carries UTM tags so visits from those posts can be attributed.
+ */
+export function buildPortfolioShareIntents(
+  portfolioUrl: string,
+  shareText: string,
+  campaign: string,
+): { linkedin: string; x: string } {
+  const tagged = (source: string) => {
+    const url = new URL(portfolioUrl)
+    url.searchParams.set('utm_source', source)
+    url.searchParams.set('utm_medium', 'social')
+    url.searchParams.set('utm_campaign', campaign)
+    return url.toString()
+  }
+  return {
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(tagged('linkedin'))}`,
+    x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(tagged('x'))}`,
+  }
+}
+
 /** Where a learner turns their portfolio public (Settings → Portfolio tab). */
 export const PORTFOLIO_SETTINGS_HREF = '/settings?tab=portfolio'
 

@@ -5,7 +5,7 @@ import { Share2, Copy, Check, CircleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BRAND } from '@/lib/brand'
-import { formatPortfolioShareUrl } from '@/lib/portfolio'
+import { formatPortfolioShareUrl, portfolioShareText } from '@/lib/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
 
 interface ShareButtonProps {
@@ -90,7 +90,7 @@ export function ShareButton({ username, name, context = 'portfolio' }: ShareButt
   const shareText =
     context === 'fellow'
       ? `I was selected as a PM Fellow at ${BRAND.fullName}. Here is my Product Management portfolio:`
-      : `${displayName}'s Product Management portfolio on ${BRAND.fullName}`
+      : portfolioShareText(displayName, BRAND.fullName)
 
   const flashStatus = (status: CopyStatus) => {
     setCopyStatus(status)
