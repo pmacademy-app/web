@@ -125,8 +125,16 @@ export interface AdminLifecycleMetrics {
    * "currently public" (not time-bound); fellow_eligible's is a request within 14 days.
    */
   nudges: AdminNudgeReadout[]
-  /** Both nudges have ≥ NUDGE_RETIRE_MIN_TREATED treated users and positive lift. */
+  /**
+   * Both nudges have ≥ NUDGE_RETIRE_MIN_TREATED treated users and positive lift, i.e.
+   * the manual campaign scripts are ready to retire. The holdout stays either way.
+   */
   retireReady: boolean
+  /**
+   * True when the nudge readout failed to load and `nudges` / `retireReady` are the zeroed
+   * fallback, so the UI must not present them as real data.
+   */
+  nudgesFailed: boolean
 }
 
 export interface AdminCommunicationsOverview {
@@ -580,10 +588,11 @@ export class CommunicationsService {
     }
 
     // The nudge readout is loaded and cached on its own so a failure there (or a cold cache)
-    // never blanks the lifecycle sequence counts. It degrades to zeros, never throws.
+    // never blanks the lifecycle sequence counts. It never throws: a failure degrades to the
+    // zeroed readout with `nudgesFailed: true` (and is not cached, since the cached fn rejects).
     const nudgeReadoutPromise = (async () => {
       try {
-        return await unstable_cache(
+        const readout = await unstable_cache(
           async () => {
             const db = createServiceRoleClient()
             // Bounded: only the nudge rows (two initial + two reminder event types).
@@ -644,8 +653,10 @@ export class CommunicationsService {
           ['admin-nudge-readout'],
           { revalidate: 120, tags: ['admin-automations'] }
         )()
-      } catch {
-        return emptyNudgeReadout(nudgeNames)
+        return { ...readout, nudgesFailed: false }
+      } catch (err) {
+        console.warn('[CommunicationsService] nudge readout failed:', err)
+        return { ...emptyNudgeReadout(nudgeNames), nudgesFailed: true }
       }
     })()
 
@@ -660,6 +671,8 @@ export class CommunicationsService {
         holdout: 0,
       })),
       ...emptyNudgeReadout(nudgeNames),
+      // Always replaced by the readout promise's own flag below.
+      nudgesFailed: true,
     }
 
     try {

@@ -47,6 +47,7 @@ export const POST = withRoute(
     // writes nothing at all. Counts cover learners in their delivery hour this run (add
     // force=true to count everyone; still nothing is written).
     const run = await runLifecycle({
+      source: 'cron',
       dryRun: query.dryRun === 'true' || query.nudgeDryRun === 'true',
       force: query.force === 'true',
     })

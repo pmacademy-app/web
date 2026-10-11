@@ -78,9 +78,14 @@ export function normalizeModerationStatus<S extends string>(
   return status && (allowed as readonly string[]).includes(status) ? (status as S) : fallback
 }
 
-/** Escapes LIKE wildcards (`%`, `_`) and the escape character so a term matches literally. */
+/**
+ * Makes a search term safe to embed in a PostgREST `ilike` pattern. Escapes the LIKE
+ * wildcards (`%`, `_`) and the escape character so they match literally, and replaces
+ * `*` with a space: PostgREST rewrites `*` to `%` in like/ilike values, and a
+ * backslash does not stop that, so it cannot be matched literally.
+ */
 export function escapeIlikeTerm(term: string): string {
-  return term.replace(/[\\%_]/g, (char) => `\\${char}`)
+  return term.replace(/\*/g, ' ').replace(/[\\%_]/g, (char) => `\\${char}`)
 }
 
 /** Longest search term accepted; anything longer is truncated before it reaches the query. */

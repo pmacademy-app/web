@@ -26,12 +26,21 @@ export const POST = withRoute(
     domain: 'admin',
     summary: 'Unexpected failure in POST /api/admin/automations/lifecycle-preview',
     query: previewQuerySchema,
+    // A preview walks every learner page (with force=true, all of them), so a stuck or
+    // repeated click must not turn into a load test. Two runs per admin per minute.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'admin' ? `admin_lifecycle_preview_${actor.userId}` : null),
+        limit: 2,
+        windowMs: 60 * 1000,
+      },
+    ],
   },
   async ({ actor, query }) => {
     requireAdmin(actor)
     try {
       const force = query.force === 'true'
-      const run = await runLifecycle({ dryRun: true, force })
+      const run = await runLifecycle({ source: 'admin_preview', dryRun: true, force })
 
       return NextResponse.json({
         success: true,

@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Users, UserCheck, UserPlus, ShieldCheck, BookOpen, GraduationCap, Zap, Award } from 'lucide-react'
-import { loadDashboardKpis } from '@/lib/admin/dashboard-service'
+import { loadDashboardKpis, loadDashboardVerifiedUsers } from '@/lib/admin/dashboard-service'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminLoadWarning } from '@/components/admin/AdminLoadWarning'
+import { OverviewKpiCardSkeleton } from './OverviewSkeletons'
 import type { OverviewRangeProps } from './types'
 
 function trend(value: number | null, positiveIsGood = true) {
@@ -10,6 +11,25 @@ function trend(value: number | null, positiveIsGood = true) {
   const isPositive = value > 0
   const good = positiveIsGood ? isPositive : !isPositive
   return { value: `${isPositive ? '+' : ''}${value}%`, positive: good }
+}
+
+/**
+ * The Verified Users card. It reads the Auth admin API, the slowest call on the page, so it
+ * streams in behind its own Suspense boundary instead of holding back the other seven cards.
+ */
+export async function OverviewVerifiedUsersKpi({ rangeKey, from, to }: OverviewRangeProps) {
+  const { verifiedUsers, verifiedUsersTrend, failed } = await loadDashboardVerifiedUsers(rangeKey, from, to)
+
+  return (
+    <AdminKpiCard
+      title="Verified Users"
+      value={failed ? 'Unavailable' : verifiedUsers.toLocaleString()}
+      subtitle={failed ? 'Could not reach the Auth API' : 'All-time verified accounts'}
+      icon={ShieldCheck}
+      iconColor={failed ? 'text-admin-warning' : 'text-admin-success'}
+      trend={failed ? undefined : trend(verifiedUsersTrend)}
+    />
+  )
 }
 
 /** The 8-card KPI grid for the selected range. */
@@ -43,14 +63,9 @@ export async function OverviewKpis({ rangeKey, from, to }: OverviewRangeProps) {
           iconColor="text-admin-info"
           trend={trend(kpis.trends.newUsers)}
         />
-        <AdminKpiCard
-          title="Verified Users"
-          value={kpis.verifiedUsers.toLocaleString()}
-          subtitle="All-time verified accounts"
-          icon={ShieldCheck}
-          iconColor="text-admin-success"
-          trend={trend(kpis.trends.verifiedUsers)}
-        />
+        <Suspense fallback={<OverviewKpiCardSkeleton label="verified users" />}>
+          <OverviewVerifiedUsersKpi rangeKey={rangeKey} from={from} to={to} />
+        </Suspense>
         <AdminKpiCard
           title="Lessons Completed"
           value={kpis.lessonsCompleted.toLocaleString()}

@@ -18,6 +18,13 @@ function formatDate(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString()
 }
 
+/** Admin Fellow UI says "declined" for a rejected request. */
+const REQUEST_STATUS_LABEL: Record<string, string> = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'declined',
+}
+
 function describe(event: FellowHistoryEvent, currentRequestId: string): { label: string; detail: string | null } {
   switch (event.kind) {
     case 'request': {
@@ -25,7 +32,7 @@ function describe(event: FellowHistoryEvent, currentRequestId: string): { label:
       if (event.reviewedAt) parts.push(`reviewed ${formatDate(event.reviewedAt)}`)
       if (event.rejectionReason) parts.push(`reason: ${event.rejectionReason}`)
       const current = event.requestId === currentRequestId ? ' (this request)' : ''
-      return { label: `Request ${event.status}${current}`, detail: parts.length ? parts.join(' · ') : null }
+      return { label: `Request ${REQUEST_STATUS_LABEL[event.status] ?? event.status}${current}`, detail: parts.length ? parts.join(' · ') : null }
     }
     case 'admin_grant':
       return { label: 'Fellow status set by admin', detail: event.adminEmail }
@@ -81,7 +88,7 @@ export function FellowRequestHistory({ history, currentRequestId }: FellowReques
               )
             })}
           </ol>
-          <p className="mt-1 text-[9px] text-admin-fg-muted">Celebrations older than 45 days may not be listed.</p>
+          <p className="mt-1 text-[11px] text-admin-fg-muted">Celebrations older than 45 days may not be listed.</p>
         </div>
       )}
     </div>

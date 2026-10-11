@@ -632,8 +632,12 @@ export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: Ad
             </div>
           )}
 
-          {lifecycleMetrics?.nudges && lifecycleMetrics.nudges.length > 0 && (
-            <AdminNudgeReadoutCard nudges={lifecycleMetrics.nudges} retireReady={lifecycleMetrics.retireReady} />
+          {lifecycleMetrics && (lifecycleMetrics.nudgesFailed || (lifecycleMetrics.nudges?.length ?? 0) > 0) && (
+            <AdminNudgeReadoutCard
+              nudges={lifecycleMetrics.nudges ?? []}
+              retireReady={lifecycleMetrics.retireReady}
+              failed={lifecycleMetrics.nudgesFailed}
+            />
           )}
         </div>
       )}

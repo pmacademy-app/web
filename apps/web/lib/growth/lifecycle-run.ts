@@ -21,7 +21,12 @@ const MAX_PAGES = 50
 /** Maximum execution duration per run to respect serverless deadlines (50s). */
 const MAX_EXECUTION_MS = 50_000
 
+/** Who started the run; it names the run in error logs so a preview failure is not read as the cron. */
+export type LifecycleRunSource = 'cron' | 'admin_preview'
+
 export interface LifecycleRunOptions {
+  /** Who started the run: the hourly cron route or the admin dry-run preview. */
+  source: LifecycleRunSource
   /** Count who would be emailed or nudged, and write nothing at all. */
   dryRun: boolean
   /** Bypass the per-user local-hour delivery gate. */
@@ -84,7 +89,11 @@ function emptyResult(dryRun: boolean, paused: boolean): LifecycleRunResult {
  * Never throws for a data failure: a query error or exception stops the run, is logged,
  * and the counts gathered so far are returned.
  */
-export async function runLifecycle({ dryRun, force, now }: LifecycleRunOptions): Promise<LifecycleRunResult> {
+export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunOptions): Promise<LifecycleRunResult> {
+  // The cron keeps its historical operation names and message prefix, so existing alerts match.
+  const logOperation = (suffix: string) => (source === 'cron' ? `cron_lifecycle_${suffix}` : `admin_lifecycle_preview_${suffix}`)
+  const logOrigin = source === 'cron' ? '/api/cron/lifecycle' : '/api/admin/automations/lifecycle-preview (dry run)'
+
   // Global pause short-circuits the whole run (per-template toggles are still enforced
   // by enqueueNotificationItem for finer control). Digest schedule reuse: lifecycle
   // sends land in the user's daily-reminder local window.
@@ -128,8 +137,8 @@ export async function runLifecycle({ dryRun, force, now }: LifecycleRunOptions):
         void logSystemError({
           severity: 'error',
           category: 'cron',
-          operation: 'cron_lifecycle_query',
-          message: `Database query failure in /api/cron/lifecycle: ${queryErr.message}`,
+          operation: logOperation('query'),
+          message: `Database query failure in ${logOrigin}: ${queryErr.message}`,
         })
         break
       }
@@ -294,8 +303,8 @@ export async function runLifecycle({ dryRun, force, now }: LifecycleRunOptions):
     void logSystemError({
       severity: 'error',
       category: 'cron',
-      operation: 'cron_lifecycle_exception',
-      message: `Unhandled exception in /api/cron/lifecycle: ${err instanceof Error ? err.message : String(err)}`,
+      operation: logOperation('exception'),
+      message: `Unhandled exception in ${logOrigin}: ${err instanceof Error ? err.message : String(err)}`,
     })
   }
 

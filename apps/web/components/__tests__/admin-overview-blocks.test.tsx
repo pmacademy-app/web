@@ -12,6 +12,7 @@ import path from 'node:path'
 const { loaders, apiPost, refresh } = vi.hoisted(() => ({
   loaders: {
     loadDashboardKpis: vi.fn(),
+    loadDashboardVerifiedUsers: vi.fn(),
     loadDashboardSeries: vi.fn(),
     loadDashboardFunnel: vi.fn(),
     loadDashboardAttention: vi.fn(),
@@ -48,7 +49,7 @@ vi.mock('@/components/admin/AdminLoadWarning', () => ({
 }))
 
 import { OverviewAttention } from '@/components/admin/overview/OverviewAttention'
-import { OverviewKpis } from '@/components/admin/overview/OverviewKpis'
+import { OverviewKpis, OverviewVerifiedUsersKpi } from '@/components/admin/overview/OverviewKpis'
 import { OverviewCharts } from '@/components/admin/overview/OverviewCharts'
 import { OverviewFunnel } from '@/components/admin/overview/OverviewFunnel'
 import { OverviewRecentActivity } from '@/components/admin/overview/OverviewRecentActivity'
@@ -102,8 +103,10 @@ async function renderBlock(element: Promise<React.ReactElement>) {
 }
 
 describe('overview blocks', () => {
-  it('KPI block passes the range to its loader and renders all 8 cards', async () => {
+  it('KPI block passes the range to its loader and renders the other 7 cards without waiting on Auth', async () => {
     loaders.loadDashboardKpis.mockResolvedValue({ range: {}, kpis: KPIS, failed: false })
+    // The verified-users loader never settles: the rest of the grid must still paint.
+    loaders.loadDashboardVerifiedUsers.mockReturnValue(new Promise(() => {}))
     await renderBlock(OverviewKpis(RANGE))
 
     expect(loaders.loadDashboardKpis).toHaveBeenCalledWith('7d', null, null)
@@ -112,10 +115,29 @@ describe('overview blocks', () => {
     expect(container.textContent).toContain('+10%')
     expect(container.textContent).toContain('Certificates Issued')
     expect(container.querySelector('[role="alert"]')).toBeNull()
+    // The verified card's slot holds a card-sized skeleton until its own loader resolves.
+    expect(container.querySelector('[aria-label="Loading verified users"]')).not.toBeNull()
+    expect(container.textContent).not.toContain('Verified Users')
+  })
+
+  it('verified-users card renders its own slice, and says so when Auth failed', async () => {
+    loaders.loadDashboardVerifiedUsers.mockResolvedValue({ verifiedUsers: 4321, verifiedUsersTrend: 25, failed: false })
+    await renderBlock(OverviewVerifiedUsersKpi(RANGE))
+
+    expect(loaders.loadDashboardVerifiedUsers).toHaveBeenCalledWith('7d', null, null)
+    expect(container.textContent).toContain('Verified Users')
+    expect(container.textContent).toContain((4321).toLocaleString())
+    expect(container.textContent).toContain('+25%')
+
+    loaders.loadDashboardVerifiedUsers.mockResolvedValue({ verifiedUsers: 0, verifiedUsersTrend: null, failed: true })
+    await renderBlock(OverviewVerifiedUsersKpi(RANGE))
+    expect(container.textContent).toContain('Unavailable')
+    expect(container.textContent).not.toMatch(/Verified Users\s*0/)
   })
 
   it('a failed block shows its own warning and still renders its content', async () => {
     loaders.loadDashboardKpis.mockResolvedValue({ range: {}, kpis: KPIS, failed: true })
+    loaders.loadDashboardVerifiedUsers.mockReturnValue(new Promise(() => {}))
     await renderBlock(OverviewKpis(RANGE))
 
     expect(container.querySelector('[role="alert"]')?.textContent).toMatch(/Key metrics could not be loaded/)

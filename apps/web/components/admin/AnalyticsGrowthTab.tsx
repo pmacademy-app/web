@@ -62,7 +62,7 @@ export function AnalyticsGrowthTab({ data }: AnalyticsGrowthTabProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminKpiCard
-          title="Celebrations Shown"
+          title="Celebrations created"
           value={celebrations.created.toLocaleString()}
           subtitle="In selected range"
           icon={PartyPopper}
@@ -111,7 +111,7 @@ export function AnalyticsGrowthTab({ data }: AnalyticsGrowthTabProps) {
           <StepBars
             label="Celebrations"
             steps={[
-              { label: 'Shown', value: celebrations.created },
+              { label: 'Created', value: celebrations.created },
               {
                 label: 'Claimed',
                 value: celebrations.claimed,
@@ -127,7 +127,7 @@ export function AnalyticsGrowthTab({ data }: AnalyticsGrowthTabProps) {
               [
                 ['Pending', fellowRequests.pending],
                 ['Approved', fellowRequests.approved],
-                ['Rejected', fellowRequests.rejected],
+                ['Declined', fellowRequests.rejected],
               ] as const
             ).map(([label, value]) => (
               <div key={label} className="rounded-lg border border-admin-border bg-admin-surface-raised px-3 py-3">

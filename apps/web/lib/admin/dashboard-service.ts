@@ -12,6 +12,7 @@ import { unstable_cache } from 'next/cache'
 import { AdminConsoleService } from './service'
 import { ADMIN_CACHE_TAGS } from './cache-tags'
 import { fetchAllRows } from './fetch-all'
+import { fetchActiveUsers } from './analytics-rpc'
 import type {
   AdminAttentionItem,
   AdminDashboardData,
@@ -188,8 +189,9 @@ export class DashboardService {
     from?: string | null,
     to?: string | null
   ): Promise<AdminDashboardData> {
-    const [kpis, series, funnel, attention, recentActivity, systemSnapshot] = await Promise.all([
+    const [kpis, verified, series, funnel, attention, recentActivity, systemSnapshot] = await Promise.all([
       loadDashboardKpis(rangeKey, from, to),
+      loadDashboardVerifiedUsers(rangeKey, from, to),
       loadDashboardSeries(rangeKey, from, to),
       loadDashboardFunnel(),
       loadDashboardAttention(rangeKey, from, to),
@@ -197,11 +199,15 @@ export class DashboardService {
       loadDashboardSystemSnapshot(),
     ])
 
-    const failed = [kpis, series, funnel, attention, recentActivity, systemSnapshot].some((slice) => slice.failed)
+    const failed = [kpis, verified, series, funnel, attention, recentActivity, systemSnapshot].some((slice) => slice.failed)
 
     return {
       range: kpis.range,
-      kpis: kpis.kpis,
+      kpis: {
+        ...kpis.kpis,
+        verifiedUsers: verified.verifiedUsers,
+        trends: { ...kpis.kpis.trends, verifiedUsers: verified.verifiedUsersTrend },
+      },
       attention: attention.attention,
       series: series.series,
       funnel: funnel.funnel,
@@ -223,7 +229,10 @@ export class DashboardService {
  *   - never throws: a failure returns that section's empty fallback with `failed: true`.
  *     The cached function throws on failure, and unstable_cache does not store a
  *     rejection, so a failed load is retried on the next request instead of being
- *     served for 90s.
+ *     served for 90s. Helpers inside a computation must not swallow errors into
+ *     normal-looking values (0, false), or a degraded result would be cached as healthy.
+ *     A computation with a usable partial result throws `DegradedSliceError` carrying
+ *     it, so the page shows the partial data with `failed: true`, uncached.
  */
 
 type ServiceClient = ReturnType<typeof createServiceRoleClient>
@@ -235,6 +244,12 @@ const RANGE_KEYS: ReadonlySet<AdminDateRangeKey> = new Set(['today', '7d', '30d'
 export interface DashboardKpisSlice {
   range: AdminDateRange
   kpis: AdminDashboardKpis
+  failed: boolean
+}
+/** The Verified Users KPI card, loaded apart from the grid because it waits on the Auth admin API. */
+export interface DashboardVerifiedUsersSlice {
+  verifiedUsers: number
+  verifiedUsersTrend: number | null
   failed: boolean
 }
 export interface DashboardSeriesSlice {
@@ -289,6 +304,21 @@ function rangeKeyParts(rangeKey: AdminDateRangeKey, from?: string | null, to?: s
   return key === 'custom' ? [key, from ?? '', to ?? ''] : [key]
 }
 
+/**
+ * Thrown from a computation whose result is usable but known to be degraded. It still
+ * rejects the cached function (so nothing is cached), and `loadSlice` serves `partial`
+ * with `failed: true` instead of the empty fallback.
+ */
+export class DegradedSliceError<T> extends Error {
+  constructor(
+    message: string,
+    readonly partial: T
+  ) {
+    super(message)
+    this.name = 'DegradedSliceError'
+  }
+}
+
 async function loadSlice<T extends object>(
   name: string,
   keyParts: string[],
@@ -304,6 +334,7 @@ async function loadSlice<T extends object>(
     return { ...revive(await cached()), failed: false }
   } catch (err) {
     console.warn(`[DashboardService] ${name} loader failed:`, err)
+    if (err instanceof DegradedSliceError) return { ...(err.partial as T), failed: true }
     return { ...fallback(), failed: true }
   }
 }
@@ -352,7 +383,11 @@ const EMPTY_KPIS: AdminDashboardKpis = {
   },
 }
 
-/** KPI grid values and prior-period trends for the range. Also returns the resolved range. */
+/**
+ * KPI grid values and prior-period trends for the range. Also returns the resolved range.
+ * `verifiedUsers` and its trend are always 0/null here: that card comes from
+ * `loadDashboardVerifiedUsers`, so the grid does not wait on the Auth admin API.
+ */
 export function loadDashboardKpis(
   rangeKey: AdminDateRangeKey = '30d',
   from?: string | null,
@@ -364,6 +399,20 @@ export function loadDashboardKpis(
     () => computeKpis(rangeKey, from, to),
     () => ({ range: resolveDashboardRange(rangeKey, from, to), kpis: EMPTY_KPIS }),
     (value) => ({ ...value, range: reviveDashboardRange(value.range) })
+  )
+}
+
+/** The Verified Users card: all-time verified accounts and the in-range trend, from the Auth admin API. */
+export function loadDashboardVerifiedUsers(
+  rangeKey: AdminDateRangeKey = '30d',
+  from?: string | null,
+  to?: string | null
+): Promise<DashboardVerifiedUsersSlice> {
+  return loadSlice(
+    'verified-users',
+    rangeKeyParts(rangeKey, from, to),
+    () => computeVerifiedUsers(rangeKey, from, to),
+    () => ({ verifiedUsers: 0, verifiedUsersTrend: null })
   )
 }
 
@@ -430,7 +479,6 @@ async function computeKpis(
     certsRes,
     certsPreviousRes,
     courseCompletionUsers,
-    verified,
   ] = await Promise.all([
     supabase.from('users').select('id', { count: 'exact', head: true }),
     supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', startIso).lte('created_at', endIso),
@@ -458,7 +506,6 @@ async function computeKpis(
     supabase.from('certificates').select('id', { count: 'exact', head: true }).gte('issued_at', startIso).lte('issued_at', endIso),
     supabase.from('certificates').select('id', { count: 'exact', head: true }).gte('issued_at', prevStartIso).lte('issued_at', prevEndIso),
     countCourseCompletionUsers(supabase),
-    countVerifiedUsers(supabase, startIso, endIso),
   ])
 
   const totalUsers = countOf(totalUsersRes, 'users total')
@@ -480,7 +527,7 @@ async function computeKpis(
       totalUsers,
       activeLearners,
       newUsers,
-      verifiedUsers: verified.total,
+      verifiedUsers: 0,
       lessonsCompleted,
       courseCompletionPct: totalUsers === 0 ? 0 : Math.round((courseCompletionUsers / totalUsers) * 1000) / 10,
       xpEarned,
@@ -489,13 +536,26 @@ async function computeKpis(
         totalUsers: computeTrend(totalUsers, totalUsers - newUsers),
         activeLearners: computeTrend(activeLearners, activeLearnersPrevious),
         newUsers: computeTrend(newUsers, newUsersPrevious),
-        verifiedUsers: computeTrend(verified.total, verified.total - verified.inRange),
+        verifiedUsers: null,
         lessonsCompleted: computeTrend(lessonsCompleted, lessonsPrevious),
         courseCompletionPct: null,
         xpEarned: computeTrend(xpEarned, xpEarnedPrevious),
         certificatesIssued: computeTrend(certificatesIssued, certificatesPrevious),
       },
     },
+  }
+}
+
+async function computeVerifiedUsers(
+  rangeKey: AdminDateRangeKey,
+  from?: string | null,
+  to?: string | null
+): Promise<Omit<DashboardVerifiedUsersSlice, 'failed'>> {
+  const { startIso, endIso } = rangeIsos(resolveDashboardRange(rangeKey, from, to))
+  const verified = await countVerifiedUsers(createServiceRoleClient(), startIso, endIso)
+  return {
+    verifiedUsers: verified.total,
+    verifiedUsersTrend: computeTrend(verified.total, verified.total - verified.inRange),
   }
 }
 
@@ -508,17 +568,17 @@ async function computeSeries(
   const { startIso, endIso } = rangeIsos(range)
   const supabase = createServiceRoleClient()
 
-  const [newUsers, xpCurrent, xpBefore, lessons, quizzes, capstones] = await Promise.all([
+  const [newUsers, xpCurrent, activeUsers, lessons, quizzes, capstones] = await Promise.all([
     fetchAllRows<{ id: string; created_at: string }>((f, t) =>
       supabase.from('users').select('id, created_at').gte('created_at', startIso).lte('created_at', endIso).range(f, t)
     ),
     fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((f, t) =>
       supabase.from('xp_events').select('user_id, xp_amount, created_at').gte('created_at', startIso).lte('created_at', endIso).range(f, t)
     ),
-    // Builds the "active before the window" set that splits new from returning learners.
-    fetchAllRows<{ user_id: string | null }>((f, t) =>
-      supabase.from('xp_events').select('user_id').lt('created_at', startIso).range(f, t)
-    ),
+    // The "active before the window" set that splits new from returning learners. The RPC
+    // returns only users with XP in the range, which are the only ones buildLearnerSeries
+    // looks up, so this matches the old scan of every xp_event before the range.
+    fetchActiveUsers(supabase, startIso, endIso),
     fetchAllRows<{ user_id: string; completed_at: string | null }>((f, t) =>
       supabase
         .from('user_lesson_progress')
@@ -540,12 +600,13 @@ async function computeSeries(
         .range(f, t)
     ),
   ])
+  if (!activeUsers) throw new Error('admin_active_users RPC failed')
 
   const learnerSeries = buildLearnerSeries({
     range,
     newUsers,
     xpEvents: xpCurrent.filter((e): e is { user_id: string; xp_amount: number; created_at: string } => e.user_id !== null),
-    usersActiveBeforeWindow: new Set(xpBefore.map((e) => e.user_id).filter((id): id is string => Boolean(id))),
+    usersActiveBeforeWindow: activeUsers.activeBefore,
   })
   const learningSeries = buildLearningSeries({
     range,
@@ -653,7 +714,11 @@ async function computeSystemSnapshot(): Promise<Omit<DashboardSystemSnapshotSlic
     AdminConsoleService.getSystemHealth(),
     AdminConsoleService.getEmailQueueOverview(),
   ])
-  return { systemSnapshot: buildSystemSnapshot(health, queue, authAvailable) }
+  const systemSnapshot = buildSystemSnapshot(health, queue, authAvailable)
+  // A real "Auth unreachable" or an unreadable queue is still shown, but never cached.
+  const problems = [!authAvailable && 'Auth API unreachable', queue.failed && 'email queue overview failed'].filter(Boolean)
+  if (problems.length > 0) throw new DegradedSliceError(problems.join('; '), { systemSnapshot })
+  return { systemSnapshot }
 }
 
 async function computeRecentActivity(): Promise<Omit<DashboardRecentActivitySlice, 'failed'>> {
@@ -731,7 +796,8 @@ async function computeRecentActivity(): Promise<Omit<DashboardRecentActivitySlic
   // One batched name lookup for every lesson/capstone actor (no per-row query).
   const nameMap = new Map<string, string>()
   if (activityUserIds.size > 0) {
-    const { data: nameRows } = await supabase.from('users').select('id, name, email').in('id', [...activityUserIds])
+    const { data: nameRows, error: nameError } = await supabase.from('users').select('id, name, email').in('id', [...activityUserIds])
+    if (nameError) throw new Error(`recent activity names: ${nameError.message}`)
     for (const row of (nameRows || []) as unknown as Array<{ id: string; name: string | null; email: string }>) {
       nameMap.set(row.id, row.name || row.email.split('@')[0] || 'Learner')
     }
@@ -770,41 +836,40 @@ async function computeRecentActivity(): Promise<Omit<DashboardRecentActivitySlic
 
 /* ─── Shared helpers ───────────────────────────────────────────────────────── */
 
-/** Users holding a full-curriculum completion badge. Swallows errors to 0, as before. */
+/** Users holding a full-curriculum completion badge. Throws on a query error so the section fails. */
 async function countCourseCompletionUsers(supabase: ServiceClient): Promise<number> {
-  try {
-    const { data } = await supabase.from('badges').select('id').eq('key', 'cpo_completion')
-    const badgeIds = ((data || []) as unknown as Array<{ id: string }>).map((b) => b.id)
-    if (badgeIds.length === 0) return 0
-    const { count } = await supabase.from('user_badges').select('user_id', { count: 'exact', head: true }).in('badge_id', badgeIds)
-    return count || 0
-  } catch {
-    return 0
-  }
+  const { data, error } = await supabase.from('badges').select('id').eq('key', 'cpo_completion')
+  if (error) throw new Error(`completion badges: ${error.message}`)
+  const badgeIds = ((data || []) as unknown as Array<{ id: string }>).map((b) => b.id)
+  if (badgeIds.length === 0) return 0
+  return countOf(
+    await supabase.from('user_badges').select('user_id', { count: 'exact', head: true }).in('badge_id', badgeIds),
+    'course completion users'
+  )
 }
 
 /**
- * Verified-account totals from the Auth admin API (first 1000 users, as before). An
- * unreachable Auth API reads as zero here; the system snapshot reports it separately.
+ * Verified-account totals from the Auth admin API (first 1000 users, as before). Throws
+ * when Auth errors, so the card shows a load warning instead of a cached zero.
  */
 async function countVerifiedUsers(
   supabase: ServiceClient,
   startIso: string,
   endIso: string
 ): Promise<{ total: number; inRange: number }> {
-  try {
-    const { data } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
-    const authUsers = data?.users || []
-    return {
-      total: authUsers.filter((u) => Boolean(u.email_confirmed_at)).length,
-      inRange: authUsers.filter((u) => u.email_confirmed_at && u.email_confirmed_at >= startIso && u.email_confirmed_at <= endIso).length,
-    }
-  } catch {
-    return { total: 0, inRange: 0 }
+  const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
+  if (error) throw new Error(`auth listUsers: ${error.message}`)
+  const authUsers = data?.users || []
+  return {
+    total: authUsers.filter((u) => Boolean(u.email_confirmed_at)).length,
+    inRange: authUsers.filter((u) => u.email_confirmed_at && u.email_confirmed_at >= startIso && u.email_confirmed_at <= endIso).length,
   }
 }
 
-/** A one-row Auth admin call: true when the Auth API answers without an error. */
+/**
+ * A one-row Auth admin call: true when the Auth API answers without an error. Never
+ * throws; computeSystemSnapshot turns a false into a `DegradedSliceError`.
+ */
 async function probeAuthAvailable(): Promise<boolean> {
   try {
     const { error } = await createServiceRoleClient().auth.admin.listUsers({ page: 1, perPage: 1 })

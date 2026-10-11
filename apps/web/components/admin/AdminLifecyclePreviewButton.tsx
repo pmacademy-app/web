@@ -74,7 +74,7 @@ export function AdminLifecyclePreviewButton({ names }: AdminLifecyclePreviewButt
 
       <div aria-live="polite">
         {error && (
-          <p role="alert" className="text-xs text-admin-danger">
+          <p data-testid="lifecycle-preview-error" className="text-xs text-admin-danger">
             {error}
           </p>
         )}
@@ -106,7 +106,7 @@ export function AdminLifecyclePreviewButton({ names }: AdminLifecyclePreviewButt
             </div>
 
             {(result.skippedTimezone > 0 || result.nudgePagesSkipped > 0) && (
-              <p className="text-[11px] text-admin-fg-subtle">
+              <p className="text-[11px] text-admin-fg-muted">
                 Skipped: {result.skippedTimezone} outside their delivery hour, {result.nudgePagesSkipped} nudge
                 page(s) that failed to load.
               </p>
@@ -141,7 +141,7 @@ function PreviewList({
     <div>
       <p className="text-[11px] font-semibold text-admin-fg-muted uppercase tracking-wider mb-1">{title}</p>
       {rows.length === 0 ? (
-        <p className="text-admin-fg-subtle">None</p>
+        <p className="text-admin-fg-muted">None</p>
       ) : (
         <ul className="space-y-1">
           {rows.map(([key, n]) => (

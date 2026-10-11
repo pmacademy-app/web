@@ -71,7 +71,8 @@ describe('AnalyticsGrowthTab', () => {
     expect(text).toContain('25')
     expect(text).toContain('Pending')
     expect(text).toContain('Approved')
-    expect(text).toContain('Rejected')
+    expect(text).toContain('Declined')
+    expect(text).not.toContain('Rejected')
   })
 
   it('never uses certificate or credential wording', () => {

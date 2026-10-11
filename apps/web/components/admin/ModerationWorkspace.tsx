@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useOptimistic, useRef, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ShieldAlert, MessageSquare, Lightbulb, FileCheck2, Globe, AlertTriangle, Award } from 'lucide-react'
 import { AdminPageShell } from './AdminPageShell'
@@ -35,6 +35,11 @@ export type ModerationListData =
 /** A URL change: `undefined` or '' removes the param. */
 export type ModerationParamsPatch = Partial<Record<'status' | 'q' | 'page' | 'capstone', string | undefined>>
 
+/** `replace` swaps the current history entry instead of adding one (used by the search box). */
+export interface ModerationNavOptions {
+  replace?: boolean
+}
+
 interface ModerationWorkspaceProps {
   data: ModerationListData
   /** Raw `status` URL param; each view applies its own default. */
@@ -56,25 +61,40 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  // Tab, filter, search and page changes are server navigations: run them in a transition so
+  // the current page stays interactive and the panel can show that a new list is loading.
+  const [isPending, startTransition] = useTransition()
 
   const activeTab: ModerationTab = data.tab
+  // The tab shown as selected: the target tab while its page loads, then the server's tab.
+  const [selectedTab, setSelectedTab] = useOptimistic<ModerationTab>(activeTab)
   const { list } = data
+
+  const navigate = useCallback(
+    (url: string, options?: ModerationNavOptions) => {
+      startTransition(() => {
+        if (options?.replace) router.replace(url, { scroll: false })
+        else router.push(url, { scroll: false })
+      })
+    },
+    [router]
+  )
 
   /**
    * Applies a URL change. Changing the status or the search resets to page 1 (decision 5);
    * opening a capstone or changing the page keeps the rest of the query.
    */
   const updateParams = useCallback(
-    (patch: ModerationParamsPatch) => {
+    (patch: ModerationParamsPatch, options?: ModerationNavOptions) => {
       const next = new URLSearchParams(searchParams.toString())
       if ('status' in patch || 'q' in patch) next.delete('page')
       for (const [key, value] of Object.entries(patch)) {
         if (value === undefined || value === '') next.delete(key)
         else next.set(key, value)
       }
-      router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
+      navigate(`/admin/moderation?${next.toString()}`, options)
     },
-    [router, searchParams]
+    [navigate, searchParams]
   )
 
   const handleTabChange = useCallback(
@@ -82,9 +102,12 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
       // Status values and search differ per tab, so a tab change starts from a clean list.
       const next = new URLSearchParams()
       next.set('tab', tab)
-      router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
+      startTransition(() => {
+        setSelectedTab(tab)
+        router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
+      })
     },
-    [router]
+    [router, setSelectedTab]
   )
 
   const handlePageChange = useCallback(
@@ -126,7 +149,7 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
       >
         {TABS.map((tab) => {
           const Icon = tab.icon
-          const isActive = activeTab === tab.id
+          const isActive = selectedTab === tab.id
           return (
             <button
               key={tab.id}
@@ -157,7 +180,9 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
         role="tabpanel"
         id={`moderation-panel-${activeTab}`}
         aria-labelledby={`moderation-tab-${activeTab}`}
-        className="space-y-4"
+        aria-busy={isPending}
+        data-pending={isPending ? 'true' : undefined}
+        className={`space-y-4 transition-opacity duration-150 motion-reduce:transition-none ${isPending ? 'opacity-60' : 'opacity-100'}`}
       >
         {list.failed && (
           <AdminLoadWarning

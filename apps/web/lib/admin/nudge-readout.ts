@@ -9,8 +9,10 @@
  * - `nudge.portfolio_ready`: a user converts when their portfolio is *currently* public. There is
  *   no published-at timestamp, so this outcome is not time-bound (the UI says so).
  *
- * Lift = treated rate − holdout rate. A nudge is `ready` to retire its holdout once it has at
- * least NUDGE_RETIRE_MIN_TREATED treated users and a positive lift.
+ * Lift = treated rate − holdout rate. A nudge is `ready` once it has at least
+ * NUDGE_RETIRE_MIN_TREATED treated users and a positive lift. When both nudges are ready
+ * (`retireReady`), the manual campaign scripts they replace can be retired (decision B12).
+ * The gate never retires the holdout itself: the holdout stays as the ongoing control.
  */
 import { PROOF_NUDGE_KEYS, nudgeEventType, type ProofNudgeKey } from '@/lib/growth/proof-nudges'
 
@@ -45,7 +47,7 @@ export interface AdminNudgeReadout {
   holdoutRate: number
   /** treatedRate − holdoutRate (can be negative). */
   lift: number
-  /** sent ≥ NUDGE_RETIRE_MIN_TREATED and lift > 0. */
+  /** sent ≥ NUDGE_RETIRE_MIN_TREATED and lift > 0: this nudge has proved itself. */
   ready: boolean
 }
 
@@ -60,7 +62,7 @@ export interface NudgeReadoutInput {
 
 export interface NudgeReadoutResult {
   nudges: AdminNudgeReadout[]
-  /** Both nudges are ready. */
+  /** Both nudges are ready, so the manual campaign scripts can be retired. The holdout stays. */
   retireReady: boolean
 }
 

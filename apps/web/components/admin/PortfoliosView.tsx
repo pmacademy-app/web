@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Globe,
   ExternalLink,
@@ -21,7 +22,7 @@ import { useAdminToast } from './admin-toast'
 import { apiPost } from '@/lib/api/client'
 import type { AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 import type { AdminPortfolioCounts } from '@/lib/admin/moderation-service'
-import type { ModerationParamsPatch } from './ModerationWorkspace'
+import type { ModerationNavOptions, ModerationParamsPatch } from './ModerationWorkspace'
 
 interface PortfoliosViewProps {
   /** One server page, already filtered by `status` and `q` (getPortfoliosPage). */
@@ -32,7 +33,7 @@ interface PortfoliosViewProps {
   status: string | null
   /** Raw `q` URL param. */
   q: string
-  onParamsChange: (patch: ModerationParamsPatch) => void
+  onParamsChange: (patch: ModerationParamsPatch, options?: ModerationNavOptions) => void
 }
 
 type TabFilter = 'pending' | 'verified' | 'all'
@@ -42,6 +43,8 @@ const SEARCH_DEBOUNCE_MS = 350
 
 export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsChange }: PortfoliosViewProps) {
   const { toast } = useAdminToast()
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [portfolios, setPortfolios] = useState<AdminPortfolioRow[]>(initialPortfolios)
   const [kpis, setKpis] = useState<AdminPortfolioCounts>(counts)
   // Re-seed the local (optimistic) copies when the server sends a new page. Not done
@@ -58,11 +61,25 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
   const [loadingUserId, setLoadingUserId] = useState<string | null>(null)
   const [unverifyTarget, setUnverifyTarget] = useState<AdminPortfolioRow | null>(null)
 
-  // The search runs on the server: push `q` to the URL once typing pauses.
+  // The last `q` this view sent to the URL. A `q` that differs from it came from outside
+  // (Back/Forward, a link), so the box follows the URL instead of re-sending its old text.
+  const lastSentQueryRef = useRef(q.trim())
+  useEffect(() => {
+    const incoming = q.trim()
+    if (incoming === lastSentQueryRef.current) return
+    lastSentQueryRef.current = incoming
+    setSearchQuery(q)
+  }, [q])
+
+  // The search runs on the server: replace `q` in the URL once typing pauses. Replace, not
+  // push, so each pause does not add a history entry for Back to walk through.
   useEffect(() => {
     const next = searchQuery.trim()
     if (next === q.trim()) return
-    const timer = setTimeout(() => onParamsChange({ q: next || undefined }), SEARCH_DEBOUNCE_MS)
+    const timer = setTimeout(() => {
+      lastSentQueryRef.current = next
+      onParamsChange({ q: next || undefined }, { replace: true })
+    }, SEARCH_DEBOUNCE_MS)
     return () => clearTimeout(timer)
   }, [searchQuery, q, onParamsChange])
 
@@ -101,6 +118,9 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
             : `Revoked verification for ${targetUser.learnerName}.`,
           'success'
         )
+        // The list is server-paged and filtered by status: refetch so a changed row leaves a
+        // status-filtered list and the counts and total stay right.
+        startRefresh(() => router.refresh())
       } else {
         const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update portfolio verification status.')
         toast(errorMsg, 'error')

@@ -137,6 +137,8 @@ describe('fetchGrowthData', () => {
     expect(has(capstones, 'eq', 'status', 'reviewed')).toBe(true)
     expect(has(capstones, 'eq', 'is_public', true)).toBe(true)
     expect(has(capstones, 'eq', 'users.is_portfolio_public', true)).toBe(true)
+    // A capstone page has no public URL until its owner has a username.
+    expect(has(capstones, 'not', 'users.username', 'is', null)).toBe(true)
 
     const fellow = queries.filter((q) => q.table === 'fellow_requests')
     expect(fellow).toHaveLength(3)

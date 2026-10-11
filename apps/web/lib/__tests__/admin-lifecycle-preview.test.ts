@@ -11,7 +11,20 @@ const mocks = vi.hoisted(() => ({
   holdout: vi.fn(),
   isGlobalPause: vi.fn(),
   writes: [] as Array<{ table: string; op: string }>,
+  usersError: null as { message: string } | null,
+  logSystemError: vi.fn(),
+  buckets: new Map<string, number>(),
 }))
+
+// A per-key counter standing in for the persistent limiter, reset before each test.
+vi.mock('@/lib/rate-limit', () => ({
+  evaluatePersistentRateLimit: vi.fn(async (key: string, opts: { limit: number; windowMs: number }) => {
+    const used = (mocks.buckets.get(key) ?? 0) + 1
+    mocks.buckets.set(key, used)
+    return { success: used <= opts.limit, remaining: Math.max(0, opts.limit - used), resetInMs: opts.windowMs }
+  }),
+}))
+vi.mock('@/lib/monitoring/logger', () => ({ logSystemError: mocks.logSystemError }))
 
 vi.mock('@/lib/admin/guard', () => ({
   requireAdminUser: (req: Request) => mocks.requireAdminUser(req),
@@ -64,7 +77,7 @@ function fakeSupabase() {
         b.not = () => b
         b.gt = () => b
         b.order = () => b
-        b.limit = async () => ({ data: USERS, error: null })
+        b.limit = async () => (mocks.usersError ? { data: null, error: mocks.usersError } : { data: USERS, error: null })
         return b
       }
       if (table === 'user_lesson_progress') return { ...writes, select: () => ({ in: async () => ({ data: [], error: null }) }) }
@@ -84,6 +97,9 @@ const preview = (query = '?force=true') =>
 
 beforeEach(() => {
   mocks.writes = []
+  mocks.usersError = null
+  mocks.buckets.clear()
+  mocks.logSystemError.mockReset()
   mocks.requireAdminUser.mockReset().mockResolvedValue(ADMIN)
   mocks.enqueue.mockReset()
   mocks.isGlobalPause.mockReset().mockResolvedValue(false)
@@ -140,6 +156,32 @@ describe('POST /api/admin/automations/lifecycle-preview', () => {
     expect(res.status).toBe(403)
     expect((await res.json()).code).toBe('FORBIDDEN')
     expect(mocks.runNudges).not.toHaveBeenCalled()
+  })
+
+  it('allows two previews per admin per minute, then answers 429 without running', async () => {
+    expect((await preview()).status).toBe(200)
+    expect((await preview()).status).toBe(200)
+    const third = await preview()
+
+    expect(third.status).toBe(429)
+    expect((await third.json()).code).toBe('RATE_LIMITED')
+    expect(mocks.runNudges).toHaveBeenCalledTimes(2)
+
+    // The bucket is per admin: another admin is not throttled by the first one.
+    mocks.requireAdminUser.mockResolvedValue({ ...ADMIN, userId: 'admin-2' })
+    expect((await preview()).status).toBe(200)
+  })
+
+  it('logs a failed preview as the admin preview, not as the cron', async () => {
+    mocks.usersError = { message: 'users unavailable' }
+
+    expect((await preview()).status).toBe(200)
+
+    expect(mocks.logSystemError).toHaveBeenCalledTimes(1)
+    const entry = mocks.logSystemError.mock.calls[0][0]
+    expect(entry.operation).toBe('admin_lifecycle_preview_query')
+    expect(entry.message).toContain('/api/admin/automations/lifecycle-preview')
+    expect(entry.message).not.toContain('/api/cron/lifecycle')
   })
 
   it('refuses the cron secret: the preview is admin only', async () => {

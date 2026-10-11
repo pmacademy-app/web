@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleDashed } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, CircleDashed } from 'lucide-react'
 import { NUDGE_RETIRE_MIN_TREATED, type AdminNudgeReadout } from '@/lib/admin/nudge-readout'
 import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 
@@ -21,10 +21,15 @@ export function formatLift(lift: number): string {
 interface AdminNudgeReadoutCardProps {
   nudges: AdminNudgeReadout[]
   retireReady: boolean
+  /** The readout query failed: the counts are placeholder zeros, so show a warning instead. */
+  failed?: boolean
 }
 
-/** Proof-nudge readout: treated vs holdout outcome rates, lift, and whether the holdout can retire. */
-export function AdminNudgeReadoutCard({ nudges, retireReady }: AdminNudgeReadoutCardProps) {
+/**
+ * Proof-nudge readout: treated vs holdout outcome rates, lift, and whether the manual campaign
+ * scripts can retire (decision B12). The holdout itself stays.
+ */
+export function AdminNudgeReadoutCard({ nudges, retireReady, failed = false }: AdminNudgeReadoutCardProps) {
   return (
     <section
       aria-labelledby="nudge-readout-heading"
@@ -40,67 +45,76 @@ export function AdminNudgeReadoutCard({ nudges, retireReady }: AdminNudgeReadout
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-left text-admin-fg-subtle border-b border-admin-border">
-              <th scope="col" className="px-4 py-2 font-semibold">Nudge</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Sent</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Held out</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Reminded</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Treated rate</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Holdout rate</th>
-              <th scope="col" className="px-4 py-2 font-semibold text-right">Lift</th>
-            </tr>
-          </thead>
-          <tbody>
-            {nudges.map((n) => (
-              <tr key={n.key} data-nudge={n.key} className="border-b border-admin-border/60 last:border-0">
-                <th scope="row" className="px-4 py-2.5 text-left font-normal">
-                  <span className="font-semibold text-admin-fg">{n.name}</span>
-                  <span className="block text-[10px] text-admin-fg-subtle">
-                    Outcome: {NUDGE_OUTCOME_LABELS[n.key] ?? n.key}
-                  </span>
-                </th>
-                <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.sent}</td>
-                <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.heldOut}</td>
-                <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.reminded}</td>
-                <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.treatedRate)}</td>
-                <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.holdoutRate)}</td>
-                <td
-                  className={`px-4 py-2.5 text-right font-mono tabular-nums ${
-                    n.lift > 0 ? 'text-admin-success' : n.lift < 0 ? 'text-admin-danger' : 'text-admin-fg-muted'
-                  }`}
-                >
-                  {formatLift(n.lift)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {failed ? (
+        <p role="alert" data-testid="nudge-readout-failed" className="px-4 py-3 flex items-start gap-2 text-xs text-admin-fg">
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-px text-admin-warning" aria-hidden="true" />
+          The nudge readout could not be loaded. Refresh the page to try again.
+        </p>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-admin-fg-muted border-b border-admin-border">
+                  <th scope="col" className="px-4 py-2 font-semibold">Nudge</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Sent</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Held out</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Reminded</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Treated rate</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Holdout rate</th>
+                  <th scope="col" className="px-4 py-2 font-semibold text-right">Lift</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nudges.map((n) => (
+                  <tr key={n.key} data-nudge={n.key} className="border-b border-admin-border/60 last:border-0">
+                    <th scope="row" className="px-4 py-2.5 text-left font-normal">
+                      <span className="font-semibold text-admin-fg">{n.name}</span>
+                      <span className="block text-[11px] text-admin-fg-muted">
+                        Outcome: {NUDGE_OUTCOME_LABELS[n.key] ?? n.key}
+                      </span>
+                    </th>
+                    <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.sent}</td>
+                    <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.heldOut}</td>
+                    <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.reminded}</td>
+                    <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.treatedRate)}</td>
+                    <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.holdoutRate)}</td>
+                    <td
+                      className={`px-4 py-2.5 text-right font-mono tabular-nums ${
+                        n.lift > 0 ? 'text-admin-success' : n.lift < 0 ? 'text-admin-danger' : 'text-admin-fg-muted'
+                      }`}
+                    >
+                      {formatLift(n.lift)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-      <div
-        data-testid="nudge-retire-line"
-        data-ready={retireReady ? 'true' : 'false'}
-        className={`px-4 py-2.5 border-t border-admin-border text-[11px] flex items-start gap-2 ${
-          retireReady ? 'text-admin-success' : 'text-admin-fg-subtle'
-        }`}
-      >
-        {retireReady ? (
-          <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden="true" />
-        ) : (
-          <CircleDashed className="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden="true" />
-        )}
-        <span>
-          {retireReady
-            ? 'Ready to retire the holdout: both nudges have enough treated users and a positive lift.'
-            : `Keep the holdout: each nudge needs at least ${NUDGE_RETIRE_MIN_TREATED} treated users and a positive lift.`}
-        </span>
-      </div>
-      <p className="px-4 pb-2.5 text-[11px] text-admin-fg-subtle">
-        The portfolio outcome counts users whose portfolio is public now, so it is not tied to the nudge date.
-      </p>
+          <div
+            data-testid="nudge-retire-line"
+            data-ready={retireReady ? 'true' : 'false'}
+            className={`px-4 py-2.5 border-t border-admin-border text-xs flex items-start gap-2 ${
+              retireReady ? 'text-admin-fg font-semibold' : 'text-admin-fg-muted'
+            }`}
+          >
+            {retireReady ? (
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-px text-admin-success" aria-hidden="true" />
+            ) : (
+              <CircleDashed className="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden="true" />
+            )}
+            <span>
+              {retireReady
+                ? 'Ready to retire the manual campaign scripts: both nudges have enough treated users and a positive lift.'
+                : `Keep the manual scripts: each nudge needs ≥${NUDGE_RETIRE_MIN_TREATED} treated users and a positive lift.`}
+            </span>
+          </div>
+          <p className="px-4 pb-2.5 text-[11px] text-admin-fg-muted">
+            The portfolio outcome counts users whose portfolio is public now, so it is not tied to the nudge date.
+          </p>
+        </>
+      )}
     </section>
   )
 }

@@ -78,17 +78,36 @@ describe('AdminNudgeReadoutCard', () => {
     expect(container.textContent).toContain('requested Fellow within 14 days')
   })
 
-  it('renders the retire line grey until both nudges are ready, then green', () => {
+  it('gates retiring the manual campaign scripts (B12), never the holdout', () => {
     act(() => root.render(<AdminNudgeReadoutCard retireReady={false} nudges={[readout({})]} />))
     let line = container.querySelector('[data-testid="nudge-retire-line"]')!
     expect(line.getAttribute('data-ready')).toBe('false')
-    expect(line.className).toContain('text-admin-fg-subtle')
-    expect(line.textContent).toContain('200')
+    expect(line.className).toContain('text-admin-fg-muted')
+    expect(line.textContent).toContain('Keep the manual scripts')
+    expect(line.textContent).toContain('≥200 treated users')
 
     act(() => root.render(<AdminNudgeReadoutCard retireReady nudges={[readout({ ready: true })]} />))
     line = container.querySelector('[data-testid="nudge-retire-line"]')!
     expect(line.getAttribute('data-ready')).toBe('true')
-    expect(line.className).toContain('text-admin-success')
+    expect(line.textContent).toContain('Ready to retire the manual campaign scripts')
+    expect(line.querySelector('svg')?.getAttribute('class')).toContain('text-admin-success')
+    expect(container.textContent?.toLowerCase()).not.toContain('retire the holdout')
+  })
+
+  it('uses readable text tokens and sizes for informational text', () => {
+    act(() => root.render(<AdminNudgeReadoutCard retireReady nudges={[readout({})]} />))
+    expect(container.innerHTML).not.toContain('text-admin-fg-subtle')
+    expect(container.innerHTML).not.toContain('text-[10px]')
+    const line = container.querySelector('[data-testid="nudge-retire-line"]')!
+    expect(line.className).toContain('text-xs')
+    expect(line.className).not.toContain('text-admin-success')
+  })
+
+  it('shows a warning instead of a zero table when the readout failed', () => {
+    act(() => root.render(<AdminNudgeReadoutCard retireReady={false} failed nudges={[readout({})]} />))
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('could not be loaded')
+    expect(container.querySelector('table')).toBeNull()
+    expect(container.querySelector('[data-testid="nudge-retire-line"]')).toBeNull()
   })
 
   it('formats lift in signed percentage points', () => {
@@ -150,7 +169,11 @@ describe('AdminLifecyclePreviewButton', () => {
     apiPost.mockResolvedValue({ ok: false, error: { kind: 'http', code: 'X', message: 'Nope', status: 500 } })
     act(() => root.render(<AdminLifecyclePreviewButton />))
     await clickPreview()
-    expect(container.querySelector('[role="alert"]')?.textContent).toBe('Nope')
+    const error = container.querySelector('[data-testid="lifecycle-preview-error"]')
+    expect(error?.textContent).toBe('Nope')
+    // One announcement mechanism: the polite live region, with no nested alert.
+    expect(error?.closest('[aria-live="polite"]')).not.toBeNull()
+    expect(container.querySelector('[role="alert"]')).toBeNull()
     expect(container.querySelector('[data-testid="lifecycle-preview-result"]')).toBeNull()
   })
 })

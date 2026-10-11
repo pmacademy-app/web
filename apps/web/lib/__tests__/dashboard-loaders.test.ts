@@ -4,7 +4,12 @@ import { unstable_cache } from 'next/cache'
 
 // Tables whose queries resolve with a PostgREST error, set per test.
 const failingTables = new Set<string>()
+// Tables whose `.in(...)` lookups (only) resolve with an error.
+const failingInLookups = new Set<string>()
 let authError: { message: string } | null = null
+let activeUsersRpcError: { message: string } | null = null
+let activeBefore = false
+const rpcCalls: Array<{ fn: string; args: unknown; order: string | null }> = []
 
 const rowsFor = (table: string): any[] => {
   const now = new Date().toISOString()
@@ -21,6 +26,10 @@ const rowsFor = (table: string): any[] => {
       return [{ id: 'c-1', user_id: 'user-1', module_slug: 'foundations', submitted_at: now }]
     case 'certificates':
       return [{ id: 'cert-1', user_id: 'user-1', learner_name: 'Alice', issued_at: now, certificate_code: 'CERT-1' }]
+    case 'badges':
+      return [{ id: 'badge-1' }]
+    case 'user_badges':
+      return [{ user_id: 'user-1' }]
     default:
       return []
   }
@@ -28,11 +37,15 @@ const rowsFor = (table: string): any[] => {
 
 const createChain = (table: string) => {
   const chain: any = {}
+  let usedIn = false
   for (const method of ['select', 'eq', 'in', 'gte', 'lte', 'lt', 'not', 'order', 'limit', 'range']) {
-    chain[method] = vi.fn(() => chain)
+    chain[method] = vi.fn(() => {
+      if (method === 'in') usedIn = true
+      return chain
+    })
   }
   chain.then = (resolve: any, reject: any) => {
-    const result = failingTables.has(table)
+    const result = failingTables.has(table) || (usedIn && failingInLookups.has(table))
       ? { data: null, count: null, error: { message: `${table} unavailable` } }
       : { data: rowsFor(table), count: rowsFor(table).length, error: null }
     return Promise.resolve(result).then(resolve, reject)
@@ -40,9 +53,30 @@ const createChain = (table: string) => {
   return chain
 }
 
+/** admin_active_users: user-1 is the one learner with XP in range. */
+const createRpc = (fn: string, args: unknown) => {
+  const call = { fn, args, order: null as string | null }
+  rpcCalls.push(call)
+  const builder: any = {
+    order: (col: string) => {
+      call.order = col
+      return builder
+    },
+    range: () => builder,
+    then: (resolve: any, reject: any) =>
+      Promise.resolve(
+        activeUsersRpcError
+          ? { data: null, error: activeUsersRpcError }
+          : { data: [{ user_id: 'user-1', active_before: activeBefore }], error: null }
+      ).then(resolve, reject),
+  }
+  return builder
+}
+
 vi.mock('../supabase', () => ({
   createServiceRoleClient: vi.fn(() => ({
     from: vi.fn((table: string) => createChain(table)),
+    rpc: vi.fn((fn: string, args: unknown) => createRpc(fn, args)),
     auth: {
       admin: {
         listUsers: vi.fn(() =>
@@ -69,6 +103,8 @@ vi.mock('../admin/service', () => ({
   },
 }))
 
+import { AdminConsoleService } from '../admin/service'
+
 import {
   DashboardService,
   loadDashboardAttention,
@@ -77,6 +113,7 @@ import {
   loadDashboardRecentActivity,
   loadDashboardSeries,
   loadDashboardSystemSnapshot,
+  loadDashboardVerifiedUsers,
 } from '../admin/dashboard-service'
 
 /** Mimics the real data cache: the result is JSON round-tripped, so Dates come back as strings. */
@@ -87,7 +124,11 @@ const jsonRoundTripCache = () =>
 describe('dashboard section loaders', () => {
   beforeEach(() => {
     failingTables.clear()
+    failingInLookups.clear()
     authError = null
+    activeUsersRpcError = null
+    activeBefore = false
+    rpcCalls.length = 0
     vi.mocked(unstable_cache).mockReset()
     vi.mocked(unstable_cache).mockImplementation(((fn: any) => fn) as any)
     vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -101,10 +142,11 @@ describe('dashboard section loaders', () => {
       loadDashboardAttention('30d'),
       loadDashboardRecentActivity(),
       loadDashboardSystemSnapshot(),
+      loadDashboardVerifiedUsers('30d'),
     ])
-    expect(slices.map((s) => s.failed)).toEqual([false, false, false, false, false, false])
+    expect(slices.map((s) => s.failed)).toEqual([false, false, false, false, false, false, false])
 
-    const [kpis, series, funnel, attention, recent, snapshot] = slices
+    const [kpis, series, funnel, attention, recent, snapshot, verified] = slices
     expect(kpis.kpis.totalUsers).toBe(1)
     expect(kpis.kpis.activeLearners).toBe(1)
     expect(kpis.kpis.xpEarned).toBe(50)
@@ -113,6 +155,9 @@ describe('dashboard section loaders', () => {
     expect(attention.attention.map((a) => a.id)).toEqual(['failed-emails', 'contact-messages', 'pending-testimonials', 'system-alerts'])
     expect(recent.recentActivity.find((r) => r.activity === 'completed a lesson')?.entity).toBe('Lesson One')
     expect(snapshot.systemSnapshot.find((s) => s.id === 'auth')?.status).toBe('healthy')
+    expect(verified.verifiedUsers).toBe(1)
+    // The KPI grid no longer waits on Auth: its own verified count is a placeholder.
+    expect(kpis.kpis.verifiedUsers).toBe(0)
   })
 
   it('revives the range Dates after a JSON-serializing cache round trip', async () => {
@@ -187,12 +232,90 @@ describe('dashboard section loaders', () => {
     await expect(cachedFn()).rejects.toThrow('certificates')
   })
 
-  it('system snapshot probes Auth itself and reports it degraded on an Auth error', async () => {
+  it('system snapshot shows a real Auth outage as degraded, but fails the slice so it is not cached', async () => {
     authError = { message: 'auth down' }
 
     const snapshot = await loadDashboardSystemSnapshot()
-    expect(snapshot.failed).toBe(false)
+    expect(snapshot.failed).toBe(true)
     expect(snapshot.systemSnapshot.find((s) => s.id === 'auth')?.status).toBe('degraded')
     expect(snapshot.systemSnapshot.find((s) => s.id === 'database')?.status).toBe('healthy')
+
+    const cachedFn = vi.mocked(unstable_cache).mock.calls[0][0] as () => Promise<unknown>
+    await expect(cachedFn()).rejects.toThrow('Auth API unreachable')
+  })
+
+  it('system snapshot fails (uncached) when the email queue overview could not be read', async () => {
+    vi.mocked(AdminConsoleService.getEmailQueueOverview).mockResolvedValueOnce({
+      pendingCount: 0,
+      failedCount: 0,
+      failed: true,
+    } as any)
+
+    const snapshot = await loadDashboardSystemSnapshot()
+    expect(snapshot.failed).toBe(true)
+    expect(snapshot.systemSnapshot.find((s) => s.id === 'email')?.status).toBe('unknown')
+    expect(snapshot.systemSnapshot.find((s) => s.id === 'auth')?.status).toBe('healthy')
+  })
+
+  it('a course-completion badge query error fails the KPIs and the funnel instead of reading as 0', async () => {
+    failingTables.add('user_badges')
+
+    const [kpis, funnel] = await Promise.all([loadDashboardKpis('30d'), loadDashboardFunnel()])
+    expect(kpis.failed).toBe(true)
+    expect(funnel.failed).toBe(true)
+
+    const kpisCall = vi.mocked(unstable_cache).mock.calls.find(([, key]) => (key as string[])[1] === 'kpis')!
+    await expect((kpisCall[0] as () => Promise<unknown>)()).rejects.toThrow('course completion users')
+  })
+
+  it('an Auth error fails only the verified-users card, never caching a zero', async () => {
+    authError = { message: 'auth down' }
+
+    const [verified, kpis] = await Promise.all([loadDashboardVerifiedUsers('30d'), loadDashboardKpis('30d')])
+    expect(verified).toEqual({ verifiedUsers: 0, verifiedUsersTrend: null, failed: true })
+    expect(kpis.failed).toBe(false)
+
+    const verifiedCall = vi.mocked(unstable_cache).mock.calls.find(([, key]) => (key as string[])[1] === 'verified-users')!
+    expect(verifiedCall[2]).toEqual({ revalidate: 90, tags: ['admin-dashboard'] })
+    await expect((verifiedCall[0] as () => Promise<unknown>)()).rejects.toThrow('auth down')
+
+    const data = await DashboardService.getDashboardData('30d', null, null)
+    expect(data.failed).toBe(true)
+    expect(data.kpis.totalUsers).toBe(1)
+  })
+
+  it('getDashboardData merges the verified-users card into the KPIs', async () => {
+    const data = await DashboardService.getDashboardData('30d', null, null)
+    expect(data.failed).toBeUndefined()
+    expect(data.kpis.verifiedUsers).toBe(1)
+  })
+
+  it('recent activity fails when the actor-name lookup errors', async () => {
+    failingInLookups.add('users')
+
+    const recent = await loadDashboardRecentActivity()
+    expect(recent).toEqual({ recentActivity: [], failed: true })
+  })
+
+  it('series reads "active before" from admin_active_users (ordered), not a scan of older xp_events', async () => {
+    activeBefore = true
+    const series = await loadDashboardSeries('30d')
+    expect(series.failed).toBe(false)
+    expect(rpcCalls.map((c) => [c.fn, c.order])).toEqual([['admin_active_users', 'user_id']])
+    // user-1 earned XP in range and was active before it: counted as returning.
+    expect(series.series.reduce((sum, p) => sum + p.returningLearners, 0)).toBe(1)
+
+    activeBefore = false
+    const fresh = await loadDashboardSeries('30d')
+    expect(fresh.series.reduce((sum, p) => sum + p.returningLearners, 0)).toBe(0)
+    expect(fresh.series.reduce((sum, p) => sum + p.activeLearners, 0)).toBe(1)
+  })
+
+  it('series fails when the admin_active_users RPC fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    activeUsersRpcError = { message: 'function admin_active_users does not exist' }
+
+    const series = await loadDashboardSeries('30d')
+    expect(series).toEqual({ series: [], failed: true })
   })
 })

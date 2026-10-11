@@ -17,6 +17,7 @@ import type { AdminLevelDistribution, AdminModuleDropOff, AdminStreakBucket } fr
 type RpcError = { message: string } | null
 type RpcResult<T> = { data: T | null; error: RpcError }
 type RpcBuilder<T> = PromiseLike<RpcResult<T>> & {
+  order: (column: string) => RpcBuilder<T>
   range: (from: number, to: number) => PromiseLike<RpcResult<T>>
 }
 /** `types/database.ts` is generated and does not know these functions yet. */
@@ -107,8 +108,11 @@ export async function fetchActiveUsers(
 ): Promise<AdminActiveUsers | null> {
   try {
     const rows = await fetchAllRows<{ user_id: string | null; active_before: boolean | null }>((from, to) =>
+      // The outer ORDER BY makes the paging stable; the function's own order is not
+      // guaranteed to survive PostgREST's wrapping query.
       asRpc(supabase)
         .rpc('admin_active_users', { p_from: fromIso, p_to: toIso })
+        .order('user_id')
         .range(from, to) as PromiseLike<RpcResult<{ user_id: string | null; active_before: boolean | null }[]>>
     )
     const active = new Set<string>()

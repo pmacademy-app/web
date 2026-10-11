@@ -28,8 +28,10 @@ const state = vi.hoisted(() => ({
   tables: null as unknown as LegacyTables,
   lessons: [] as CurriculumEntry[],
   failRpc: new Set<string>(),
+  failTables: new Set<string>(),
   queries: [] as Array<{ table: string; filters: string[]; head: boolean }>,
   rpcCalls: [] as Array<{ fn: string; args?: Record<string, unknown> }>,
+  rpcOrders: [] as Array<{ fn: string; col: string }>,
 }))
 
 /* ─── SQL transcriptions (one per function in the migration) ─────────────── */
@@ -140,6 +142,7 @@ function tableBuilder(table: string) {
   let window: [number, number] | null = null
 
   const run = (): Result => {
+    if (state.failTables.has(table)) return { data: null, error: { message: `${table} unavailable` }, count: null }
     const rows = (state.tables[table as keyof LegacyTables] as unknown as Row[]).filter((r) => preds.every((p) => p(r)))
     if (record.head) return { data: null, error: null, count: rows.length }
     return { data: window ? rows.slice(window[0], window[1] + 1) : rows, error: null, count: null }
@@ -198,12 +201,26 @@ function rpc(fn: string, args?: Record<string, unknown>) {
         throw new Error(`unexpected rpc ${fn}`)
     }
   }
+  let orderBy: string | null = null
   const run = (window?: [number, number]): Result => {
     if (state.failRpc.has(fn)) return { data: null, error: { message: `function public.${fn} does not exist` } }
-    const data = answer()
+    let data = answer()
+    if (orderBy && Array.isArray(data)) {
+      const col = orderBy
+      data = [...data].sort((a, b) => String(a[col]).localeCompare(String(b[col])))
+    }
     return { data: window && Array.isArray(data) ? data.slice(window[0], window[1] + 1) : data, error: null }
   }
-  return { ...thenable(() => run()), range: (from: number, to: number) => thenable(() => run([from, to])) }
+  const builder = {
+    ...thenable(() => run()),
+    order: (col: string) => {
+      state.rpcOrders.push({ fn, col })
+      orderBy = col
+      return builder
+    },
+    range: (from: number, to: number) => thenable(() => run([from, to])),
+  }
+  return builder
 }
 
 vi.mock('../supabase', () => ({
@@ -323,8 +340,10 @@ beforeEach(() => {
   state.tables = seeded.tables
   state.lessons = seeded.lessons
   state.failRpc = new Set()
+  state.failTables = new Set()
   state.queries = []
   state.rpcCalls = []
+  state.rpcOrders = []
   vi.spyOn(console, 'error').mockImplementation(() => {})
 })
 
@@ -418,6 +437,10 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     state.tables.xp_events = [...state.tables.xp_events, ...many]
     const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '7d' })
     expect(state.rpcCalls.filter((c) => c.fn === 'admin_active_users').length).toBeGreaterThanOrEqual(3)
+    // Every page is ordered by the outer query, so pages cannot overlap or skip rows.
+    expect(state.rpcOrders.filter((o) => o.fn === 'admin_active_users')).toEqual(
+      state.rpcCalls.filter((c) => c.fn === 'admin_active_users').map(() => ({ fn: 'admin_active_users', col: 'user_id' }))
+    )
     expect(data.learners.newLearners + data.learners.returningLearners).toBe(data.learners.activeLearners)
   })
 
@@ -457,5 +480,13 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     // Range-bounded data still loads.
     expect(data.engagement.xpEarned).toBeGreaterThan(0)
     expect(data.overview.kpis.lessonsCompleted).toBeGreaterThan(0)
+  })
+})
+
+describe('analytics service: head-count failures', () => {
+  it('a failing badge count marks the payload failed instead of reading as zero badges', async () => {
+    state.failTables.add('user_badges')
+    const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d' })
+    expect(data.failed).toBe(true)
   })
 })

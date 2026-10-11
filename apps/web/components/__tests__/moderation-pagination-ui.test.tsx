@@ -13,7 +13,7 @@ import { createRoot, type Root } from 'react-dom/client'
 // active tab, the URL (tab, status, q, page, capstone) drives every list, and changing the
 // tab, status or search resets to page 1. The views render the server page as-is.
 
-const nav = vi.hoisted(() => ({ search: '', push: vi.fn() }))
+const nav = vi.hoisted(() => ({ search: '', push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }))
 const services = vi.hoisted(() => ({
   getModerationQueuePage: vi.fn(),
   getPrivateFeedbackPage: vi.fn(),
@@ -24,7 +24,7 @@ const services = vi.hoisted(() => ({
 }))
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: nav.push, replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
+  useRouter: () => ({ push: nav.push, replace: nav.replace, refresh: nav.refresh, prefetch: vi.fn() }),
   useSearchParams: () => new URLSearchParams(nav.search),
   usePathname: () => '/admin/moderation',
 }))
@@ -52,6 +52,8 @@ vi.mock('@/lib/admin/fellow-request-service', () => ({
 }))
 
 import { ModerationWorkspace, type ModerationListData } from '@/components/admin/ModerationWorkspace'
+import { apiPatch, apiPost } from '@/lib/api/client'
+import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
 import AdminModerationPage from '@/app/admin/(console)/moderation/page'
 import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 
@@ -90,6 +92,27 @@ function portfolio(id: string, isFellow: boolean): AdminPortfolioRow {
   }
 }
 
+function fellowRequest(id: string): AdminFellowRequestItem {
+  return {
+    id,
+    userId: `u-${id}`,
+    userName: `Learner ${id}`,
+    username: `l${id}`,
+    email: `${id}@example.test`,
+    status: 'pending',
+    requestedAt: '2026-04-01T00:00:00Z',
+    reviewedBy: null,
+    reviewedAt: null,
+    rejectionReason: null,
+    isEligible: true,
+    isPortfolioPublic: true,
+    readinessCompletedCount: 4,
+    readinessTotalCount: 4,
+    isFellow: false,
+    history: [],
+  }
+}
+
 const page = <T,>(items: T[], extra: Partial<{ total: number; page: number; failed: boolean }> = {}) => ({
   items,
   total: extra.total ?? items.length,
@@ -104,6 +127,8 @@ let root: Root
 beforeEach(() => {
   nav.search = ''
   nav.push.mockReset()
+  nav.replace.mockReset()
+  nav.refresh.mockReset()
   Object.values(services).forEach((fn) => fn.mockReset())
   container = document.createElement('div')
   document.body.appendChild(container)
@@ -282,8 +307,100 @@ describe('ModerationWorkspace URL-driven paging', () => {
     act(() => {
       vi.advanceTimersByTime(400)
     })
-    const params = lastPushedParams()
+    // The search replaces the history entry instead of pushing one per pause.
+    expect(nav.push).not.toHaveBeenCalled()
+    expect(nav.replace).toHaveBeenCalledTimes(1)
+    const params = new URLSearchParams((nav.replace.mock.calls[0][0] as string).split('?')[1])
     expect(params.get('q')).toBe('ada')
     expect(params.has('page')).toBe(false)
+  })
+
+  it('follows the URL when q changes from outside (Back) instead of re-sending the old search', () => {
+    vi.useFakeTimers()
+    nav.search = 'tab=portfolios&q=ada'
+    const data: ModerationListData = {
+      tab: 'portfolios',
+      list: { ...page([portfolio('1', false)]), counts: { all: 1, pending: 1, verified: 0 } },
+    }
+    render(data, { q: 'ada' })
+    const input = container.querySelector('input[aria-label="Search portfolios"]') as HTMLInputElement
+    expect(input.value).toBe('ada')
+
+    nav.search = 'tab=portfolios'
+    render(data, { q: '' })
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(input.value).toBe('')
+    expect(nav.push).not.toHaveBeenCalled()
+    expect(nav.replace).not.toHaveBeenCalled()
+    // Same element: the box was not remounted, so focus behaviour is unchanged.
+    expect(container.querySelector('input[aria-label="Search portfolios"]')).toBe(input)
+  })
+
+  it('selects the target tab and marks the panel busy while the tab change is pending', async () => {
+    render({ tab: 'capstones', list: page([]), capstone: null, capstoneFailed: false })
+    const panel = () => container.querySelector('[role="tabpanel"]')!
+    const tab = (label: string) =>
+      Array.from(container.querySelectorAll('[role="tab"]')).find((t) => t.textContent?.includes(label))!
+    expect(panel().getAttribute('aria-busy')).toBe('false')
+
+    // Outside act, React commits the urgent pending state in a microtask and leaves the
+    // transition render for a later task, so the pending UI is observable in between.
+    const env = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    env.IS_REACT_ACT_ENVIRONMENT = false
+    try {
+      ;(tab('Fellow Requests') as HTMLButtonElement).click()
+      expect(nav.push).toHaveBeenCalledWith('/admin/moderation?tab=fellow-requests', { scroll: false })
+      await Promise.resolve()
+      expect(panel().getAttribute('aria-busy')).toBe('true')
+      expect(panel().className).toContain('opacity-60')
+      expect(tab('Fellow Requests').getAttribute('aria-selected')).toBe('true')
+      expect(tab('Capstones').getAttribute('aria-selected')).toBe('false')
+    } finally {
+      env.IS_REACT_ACT_ENVIRONMENT = true
+    }
+    // The mocked navigation never changes `data`, so once the transition settles the
+    // server's tab is selected again and the panel is no longer busy.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0))
+    })
+    expect(panel().getAttribute('aria-busy')).toBe('false')
+    expect(tab('Capstones').getAttribute('aria-selected')).toBe('true')
+  })
+})
+
+describe('moderation mutations refetch the server page', () => {
+  it('refreshes after approving a Fellow request so the status-filtered list and total update', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({ tab: 'fellow-requests', list: page([fellowRequest('r1')]) })
+    await act(async () => buttonByText('Approve').click())
+    expect(apiPatch).toHaveBeenCalledWith('/api/admin/fellow-requests/r1', { decision: 'approved', rejectionReason: undefined })
+    expect(nav.refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not refresh when the review fails', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: false, error: { message: 'Nope' } } as never)
+    render({ tab: 'fellow-requests', list: page([fellowRequest('r1')]) })
+    await act(async () => buttonByText('Approve').click())
+    expect(nav.refresh).not.toHaveBeenCalled()
+  })
+
+  it('says "declined", not "rejected", in the Fellow request filters', () => {
+    render({ tab: 'fellow-requests', list: page([fellowRequest('r1')]) })
+    expect(buttonByText('declined')).toBeTruthy()
+    expect(buttonByText('rejected')).toBeUndefined()
+    expect(buttonByText('Decline')).toBeTruthy()
+  })
+
+  it('refreshes after verifying a portfolio', async () => {
+    vi.mocked(apiPost).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({
+      tab: 'portfolios',
+      list: { ...page([portfolio('1', false)]), counts: { all: 1, pending: 1, verified: 0 } },
+    })
+    await act(async () => buttonByText('Verify').click())
+    expect(apiPost).toHaveBeenCalledWith('/api/admin/users/1/fellow-status', { isFellow: true })
+    expect(nav.refresh).toHaveBeenCalledTimes(1)
   })
 })

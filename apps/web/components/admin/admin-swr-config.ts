@@ -31,7 +31,8 @@ export function alertsErrorBackoffMs(retryCount: number): number {
 /**
  * Error retry handler for the alerts poll. While the cache holds an error,
  * SWR skips its own refresh ticks, so this handler alone decides when the
- * next request goes out.
+ * next request goes out. A retry that comes due while the tab is hidden is
+ * dropped; refocusing the tab revalidates.
  */
 export const alertsOnErrorRetry: NonNullable<SWRConfiguration['onErrorRetry']> = (
   _error,
@@ -41,6 +42,9 @@ export const alertsOnErrorRetry: NonNullable<SWRConfiguration['onErrorRetry']> =
   { retryCount }
 ) => {
   setTimeout(() => {
+    // The console is often left in a background tab: do not retry while it is hidden. The
+    // focus revalidation (revalidateOnFocus) picks the poll back up when the tab returns.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
     void revalidate({ retryCount })
   }, alertsErrorBackoffMs(retryCount))
 }

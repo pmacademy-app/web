@@ -82,6 +82,9 @@ describe('paging helpers', () => {
 
   it('escapes LIKE wildcards and quotes the or-filter value', () => {
     expect(escapeIlikeTerm('50%_off\\')).toBe('50\\%\\_off\\\\')
+    // PostgREST reads `*` as `%` in ilike values, so it never reaches the pattern.
+    expect(escapeIlikeTerm('a*b**')).toBe('a b  ')
+    expect(buildIlikeOrFilter(['name'], '*')).not.toContain('*')
     // `%` -> `\%` for LIKE, then `\` -> `\\` inside the PostgREST double-quoted value.
     expect(buildIlikeOrFilter(['name', 'bio'], ' a%b_c ')).toBe(
       'name.ilike."%a\\\\%b\\\\_c%",bio.ilike."%a\\\\%b\\\\_c%"'

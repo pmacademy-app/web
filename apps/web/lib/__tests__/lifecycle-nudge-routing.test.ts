@@ -11,7 +11,11 @@ const mocks = vi.hoisted(() => ({
   runNudges: vi.fn(),
   holdout: vi.fn(),
   inserts: [] as Array<Record<string, unknown>>,
+  usersError: null as { message: string } | null,
+  logSystemError: vi.fn(),
 }))
+
+vi.mock('@/lib/monitoring/logger', () => ({ logSystemError: mocks.logSystemError }))
 
 vi.mock('@/lib/notifications/queue/processor', () => ({ enqueueNotificationItem: mocks.enqueue }))
 vi.mock('@/lib/growth/proof-nudges-run', () => ({ runProofNudgesForPage: mocks.runNudges }))
@@ -50,7 +54,7 @@ function fakeSupabase() {
         b.not = () => b
         b.gt = () => b
         b.order = () => b
-        b.limit = async () => ({ data: USERS, error: null })
+        b.limit = async () => (mocks.usersError ? { data: null, error: mocks.usersError } : { data: USERS, error: null })
         return b
       }
       if (table === 'user_lesson_progress') return { select: () => ({ in: async () => ({ data: [], error: null }) }) }
@@ -82,6 +86,8 @@ const nudgeCandidateIds = () => (mocks.runNudges.mock.calls[0]?.[1] as Array<{ i
 beforeEach(() => {
   process.env.CRON_SECRET = 'test-cron-secret'
   mocks.inserts = []
+  mocks.usersError = null
+  mocks.logSystemError.mockReset()
   mocks.enqueue.mockReset()
   mocks.holdout.mockReset().mockReturnValue(false)
   mocks.runNudges.mockReset().mockResolvedValue({ sent: { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }, heldOut: 0, skipped: false })
@@ -109,6 +115,20 @@ describe('lifecycle cron → proof nudge routing', () => {
     expect(mocks.runNudges.mock.calls[0][2]).toMatchObject({ dryRun: true })
     // The held-out learner is still evaluated for a nudge (in dry-run mode).
     expect(nudgeCandidateIds()).toEqual(['u-2'])
+  })
+
+  it('logs a failed run under the cron operation names', async () => {
+    mocks.usersError = { message: 'users unavailable' }
+
+    const res = await run('')
+
+    expect(res.status).toBe(200)
+    expect(mocks.logSystemError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operation: 'cron_lifecycle_query',
+        message: 'Database query failure in /api/cron/lifecycle: users unavailable',
+      })
+    )
   })
 
   it('accepts the older nudgeDryRun parameter', async () => {

@@ -40,6 +40,7 @@ describe('admin alerts polling config', () => {
   describe('onErrorRetry', () => {
     afterEach(() => {
       vi.useRealTimers()
+      vi.unstubAllGlobals()
     })
 
     it('schedules the revalidation after the backoff delay, passing the retry count', () => {
@@ -57,6 +58,22 @@ describe('admin alerts polling config', () => {
       vi.advanceTimersByTime(1)
       expect(revalidate).toHaveBeenCalledTimes(1)
       expect(revalidate).toHaveBeenCalledWith({ retryCount: 2 })
+    })
+
+    it('skips the retry when the tab is hidden when it comes due', () => {
+      vi.useFakeTimers()
+      vi.stubGlobal('document', { visibilityState: 'visible' })
+      const revalidate = vi.fn(() => Promise.resolve(true))
+
+      alertsOnErrorRetry(new Error('boom'), 'k', {} as never, revalidate, { retryCount: 1, dedupe: true })
+      ;(globalThis.document as { visibilityState: string }).visibilityState = 'hidden'
+      vi.advanceTimersByTime(alertsErrorBackoffMs(1))
+      expect(revalidate).not.toHaveBeenCalled()
+
+      alertsOnErrorRetry(new Error('boom'), 'k', {} as never, revalidate, { retryCount: 1, dedupe: true })
+      ;(globalThis.document as { visibilityState: string }).visibilityState = 'visible'
+      vi.advanceTimersByTime(alertsErrorBackoffMs(1))
+      expect(revalidate).toHaveBeenCalledTimes(1)
     })
 
     it('never waits longer than 5 minutes', () => {

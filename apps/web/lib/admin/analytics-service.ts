@@ -121,13 +121,15 @@ export async function fetchGrowthData(
       .lte('created_at', endIso),
     // Referrals rewarded in range
     supabase.from('referrals').select('id', head).gte('rewarded_at', startIso).lte('rewarded_at', endIso),
-    // Public capstone pages right now: reviewed + public, owner's portfolio public
+    // Public capstone pages right now: reviewed + public, owner's portfolio public and
+    // owner has a username (the public page URL needs one).
     supabase
       .from('capstone_submissions')
       .select('id, users!capstone_submissions_user_id_fkey!inner(id)', head)
       .eq('status', 'reviewed')
       .eq('is_public', true)
-      .eq('users.is_portfolio_public', true),
+      .eq('users.is_portfolio_public', true)
+      .not('users.username', 'is', null),
     // Fellow requests in range, one count per status
     ...FELLOW_REQUEST_STATUSES.map((status) =>
       supabase
@@ -416,6 +418,9 @@ export class AnalyticsService {
       if (certificatesTotalRes.error) {
         console.error('[AnalyticsService] Certificate count failed:', certificatesTotalRes.error.message)
       }
+      if (badgesAwardedRes.error) {
+        console.error('[AnalyticsService] Badge count failed:', badgesAwardedRes.error.message)
+      }
       const failed =
         !userStats ||
         !activeUsers ||
@@ -423,6 +428,7 @@ export class AnalyticsService {
         !capstoneStats ||
         !flashcardStats ||
         Boolean(certificatesTotalRes.error) ||
+        Boolean(badgesAwardedRes.error) ||
         Boolean(growth?.failed)
 
       // ── Process Learner Demographics ─────────────────────────────────────────

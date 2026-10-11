@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, ExternalLink, AlertTriangle, X, Check } from 'lucide-react'
 import Link from 'next/link'
 import { AdminDataTable, Column } from './AdminDataTable'
@@ -20,8 +21,24 @@ interface FellowRequestsViewProps {
 
 const STATUS_FILTERS = ['pending', 'approved', 'rejected', 'all']
 
+/** Admin Fellow UI says "declined"; the stored status stays 'rejected'. */
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'declined',
+  all: 'all',
+}
+
 export function FellowRequestsView({ initialQueue, status, onParamsChange }: FellowRequestsViewProps) {
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [queue, setQueue] = useState<AdminFellowRequestItem[]>(initialQueue)
+  // Re-seed the optimistic copy when the server sends a fresh page (after router.refresh()).
+  const [seed, setSeed] = useState(initialQueue)
+  if (seed !== initialQueue) {
+    setSeed(initialQueue)
+    setQueue(initialQueue)
+  }
   const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'pending'
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
@@ -38,7 +55,7 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
       )
 
       if (!result.ok || !result.data.success) {
-        const fallback = `Failed to ${decision === 'approved' ? 'approve' : 'reject'} request.`
+        const fallback = `Failed to ${decision === 'approved' ? 'approve' : 'decline'} request.`
         setErrorMsg(!result.ok ? result.error.message : (result.data.error || fallback))
         return
       }
@@ -62,6 +79,9 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
       )
       setRejectingId(null)
       setRejectReason('')
+      // The list is server-paged and filtered by status: refetch so a reviewed row leaves a
+      // status-filtered list and the total stays right.
+      startRefresh(() => router.refresh())
     } catch {
       setErrorMsg('Network error while reviewing request.')
     } finally {
@@ -105,7 +125,7 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
         <div className="space-y-1">
           <AdminStatusBadge
             status={item.status === 'approved' ? 'healthy' : item.status === 'rejected' ? 'archived' : 'pending'}
-            label={item.status.toUpperCase()}
+            label={(STATUS_LABELS[item.status] ?? item.status).toUpperCase()}
           />
           {rejectingId === item.id && (
             <div className="mt-1.5 space-y-1.5 max-w-[220px]">
@@ -179,10 +199,10 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
                 <button
                   onClick={() => setRejectingId(item.id)}
                   disabled={isLoading}
-                  title="Reject Fellow request"
+                  title="Decline Fellow request"
                   className="px-2 py-1 rounded bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger text-[10px] font-bold border border-admin-danger/25 flex items-center gap-1 transition-colors disabled:opacity-50"
                 >
-                  <XCircle className="w-3 h-3" /> Reject
+                  <XCircle className="w-3 h-3" /> Decline
                 </button>
               </>
             )}
@@ -213,7 +233,7 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
                 : 'bg-admin-surface text-admin-fg-muted hover:text-admin-fg border border-admin-border'
             }`}
           >
-            {f}
+            {STATUS_LABELS[f] ?? f}
           </button>
         ))}
       </div>

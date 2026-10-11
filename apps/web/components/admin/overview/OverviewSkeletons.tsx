@@ -34,6 +34,11 @@ export function OverviewKpisSkeleton() {
   )
 }
 
+/** One KPI card, for a card that streams in after the rest of the grid. */
+export function OverviewKpiCardSkeleton({ label }: { label: string }) {
+  return <SkeletonCard className="h-[8.5rem]" label={label} />
+}
+
 export function OverviewChartsSkeleton() {
   return (
     <div role="status" aria-label="Loading activity charts" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
