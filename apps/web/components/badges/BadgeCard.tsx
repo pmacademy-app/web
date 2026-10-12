@@ -18,12 +18,27 @@ import {
   GraduationCap,
   Lock,
 } from 'lucide-react'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import type { BadgeProgressItem } from '@/lib/badges'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
 
 interface BadgeCardProps {
   badge: BadgeProgressItem
+  /**
+   * The owner's portfolio, for sharing an earned badge (Growth R5 B4). A public portfolio gets a
+   * share control with this badge's wording; a private one gets a "Publish portfolio" link.
+   * Omitted: no share control.
+   */
+  portfolio?: { username: string; isPublic: boolean } | null
 }
+
+/** ShareButton reads `navigator` during render, so it is client-only (as on the dashboard). */
+const ShareButton = dynamic(
+  () => import('@/components/portfolio/ShareButton').then((mod) => mod.ShareButton),
+  { ssr: false, loading: () => <span aria-hidden="true" className="inline-block h-8 w-24 rounded-lg bg-muted/40" /> },
+)
 
 function renderBadgeIcon(iconName: string, isEarned: boolean) {
   const iconProps = { className: cn('w-5 h-5', isEarned ? 'text-primary' : 'text-muted-foreground') }
@@ -62,7 +77,7 @@ function renderBadgeIcon(iconName: string, isEarned: boolean) {
   }
 }
 
-export function BadgeCard({ badge }: BadgeCardProps) {
+export function BadgeCard({ badge, portfolio }: BadgeCardProps) {
   const { definition, isEarned, earnedAt, currentValue, targetValue, progressPercentage } = badge
 
   const formattedDate = earnedAt
@@ -124,7 +139,22 @@ export function BadgeCard({ badge }: BadgeCardProps) {
             </span>
             {formattedDate && <span className="font-mono">{formattedDate}</span>}
           </div>
-        ) : (
+        ) : null}
+        {isEarned && portfolio && (
+          <div className="mt-2 flex justify-end" data-testid="badge-share">
+            {portfolio.isPublic ? (
+              <ShareButton username={portfolio.username} context="badge" badgeName={definition.name} />
+            ) : (
+              <Link
+                href={PORTFOLIO_SETTINGS_HREF}
+                className="text-[11px] font-bold text-primary hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                Publish portfolio to share
+              </Link>
+            )}
+          </div>
+        )}
+        {!isEarned && (
           <div className="space-y-1">
             <div className="flex justify-between items-center text-[11px] font-mono">
               <span className="text-muted-foreground">Progress</span>

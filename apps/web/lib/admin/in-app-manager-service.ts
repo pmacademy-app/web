@@ -9,6 +9,7 @@
 import { createServiceRoleClient } from '@/lib/supabase'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { queryUserIds } from './user-filter-query'
+import { buildIlikeOrFilter } from './search-filter'
 import type { AdminUserFilters } from './types'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
 
@@ -204,7 +205,7 @@ export class InAppManagerService {
       }
 
       if (search && search.trim()) {
-        q = q.or(`title.ilike.%${search.trim()}%,body.ilike.%${search.trim()}%`)
+        q = q.or(buildIlikeOrFilter(['title', 'body'], search))
       }
 
       const { data, count, error } = await q.range(offset, offset + pageSize - 1)

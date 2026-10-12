@@ -87,7 +87,7 @@ export function AdminModal({ open, onClose, title, description, children, classN
     >
       <div
         ref={dialogRef}
-        className={cn('bg-admin-surface border border-admin-border rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 relative', className)}
+        className={cn('bg-admin-surface border border-admin-border rounded-2xl max-w-lg w-full max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 shadow-2xl space-y-5 relative', className)}
       >
         <div className="flex items-center justify-between border-b border-admin-border pb-4">
           <div>

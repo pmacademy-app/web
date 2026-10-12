@@ -23,6 +23,7 @@ const createChain = (table: string) => {
       return chain
     }),
     order: vi.fn(() => chain),
+    range: vi.fn(() => chain),
     limit: vi.fn(() => chain),
     insert: vi.fn((payload: any) => {
       chain._insertPayload = payload
@@ -38,7 +39,7 @@ const createChain = (table: string) => {
       if (table === 'testimonials') {
         resolve({ data: mockTestimonials, error: null })
       } else if (table === 'user_feedback') {
-        resolve({ data: mockFeedback, error: null })
+        resolve({ data: mockFeedback, count: mockFeedback.length, error: null })
       } else if (table === 'users') {
         const filtered = chain._userIds
           ? mockUsers.filter((u) => chain._userIds.includes(u.id))
@@ -244,7 +245,7 @@ describe('Phase 2 — Feedback & Moderation Data Mapping Integrity', () => {
     })
   })
 
-  describe('getPrivateFeedbackList()', () => {
+  describe('getPrivateFeedbackPage()', () => {
     it('correctly maps anonymous feedback vs deleted learner vs active learner with valid name', async () => {
       mockFeedback = [
         {
@@ -289,7 +290,8 @@ describe('Phase 2 — Feedback & Moderation Data Mapping Integrity', () => {
       ]
 
       const { FeedbackAdminService } = await import('@/lib/admin/feedback-service')
-      const feedbackList = await FeedbackAdminService.getPrivateFeedbackList()
+      const { items: feedbackList, failed } = await FeedbackAdminService.getPrivateFeedbackPage()
+      expect(failed).toBe(false)
 
       expect(lastSelectedUsersColumns).toBe('id, name, username, email')
       expect(lastSelectedUsersColumns).not.toContain('full_name')

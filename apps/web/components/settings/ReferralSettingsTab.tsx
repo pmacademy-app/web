@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { trackReferralLinkCopied, trackReferralShared } from '@/lib/analytics'
 import { BRAND } from '@/lib/brand'
+import { REFERRAL_REWARD_XP } from '@/lib/referral/reward'
 import { ReferralShareModal } from '@/components/referral/ReferralShareModal'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
@@ -40,6 +41,7 @@ export function ReferralSettingsTab() {
 
   const { data, isLoading } = useApiQuery<ReferralStatsResponse>('/api/referrals')
   const stats = data?.stats ?? null
+  const rewardXp = stats?.rewardXp ?? REFERRAL_REWARD_XP
   const loading = isLoading && !data
 
   const referralLink = stats?.referralLink || `${typeof window !== 'undefined' ? window.location.origin : ''}/signup`
@@ -88,7 +90,7 @@ export function ReferralSettingsTab() {
                 Invite Peers & Earn XP
               </h2>
               <p className="text-xs text-muted-foreground max-w-lg leading-relaxed">
-                Invite fellow aspiring product managers and colleagues to {BRAND.product}. When they complete their first lesson, you earn <strong className="text-primary font-semibold">+50 XP</strong>!
+                Invite fellow aspiring product managers and colleagues to {BRAND.product}. When they complete their first lesson, you earn <strong className="text-primary font-semibold">+{rewardXp} XP</strong>!
               </p>
             </div>
           </div>
@@ -115,12 +117,12 @@ export function ReferralSettingsTab() {
               type="text"
               readOnly
               value={referralLink}
-              className="flex-1 bg-transparent text-xs font-mono text-foreground focus:outline-hidden px-2 select-all overflow-hidden text-ellipsis"
+              className="flex-1 min-w-0 bg-transparent text-base sm:text-xs font-mono text-foreground focus:outline-hidden px-2 select-all overflow-hidden text-ellipsis"
             />
             <button
               type="button"
               onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-accent/50 transition-all cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 min-h-10 rounded-lg bg-card border border-border text-foreground text-xs font-semibold hover:bg-accent/50 transition-all cursor-pointer shrink-0"
             >
               {copied ? (
                 <>
@@ -143,7 +145,7 @@ export function ReferralSettingsTab() {
           <button
             type="button"
             onClick={() => handleSocialShare('linkedin')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/30 text-xs font-semibold text-foreground hover:text-[#0A66C2] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 min-h-10 rounded-lg border border-border bg-card hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/30 text-xs font-semibold text-foreground hover:text-[#0A66C2] transition-colors cursor-pointer"
           >
             <LinkedInIcon className="w-3.5 h-3.5 text-[#0A66C2]" />
             LinkedIn
@@ -151,7 +153,7 @@ export function ReferralSettingsTab() {
           <button
             type="button"
             onClick={() => handleSocialShare('twitter')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-foreground/10 hover:border-foreground/30 text-xs font-semibold text-foreground transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 min-h-10 rounded-lg border border-border bg-card hover:bg-foreground/10 hover:border-foreground/30 text-xs font-semibold text-foreground transition-colors cursor-pointer"
           >
             <TwitterIcon className="w-3.5 h-3.5" />
             X / Twitter
@@ -159,7 +161,7 @@ export function ReferralSettingsTab() {
           <button
             type="button"
             onClick={() => handleSocialShare('whatsapp')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-[#25D366]/10 hover:border-[#25D366]/30 text-xs font-semibold text-foreground hover:text-[#25D366] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 min-h-10 rounded-lg border border-border bg-card hover:bg-[#25D366]/10 hover:border-[#25D366]/30 text-xs font-semibold text-foreground hover:text-[#25D366] transition-colors cursor-pointer"
           >
             <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
             WhatsApp
@@ -256,7 +258,7 @@ export function ReferralSettingsTab() {
                   {item.status === 'rewarded' || item.status === 'activated' ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                       <Check className="w-3 h-3" />
-                      Activated (+50 XP)
+                      Activated
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-secondary text-muted-foreground border border-border">
@@ -274,6 +276,8 @@ export function ReferralSettingsTab() {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         referralLink={referralLink}
+        source="settings_tab"
+        rewardXp={rewardXp}
       />
     </div>
   )

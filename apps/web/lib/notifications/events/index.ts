@@ -11,6 +11,7 @@ import type {
   CertificateGeneratedPayload,
   CapstoneSubmittedPayload,
   CapstoneReviewedPayload,
+  FellowGrantedPayload,
   UserRegisteredPayload,
   UserVerifiedPayload,
   PasswordResetRequestedPayload,
@@ -86,6 +87,16 @@ export const EVENT_DEFINITIONS: Record<string, NotificationEventDefinition> = {
     description: 'Triggered when a learner toggles their public portfolio link active',
     validatePayload: (p): p is PortfolioPublishedPayload =>
       isObject(p) && typeof p.username === 'string',
+  },
+  'fellow.granted': {
+    eventName: 'fellow.granted',
+    category: 'achievements',
+    defaultPriority: 'high',
+    description: 'Triggered when an admin grants a learner PM Fellow status (false → true only)',
+    validatePayload: (p): p is FellowGrantedPayload =>
+      isObject(p) &&
+      typeof p.grantedAt === 'string' &&
+      (typeof p.username === 'string' || p.username === null),
   },
   'certificate.generated': {
     eventName: 'certificate.generated',

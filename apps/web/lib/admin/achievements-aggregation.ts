@@ -47,7 +47,22 @@ export interface AdminCapstoneRow {
   /** First-review timestamp (Phase 8.2). Null while the submission is still awaiting review. */
   reviewedAt: string | null
   wordCount: number
+  /** Owner's portfolio handle (admin R6 C4). Null when the owner has none or is unknown. */
+  username: string | null
+  /** Whether the owner's portfolio is public (admin R6 C4). */
+  portfolioPublic: boolean
+  /**
+   * App path of the public capstone page (`capstoneSharePath`), set only when that page
+   * actually renders: reviewed, public, a username, and a public owner portfolio. Else null.
+   */
+  publicPath: string | null
 }
+
+/**
+ * A capstone row in the moderation list. The essay is not sent to the client for the list
+ * (the table shows `wordCount` only); the review drawer loads the full `AdminCapstoneRow`.
+ */
+export type AdminCapstoneListRow = Omit<AdminCapstoneRow, 'content'>
 
 export interface AdminPortfolioRow {
   userId: string

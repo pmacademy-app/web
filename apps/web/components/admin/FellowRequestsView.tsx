@@ -1,20 +1,45 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, ExternalLink, AlertTriangle, X, Check } from 'lucide-react'
 import Link from 'next/link'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { apiPatch } from '@/lib/api/client'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
+import type { ModerationParamsPatch } from './ModerationWorkspace'
+import { FellowRequestHistory } from './FellowRequestHistory'
 
 interface FellowRequestsViewProps {
+  /** One server page, already filtered by `status` (getQueuePage). */
   initialQueue: AdminFellowRequestItem[]
+  /** Raw `status` URL param; unknown or absent means 'pending'. */
+  status: string | null
+  onParamsChange: (patch: ModerationParamsPatch) => void
 }
 
-export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
+const STATUS_FILTERS = ['pending', 'approved', 'rejected', 'all']
+
+/** Admin Fellow UI says "declined"; the stored status stays 'rejected'. */
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'declined',
+  all: 'all',
+}
+
+export function FellowRequestsView({ initialQueue, status, onParamsChange }: FellowRequestsViewProps) {
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [queue, setQueue] = useState<AdminFellowRequestItem[]>(initialQueue)
-  const [statusFilter, setStatusFilter] = useState<string>('pending')
+  // Re-seed the optimistic copy when the server sends a fresh page (after router.refresh()).
+  const [seed, setSeed] = useState(initialQueue)
+  if (seed !== initialQueue) {
+    setSeed(initialQueue)
+    setQueue(initialQueue)
+  }
+  const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'pending'
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
@@ -30,7 +55,7 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
       )
 
       if (!result.ok || !result.data.success) {
-        const fallback = `Failed to ${decision === 'approved' ? 'approve' : 'reject'} request.`
+        const fallback = `Failed to ${decision === 'approved' ? 'approve' : 'decline'} request.`
         setErrorMsg(!result.ok ? result.error.message : (result.data.error || fallback))
         return
       }
@@ -38,20 +63,31 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
       setQueue((prev) =>
         prev.map((item) =>
           item.id === id
-            ? { ...item, status: decision, rejectionReason: reason || null, isFellow: decision === 'approved' ? true : item.isFellow }
+            ? {
+                ...item,
+                status: decision,
+                rejectionReason: reason || null,
+                isFellow: decision === 'approved' ? true : item.isFellow,
+                history: (item.history ?? []).map((event) =>
+                  event.kind === 'request' && event.requestId === id
+                    ? { ...event, status: decision, reviewedAt: new Date().toISOString(), rejectionReason: reason || null }
+                    : event
+                ),
+              }
             : item
         )
       )
       setRejectingId(null)
       setRejectReason('')
+      // The list is server-paged and filtered by status: refetch so a reviewed row leaves a
+      // status-filtered list and the total stays right.
+      startRefresh(() => router.refresh())
     } catch {
       setErrorMsg('Network error while reviewing request.')
     } finally {
       setLoadingId(null)
     }
   }
-
-  const filteredQueue = queue.filter((item) => statusFilter === 'all' || item.status === statusFilter)
 
   const columns: Column<AdminFellowRequestItem>[] = [
     {
@@ -89,7 +125,7 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
         <div className="space-y-1">
           <AdminStatusBadge
             status={item.status === 'approved' ? 'healthy' : item.status === 'rejected' ? 'archived' : 'pending'}
-            label={item.status.toUpperCase()}
+            label={(STATUS_LABELS[item.status] ?? item.status).toUpperCase()}
           />
           {rejectingId === item.id && (
             <div className="mt-1.5 space-y-1.5 max-w-[220px]">
@@ -98,6 +134,7 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Reason (optional)"
+                aria-label={`Reason for declining ${item.userName} (optional)`}
                 className="w-full text-[11px] px-2 py-1 rounded bg-admin-bg border border-admin-border text-admin-fg focus:outline-none focus:border-admin-accent"
               />
               <div className="flex gap-1.5">
@@ -123,9 +160,12 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
     {
       header: 'Requested',
       cell: (item) => (
-        <span className="text-admin-fg-muted font-mono text-[11px]">
-          {new Date(item.requestedAt).toLocaleDateString()}
-        </span>
+        <div>
+          <span className="text-admin-fg-muted font-mono text-[11px]">
+            {new Date(item.requestedAt).toLocaleDateString()}
+          </span>
+          <FellowRequestHistory history={item.history} currentRequestId={item.id} />
+        </div>
       ),
     },
     {
@@ -143,8 +183,9 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
                 rel="noopener noreferrer"
                 className="p-1.5 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg border border-admin-border transition-colors"
                 title="View public portfolio"
+                aria-label={`View ${item.userName}'s public portfolio (opens in a new tab)`}
               >
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
             )}
             {item.status === 'pending' && (
@@ -160,10 +201,10 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
                 <button
                   onClick={() => setRejectingId(item.id)}
                   disabled={isLoading}
-                  title="Reject Fellow request"
+                  title="Decline Fellow request"
                   className="px-2 py-1 rounded bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger text-[10px] font-bold border border-admin-danger/25 flex items-center gap-1 transition-colors disabled:opacity-50"
                 >
-                  <XCircle className="w-3 h-3" /> Reject
+                  <XCircle className="w-3 h-3" /> Decline
                 </button>
               </>
             )}
@@ -176,30 +217,32 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
   return (
     <div className="space-y-4">
       {errorMsg && (
-        <div className="p-3 rounded-lg bg-admin-danger-soft border border-admin-danger/25 text-xs text-admin-danger">
+        <div role="alert" className="p-3 rounded-lg bg-admin-danger-soft border border-admin-danger/25 text-xs text-admin-danger">
           {errorMsg}
         </div>
       )}
 
       <div className="flex items-center gap-2">
-        {['pending', 'approved', 'rejected', 'all'].map((f) => (
+        {STATUS_FILTERS.map((f) => (
           <button
             key={f}
-            onClick={() => setStatusFilter(f)}
+            type="button"
+            onClick={() => onParamsChange({ status: f === 'pending' ? undefined : f })}
+            aria-pressed={statusFilter === f}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
               statusFilter === f
                 ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25'
                 : 'bg-admin-surface text-admin-fg-muted hover:text-admin-fg border border-admin-border'
             }`}
           >
-            {f}
+            {STATUS_LABELS[f] ?? f}
           </button>
         ))}
       </div>
 
       <AdminDataTable
         columns={columns}
-        data={filteredQueue}
+        data={queue}
         keyExtractor={(item) => item.id}
         emptyTitle="No Fellow requests found"
         emptyDescription="Requests submitted by eligible learners will appear here for review."

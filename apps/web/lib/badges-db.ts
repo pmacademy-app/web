@@ -9,6 +9,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Selected } from '@/lib/db'
 import type { Database } from '@/lib/supabase'
 import { BADGE_DEFINITIONS, type BadgeDefinition } from '@/config/badges'
+import { countCompletedModules } from '@/lib/curriculum-registry'
 import {
   calculateBadgeProgress,
   evaluateEligibleBadges,
@@ -35,6 +36,8 @@ export interface BadgeStatsPreloadedData {
   >[]
   /** Already-fetched `capstone_submissions` rows (any status) for this user — filtered internally to submitted/reviewed. */
   capstoneRows?: Selected<'capstone_submissions', 'status'>[]
+  /** The user's own users row, already loaded (the dashboard's profile) — skips that query. */
+  user?: Database['public']['Tables']['users']['Row'] | null
 }
 
 /**
@@ -50,7 +53,7 @@ async function fetchUserStatsForBadges(
   preloaded?: BadgeStatsPreloadedData
 ): Promise<UserStatsForBadges> {
   // 1. Fetch user record
-  const { data: user } = await supabase.from('users').select('*').eq('id', userId).single()
+  const user = preloaded?.user ?? (await supabase.from('users').select('*').eq('id', userId).single()).data
 
   // 2. Completed lesson progress
   let progressRows = preloaded?.progressRows
@@ -64,7 +67,8 @@ async function fetchUserStatsForBadges(
 
   const completedLessons = (progressRows || []).filter((p) => p.status === 'completed')
   const lessonsCompletedCount = completedLessons.length
-  const modulesCompletedCount = Math.min(9, Math.floor(lessonsCompletedCount / 10))
+  // Real modules (every registry lesson done), not lessons / 10.
+  const modulesCompletedCount = countCompletedModules(completedLessons.map((p) => p.lesson_id))
 
   const perfectFirstAttemptQuizCount = completedLessons.filter(
     (p) => p.quiz_attempts === 1 && (p.quiz_score ?? 0) === 100
@@ -101,6 +105,7 @@ async function fetchUserStatsForBadges(
     usedStreakFreeze: (user?.streak_freezes_available ?? 0) > 0,
     email: user?.email || '',
     name: user?.name || '',
+    username: user?.username ?? null,
   }
 }
 
@@ -244,9 +249,12 @@ export async function evaluateAndAwardBadges(
           occurredAt: new Date().toISOString(),
           payload: {
             userId,
-            badgeId: badgeDef.key,
+            badgeKey: badgeDef.key,
             badgeName: badgeDef.name,
             badgeDescription: badgeDef.description,
+            // For the share action (Growth R5 B4): only a public portfolio can be shared.
+            username: stats.username ?? null,
+            isPortfolioPublic: stats.isPortfolioPublic === true,
           },
         })
       } catch (dispatchErr) {

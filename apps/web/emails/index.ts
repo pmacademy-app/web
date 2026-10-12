@@ -9,6 +9,10 @@ import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
 import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
+import { FellowGranted } from './templates/achievement/FellowGranted'
+import { CapstonePublished } from './templates/achievement/CapstonePublished'
+import { ProofNudgeEmail } from './templates/nudges/ProofNudge'
+import { LifecycleEmail } from './templates/lifecycle/LifecycleEmail'
 import { DirectMessageEmail } from './templates/admin/DirectMessage'
 import { BRAND } from '@/lib/brand'
 
@@ -61,6 +65,23 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     component: PortfolioPublished,
     subjectLine: 'Your Public Portfolio is Live!',
   },
+  'achievement.fellow_granted': {
+    component: FellowGranted,
+    subjectLine: `You're now a ${BRAND.company} PM Fellow!`,
+  },
+  'achievement.capstone_published': {
+    component: CapstonePublished,
+    subjectLine: 'Your capstone is published',
+  },
+  // Growth R5 B6/B7 proof nudges (one component; the nudge variable picks the copy).
+  'nudge.portfolio_ready': {
+    component: ProofNudgeEmail,
+    subjectLine: 'Your portfolio is ready to share',
+  },
+  'nudge.fellow_eligible': {
+    component: ProofNudgeEmail,
+    subjectLine: 'You qualify for PM Fellow',
+  },
 
   // Scheduled Digests & Reminders
   'learning.weekly_recap': {
@@ -80,20 +101,20 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     subjectLine: `Resume your learning path on ${BRAND.shortName}`,
   },
 
-  // Phase 1.5 — Lifecycle reactivation sequences. These reuse the existing
-  // WelcomeEmail component (a "get started / come back" nudge) rather than
-  // introducing new visual templates; the distinct keys exist so each sequence is
+  // Phase 1.5 — Lifecycle reactivation sequences. Growth R5 B10 moved them off the
+  // generic WelcomeEmail onto LifecycleEmail: per-sequence copy, and the learner's own
+  // next proof step on the two comeback sequences. The distinct keys keep each sequence
   // independently toggleable, idempotent, and measurable in `email_queue`.
   'lifecycle.d1_never_started': {
-    component: WelcomeEmail,
+    component: LifecycleEmail,
     subjectLine: `Ready to start your first lesson on ${BRAND.shortName}?`,
   },
   'lifecycle.d3_started_not_finished': {
-    component: WelcomeEmail,
+    component: LifecycleEmail,
     subjectLine: `Pick up where you left off on ${BRAND.shortName}`,
   },
   'lifecycle.streak_broken': {
-    component: WelcomeEmail,
+    component: LifecycleEmail,
     subjectLine: `Your learning streak is waiting on ${BRAND.shortName}`,
   },
 }

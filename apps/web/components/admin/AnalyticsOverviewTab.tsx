@@ -12,8 +12,10 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
-import { AdminLearnerActivityChart } from './AdminLearnerActivityChart'
-import { AdminLearningActivityChart } from './AdminLearningActivityChart'
+import {
+  AdminLearnerActivityChartLazy as AdminLearnerActivityChart,
+  AdminLearningActivityChartLazy as AdminLearningActivityChart,
+} from './charts-lazy'
 import { AdminFunnelChart } from './AdminFunnelChart'
 import type { AdminExecutiveOverview } from '@/lib/admin/types'
 

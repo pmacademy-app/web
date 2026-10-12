@@ -7,10 +7,11 @@
  * References: PRD.md §4.10, Architecture.md §5, Master Plan Phase 7
  */
 
+import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '@/lib/referral/reward'
+import { SettingsService } from '@/lib/admin/settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
-import { XP_VALUES } from '@/lib/xp/xp'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { BRAND } from '@/lib/brand'
 
@@ -52,11 +53,35 @@ export interface UserReferralStats {
   totalInvited: number
   activatedCount: number
   totalXpEarned: number
+  /** The reward currently paid per activated referral. */
+  rewardXp: number
   referrals: ReferredUserSummary[]
 }
 
 const MAX_REFERRALS_PER_24H = 10
-export const REFERRAL_ACTIVATION_XP = XP_VALUES.REFERRAL_ACTIVATION
+/** The default reward; the live value comes from resolveReferralRewardXp(). */
+export const REFERRAL_ACTIVATION_XP = REFERRAL_REWARD_XP
+
+/**
+ * The reward an admin configured (Settings → Learning), validated, or the default. Without
+ * `strict` it never throws: SettingsService falls back to defaults when the settings row cannot be
+ * read, and anything else resolves to the default reward.
+ *
+ * `strict` is for the award itself: a failed settings read throws (SettingsReadError) instead of
+ * resolving to the default, so the caller can pay later rather than pay a guessed amount.
+ */
+export async function resolveReferralRewardXp({ strict = false }: { strict?: boolean } = {}): Promise<number> {
+  if (strict) {
+    const settings = await SettingsService.getLearningSettings({ strict: true })
+    return normalizeReferralRewardXp(settings.xpReferralReward)
+  }
+  try {
+    const settings = await SettingsService.getLearningSettings()
+    return normalizeReferralRewardXp(settings.xpReferralReward)
+  } catch {
+    return REFERRAL_REWARD_XP
+  }
+}
 
 /**
  * Resolves a referral code or handle to a valid referrer user.
@@ -212,8 +237,16 @@ export async function applyPendingReferral(
 }
 
 /**
- * Checks and activates referral rewards when a learner completes their first lesson.
- * Idempotent: rewards only once per referral attribution.
+ * Checks and activates the referral reward for a learner who has completed a lesson.
+ *
+ * Despite the name, the caller (recordQuizAttemptAction in lib/academy/lessons-db.ts) runs this on
+ * every lesson completion, not only the first. That is the retry: a run that could not finish (see
+ * the `reason` it returns) leaves the referral `signed_up`, and the next completion picks it up.
+ * With no `signed_up` referral it returns after one read on the unique referred_user_id index.
+ *
+ * Idempotent across retries and concurrent runs: the XP is awarded once per referral (the ledger),
+ * the status flips once (compare-and-set on `signed_up`), and the notification is sent only by the
+ * run that flipped it, under a stable idempotency key.
  */
 export async function onFirstLessonCompletedReferralCheck(
   supabase: SupabaseClient<Database>,
@@ -231,30 +264,21 @@ export async function onFirstLessonCompletedReferralCheck(
     return { rewarded: false, reason: 'no_pending_referral' }
   }
 
-  const now = new Date().toISOString()
-
-  // 2. Mark referral status as rewarded / activated atomically
-  const { data: updatedRows, error: updateError } = (await (supabase
-    .from('referrals') as unknown as DBChain)
-    .update({
-      status: 'rewarded',
-      rewarded_at: now,
-    })
-    .eq('id', referral.id)
-    .eq('status', 'signed_up')
-    .select('id')) as unknown as { data: { id: string }[] | null; error: unknown }
-
-  if (updateError) {
-    console.error('[referral-service] Failed to update referral status:', updateError)
-    return { rewarded: false, reason: 'update_failed' }
+  // 2. Resolve the reward first. A failed settings read leaves the referral `signed_up` (retried
+  // when the learner completes their next lesson) rather than paying the default in place of the
+  // configured amount.
+  let rewardXp: number
+  try {
+    rewardXp = await resolveReferralRewardXp({ strict: true })
+  } catch (settingsErr) {
+    console.error('[referral-service] Referral reward setting unavailable; referral left pending:', settingsErr)
+    return { rewarded: false, reason: 'reward_unavailable' }
   }
 
-  // If another concurrent request already updated this referral row
-  if (Array.isArray(updatedRows) && updatedRows.length === 0) {
-    return { rewarded: false, reason: 'already_activated' }
-  }
-
-  // 3. Award referral XP to referrer (idempotent with hasXpEvent check)
+  // 3. Award the XP before the status changes, so a referral is never `rewarded` without it. The
+  // ledger is what makes the payment exactly-once: one `referral` event per (referrer, referral
+  // id), by the hasXpEvent check and, under two concurrent activations, by the unique index
+  // (awardXp treats the losing insert as already awarded). A failure here leaves `signed_up`.
   try {
     const alreadyAwarded = await hasXpEvent(
       supabase,
@@ -267,15 +291,41 @@ export async function onFirstLessonCompletedReferralCheck(
         supabase,
         referral.referrer_id,
         'referral',
-        REFERRAL_ACTIVATION_XP,
+        rewardXp,
         referral.id
       )
     }
   } catch (xpErr) {
-    console.error('[referral-service] Error awarding referral XP to referrer:', xpErr)
+    console.error('[referral-service] Error awarding referral XP to referrer; referral left pending:', xpErr)
+    return { rewarded: false, reason: 'xp_award_failed' }
   }
 
-  // 4. Send in-app notification to referrer
+  const now = new Date().toISOString()
+
+  // 4. Mark referral status as rewarded / activated atomically
+  const { data: updatedRows, error: updateError } = (await (supabase
+    .from('referrals') as unknown as DBChain)
+    .update({
+      status: 'rewarded',
+      rewarded_at: now,
+    })
+    .eq('id', referral.id)
+    .eq('status', 'signed_up')
+    .select('id')) as unknown as { data: { id: string }[] | null; error: unknown }
+
+  if (updateError) {
+    // The XP is paid but the referral still reads `signed_up` and nobody was notified. The next
+    // lesson's check finds the XP event, skips the award and completes the status and notification.
+    console.error('[referral-service] Failed to update referral status:', updateError)
+    return { rewarded: false, reason: 'update_failed' }
+  }
+
+  // If another concurrent request already updated this referral row
+  if (Array.isArray(updatedRows) && updatedRows.length === 0) {
+    return { rewarded: false, reason: 'already_activated' }
+  }
+
+  // 5. Send in-app notification to referrer
   try {
     // Look up referred user handle/name for contextual message
     const { data: referredUser } = (await (supabase
@@ -290,7 +340,7 @@ export async function onFirstLessonCompletedReferralCheck(
       userId: referral.referrer_id,
       category: 'achievement',
       title: 'Referral Reward Earned! 🎁',
-      body: `${learnerName} completed their first lesson! You received +${REFERRAL_ACTIVATION_XP} XP for introducing them to ${BRAND.product}.`,
+      body: `${learnerName} completed their first lesson! You received +${rewardXp} XP for introducing them to ${BRAND.product}.`,
       actionUrl: '/settings?tab=referrals',
       priority: 'high',
       idempotencyKey: `referral-reward-${referral.id}`,
@@ -302,7 +352,7 @@ export async function onFirstLessonCompletedReferralCheck(
   return {
     rewarded: true,
     referrerId: referral.referrer_id,
-    xpAwarded: REFERRAL_ACTIVATION_XP,
+    xpAwarded: rewardXp,
   }
 }
 
@@ -371,16 +421,34 @@ export async function getUserReferralStats(
     }
   })
 
+  // What was actually awarded, so a changed reward never rewrites past earnings.
+  const [{ data: referralXpRows, error: referralXpError }, rewardXp] = await Promise.all([
+    (supabase.from('xp_events') as unknown as DBChain)
+      .select('xp_amount')
+      .eq('user_id', userId)
+      .eq('source_type', 'referral') as unknown as Promise<{ data: { xp_amount: number }[] | null; error: unknown }>,
+    resolveReferralRewardXp(),
+  ])
+
   const activatedCount = formattedReferrals.filter(
     (r) => r.status === 'rewarded' || r.status === 'activated'
   ).length
+
+  // A failed read must not show "0 XP earned": estimate from the current reward instead.
+  if (referralXpError) {
+    console.warn('[referral-service] referral XP read failed; estimating from the current reward')
+  }
+  const totalXpEarned = referralXpError
+    ? activatedCount * rewardXp
+    : (referralXpRows ?? []).reduce((sum, row) => sum + (row.xp_amount || 0), 0)
 
   return {
     referralCode,
     referralLink,
     totalInvited: formattedReferrals.length,
     activatedCount,
-    totalXpEarned: activatedCount * REFERRAL_ACTIVATION_XP,
+    totalXpEarned,
+    rewardXp,
     referrals: formattedReferrals,
   }
 }

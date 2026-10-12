@@ -7,6 +7,7 @@ import {
   DEFAULT_PORTFOLIO_LAYOUT,
 } from '@/lib/portfolio-db'
 import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
+import { portfolioOgCardPath } from '@/lib/og/card-paths'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
 import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
 import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const { name, bio, isFellow } = portfolio.user
   const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
-  const ogImageUrl = `${SITE_ORIGIN}/api/og/portfolio/${username}`
+  const ogImageUrl = `${SITE_ORIGIN}${portfolioOgCardPath(username)}`
 
   const metaTitle = isFellow
     ? `${name} | Product Management Fellow at Prodily | Portfolio`
@@ -149,7 +150,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
       case 'progress':
         return <PortfolioProgress key="progress" progress={progress} />
       case 'capstones':
-        return <PortfolioCapstones key="capstones" capstones={capstones} />
+        return <PortfolioCapstones key="capstones" capstones={capstones} username={username} />
       case 'achievements':
         return (
           <PortfolioAchievements

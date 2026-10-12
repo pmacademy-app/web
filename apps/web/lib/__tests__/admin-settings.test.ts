@@ -1,5 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { SettingsService } from '../admin/settings-service'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { NextRequest } from 'next/server'
+import { SettingsReadError, SettingsService } from '../admin/settings-service'
+import { resolveReferralRewardXp } from '../referral/referral-service'
+import { REFERRAL_REWARD_XP } from '../referral/reward'
 import type {
   ProductSettings,
   LearningSettings,
@@ -7,7 +10,28 @@ import type {
   NotificationSettings,
 } from '../admin/types'
 
+const guard = vi.hoisted(() => ({ requireAdminUser: vi.fn(), logAdminAction: vi.fn() }))
+vi.mock('@/lib/admin/guard', () => ({
+  requireAdminUser: (req: Request) => guard.requireAdminUser(req),
+  logAdminAction: guard.logAdminAction,
+}))
+
 const mockStorage: Record<string, unknown> = {}
+/** Failure switches for the database stand-in: every write, and reads of the listed keys (or all). */
+const faults = {
+  writes: false,
+  /** Keys whose write fails while the others succeed. */
+  writeKeys: [] as string[],
+  reads: [] as string[] | 'all',
+  writeCount: 0,
+  /** The keys written, in order. */
+  written: [] as string[],
+}
+const failed = () =>
+  new Response(JSON.stringify({ message: 'database unavailable', code: '57P03' }), {
+    status: 500,
+    headers: { 'Content-Type': 'application/json' },
+  })
 const originalFetch = global.fetch
 global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   const urlStr = String(input)
@@ -19,9 +43,15 @@ global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
 
   if (isSupabaseCall) {
     if (init?.method === 'POST' || init?.method === 'PATCH' || init?.method === 'PUT') {
+      if (faults.writes) return failed()
+      try {
+        if (faults.writeKeys.includes(JSON.parse(String(init.body))?.key)) return failed()
+      } catch {}
+      faults.writeCount += 1
       try {
         const body = JSON.parse(String(init.body))
         if (body?.key) {
+          faults.written.push(body.key)
           mockStorage[body.key] = body.value
         }
       } catch {}
@@ -30,6 +60,7 @@ global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
+    if (faults.reads === 'all' || faults.reads.some((key) => urlStr.includes(`eq.${key}`))) return failed()
     for (const key of Object.keys(mockStorage)) {
       if (urlStr.includes(encodeURIComponent(key)) || urlStr.includes(key)) {
         return new Response(JSON.stringify({ value: mockStorage[key] }), {
@@ -258,5 +289,203 @@ describe('Admin Settings Unit Test Suite', () => {
     const reloaded = await SettingsService.getOnboardingSettings()
     expect(reloaded.fieldOptions?.goal?.[0].label).toBe('Director / VP of Product Transition')
     expect(reloaded.fieldOptions?.experience_level?.[0].label).toBe('University Student')
+  })
+})
+
+// A database error is not "no record yet". A failed write must not report success, and a failed
+// read must not hand the admin form a page of defaults to save over the real record. Runtime
+// readers are the exception: they keep getting defaults so a blip never takes the app down.
+describe('settings when the database fails', () => {
+  const patch = async (section: string, body: unknown) => {
+    const { PATCH } = await import('../../app/api/admin/settings/route')
+    return PATCH(
+      new NextRequest(`https://prodily.app/api/admin/settings?section=${section}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+      { params: Promise.resolve({}) },
+    )
+  }
+
+  beforeEach(() => {
+    for (const key of Object.keys(mockStorage)) delete mockStorage[key]
+    faults.writes = false
+    faults.writeKeys = []
+    faults.reads = []
+    SettingsService.invalidateCache()
+    faults.writeCount = 0
+    faults.written = []
+    guard.logAdminAction.mockReset()
+    guard.requireAdminUser.mockReset().mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    faults.writes = false
+    faults.writeKeys = []
+    faults.reads = []
+    vi.restoreAllMocks()
+    SettingsService.invalidateCache()
+  })
+
+  describe('a failed write', () => {
+    it('rejects for every section and leaves the caches alone', async () => {
+      faults.writes = true
+      const invalidate = vi.spyOn(SettingsService, 'invalidateCache')
+
+      await expect(SettingsService.updateProductSettings({ maintenanceMode: true })).rejects.toThrow(/product settings/)
+      await expect(SettingsService.updateLearningSettings({ quizPassThreshold: 85 })).rejects.toThrow(/learning settings/)
+      await expect(SettingsService.updateEmailSettings({ fromName: 'X' })).rejects.toThrow(/email settings/)
+      await expect(SettingsService.updateNotificationSettings({ weeklyRecapDay: 5 })).rejects.toThrow(/notifications settings/)
+      await expect(SettingsService.updateOnboardingSettings({ enabled: false })).rejects.toThrow(/onboarding settings/)
+
+      expect(invalidate).not.toHaveBeenCalled()
+      expect(mockStorage).toEqual({})
+    })
+
+    it('rejects when the enforced daily send limit cannot be written', async () => {
+      faults.writes = true
+      await expect(SettingsService.updateEmailSettings({ dailySendLimit: 200 })).rejects.toThrow(/email settings/)
+    })
+
+    // The section is written first: a save reported as failed must not already have changed the
+    // limit the send pipeline enforces.
+    it('writes the email section before the enforced daily send limit', async () => {
+      await SettingsService.updateEmailSettings({ dailySendLimit: 200 })
+
+      expect(faults.written).toEqual(['email_settings', 'email_daily_send_limit'])
+      expect(mockStorage.email_daily_send_limit).toEqual({ limit: 200 })
+    })
+
+    it('leaves the enforced daily send limit alone when the email section cannot be written', async () => {
+      mockStorage.email_daily_send_limit = { limit: 500 }
+      faults.writeKeys = ['email_settings']
+
+      await expect(SettingsService.updateEmailSettings({ dailySendLimit: 200 })).rejects.toThrow('Failed to save email settings')
+
+      expect(faults.written).toEqual([])
+      expect(mockStorage.email_daily_send_limit).toEqual({ limit: 500 })
+    })
+
+    it('says the section saved but the limit did not when only the enforced key fails', async () => {
+      mockStorage.email_daily_send_limit = { limit: 500 }
+      faults.writeKeys = ['email_daily_send_limit']
+
+      const save = SettingsService.updateEmailSettings({ fromName: 'Prodily Team', dailySendLimit: 200 })
+      await expect(save).rejects.toThrow(/saved/i)
+      await expect(save).rejects.toThrow(/daily send limit/i)
+
+      expect(faults.written).toEqual(['email_settings'])
+      expect((mockStorage.email_settings as EmailSettings).fromName).toBe('Prodily Team')
+      // The limit in force, and the one the form shows on reload, is still the old one.
+      expect(mockStorage.email_daily_send_limit).toEqual({ limit: 500 })
+      expect((await SettingsService.getEmailSettings({ strict: true })).dailySendLimit).toBe(500)
+    })
+
+    it('is a failed request with no audit entry', async () => {
+      faults.writes = true
+
+      const res = await patch('product', { maintenanceMode: true })
+
+      expect(res.status).toBe(500)
+      expect((await res.json()).success).toBe(false)
+      expect(guard.logAdminAction).not.toHaveBeenCalled()
+    })
+
+    it('a write that succeeds is still a 200 with an audit entry', async () => {
+      const res = await patch('product', { maintenanceMode: true })
+
+      expect(res.status).toBe(200)
+      expect(guard.logAdminAction).toHaveBeenCalledTimes(1)
+      expect((mockStorage.product_settings as ProductSettings).maintenanceMode).toBe(true)
+    })
+  })
+
+  describe('a failed read', () => {
+    it('is reported by a strict read instead of being replaced by defaults', async () => {
+      faults.reads = 'all'
+
+      await expect(SettingsService.getProductSettings({ strict: true })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.getLearningSettings({ strict: true })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.getEmailSettings({ strict: true })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.getOnboardingSettings({ strict: true })).rejects.toBeInstanceOf(SettingsReadError)
+    })
+
+    it('refuses to save over a record it could not read', async () => {
+      mockStorage.product_settings = { siteName: 'Real name', allowSignups: false }
+      mockStorage.learning_settings = { xpReferralReward: 120 }
+      faults.reads = 'all'
+
+      await expect(SettingsService.updateProductSettings({ siteDescription: 'x' })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.updateLearningSettings({ quizPassThreshold: 85 })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.updateEmailSettings({ fromName: 'X' })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.updateNotificationSettings({ weeklyRecapDay: 5 })).rejects.toBeInstanceOf(SettingsReadError)
+      await expect(SettingsService.updateOnboardingSettings({ enabled: false })).rejects.toBeInstanceOf(SettingsReadError)
+
+      expect(faults.writeCount).toBe(0)
+      expect(mockStorage.product_settings).toEqual({ siteName: 'Real name', allowSignups: false })
+      expect(mockStorage.learning_settings).toEqual({ xpReferralReward: 120 })
+    })
+
+    it('fails the save request without writing or logging', async () => {
+      faults.reads = 'all'
+
+      const res = await patch('product', { maintenanceMode: true })
+
+      expect(res.status).toBe(500)
+      expect((await res.json()).success).toBe(false)
+      expect(faults.writeCount).toBe(0)
+      expect(guard.logAdminAction).not.toHaveBeenCalled()
+    })
+
+    it('is not cached: the next read sees the real record', async () => {
+      mockStorage.product_settings = { siteName: 'Real name' }
+      faults.reads = 'all'
+      expect((await SettingsService.getProductSettings()).siteName).toBe('Prodily')
+
+      faults.reads = []
+      expect((await SettingsService.getProductSettings()).siteName).toBe('Real name')
+    })
+
+    it('still gives runtime readers the defaults', async () => {
+      mockStorage.product_settings = { requireEmailVerification: false }
+      mockStorage.learning_settings = { xpReferralReward: 120 }
+      faults.reads = 'all'
+
+      const product = await SettingsService.getProductSettings()
+      expect(product.siteName).toBe('Prodily')
+      expect(product.maintenanceMode).toBe(false)
+      await expect(SettingsService.isEmailVerificationRequired()).resolves.toBe(true)
+      await expect(resolveReferralRewardXp()).resolves.toBe(REFERRAL_REWARD_XP)
+      await expect(SettingsService.getEmailSettings()).resolves.toMatchObject({ fromName: 'Prodily' })
+      await expect(SettingsService.getOnboardingSettings()).resolves.toMatchObject({ enabled: true })
+    })
+
+    it('marks only the unreadable sections for the settings page', async () => {
+      mockStorage.learning_settings = { xpReferralReward: 120 }
+      faults.reads = ['product_settings', 'onboarding_settings']
+
+      const page = await SettingsService.getAdminWorkspaceSettings()
+
+      expect([...page.failedSections].sort()).toEqual(['onboarding', 'product'])
+      expect(page.data.learning.xpReferralReward).toBe(120)
+      expect(Array.isArray(page.data['feature-flags'])).toBe(true)
+    })
+  })
+
+  describe('a section that was never saved', () => {
+    it('reads as defaults with nothing marked failed, and saves', async () => {
+      const page = await SettingsService.getAdminWorkspaceSettings()
+      expect(page.failedSections).toEqual([])
+      expect(page.data.product.siteName).toBe('Prodily')
+      await expect(SettingsService.getProductSettings({ strict: true })).resolves.toMatchObject({ allowSignups: true })
+
+      const updated = await SettingsService.updateProductSettings({ maintenanceMode: true })
+
+      expect(updated.maintenanceMode).toBe(true)
+      expect(faults.writeCount).toBe(1)
+      expect((mockStorage.product_settings as ProductSettings).maintenanceMode).toBe(true)
+    })
   })
 })

@@ -1,27 +1,22 @@
 import React, { Suspense } from 'react'
-import {
-  Users,
-  UserCheck,
-  UserPlus,
-  ShieldCheck,
-  BookOpen,
-  GraduationCap,
-  Zap,
-  Award,
-  Activity,
-} from 'lucide-react'
-import { DashboardService } from '@/lib/admin/dashboard-service'
+import { Activity } from 'lucide-react'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
-import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDashboardRefreshButton } from '@/components/admin/AdminDashboardRefreshButton'
 import { AdminRangeSelector } from '@/components/admin/AdminRangeSelector'
-import { AdminAttentionCenter } from '@/components/admin/AdminAttentionCenter'
-import { AdminLearnerActivityChart } from '@/components/admin/AdminLearnerActivityChart'
-import { AdminLearningActivityChart } from '@/components/admin/AdminLearningActivityChart'
-import { AdminFunnelChart } from '@/components/admin/AdminFunnelChart'
-import { AdminRecentActivityList } from '@/components/admin/AdminRecentActivityList'
-import { AdminSystemSnapshot } from '@/components/admin/AdminSystemSnapshot'
-import { AdminLoadWarning } from '@/components/admin/AdminLoadWarning'
+import { OverviewAttention } from '@/components/admin/overview/OverviewAttention'
+import { OverviewKpis } from '@/components/admin/overview/OverviewKpis'
+import { OverviewCharts } from '@/components/admin/overview/OverviewCharts'
+import { OverviewFunnel } from '@/components/admin/overview/OverviewFunnel'
+import { OverviewRecentActivity } from '@/components/admin/overview/OverviewRecentActivity'
+import { OverviewSystemSnapshot } from '@/components/admin/overview/OverviewSystemSnapshot'
+import {
+  OverviewAttentionSkeleton,
+  OverviewChartsSkeleton,
+  OverviewFunnelSkeleton,
+  OverviewKpisSkeleton,
+  OverviewRecentActivitySkeleton,
+  OverviewSystemSnapshotSkeleton,
+} from '@/components/admin/overview/OverviewSkeletons'
 import type { AdminDateRangeKey } from '@/lib/admin/types'
 
 export const revalidate = 0
@@ -30,24 +25,22 @@ interface AdminDashboardPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+/**
+ * Admin overview. The header and range selector render at once; every data block loads
+ * through its own cached loader behind its own Suspense boundary, so a slow or failing
+ * section never holds up (or blanks) the rest of the page.
+ */
 export default async function AdminDashboardPage({ searchParams }: AdminDashboardPageProps) {
   const params = await searchParams
-  const range = (params.range as AdminDateRangeKey) || '30d'
+  const rangeKey = (params.range as AdminDateRangeKey) || '30d'
   const from = typeof params.from === 'string' ? params.from : null
   const to = typeof params.to === 'string' ? params.to : null
-
-  const data = await DashboardService.getDashboardData(range, from, to)
-  const { kpis } = data
+  const range = { rangeKey, from, to }
+  // Range-scoped blocks remount on a range change, so their skeleton shows while the new range loads.
+  const rangeKeyId = `${rangeKey}|${from ?? ''}|${to ?? ''}`
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
-
-  const trend = (value: number | null, positiveIsGood = true) => {
-    if (value === null || value === 0) return undefined
-    const isPositive = value > 0
-    const good = positiveIsGood ? isPositive : !isPositive
-    return { value: `${isPositive ? '+' : ''}${value}%`, positive: good }
-  }
 
   return (
     <div className="space-y-6">
@@ -65,94 +58,31 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
         }
       />
 
-      {data.failed && (
-        <AdminLoadWarning message="Live database metrics could not be fully loaded. Showing fallback metrics." />
-      )}
+      <Suspense key={`attention:${rangeKeyId}`} fallback={<OverviewAttentionSkeleton />}>
+        <OverviewAttention {...range} />
+      </Suspense>
 
-      {/* Needs Attention */}
-      <AdminAttentionCenter items={data.attention} />
+      <Suspense key={`kpis:${rangeKeyId}`} fallback={<OverviewKpisSkeleton />}>
+        <OverviewKpis {...range} />
+      </Suspense>
 
-      {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AdminKpiCard
-          title="Total Users"
-          value={kpis.totalUsers.toLocaleString()}
-          subtitle="All-time registered accounts"
-          icon={Users}
-          trend={trend(kpis.trends.totalUsers)}
-        />
-        <AdminKpiCard
-          title="Active Learners"
-          value={kpis.activeLearners.toLocaleString()}
-          subtitle="Earned XP in selected range"
-          icon={UserCheck}
-          iconColor="text-admin-success"
-          trend={trend(kpis.trends.activeLearners)}
-        />
-        <AdminKpiCard
-          title="New Users"
-          value={kpis.newUsers.toLocaleString()}
-          subtitle="Registered in selected range"
-          icon={UserPlus}
-          iconColor="text-admin-info"
-          trend={trend(kpis.trends.newUsers)}
-        />
-        <AdminKpiCard
-          title="Verified Users"
-          value={kpis.verifiedUsers.toLocaleString()}
-          subtitle="All-time verified accounts"
-          icon={ShieldCheck}
-          iconColor="text-admin-success"
-          trend={trend(kpis.trends.verifiedUsers)}
-        />
-        <AdminKpiCard
-          title="Lessons Completed"
-          value={kpis.lessonsCompleted.toLocaleString()}
-          subtitle="Completed lessons in range"
-          icon={BookOpen}
-          iconColor="text-admin-accent"
-          trend={trend(kpis.trends.lessonsCompleted)}
-        />
-        <AdminKpiCard
-          title="Course Completion"
-          value={`${kpis.courseCompletionPct}%`}
-          subtitle="Learners who finished the curriculum"
-          icon={GraduationCap}
-          iconColor="text-admin-warning"
-          trend={trend(kpis.trends.courseCompletionPct)}
-        />
-        <AdminKpiCard
-          title="XP Earned"
-          value={kpis.xpEarned.toLocaleString()}
-          subtitle="Total XP awarded in range"
-          icon={Zap}
-          iconColor="text-admin-info"
-          trend={trend(kpis.trends.xpEarned)}
-        />
-        <AdminKpiCard
-          title="Certificates Issued"
-          value={kpis.certificatesIssued.toLocaleString()}
-          subtitle="Certificates in range"
-          icon={Award}
-          iconColor="text-admin-success"
-          trend={trend(kpis.trends.certificatesIssued)}
-        />
-      </div>
+      <Suspense key={`charts:${rangeKeyId}`} fallback={<OverviewChartsSkeleton />}>
+        <OverviewCharts {...range} />
+      </Suspense>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AdminLearnerActivityChart data={data.series} />
-        <AdminLearningActivityChart data={data.series} />
+        <Suspense fallback={<OverviewFunnelSkeleton />}>
+          <OverviewFunnel />
+        </Suspense>
+        <Suspense fallback={<OverviewRecentActivitySkeleton />}>
+          <OverviewRecentActivity />
+        </Suspense>
       </div>
 
-      {/* Funnel + Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AdminFunnelChart stages={data.funnel} />
-        <AdminRecentActivityList items={data.recentActivity} />
-      </div>
-
-      {/* System Snapshot */}
-      <AdminSystemSnapshot items={data.systemSnapshot} />
+      {/* Last on the page: it is the slowest loader (Auth admin probe). */}
+      <Suspense fallback={<OverviewSystemSnapshotSkeleton />}>
+        <OverviewSystemSnapshot />
+      </Suspense>
     </div>
   )
 }

@@ -141,6 +141,104 @@ export function formatPortfolioShareUrl(siteOrigin: string, username: string): s
 }
 
 /**
+ * Third-person share text for a portfolio. Neutral and always true, so a visitor can share it
+ * too. The product name is passed in so this module stays free of imports.
+ */
+export function portfolioShareText(displayName: string, productName: string): string {
+  return `${displayName}'s Product Management portfolio on ${productName}`
+}
+
+/** App path of one public capstone page (Growth R5 B13): `/p/<username>/capstones/<module>`. */
+export function capstoneSharePath(username: string, moduleSlug: string): string {
+  return `/p/${encodeURIComponent(username)}/capstones/${encodeURIComponent(moduleSlug)}`
+}
+
+/** Absolute URL of one public capstone page. */
+export function formatCapstoneShareUrl(siteOrigin: string, username: string, moduleSlug: string): string {
+  return `${siteOrigin.replace(/\/$/, '')}${capstoneSharePath(username, moduleSlug)}`
+}
+
+/** Third-person share text for one capstone, safe for visitors to share too. */
+export function capstoneShareText(displayName: string, capstoneTitle: string, productName: string): string {
+  return `${displayName}'s "${capstoneTitle}" product management case study on ${productName}`
+}
+
+/** First-person share text for one earned badge (owner-only surfaces). */
+export function badgeShareText(badgeName: string, productName: string): string {
+  return `I just earned the "${badgeName}" badge on ${productName}. Here is my Product Management portfolio:`
+}
+
+/**
+ * LinkedIn and X share links for a portfolio, for surfaces that cannot run ShareButton (email).
+ * The shared URL carries UTM tags so visits from those posts can be attributed.
+ */
+export function buildPortfolioShareIntents(
+  portfolioUrl: string,
+  shareText: string,
+  campaign: string,
+): { linkedin: string; x: string } {
+  const tagged = (source: string) => {
+    const url = new URL(portfolioUrl)
+    url.searchParams.set('utm_source', source)
+    url.searchParams.set('utm_medium', 'social')
+    url.searchParams.set('utm_campaign', campaign)
+    return url.toString()
+  }
+  return {
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(tagged('linkedin'))}`,
+    x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(tagged('x'))}`,
+  }
+}
+
+/** Where a learner turns their portfolio public (Settings → Portfolio tab). */
+export const PORTFOLIO_SETTINGS_HREF = '/settings?tab=portfolio'
+
+export type PortfolioNavState = 'public' | 'private'
+
+export interface PortfolioNavItem {
+  label: string
+  /** Relative path: `/p/<encoded username>` when public, the settings tab when private. */
+  href: string
+  /** True when the item should open in a new tab (the public page sits outside the app shell). */
+  external: boolean
+  state: PortfolioNavState
+}
+
+/**
+ * Derives the app-nav "My Portfolio" entry from the learner's profile.
+ *
+ * - No usable username (null, empty, whitespace) → `null`: there is nothing to link to yet.
+ * - Public portfolio → links to the public page, opened in a new tab.
+ * - Private portfolio → points at the settings tab where it can be published.
+ */
+export function getPortfolioNavItem({
+  username,
+  isPortfolioPublic,
+}: {
+  username?: string | null
+  isPortfolioPublic?: boolean | null
+}): PortfolioNavItem | null {
+  const trimmed = typeof username === 'string' ? username.trim() : ''
+  if (!trimmed) return null
+
+  if (isPortfolioPublic === true) {
+    return {
+      label: 'My Portfolio',
+      href: `/p/${encodeURIComponent(trimmed)}`,
+      external: true,
+      state: 'public',
+    }
+  }
+
+  return {
+    label: 'Publish portfolio',
+    href: PORTFOLIO_SETTINGS_HREF,
+    external: false,
+    state: 'private',
+  }
+}
+
+/**
  * Generates schema.org ProfilePage + Person JSON-LD for public portfolio SEO.
  * Conforms to Schema.org ProfilePage standard with nested mainEntity Person.
  */

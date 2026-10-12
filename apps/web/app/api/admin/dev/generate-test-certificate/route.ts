@@ -4,7 +4,8 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { issueCertificate } from '@/lib/certificates-db'
+import { issueTestCertificate } from '@/lib/certificates-db'
+import { PublicError } from '@/lib/errors/public-error'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 import { BRAND } from '@/lib/brand'
@@ -47,39 +48,33 @@ export const POST = withRoute(
 
     const typedUser = user as unknown as { id: string; email: string; name?: string; username?: string }
 
-    // 2. Issue Test Certificate (reuses production certificate service with admin dev bypass)
-    const certRow = await issueCertificate(supabase, targetUserId, type, moduleSlug, { bypassPrerequisites: true })
-
-    // Override / mark certificate as DEV TEST certificate
-    const testCertCode = `TEST-${certRow.certificate_code}`
-    
-    // Update inserted certificate row with test indicator using typed chain
-    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
-    await (supabase.from('certificates') as unknown as DBUpdateChain)
-      .update({
-        certificate_code: testCertCode,
-        career_title: `[TEST] ${certRow.career_title}`,
-      })
-      .eq('id', certRow.id)
+    // 2. Insert a fresh TEST certificate. Never routed through the learner issuance flow
+    // and never updates an existing row: the learner's real certificate (any year) stays
+    // untouched, and every run gets its own unique TEST- code (and so its own email).
+    const certRow = await issueTestCertificate(supabase, targetUserId, type, moduleSlug)
+    const testCertCode = certRow.certificate_code
 
     const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
     const verificationUrl = `${siteOrigin}/verify/${encodeURIComponent(testCertCode)}`
 
-    // 3. Trigger Notification Event (reuses production event & email queue pipeline)
+    // 3. Trigger Notification Event (reuses production event & email queue pipeline).
+    // Delivered to the admin who ran the test, never to the learner: admin test data must
+    // not reach a learner's inbox or bell (Growth R5 P3). The certificate row still belongs
+    // to the learner so its verify page can be checked.
     initializeNotificationConnectors()
     await globalNotificationDispatcher.dispatch({
       id: `dev-cert-event-${Date.now()}`,
       event: 'certificate.generated',
-      userId: targetUserId,
-      userEmail: typedUser.email,
-      userName: typedUser.name || typedUser.username || 'Learner',
+      userId: authGuard.userId,
+      userEmail: authGuard.email,
+      userName: 'Admin (test delivery)',
       userTimezone: 'UTC',
       priority: 'high',
       category: 'certificates',
       occurredAt: new Date().toISOString(),
       payload: {
         certificateCode: testCertCode,
-        certificateType: type,
+        certificateType: certRow.type,
         learnerName: typedUser.name || typedUser.username || 'Learner',
         verificationUrl,
         isTestCertificate: true,
@@ -115,6 +110,9 @@ export const POST = withRoute(
       isTestCertificate: true,
     })
   } catch (err) {
+    if (err instanceof PublicError) {
+      return NextResponse.json({ success: false, error: err.message, code: err.code }, { status: err.status })
+    }
     const message = adminErrorMessage(err, 'Failed to generate test certificate')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }

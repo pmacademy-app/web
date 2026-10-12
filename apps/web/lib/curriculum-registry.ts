@@ -76,3 +76,30 @@ export function getModuleSlugForLessonId(lessonId: string): string | null {
   }
   return null
 }
+
+/**
+ * Canonical module slugs in registry order. Alias keys (`tech_ai`, `platform`,
+ * `advanced_strategy`) repeat an earlier module's lessons and are skipped.
+ */
+export const CANONICAL_MODULE_SLUGS: readonly string[] = (() => {
+  const seen = new Set<string>()
+  const slugs: string[] = []
+  for (const [slug, ids] of Object.entries(MODULE_LESSON_MAP)) {
+    const signature = ids.join(',')
+    if (seen.has(signature)) continue
+    seen.add(signature)
+    slugs.push(slug)
+  }
+  return slugs
+})()
+
+/** Lessons in the full curriculum, counted from the registry (each lesson once). */
+export const CURRICULUM_LESSON_COUNT: number = new Set(Object.values(MODULE_LESSON_MAP).flat()).size
+
+/** How many canonical modules have every one of their lessons in `completedLessonIds`. */
+export function countCompletedModules(completedLessonIds: Iterable<string>): number {
+  const completed = completedLessonIds instanceof Set ? completedLessonIds : new Set(completedLessonIds)
+  return CANONICAL_MODULE_SLUGS.filter((slug) =>
+    MODULE_LESSON_MAP[slug].every((id) => completed.has(id))
+  ).length
+}

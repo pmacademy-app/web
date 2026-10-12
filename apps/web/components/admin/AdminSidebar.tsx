@@ -263,7 +263,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: Adm
               type="button"
               onClick={onMobileClose}
               aria-label="Close admin navigation menu"
-              className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg transition-colors"
+              className="absolute top-2 right-2 z-10 size-10 inline-flex items-center justify-center rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>

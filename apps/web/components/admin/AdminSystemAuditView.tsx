@@ -11,6 +11,7 @@ import { AdminDatePicker } from './AdminDatePicker'
 import { AdminAuditEntryDrawer } from './AdminAuditEntryDrawer'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import { useApiQuery } from '@/lib/api/hooks'
+import { ADMIN_LIST_SWR_CONFIG } from './admin-swr-config'
 import type { AdminAuditEntry, AdminAuditLogResult } from '@/lib/admin/types'
 import type { AdminSystemAuditLogResponse } from '@/lib/api/contracts/admin'
 
@@ -60,8 +61,7 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
     mutate: revalidateAudit,
   } = useApiQuery<AdminSystemAuditLogResponse>(swrKey, {
     fallbackData: initial,
-    revalidateOnMount: false,
-    dedupingInterval: 5_000,
+    ...ADMIN_LIST_SWR_CONFIG,
   })
 
   const data = queryData || initial

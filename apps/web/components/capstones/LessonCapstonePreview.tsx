@@ -18,7 +18,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Award, ArrowRight, CheckCircle2, Lock } from 'lucide-react'
-import { getCapstoneDefinition } from '@/config/capstones'
+import { getCapstoneForModule } from '@/config/capstones'
 import { useApiQuery } from '@/lib/api/hooks'
 import type { CapstoneStatus } from '@/lib/capstones'
 
@@ -36,9 +36,10 @@ interface CapstoneModuleResponse {
 }
 
 export function LessonCapstonePreview({ moduleSlug, className = '' }: LessonCapstonePreviewProps) {
-  const definition = getCapstoneDefinition(moduleSlug)
+  // `moduleSlug` is the curriculum slug; the capstone may be keyed differently (growth → metrics).
+  const definition = getCapstoneForModule(moduleSlug)
   // Only modules that actually have a capstone definition get a preview.
-  const endpoint = definition ? `/api/capstones/${encodeURIComponent(moduleSlug)}` : null
+  const endpoint = definition ? `/api/capstones/${encodeURIComponent(definition.moduleSlug)}` : null
   const { data } = useApiQuery<CapstoneModuleResponse>(endpoint)
 
   if (!definition) return null
@@ -126,7 +127,7 @@ export function LessonCapstonePreview({ moduleSlug, className = '' }: LessonCaps
       )}
 
       <Link
-        href={`/capstones/${moduleSlug}`}
+        href={`/capstones/${definition.moduleSlug}`}
         className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
       >
         <span>{cta}</span>

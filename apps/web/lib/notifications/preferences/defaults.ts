@@ -210,14 +210,27 @@ export async function getResolvedUserNotificationPreferences(
   }
 }
 
+/** A strict batch preferences read failed; the caller should skip the batch, not assume defaults. */
+export class NotificationPreferencesReadError extends Error {
+  constructor(reason: string) {
+    super(reason)
+    this.name = 'NotificationPreferencesReadError'
+  }
+}
+
 /**
  * Resolves persisted notification preferences for multiple users in a single query.
  * Prevents N+1 database queries during batch queue processing or broadcasts.
+ *
+ * A failed read returns default preferences for everyone, which treats a learner who opted out as
+ * opted in. A bulk sender passes `strict` to get a NotificationPreferencesReadError instead and
+ * skip the batch.
  */
 export async function getBatchUserNotificationPreferences(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
-  userIds: string[]
+  userIds: string[],
+  { strict = false }: { strict?: boolean } = {}
 ): Promise<Map<string, UserNotificationPreferences>> {
   const resultMap = new Map<string, UserNotificationPreferences>()
   if (!userIds || userIds.length === 0) return resultMap
@@ -235,13 +248,22 @@ export async function getBatchUserNotificationPreferences(
       .select('*')
       .in('user_id', uniqueIds)
 
+    if (error && strict) {
+      throw new NotificationPreferencesReadError((error as { message?: string }).message || 'preferences read failed')
+    }
+
     if (!error && rows) {
       for (const row of rows as Record<string, unknown>[]) {
         const uid = String(row.user_id)
         resultMap.set(uid, mapDbRowToNotificationPreferences(uid, row))
       }
     }
-  } catch {
+  } catch (err) {
+    if (strict) {
+      throw err instanceof NotificationPreferencesReadError
+        ? err
+        : new NotificationPreferencesReadError(err instanceof Error ? err.message : 'preferences read failed')
+    }
     // Graceful fallback to default preferences already in map
   }
 

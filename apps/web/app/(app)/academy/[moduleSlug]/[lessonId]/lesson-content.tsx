@@ -50,8 +50,12 @@ import {
   trackDeepDiveOpened,
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
+import { ReferralInviteLauncher } from '@/components/referral/ReferralInviteLauncher'
+import { deferQuickStartToNextSession } from '@/lib/quick-start/deferred-launch'
+import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
+import { getCapstoneHref } from '@/config/capstones'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
 import {
   getCoreBlocks,
@@ -526,6 +530,8 @@ export default function LessonPageContent({
   const [theorySubmitting, setTheorySubmitting] = useState(false)
   const [theoryError, setTheoryError] = useState<string | null>(null)
   const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
+  // Growth R5 B11: the first-lesson celebration can hand off to the referral modal.
+  const [firstLessonInviteOpen, setFirstLessonInviteOpen] = useState(false)
   const [celebrationXp, setCelebrationXp] = useState(50)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
@@ -568,6 +574,9 @@ export default function LessonPageContent({
   }, [])
 
   const { setBreadcrumbs } = useBreadcrumbs()
+  // Growth R1 / Task 5: closing the first-lesson celebration queues the Quick Start tour for
+  // the next non-lesson page.
+  const quickStart = useQuickStartOptional()
 
   // Sync breadcrumbs with topbar — use globalOrder for correct display
   useEffect(() => {
@@ -743,7 +752,7 @@ export default function LessonPageContent({
               Apply what you learned across Module {moduleNumber} by building a real-world product deliverable for your public portfolio.
             </p>
             <Link
-              href={`/capstones/${lesson.module}`}
+              href={getCapstoneHref(lesson.module)}
               className="inline-flex items-center justify-center w-full rounded-xl bg-primary px-5 py-3 text-xs font-bold text-primary-foreground shadow hover:bg-primary/90 transition-all"
             >
               Start Capstone Project →
@@ -1055,10 +1064,25 @@ export default function LessonPageContent({
 
       <FirstSessionCelebrationModal
         isOpen={showFirstSessionCelebration}
-        onClose={() => setShowFirstSessionCelebration(false)}
+        onClose={() => {
+          setShowFirstSessionCelebration(false)
+          quickStart?.requestDeferredLaunch()
+        }}
         lessonId={lesson.id}
         xpEarned={celebrationXp}
         nextLessonUrl={nextLessonUrl}
+        onInvitePeers={() => {
+          // Swap, never chain: the celebration closes, the referral modal opens, and Quick Start
+          // waits for the next session instead of following this dialog.
+          setShowFirstSessionCelebration(false)
+          deferQuickStartToNextSession()
+          setFirstLessonInviteOpen(true)
+        }}
+      />
+      <ReferralInviteLauncher
+        open={firstLessonInviteOpen}
+        onClose={() => setFirstLessonInviteOpen(false)}
+        source="first_lesson_celebration"
       />
     </div>
   )

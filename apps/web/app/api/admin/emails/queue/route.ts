@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { processEmailQueue } from '@/lib/notifications/queue/processor'
+import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
 export const GET = withRoute(
   {
@@ -44,6 +45,7 @@ export const POST = withRoute(
         { processed: result.processed }
       )
 
+      revalidateAdminShell()
       return NextResponse.json({ success: true, result })
     } catch (err) {
       const message = adminErrorMessage(err, 'Failed to process email queue')

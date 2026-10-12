@@ -45,12 +45,18 @@ export function QuickStartModal() {
     prevStep,
     skipTour,
     finishTour,
+    closeQuickStart,
+    openMode,
   } = useQuickStart()
 
   const isFirstStep = currentStepIndex === 0
   const isLastStep = currentStepIndex === totalSteps - 1
   const IconComponent = currentStep.icon || Sparkles
   const cardRef = useRef<HTMLDivElement>(null)
+
+  // A tour the learner did not ask for (opened after the first lesson) closes on a stray
+  // backdrop click instead of being permanently skipped. Esc, X and "Skip Tour" still skip.
+  const handleBackdropClick = openMode === 'post_first_lesson' ? closeQuickStart : () => skipTour()
 
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
   const [isDesktop, setIsDesktop] = useState(false)
@@ -178,11 +184,50 @@ export function QuickStartModal() {
     return () => window.removeEventListener('resize', handleResize)
   }, [isOpen, updateLayout])
 
+  // Focus management: move focus into the dialog when it opens, and hand it back to whatever
+  // had it before when the dialog closes.
+  useEffect(() => {
+    if (!isOpen) return
+    const active = document.activeElement
+    const returnFocusTo = active instanceof HTMLElement ? active : null
+    cardRef.current?.focus({ preventScroll: true })
+    return () => {
+      if (returnFocusTo && returnFocusTo.isConnected) returnFocusTo.focus({ preventScroll: true })
+    }
+  }, [isOpen])
+
   // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Tab') {
+        // Keep Tab / Shift+Tab cycling inside the dialog.
+        const card = cardRef.current
+        if (!card) return
+        const focusables = Array.from(
+          card.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        )
+        const active = document.activeElement
+        if (focusables.length === 0) {
+          e.preventDefault()
+          card.focus({ preventScroll: true })
+          return
+        }
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        const outside = !(active instanceof Node) || !card.contains(active)
+        if (e.shiftKey) {
+          if (outside || active === first || active === card) {
+            e.preventDefault()
+            last.focus()
+          }
+        } else if (outside || active === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      } else if (e.key === 'Escape') {
         e.preventDefault()
         skipTour()
       } else if (e.key === 'ArrowRight' && !isLastStep) {
@@ -367,7 +412,7 @@ export function QuickStartModal() {
         <div
           className="fixed inset-0 bg-black/60 transition-opacity"
           style={{ zIndex: 48 }}
-          onClick={() => skipTour()}
+          onClick={handleBackdropClick}
           aria-hidden="true"
         />
       )}
@@ -377,7 +422,7 @@ export function QuickStartModal() {
         <div
           className="fixed inset-0"
           style={{ zIndex: 47 }}
-          onClick={() => skipTour()}
+          onClick={handleBackdropClick}
           aria-hidden="true"
         />
       )}
@@ -388,6 +433,7 @@ export function QuickStartModal() {
       {/* Tour Modal Card */}
       <div
         ref={cardRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="quickstart-title"

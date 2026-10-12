@@ -13,6 +13,19 @@ import { AUTOMATION_METADATA, EmailAutomationsService } from '@/lib/notification
 import { DEFAULT_LIFECYCLE_HOLDOUT_PERCENT } from '@/lib/notifications/lifecycle/holdout'
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
+import { fetchAllRows } from './fetch-all'
+import { ADMIN_CACHE_TAGS } from './cache-tags'
+import { cacheWithMaxAge } from './bounded-cache'
+import { buildIlikeOrFilter } from './search-filter'
+import {
+  computeNudgeReadout,
+  emptyNudgeReadout,
+  NUDGE_READOUT_EVENT_TYPES,
+  type AdminNudgeReadout,
+  type FellowRequestRow,
+  type NudgeEventRow,
+} from './nudge-readout'
+import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 import {
   TEMPLATE_SAMPLE_VARIABLES,
   TEMPLATE_VARIABLE_CATALOG,
@@ -109,6 +122,21 @@ export interface AdminLifecycleMetrics {
   /** Configured holdout share (read-only; code-controlled, not editable from Admin). */
   holdoutPercent: number
   sequences: AdminLifecycleSequenceMetric[]
+  /**
+   * Proof-nudge readout (treated vs holdout, distinct users). portfolio_ready's outcome is
+   * "currently public" (not time-bound); fellow_eligible's is a request within 14 days.
+   */
+  nudges: AdminNudgeReadout[]
+  /**
+   * Both nudges have ≥ NUDGE_RETIRE_MIN_TREATED treated users and positive lift, i.e.
+   * the manual campaign scripts are ready to retire. The holdout stays either way.
+   */
+  retireReady: boolean
+  /**
+   * True when the nudge readout failed to load and `nudges` / `retireReady` are the zeroed
+   * fallback, so the UI must not present them as real data.
+   */
+  nudgesFailed: boolean
 }
 
 export interface AdminCommunicationsOverview {
@@ -178,7 +206,7 @@ export class CommunicationsService {
       )
       if (status) query = query.eq('status', status)
       if (search) {
-        query = query.or(`to_email.ilike.%${search}%,template_key.ilike.%${search}%`)
+        query = query.or(buildIlikeOrFilter(['to_email', 'template_key'], search))
       }
       query = query.order('created_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -548,10 +576,92 @@ export class CommunicationsService {
    *
    * The `holdoutPercent` is the code-controlled constant, surfaced read-only so an
    * admin can see the experiment design without being able to alter it here.
+   *
+   * It also carries the proof-nudge readout (see `nudge-readout.ts`): sent / held out /
+   * reminded per nudge, treated vs holdout outcome rates and lift, cached 120s under the
+   * `admin-automations` tag.
    */
   public static async getLifecycleMetrics(): Promise<AdminLifecycleMetrics> {
     const supabase = createServiceRoleClient()
     const sequencesMeta = AUTOMATION_METADATA.filter((a) => a.key.startsWith('lifecycle.'))
+    const nudgeNames: Partial<Record<ProofNudgeKey, string>> = {}
+    for (const meta of AUTOMATION_METADATA) {
+      if (meta.key.startsWith('nudge.')) nudgeNames[meta.key as ProofNudgeKey] = meta.name
+    }
+
+    // The nudge readout is loaded and cached on its own so a failure there (or a cold cache)
+    // never blanks the lifecycle sequence counts. It never throws: a failure degrades to the
+    // zeroed readout with `nudgesFailed: true` (and is not cached, since the cached fn rejects).
+    // cacheWithMaxAge waits for the recompute of a stale entry, so that failure shows too.
+    const nudgeReadoutPromise = (async () => {
+      try {
+        const readout = await cacheWithMaxAge(
+          async () => {
+            const db = createServiceRoleClient()
+            // Bounded: only the nudge rows (two initial + two reminder event types).
+            const events = await fetchAllRows<NudgeEventRow>((from, to) =>
+              db
+                .from('notification_events')
+                .select('user_id, event_type, skipped_reason, created_at')
+                .in('event_type', NUDGE_READOUT_EVENT_TYPES)
+                .order('id', { ascending: true })
+                .range(from, to)
+            )
+
+            const usersFor = (key: ProofNudgeKey) => [
+              ...new Set(events.filter((e) => e.event_type === key).map((e) => e.user_id)),
+            ]
+            const chunks = (ids: string[]) => {
+              const out: string[][] = []
+              for (let i = 0; i < ids.length; i += 200) out.push(ids.slice(i, i + 200))
+              return out
+            }
+
+            // Outcome rows only for the nudged users, in batched `in` lookups.
+            const [publicRows, fellowRequests] = await Promise.all([
+              Promise.all(
+                chunks(usersFor('nudge.portfolio_ready')).map((ids) =>
+                  fetchAllRows<{ id: string }>((from, to) =>
+                    db
+                      .from('users')
+                      .select('id')
+                      .in('id', ids)
+                      .eq('is_portfolio_public', true)
+                      .order('id', { ascending: true })
+                      .range(from, to)
+                  )
+                )
+              ).then((pages) => pages.flat()),
+              Promise.all(
+                chunks(usersFor('nudge.fellow_eligible')).map((ids) =>
+                  fetchAllRows<FellowRequestRow>((from, to) =>
+                    db
+                      .from('fellow_requests')
+                      .select('user_id, requested_at')
+                      .in('user_id', ids)
+                      .order('id', { ascending: true })
+                      .range(from, to)
+                  )
+                )
+              ).then((pages) => pages.flat()),
+            ])
+
+            return computeNudgeReadout({
+              events,
+              publicUserIds: publicRows.map((r) => r.id),
+              fellowRequests,
+              names: nudgeNames,
+            })
+          },
+          ['admin-nudge-readout'],
+          { revalidate: 120, tags: [ADMIN_CACHE_TAGS.automations] }
+        )()
+        return { ...readout, nudgesFailed: false }
+      } catch (err) {
+        console.warn('[CommunicationsService] nudge readout failed:', err)
+        return { ...emptyNudgeReadout(nudgeNames), nudgesFailed: true }
+      }
+    })()
 
     const emptyResult: AdminLifecycleMetrics = {
       holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT,
@@ -563,6 +673,9 @@ export class CommunicationsService {
         failed: 0,
         holdout: 0,
       })),
+      ...emptyNudgeReadout(nudgeNames),
+      // Always replaced by the readout promise's own flag below.
+      nudgesFailed: true,
     }
 
     try {
@@ -595,9 +708,10 @@ export class CommunicationsService {
           }
         })
       )
-      return { holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT, sequences }
+      const readout = await nudgeReadoutPromise
+      return { holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT, sequences, ...readout }
     } catch {
-      return emptyResult
+      return { ...emptyResult, ...(await nudgeReadoutPromise) }
     }
   }
 

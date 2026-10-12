@@ -157,10 +157,6 @@ export function OnboardingSettingsSection({
     goalOptions
   )
 
-  const handleToggleEnabled = (enabled: boolean) => {
-    onChange({ enabled })
-  }
-
   const updateFieldOptions = (groupKey: OptionGroupKey, newOptions: OnboardingFieldOption[]) => {
     onChange({
       fieldOptions: {
@@ -222,12 +218,16 @@ export function OnboardingSettingsSection({
           label="Enable Onboarding Screen"
           description="New learners choose a primary goal and an experience level on one screen before they start learning. Profile and portfolio details are collected later in Settings → Portfolio."
         >
-          <AdminToggle
-            pressed={data.enabled}
-            onPressedChange={handleToggleEnabled}
-            disabled={isSaving}
-            aria-label="Toggle onboarding screen"
-          />
+          {/* Not wired: the onboarding route never reads this flag, so the toggle stays
+              read-only until it does. The option editor below is live. */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-admin-fg-muted">Not used by the app yet</span>
+            <AdminToggle
+              pressed={data.enabled}
+              disabled
+              aria-label="Onboarding screen toggle, not used by the app yet"
+            />
+          </div>
         </SettingRow>
       </AdminSection>
 
@@ -268,7 +268,7 @@ export function OnboardingSettingsSection({
                     type="button"
                     onClick={() => setActiveOptionGroup(grp.key)}
                     className={cn(
-                      'p-2.5 rounded-lg border text-left flex items-center gap-2 transition-all',
+                      'p-2.5 rounded-lg border text-left flex items-center gap-2 transition-[color,background-color,border-color,box-shadow]',
                       isSelected
                         ? 'border-admin-accent bg-admin-accent-soft text-admin-accent font-semibold shadow-xs'
                         : 'border-admin-border bg-admin-surface-raised/40 text-admin-fg-muted hover:text-admin-fg hover:border-admin-border-strong'
@@ -289,7 +289,7 @@ export function OnboardingSettingsSection({
                 <div
                   key={opt.id}
                   className={cn(
-                    'p-3.5 rounded-lg border transition-all space-y-2.5',
+                    'p-3.5 rounded-lg border transition-[background-color,border-color,opacity] space-y-2.5',
                     opt.enabled !== false
                       ? 'border-admin-border bg-admin-surface-raised/40'
                       : 'border-admin-border/50 bg-admin-surface-raised/20 opacity-60'

@@ -295,7 +295,7 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
               type="button"
               disabled={isRetrying}
               onClick={handleRetrySelected}
-              className="px-3 py-1.5 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
             >
               {isRetrying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
               <span>Retry Selected ({selectedIds.length})</span>
@@ -318,7 +318,7 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
             type="button"
             disabled={isProcessing}
             onClick={handleProcessQueue}
-            className="px-3.5 py-1.5 rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg hover:border-admin-border-strong text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg hover:border-admin-border-strong text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
           >
             {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 text-admin-accent" />}
             <span>Process Queue Now</span>
@@ -455,7 +455,7 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
                   type="button"
                   disabled={isRetryingSingle}
                   onClick={() => handleRetrySingle(selected.id)}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-all inline-flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-colors inline-flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {isRetryingSingle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
                   <span>Retry Delivery Now</span>

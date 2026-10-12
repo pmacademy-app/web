@@ -68,6 +68,28 @@ describe('B10-A — logout', () => {
     expect(router.refresh).toHaveBeenCalledTimes(1)
   })
 
+  // Growth R5 / F3: a queued Quick Start must not open for the next person on this browser.
+  it('clears the pending Quick Start flag, even when the sign-out call fails', async () => {
+    const { QUICK_START_PENDING_KEY } = await import('@/lib/quick-start/deferred-launch')
+    const store = new Map<string, string>([[QUICK_START_PENDING_KEY, '1']])
+    const localStorage = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => void store.set(key, value),
+      removeItem: (key: string) => void store.delete(key),
+    }
+    vi.stubGlobal('window', { localStorage, sessionStorage: localStorage })
+    global.fetch = vi.fn(async () => {
+      throw new Error('offline')
+    }) as typeof global.fetch
+
+    try {
+      await logout(createRouter(), { redirectTo: LEARNER_LOGIN_PATH })
+      expect(store.has(QUICK_START_PENDING_KEY)).toBe(false)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('navigates and reports failure when the server could not revoke at the provider', async () => {
     global.fetch = vi.fn(async () => signOutResponse('failed')) as typeof global.fetch
     const router = createRouter()

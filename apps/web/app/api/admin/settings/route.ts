@@ -34,24 +34,27 @@ export const GET = withRoute(
   const section = getSectionFromRequest(request)
 
   try {
+    // Strict reads: a section that cannot be read is an error here, never a page of defaults that
+    // a client could send straight back as a save.
+    const strict = { strict: true }
     if (section) {
       // Fetch single section
       let data: unknown
       switch (section) {
         case 'product':
-          data = await SettingsService.getProductSettings()
+          data = await SettingsService.getProductSettings(strict)
           break
         case 'learning':
-          data = await SettingsService.getLearningSettings()
+          data = await SettingsService.getLearningSettings(strict)
           break
         case 'email':
-          data = await SettingsService.getEmailSettings()
+          data = await SettingsService.getEmailSettings(strict)
           break
         case 'notifications':
-          data = await SettingsService.getNotificationSettings()
+          data = await SettingsService.getNotificationSettings(strict)
           break
         case 'onboarding':
-          data = await SettingsService.getOnboardingSettings()
+          data = await SettingsService.getOnboardingSettings(strict)
           break
         case 'feature-flags':
           data = await SettingsService.getFeatureFlags()
@@ -60,7 +63,7 @@ export const GET = withRoute(
       return NextResponse.json({ success: true, data })
     } else {
       // Fetch all sections
-      const all = await SettingsService.getAllSettings()
+      const all = await SettingsService.getAllSettings(strict)
       return NextResponse.json({ success: true, data: all })
     }
   } catch (err) {

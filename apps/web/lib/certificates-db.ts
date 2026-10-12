@@ -9,9 +9,12 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
-import { generateCertificateCode } from '@/lib/certificates'
-import { getLessonIdsForModule } from '@/lib/curriculum-registry'
+import { TEST_CERTIFICATE_PREFIX, generateCertificateCode, isTestCertificateCode } from '@/lib/certificates'
+import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
+
+// Defined in the client-safe module so UI can ask without importing this data layer.
+export { TEST_CERTIFICATE_PREFIX, isTestCertificateCode }
 
 export type CertificateRow = Database['public']['Tables']['certificates']['Row']
 
@@ -37,6 +40,163 @@ export interface VerifiedCertificatePayload {
   portfolioUrl: string
 }
 
+export interface IssueCertificateResult {
+  certificate: CertificateRow
+  /** True only when this call inserted the row; false when it already existed. */
+  created: boolean
+}
+
+type CertificateInsert = Database['public']['Tables']['certificates']['Insert']
+type UserRow = Database['public']['Tables']['users']['Row']
+
+/** Postgres unique_violation. */
+const UNIQUE_VIOLATION = '23505'
+
+/** Lessons required for the full-curriculum certificate. */
+export const FULL_CURRICULUM_LESSON_COUNT = CURRICULUM_LESSON_COUNT
+
+function normalizeCertificateType(type: string): string {
+  return type === 'module' ? 'module_completion' : type
+}
+
+/** The full-curriculum certificate has no module; for modules '' means "none". */
+function normalizeModuleSlug(normalizedType: string, moduleSlug: string | null | undefined): string | null {
+  if (normalizedType === 'full_curriculum') return null
+  return moduleSlug || null
+}
+
+interface IssuanceContext {
+  user: UserRow
+  completedLessonIds: Set<string>
+}
+
+async function loadIssuanceContext(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<IssuanceContext> {
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (userError || !user) {
+    throw new PublicError('User profile not found.', { status: 404, code: 'NOT_FOUND' })
+  }
+
+  const { data: progressRows, error: progressError } = await supabase
+    .from('user_lesson_progress')
+    .select('lesson_id')
+    .eq('user_id', userId)
+    .eq('status', 'completed')
+
+  // A failed read is not "0 lessons": that would report a graduate as not eligible.
+  if (progressError) {
+    console.error('[certificates-db] Lesson progress lookup failed:', progressError)
+    throw new Error('Lesson progress lookup failed.')
+  }
+
+  return { user, completedLessonIds: new Set((progressRows || []).map((p) => p.lesson_id)) }
+}
+
+/** The certificate row as issued today: a snapshot of the learner's progress and level. */
+function buildCertificateInsert(
+  context: IssuanceContext,
+  userId: string,
+  certificateCode: string,
+  normalizedType: string,
+  moduleSlug: string | null
+): CertificateInsert {
+  const { user, completedLessonIds } = context
+  const lessonsCompleted = completedLessonIds.size
+  const levelInfo = calculateLevel(user.total_xp || 0)
+
+  return {
+    user_id: userId,
+    certificate_code: certificateCode,
+    type: normalizedType,
+    module_slug: moduleSlug,
+    learner_name: user.name || user.username || 'PM Academy Learner',
+    level: levelInfo.level,
+    career_title: levelInfo.title,
+    total_xp: user.total_xp || 0,
+    lessons_completed: lessonsCompleted,
+    modules_completed: Math.min(9, Math.floor(lessonsCompleted / 10)),
+    issued_at: new Date().toISOString(),
+  }
+}
+
+/**
+ * Finds the learner's existing real certificate for (type, module).
+ *
+ * The code embeds the issue year, so the unique-code lookup alone misses a row minted
+ * in an earlier year and a second certificate would be inserted. The fallback scans the
+ * learner's own rows (at most one per module plus the full curriculum) and matches on
+ * identity instead, ignoring admin TEST- rows.
+ *
+ * Precedence: a by-code hit for the current year is returned first, even when an older
+ * matching row exists. Otherwise the fallback returns the learner's oldest matching
+ * row — the one they have already shared.
+ *
+ * A failed lookup throws rather than reporting "none", because the caller would
+ * otherwise insert a duplicate. A code owned by another learner throws
+ * CERTIFICATE_CODE_COLLISION rather than ever returning someone else's certificate.
+ */
+async function findExistingCertificate(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  normalizedType: string,
+  moduleSlug: string | null,
+  certCode: string
+): Promise<CertificateRow | null> {
+  const { data: byCode, error: byCodeError } = await supabase
+    .from('certificates')
+    .select('*')
+    .eq('certificate_code', certCode)
+    .maybeSingle()
+
+  if (byCodeError) {
+    console.error('[certificates-db] Certificate lookup by code failed:', byCodeError)
+    throw new Error('Certificate lookup failed.')
+  }
+
+  if (byCode) {
+    if (byCode.user_id !== userId) {
+      console.error('[certificates-db] Certificate code collision across learners:', {
+        certificateCode: certCode,
+        requestingUserId: userId,
+      })
+      throw new PublicError('This certificate could not be issued. Please contact support.', {
+        status: 409,
+        code: 'CERTIFICATE_CODE_COLLISION',
+      })
+    }
+    return byCode
+  }
+
+  const { data: userRows, error: userRowsError } = await supabase
+    .from('certificates')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (userRowsError) {
+    console.error('[certificates-db] Certificate lookup by learner failed:', userRowsError)
+    throw new Error('Certificate lookup failed.')
+  }
+
+  const matches = (Array.isArray(userRows) ? userRows : [])
+    .filter(
+      (row) =>
+        row.user_id === userId &&
+        row.type === normalizedType &&
+        (normalizedType === 'full_curriculum' || (row.module_slug || null) === moduleSlug) &&
+        !isTestCertificateCode(row.certificate_code)
+    )
+    .sort((a, b) => (a.issued_at < b.issued_at ? -1 : a.issued_at > b.issued_at ? 1 : 0))
+
+  return matches[0] ?? null
+}
+
 /**
  * Issues or retrieves an official certificate record for a user.
  * Strictly verifies curriculum or modular completion prerequisites before issuance.
@@ -48,50 +208,53 @@ export async function issueCertificate(
   moduleSlug: string | null = null,
   options?: IssueCertificateOptions
 ): Promise<CertificateRow> {
-  const normalizedType = type === 'module' ? 'module_completion' : type
+  const { certificate } = await issueCertificateWithStatus(supabase, userId, type, moduleSlug, options)
+  return certificate
+}
 
-  // 1. Fetch user state
-  const { data: user, error: userError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single()
+/**
+ * Same as `issueCertificate`, but also reports whether this call created the row, so
+ * callers can announce a certificate exactly once.
+ *
+ * Idempotent per (user, type, module): an existing real certificate is returned with
+ * `created: false`, including one whose code was minted in an earlier year, and a
+ * concurrent insert that loses the unique-code race resolves to the winner's row
+ * rather than failing.
+ */
+export async function issueCertificateWithStatus(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  type: string = 'full_curriculum',
+  moduleSlug: string | null = null,
+  options?: IssueCertificateOptions
+): Promise<IssueCertificateResult> {
+  const normalizedType = normalizeCertificateType(type)
+  const normalizedSlug = normalizeModuleSlug(normalizedType, moduleSlug)
 
-  if (userError || !user) {
-    throw new PublicError('User profile not found.', { status: 404, code: 'NOT_FOUND' })
-  }
-
-  // 2. Fetch total completed lessons count
-  const { data: progressRows } = await supabase
-    .from('user_lesson_progress')
-    .select('lesson_id')
-    .eq('user_id', userId)
-    .eq('status', 'completed')
-
-  const completedLessonIds = new Set((progressRows || []).map((p) => p.lesson_id))
+  // 1-2. Fetch user state and completed lessons
+  const context = await loadIssuanceContext(supabase, userId)
+  const { completedLessonIds } = context
   const lessonsCompleted = completedLessonIds.size
-  const modulesCompleted = Math.min(9, Math.floor(lessonsCompleted / 10))
-  const levelInfo = calculateLevel(user.total_xp || 0)
 
   // 3. Prerequisite validation (enforced unless explicit bypass provided)
   if (!options?.bypassPrerequisites) {
     if (normalizedType === 'full_curriculum') {
-      if (lessonsCompleted < 90) {
+      if (lessonsCompleted < FULL_CURRICULUM_LESSON_COUNT) {
         throw new PublicError(
-          `Full curriculum completion certificate requires completing all 90 lessons (currently ${lessonsCompleted}/90).`,
+          `Full curriculum completion certificate requires completing all ${FULL_CURRICULUM_LESSON_COUNT} lessons (currently ${lessonsCompleted}/${FULL_CURRICULUM_LESSON_COUNT}).`,
           { status: 400, code: 'PREREQUISITES_NOT_MET' }
         )
       }
     } else if (normalizedType === 'module_completion') {
-      if (!moduleSlug) {
+      if (!normalizedSlug) {
         throw new PublicError('Module slug is required for module certificate issuance.', {
           status: 400,
           code: 'INVALID_REQUEST',
         })
       }
-      const requiredLessonIds = getLessonIdsForModule(moduleSlug)
+      const requiredLessonIds = getLessonIdsForModule(normalizedSlug)
       if (requiredLessonIds.length === 0) {
-        throw new PublicError(`Invalid or unrecognized module slug: "${moduleSlug}".`, {
+        throw new PublicError(`Invalid or unrecognized module slug: "${normalizedSlug}".`, {
           status: 400,
           code: 'INVALID_MODULE',
         })
@@ -111,33 +274,17 @@ export async function issueCertificate(
     }
   }
 
-  const certCode = generateCertificateCode(userId, normalizedType, moduleSlug)
+  const certCode = generateCertificateCode(userId, normalizedType, normalizedSlug)
 
   // 4. Check if certificate already exists (idempotent lookup)
-  const { data: existing } = await supabase
-    .from('certificates')
-    .select('*')
-    .eq('certificate_code', certCode)
-    .maybeSingle()
+  const existing = await findExistingCertificate(supabase, userId, normalizedType, normalizedSlug, certCode)
 
   if (existing) {
-    return existing
+    return { certificate: existing, created: false }
   }
 
   // 5. Insert new certificate
-  const newCert = {
-    user_id: userId,
-    certificate_code: certCode,
-    type: normalizedType,
-    module_slug: moduleSlug,
-    learner_name: user.name || user.username || 'PM Academy Learner',
-    level: levelInfo.level,
-    career_title: levelInfo.title,
-    total_xp: user.total_xp || 0,
-    lessons_completed: lessonsCompleted,
-    modules_completed: modulesCompleted,
-    issued_at: new Date().toISOString(),
-  }
+  const newCert = buildCertificateInsert(context, userId, certCode, normalizedType, normalizedSlug)
 
   const { data: inserted, error: insertError } = await supabase
     .from('certificates')
@@ -145,9 +292,81 @@ export async function issueCertificate(
     .select('*')
     .single()
 
+  if (insertError?.code === UNIQUE_VIOLATION) {
+    // A concurrent request committed the same certificate between our lookup and insert.
+    // Throws on a cross-learner collision; never returns another learner's row.
+    const winner = await findExistingCertificate(supabase, userId, normalizedType, normalizedSlug, certCode)
+    if (winner) {
+      return { certificate: winner, created: false }
+    }
+  }
+
   if (insertError || !inserted) {
     console.error('[certificates-db] Error inserting certificate:', insertError)
     throw new PublicError('Failed to issue certificate.', { status: 400, code: 'ISSUE_FAILED' })
+  }
+
+  return { certificate: inserted, created: true }
+}
+
+/**
+ * A unique admin dev test code: `TEST-PMA-YYYY-XXXXXXXX-XXXXXX`.
+ *
+ * The random suffix makes every dev run its own row (and its own email idempotency
+ * key), and the prefix keeps it out of every real-certificate lookup.
+ */
+export function buildTestCertificateCode(
+  userId: string,
+  type: string = 'full_curriculum',
+  moduleSlug: string | null = null
+): string {
+  const normalizedType = normalizeCertificateType(type)
+  const baseCode = generateCertificateCode(userId, normalizedType, normalizeModuleSlug(normalizedType, moduleSlug))
+  const suffix = globalThis.crypto.randomUUID().replace(/-/g, '').slice(0, 6).toUpperCase()
+  return `${TEST_CERTIFICATE_PREFIX}${baseCode}-${suffix}`
+}
+
+/**
+ * Inserts a fresh admin dev TEST certificate for any learner, bypassing prerequisites.
+ *
+ * Deliberately separate from `issueCertificateWithStatus`: it never looks up, returns
+ * or modifies an existing row, so the dev tool cannot touch a learner's real
+ * certificate.
+ */
+export async function issueTestCertificate(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  type: string = 'full_curriculum',
+  moduleSlug: string | null = null
+): Promise<CertificateRow> {
+  const normalizedType = normalizeCertificateType(type)
+  if (normalizedType !== 'full_curriculum' && normalizedType !== 'module_completion') {
+    throw new PublicError(`Invalid certificate type: "${type}". Must be "full_curriculum" or "module_completion".`, {
+      status: 400,
+      code: 'INVALID_REQUEST',
+    })
+  }
+  const normalizedSlug = normalizeModuleSlug(normalizedType, moduleSlug)
+  if (normalizedType === 'module_completion' && !normalizedSlug) {
+    throw new PublicError('Module slug is required for module certificate issuance.', {
+      status: 400,
+      code: 'INVALID_REQUEST',
+    })
+  }
+
+  const context = await loadIssuanceContext(supabase, userId)
+  const testCode = buildTestCertificateCode(userId, normalizedType, normalizedSlug)
+  const row = buildCertificateInsert(context, userId, testCode, normalizedType, normalizedSlug)
+
+  const { data: inserted, error: insertError } = await supabase
+    .from('certificates')
+    .insert({ ...row, career_title: `[TEST] ${row.career_title}` })
+    .select('*')
+    .single()
+
+  if (insertError || !inserted) {
+    console.error('[certificates-db] Error inserting test certificate:', insertError)
+    throw new PublicError('Failed to insert test certificate.', { status: 500, code: 'ISSUE_FAILED' })
   }
 
   return inserted

@@ -4,7 +4,7 @@ import React from 'react'
 import { Users, Activity, Flame, Shield } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminSection } from './AdminSection'
-import { AdminLearnerActivityChart } from './AdminLearnerActivityChart'
+import { AdminLearnerActivityChartLazy as AdminLearnerActivityChart } from './charts-lazy'
 import type { AdminLearnerDemographics, AdminStreakBucket, AdminLevelDistribution } from '@/lib/admin/types'
 
 interface AnalyticsLearnersTabProps {
@@ -21,7 +21,7 @@ function StreakBars({ buckets }: { buckets: AdminStreakBucket[] }) {
           <span className="w-24 shrink-0 text-[11px] font-semibold text-admin-fg-muted">{b.bucket}</span>
           <div className="flex-1 h-2.5 rounded-full bg-admin-surface-raised border border-admin-border overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-admin-accent to-admin-info transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-admin-accent to-admin-info transition-[width] duration-500 motion-reduce:transition-none"
               style={{ width: `${(b.count / max) * 100}%` }}
             />
           </div>
@@ -49,7 +49,7 @@ function LevelBars({ levels }: { levels: AdminLevelDistribution[] }) {
           </div>
           <div className="h-2 rounded-full bg-admin-surface-raised border border-admin-border overflow-hidden">
             <div
-              className="h-full rounded-full bg-admin-accent transition-all"
+              className="h-full rounded-full bg-admin-accent transition-[width] duration-500 motion-reduce:transition-none"
               style={{ width: `${lvl.percentage}%` }}
             />
           </div>

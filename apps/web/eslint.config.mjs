@@ -119,7 +119,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "admin/admin-toast.tsx",
   "auth/ResendVerificationCard.tsx",
   "badges/BadgeNotification.tsx",
-  "capstones/CapstoneCard.tsx",
   "capstones/RichEditor.tsx",
   "capstones/SubmitConfirmationModal.tsx",
   "feedback/ContextualFeedbackModal.tsx",
@@ -147,7 +146,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "notifications/NotificationToast.tsx",
   "portfolio/FeaturedCapstoneCard.tsx",
   "portfolio/PortfolioCapstones.tsx",
-  "portfolio/ShareButton.tsx",
   "progress/ProgressSectionDropdown.tsx",
   "quick-start/QuickStartModal.tsx",
   "quiz/QuizOption.tsx",
@@ -180,6 +178,9 @@ const eslintConfig = [
     ],
   },
   {
+    // `route.ts` only, as is the rule itself. A `route.tsx` handler is invisible to it; the
+    // only ones allowed are the OG image routes, pinned by name in
+    // lib/__tests__/b7h-wrapper-enforcement.test.ts.
     files: ["app/api/**/route.ts"],
     plugins: { prodily },
     rules: {

@@ -271,7 +271,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
             type="button"
             disabled={isSaving}
             onClick={handleSaveDraft}
-            className="px-3 py-2 rounded-lg border border-admin-accent/30 bg-admin-surface hover:bg-admin-surface-raised text-admin-fg text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-3 py-2 rounded-lg border border-admin-accent/30 bg-admin-surface hover:bg-admin-surface-raised text-admin-fg text-xs font-semibold transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Save className="w-3.5 h-3.5 text-admin-fg-muted" /> {isSaving ? 'Saving…' : 'Save Draft'}
           </button>
@@ -279,7 +279,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
             type="button"
             disabled={isPublishing}
             onClick={handlePublish}
-            className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50"
+            className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50"
           >
             <Save className="w-3.5 h-3.5" /> {isPublishing ? 'Publishing…' : 'Publish Version'}
           </button>

@@ -1,4 +1,9 @@
 import { revalidatePath } from 'next/cache'
+import nextPackage from 'next/package.json'
+import { ADMIN_CACHE_TAGS } from './cache-tags'
+import { cacheWithMaxAge } from './bounded-cache'
+import { revalidateCapstoneOgCards, revalidatePortfolioOgCard } from '@/lib/og/revalidate-capstone-cards'
+import { buildIlikeOrFilter } from './search-filter'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -23,6 +28,8 @@ import type {
   AdminEmailQueueOverview,
 } from './types'
 import type { CurriculumEntry } from '@/types'
+import type { FellowGrantedPayload } from '@/lib/notifications/events/types'
+import { BRAND } from '@/lib/brand'
 
 /** Live counts surfaced to the console shell (sidebar badges + header status). */
 export interface AdminConsoleShellContext {
@@ -44,6 +51,14 @@ export interface AdminConsoleShellContext {
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown; count?: number | null }>
 }
+
+/**
+ * The `fellow.granted` event id for one grant: `fellow-granted-<userId>-<grant epoch ms>`. One per
+ * grant, so a re-grant after a revoke is a new event; the in-app row, the email and the
+ * celebration are all keyed by it.
+ */
+export const fellowGrantedEventId = (userId: string, grantedAt: string): string =>
+  `fellow-granted-${userId}-${Date.parse(grantedAt)}`
 
 export class AdminConsoleService {
   /**
@@ -83,7 +98,7 @@ export class AdminConsoleService {
         failedNotifications24h: failedCount24h,
         lastCheckedAt: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        nextVersion: `Next.js ${nextPackage.version} (Turbopack)`,
       }
     } catch (err) {
       console.warn('[AdminConsoleService] getSystemHealth failed:', err)
@@ -95,33 +110,62 @@ export class AdminConsoleService {
         failedNotifications24h: 0,
         lastCheckedAt: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        nextVersion: `Next.js ${nextPackage.version} (Turbopack)`,
       }
     }
   }
 
   /**
    * Fetches the live counts the console shell needs for the sidebar attention
-   * badges and the header system-status chip. Runs once per layout render.
+   * badges and the header system-status chip. Runs on every console layout render, so
+   * the six head counts are cached for 30s under the `admin-shell` tag; the mutation
+   * routes that change one of these counts expire the tag (`revalidateAdminShell`).
+   *
+   * There is no separate reachability probe: `systemOnline` is "the count batch
+   * succeeded" and `databaseLatencyMs` is how long that batch took, both measured inside
+   * the cached function (so they are as fresh as the counts). A failed batch throws out
+   * of the cached function, which keeps the failure out of the cache; the counts that
+   * did come back are still shown. `cacheWithMaxAge` makes that hold for a stale entry
+   * too: the read waits for the recompute, so an outage reports offline instead of
+   * replaying the last healthy counts, and nothing older than the 30s window is served.
    */
   public static async getConsoleShellContext(): Promise<AdminConsoleShellContext> {
-    try {
+    const emptyAttention: AdminConsoleShellContext['attention'] = {
+      contactMessages: 0,
+      pendingTestimonials: 0,
+      systemErrors: 0,
+      failedEmails: 0,
+      pendingCapstones: 0,
+      newFeedback: 0,
+    }
+    const sum = (a: AdminConsoleShellContext['attention']) =>
+      a.contactMessages + a.pendingTestimonials + a.systemErrors + a.failedEmails + a.pendingCapstones + a.newFeedback
+
+    class ShellCountBatchError extends Error {
+      constructor(readonly attention: AdminConsoleShellContext['attention']) {
+        super('One or more console shell counts failed')
+      }
+    }
+
+    // Must not read cookies or headers: unstable_cache forbids request-scoped APIs, so
+    // this uses the service-role client and nothing user-specific.
+    const loadCounts = async (): Promise<AdminConsoleShellContext> => {
       const supabase = createServiceRoleClient()
+      const head = { count: 'exact', head: true } as const
 
       const startTime = Date.now()
-      const { error } = await supabase.from('users').select('id').limit(1)
+      const results = await Promise.all([
+        supabase.from('contact_messages').select('id', head).eq('status', 'new'),
+        supabase.from('testimonials').select('id', head).eq('status', 'pending'),
+        supabase.from('system_errors').select('id', head).eq('status', 'new'),
+        supabase.from('email_queue').select('id', head).eq('status', 'failed'),
+        supabase.from('capstone_submissions').select('id', head).eq('status', 'submitted'),
+        supabase.from('user_feedback').select('id', head).eq('status', 'new'),
+      ])
       const latency = Date.now() - startTime
 
       const [contactMessages, pendingTestimonials, systemErrors, failedEmails, pendingCapstones, newFeedback] =
-        await Promise.all([
-          supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-          supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-          supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-          supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
-          supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('status', 'submitted'),
-          supabase.from('user_feedback').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-        ])
-
+        results
       const attention = {
         contactMessages: contactMessages.count || 0,
         pendingTestimonials: pendingTestimonials.count || 0,
@@ -130,32 +174,23 @@ export class AdminConsoleService {
         pendingCapstones: pendingCapstones.count || 0,
         newFeedback: newFeedback.count || 0,
       }
-      const attentionTotal =
-        attention.contactMessages +
-        attention.pendingTestimonials +
-        attention.systemErrors +
-        attention.failedEmails +
-        attention.pendingCapstones +
-        attention.newFeedback
 
-      return {
-        attention,
-        attentionTotal,
-        systemOnline: !error,
-        databaseLatencyMs: error ? null : latency,
-      }
+      if (results.some((r) => r.error)) throw new ShellCountBatchError(attention)
+
+      return { attention, attentionTotal: sum(attention), systemOnline: true, databaseLatencyMs: latency }
+    }
+
+    try {
+      return await cacheWithMaxAge(loadCounts, ['admin-console-shell-context'], {
+        revalidate: 30,
+        tags: [ADMIN_CACHE_TAGS.shell],
+      })()
     } catch (err) {
+      const attention = err instanceof ShellCountBatchError ? err.attention : emptyAttention
       console.warn('[AdminConsoleService] getConsoleShellContext failed:', err)
       return {
-        attention: {
-          contactMessages: 0,
-          pendingTestimonials: 0,
-          systemErrors: 0,
-          failedEmails: 0,
-          pendingCapstones: 0,
-          newFeedback: 0,
-        },
-        attentionTotal: 0,
+        attention,
+        attentionTotal: sum(attention),
         systemOnline: false,
         databaseLatencyMs: null,
       }
@@ -199,8 +234,8 @@ export class AdminConsoleService {
 
       // Search (applied alongside ID constraint)
       if (search && typeof search === 'string' && search.trim()) {
-        const q = search.trim()
-        query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,username.ilike.%${q}%`)
+        // Quoted and escaped: the term must not be able to add a condition of its own.
+        query = query.or(buildIlikeOrFilter(['name', 'email', 'username'], search))
       }
 
       // Direct column filters (fast — applied on DB, not via sub-query)
@@ -372,7 +407,7 @@ export class AdminConsoleService {
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('xp_events').select('user_id').gte('created_at', activeSince).limit(5000),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', signupsSince),
-        supabase.from('user_lesson_progress').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+        supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
       ])
 
       const totalUsers = totalRes.count || 0
@@ -518,7 +553,8 @@ export class AdminConsoleService {
         .limit(50),
       supabase
         .from('user_flashcard_srs')
-        .select('id', { count: 'exact', head: true })
+        // No `id` column here (the key is user_id + flashcard_id).
+        .select('user_id', { count: 'exact', head: true })
         .eq('user_id', userId),
       supabase
         .from('email_queue')
@@ -941,20 +977,34 @@ export class AdminConsoleService {
    *
    * Note: the `users` table has no `updated_at` column, so the update payload
    * only touches `is_fellow`.
+   *
+   * A real false → true transition dispatches `fellow.granted` (in-app + email). Every grant
+   * path — the fellow-status route, the user action route and Fellow request approval — runs
+   * through here, so this is the single place that announces a grant. The transition is
+   * detected atomically by the grant's conditional update (`WHERE is_fellow = false`), not by
+   * the earlier read, so concurrent or retried grants announce it exactly once.
    */
   public static async toggleUserFellowStatus(targetUserId: string, isFellow: boolean): Promise<boolean> {
     const supabase = createServiceRoleClient()
 
     // Enforce public portfolio invariant: only public portfolios can be verified
+    type FellowUserRow = {
+      id: string
+      username: string | null
+      is_portfolio_public: boolean
+      is_fellow?: boolean | null
+      email?: string | null
+      name?: string | null
+    }
     type UserQueryChain = {
       select: (cols: string) => {
         eq: (col: string, val: string) => {
-          maybeSingle: () => Promise<{ data: { id: string; username: string | null; is_portfolio_public: boolean } | null; error: unknown }>
+          maybeSingle: () => Promise<{ data: FellowUserRow | null; error: unknown }>
         }
       }
     }
     const { data: userRow } = await (supabase.from('users') as unknown as UserQueryChain)
-      .select('id, username, is_portfolio_public')
+      .select('id, username, is_portfolio_public, is_fellow, email, name')
       .eq('id', targetUserId)
       .maybeSingle()
 
@@ -966,26 +1016,111 @@ export class AdminConsoleService {
       throw new Error('Cannot verify a private portfolio. The user portfolio must be public.')
     }
 
-    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
-    const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
-      .update({ is_fellow: isFellow })
-      .eq('id', targetUserId)
+    // `userRow.is_fellow` above is only a snapshot: two concurrent grants (a double click, a
+    // retry) can both read `false`. So the transition itself is decided by the database — a
+    // grant only updates a row that is still `is_fellow = false` (the column is NOT NULL) and
+    // returns it, which makes exactly one caller the one that performed the false → true flip.
+    let grantedNow = false
+    if (isFellow) {
+      type DBGrantChain = {
+        update: (data: Record<string, unknown>) => {
+          eq: (col: string, val: string) => {
+            eq: (col: string, val: boolean) => {
+              select: (cols: string) => Promise<{ data: Array<{ id: string }> | null; error: unknown }>
+            }
+          }
+        }
+      }
+      const { data: grantedRows, error } = await (supabase.from('users') as unknown as DBGrantChain)
+        .update({ is_fellow: true })
+        .eq('id', targetUserId)
+        .eq('is_fellow', false)
+        .select('id')
 
-    if (error) {
-      return false
+      if (error) {
+        return false
+      }
+
+      // Zero rows is not a failure: the user is already a Fellow (or a concurrent grant won),
+      // so the requested end state holds and the action stays an idempotent success.
+      grantedNow = Array.isArray(grantedRows) && grantedRows.length > 0
+    } else {
+      type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
+      const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
+        .update({ is_fellow: false })
+        .eq('id', targetUserId)
+
+      if (error) {
+        return false
+      }
     }
 
     // Proactively revalidate public portfolio and OG social preview cards
     if (userRow.username) {
       try {
         revalidatePath(`/p/${userRow.username}`)
-        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidatePortfolioOgCard(userRow.username)
+        revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments
       }
     }
 
+    if (grantedNow) {
+      await this.dispatchFellowGrantedNotification(userRow)
+    }
+
     return true
+  }
+
+  /**
+   * Dispatches `fellow.granted` to the newly granted learner. Failures are swallowed: a
+   * notification problem must never fail the admin action.
+   *
+   * Only called by the caller whose conditional update performed the false → true flip, so
+   * racing grants dispatch once. Each grant has its own event id (user + grant time), so a
+   * re-grant after a revoke is announced again (in-app, email and celebration) while a retried
+   * dispatch of the same grant stays deduplicated downstream (Growth R5 P1).
+   */
+  private static async dispatchFellowGrantedNotification(user: {
+    id: string
+    username: string | null
+    is_portfolio_public: boolean
+    email?: string | null
+    name?: string | null
+  }): Promise<void> {
+    try {
+      const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
+      const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
+      initializeNotificationConnectors()
+
+      const origin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
+      const grantedAt = new Date().toISOString()
+      const payload: FellowGrantedPayload = {
+        username: user.username,
+        isPortfolioPublic: Boolean(user.is_portfolio_public),
+        portfolioUrl: user.username ? `${origin}/p/${encodeURIComponent(user.username)}` : null,
+        grantedAt,
+      }
+
+      const result = await globalNotificationDispatcher.dispatch({
+        id: fellowGrantedEventId(user.id, grantedAt),
+        event: 'fellow.granted',
+        userId: user.id,
+        userEmail: user.email || '',
+        userName: user.name || user.username || 'Learner',
+        userTimezone: 'UTC',
+        priority: 'high',
+        category: 'achievements',
+        occurredAt: grantedAt,
+        payload,
+      })
+      if (!result?.dispatched || (result.errors?.length ?? 0) > 0) {
+        console.error('[AdminConsoleService] fellow.granted dispatch incomplete:', result?.errors)
+      }
+    } catch (err) {
+      console.error('[AdminConsoleService] fellow.granted dispatch failed:', err)
+    }
   }
 
   /**
@@ -1029,7 +1164,8 @@ export class AdminConsoleService {
     if (userRow.username) {
       try {
         revalidatePath(`/p/${userRow.username}`)
-        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidatePortfolioOgCard(userRow.username)
+        revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments
       }

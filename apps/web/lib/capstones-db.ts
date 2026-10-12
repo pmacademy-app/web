@@ -8,7 +8,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { getAllCapstoneDefinitions, getCapstoneDefinition } from '@/config/capstones'
+import { getAllCapstoneDefinitions, getCapstoneDefinition, getCurriculumModuleForCapstone } from '@/config/capstones'
 import {
   deriveCapstoneStatus,
   validateCapstoneSubmission,
@@ -134,7 +134,7 @@ export async function getModuleCapstonesOverview(
   return definitions.map((def) => {
     const sub = submissionMap.get(def.moduleSlug) ?? null
     
-    const moduleLessonIds = getLessonIdsForModule(def.moduleSlug)
+    const moduleLessonIds = getLessonIdsForModule(getCurriculumModuleForCapstone(def.moduleSlug))
     const totalLessons = moduleLessonIds.length > 0 ? moduleLessonIds.length : 10
     const lessonsCompleted = moduleLessonIds.length > 0
       ? moduleLessonIds.filter((id) => completedLessonIds.has(id)).length
@@ -208,7 +208,7 @@ export async function loadCapstoneSubmission(
   const reflection = reflections && reflections.length > 0 ? reflections[0] : null
 
   // Authoritatively derive capstone status based on module lesson completion
-  const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+  const moduleLessonIds = getLessonIdsForModule(getCurriculumModuleForCapstone(moduleSlug))
   const totalLessons = moduleLessonIds.length > 0 ? moduleLessonIds.length : 10
   let lessonsCompleted = 0
   if (moduleLessonIds.length > 0) {
@@ -258,7 +258,7 @@ export async function saveDraftAction(
   // Phase 7 threshold resolved server-side (control 8-of-10 by default; lower under treatment) —
   // never a client-supplied value, so visibility can never grant submission access.
   if (!existing) {
-    const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+    const moduleLessonIds = getLessonIdsForModule(getCurriculumModuleForCapstone(moduleSlug))
     let lessonsCompleted = 0
     if (moduleLessonIds.length > 0) {
       const { data: progressRows } = await supabase
@@ -365,7 +365,7 @@ export async function submitCapstoneAction(
   // gate as the draft path — the eligibility threshold is authoritative here and cannot be
   // bypassed by a direct API request from an ineligible learner.
   if (!existing) {
-    const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+    const moduleLessonIds = getLessonIdsForModule(getCurriculumModuleForCapstone(moduleSlug))
     let lessonsCompleted = 0
     if (moduleLessonIds.length > 0) {
       const { data: progressRows } = await supabase

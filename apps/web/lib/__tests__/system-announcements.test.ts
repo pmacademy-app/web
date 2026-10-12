@@ -164,18 +164,32 @@ vi.mock('../supabase', () => {
 
       return {
         from: (table: string) => createBuilder(table),
-        rpc: vi.fn().mockResolvedValue({
-          data: {
-            totalUsers: 10,
-            activeLearners7d: 5,
-            newSignups24h: 2,
-            totalLessonsCompleted: 40,
-            totalCapstonesSubmitted: 3,
-            totalCertificatesIssued: 1,
-            totalPublicPortfolios: 2,
-            totalXpAwarded: 2500,
-          },
-          error: null,
+        // Function-aware: the funnel and active-user RPCs are paged builders, the rest is the summary.
+        rpc: vi.fn((fn: string) => {
+          const result =
+            fn === 'admin_funnel_distinct_users'
+              ? { data: { first_lesson: 1, first_quiz: 1, module_completion: 0 }, error: null }
+              : fn === 'admin_active_users'
+                ? { data: [{ user_id: 'u-1', active_before: false }], error: null }
+                : {
+                  data: {
+                    totalUsers: 10,
+                    activeLearners7d: 5,
+                    newSignups24h: 2,
+                    totalLessonsCompleted: 40,
+                    totalCapstonesSubmitted: 3,
+                    totalCertificatesIssued: 1,
+                    totalPublicPortfolios: 2,
+                    totalXpAwarded: 2500,
+                  },
+                  error: null,
+                }
+          const builder: any = {
+            order: () => builder,
+            range: () => builder,
+            then: (resolve: any, reject: any) => Promise.resolve(result).then(resolve, reject),
+          }
+          return builder
         }),
         auth: {
           admin: {

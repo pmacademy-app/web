@@ -164,6 +164,30 @@ describe('Phase 1 Admin Panel — lifecycle metrics data sources', () => {
     }
   })
 
+  it('flags nudgesFailed only when the nudge readout falls back to zeros', async () => {
+    const chainResolving = (result: unknown) => {
+      const chain: Record<string, unknown> = {}
+      for (const m of ['select', 'eq', 'in', 'order', 'range']) chain[m] = () => chain
+      chain.then = (resolve: (v: unknown) => unknown) => resolve(result)
+      return chain
+    }
+
+    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue({
+      from: () => chainResolving({ data: [], count: 0, error: null }),
+    } as never)
+    const healthy = await CommunicationsService.getLifecycleMetrics()
+    expect(healthy.nudgesFailed).toBe(false)
+
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue({
+      from: () => chainResolving({ data: null, count: null, error: { message: 'notification_events unavailable' } }),
+    } as never)
+    const degraded = await CommunicationsService.getLifecycleMetrics()
+    expect(degraded.nudgesFailed).toBe(true)
+    expect(degraded.retireReady).toBe(false)
+    expect(degraded.nudges.every((n) => n.sent === 0 && n.heldOut === 0)).toBe(true)
+  })
+
   it('holdout information reflects the actual code constant (30%)', () => {
     expect(DEFAULT_LIFECYCLE_HOLDOUT_PERCENT).toBe(30)
   })

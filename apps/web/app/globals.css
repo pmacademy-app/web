@@ -636,3 +636,15 @@ body {
     transform: scaleX(1);
   }
 }
+
+/* Admin console: no motion at all when the user asks for reduced motion.
+   Covers skeleton pulses, spinners, the alert counter and every transition. */
+@media (prefers-reduced-motion: reduce) {
+  .admin-console,
+  .admin-console *,
+  .admin-console *::before,
+  .admin-console *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

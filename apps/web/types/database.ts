@@ -776,6 +776,7 @@ export type Database = {
           action_url: string | null
           body: string
           category: string
+          celebrated_at: string | null
           created_at: string
           event_id: string | null
           expires_at: string
@@ -784,6 +785,7 @@ export type Database = {
           is_read: boolean
           priority: number
           read_at: string | null
+          secondary_action: Json | null
           title: string
           user_id: string
         }
@@ -791,6 +793,7 @@ export type Database = {
           action_url?: string | null
           body: string
           category: string
+          celebrated_at?: string | null
           created_at?: string
           event_id?: string | null
           expires_at?: string
@@ -799,6 +802,7 @@ export type Database = {
           is_read?: boolean
           priority?: number
           read_at?: string | null
+          secondary_action?: Json | null
           title: string
           user_id: string
         }
@@ -806,6 +810,7 @@ export type Database = {
           action_url?: string | null
           body?: string
           category?: string
+          celebrated_at?: string | null
           created_at?: string
           event_id?: string | null
           expires_at?: string
@@ -814,6 +819,7 @@ export type Database = {
           is_read?: boolean
           priority?: number
           read_at?: string | null
+          secondary_action?: Json | null
           title?: string
           user_id?: string
         }

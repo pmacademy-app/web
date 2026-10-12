@@ -1,4 +1,5 @@
 import React from 'react'
+import { AlertTriangle, Clock, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export type AdminStatusVariant =
@@ -30,6 +31,9 @@ export function AdminStatusBadge({ status, label, dot = true, className, ...prop
 
   let badgeStyle = 'bg-admin-surface-raised text-admin-fg-muted border-admin-border'
   let dotStyle = 'bg-admin-neutral'
+  // Warning-family states show a static icon instead of a pulsing dot, so the
+  // state reads at a glance without idle motion.
+  let DotIcon: LucideIcon | null = null
   let displayLabel = label || status
 
   switch (normalizedStatus) {
@@ -45,7 +49,8 @@ export function AdminStatusBadge({ status, label, dot = true, className, ...prop
     case 'pending':
     case 'processing':
       badgeStyle = 'bg-admin-warning-soft text-admin-warning border-admin-warning/25'
-      dotStyle = 'bg-admin-warning animate-pulse'
+      dotStyle = 'bg-admin-warning'
+      DotIcon = normalizedStatus === 'warning' ? AlertTriangle : Clock
       displayLabel = label || (normalizedStatus === 'pending' ? 'Pending' : 'Warning')
       break
     case 'danger':
@@ -86,13 +91,17 @@ export function AdminStatusBadge({ status, label, dot = true, className, ...prop
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border tracking-tight transition-all',
+        'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border tracking-tight transition-colors',
         badgeStyle,
         className
       )}
       {...props}
     >
-      {dot && <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', dotStyle)} />}
+      {dot && DotIcon ? (
+        <DotIcon className="w-3 h-3 shrink-0" aria-hidden="true" />
+      ) : dot ? (
+        <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', dotStyle)} aria-hidden="true" />
+      ) : null}
       <span className="capitalize">{displayLabel}</span>
     </span>
   )

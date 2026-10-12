@@ -23,10 +23,104 @@ export const XP_VALUES: XpValuesConfig = {
 let cachedSettings: XpValuesConfig | null = null
 let cacheTimestamp = 0
 const CACHE_TTL_MS = 30_000
+/** After a failed settings read the cached values are served this long before the next attempt. */
+const ERROR_RETRY_MS = 5_000
+
+/** The admin learning-settings key, written by Settings → Learning (lib/admin/settings-service.ts). */
+export const LEARNING_SETTINGS_KEY = 'learning_settings'
+/** The key this reader used before the admin and runtime keys were reconciled. Still honoured. */
+export const LEGACY_LEARNING_SETTINGS_KEY = 'learning'
+/**
+ * Admin XP settings apply only once saved by the reconciled admin form, which marks the record with
+ * this version. An older record (saved while admin defaults did not match the live values, and
+ * never actually applied) is ignored, so deploying the fix changes no learner's XP by itself.
+ */
+export const XP_SETTINGS_VERSION = 2
+
+/** Maps a stored settings object onto XP values, field by field, falling back to the defaults. */
+export function resolveXpValues(v: Record<string, unknown>): XpValuesConfig {
+  return {
+    THEORY_READ: typeof v.xpPerLessonComplete === 'number' && v.xpPerLessonComplete > 0
+      ? v.xpPerLessonComplete
+      : XP_VALUES.THEORY_READ,
+    QUIZ_CORRECT: typeof v.xpPerQuizPass === 'number' && v.xpPerQuizPass > 0
+      ? v.xpPerQuizPass
+      : typeof v.xpPerQuizCorrect === 'number' && v.xpPerQuizCorrect > 0
+      ? v.xpPerQuizCorrect
+      : XP_VALUES.QUIZ_CORRECT,
+    QUIZ_PERFECT_BONUS: typeof v.xpQuizPerfectBonus === 'number' && v.xpQuizPerfectBonus >= 0
+      ? v.xpQuizPerfectBonus
+      : XP_VALUES.QUIZ_PERFECT_BONUS,
+    FLASHCARD_REVIEW: typeof v.xpPerFlashcardReview === 'number' && v.xpPerFlashcardReview > 0
+      ? v.xpPerFlashcardReview
+      : XP_VALUES.FLASHCARD_REVIEW,
+    REFLECTION_SUBMITTED: typeof v.xpPerReflection === 'number' && v.xpPerReflection > 0
+      ? v.xpPerReflection
+      : XP_VALUES.REFLECTION_SUBMITTED,
+    CAPSTONE_SUBMITTED: typeof v.xpPerCapstoneSubmitted === 'number' && v.xpPerCapstoneSubmitted > 0
+      ? v.xpPerCapstoneSubmitted
+      : XP_VALUES.CAPSTONE_SUBMITTED,
+    DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' && v.xpStreakBaseReward > 0
+      ? v.xpStreakBaseReward
+      : XP_VALUES.DAILY_STREAK_BASE,
+    REFERRAL_ACTIVATION: typeof v.xpReferralReward === 'number' && v.xpReferralReward > 0
+      ? v.xpReferralReward
+      : XP_VALUES.REFERRAL_ACTIVATION,
+  }
+}
+
+/** Drops the 30s cache, e.g. right after an admin saves new XP settings on this instance. */
+export function invalidateRuntimeXpCache(): void {
+  cachedSettings = null
+  cacheTimestamp = 0
+}
+
+type SettingsClient = {
+  from: (table: string) => {
+    select: (col: string) => {
+      eq: (k: string, v: string) => {
+        maybeSingle: () => Promise<{ data: { value?: Record<string, unknown> } | null; error?: unknown }>
+      }
+    }
+  }
+}
+
+async function readSettingsValue(client: SettingsClient, key: string): Promise<Record<string, unknown> | null> {
+  const { data, error } = await client.from('system_settings').select('value').eq('key', key).maybeSingle()
+  if (error) throw error
+  return data?.value && typeof data.value === 'object' ? data.value : null
+}
+
+/** One uncached read in source order (see getRuntimeXpValues). Throws on a read error; null = no record. */
+async function readConfiguredXpValues(client: SettingsClient): Promise<XpValuesConfig | null> {
+  const admin = await readSettingsValue(client, LEARNING_SETTINGS_KEY)
+  const source =
+    admin && admin.xpSettingsVersion === XP_SETTINGS_VERSION
+      ? admin
+      : await readSettingsValue(client, LEGACY_LEARNING_SETTINGS_KEY)
+  return source ? resolveXpValues(source) : null
+}
 
 /**
- * Loads dynamic XP settings configured by admins in system_settings,
- * falling back safely to static XP_VALUES defaults with a 30s cache TTL.
+ * The XP values in effect, read now, for callers that must not mistake a fallback for the real
+ * thing (the admin settings form). Throws when the settings cannot be read, instead of returning
+ * the last good values or the static defaults as getRuntimeXpValues does. Never served from the
+ * cache (which may hold such a fallback) and a failure leaves the cache as it was.
+ */
+export async function readRuntimeXpValuesStrict(supabaseClient: unknown): Promise<XpValuesConfig> {
+  const resolved = (await readConfiguredXpValues(supabaseClient as SettingsClient)) ?? XP_VALUES
+  cachedSettings = resolved
+  cacheTimestamp = Date.now()
+  return resolved
+}
+
+/**
+ * Loads the XP values admins configured, with a 30s cache, falling back safely to XP_VALUES.
+ * A failed read keeps the last good values and is retried after a few seconds.
+ *
+ * Source order: the admin settings (`learning_settings`) once saved by the reconciled form
+ * (`xpSettingsVersion` 2), else the legacy `learning` record this reader always used, else the
+ * static defaults.
  */
 export async function getRuntimeXpValues(
   supabaseClient?: unknown,
@@ -40,57 +134,19 @@ export async function getRuntimeXpValues(
   if (!supabaseClient) return cachedSettings || XP_VALUES
 
   try {
-    const client = supabaseClient as {
-      from: (table: string) => {
-        select: (col: string) => {
-          eq: (k: string, v: string) => {
-            maybeSingle: () => Promise<{ data: { value?: Record<string, unknown> } | null; error?: unknown }>
-          }
-        }
-      }
-    }
-    const { data, error } = await client
-      .from('system_settings')
-      .select('value')
-      .eq('key', 'learning')
-      .maybeSingle()
-
-    if (!error && data?.value && typeof data.value === 'object') {
-      const v = data.value
-      const resolved: XpValuesConfig = {
-        THEORY_READ: typeof v.xpPerLessonComplete === 'number' && v.xpPerLessonComplete > 0
-          ? v.xpPerLessonComplete
-          : XP_VALUES.THEORY_READ,
-        QUIZ_CORRECT: typeof v.xpPerQuizPass === 'number' && v.xpPerQuizPass > 0
-          ? v.xpPerQuizPass
-          : typeof v.xpPerQuizCorrect === 'number' && v.xpPerQuizCorrect > 0
-          ? v.xpPerQuizCorrect
-          : XP_VALUES.QUIZ_CORRECT,
-        QUIZ_PERFECT_BONUS: typeof v.xpQuizPerfectBonus === 'number' && v.xpQuizPerfectBonus >= 0
-          ? v.xpQuizPerfectBonus
-          : XP_VALUES.QUIZ_PERFECT_BONUS,
-        FLASHCARD_REVIEW: typeof v.xpPerFlashcardReview === 'number' && v.xpPerFlashcardReview > 0
-          ? v.xpPerFlashcardReview
-          : XP_VALUES.FLASHCARD_REVIEW,
-        REFLECTION_SUBMITTED: typeof v.xpPerReflection === 'number' && v.xpPerReflection > 0
-          ? v.xpPerReflection
-          : XP_VALUES.REFLECTION_SUBMITTED,
-        CAPSTONE_SUBMITTED: typeof v.xpPerCapstoneSubmitted === 'number' && v.xpPerCapstoneSubmitted > 0
-          ? v.xpPerCapstoneSubmitted
-          : XP_VALUES.CAPSTONE_SUBMITTED,
-        DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' && v.xpStreakBaseReward > 0
-          ? v.xpStreakBaseReward
-          : XP_VALUES.DAILY_STREAK_BASE,
-        REFERRAL_ACTIVATION: typeof v.xpReferralReward === 'number' && v.xpReferralReward > 0
-          ? v.xpReferralReward
-          : XP_VALUES.REFERRAL_ACTIVATION,
-      }
+    const resolved = await readConfiguredXpValues(supabaseClient as SettingsClient)
+    if (resolved) {
       cachedSettings = resolved
       cacheTimestamp = now
       return resolved
     }
   } catch (err) {
-    console.warn('[getRuntimeXpValues] Fallback to static XP defaults:', err)
+    // A failed read is not a reason to change what learners earn: keep the last good values (the
+    // static defaults only if there never were any) and read again after a short backoff.
+    console.warn('[getRuntimeXpValues] Settings read failed; serving the last known XP values:', err)
+    cachedSettings = cachedSettings || XP_VALUES
+    cacheTimestamp = now - CACHE_TTL_MS + ERROR_RETRY_MS
+    return cachedSettings
   }
 
   cachedSettings = XP_VALUES

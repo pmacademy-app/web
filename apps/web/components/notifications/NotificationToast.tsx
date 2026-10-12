@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { subscribeClientNotificationEvent, type ClientNotificationEventDetail } from '@/lib/events/client-event-bus'
 import { Sparkles, Award, CheckCircle2, AlertCircle, X } from 'lucide-react'
 
@@ -42,9 +43,16 @@ export function NotificationToast() {
     ? 'bg-emerald-500/10 text-emerald-500'
     : 'bg-primary/10 text-primary'
 
-  return (
+  // The toast only exists after a client event, so there is no server render to match.
+  if (typeof document === 'undefined') return null
+
+  // Rendered into <body>: the Topbar that owns this component has a backdrop-filter, which
+  // would otherwise become the containing block (and stacking context) for `position: fixed`.
+  // The bottom offset clears the mobile tab bar, which is hidden from `lg`.
+  return createPortal(
     <div
-      className={`fixed bottom-6 right-6 z-50 max-w-sm w-full bg-card border rounded-2xl shadow-2xl p-4 flex items-start gap-3 animate-in slide-in-from-bottom duration-300 motion-reduce:animate-none ${borderClass}`}
+      data-testid="notification-toast"
+      className={`fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-6 sm:w-full sm:max-w-sm lg:bottom-6 z-50 bg-card border rounded-2xl shadow-2xl p-4 flex items-start gap-3 animate-in slide-in-from-bottom duration-300 motion-reduce:animate-none ${borderClass}`}
       role={isError ? 'alert' : 'status'}
       aria-live={isError ? 'assertive' : 'polite'}
     >
@@ -80,6 +88,7 @@ export function NotificationToast() {
       >
         <X className="w-3.5 h-3.5" />
       </button>
-    </div>
+    </div>,
+    document.body,
   )
 }

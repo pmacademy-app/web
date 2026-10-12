@@ -83,3 +83,30 @@ export interface AdminUsersQueryResponse {
   total?: number
   error?: string
 }
+
+/** POST /api/admin/automations/lifecycle-preview: what a lifecycle run would do, with nothing written. */
+export interface AdminLifecyclePreviewResponse {
+  success: boolean
+  dryRun: true
+  force: boolean
+  paused: boolean
+  lifecycleQueued: number
+  queuedBySequence: Record<string, number>
+  heldOut: number
+  skippedTimezone: number
+  skippedNoSegment: number
+  /** Pages of learners skipped entirely (lifecycle emails and nudges) by a failed progress or preferences read. */
+  pagesSkipped: number
+  nudges: Record<string, number>
+  nudgesHeldOut: number
+  /** Pages whose nudges were not evaluated: every page in `pagesSkipped`, plus nudge-only failures. */
+  nudgePagesSkipped: number
+  error?: string
+}
+
+/** POST /api/admin/cache/revalidate: the admin cache tag that was expired. */
+export interface AdminCacheRevalidateResponse {
+  success: boolean
+  tag: string
+  error?: string
+}

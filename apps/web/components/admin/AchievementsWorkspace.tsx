@@ -94,7 +94,7 @@ export function AchievementsWorkspace({ kpis, loadFailed }: AchievementsWorkspac
             <Link
               key={tile.href}
               href={tile.href}
-              className="group flex items-start gap-4 rounded-xl bg-admin-surface border border-admin-border p-5 shadow-xl transition-all hover:border-admin-border-strong hover:shadow-2xl"
+              className="group flex items-start gap-4 rounded-xl bg-admin-surface border border-admin-border p-5 shadow-xl transition-[border-color,box-shadow] hover:border-admin-border-strong hover:shadow-2xl"
             >
               <div className="p-2.5 rounded-lg bg-admin-surface-raised border border-admin-border group-hover:scale-105 transition-transform">
                 <Icon className={`w-5 h-5 ${tile.iconColor}`} />
@@ -103,7 +103,7 @@ export function AchievementsWorkspace({ kpis, loadFailed }: AchievementsWorkspac
                 <h3 className="text-sm font-bold text-admin-fg">{tile.title}</h3>
                 <p className="text-xs text-admin-fg-muted leading-relaxed">{tile.description}</p>
               </div>
-              <ArrowRight className="w-4 h-4 text-admin-fg-subtle shrink-0 mt-1 group-hover:text-admin-accent group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight className="w-4 h-4 text-admin-fg-subtle shrink-0 mt-1 group-hover:text-admin-accent group-hover:translate-x-0.5 transition-[color,translate]" />
             </Link>
           )
         })}

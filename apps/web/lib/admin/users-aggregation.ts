@@ -5,6 +5,7 @@ import type {
   AdminUserModuleProgress,
 } from './types'
 import type { CurriculumEntry } from '@/types'
+import { CURRICULUM_LESSON_COUNT } from '@/lib/curriculum-registry'
 
 /**
  * Pure aggregation helpers for the Phase 3 Users Workspace.
@@ -17,7 +18,7 @@ import type { CurriculumEntry } from '@/types'
  */
 
 /** Total lessons in the curriculum (used as the course-progress denominator). */
-export const TOTAL_LESSONS = 90
+export const TOTAL_LESSONS = CURRICULUM_LESSON_COUNT
 
 /** Clamps a value to [0, 100] and rounds to one decimal place. */
 export function clampPct(value: number): number {

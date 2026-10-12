@@ -561,6 +561,46 @@ export function getCapstoneDefinition(moduleSlug: string): CapstoneDefinition | 
 }
 
 /**
+ * Curriculum module slugs (lib/curriculum-registry.ts) whose capstone is keyed differently in
+ * CAPSTONE_DEFINITIONS. The Growth module's capstone predates the rename and lives under `metrics`.
+ * This is the single source of truth for crossing between the two slug spaces.
+ */
+const CURRICULUM_TO_CAPSTONE_SLUG: Record<string, string> = {
+  growth: 'metrics',
+}
+
+/**
+ * Maps a curriculum module slug to its capstone slug (the `/capstones/[module]` route key).
+ */
+export function getCapstoneSlugForModule(moduleSlug: string): string {
+  return CURRICULUM_TO_CAPSTONE_SLUG[moduleSlug] ?? moduleSlug
+}
+
+/**
+ * Maps a capstone slug back to the curriculum module whose lessons gate it.
+ */
+export function getCurriculumModuleForCapstone(capstoneSlug: string): string {
+  for (const [moduleSlug, slug] of Object.entries(CURRICULUM_TO_CAPSTONE_SLUG)) {
+    if (slug === capstoneSlug) return moduleSlug
+  }
+  return capstoneSlug
+}
+
+/**
+ * Returns the capstone definition for a curriculum module slug, or null if it has none.
+ */
+export function getCapstoneForModule(moduleSlug: string): CapstoneDefinition | null {
+  return getCapstoneDefinition(getCapstoneSlugForModule(moduleSlug))
+}
+
+/**
+ * Returns the capstone workspace path for a curriculum module slug.
+ */
+export function getCapstoneHref(moduleSlug: string): string {
+  return `/capstones/${getCapstoneSlugForModule(moduleSlug)}`
+}
+
+/**
  * Returns an ordered array of all capstone definitions (Modules 1 to 9).
  */
 export function getAllCapstoneDefinitions(): CapstoneDefinition[] {

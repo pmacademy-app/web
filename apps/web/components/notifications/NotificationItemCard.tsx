@@ -2,6 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import type { NotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
+import { trackNotificationActionClicked } from '@/lib/analytics'
 import {
   Clock,
   ExternalLink,
@@ -32,6 +35,8 @@ export interface NotificationItem {
   priority?: string
   isRead: boolean
   deepLink?: string
+  /** Optional second action (share, add to LinkedIn), already validated by the API. */
+  secondaryAction?: NotificationSecondaryAction | null
   icon?: string
   createdAt: string
 }
@@ -81,7 +86,7 @@ export function NotificationItemCard({
             {item.title}
           </h4>
 
-          <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground shrink-0 mt-0.5">
+          <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground shrink-0 mt-0.5">
             <Clock className="w-2.5 h-2.5" />
             {formattedTime}
           </span>
@@ -94,13 +99,13 @@ export function NotificationItemCard({
         <div className="flex items-center justify-between text-[10px] pt-1">
           <div className="flex items-center gap-1.5">
             <span
-              className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${categoryBadge.className}`}
+              className={`text-[11px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${categoryBadge.className}`}
             >
               {categoryBadge.label}
             </span>
 
             {isUrgent && (
-              <span className="text-[9px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
+              <span className="text-[11px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
                 Urgent
               </span>
             )}
@@ -126,7 +131,7 @@ export function NotificationItemCard({
             }}
             title="Mark as read"
             aria-label="Mark notification as read"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-md transition-opacity cursor-pointer"
+            className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100 p-2 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-md transition-opacity cursor-pointer"
           >
             <Check className="w-3 h-3" />
           </button>
@@ -146,22 +151,34 @@ export function NotificationItemCard({
       : 'bg-primary/5 border-primary/20 text-foreground shadow-xs hover:border-primary/40 hover:bg-primary/10'
   }`
 
-  if (item.deepLink) {
-    return (
+  const handleLinkClick = () => {
+    handleInteraction()
+    onNavigate?.()
+  }
+  const linkClassName = `block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardClassName}`
+
+  // The API sends an in-app path or a clean absolute https URL (an admin broadcast can carry
+  // one). An absolute URL leaves the app, so it is a plain anchor in a new tab, not a route.
+  const card = item.deepLink && isExternalHttpsUrl(item.deepLink) ? (
+      <a
+        href={item.deepLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleLinkClick}
+        className={linkClassName}
+      >
+        {cardInner}
+        <span className="sr-only"> (opens in a new tab)</span>
+      </a>
+  ) : item.deepLink ? (
       <Link
         href={item.deepLink}
-        onClick={() => {
-          handleInteraction()
-          onNavigate?.()
-        }}
-        className={`block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardClassName}`}
+        onClick={handleLinkClick}
+        className={linkClassName}
       >
         {cardInner}
       </Link>
-    )
-  }
-
-  return (
+  ) : (
     <div
       onClick={handleInteraction}
       className={`block w-full cursor-pointer ${cardClassName}`}
@@ -174,6 +191,89 @@ export function NotificationItemCard({
       }}
     >
       {cardInner}
+    </div>
+  )
+
+  // Rendered beside the card, never inside it: the card is itself a link, and interactive
+  // controls must not nest.
+  if (!item.secondaryAction) return card
+  return (
+    <div className="space-y-1.5">
+      {card}
+      <SecondaryActionRow
+        action={item.secondaryAction}
+        onUse={handleInteraction}
+        // An in-app link leaves the page, so a drawer must close like it does for the card link.
+        onNavigate={onNavigate}
+      />
+    </div>
+  )
+}
+
+/**
+ * ShareButton picks its icon from `navigator` during render, so it is client-only (as on the
+ * dashboard proof card) to avoid a hydration mismatch.
+ */
+const ShareButton = dynamic(
+  () => import('@/components/portfolio/ShareButton').then((mod) => mod.ShareButton),
+  { ssr: false, loading: () => <span aria-hidden="true" className="inline-block h-8 w-24 rounded-lg bg-muted/40" /> },
+)
+
+/** True for an absolute `https://` URL; in-app paths (and anything else) stay with `Link`. */
+function isExternalHttpsUrl(href: string): boolean {
+  return /^https:\/\//i.test(href)
+}
+
+const ACTION_LINK =
+  'inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary'
+
+function SecondaryActionRow({
+  action,
+  onUse,
+  onNavigate,
+}: {
+  action: NotificationSecondaryAction
+  onUse: () => void
+  onNavigate?: () => void
+}) {
+  const use = () => {
+    trackNotificationActionClicked(action.kind)
+    onUse()
+  }
+
+  return (
+    <div className="flex items-center justify-end gap-2 px-1" data-testid="notification-secondary-action">
+      {action.kind === 'share_portfolio' && (
+        <div className="inline-flex" onClickCapture={use}>
+          <ShareButton
+            username={action.username}
+            context={action.context}
+            badgeName={action.context === 'badge' ? action.badgeName : undefined}
+            capstone={
+              action.context === 'capstone' ? { moduleSlug: action.moduleSlug, title: action.capstoneTitle } : undefined
+            }
+          />
+        </div>
+      )}
+      {action.kind === 'link' && (
+        <Link
+          href={action.href}
+          onClick={() => {
+            use()
+            onNavigate?.()
+          }}
+          className={ACTION_LINK}
+        >
+          {action.label}
+        </Link>
+      )}
+      {action.kind === 'linkedin_add_to_profile' && (
+        <a href={action.url} target="_blank" rel="noopener noreferrer" onClick={use} className={ACTION_LINK}>
+          {action.label}
+          <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      )}
     </div>
   )
 }

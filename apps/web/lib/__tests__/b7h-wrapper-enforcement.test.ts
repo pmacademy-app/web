@@ -153,18 +153,29 @@ describe('B7-H — compliant code and non-route code pass', () => {
 
 // ─── The repository's own inventory ──────────────────────────────────────────
 
-function allRouteFiles(): string[] {
+function allRouteFiles(fileName = 'route.ts'): string[] {
   const hits: string[] = []
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
       const full = path.join(dir, entry)
       if (statSync(full).isDirectory()) walk(full)
-      else if (entry === 'route.ts') hits.push(path.relative(API_DIR, full).split(path.sep).join('/'))
+      else if (entry === fileName) hits.push(path.relative(API_DIR, full).split(path.sep).join('/'))
     }
   }
   walk(API_DIR)
   return hits.sort()
 }
+
+/**
+ * The only `route.tsx` handlers. The lint rule and the inventory below both look at
+ * `route.ts`, so a handler in a `.tsx` file is checked by neither. These two render OG
+ * images with JSX, which is the one reason for the extension; they are public, read-only
+ * and return an image, so there is no JSON envelope for `withRoute` to produce.
+ */
+const TSX_ROUTES = [
+  'og/portfolio/[username]/capstones/[moduleSlug]/route.tsx',
+  'og/portfolio/[username]/route.tsx',
+]
 
 describe('B7-H — the repository satisfies the rule it just adopted', () => {
   const files = allRouteFiles()
@@ -184,9 +195,22 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // 130 since Phase 6 added `user/curriculum-access/route.ts`: the public search index is
   // edge-cached, so per-learner lesson lock state is served by this authenticated route
   // (also on `withRoute`).
-  it('accounts for all 130 routes', () => {
-    expect(files).toHaveLength(130)
-    expect(migrated).toHaveLength(127)
+  // 131 since Growth R1 added `notifications/celebrations/route.ts`: the learner's one-time
+  // achievement celebration is claimed server-side with a compare-and-set (also on `withRoute`).
+  // 133 since Admin R6 added `admin/automations/lifecycle-preview/route.ts` (an admin dry run of
+  // the lifecycle job) and `admin/cache/revalidate/route.ts` (admin cache refresh), both on `withRoute`.
+  it('accounts for all 133 routes', () => {
+    expect(files).toHaveLength(133)
+    expect(migrated).toHaveLength(130)
+  })
+
+  it('allows a route.tsx handler only for the listed OG image routes', () => {
+    const tsxRoutes = allRouteFiles('route.tsx')
+
+    // A new `.tsx` route shows up here: move it to `route.ts` so the wrapper rule sees it,
+    // or, if it is another OG image, add it to the list above on purpose.
+    expect(tsxRoutes).toEqual(TSX_ROUTES)
+    for (const file of tsxRoutes) expect(file.startsWith('og/'), file).toBe(true)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {
@@ -196,7 +220,7 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     expect(inGroup('cron/')).toBe(7)
     expect(inGroup('auth/')).toBe(8)
     expect(inGroup('settings/')).toBe(11)
-    expect(inGroup('admin/')).toBe(61)
+    expect(inGroup('admin/')).toBe(63)
   })
 
   it('leaves no route resolving admin authorization by hand', () => {

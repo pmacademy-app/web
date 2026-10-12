@@ -13,17 +13,24 @@ import { UserRoleToggle } from './UserRoleToggle'
 import { UserFellowToggle } from './UserFellowToggle'
 import { UserPortfolioVerificationToggle } from './UserPortfolioVerificationToggle'
 import { DeveloperActionsSection } from './DeveloperActionsSection'
+import { UserProofPanel } from './UserProofPanel'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { USER_DETAIL_TABS, UserTabPanels, type UserDetailTabKey } from './UserTabPanels'
 import { useAdminToast } from './admin-toast'
 import { apiPost, apiDelete } from '@/lib/api/client'
 import type { AdminUserDetail } from '@/lib/admin/types'
+import type { AdminUserProofSummary } from '@/lib/admin/user-proof-service'
 
 interface UserDetailDrawerProps {
   /** Active user id from the URL (`?userId=`). Null when the drawer is closed. */
   userId: string | null
   /** Server-fetched detail payload. May lag behind `userId` during navigation. */
   user: AdminUserDetail | null
+  /**
+   * Server-loaded proof state (Admin R6 / C3), loaded separately from `user`. `null` means the
+   * load failed and the panel shows an inline note; `undefined` means it was not provided.
+   */
+  proof?: AdminUserProofSummary | null
   isOpen: boolean
   onClose: () => void
 }
@@ -51,7 +58,7 @@ function DrawerSkeleton() {
   )
 }
 
-export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDrawerProps) {
+export function UserDetailDrawer({ userId, user, proof, isOpen, onClose }: UserDetailDrawerProps) {
   const { toast } = useAdminToast()
   const router = useRouter()
   const [pendingAction, setPendingAction] = useState<ConfirmAction>(null)
@@ -232,6 +239,13 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
               initialIsFellow={Boolean(user!.isFellow)}
               userEmail={user!.email}
             />
+
+            {/* Proof state: portfolio, Fellow, next step, last nudge */}
+            {/* A proof for a different user is stale (mid-navigation): hide it rather than show it
+                or misreport it as a load failure. */}
+            {proof !== undefined && (proof === null || proof.userId === user!.id) && (
+              <UserProofPanel proof={proof} />
+            )}
 
             {/* Automatic Portfolio Verification Override Control */}
             <UserPortfolioVerificationToggle

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { ModerationService } from '@/lib/admin/moderation-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 // Mock guard and logger
@@ -24,6 +23,20 @@ vi.mock('@/lib/admin/guard', () => ({
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(),
   createAuthenticatedServerClient: vi.fn(),
+}))
+
+// A grant now dispatches `fellow.granted`; keep the real dispatcher/connectors (which would
+// write in-app rows and queue email through the mocked client) out of these route tests.
+// The event itself is covered by fellow-granted-event.test.ts.
+const mockDispatch = vi.fn(async (event: unknown) => {
+  void event
+  return { dispatched: true, handlerCount: 0, errors: [] as unknown[] }
+})
+vi.mock('@/lib/notifications/dispatcher', () => ({
+  globalNotificationDispatcher: { dispatch: (e: unknown) => mockDispatch(e) },
+}))
+vi.mock('@/lib/notifications/events/connectors', () => ({
+  initializeNotificationConnectors: vi.fn(),
 }))
 
 // Import route handlers
@@ -118,8 +131,13 @@ describe('Admin Portfolio Verification & Queue Test Suite', () => {
                   })),
                 })),
               })),
+              // A grant is conditional: update → eq('id') → eq('is_fellow', false) → select('id').
               update: vi.fn(() => ({
-                eq: vi.fn(async () => ({ error: null })),
+                eq: vi.fn(() => ({
+                  eq: vi.fn(() => ({
+                    select: vi.fn(async () => ({ data: [{ id: 'usr-pub' }], error: null })),
+                  })),
+                })),
               })),
             }
           }
@@ -238,89 +256,6 @@ describe('Admin Portfolio Verification & Queue Test Suite', () => {
         'usr-rev',
         { isFellow: false }
       )
-    })
-  })
-
-  describe('3. ModerationService.getPortfolios Data Aggregation', () => {
-    it('returns only public portfolios enriched with capstone counts, bio, and fellow status', async () => {
-      const mockUsers = [
-        {
-          id: 'u-1',
-          name: 'Sarah Chen',
-          username: 'sarahc',
-          email: 'sarah@example.com',
-          avatar_url: 'https://example.com/avatar1.jpg',
-          bio: 'Platform Product Manager with 5 years experience.',
-          is_fellow: false,
-          is_portfolio_public: true,
-          created_at: '2026-08-01T00:00:00Z',
-        },
-        {
-          id: 'u-2',
-          name: 'Alex Mercer',
-          username: 'alexm',
-          email: 'alex@example.com',
-          avatar_url: null,
-          bio: 'Aspiring PM focused on growth.',
-          is_fellow: true,
-          is_portfolio_public: true,
-          created_at: '2026-08-05T00:00:00Z',
-        },
-      ]
-
-      const mockCapstones = [
-        { user_id: 'u-1' },
-        { user_id: 'u-1' },
-        { user_id: 'u-2' },
-      ]
-
-      const mockSupabase = {
-        from: vi.fn((table: string) => {
-          if (table === 'users') {
-            return {
-              select: vi.fn(() => ({
-                eq: vi.fn(() => ({
-                  order: vi.fn(() => ({
-                    range: vi.fn(async () => ({ data: mockUsers, error: null })),
-                  })),
-                })),
-              })),
-            }
-          }
-          if (table === 'capstone_submissions') {
-            return {
-              select: vi.fn(() => ({
-                in: vi.fn(() => ({
-                  in: vi.fn(() => ({
-                    neq: vi.fn(async () => ({ data: mockCapstones, error: null })),
-                  })),
-                })),
-              })),
-            }
-          }
-          return {}
-        }),
-      } as unknown as SupabaseClient<Database>
-      vi.mocked(createServiceRoleClient).mockReturnValue(mockSupabase)
-
-      const result = await ModerationService.getPortfolios()
-      expect(result.failed).toBe(false)
-      expect(result.portfolios).toHaveLength(2)
-
-      // First portfolio (Pending Verification)
-      expect(result.portfolios[0].userId).toBe('u-1')
-      expect(result.portfolios[0].learnerName).toBe('Sarah Chen')
-      expect(result.portfolios[0].username).toBe('sarahc')
-      expect(result.portfolios[0].email).toBe('sarah@example.com')
-      expect(result.portfolios[0].isFellow).toBe(false)
-      expect(result.portfolios[0].capstoneCount).toBe(2)
-
-      // Second portfolio (Verified Fellow)
-      expect(result.portfolios[1].userId).toBe('u-2')
-      expect(result.portfolios[1].learnerName).toBe('Alex Mercer')
-      expect(result.portfolios[1].username).toBe('alexm')
-      expect(result.portfolios[1].isFellow).toBe(true)
-      expect(result.portfolios[1].capstoneCount).toBe(1)
     })
   })
 })

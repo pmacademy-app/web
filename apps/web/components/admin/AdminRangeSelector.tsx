@@ -66,7 +66,7 @@ export function AdminRangeSelector() {
             onClick={() => applyRange(preset.key)}
             aria-pressed={active === preset.key}
             className={cn(
-              'px-2.5 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50',
+              'px-2.5 py-1 min-h-9 sm:min-h-0 rounded-md text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50',
               active === preset.key
                 ? 'bg-admin-accent text-admin-accent-contrast'
                 : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised'
@@ -84,7 +84,7 @@ export function AdminRangeSelector() {
             value={customFrom}
             onChange={(e) => applyRange('custom', e.target.value, customTo)}
             aria-label="Custom range start"
-            className="bg-transparent text-xs text-admin-fg font-medium outline-none [color-scheme:dark] rounded focus-visible:ring-1 focus-visible:ring-admin-accent/50"
+            className="bg-transparent text-base sm:text-xs text-admin-fg font-medium outline-none [color-scheme:dark] rounded focus-visible:ring-1 focus-visible:ring-admin-accent/50"
           />
           <span className="text-admin-fg-muted text-xs">→</span>
           <input
@@ -92,7 +92,7 @@ export function AdminRangeSelector() {
             value={customTo}
             onChange={(e) => applyRange('custom', customFrom, e.target.value)}
             aria-label="Custom range end"
-            className="bg-transparent text-xs text-admin-fg font-medium outline-none [color-scheme:dark] rounded focus-visible:ring-1 focus-visible:ring-admin-accent/50"
+            className="bg-transparent text-base sm:text-xs text-admin-fg font-medium outline-none [color-scheme:dark] rounded focus-visible:ring-1 focus-visible:ring-admin-accent/50"
           />
         </div>
       )}

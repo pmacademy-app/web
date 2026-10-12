@@ -7,6 +7,9 @@
  * - All wrappers are null-safe: no-ops if GA is not loaded.
  */
 
+import type { PortfolioNavState } from '@/lib/portfolio'
+import type { AchievementCelebrationKind } from '@/lib/api/contracts/achievement-celebration'
+
 // Extend Window type so TypeScript knows about gtag
 declare global {
   interface Window {
@@ -19,7 +22,22 @@ declare global {
 
 type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'final_cta'
 
-type QuickStartMode = 'auto' | 'manual'
+/**
+ * `auto` = entrance auto-launch (gated off), `manual` = reopened by the learner,
+ * `post_first_lesson` = deferred open after the first completed lesson (Growth R1).
+ */
+export type QuickStartMode = 'auto' | 'manual' | 'post_first_lesson'
+
+export type PortfolioSharePlatform = 'linkedin' | 'x' | 'native' | 'copy'
+
+export type AchievementCelebrationCtaAction =
+  | 'add_to_linkedin'
+  | 'share_portfolio'
+  | 'publish_portfolio'
+  | 'invite_peers'
+  | 'start_capstone'
+  | 'view_capstone'
+  | 'continue_learning'
 
 type EventMap = {
   waitlist_signup:          Record<string, never>
@@ -50,6 +68,20 @@ type EventMap = {
 
   // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
   goal_context_viewed:      { goal_id?: string; recommended_module?: string }
+  dashboard_proof_card_clicked: {
+    action:
+      | 'view_portfolio'
+      | 'share_portfolio'
+      | 'publish_portfolio'
+      | 'setup_portfolio'
+      | 'view_certificates'
+      | 'view_fellow_readiness'
+      | 'request_fellow'
+      | 'view_badges'
+      | 'invite_peers'
+      | 'view_progress'
+    portfolio_state: 'public' | 'private' | 'none'
+  }
 
   // ─── Capstone & Proof-of-Work Events (Phase 4) ───────────────────────────
   portfolio_artifact_created:     { module_slug: string; is_public: boolean }
@@ -74,10 +106,21 @@ type EventMap = {
   deep_dive_opened:          { lesson_id: string }
 
   // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
+  referral_modal_opened:           { source: string }
+  notification_action_clicked:     { kind: 'share_portfolio' | 'link' | 'linkedin_add_to_profile' }
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
   referral_signup_completed:       Record<string, never>
+  portfolio_share_clicked:         { platform: PortfolioSharePlatform }
+  nav_portfolio_clicked:           { state: PortfolioNavState; surface: 'sidebar' | 'sidebar_collapsed' | 'mobile_drawer' }
+
+  // ─── Achievement Celebration Events (Growth R1) ───────────────────────────
+  achievement_celebration_viewed:      { kind: AchievementCelebrationKind }
+  achievement_celebration_cta_clicked: { kind: AchievementCelebrationKind; action: AchievementCelebrationCtaAction }
 }
+
+/** Payload of `nav_portfolio_clicked`; the single source for its `state`/`surface` unions. */
+export type NavPortfolioClickedParams = EventMap['nav_portfolio_clicked']
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
 
@@ -213,6 +256,14 @@ export function trackGoalContextViewed(goalId?: string, recommendedModule?: stri
   trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
 }
 
+/** Fired when a learner clicks an action on the dashboard Portfolio & Proof card (no PII). */
+export function trackDashboardProofCardClicked(
+  action: EventMap['dashboard_proof_card_clicked']['action'],
+  portfolioState: EventMap['dashboard_proof_card_clicked']['portfolio_state'],
+) {
+  trackEvent('dashboard_proof_card_clicked', { action, portfolio_state: portfolioState })
+}
+
 // ─── Capstone & Proof-of-Work Trackers (Phase 4) ───────────────────────────
 
 /** Fired when a capstone submission creates/updates a portfolio artifact. */
@@ -283,6 +334,16 @@ export function trackDeepDiveOpened(lessonId: string) {
 
 // ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────
 
+/** Fired when a notification's second action (share, add to LinkedIn, link) is used. */
+export function trackNotificationActionClicked(kind: EventMap['notification_action_clicked']['kind']) {
+  trackEvent('notification_action_clicked', { kind })
+}
+
+/** Fired each time the referral share modal opens, with the surface that opened it. */
+export function trackReferralModalOpened(source: string) {
+  trackEvent('referral_modal_opened', { source })
+}
+
 /** Fired when a learner copies their personal referral invitation link. */
 export function trackReferralLinkCopied(channel = 'direct') {
   trackEvent('referral_link_copied', { channel })
@@ -296,6 +357,34 @@ export function trackReferralShared(platform: 'linkedin' | 'twitter' | 'whatsapp
 /** Fired when a learner successfully completes registration via a referral link. */
 export function trackReferralSignupCompleted() {
   trackEvent('referral_signup_completed')
+}
+
+/** Fired when anyone (owner or visitor) uses a share control on a public portfolio page. */
+export function trackPortfolioShareClicked(platform: PortfolioSharePlatform) {
+  trackEvent('portfolio_share_clicked', { platform })
+}
+
+/** Fired when a learner clicks the app-nav portfolio item ("My Portfolio" when public, "Publish portfolio" when private). No username is sent. */
+export function trackNavPortfolioClicked(
+  state: NavPortfolioClickedParams['state'],
+  surface: NavPortfolioClickedParams['surface'],
+) {
+  trackEvent('nav_portfolio_clicked', { state, surface })
+}
+
+// ─── Achievement Celebration Trackers (Growth R1) ────────────────────────────
+
+/** Fired once when the celebration modal for a certificate, published capstone or Fellow grant is shown. */
+export function trackAchievementCelebrationViewed(kind: AchievementCelebrationKind) {
+  trackEvent('achievement_celebration_viewed', { kind })
+}
+
+/** Fired when a learner uses a CTA in the celebration modal. No certificate code, username or notification id is sent. */
+export function trackAchievementCelebrationCtaClicked(
+  kind: AchievementCelebrationKind,
+  action: AchievementCelebrationCtaAction,
+) {
+  trackEvent('achievement_celebration_cta_clicked', { kind, action })
 }
 
 

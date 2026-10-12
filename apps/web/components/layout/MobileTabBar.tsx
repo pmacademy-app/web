@@ -61,7 +61,7 @@ export function MobileTabBar({ onOpenMenu }: MobileTabBarProps) {
               />
               <span
                 className={cn(
-                  'text-[10px] mt-0.5 tracking-tight transition-colors',
+                  'text-[11px] mt-0.5 tracking-tight transition-colors',
                   isActive ? 'font-semibold text-primary' : 'font-medium'
                 )}
               >
@@ -94,7 +94,7 @@ export function MobileTabBar({ onOpenMenu }: MobileTabBarProps) {
           />
           <span
             className={cn(
-              'text-[10px] mt-0.5 tracking-tight transition-colors',
+              'text-[11px] mt-0.5 tracking-tight transition-colors',
               isMoreActive ? 'font-semibold text-primary' : 'font-medium'
             )}
           >

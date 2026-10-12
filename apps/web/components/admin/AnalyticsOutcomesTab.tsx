@@ -142,7 +142,7 @@ export function AnalyticsOutcomesTab({ data }: AnalyticsOutcomesTabProps) {
               </div>
               <div className="h-2 rounded-full bg-admin-surface border border-admin-border overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-admin-accent transition-all"
+                  className="h-full rounded-full bg-admin-accent transition-[width] duration-500 motion-reduce:transition-none"
                   style={{
                     width: `${capstonesSubmitted > 0 ? (capstonesReviewed / capstonesSubmitted) * 100 : 100}%`,
                   }}

@@ -10,6 +10,8 @@ import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
+import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
+import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
 
 /**
@@ -394,15 +396,25 @@ export async function recordQuizAttemptAction(
       },
     })
 
-    const { data: userProgress } = await supabase
+    const { data: userProgress, error: progressError } = await supabase
       .from('user_lesson_progress')
       .select('lesson_id, status')
       .eq('user_id', userId)
+    if (progressError) {
+      // Without it no module (or certificate) can be detected for this completion.
+      console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
+    }
 
-    totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
+    const completedLessonIds = new Set(
+      (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
+    )
+    totalCompletedLessons = completedLessonIds.size
 
-    // Phase 7: Check and activate referral reward if this is the learner's first completed lesson
-    if (totalCompletedLessons === 1) {
+    // Phase 7: activate the referral reward once the learner has a completed lesson. Checked on
+    // every completion, not only the first: an activation that failed (settings read, XP insert,
+    // status update) leaves the referral `signed_up`, and this is its retry. With nothing pending
+    // the check is one read on the unique referrals(referred_user_id) index and returns.
+    if (totalCompletedLessons >= 1) {
       try {
         const { onFirstLessonCompletedReferralCheck } = await import('../referral/referral-service')
         await onFirstLessonCompletedReferralCheck(supabase, userId)
@@ -411,11 +423,15 @@ export async function recordQuizAttemptAction(
       }
     }
 
-    if (totalCompletedLessons > 0 && totalCompletedLessons % 10 === 0) {
-      const moduleIndex = Math.floor(totalCompletedLessons / 10)
-
+    // Growth R4: a module is complete when its last open lesson is completed, in any order.
+    // Only a first attempt can newly complete a lesson (every attempt upserts status 'completed'
+    // and quiz_attempts starts at 0), so later attempts skip the check. The
+    // dispatcher does not dedupe by event id; a replay (or a race between two tabs) is harmless
+    // because the stable id feeds the in-app and email idempotency keys, which do.
+    const completedModule = isFirstAttempt ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
+    if (completedModule) {
       await globalNotificationDispatcher.dispatch({
-        id: `module-complete-${userId}-${moduleIndex}`,
+        id: moduleCompletedEventId(userId, completedModule.slug),
         event: 'module.completed',
         userId,
         userEmail: userRec?.email || '',
@@ -426,11 +442,31 @@ export async function recordQuizAttemptAction(
         occurredAt: new Date().toISOString(),
         payload: {
           userId,
-          moduleName: `Module ${moduleIndex}`,
-          moduleSlug: `module-${moduleIndex}`,
-          xpBonusEarned: 200,
+          moduleName: completedModule.name,
+          moduleSlug: completedModule.slug,
+          totalLessonsCompleted: totalCompletedLessons,
+          completedAt: new Date().toISOString(),
         },
       })
+    }
+
+    // Growth R1: issue (and announce once) the full-curriculum certificate as soon as
+    // the learner completes every lesson. Gated on `isFirstAttempt`: the first quiz
+    // attempt is the one that marks a lesson completed (later attempts cannot change the
+    // completed count), so post-90 resubmissions skip the extra queries. Learners who
+    // finished before this hook existed, or whose issuance failed here, are repaired by
+    // the certificates page. The helper is idempotent and only dispatches when it
+    // created the row; isolated so a failure never breaks quiz submission.
+    if (isFirstAttempt && totalCompletedLessons >= CURRICULUM_LESSON_COUNT) {
+      try {
+        const { issueFullCurriculumCertificateIfEligible } = await import('../certificates/issue-flow')
+        await issueFullCurriculumCertificateIfEligible(supabase, userId, {
+          email: userRec?.email,
+          name: userRec?.name,
+        })
+      } catch (certErr) {
+        console.warn('[lessons-db] Full-curriculum certificate issuance warning:', certErr)
+      }
     }
   } catch (modErr) {
     console.warn('[lessons-db] Notification dispatch warning:', modErr)

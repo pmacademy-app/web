@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { revalidateCapstoneOgCards, revalidatePortfolioOgCard } from '@/lib/og/revalidate-capstone-cards'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
@@ -47,7 +48,13 @@ export const POST = withRoute(
 
       if (result.settings.username) {
         revalidatePath(`/p/${result.settings.username}`)
-        revalidatePath(`/api/og/portfolio/${result.settings.username}`)
+      }
+      // Cards are cached per handle. On a username change the old handle's cards would otherwise
+      // keep the learner's name and capstone titles until they expire, so purge both.
+      for (const handle of new Set([result.previousUsername, result.settings.username])) {
+        if (!handle) continue
+        revalidatePortfolioOgCard(handle)
+        revalidateCapstoneOgCards(handle)
       }
       revalidatePath('/settings')
 

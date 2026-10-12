@@ -242,6 +242,10 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
             Two quick choices and you&apos;re learning. You can add your profile and portfolio details
             anytime in Settings.
           </p>
+          {/* Growth R5 B12a: frame the outcome before the first lesson. */}
+          <p className="text-xs sm:text-sm font-semibold text-foreground max-w-md" data-testid="onboarding-portfolio-framing">
+            Every lesson and capstone you finish builds a public PM portfolio recruiters can see.
+          </p>
         </div>
 
         {/* Error Alert */}

@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Trophy, Zap, Flame, BarChart3, ArrowRight, Home } from 'lucide-react'
+import { Trophy, Zap, Flame, BarChart3, ArrowRight, Home, UserPlus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,8 @@ interface FirstSessionCelebrationModalProps {
   lessonId: string
   xpEarned?: number
   nextLessonUrl?: string | null
+  /** Growth R5 B11: shows "Invite a peer". The caller closes this dialog before opening the next. */
+  onInvitePeers?: () => void
 }
 
 export function FirstSessionCelebrationModal({
@@ -26,6 +29,7 @@ export function FirstSessionCelebrationModal({
   lessonId,
   xpEarned = 50,
   nextLessonUrl,
+  onInvitePeers,
 }: FirstSessionCelebrationModalProps) {
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +41,7 @@ export function FirstSessionCelebrationModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         data-testid="first-session-celebration-modal"
-        className="sm:max-w-md p-6 text-center overflow-hidden"
+        className="sm:max-w-md p-6 text-center overflow-x-hidden"
       >
         {/* Celebration Trophy Icon */}
         <div className="flex justify-center pt-2 pb-1">
@@ -82,6 +86,11 @@ export function FirstSessionCelebrationModal({
           </div>
         </div>
 
+        {/* Growth R5 B11: frame the work as proof from the very first lesson. */}
+        <p className="text-xs text-muted-foreground leading-relaxed" data-testid="portfolio-teaser">
+          Every lesson you finish builds your public PM portfolio, the proof of your work you can share with recruiters.
+        </p>
+
         {/* Primary and secondary navigation actions */}
         <div className="flex flex-col gap-2.5 pt-2">
           {nextLessonUrl ? (
@@ -112,6 +121,13 @@ export function FirstSessionCelebrationModal({
             <Home className="w-3.5 h-3.5" />
             Go to Dashboard
           </Link>
+
+          {onInvitePeers && (
+            <Button type="button" variant="ghost" size="sm" onClick={onInvitePeers}>
+              <UserPlus aria-hidden="true" />
+              Invite a peer
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

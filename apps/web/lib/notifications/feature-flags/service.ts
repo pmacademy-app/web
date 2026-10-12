@@ -18,6 +18,10 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
   IN_APP_NOTIFICATIONS_ENABLED: true,
   QUEUE_PROCESSING_ENABLED: true,
 
+  // Kill switch for the one-time achievement celebration modal (Fellow, certificate,
+  // published capstone). Off = nothing is claimed; the notifications stay in the bell.
+  ACHIEVEMENT_CELEBRATIONS_ENABLED: true,
+
   // Email scope: Only major achievement milestones (module completed, certificate, portfolio)
   // Per-lesson/badge/XP events are In-App only
   ACHIEVEMENT_EMAIL_ENABLED: true,

@@ -101,7 +101,7 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@prodily.adityagangwani.me"
-                className="w-full pl-9 pr-4 py-2.5 bg-admin-bg border border-admin-border rounded-xl text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 focus:ring-1 focus:ring-admin-accent/30 transition-all"
+                className="w-full pl-9 pr-4 py-2.5 bg-admin-bg border border-admin-border rounded-xl text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 focus:ring-1 focus:ring-admin-accent/30 transition-[border-color,box-shadow]"
               />
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-9 pr-4 py-2.5 bg-admin-bg border border-admin-border rounded-xl text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 focus:ring-1 focus:ring-admin-accent/30 transition-all"
+                className="w-full pl-9 pr-4 py-2.5 bg-admin-bg border border-admin-border rounded-xl text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 focus:ring-1 focus:ring-admin-accent/30 transition-[border-color,box-shadow]"
               />
             </div>
           </div>

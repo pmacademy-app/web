@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { Star, MessageSquare, Clock, Lightbulb, CheckCircle2, XCircle, Mail, User } from 'lucide-react'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminDrawer } from './AdminDrawer'
@@ -24,7 +25,15 @@ export interface AdminFeedbackItem {
 }
 
 export function FeedbackListView({ initialFeedback }: { initialFeedback: AdminFeedbackItem[] }) {
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [feedbackList, setFeedbackList] = useState<AdminFeedbackItem[]>(initialFeedback)
+  // Re-seed the optimistic copy when the server sends a fresh page (after router.refresh()).
+  const [seed, setSeed] = useState(initialFeedback)
+  if (seed !== initialFeedback) {
+    setSeed(initialFeedback)
+    setFeedbackList(initialFeedback)
+  }
   const [selected, setSelected] = useState<AdminFeedbackItem | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
   const { toast } = useAdminToast()
@@ -45,6 +54,9 @@ export function FeedbackListView({ initialFeedback }: { initialFeedback: AdminFe
         if (selected && selected.id === feedbackId) {
           setSelected((prev) => (prev ? { ...prev, status: newStatus } : null))
         }
+        // The list is server-paged and can be filtered by status (`?status=`): refetch so a
+        // row that no longer matches leaves the list and the total and pager stay right.
+        startRefresh(() => router.refresh())
       } else {
         const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update status.')
         toast(errorMsg, 'error')

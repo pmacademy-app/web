@@ -1,8 +1,8 @@
 'use client'
 
-import React, { Suspense } from 'react'
+import React, { Suspense, useOptimistic, useTransition } from 'react'
 import Link from 'next/link'
-import { useSearchParams, usePathname } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Users,
@@ -10,14 +10,18 @@ import {
   Zap,
   Award,
   Download,
+  TrendingUp,
 } from 'lucide-react'
 import { AdminRangeSelector } from './AdminRangeSelector'
 import { AdminLoadWarning } from './AdminLoadWarning'
 import { AnalyticsOverviewTab } from './AnalyticsOverviewTab'
 import { AnalyticsLearnersTab } from './AnalyticsLearnersTab'
 import { AnalyticsLearningTab } from './AnalyticsLearningTab'
-import { AnalyticsEngagementTab } from './AnalyticsEngagementTab'
-import { AnalyticsOutcomesTab } from './AnalyticsOutcomesTab'
+import { AnalyticsGrowthTab } from './AnalyticsGrowthTab'
+import {
+  AnalyticsEngagementTabLazy as AnalyticsEngagementTab,
+  AnalyticsOutcomesTabLazy as AnalyticsOutcomesTab,
+} from './charts-lazy'
 import type { AdminAnalyticsTab, AdminAnalyticsWorkspaceData } from '@/lib/admin/types'
 
 interface AnalyticsWorkspaceProps {
@@ -60,14 +64,32 @@ const TABS: Array<{
     icon: Award,
     description: 'Certificate issuance velocity, capstone reviews and portfolio adoption',
   },
+  {
+    key: 'growth',
+    label: 'Growth',
+    icon: TrendingUp,
+    description: 'Celebrations, referrals, public capstone pages and Fellow requests',
+  },
 ]
 
+function isKnownTab(value: string | null | undefined): value is AdminAnalyticsTab {
+  return !!value && TABS.some((t) => t.key === value)
+}
+
 export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
+  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-
-
-  const currentTab = (searchParams.get('tab') as AdminAnalyticsTab) || data.tab || 'overview'
+  const tabParam = searchParams.get('tab')
+  const currentTab: AdminAnalyticsTab = isKnownTab(tabParam)
+    ? tabParam
+    : isKnownTab(data.tab)
+      ? data.tab
+      : 'overview'
+  // A tab change is a server load, and `currentTab` only moves when it commits. Until then the
+  // clicked tab is shown as selected and the panel as busy, so a slow load still answers the click.
+  const [isPending, startTransition] = useTransition()
+  const [selectedTab, setSelectedTab] = useOptimistic<AdminAnalyticsTab>(currentTab)
 
   const handleExportCsv = () => {
     // Generate simple CSV payload for current tab data
@@ -102,13 +124,23 @@ export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
           className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto"
         >
           {TABS.map(({ key, label, icon: Icon }) => {
-            const isActive = currentTab === key
+            const isActive = selectedTab === key
             const params = new URLSearchParams(searchParams.toString())
             params.set('tab', key)
+            const href = `${pathname}?${params.toString()}`
             return (
               <Link
                 key={key}
-                href={`${pathname}?${params.toString()}`}
+                href={href}
+                // Only in-app navigations get here (not Ctrl/Cmd-click or open in a new tab):
+                // the same push the link would do, inside a transition this component can see.
+                onNavigate={(e) => {
+                  e.preventDefault()
+                  startTransition(() => {
+                    setSelectedTab(key)
+                    router.push(href)
+                  })
+                }}
                 aria-current={isActive ? 'page' : undefined}
                 className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap rounded-t focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50 ${
                   isActive
@@ -145,12 +177,19 @@ export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
         <AdminLoadWarning message="Live analytics data could not be fully aggregated from the database. Showing cached or fallback numbers." />
       )}
 
-      {/* Tab Panels */}
-      {currentTab === 'overview' && <AnalyticsOverviewTab data={data.overview} />}
-      {currentTab === 'learners' && <AnalyticsLearnersTab data={data.learners} />}
-      {currentTab === 'learning' && <AnalyticsLearningTab data={data.learning} />}
-      {currentTab === 'engagement' && <AnalyticsEngagementTab data={data.engagement} />}
-      {currentTab === 'outcomes' && <AnalyticsOutcomesTab data={data.outcomes} />}
+      {/* Tab Panels: the loaded tab stays on screen, dimmed, while the next one loads. */}
+      <div
+        aria-busy={isPending}
+        data-pending={isPending ? 'true' : undefined}
+        className={`transition-opacity duration-150 motion-reduce:transition-none ${isPending ? 'opacity-60' : 'opacity-100'}`}
+      >
+        {currentTab === 'overview' && <AnalyticsOverviewTab data={data.overview} />}
+        {currentTab === 'learners' && <AnalyticsLearnersTab data={data.learners} />}
+        {currentTab === 'learning' && <AnalyticsLearningTab data={data.learning} />}
+        {currentTab === 'engagement' && <AnalyticsEngagementTab data={data.engagement} />}
+        {currentTab === 'outcomes' && <AnalyticsOutcomesTab data={data.outcomes} />}
+        {currentTab === 'growth' && <AnalyticsGrowthTab data={data.growth} />}
+      </div>
     </div>
   )
 }

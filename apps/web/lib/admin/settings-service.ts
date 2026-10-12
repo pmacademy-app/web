@@ -9,6 +9,18 @@ import type {
   SettingsSectionKey,
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
+import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '../referral/reward'
+import {
+  XP_SETTINGS_VERSION,
+  XP_VALUES,
+  getRuntimeXpValues,
+  invalidateRuntimeXpCache,
+  readRuntimeXpValuesStrict,
+  type XpValuesConfig,
+} from '../xp/xp'
+
+/** Upper bound for any admin XP setting; anything above keeps the current value. */
+const MAX_XP_SETTING = 10_000
 
 /**
  * Settings Service (Phase 8).
@@ -38,11 +50,49 @@ const DEFAULT_PRODUCT_SETTINGS: ProductSettings = {
   sessionTimeoutMinutes: 10080, // 7 days
 }
 
-const DEFAULT_LEARNING_SETTINGS: LearningSettings = {
-  xpPerLessonComplete: 50,
-  xpPerQuizPass: 100,
-  xpPerFlashcardReview: 10,
-  xpPerReflection: 25,
+/** Admin XP fields from runtime XP values (the inverse of resolveXpValues in lib/xp/xp.ts). */
+export function xpFieldsFromRuntime(xp: XpValuesConfig): Pick<
+  LearningSettings,
+  | 'xpPerLessonComplete'
+  | 'xpPerQuizPass'
+  | 'xpPerFlashcardReview'
+  | 'xpPerReflection'
+  | 'xpReferralReward'
+  | 'xpQuizPerfectBonus'
+  | 'xpPerCapstoneSubmitted'
+  | 'xpStreakBaseReward'
+> {
+  return {
+    xpPerLessonComplete: xp.THEORY_READ,
+    xpPerQuizPass: xp.QUIZ_CORRECT,
+    xpPerFlashcardReview: xp.FLASHCARD_REVIEW,
+    xpPerReflection: xp.REFLECTION_SUBMITTED,
+    xpReferralReward: xp.REFERRAL_ACTIVATION,
+    xpQuizPerfectBonus: xp.QUIZ_PERFECT_BONUS,
+    xpPerCapstoneSubmitted: xp.CAPSTONE_SUBMITTED,
+    xpStreakBaseReward: xp.DAILY_STREAK_BASE,
+  }
+}
+
+/**
+ * The XP fields the runtime reads from the admin record only once it is versioned (lib/xp/xp.ts).
+ * The referral reward is not one of them: it was always read from this record, on any build.
+ */
+const VERSION_GATED_XP_FIELDS = [
+  'xpPerLessonComplete',
+  'xpPerQuizPass',
+  'xpPerFlashcardReview',
+  'xpPerReflection',
+  'xpQuizPerfectBonus',
+  'xpPerCapstoneSubmitted',
+  'xpStreakBaseReward',
+] as const satisfies ReadonlyArray<keyof LearningSettings>
+
+// XP defaults ARE the live defaults (XP_VALUES): saving the form unchanged changes nobody's XP.
+// (They used to be 50/100/10/25, which never applied because the runtime read another key.)
+export const DEFAULT_LEARNING_SETTINGS: LearningSettings = {
+  ...xpFieldsFromRuntime(XP_VALUES),
+  xpReferralReward: REFERRAL_REWARD_XP,
   streakFreezeEnabled: true,
   streakFreezeCostXp: 500,
   certificateAutoIssue: true,
@@ -122,15 +172,49 @@ function getDefaultSettings<T>(section: SettingsSectionKey): T {
   }
 }
 
+/** A settings section could not be read. Not the same as "no record yet", which reads as the defaults. */
+export class SettingsReadError extends Error {
+  constructor(public readonly section: SettingsSectionKey) {
+    super(`Could not read the current ${section} settings`)
+    this.name = 'SettingsReadError'
+  }
+}
+
+/**
+ * `strict` is for the admin settings screen and the update functions: a failed read throws
+ * SettingsReadError instead of returning defaults, which a save would then write over the real
+ * record. Runtime readers leave it off and keep getting defaults when the database is unreachable.
+ */
+export interface SettingsReadOptions {
+  strict?: boolean
+}
+
+const STRICT: SettingsReadOptions = { strict: true }
+
+/** What the admin settings screen loads: every section, and which of them could not be read. */
+export interface AdminWorkspaceSettings {
+  data: {
+    product: ProductSettings
+    learning: LearningSettings
+    email: EmailSettings
+    notifications: NotificationSettings
+    onboarding: OnboardingSettings
+    'feature-flags': FeatureFlagRecord[]
+  }
+  /** Sections whose `data` is placeholder defaults: never show them as an editable form. */
+  failedSections: SettingsSectionKey[]
+}
+
 export class SettingsService {
   private static sectionCache = new Map<string, { value: unknown; timestamp: number }>()
   private static readonly CACHE_TTL_MS = 60_000 // 60 seconds L1 in-memory TTL
 
   /**
    * Generic fetch for a settings section with in-memory caching.
-   * Returns defaults if no record exists or on error.
+   * Returns defaults if no record exists. On a read error it returns defaults too (uncached),
+   * unless `strict`, which throws SettingsReadError.
    */
-  private static async getSettings<T>(section: SettingsSectionKey): Promise<T> {
+  private static async getSettings<T>(section: SettingsSectionKey, { strict = false }: SettingsReadOptions = {}): Promise<T> {
     const now = Date.now()
     const cached = this.sectionCache.get(section)
     if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
@@ -166,6 +250,7 @@ export class SettingsService {
       return result
     } catch (err) {
       console.warn(`[SettingsService] getSettings(${section}) failed:`, err)
+      if (strict) throw new SettingsReadError(section)
       return getDefaultSettings<T>(section)
     }
   }
@@ -178,12 +263,14 @@ export class SettingsService {
     const key = SETTINGS_KEYS[section]
 
     try {
-      type DBChain = { upsert: (row: unknown) => Promise<{ error: unknown }> }
-      await (supabase.from('system_settings') as unknown as DBChain).upsert({
+      type DBChain = { upsert: (row: unknown) => Promise<{ error: { message?: string } | null }> }
+      const { error } = await (supabase.from('system_settings') as unknown as DBChain).upsert({
         key,
         value,
         updated_at: new Date().toISOString(),
       })
+      // supabase-js returns a failed write instead of throwing it.
+      if (error) throw new Error(error.message || 'upsert failed')
       SettingsService.invalidateCache()
       return value
     } catch (err) {
@@ -232,16 +319,53 @@ export class SettingsService {
 
   // ─── Public API ────────────────────────────────────────────────────────────
 
-  public static async getProductSettings(): Promise<ProductSettings> {
-    return this.getSettings<ProductSettings>('product')
+  public static async getProductSettings(options: SettingsReadOptions = {}): Promise<ProductSettings> {
+    return this.getSettings<ProductSettings>('product', options)
   }
 
-  public static async getLearningSettings(): Promise<LearningSettings> {
-    return this.getSettings<LearningSettings>('learning')
+  /**
+   * Learning settings as they are in effect. A record not yet saved by the reconciled form
+   * (xpSettingsVersion !== 2) never drove runtime XP, so its XP numbers are replaced by the values
+   * actually in effect: the admin sees, and a first save keeps, what learners really earn.
+   * Every read carries `xpFormVersion`, which the form echoes back on save (see updateLearningSettings).
+   */
+  public static async getLearningSettings(options: SettingsReadOptions = {}): Promise<LearningSettings> {
+    const settings = await this.getSettings<LearningSettings>('learning', options)
+    if (settings.xpSettingsVersion === XP_SETTINGS_VERSION) {
+      return { ...settings, xpFormVersion: XP_SETTINGS_VERSION }
+    }
+    let live: XpValuesConfig = XP_VALUES
+    if (options.strict) {
+      // getRuntimeXpValues never fails: on a read error it answers with the last good values or the
+      // static defaults. Shown as "live" with a valid xpFormVersion, those would be stamped version
+      // 2 by the next save, over whatever the legacy record really holds. So read them for real.
+      try {
+        live = await readRuntimeXpValuesStrict(createServiceRoleClient())
+      } catch (err) {
+        console.warn('[SettingsService] getLearningSettings: live XP values could not be read:', err)
+        throw new SettingsReadError('learning')
+      }
+    } else {
+      try {
+        // The runtime's own 30s cache: this runs on dashboard loads.
+        live = await getRuntimeXpValues(createServiceRoleClient())
+      } catch {
+        // No database client (e.g. env not configured): the static defaults are what is in effect.
+      }
+    }
+    // The referral reward is the exception: the stored value is honoured rather than replaced.
+    // Before Growth R5 the referral service paid a constant (50) and this field did not exist;
+    // since then it resolves the reward from this record whatever its version. That is safe: an
+    // older record has no value (so the default, 50, applies) unless an admin has since set "XP
+    // per Referral" on purpose, and an unusable value falls back to 50 at award time
+    // (normalizeReferralRewardXp).
+    const { xpReferralReward: _referralFromRuntime, ...liveXp } = xpFieldsFromRuntime(live)
+    void _referralFromRuntime
+    return { ...settings, ...liveXp, xpFormVersion: XP_SETTINGS_VERSION }
   }
 
-  public static async getEmailSettings(): Promise<EmailSettings> {
-    const settings = await this.getSettings<EmailSettings>('email')
+  public static async getEmailSettings(options: SettingsReadOptions = {}): Promise<EmailSettings> {
+    const settings = await this.getSettings<EmailSettings>('email', options)
 
     // `dailySendLimit` is surfaced from `system_settings.email_daily_send_limit` —
     // the key the queue processor's quota gate actually reads. This section used to
@@ -250,15 +374,18 @@ export class SettingsService {
     let effectiveDailyLimit = settings.dailySendLimit
     try {
       const supabase = createServiceRoleClient()
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('system_settings')
         .select('value')
         .eq('key', 'email_daily_send_limit')
         .maybeSingle()
+      if (error) throw new Error(error.message)
       const limit = Number((data as { value?: { limit?: unknown } } | null)?.value?.limit)
       if (Number.isFinite(limit) && limit > 0) effectiveDailyLimit = limit
     } catch {
-      // Fall back to the stored section value if the runtime key is unreadable.
+      // Fall back to the stored section value if the runtime key is unreadable. Not for the admin
+      // form: saving it would write that stale number through to the enforced key.
+      if (options.strict) throw new SettingsReadError('email')
     }
 
     return {
@@ -268,12 +395,12 @@ export class SettingsService {
     }
   }
 
-  public static async getNotificationSettings(): Promise<NotificationSettings> {
-    return this.getSettings<NotificationSettings>('notifications')
+  public static async getNotificationSettings(options: SettingsReadOptions = {}): Promise<NotificationSettings> {
+    return this.getSettings<NotificationSettings>('notifications', options)
   }
 
-  public static async getOnboardingSettings(): Promise<OnboardingSettings> {
-    const settings = await this.getSettings<OnboardingSettings>('onboarding')
+  public static async getOnboardingSettings(options: SettingsReadOptions = {}): Promise<OnboardingSettings> {
+    const settings = await this.getSettings<OnboardingSettings>('onboarding', options)
 
     // Phase 4C: the single-screen onboarding consumes only the goal and experience option
     // lists. Fall back to the defaults when a group is missing or empty. Any legacy option
@@ -308,7 +435,9 @@ export class SettingsService {
   public static async updateProductSettings(
     partial: Partial<ProductSettings>
   ): Promise<ProductSettings> {
-    const current = await this.getProductSettings()
+    // Strict here and in every update below: never merge the change over defaults standing in for a
+    // record that could not be read.
+    const current = await this.getProductSettings(STRICT)
     const updated = { ...current, ...partial }
     return this.upsertSettings('product', updated)
   }
@@ -316,15 +445,55 @@ export class SettingsService {
   public static async updateLearningSettings(
     partial: Partial<LearningSettings>
   ): Promise<LearningSettings> {
-    const current = await this.getLearningSettings()
-    const updated = { ...current, ...partial }
-    return this.upsertSettings('learning', updated)
+    const { xpFormVersion: _currentFormVersion, ...current } = await this.getLearningSettings(STRICT)
+    void _currentFormVersion
+    // Neither marker is taken from the body: the form version is a per-request proof and is never
+    // stored, and the stored version is only ever set below.
+    const { xpFormVersion, xpSettingsVersion: _bodySettingsVersion, ...body } = partial
+    void _bodySettingsVersion
+    // A form loaded before the reconciliation (an admin tab left open across the deploy, or an old
+    // instance during a rolling one) still holds the old inert defaults (50/100/10/25) and PATCHes
+    // the whole section. Its XP numbers are dropped; the rest of what it sent still saves.
+    const fromReconciledForm = xpFormVersion === XP_SETTINGS_VERSION
+    if (!fromReconciledForm) {
+      for (const field of VERSION_GATED_XP_FIELDS) delete body[field]
+    }
+    const updated: LearningSettings = { ...current, ...body }
+    // Store only values the runtime will actually use: an invalid number keeps the current one
+    // instead of being silently replaced by a default at award time.
+    const positive = (value: unknown, fallback: number) =>
+      typeof value === 'number' && Number.isInteger(value) && value > 0 && value <= MAX_XP_SETTING ? value : fallback
+    updated.xpPerLessonComplete = positive(updated.xpPerLessonComplete, current.xpPerLessonComplete)
+    updated.xpPerQuizPass = positive(updated.xpPerQuizPass, current.xpPerQuizPass)
+    updated.xpPerFlashcardReview = positive(updated.xpPerFlashcardReview, current.xpPerFlashcardReview)
+    updated.xpPerReflection = positive(updated.xpPerReflection, current.xpPerReflection)
+    updated.xpPerCapstoneSubmitted = positive(updated.xpPerCapstoneSubmitted, current.xpPerCapstoneSubmitted)
+    updated.xpStreakBaseReward = positive(updated.xpStreakBaseReward, current.xpStreakBaseReward)
+    updated.xpQuizPerfectBonus =
+      typeof updated.xpQuizPerfectBonus === 'number' &&
+      Number.isInteger(updated.xpQuizPerfectBonus) &&
+      updated.xpQuizPerfectBonus >= 0 &&
+      updated.xpQuizPerfectBonus <= MAX_XP_SETTING
+        ? updated.xpQuizPerfectBonus
+        : current.xpQuizPerfectBonus
+    // Same rule for the referral reward (the default only when the current value is itself unusable).
+    updated.xpReferralReward =
+      normalizeReferralRewardXp(updated.xpReferralReward) === updated.xpReferralReward
+        ? updated.xpReferralReward
+        : normalizeReferralRewardXp(current.xpReferralReward)
+    // From now on this record drives runtime XP (lib/xp/xp.ts). An older form does not make that
+    // switch: the record keeps whichever version it had, so live XP stays exactly as it was.
+    if (fromReconciledForm) updated.xpSettingsVersion = XP_SETTINGS_VERSION
+    const saved = await this.upsertSettings('learning', updated)
+    // This instance picks the change up at once; others within their 30s runtime cache.
+    invalidateRuntimeXpCache()
+    return { ...saved, xpFormVersion: XP_SETTINGS_VERSION }
   }
 
   public static async updateEmailSettings(
     partial: Partial<EmailSettings>
   ): Promise<EmailSettings> {
-    const current = await this.getEmailSettings()
+    const current = await this.getEmailSettings(STRICT)
     // Don't allow overwriting read-only field
     const allowed = { ...partial }
     delete (allowed as { resendApiKeyConfigured?: boolean }).resendApiKeyConfigured
@@ -333,26 +502,39 @@ export class SettingsService {
     // Write `dailySendLimit` through to the key the send pipeline enforces, so this
     // control and the Communications workspace's daily limit stay one value rather
     // than two that silently diverge.
-    if (typeof allowed.dailySendLimit === 'number' && Number.isFinite(allowed.dailySendLimit)) {
-      const limitVal = Math.max(10, Math.min(1000, Math.trunc(allowed.dailySendLimit)))
-      updated.dailySendLimit = limitVal
+    const limitVal =
+      typeof allowed.dailySendLimit === 'number' && Number.isFinite(allowed.dailySendLimit)
+        ? Math.max(10, Math.min(1000, Math.trunc(allowed.dailySendLimit)))
+        : null
+    if (limitVal !== null) updated.dailySendLimit = limitVal
+
+    // The section first: if it fails, "Failed to save" is true and the enforced limit is untouched.
+    const saved = await this.upsertSettings('email', updated)
+
+    if (limitVal !== null) {
       try {
         const supabase = createServiceRoleClient()
-        await supabase
+        const { error } = await supabase
           .from('system_settings')
           .upsert({ key: 'email_daily_send_limit', value: { limit: limitVal }, updated_at: new Date().toISOString() })
+        if (error) throw new Error(error.message)
       } catch (err) {
+        // The section is saved but the enforced limit did not change: say exactly that. Reads
+        // surface the enforced key, so the form shows the limit still in force after a reload.
         console.warn('[SettingsService] Failed to propagate dailySendLimit to email_daily_send_limit:', err)
+        throw new Error(
+          'Email settings were saved, but the daily send limit was not applied: the previous limit is still enforced. Save again to retry.'
+        )
       }
     }
 
-    return this.upsertSettings('email', updated)
+    return saved
   }
 
   public static async updateNotificationSettings(
     partial: Partial<NotificationSettings>
   ): Promise<NotificationSettings> {
-    const current = await this.getNotificationSettings()
+    const current = await this.getNotificationSettings(STRICT)
     const updated = { ...current, ...partial }
     return this.upsertSettings('notifications', updated)
   }
@@ -360,15 +542,15 @@ export class SettingsService {
   public static async updateOnboardingSettings(
     partial: Partial<OnboardingSettings>
   ): Promise<OnboardingSettings> {
-    const current = await this.getOnboardingSettings()
+    const current = await this.getOnboardingSettings(STRICT)
     const updated = { ...current, ...partial }
     return this.upsertSettings('onboarding', updated)
   }
 
   /**
-   * Get all settings at once (for initial page load).
+   * Get all settings at once.
    */
-  public static async getAllSettings(): Promise<{
+  public static async getAllSettings(options: SettingsReadOptions = {}): Promise<{
     product: ProductSettings
     learning: LearningSettings
     email: EmailSettings
@@ -377,13 +559,40 @@ export class SettingsService {
     featureFlags: FeatureFlagRecord[]
   }> {
     const [product, learning, email, notifications, onboarding, featureFlags] = await Promise.all([
-      this.getProductSettings(),
-      this.getLearningSettings(),
-      this.getEmailSettings(),
-      this.getNotificationSettings(),
-      this.getOnboardingSettings(),
+      this.getProductSettings(options),
+      this.getLearningSettings(options),
+      this.getEmailSettings(options),
+      this.getNotificationSettings(options),
+      this.getOnboardingSettings(options),
       this.getFeatureFlags(),
     ])
     return { product, learning, email, notifications, onboarding, featureFlags }
+  }
+
+  /**
+   * Everything the admin settings screen needs. A section that could not be read is listed in
+   * `failedSections` and carries placeholder defaults, so the screen can show an error for it
+   * instead of a form whose save would overwrite the real record.
+   */
+  public static async getAdminWorkspaceSettings(): Promise<AdminWorkspaceSettings> {
+    const failedSections: SettingsSectionKey[] = []
+    const orFailed = <T>(section: SettingsSectionKey, read: Promise<T>): Promise<T> =>
+      read.catch(() => {
+        failedSections.push(section)
+        return getDefaultSettings<T>(section)
+      })
+    const [product, learning, email, notifications, onboarding, featureFlags] = await Promise.all([
+      orFailed('product', this.getProductSettings(STRICT)),
+      orFailed('learning', this.getLearningSettings(STRICT)),
+      orFailed('email', this.getEmailSettings(STRICT)),
+      // Nothing on the screen edits this section (it points to Communications), so it stays tolerant.
+      this.getNotificationSettings(),
+      orFailed('onboarding', this.getOnboardingSettings(STRICT)),
+      this.getFeatureFlags(),
+    ])
+    return {
+      data: { product, learning, email, notifications, onboarding, 'feature-flags': featureFlags },
+      failedSections,
+    }
   }
 }

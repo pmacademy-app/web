@@ -42,7 +42,7 @@ export function AdminFunnelChart({ stages }: AdminFunnelChartProps) {
                 <div className="h-2.5 rounded-full bg-admin-bg border border-admin-border overflow-hidden">
                   <div
                     className={cn(
-                      'h-full rounded-full transition-all',
+                      'h-full rounded-full transition-[width]',
                       idx === 0 ? 'bg-admin-accent' : 'bg-admin-accent/60'
                     )}
                     style={{ width: `${width}%` }}

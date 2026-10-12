@@ -3,6 +3,8 @@ import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
+import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
+import { getCapstoneDefinition } from '@/config/capstones'
 
 let isConnectorsInitialized = false
 
@@ -30,6 +32,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     'srs.review_due',
     'capstone.submitted',
     'capstone.reviewed',
+    'fellow.granted',
     'quiz.completed',
     'streak.updated',
     'review.completed',
@@ -49,6 +52,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
           title: content.title,
           body: content.body,
           actionUrl: content.actionUrl,
+          secondaryAction: content.secondaryAction,
           priority: event.priority,
         })
       }
@@ -112,12 +116,15 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         userName: event.userName || 'Learner',
         moduleName: event.payload.moduleName || 'Module',
         moduleSlug: event.payload.moduleSlug || 'foundations',
-        xpBonus: event.payload.xpBonusEarned || 200,
       },
       eventId: event.id,
       eventType: event.event,
       category: 'learning',
       priorityLevel: 'medium',
+      // One email per completed module (the event id is per learner per module), decided by the
+      // email_queue unique index. Without a key the processor's (user, template, event type)
+      // lookup lets the first module's email suppress every later module's.
+      idempotencyKey: `module-completed:${event.id}`,
     })
   })
 
@@ -134,11 +141,19 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         badgeName: event.payload.badgeName,
         badgeDescription: event.payload.badgeDescription,
         badgeIcon: event.payload.badgeIcon || '🏅',
+        // Share links only for a public portfolio (Growth R5 B4).
+        portfolioUrl:
+          event.payload.isPortfolioPublic === true && typeof event.payload.username === 'string' && event.payload.username
+            ? `${(process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')}/p/${encodeURIComponent(event.payload.username)}`
+            : null,
       },
       eventId: event.id,
       eventType: event.event,
       category: 'achievements',
       priorityLevel: 'medium',
+      // One email per badge (the event id is per learner per badge), decided by the email_queue
+      // unique index rather than the (user, template, event type) lookup.
+      idempotencyKey: `badge-earned:${event.id}`,
     })
   })
 
@@ -160,11 +175,22 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'achievements',
       priorityLevel: 'high',
+      // One email per level reached (the event id is per learner per level), same as above.
+      idempotencyKey: `level-up:${event.id}`,
     })
   })
 
   // 7. Achievement: certificate.generated -> achievement.certificate
   d.registerHandler('certificate.generated', 'connector.achievement.certificate', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // One email per certificate, decided by the email_queue unique index. Without a key
+    // the processor falls back to a (user, template, event type) SELECT, which lets an
+    // earlier module-certificate email suppress the full-curriculum one and is not
+    // race-safe.
+    const certificateCode = event.payload.certificateCode
+    const idempotencyKey =
+      typeof certificateCode === 'string' && certificateCode.length > 0
+        ? `certificate:${certificateCode}`
+        : undefined
     await enqueueNotificationItem({
       userId: event.userId,
       toEmail: event.userEmail,
@@ -180,6 +206,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'certificates',
       priorityLevel: 'high',
+      idempotencyKey,
     })
   })
 
@@ -200,6 +227,73 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'portfolio',
       priorityLevel: 'medium',
+    })
+  })
+
+  // 9. Achievement: fellow.granted -> achievement.fellow_granted
+  d.registerHandler('fellow.granted', 'connector.achievement.fellow_granted', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // The grant path tolerates a users row without an email; there is no one to send to then.
+    if (!event.userEmail) return
+    const username = typeof event.payload.username === 'string' ? event.payload.username : null
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
+    await enqueueNotificationItem({
+      userId: event.userId,
+      toEmail: event.userEmail,
+      toName: event.userName,
+      channel: 'email',
+      templateKey: 'achievement.fellow_granted',
+      templateVariables: {
+        userName: event.userName || 'Learner',
+        username,
+        portfolioUrl:
+          event.payload.portfolioUrl ||
+          (username ? `${origin}/p/${encodeURIComponent(username)}` : `${origin}${PORTFOLIO_SETTINGS_HREF}`),
+      },
+      eventId: event.id,
+      eventType: event.event,
+      category: 'achievements',
+      priorityLevel: 'high',
+      // One Fellow email per grant (the event id is per grant), decided by the email_queue unique
+      // index: a retried dispatch is deduplicated, a re-grant after a revoke is emailed again.
+      idempotencyKey: `fellow-granted:${event.id}`,
+    })
+  })
+
+  // Growth R5 B5: capstone.reviewed (published) -> achievement.capstone_published
+  d.registerHandler('capstone.reviewed', 'connector.achievement.capstone_published', async (event: EventEnvelope<Record<string, unknown>>) => {
+    // A rejection or unpublished review is not news worth an email.
+    if (event.payload.isPublished !== true || !event.userEmail) return
+    const submissionId = typeof event.payload.submissionId === 'string' ? event.payload.submissionId : ''
+    if (!submissionId) return
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
+    const username = typeof event.payload.username === 'string' ? event.payload.username : ''
+    const moduleSlug = typeof event.payload.moduleSlug === 'string' ? event.payload.moduleSlug : ''
+    await enqueueNotificationItem({
+      userId: event.userId,
+      toEmail: event.userEmail,
+      toName: event.userName,
+      channel: 'email',
+      templateKey: 'achievement.capstone_published',
+      templateVariables: {
+        userName: event.userName || 'Learner',
+        moduleTitle: event.payload.moduleTitle || 'your module',
+        // The case study's own title, for the share text (the page and notification quote it too).
+        capstoneTitle: (moduleSlug && getCapstoneDefinition(moduleSlug)?.title) || null,
+        portfolioUrl:
+          username && event.payload.isPortfolioPublic === true ? `${origin}/p/${encodeURIComponent(username)}` : null,
+        // Growth R5 B13b: the capstone's own public page, shared and opened from the email.
+        casePageUrl:
+          username && moduleSlug && event.payload.isPortfolioPublic === true
+            ? `${origin}${capstoneSharePath(username, moduleSlug)}`
+            : null,
+        capstoneUrl: moduleSlug ? `${origin}/capstones/${encodeURIComponent(moduleSlug)}` : `${origin}/capstones`,
+      },
+      eventId: event.id,
+      eventType: event.event,
+      category: 'achievements',
+      priorityLevel: 'medium',
+      // One email per published submission, however often the review is retried.
+      idempotencyKey: `capstone-published-email-${submissionId}`,
     })
   })
 }

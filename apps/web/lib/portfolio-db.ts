@@ -7,6 +7,7 @@
  * Enforces strict privacy rules: private portfolios and private reflections are never exposed.
  */
 
+import { CURRICULUM_LESSON_COUNT, countCompletedModules } from '@/lib/curriculum-registry'
 import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, TablesUpdate } from '@/lib/supabase'
@@ -20,7 +21,12 @@ import {
   VALID_PORTFOLIO_SECTIONS,
   type PortfolioSectionId,
 } from '@/lib/portfolio'
-import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
+import {
+  calculatePortfolioReadiness,
+  calculatePortfolioVerification,
+  type PortfolioVerificationOverride,
+  portfolioFallbackUsername as portfolioFallbackUsernameFor,
+} from '@/lib/portfolio-readiness'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -127,7 +133,9 @@ export async function getPublicPortfolioData(
   const { data: users, error: userError } = await supabase
     .from('users')
     .select('*')
-    .ilike('username', sanitizedUsername)
+    // Escaped: in ILIKE, `_` and `%` are wildcards, and usernames may contain `_`. Unescaped,
+    // /p/a_b could resolve to another learner's public portfolio.
+    .ilike('username', sanitizedUsername.replace(/[\\%_]/g, (char) => `\\${char}`))
     .limit(1)
 
   if (userError || !users || users.length === 0) {
@@ -154,8 +162,8 @@ export async function getPublicPortfolioData(
     .eq('status', 'completed')
 
   const completedLessonsCount = progressRows?.length ?? 0
-  const totalLessonsCount = 90
-  const completedModulesCount = Math.min(9, Math.floor(completedLessonsCount / 10))
+  const totalLessonsCount = CURRICULUM_LESSON_COUNT
+  const completedModulesCount = countCompletedModules((progressRows ?? []).map((p) => p.lesson_id))
   const progressPercentage = Math.min(100, Math.round((completedLessonsCount / totalLessonsCount) * 100))
 
   // 4. Fetch public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)
@@ -434,6 +442,9 @@ export class PortfolioValidationError extends Error {
   }
 }
 
+// Pure helpers, re-exported for existing callers; they live with the readiness model.
+export { portfolioFallbackUsername, portfolioReadinessInputFromUserRow } from '@/lib/portfolio-readiness'
+
 export async function getPortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string
@@ -448,10 +459,7 @@ export async function getPortfolioSettings(
     throw new Error('User profile not found.')
   }
 
-  // Auto-generate username from name or id if not set
-  const fallbackUsername = user.name
-    ? user.name.toLowerCase().replace(/[^a-z0-9]/g, '')
-    : `user_${userId.substring(0, 8)}`
+  const fallbackUsername = portfolioFallbackUsernameFor(user.name, userId)
 
   const rawLayout = user.portfolio_layout
   const portfolioLayout: PortfolioSectionId[] = Array.isArray(rawLayout) && rawLayout.length > 0
@@ -481,7 +489,7 @@ export async function updatePortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string,
   settings: PortfolioSettingsData
-): Promise<{ success: boolean; settings: PortfolioSettingsData }> {
+): Promise<{ success: boolean; settings: PortfolioSettingsData; previousUsername: string | null }> {
   // 1. Validate username
   const usernameCheck = validateUsername(settings.username)
   if (!usernameCheck.isValid) {
@@ -557,6 +565,16 @@ export async function updatePortfolioSettings(
     }
   }
 
+  // The handle being replaced, so the caller can purge OG cards cached under it. Best-effort:
+  // a failed read only costs that purge, never the save.
+  let previousUsername: string | null = null
+  try {
+    const { data: before } = await supabase.from('users').select('username').eq('id', userId).maybeSingle()
+    previousUsername = before?.username || null
+  } catch {
+    previousUsername = null
+  }
+
   const { error: updateError } = await supabase
     .from('users')
     .update(updatePayload)
@@ -599,6 +617,7 @@ export async function updatePortfolioSettings(
 
   return {
     success: true,
+    previousUsername,
     settings: {
       username: cleanUsername,
       name: (updatePayload.name as string) || '',

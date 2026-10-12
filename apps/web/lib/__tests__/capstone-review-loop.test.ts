@@ -26,6 +26,47 @@ vi.mock('@/lib/admin/guard', () => ({
   logAdminAction: vi.fn(async () => {}),
 }))
 
+// In-memory `in_app_notifications` for the in-app write path: the idempotency lookup
+// (select → eq → eq → maybeSingle) and the insert (insert → select → single).
+const inAppDb = vi.hoisted(() => {
+  const rows: Array<Record<string, unknown>> = []
+  const client = {
+    from: (table: string) => {
+      if (table !== 'in_app_notifications') throw new Error(`unexpected table ${table}`)
+      return {
+        select: () => {
+          const filters: Record<string, unknown> = {}
+          const chain = {
+            eq: (column: string, value: unknown) => {
+              filters[column] = value
+              return chain
+            },
+            maybeSingle: async () => ({
+              data: rows.find((row) => Object.entries(filters).every(([k, v]) => row[k] === v)) ?? null,
+              error: null,
+            }),
+          }
+          return chain
+        },
+        insert: (payload: Record<string, unknown>) => ({
+          select: () => ({
+            single: async () => {
+              const row = { id: `n${rows.length + 1}`, ...payload }
+              rows.push(row)
+              return { data: row, error: null }
+            },
+          }),
+        }),
+      }
+    },
+  }
+  return { rows, client }
+})
+vi.mock('@/lib/supabase', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  createServiceRoleClient: () => inAppDb.client,
+}))
+
 import { ModerationService } from '@/lib/admin/moderation-service'
 import { computeReviewAge } from '@/lib/admin/capstone-review-aging'
 import { EVENT_DEFINITIONS, validateEventPayload } from '@/lib/notifications/events'
@@ -120,6 +161,103 @@ describe('Phase 8.2 — capstone review lifecycle', () => {
     expect(captured.updatePayload).not.toHaveProperty('reviewed_by')
 
     // No duplicate notification.
+    expect(dispatchMock).not.toHaveBeenCalled()
+  })
+
+  it('notifies when a re-review publishes a capstone that was rejected before', async () => {
+    const { client, captured } = mockClient({
+      id: 's1',
+      user_id: 'learner-1',
+      module_slug: 'foundations',
+      status: 'reviewed',
+      is_public: false,
+      reviewed_at: '2026-09-01T00:00:00Z',
+    })
+
+    const ok = await ModerationService.reviewCapstone('admin-2', 'admin2@prodily.app', 's1', 'approve', client)
+    expect(ok).toBe(true)
+
+    // The first decision's timestamp is kept.
+    expect(captured.updatePayload?.is_public).toBe(true)
+    expect(captured.updatePayload).not.toHaveProperty('reviewed_at')
+
+    // Its own event id: the in-app row is keyed by the event id, so reusing the first review's id
+    // would drop the "published" notice as a duplicate of the earlier "listing is off" one. The
+    // email is keyed by payload.submissionId (capstone-published-email-s1), not by this id.
+    expect(dispatchMock).toHaveBeenCalledTimes(1)
+    const event = dispatchMock.mock.calls[0][0] as any
+    expect(event.id).toBe('capstone-reviewed-s1-published')
+    expect(event.payload.submissionId).toBe('s1')
+    expect(event.payload.isPublished).toBe(true)
+  })
+
+  it('reject then approve adds a second in-app row with the published wording', async () => {
+    const featureFlags = await import('@/lib/notifications/feature-flags/service')
+    const { createInAppNotification } = await import('@/lib/notifications/in-app/service')
+    const { createDefaultNotificationPreferences } = await import('@/lib/notifications/preferences/defaults')
+    vi.spyOn(featureFlags.globalFeatureFlagService, 'isEnabledAsync').mockResolvedValue(true)
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-test-key')
+    inAppDb.rows.length = 0
+
+    // What the in-app connector does with a dispatched event (lib/notifications/events/connectors.ts).
+    const deliver = async (event: any) => {
+      const content = buildInAppContentFromEvent(event)
+      return createInAppNotification({
+        userId: event.userId,
+        eventId: event.id,
+        idempotencyKey: event.id,
+        category: event.category,
+        title: content.title,
+        body: content.body,
+        actionUrl: content.actionUrl,
+        priority: event.priority,
+        preloadedPreferences: createDefaultNotificationPreferences(event.userId),
+      })
+    }
+
+    try {
+      // First review: reject.
+      const first = mockClient({ id: 's1', user_id: 'learner-1', module_slug: 'foundations', status: 'submitted', is_public: true, reviewed_at: null })
+      expect(await ModerationService.reviewCapstone('admin-1', 'admin@prodily.app', 's1', 'reject', first.client)).toBe(true)
+      const rejected = dispatchMock.mock.calls[0][0] as any
+      expect(rejected.id).toBe('capstone-reviewed-s1')
+      expect((await deliver(rejected)).reason).toBeUndefined()
+
+      // Re-review: approve.
+      const second = mockClient({ id: 's1', user_id: 'learner-1', module_slug: 'foundations', status: 'reviewed', is_public: false, reviewed_at: '2026-09-01T00:00:00Z' })
+      expect(await ModerationService.reviewCapstone('admin-1', 'admin@prodily.app', 's1', 'approve', second.client)).toBe(true)
+      expect(dispatchMock).toHaveBeenCalledTimes(2)
+      const published = dispatchMock.mock.calls[1][0] as any
+      expect((await deliver(published)).reason).toBeUndefined()
+
+      expect(inAppDb.rows.map((row) => row.idempotency_key)).toEqual([
+        'capstone-reviewed-s1',
+        'capstone-reviewed-s1-published',
+      ])
+      expect(inAppDb.rows[0].body).toContain('the public listing is off for now')
+      expect(inAppDb.rows[1].body).toContain('published it to your portfolio')
+
+      // A retried publishing re-review is still a duplicate of itself.
+      expect((await deliver(published)).reason).toBe('duplicate_idempotent')
+      expect(inAppDb.rows).toHaveLength(2)
+    } finally {
+      vi.unstubAllEnvs()
+      vi.restoreAllMocks()
+    }
+  })
+
+  it('does not re-notify when an already published capstone is approved again', async () => {
+    const { client } = mockClient({
+      id: 's1',
+      user_id: 'learner-1',
+      module_slug: 'foundations',
+      status: 'reviewed',
+      is_public: true,
+      reviewed_at: '2026-09-01T00:00:00Z',
+    })
+
+    expect(await ModerationService.reviewCapstone('admin-2', 'admin2@prodily.app', 's1', 'approve', client)).toBe(true)
     expect(dispatchMock).not.toHaveBeenCalled()
   })
 
