@@ -69,6 +69,7 @@ export const POST = withRoute(
       heldOut: run.heldOut,
       skippedTimezone: run.skippedTimezone,
       skippedNoSegment: run.skippedNoSegment,
+      pagesSkipped: run.pagesSkipped,
       dryRun: run.dryRun,
       proofNudges: {
         dryRun: run.dryRun,

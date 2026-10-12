@@ -1,6 +1,9 @@
-import { revalidatePath, unstable_cache } from 'next/cache'
+import { revalidatePath } from 'next/cache'
+import nextPackage from 'next/package.json'
 import { ADMIN_CACHE_TAGS } from './cache-tags'
-import { revalidateCapstoneOgCards } from '@/lib/og/revalidate-capstone-cards'
+import { cacheWithMaxAge } from './bounded-cache'
+import { revalidateCapstoneOgCards, revalidatePortfolioOgCard } from '@/lib/og/revalidate-capstone-cards'
+import { buildIlikeOrFilter } from './search-filter'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -95,7 +98,7 @@ export class AdminConsoleService {
         failedNotifications24h: failedCount24h,
         lastCheckedAt: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        nextVersion: `Next.js ${nextPackage.version} (Turbopack)`,
       }
     } catch (err) {
       console.warn('[AdminConsoleService] getSystemHealth failed:', err)
@@ -107,7 +110,7 @@ export class AdminConsoleService {
         failedNotifications24h: 0,
         lastCheckedAt: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        nextVersion: `Next.js ${nextPackage.version} (Turbopack)`,
       }
     }
   }
@@ -122,7 +125,9 @@ export class AdminConsoleService {
    * succeeded" and `databaseLatencyMs` is how long that batch took, both measured inside
    * the cached function (so they are as fresh as the counts). A failed batch throws out
    * of the cached function, which keeps the failure out of the cache; the counts that
-   * did come back are still shown.
+   * did come back are still shown. `cacheWithMaxAge` makes that hold for a stale entry
+   * too: the read waits for the recompute, so an outage reports offline instead of
+   * replaying the last healthy counts, and nothing older than the 30s window is served.
    */
   public static async getConsoleShellContext(): Promise<AdminConsoleShellContext> {
     const emptyAttention: AdminConsoleShellContext['attention'] = {
@@ -176,7 +181,7 @@ export class AdminConsoleService {
     }
 
     try {
-      return await unstable_cache(loadCounts, ['admin-console-shell-context'], {
+      return await cacheWithMaxAge(loadCounts, ['admin-console-shell-context'], {
         revalidate: 30,
         tags: [ADMIN_CACHE_TAGS.shell],
       })()
@@ -229,8 +234,8 @@ export class AdminConsoleService {
 
       // Search (applied alongside ID constraint)
       if (search && typeof search === 'string' && search.trim()) {
-        const q = search.trim()
-        query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,username.ilike.%${q}%`)
+        // Quoted and escaped: the term must not be able to add a condition of its own.
+        query = query.or(buildIlikeOrFilter(['name', 'email', 'username'], search))
       }
 
       // Direct column filters (fast — applied on DB, not via sub-query)
@@ -402,7 +407,7 @@ export class AdminConsoleService {
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('xp_events').select('user_id').gte('created_at', activeSince).limit(5000),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', signupsSince),
-        supabase.from('user_lesson_progress').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+        supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
       ])
 
       const totalUsers = totalRes.count || 0
@@ -548,7 +553,8 @@ export class AdminConsoleService {
         .limit(50),
       supabase
         .from('user_flashcard_srs')
-        .select('id', { count: 'exact', head: true })
+        // No `id` column here (the key is user_id + flashcard_id).
+        .select('user_id', { count: 'exact', head: true })
         .eq('user_id', userId),
       supabase
         .from('email_queue')
@@ -1053,7 +1059,7 @@ export class AdminConsoleService {
     if (userRow.username) {
       try {
         revalidatePath(`/p/${userRow.username}`)
-        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidatePortfolioOgCard(userRow.username)
         revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments
@@ -1158,7 +1164,7 @@ export class AdminConsoleService {
     if (userRow.username) {
       try {
         revalidatePath(`/p/${userRow.username}`)
-        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+        revalidatePortfolioOgCard(userRow.username)
         revalidateCapstoneOgCards(userRow.username)
       } catch {
         // revalidatePath is best-effort in some environments

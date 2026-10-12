@@ -4,6 +4,7 @@ import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { findPublicCapstone } from '@/lib/portfolio-capstone-page'
 import { BRAND } from '@/lib/brand'
 import { OG, ProdilyLogoMark } from '@/lib/og/brand'
+import { capstoneOgCardPath, needsCanonicalOgRedirect, redirectToOgCardPath } from '@/lib/og/card-paths'
 
 /**
  * OG image for one public capstone page (Growth R5 / B13b).
@@ -12,6 +13,12 @@ import { OG, ProdilyLogoMark } from '@/lib/og/brand'
  * why `force-static` is needed with a declared Request argument). Privacy is checked on every
  * regeneration through findPublicCapstone, the same rule the page uses: a capstone that is not on
  * the public portfolio gets the generic brand card, never its title.
+ *
+ * The cache is per URL path and the username lookup ignores case, so a titled card is rendered
+ * only under the lowercase username; any other spelling is redirected there before the lookup
+ * (lib/og/card-paths.ts). That keeps one entry per learner and capstone, which is the entry
+ * revalidateCapstoneOgCards purges when the portfolio goes private, the capstone is unpublished or
+ * the username changes. A CDN copy can still outlive the purge by its own s-maxage.
  */
 export const dynamic = 'force-static'
 export const revalidate = 3600
@@ -51,6 +58,9 @@ function Frame({ children }: { children: React.ReactNode }) {
 export async function GET(request: Request, { params }: RouteProps) {
   try {
     const { username, moduleSlug } = await params
+    if (needsCanonicalOgRedirect(username)) {
+      return redirectToOgCardPath(capstoneOgCardPath(username, moduleSlug))
+    }
     const portfolio = await getPublicPortfolioData(createServiceRoleClient(), username)
     const capstone = findPublicCapstone(portfolio, moduleSlug)
 

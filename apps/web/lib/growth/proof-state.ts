@@ -90,6 +90,22 @@ export function deriveProofState(input: ProofStateInput): ProofState {
   }
 }
 
+/**
+ * Whether to tell a learner, unprompted, that they qualify for PM Fellow (the nudge, the weekly
+ * recap and the lifecycle emails all use this). Only for learners who never had a request decided:
+ * not after a rejection (`fellowState` is still 'eligible' then; they can see and re-request in
+ * Settings, and an unprompted "you qualify" reads badly), and not after an approval (that learner
+ * was a Fellow; if they are not one now, the status was revoked). A Fellow granted and revoked by
+ * an admin with no request leaves no trace here, so that rare case can still be prompted.
+ */
+export function shouldPromptFellowRequest(state: Pick<ProofState, 'fellowState' | 'latestFellowRequestStatus'>): boolean {
+  return (
+    state.fellowState === 'eligible' &&
+    state.latestFellowRequestStatus !== 'rejected' &&
+    state.latestFellowRequestStatus !== 'approved'
+  )
+}
+
 export type ProofNextStepKind = 'publish_portfolio' | 'request_fellow' | 'submit_capstone' | 'continue_lessons' | 'none'
 
 export interface ProofNextStep {
@@ -104,7 +120,7 @@ const PORTFOLIO_SETTINGS_PATH = '/settings?tab=portfolio'
 
 /**
  * The one next step that moves the learner's proof forward, in priority order:
- * publish a ready portfolio → request Fellow when eligible → submit the next capstone →
+ * publish a ready portfolio → request Fellow when eligible and never decided → submit the next capstone →
  * continue lessons toward the certificate → nothing (all done).
  */
 export function selectProofNextStep(state: ProofState): ProofNextStep {
@@ -115,7 +131,7 @@ export function selectProofNextStep(state: ProofState): ProofNextStep {
       path: PORTFOLIO_SETTINGS_PATH,
     }
   }
-  if (state.fellowState === 'eligible') {
+  if (shouldPromptFellowRequest(state)) {
     return {
       kind: 'request_fellow',
       text: 'Your portfolio qualifies you for PM Fellow. Request it from your portfolio settings.',

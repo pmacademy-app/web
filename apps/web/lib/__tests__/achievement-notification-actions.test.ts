@@ -80,6 +80,15 @@ describe('fellow.granted', () => {
     })
   })
 
+  it('says the badge is live only when the portfolio is public', () => {
+    const body = (payload: Record<string, unknown>) => buildInAppContentFromEvent(envelope('fellow.granted', payload)).body
+    expect(body({ username: 'ada', isPortfolioPublic: true })).toMatch(/now live on your public portfolio/)
+    for (const payload of [{ username: 'ada', isPortfolioPublic: false }, { username: null, isPortfolioPublic: true }]) {
+      expect(body(payload)).not.toMatch(/now live/)
+      expect(body(payload)).toMatch(/make your portfolio public/i)
+    }
+  })
+
   it.each([
     [{ username: 'ada', isPortfolioPublic: true }],
     [{ username: 'ada', isPortfolioPublic: false }],

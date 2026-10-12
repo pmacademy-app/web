@@ -86,7 +86,12 @@ AS $$
            m.value ->> 'slug' AS slug,
            ARRAY(
              SELECT DISTINCT l.lesson_id
-             FROM jsonb_array_elements_text(COALESCE(m.value -> 'lesson_ids', '[]'::jsonb)) AS l(lesson_id)
+             FROM jsonb_array_elements_text(
+               CASE WHEN jsonb_typeof(m.value -> 'lesson_ids') = 'array'
+                    THEN m.value -> 'lesson_ids'
+                    ELSE '[]'::jsonb
+               END
+             ) AS l(lesson_id)
            ) AS lesson_ids
     FROM jsonb_array_elements(COALESCE(p_modules, '[]'::jsonb)) WITH ORDINALITY AS m(value, ord)
   ),

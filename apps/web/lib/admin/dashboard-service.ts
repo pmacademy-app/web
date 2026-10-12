@@ -1,3 +1,4 @@
+import nextPackage from 'next/package.json'
 import { createServiceRoleClient } from '../supabase'
 import { fetchCurriculumData } from '../lesson-loader'
 import {
@@ -8,11 +9,11 @@ import {
   mergeSeries,
   resolveRange,
 } from './dashboard-aggregation'
-import { unstable_cache } from 'next/cache'
 import { AdminConsoleService } from './service'
 import { ADMIN_CACHE_TAGS } from './cache-tags'
+import { cacheWithMaxAge } from './bounded-cache'
 import { fetchAllRows } from './fetch-all'
-import { fetchActiveUsers } from './analytics-rpc'
+import { fetchActiveUsers, fetchFunnelDistinctUsers } from './analytics-rpc'
 import type {
   AdminAttentionItem,
   AdminDashboardData,
@@ -110,15 +111,17 @@ export class DashboardService {
           supabase.from('users').select('id', { count: 'exact', head: true }).eq('is_portfolio_public', true),
           // Both of these feed an aggregate (a sum and a distinct count), so a
           // truncated page produces a confidently wrong number with no error. Paged to
-          // completion rather than capped. F-COR-4.
+          // completion rather than capped, and ordered so pages cannot overlap or skip. F-COR-4.
           fetchAllRows<{ total_xp: number | null }>((from, to) =>
-            supabase.from('users').select('total_xp').range(from, to)
+            supabase.from('users').select('total_xp').order('id').range(from, to)
           ).then((data) => ({ data })),
           fetchAllRows<{ user_id: string | null }>((from, to) =>
             supabase
               .from('xp_events')
               .select('user_id')
               .gte('created_at', past7d.toISOString())
+              .order('created_at')
+              .order('id')
               .range(from, to)
           ).then((data) => ({ data })),
           AdminConsoleService.getSystemHealth(),
@@ -158,7 +161,7 @@ export class DashboardService {
           failedNotifications24h: 0,
           lastCheckedAt: new Date().toISOString(),
           environment: process.env.NODE_ENV || 'development',
-          nextVersion: 'Next.js 16.2.12 (Turbopack)',
+          nextVersion: `Next.js ${nextPackage.version} (Turbopack)`,
         }))
         return {
           totalUsers: 0,
@@ -229,7 +232,9 @@ export class DashboardService {
  *   - never throws: a failure returns that section's empty fallback with `failed: true`.
  *     The cached function throws on failure, and unstable_cache does not store a
  *     rejection, so a failed load is retried on the next request instead of being
- *     served for 90s. Helpers inside a computation must not swallow errors into
+ *     served for 90s. `cacheWithMaxAge` (./bounded-cache) keeps that true once an entry
+ *     is stale: the read waits for the recompute rather than taking the old value, so
+ *     its failure lands here and nothing older than the 90s window is served. Helpers inside a computation must not swallow errors into
  *     normal-looking values (0, false), or a degraded result would be cached as healthy.
  *     A computation with a usable partial result throws `DegradedSliceError` carrying
  *     it, so the page shows the partial data with `failed: true`, uncached.
@@ -327,7 +332,7 @@ async function loadSlice<T extends object>(
   revive: (value: T) => T = (value) => value
 ): Promise<T & { failed: boolean }> {
   try {
-    const cached = unstable_cache(compute, ['admin-dashboard', name, ...keyParts], {
+    const cached = cacheWithMaxAge(compute, ['admin-dashboard', name, ...keyParts], {
       revalidate: DASHBOARD_CACHE_SECONDS,
       tags: [ADMIN_CACHE_TAGS.dashboard],
     })
@@ -484,22 +489,38 @@ async function computeKpis(
     supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', startIso).lte('created_at', endIso),
     supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', prevStartIso).lte('created_at', prevEndIso),
     // XP sums and distinct active-user sets: a capped page here would be confidently
-    // wrong above the cap, so these page to completion. F-COR-4.
+    // wrong above the cap, so these page to completion. F-COR-4. Ordered by the range
+    // column and then the primary key, so pages cannot overlap or skip rows.
     fetchAllRows<{ user_id: string | null; xp_amount: number }>((f, t) =>
-      supabase.from('xp_events').select('user_id, xp_amount').gte('created_at', startIso).lte('created_at', endIso).range(f, t)
+      supabase
+        .from('xp_events')
+        .select('user_id, xp_amount')
+        .gte('created_at', startIso)
+        .lte('created_at', endIso)
+        .order('created_at')
+        .order('id')
+        .range(f, t)
     ),
     fetchAllRows<{ user_id: string | null; xp_amount: number }>((f, t) =>
-      supabase.from('xp_events').select('user_id, xp_amount').gte('created_at', prevStartIso).lte('created_at', prevEndIso).range(f, t)
+      supabase
+        .from('xp_events')
+        .select('user_id, xp_amount')
+        .gte('created_at', prevStartIso)
+        .lte('created_at', prevEndIso)
+        .order('created_at')
+        .order('id')
+        .range(f, t)
     ),
+    // user_lesson_progress has no `id` column (its key is user_id + lesson_id).
     supabase
       .from('user_lesson_progress')
-      .select('id', { count: 'exact', head: true })
+      .select('user_id', { count: 'exact', head: true })
       .eq('status', 'completed')
       .gte('completed_at', startIso)
       .lte('completed_at', endIso),
     supabase
       .from('user_lesson_progress')
-      .select('id', { count: 'exact', head: true })
+      .select('user_id', { count: 'exact', head: true })
       .eq('status', 'completed')
       .gte('completed_at', prevStartIso)
       .lte('completed_at', prevEndIso),
@@ -568,12 +589,27 @@ async function computeSeries(
   const { startIso, endIso } = rangeIsos(range)
   const supabase = createServiceRoleClient()
 
+  // Each paged read is ordered by its range column, then its primary key (see computeKpis).
   const [newUsers, xpCurrent, activeUsers, lessons, quizzes, capstones] = await Promise.all([
     fetchAllRows<{ id: string; created_at: string }>((f, t) =>
-      supabase.from('users').select('id, created_at').gte('created_at', startIso).lte('created_at', endIso).range(f, t)
+      supabase
+        .from('users')
+        .select('id, created_at')
+        .gte('created_at', startIso)
+        .lte('created_at', endIso)
+        .order('created_at')
+        .order('id')
+        .range(f, t)
     ),
     fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((f, t) =>
-      supabase.from('xp_events').select('user_id, xp_amount, created_at').gte('created_at', startIso).lte('created_at', endIso).range(f, t)
+      supabase
+        .from('xp_events')
+        .select('user_id, xp_amount, created_at')
+        .gte('created_at', startIso)
+        .lte('created_at', endIso)
+        .order('created_at')
+        .order('id')
+        .range(f, t)
     ),
     // The "active before the window" set that splits new from returning learners. The RPC
     // returns only users with XP in the range, which are the only ones buildLearnerSeries
@@ -586,10 +622,20 @@ async function computeSeries(
         .eq('status', 'completed')
         .gte('completed_at', startIso)
         .lte('completed_at', endIso)
+        .order('completed_at')
+        .order('user_id')
+        .order('lesson_id')
         .range(f, t)
     ),
     fetchAllRows<{ id: string; user_id: string | null; attempted_at: string }>((f, t) =>
-      supabase.from('quiz_attempts').select('id, user_id, attempted_at').gte('attempted_at', startIso).lte('attempted_at', endIso).range(f, t)
+      supabase
+        .from('quiz_attempts')
+        .select('id, user_id, attempted_at')
+        .gte('attempted_at', startIso)
+        .lte('attempted_at', endIso)
+        .order('attempted_at')
+        .order('id')
+        .range(f, t)
     ),
     fetchAllRows<{ user_id: string | null; submitted_at: string | null }>((f, t) =>
       supabase
@@ -597,6 +643,8 @@ async function computeSeries(
         .select('user_id, submitted_at')
         .gte('submitted_at', startIso)
         .lte('submitted_at', endIso)
+        .order('submitted_at')
+        .order('id')
         .range(f, t)
     ),
   ])
@@ -621,24 +669,25 @@ async function computeSeries(
 async function computeFunnel(): Promise<Omit<DashboardFunnelSlice, 'failed'>> {
   const supabase = createServiceRoleClient()
 
-  const [totalUsersRes, usersWithGoalRes, firstLessonRes, firstQuizRes, moduleCompletionRes, certificateRes, courseCompletionUsers] =
-    await Promise.all([
-      supabase.from('users').select('id', { count: 'exact', head: true }),
-      supabase.from('users').select('id', { count: 'exact', head: true }).not('goal', 'is', null),
-      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
-      supabase.from('quiz_attempts').select('user_id', { count: 'exact', head: true }),
-      supabase.from('capstone_submissions').select('user_id', { count: 'exact', head: true }).not('submitted_at', 'is', null),
-      supabase.from('certificates').select('user_id', { count: 'exact', head: true }),
-      countCourseCompletionUsers(supabase),
-    ])
+  // The three activity steps are learners, not rows: a head count of completed lessons,
+  // quiz answers or submissions grows with every row a learner adds and overtakes
+  // "Registered". The RPC returns distinct users per step (20261013000001).
+  const [totalUsersRes, usersWithGoalRes, distinctUsers, certificateRes, courseCompletionUsers] = await Promise.all([
+    supabase.from('users').select('id', { count: 'exact', head: true }),
+    supabase.from('users').select('id', { count: 'exact', head: true }).not('goal', 'is', null),
+    fetchFunnelDistinctUsers(supabase),
+    supabase.from('certificates').select('user_id', { count: 'exact', head: true }),
+    countCourseCompletionUsers(supabase),
+  ])
+  if (!distinctUsers) throw new Error('admin_funnel_distinct_users RPC failed')
 
   return {
     funnel: buildFunnel([
       { key: 'registered', label: 'Registered', count: countOf(totalUsersRes, 'funnel registered') },
       { key: 'onboarding', label: 'Onboarding', count: countOf(usersWithGoalRes, 'funnel onboarding') },
-      { key: 'first_lesson', label: 'First Lesson', count: countOf(firstLessonRes, 'funnel first lesson') },
-      { key: 'first_quiz', label: 'First Quiz', count: countOf(firstQuizRes, 'funnel first quiz') },
-      { key: 'module_completion', label: 'Module Completion', count: countOf(moduleCompletionRes, 'funnel module completion') },
+      { key: 'first_lesson', label: 'First Lesson', count: distinctUsers.firstLesson },
+      { key: 'first_quiz', label: 'First Quiz', count: distinctUsers.firstQuiz },
+      { key: 'module_completion', label: 'Module Completion', count: distinctUsers.moduleCompletion },
       { key: 'course_completion', label: 'Course Completion', count: courseCompletionUsers },
       { key: 'certificate', label: 'Certificate', count: countOf(certificateRes, 'funnel certificate') },
     ]),
@@ -715,8 +764,13 @@ async function computeSystemSnapshot(): Promise<Omit<DashboardSystemSnapshotSlic
     AdminConsoleService.getEmailQueueOverview(),
   ])
   const systemSnapshot = buildSystemSnapshot(health, queue, authAvailable)
-  // A real "Auth unreachable" or an unreadable queue is still shown, but never cached.
-  const problems = [!authAvailable && 'Auth API unreachable', queue.failed && 'email queue overview failed'].filter(Boolean)
+  // A real "Auth unreachable", a degraded or down database probe, or an unreadable queue is
+  // still shown, but never cached: a cached tile would keep reading as it did for 90s.
+  const problems = [
+    !authAvailable && 'Auth API unreachable',
+    health.status !== 'healthy' && `database ${health.status}`,
+    queue.failed && 'email queue overview failed',
+  ].filter(Boolean)
   if (problems.length > 0) throw new DegradedSliceError(problems.join('; '), { systemSnapshot })
   return { systemSnapshot }
 }
@@ -745,7 +799,10 @@ async function computeRecentActivity(): Promise<Omit<DashboardRecentActivitySlic
       .select('id, user_id, module_slug, submitted_at')
       .order('submitted_at', { ascending: false })
       .limit(limit),
-    fetchCurriculumData().catch(() => null),
+    fetchCurriculumData().catch((curriculumErr) => {
+      console.warn('[DashboardService] recent activity curriculum load failed:', curriculumErr)
+      return null
+    }),
   ])
 
   for (const [res, label] of [
@@ -827,11 +884,16 @@ async function computeRecentActivity(): Promise<Omit<DashboardRecentActivitySlic
     })
   }
 
-  return {
-    recentActivity: results
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, limit),
+  const recentActivity = results
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, limit)
+
+  // Without the curriculum the lesson rows above carry raw lesson ids as titles: still
+  // worth showing, but never cached as a healthy result.
+  if (!curriculumData?.lessons && lessonRowsTyped.length > 0) {
+    throw new DegradedSliceError('curriculum unavailable', { recentActivity })
   }
+  return { recentActivity }
 }
 
 /* ─── Shared helpers ───────────────────────────────────────────────────────── */

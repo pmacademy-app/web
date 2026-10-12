@@ -51,6 +51,54 @@ describe('Supabase Row Level Security (RLS) Policy Test Suite', () => {
     expect(b1Sql).toContain('CREATE POLICY "Users can view own certificates" ON public.certificates')
   })
 
+  it('1b. Learners can only update the read state of their own in-app notifications', () => {
+    const migrationsDir = path.resolve(process.cwd(), '../../supabase/migrations')
+    const name = '20261013000002_restrict_in_app_notification_updates'
+    const code = (file: string) => fs.readFileSync(path.join(migrationsDir, file), 'utf-8').replace(/--.*$/gm, '')
+    const up = code(`${name}.sql`)
+    const down = code(`rollback/${name}.down.sql`)
+    const policy = '"Users can update own in-app notifications"'
+
+    // Table-wide UPDATE is taken away first, then only the read-state columns are granted back.
+    const revoke = up.indexOf('REVOKE UPDATE ON public.in_app_notifications FROM authenticated, anon;')
+    const grant = up.indexOf('GRANT UPDATE (is_read, read_at) ON public.in_app_notifications TO authenticated;')
+    expect(revoke).toBeGreaterThanOrEqual(0)
+    expect(grant).toBeGreaterThan(revoke)
+    // No other grant: nothing for anon, and no other column (celebrated_at, action_url, ...).
+    expect(up.match(/\bGRANT\b/g)).toHaveLength(1)
+
+    // The policy is re-created (re-runnable) and now checks the written row as well.
+    expect(up).toContain(`DROP POLICY IF EXISTS ${policy} ON public.in_app_notifications;`)
+    expect(up).toMatch(
+      /CREATE POLICY "Users can update own in-app notifications"\s+ON public\.in_app_notifications FOR UPDATE\s+USING \(auth\.uid\(\) = user_id\)\s+WITH CHECK \(auth\.uid\(\) = user_id\);/,
+    )
+    // Reads and the service role are left alone.
+    expect(up).not.toMatch(/SELECT|service_role|DISABLE ROW LEVEL SECURITY/i)
+
+    // REVOKE is silent about a grant made by another role, so the migration checks its own
+    // result: it fails while table-wide UPDATE is still there, and when "mark read" would not work.
+    const selfCheck = up.slice(up.indexOf('COMMENT ON POLICY'))
+    expect(selfCheck).toMatch(
+      /DO \$\$\s+BEGIN\s+IF has_table_privilege\('authenticated', 'public\.in_app_notifications', 'UPDATE'\) THEN\s+RAISE EXCEPTION '[^']*as that role[^']*';\s+END IF;/,
+    )
+    for (const column of ['is_read', 'read_at']) {
+      expect(selfCheck).toContain(
+        `IF NOT has_column_privilege('authenticated', 'public.in_app_notifications', '${column}', 'UPDATE') THEN`,
+      )
+    }
+    expect(selfCheck.match(/RAISE EXCEPTION/g)).toHaveLength(3)
+    expect(selfCheck).toMatch(/END \$\$;\s*$/)
+
+    // Rollback: column grant removed, table-wide UPDATE back, original policy (no WITH CHECK).
+    expect(down).toContain('REVOKE UPDATE (is_read, read_at) ON public.in_app_notifications FROM authenticated;')
+    expect(down).toContain('GRANT UPDATE ON public.in_app_notifications TO authenticated, anon;')
+    expect(down).toContain(`DROP POLICY IF EXISTS ${policy} ON public.in_app_notifications;`)
+    expect(down).toMatch(
+      /CREATE POLICY "Users can update own in-app notifications"\s+ON public\.in_app_notifications FOR UPDATE\s+USING \(auth\.uid\(\) = user_id\);/,
+    )
+    expect(down).not.toMatch(/WITH CHECK/i)
+  })
+
   it('2. User-scoped unauthenticated client is denied unauthorized table access', async () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

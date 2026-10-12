@@ -23,22 +23,15 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     ? (params.section as SettingsSectionKey)
     : 'product'
 
-  // Fetch all settings in parallel for the initial load
-  const [product, learning, email, notifications, featureFlags, onboarding] = await Promise.all([
-    SettingsService.getProductSettings(),
-    SettingsService.getLearningSettings(),
-    SettingsService.getEmailSettings(),
-    SettingsService.getNotificationSettings(),
-    SettingsService.getFeatureFlags(),
-    SettingsService.getOnboardingSettings(),
-  ])
-
-  const initialData = { product, learning, email, notifications, 'feature-flags': featureFlags, onboarding }
+  // Fetch all settings in parallel for the initial load. A section that could not be read comes
+  // back in `failedSections`; the workspace shows an error for it instead of a form of defaults.
+  const { data: initialData, failedSections } = await SettingsService.getAdminWorkspaceSettings()
 
   return (
     <SettingsWorkspace
       initialSection={section}
       initialData={initialData}
+      failedSections={failedSections}
     />
   )
 }

@@ -121,3 +121,23 @@ describe('PortfolioSettingsForm — layout refresh after save', () => {
     expect(refresh).not.toHaveBeenCalled()
   })
 })
+
+describe('PortfolioSettingsForm — share card preview link', () => {
+  const previewLink = (el: HTMLElement) =>
+    Array.from(el.querySelectorAll('a')).find((a) => a.textContent?.includes('Social Preview Card'))
+
+  it('points at the canonical card path, whatever is typed in the username box', () => {
+    const el = renderForm()
+    expect(previewLink(el)?.getAttribute('href')).toBe('/api/og/portfolio/ada')
+
+    // The card route serves one lowercase, trimmed, encoded path per learner; a raw form value
+    // would open a redirect at best and a broken URL at worst.
+    const input = el.querySelector('#setting-username') as HTMLInputElement
+    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    act(() => {
+      setValue.call(input, ' Ada L/x ')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    expect(previewLink(el)?.getAttribute('href')).toBe('/api/og/portfolio/ada%20l%2Fx')
+  })
+})

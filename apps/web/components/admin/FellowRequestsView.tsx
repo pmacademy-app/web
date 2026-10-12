@@ -134,6 +134,7 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Reason (optional)"
+                aria-label={`Reason for declining ${item.userName} (optional)`}
                 className="w-full text-[11px] px-2 py-1 rounded bg-admin-bg border border-admin-border text-admin-fg focus:outline-none focus:border-admin-accent"
               />
               <div className="flex gap-1.5">
@@ -182,8 +183,9 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
                 rel="noopener noreferrer"
                 className="p-1.5 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg border border-admin-border transition-colors"
                 title="View public portfolio"
+                aria-label={`View ${item.userName}'s public portfolio (opens in a new tab)`}
               >
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
             )}
             {item.status === 'pending' && (
@@ -215,7 +217,7 @@ export function FellowRequestsView({ initialQueue, status, onParamsChange }: Fel
   return (
     <div className="space-y-4">
       {errorMsg && (
-        <div className="p-3 rounded-lg bg-admin-danger-soft border border-admin-danger/25 text-xs text-admin-danger">
+        <div role="alert" className="p-3 rounded-lg bg-admin-danger-soft border border-admin-danger/25 text-xs text-admin-danger">
           {errorMsg}
         </div>
       )}

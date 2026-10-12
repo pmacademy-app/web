@@ -16,13 +16,23 @@ function parseTab(value: string | string[] | undefined): AdminAnalyticsTab {
     : 'overview'
 }
 
+/** Known ranges. `?range=` is validated the same way; anything else is the default 30 days. */
+const ANALYTICS_RANGES = ['today', '7d', '30d', '90d', 'custom'] as const satisfies readonly AdminDateRangeKey[]
+
+function parseRange(value: string | string[] | undefined): AdminDateRangeKey {
+  return typeof value === 'string' && (ANALYTICS_RANGES as readonly string[]).includes(value)
+    ? (value as AdminDateRangeKey)
+    : '30d'
+}
+
 interface AdminAnalyticsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export default async function AdminAnalyticsPage({ searchParams }: AdminAnalyticsPageProps) {
   const params = await searchParams
-  const range = (params.range as AdminDateRangeKey) || '30d'
+  const range = parseRange(params.range)
+  // A repeated param (`?from=a&from=b`) arrives as an array and is dropped.
   const from = typeof params.from === 'string' ? params.from : null
   const to = typeof params.to === 'string' ? params.to : null
   const tab = parseTab(params.tab)

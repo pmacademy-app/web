@@ -42,6 +42,18 @@ describe('R4-A0 privileged user column guard', () => {
     expect(sql).not.toMatch(/SECURITY DEFINER/i)
   })
 
+  it('pins search_path on the trigger function', () => {
+    expect(sql).toMatch(
+      /CREATE OR REPLACE FUNCTION public\.guard_privileged_user_columns\(\)\s+RETURNS trigger\s+LANGUAGE plpgsql\s+SET search_path = public, pg_temp\s+AS \$\$/
+    )
+  })
+
+  it('documents the role check as a deny-list that new PostgREST roles must join', () => {
+    const raw = read(migrationsDir, MIGRATION)
+    expect(raw).toMatch(/deny-list, not an allow-list/)
+    expect(raw).toMatch(/new role that PostgREST can switch to/)
+  })
+
   it('raises insufficient_privilege (42501)', () => {
     expect(sql.match(/ERRCODE = '42501'/g)?.length).toBe(2)
   })
@@ -51,6 +63,24 @@ describe('R4-A0 privileged user column guard', () => {
     expect(down).toMatch(/DROP TRIGGER IF EXISTS trigger_guard_privileged_user_columns ON public\.users/)
     expect(down).toMatch(/DROP FUNCTION IF EXISTS public\.guard_privileged_user_columns\(\)/)
     expect(fs.existsSync(path.join(migrationsDir, 'validation', 'r4a0_privileged_columns_validation.sql'))).toBe(true)
+  })
+
+  it('validates INSERT as a learner and as anon, and leaves nothing behind', () => {
+    const validation = code(read(migrationsDir, 'validation', 'r4a0_privileged_columns_validation.sql'))
+
+    expect(validation).toMatch(/INSERT INTO public\.users \(id, is_admin\) VALUES \(v_uid, true\);/)
+    expect(validation).toMatch(/SET LOCAL ROLE anon;/)
+    expect(validation).toMatch(/INSERT INTO public\.users \(id, is_admin\) VALUES \(gen_random_uuid\(\), true\);/)
+    // Both INSERT checks must tell the guard apart from an RLS refusal, which is also 42501.
+    expect(validation.match(/NOT LIKE 'privileged user columns%'/g)).toHaveLength(2)
+    // A role with no INSERT grant on the table never reaches the guard: reported, not a failure,
+    // for the learner as well as for anon.
+    expect(validation.match(/IF v_rejected_by LIKE 'permission denied for%' THEN\s+RAISE NOTICE/g)).toHaveLength(2)
+    // One transaction, rolled back, with every role switch undone before the end.
+    expect(validation.trimStart().startsWith('BEGIN;')).toBe(true)
+    expect(validation.trimEnd().endsWith('ROLLBACK;')).toBe(true)
+    expect(validation).not.toMatch(/\bCOMMIT\b/)
+    expect(validation.match(/SET LOCAL ROLE/g)).toHaveLength(validation.match(/RESET ROLE;/g)?.length ?? 0)
   })
 })
 

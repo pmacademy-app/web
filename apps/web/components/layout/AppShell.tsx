@@ -69,7 +69,7 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
 
   return (
     <SearchOverlayProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-dvh bg-background">
         {/* Navigation Sidebar */}
         <Sidebar
           isOpen={isSidebarOpen}
@@ -81,7 +81,7 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
         />
 
         {/* Main Content Pane */}
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <div className="flex flex-col flex-1 min-w-0 overflow-x-clip">
           {/* System Announcement Banner — only in authenticated learner app context */}
           <SystemAnnouncementBanner userId={userProfile.id} cohortId={userProfile.cohort_id} />
 

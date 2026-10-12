@@ -9,7 +9,9 @@ import type { AdminLevelDistribution, AdminModuleDropOff, AdminStreakBucket } fr
  *
  * Each caller returns `null` when the RPC errors (missing function, timeout,
  * malformed payload) so the service can mark that section `failed` instead of
- * throwing. The reducers turn the SQL aggregates into the exact shapes the old
+ * throwing. A payload is malformed when a key the SQL always emits is absent or
+ * not a number: reading that as 0 would cache made-up zeros as a healthy result.
+ * The reducers turn the SQL aggregates into the exact shapes the old
  * whole-table JS reductions produced; the parity test
  * (lib/__tests__/admin-analytics-rpc-parity.test.ts) holds them to that.
  */
@@ -25,13 +27,35 @@ type RpcClient = { rpc: (fn: string, args?: object) => RpcBuilder<unknown> }
 
 const asRpc = (supabase: unknown) => supabase as RpcClient
 
-const num = (value: unknown): number => {
+/** A number as PostgREST sends it (a numeric string for bigint). Null when absent or not a number. */
+const num = (value: unknown): number | null => {
+  if (typeof value !== 'number' && (typeof value !== 'string' || value.trim() === '')) return null
   const n = Number(value)
-  return Number.isFinite(n) ? n : 0
+  return Number.isFinite(n) ? n : null
+}
+
+/** Every value as a number, or null if any one is missing or not a number. */
+const nums = (values: unknown[]): number[] | null => {
+  const out = values.map(num)
+  return out.every((n): n is number => n !== null) ? out : null
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
+
+/** Calls an RPC and parses its payload; a payload the parser rejects is logged and returned as null. */
+async function callParsed<T>(
+  supabase: unknown,
+  fn: string,
+  parse: (data: Record<string, unknown>) => T | null,
+  args?: object
+): Promise<T | null> {
+  const data = await callJson(supabase, fn, args)
+  if (!data) return null
+  const parsed = parse(data)
+  if (!parsed) console.error(`[AnalyticsRpc] ${fn} returned an unexpected payload`)
+  return parsed
+}
 
 async function callJson(supabase: unknown, fn: string, args?: object): Promise<Record<string, unknown> | null> {
   try {
@@ -62,20 +86,19 @@ export interface AdminUserStats {
   streaks: number[]
 }
 
-export function parseUserStats(data: Record<string, unknown>): AdminUserStats {
-  const levels = isRecord(data.levels) ? data.levels : {}
-  const streaks = Array.isArray(data.streaks) ? data.streaks : []
-  return {
-    total: num(data.total),
-    publicPortfolios: num(data.public_portfolios),
-    levels: LEVEL_TIERS.map((tier) => num(levels[String(tier.level)])),
-    streaks: STREAK_BUCKETS.map((_, i) => num(streaks[i])),
-  }
+export function parseUserStats(data: Record<string, unknown>): AdminUserStats | null {
+  const levelCounts = isRecord(data.levels) ? data.levels : {}
+  const streakCounts = Array.isArray(data.streaks) ? data.streaks : []
+  const total = num(data.total)
+  const publicPortfolios = num(data.public_portfolios)
+  const levels = nums(LEVEL_TIERS.map((tier) => levelCounts[String(tier.level)]))
+  const streaks = nums(STREAK_BUCKETS.map((_, i) => streakCounts[i]))
+  if (total === null || publicPortfolios === null || !levels || !streaks) return null
+  return { total, publicPortfolios, levels, streaks }
 }
 
 export async function fetchUserStats(supabase: unknown): Promise<AdminUserStats | null> {
-  const data = await callJson(supabase, 'admin_user_stats')
-  return data ? parseUserStats(data) : null
+  return callParsed(supabase, 'admin_user_stats', parseUserStats)
 }
 
 /** Same output as `computeLevelDistribution(allUsers)`. */
@@ -146,16 +169,23 @@ export interface AdminLessonCompletionStats {
   modules: Map<number, { started: number; completed: number }>
 }
 
-export function parseLessonCompletionStats(data: Record<string, unknown>): AdminLessonCompletionStats {
-  const histogram = (Array.isArray(data.completion_histogram) ? data.completion_histogram : [])
-    .filter(isRecord)
-    .map((h) => ({ lessons: num(h.lessons), users: num(h.users) }))
-  const modules = new Map<number, { started: number; completed: number }>()
-  for (const m of Array.isArray(data.modules) ? data.modules : []) {
-    if (!isRecord(m)) continue
-    modules.set(num(m.idx), { started: num(m.started), completed: num(m.completed) })
+export function parseLessonCompletionStats(data: Record<string, unknown>): AdminLessonCompletionStats | null {
+  const distinctUsers = num(data.distinct_users)
+  if (distinctUsers === null || !Array.isArray(data.completion_histogram) || !Array.isArray(data.modules)) return null
+
+  const histogram: AdminLessonCompletionStats['histogram'] = []
+  for (const h of data.completion_histogram) {
+    const row = isRecord(h) ? nums([h.lessons, h.users]) : null
+    if (!row) return null
+    histogram.push({ lessons: row[0], users: row[1] })
   }
-  return { distinctUsers: num(data.distinct_users), histogram, modules }
+  const modules = new Map<number, { started: number; completed: number }>()
+  for (const m of data.modules) {
+    const row = isRecord(m) ? nums([m.idx, m.started, m.completed]) : null
+    if (!row) return null
+    modules.set(row[0], { started: row[1], completed: row[2] })
+  }
+  return { distinctUsers, histogram, modules }
 }
 
 export async function fetchLessonCompletionStats(
@@ -163,8 +193,7 @@ export async function fetchLessonCompletionStats(
   moduleDefs: AdminModuleDef[]
 ): Promise<AdminLessonCompletionStats | null> {
   const p_modules = moduleDefs.map((m) => ({ slug: m.slug, lesson_ids: m.lessonIds }))
-  const data = await callJson(supabase, 'admin_lesson_completion_stats', { p_modules })
-  return data ? parseLessonCompletionStats(data) : null
+  return callParsed(supabase, 'admin_lesson_completion_stats', parseLessonCompletionStats, { p_modules })
 }
 
 /**
@@ -220,13 +249,14 @@ export interface AdminCapstoneStats {
   submittedAt: string[]
 }
 
-export function parseCapstoneStats(data: Record<string, unknown>): AdminCapstoneStats {
+export function parseCapstoneStats(data: Record<string, unknown>): AdminCapstoneStats | null {
+  const submitted = num(data.submitted)
+  const reviewed = num(data.reviewed)
+  if (submitted === null || reviewed === null || !Array.isArray(data.submitted_at)) return null
   return {
-    submitted: num(data.submitted),
-    reviewed: num(data.reviewed),
-    submittedAt: (Array.isArray(data.submitted_at) ? data.submitted_at : []).filter(
-      (v): v is string => typeof v === 'string' && v.length > 0
-    ),
+    submitted,
+    reviewed,
+    submittedAt: data.submitted_at.filter((v): v is string => typeof v === 'string' && v.length > 0),
   }
 }
 
@@ -235,8 +265,7 @@ export async function fetchCapstoneStats(
   fromIso: string,
   toIso: string
 ): Promise<AdminCapstoneStats | null> {
-  const data = await callJson(supabase, 'admin_capstone_stats', { p_from: fromIso, p_to: toIso })
-  return data ? parseCapstoneStats(data) : null
+  return callParsed(supabase, 'admin_capstone_stats', parseCapstoneStats, { p_from: fromIso, p_to: toIso })
 }
 
 /* ─── #17 admin_flashcard_stats ───────────────────────────────────────────── */
@@ -246,11 +275,42 @@ export interface AdminFlashcardStats {
   distinctUsers: number
 }
 
-export function parseFlashcardStats(data: Record<string, unknown>): AdminFlashcardStats {
-  return { total: num(data.total), distinctUsers: num(data.distinct_users) }
+export function parseFlashcardStats(data: Record<string, unknown>): AdminFlashcardStats | null {
+  const total = num(data.total)
+  const distinctUsers = num(data.distinct_users)
+  if (total === null || distinctUsers === null) return null
+  return { total, distinctUsers }
 }
 
 export async function fetchFlashcardStats(supabase: unknown): Promise<AdminFlashcardStats | null> {
-  const data = await callJson(supabase, 'admin_flashcard_stats')
-  return data ? parseFlashcardStats(data) : null
+  return callParsed(supabase, 'admin_flashcard_stats', parseFlashcardStats)
+}
+
+/* ─── admin_funnel_distinct_users ─────────────────────────────────────────── */
+/* supabase/migrations/20261013000001_admin_funnel_distinct_users.sql */
+
+/** Learners (not rows) who reached each activity step of the overview funnel. */
+export interface AdminFunnelDistinctUsers {
+  /** Users with at least one completed lesson. */
+  firstLesson: number
+  /** Users with at least one quiz attempt. */
+  firstQuiz: number
+  /** Users with at least one submitted capstone. */
+  moduleCompletion: number
+}
+
+/**
+ * Returns null when a count is missing or not a number: a funnel step silently showing
+ * 0 learners is worse than the section reporting `failed`.
+ */
+export function parseFunnelDistinctUsers(data: Record<string, unknown>): AdminFunnelDistinctUsers | null {
+  const counts = nums([data.first_lesson, data.first_quiz, data.module_completion])
+  // A count is never negative.
+  if (!counts || counts.some((n) => n < 0)) return null
+  const [firstLesson, firstQuiz, moduleCompletion] = counts
+  return { firstLesson, firstQuiz, moduleCompletion }
+}
+
+export async function fetchFunnelDistinctUsers(supabase: unknown): Promise<AdminFunnelDistinctUsers | null> {
+  return callParsed(supabase, 'admin_funnel_distinct_users', parseFunnelDistinctUsers)
 }

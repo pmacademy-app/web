@@ -12,12 +12,18 @@
 -- guard only restricts the PostgREST end-user roles, `authenticated` and `anon`.
 --
 -- The function is deliberately NOT security definer: `current_user` must be the caller's role.
+--
+-- The role check below is a deny-list, not an allow-list: only the roles it names are guarded.
+-- Any new role that PostgREST can switch to (a custom JWT `role` claim) must be added to it,
+-- or that role can write these columns.
 
 CREATE OR REPLACE FUNCTION public.guard_privileged_user_columns()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = public, pg_temp
 AS $$
 BEGIN
+  -- Deny-list: add every new PostgREST-switchable end-user role here.
   IF current_user NOT IN ('authenticated', 'anon') THEN
     RETURN NEW;
   END IF;

@@ -153,18 +153,29 @@ describe('B7-H — compliant code and non-route code pass', () => {
 
 // ─── The repository's own inventory ──────────────────────────────────────────
 
-function allRouteFiles(): string[] {
+function allRouteFiles(fileName = 'route.ts'): string[] {
   const hits: string[] = []
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
       const full = path.join(dir, entry)
       if (statSync(full).isDirectory()) walk(full)
-      else if (entry === 'route.ts') hits.push(path.relative(API_DIR, full).split(path.sep).join('/'))
+      else if (entry === fileName) hits.push(path.relative(API_DIR, full).split(path.sep).join('/'))
     }
   }
   walk(API_DIR)
   return hits.sort()
 }
+
+/**
+ * The only `route.tsx` handlers. The lint rule and the inventory below both look at
+ * `route.ts`, so a handler in a `.tsx` file is checked by neither. These two render OG
+ * images with JSX, which is the one reason for the extension; they are public, read-only
+ * and return an image, so there is no JSON envelope for `withRoute` to produce.
+ */
+const TSX_ROUTES = [
+  'og/portfolio/[username]/capstones/[moduleSlug]/route.tsx',
+  'og/portfolio/[username]/route.tsx',
+]
 
 describe('B7-H — the repository satisfies the rule it just adopted', () => {
   const files = allRouteFiles()
@@ -191,6 +202,15 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   it('accounts for all 133 routes', () => {
     expect(files).toHaveLength(133)
     expect(migrated).toHaveLength(130)
+  })
+
+  it('allows a route.tsx handler only for the listed OG image routes', () => {
+    const tsxRoutes = allRouteFiles('route.tsx')
+
+    // A new `.tsx` route shows up here: move it to `route.ts` so the wrapper rule sees it,
+    // or, if it is another OG image, add it to the list above on purpose.
+    expect(tsxRoutes).toEqual(TSX_ROUTES)
+    for (const file of tsxRoutes) expect(file.startsWith('og/'), file).toBe(true)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {

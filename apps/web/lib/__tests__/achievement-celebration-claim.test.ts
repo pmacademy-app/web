@@ -500,6 +500,161 @@ describe('claimNextAchievementCelebration — capstones', () => {
     expect(db.notification('n-cap')).toMatchObject({ is_read: false })
   })
 
+  // A re-review that publishes a previously rejected capstone writes a second bell row keyed
+  // `capstone-reviewed-<id>-published` (lib/admin/moderation-service.ts). The two rows are one
+  // capstone: it celebrates once, through the published notice when there is one, and the other
+  // row is retired with it (as superseded Fellow grants are).
+  it('offers exactly one celebration for a capstone that was rejected and then published', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-rejected', `capstone-reviewed-${SUBMISSION}`, { created_at: ago(2 * DAY_MS) }),
+        notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    expect(await claim(db)).toMatchObject({
+      kind: 'capstone',
+      notificationId: 'n-published',
+      capstone: { moduleSlug: 'discovery' },
+    })
+    expect(db.notification('n-published')).toMatchObject({ is_read: true, celebrated_at: NOW.toISOString() })
+    // The earlier notice is retired, not read: it still shows as unread in the bell.
+    expect(db.notification('n-rejected')).toMatchObject({ is_read: false, read_at: null, celebrated_at: NOW.toISOString() })
+    expect(await claim(db)).toBeNull()
+    // One claim and one retire; the second call writes nothing.
+    expect(db.updates()).toHaveLength(2)
+  })
+
+  // The case the first review's row could never serve: it is past the 14 day window (or expired)
+  // by the time the capstone is published, so it is not a candidate at all.
+  it('celebrates a capstone published on re-review long after the first review', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-rejected', `capstone-reviewed-${SUBMISSION}`, { created_at: ago(30 * DAY_MS) }),
+        notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    expect(await claim(db)).toMatchObject({ kind: 'capstone', notificationId: 'n-published' })
+    expect(db.notification('n-rejected')?.celebrated_at).toBe(NOW.toISOString())
+    expect(await claim(db)).toBeNull()
+  })
+
+  it('celebrates through the published notice when the first review left no row', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`)],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    expect(await claim(db)).toMatchObject({ kind: 'capstone', notificationId: 'n-published' })
+    expect(db.updates()).toHaveLength(1)
+    expect(await claim(db)).toBeNull()
+  })
+
+  it('does not celebrate again when an already celebrated capstone is unpublished and republished', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-first', `capstone-reviewed-${SUBMISSION}`, {
+          created_at: ago(2 * DAY_MS),
+          is_read: true,
+          read_at: ago(2 * DAY_MS),
+          celebrated_at: ago(2 * DAY_MS),
+        }),
+        notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    expect(await claim(db)).toBeNull()
+    expect(db.updates()).toEqual([])
+    expect(db.notification('n-published')).toMatchObject({ is_read: false, celebrated_at: null })
+  })
+
+  // The other way round: the published notice celebrated but retiring its sibling failed. The
+  // sibling verifies against the (published) submission, so only the group check stops a repeat.
+  it('does not celebrate the first notice once the published one has celebrated', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-rejected', `capstone-reviewed-${SUBMISSION}`, { created_at: ago(2 * DAY_MS) }),
+        notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`, {
+          is_read: true,
+          read_at: ago(HOUR_MS),
+          celebrated_at: ago(HOUR_MS),
+        }),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    expect(await claim(db)).toBeNull()
+    expect(db.updates()).toEqual([])
+  })
+
+  it('lets exactly one of two concurrent claims celebrate a capstone with both notices', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-rejected', `capstone-reviewed-${SUBMISSION}`, { created_at: ago(2 * DAY_MS) }),
+        notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION)],
+    })
+
+    const results = await Promise.all([claim(db), claim(db)])
+
+    expect(results.filter(Boolean)).toHaveLength(1)
+    expect(await claim(db)).toBeNull()
+  })
+
+  it.each([
+    ['still unpublished', { is_public: false }],
+    ['another learner’s', { user_id: OTHER_USER }],
+  ])('skips a published notice whose submission is %s', async (_label, overrides) => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-published', `capstone-reviewed-${SUBMISSION}-published`)],
+      capstone_submissions: [capstoneRow(SUBMISSION, overrides)],
+    })
+
+    expect(await claim(db)).toBeNull()
+    expect(db.updates()).toEqual([])
+  })
+
+  it('keeps each capstone to its own notices when two are waiting', async () => {
+    const SECOND = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [
+        notificationRow('n-a-rejected', `capstone-reviewed-${SUBMISSION}`, { created_at: ago(3 * DAY_MS) }),
+        notificationRow('n-b', `capstone-reviewed-${SECOND}`, { created_at: ago(2 * DAY_MS) }),
+        notificationRow('n-a-published', `capstone-reviewed-${SUBMISSION}-published`),
+      ],
+      capstone_submissions: [capstoneRow(SUBMISSION), capstoneRow(SECOND, { module_slug: 'strategy' })],
+    })
+
+    // Oldest first within the kind, by the notice that celebrates.
+    expect(await claim(db)).toMatchObject({ notificationId: 'n-b', capstone: { moduleSlug: 'strategy' } })
+    expect(db.notification('n-a-rejected')?.celebrated_at).toBeNull()
+    expect(await claim(db)).toMatchObject({ notificationId: 'n-a-published', capstone: { moduleSlug: 'discovery' } })
+    expect(await claim(db)).toBeNull()
+  })
+
+  it('never queries capstone_submissions for a published key whose id is not a UUID', async () => {
+    db = createFakeSupabase({
+      users: [userRow()],
+      in_app_notifications: [notificationRow('n-cap', 'capstone-reviewed-not-a-uuid-published')],
+    })
+
+    expect(await claim(db)).toBeNull()
+    expect(db.queriesOn('capstone_submissions')).toEqual([])
+  })
+
   it('never queries capstone_submissions for a key suffix that is not a UUID', async () => {
     db = createFakeSupabase({
       users: [userRow()],
@@ -1234,5 +1389,87 @@ describe('achievement celebration wiring', () => {
 
     expect(section).not.toMatch(/flags\[0\] \? FLAG_CATEGORIES\[flags\[0\]\.key\] :/)
     expect(section).toMatch(/FLAG_CATEGORIES\[flags\[0\]\.key\] \?\? FALLBACK_CATEGORY/)
+  })
+})
+
+// ─── Database scripts around celebrated_at ───────────────────────────────────
+
+describe('celebrated_at rollback and post-deploy backfill', () => {
+  const supabaseDir = path.resolve(WEB_ROOT, '../../supabase')
+  /** The SQL without `--` comments, so assertions only see executable statements. */
+  const code = (file: string) => readFileSync(path.join(supabaseDir, file), 'utf8').replace(/--.*$/gm, '')
+
+  it('marks celebrated-but-unread rows read before the rollback drops the column', () => {
+    // The rolled-back code claims on is_read, so a row retired by the newest-Fellow rule
+    // (celebrated, never read) would be celebrated again.
+    const down = code('migrations/rollback/20261011000002_in_app_notification_celebrated_at.down.sql')
+    const update = down.search(
+      /UPDATE public\.in_app_notifications\s+SET is_read = true, read_at = coalesce\(read_at, celebrated_at\)\s+WHERE celebrated_at IS NOT NULL AND is_read = false;/
+    )
+
+    expect(update).toBeGreaterThanOrEqual(0)
+    expect(down.indexOf('DROP COLUMN IF EXISTS celebrated_at')).toBeGreaterThan(update)
+    // Re-runnable: the UPDATE is skipped once the column is gone.
+    expect(down.slice(0, update)).toMatch(/IF EXISTS \([\s\S]*column_name = 'celebrated_at'/)
+  })
+
+  it('tells the operator to revert the app before either notification rollback', () => {
+    for (const name of [
+      '20261011000001_in_app_notification_secondary_action',
+      '20261011000002_in_app_notification_celebrated_at',
+    ]) {
+      const raw = readFileSync(path.join(supabaseDir, `migrations/rollback/${name}.down.sql`), 'utf8')
+      expect(raw, name).toContain('Revert the app to the previous release first')
+    }
+  })
+
+  it('refuses a deployed_at that is unzoned, in the future or over a day old, before any write', () => {
+    const backfill = code('post-deploy/r5_celebrated_at_backfill.sql')
+    const guard = backfill.slice(backfill.indexOf('DO $$'), backfill.indexOf('END $$;'))
+    const update = backfill.indexOf('UPDATE public.in_app_notifications')
+
+    expect(backfill.indexOf('BEGIN;')).toBeGreaterThanOrEqual(0)
+    expect(backfill.indexOf('BEGIN;')).toBeLessThan(backfill.indexOf('DO $$'))
+    expect(backfill.indexOf('END $$;')).toBeLessThan(update)
+    expect(backfill.indexOf('COMMIT;')).toBeGreaterThan(update)
+    expect(backfill).toMatch(/set_config\('r5\.deployed_at', :deployed_at, true\)/)
+    expect(guard.match(/RAISE EXCEPTION/g)).toHaveLength(3)
+    expect(guard).toMatch(/v_at > now\(\)/)
+    expect(guard).toMatch(/v_at < now\(\) - interval '24 hours'/)
+
+    // The offset check itself, run against the pattern the script ships.
+    const pattern = guard.match(/v_raw !~\* '([^']+)'/)?.[1]
+    expect(pattern).toBeTruthy()
+    const hasOffset = (value: string) => new RegExp(pattern!, 'i').test(value)
+    for (const ok of [
+      '2026-10-12T09:30:00Z',
+      '2026-10-12 09:30:00+00',
+      '2026-10-12T15:00:00.123+05:30',
+      '2026-10-12T09:30-0500',
+    ]) {
+      expect(hasOffset(ok), ok).toBe(true)
+    }
+    for (const bad of ['2026-10-12T09:30:00', '2026-10-12 09:30', '2026-10-12', 'now', '']) {
+      expect(hasOffset(bad), bad).toBe(false)
+    }
+  })
+
+  it('still limits the backfill to rows read before the deploy, for each claimable prefix', () => {
+    const backfill = code('post-deploy/r5_celebrated_at_backfill.sql')
+
+    expect(backfill).toMatch(/coalesce\(read_at, created_at\) < :deployed_at::timestamptz/)
+    expect(backfill).toMatch(/AND celebrated_at IS NULL/)
+    for (const prefix of Object.values(ACHIEVEMENT_CELEBRATION_KEY_PREFIXES)) {
+      expect(backfill).toContain(`idempotency_key LIKE '${prefix}%'`)
+    }
+  })
+
+  it('describes the uncelebrated index as covering every keyed row, not only achievements', () => {
+    const raw = readFileSync(
+      path.join(supabaseDir, 'migrations/20261011000002_in_app_notification_celebrated_at.sql'),
+      'utf8'
+    )
+    expect(raw).not.toContain('keep that lookup narrow')
+    expect(raw).toMatch(/every uncelebrated row that has an idempotency key/)
   })
 })

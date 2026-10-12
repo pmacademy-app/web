@@ -410,8 +410,11 @@ export async function recordQuizAttemptAction(
     )
     totalCompletedLessons = completedLessonIds.size
 
-    // Phase 7: Check and activate referral reward if this is the learner's first completed lesson
-    if (totalCompletedLessons === 1) {
+    // Phase 7: activate the referral reward once the learner has a completed lesson. Checked on
+    // every completion, not only the first: an activation that failed (settings read, XP insert,
+    // status update) leaves the referral `signed_up`, and this is its retry. With nothing pending
+    // the check is one read on the unique referrals(referred_user_id) index and returns.
+    if (totalCompletedLessons >= 1) {
       try {
         const { onFirstLessonCompletedReferralCheck } = await import('../referral/referral-service')
         await onFirstLessonCompletedReferralCheck(supabase, userId)
@@ -423,7 +426,8 @@ export async function recordQuizAttemptAction(
     // Growth R4: a module is complete when its last open lesson is completed, in any order.
     // Only a first attempt can newly complete a lesson (every attempt upserts status 'completed'
     // and quiz_attempts starts at 0), so later attempts skip the check. The
-    // stable id makes a replay (or a race between two tabs) a no-op in the dispatcher.
+    // dispatcher does not dedupe by event id; a replay (or a race between two tabs) is harmless
+    // because the stable id feeds the in-app and email idempotency keys, which do.
     const completedModule = isFirstAttempt ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
     if (completedModule) {
       await globalNotificationDispatcher.dispatch({

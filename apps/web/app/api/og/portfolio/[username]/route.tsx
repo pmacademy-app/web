@@ -4,6 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { BRAND } from '@/lib/brand'
 import { OG, ProdilyLogoMark } from '@/lib/og/brand'
+import { needsCanonicalOgRedirect, portfolioOgCardPath, redirectToOgCardPath } from '@/lib/og/card-paths'
 
 /**
  * Cached, not dynamic.
@@ -26,6 +27,15 @@ import { OG, ProdilyLogoMark } from '@/lib/og/brand'
  * depend on the interval: the two `revalidatePath()` call sites above invalidate the
  * moment the underlying profile actually changes, and the entry is per-username, so a
  * cached card can never be served under a different username.
+ *
+ * "Per-username" means per URL path, and `revalidatePath()` is case-sensitive while the
+ * lookup is not. So the card is rendered only under the trimmed lowercase username; any
+ * other spelling is redirected there before the lookup (lib/og/card-paths.ts), which
+ * leaves one entry per learner. The settings-save path purges that lowercase entry, for
+ * the previous handle too when the username changes. The admin call sites still purge
+ * the username as stored, which is the same path only while stored usernames are
+ * lowercase (settings saves lowercase them). A CDN copy can outlive any purge by its
+ * own `s-maxage`.
  *
  * Privacy is enforced inside the handler on every regeneration, twice —
  * `getPublicPortfolioData()` returns null for a private portfolio, and the branch
@@ -89,6 +99,9 @@ function LinkIcon({ size = 16, color }: { size?: number; color: string }) {
 export async function GET(request: Request, { params }: RouteProps) {
   try {
     const { username } = await params
+    if (needsCanonicalOgRedirect(username)) {
+      return redirectToOgCardPath(portfolioOgCardPath(username))
+    }
     const supabase = createServiceRoleClient()
     const portfolio = await getPublicPortfolioData(supabase, username)
 

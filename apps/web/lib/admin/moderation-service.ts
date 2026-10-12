@@ -15,7 +15,8 @@ import { logAdminAction } from './guard'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { MAX_OFFSET, MAX_PAGE_SIZE } from '@/lib/api/pagination'
 import { capstoneSharePath } from '@/lib/portfolio'
-import type { AdminCapstoneRow, AdminPortfolioRow } from './achievements-aggregation'
+import { buildIlikeOrFilter, escapeIlikeTerm } from './search-filter'
+import type { AdminCapstoneListRow, AdminCapstoneRow, AdminPortfolioRow } from './achievements-aggregation'
 
 // ---------------------------------------------------------------------------
 // Server-side paging for the Moderation tabs (admin R6 B7).
@@ -69,6 +70,49 @@ export function normalizeModerationPaging(
   return { page: p, pageSize: size, from, to: from + size - 1 }
 }
 
+/** The URL params that drive the Moderation workspace (decision 5). */
+export const MODERATION_URL_PARAMS = ['tab', 'status', 'q', 'page', 'capstone'] as const
+export type ModerationUrlParams = Partial<Record<(typeof MODERATION_URL_PARAMS)[number], string>>
+
+/**
+ * Reduces raw page `searchParams` to the moderation params as plain strings. A repeated
+ * param (`?q=a&q=b`) arrives as an array and is dropped, so the client views never
+ * receive a non-string.
+ */
+export function normalizeModerationSearchParams(
+  raw: Record<string, string | string[] | undefined>
+): ModerationUrlParams {
+  const params: ModerationUrlParams = {}
+  for (const key of MODERATION_URL_PARAMS) {
+    const value = raw[key]
+    if (typeof value === 'string') params[key] = value
+  }
+  return params
+}
+
+/**
+ * Where to send the admin when the requested page is past the end of a list that still
+ * has rows (the last row of the last page was just reviewed, or a hand-typed `?page=99`):
+ * the last page that has rows, with `tab`, `status`, `q` and `capstone` kept. Returns null
+ * when the page should render as it is, including an empty page 1 and a failed load.
+ */
+export function moderationLastPagePath(
+  tab: string,
+  params: ModerationUrlParams,
+  list: { items: readonly unknown[]; total: number; page: number; pageSize: number; failed?: boolean }
+): string | null {
+  if (list.failed || list.items.length > 0 || list.total <= 0 || list.page <= 1) return null
+  const lastPage = Math.ceil(list.total / list.pageSize)
+  // The total says this page has rows (the list changed between two reads): do not loop.
+  if (lastPage >= list.page) return null
+  const next = new URLSearchParams({ tab })
+  if (params.status) next.set('status', params.status)
+  if (params.q) next.set('q', params.q)
+  if (lastPage > 1) next.set('page', String(lastPage))
+  if (params.capstone) next.set('capstone', params.capstone)
+  return `/admin/moderation?${next.toString()}`
+}
+
 /** Returns `status` when it is one of `allowed`, else `fallback`. */
 export function normalizeModerationStatus<S extends string>(
   status: string | null | undefined,
@@ -78,29 +122,9 @@ export function normalizeModerationStatus<S extends string>(
   return status && (allowed as readonly string[]).includes(status) ? (status as S) : fallback
 }
 
-/**
- * Makes a search term safe to embed in a PostgREST `ilike` pattern. Escapes the LIKE
- * wildcards (`%`, `_`) and the escape character so they match literally, and replaces
- * `*` with a space: PostgREST rewrites `*` to `%` in like/ilike values, and a
- * backslash does not stop that, so it cannot be matched literally.
- */
-export function escapeIlikeTerm(term: string): string {
-  return term.replace(/\*/g, ' ').replace(/[\\%_]/g, (char) => `\\${char}`)
-}
-
-/** Longest search term accepted; anything longer is truncated before it reaches the query. */
-const MAX_SEARCH_LENGTH = 100
-
-/**
- * Builds a PostgREST `or` filter matching `term` as a case-insensitive substring of any
- * column. The pattern is double-quoted so commas, parentheses and dots in the term are
- * not parsed as filter syntax; inside the quotes `\` and `"` are backslash-escaped.
- */
-export function buildIlikeOrFilter(columns: readonly string[], term: string): string {
-  const pattern = `%${escapeIlikeTerm(term.trim().slice(0, MAX_SEARCH_LENGTH))}%`
-  const quoted = `"${pattern.replace(/[\\"]/g, (char) => `\\${char}`)}"`
-  return columns.map((column) => `${column}.ilike.${quoted}`).join(',')
-}
+// The search-term escaping lives in ./search-filter so the other admin services can use
+// it without importing this module; re-exported here for existing importers.
+export { buildIlikeOrFilter, escapeIlikeTerm }
 
 type PageQueryResult = {
   data: unknown
@@ -183,8 +207,10 @@ interface UserRow {
 
 /**
  * The public-page fields of an admin capstone row (admin R6 C4). The page at
- * `capstoneSharePath` 404s unless the capstone is reviewed and public AND the owner has a
- * username and a public portfolio, so `publicPath` is only set when all four hold.
+ * `capstoneSharePath` is available for a submitted or reviewed capstone that is public on
+ * a public portfolio (owner decision: it does not wait for review). The admin link here is
+ * deliberately narrower (R6 decision): `publicPath` is only set for a reviewed, public
+ * capstone whose owner has a username and a public portfolio.
  */
 export function capstonePublicLink(
   s: { module_slug: string; status: string; is_public: boolean },
@@ -229,8 +255,11 @@ export class ModerationService {
     return user?.name || user?.username || user?.email?.split('@')[0] || fallback
   }
 
-  /** Maps a submission row onto the admin capstone shape (learner name + module titles). */
-  private static toCapstoneRow(s: CapstoneSubmissionRow, userMap: Map<string, UserRow>): AdminCapstoneRow {
+  /**
+   * Maps a submission row onto the list shape (learner name + module titles). The essay is
+   * read here only to count its words; it is not part of the result.
+   */
+  private static toCapstoneListRow(s: CapstoneSubmissionRow, userMap: Map<string, UserRow>): AdminCapstoneListRow {
     const user = s.user_id ? userMap.get(s.user_id) : undefined
     const definition = getCapstoneDefinition(s.module_slug)
     return {
@@ -240,7 +269,6 @@ export class ModerationService {
       moduleSlug: s.module_slug,
       moduleTitle: definition?.moduleTitle || s.module_slug,
       capstoneTitle: definition?.title || s.module_slug,
-      content: s.content,
       status: s.status,
       isPublic: s.is_public,
       submittedAt: s.submitted_at,
@@ -248,6 +276,11 @@ export class ModerationService {
       wordCount: s.content.trim().split(/\s+/).filter(Boolean).length,
       ...capstonePublicLink(s, user),
     }
+  }
+
+  /** The full admin capstone shape, essay included, for the review drawer. */
+  private static toCapstoneRow(s: CapstoneSubmissionRow, userMap: Map<string, UserRow>): AdminCapstoneRow {
+    return { ...this.toCapstoneListRow(s, userMap), content: s.content }
   }
 
   /**
@@ -261,10 +294,13 @@ export class ModerationService {
    * that expression, so the list is read as two segments — awaiting, then the rest — and
    * the page window is split across them. Both segments are counted up front, so no slice
    * is ever requested past its end. Learner names come from one batched `users` lookup.
+   *
+   * List rows carry `wordCount` but no `content`: the table never renders the essay,
+   * and the review drawer reads it through `getCapstoneById`.
    */
   public static async getCapstonesPage(
     params: ModerationPageParams = {}
-  ): Promise<ModerationPage<AdminCapstoneRow>> {
+  ): Promise<ModerationPage<AdminCapstoneListRow>> {
     const { page, pageSize, from, to } = normalizeModerationPaging(params.page, params.pageSize)
     const status = normalizeModerationStatus(params.status, CAPSTONE_STATUS_FILTERS, 'all')
     const supabase = createServiceRoleClient()
@@ -326,7 +362,7 @@ export class ModerationService {
       )
 
       return {
-        items: rows.map((s) => this.toCapstoneRow(s, userMap)),
+        items: rows.map((s) => this.toCapstoneListRow(s, userMap)),
         total: awaitingTotal + restTotal,
         page,
         pageSize,
@@ -378,9 +414,12 @@ export class ModerationService {
    * `capstone.reviewed` in-app notification to the submitting learner. Both effects are idempotent:
    *   - `reviewed_at`/`reviewed_by` are only written when currently null, so repeating the action
    *     never moves the timestamp.
-   *   - the notification is dispatched only on the first transition into reviewed (the row was not
-   *     previously reviewed), and the dispatch itself carries a stable idempotency key, so a
-   *     repeated review never produces a duplicate notification.
+   *   - the notification is dispatched on the first transition into reviewed (the row was not
+   *     previously reviewed) and when a later review publishes a capstone that was not published
+   *     before (reject, then approve). Each dispatch carries a stable event id, so a repeated
+   *     review never produces a duplicate: the published email is keyed per submission, and the
+   *     in-app write is keyed by the event id. The publishing re-review has its own id
+   *     (`capstone-reviewed-<id>-published`), so it adds one in-app row saying "published".
    *
    * This method performs the server-side authorization boundary's *work*; authorization itself is
    * enforced upstream (the `/api/admin/capstones/[id]/review` route is admin-gated via `withRoute`),
@@ -399,11 +438,18 @@ export class ModerationService {
       //    both the timestamp write and the single notification — and (b) resolve the recipient.
       const { data: current, error: readError } = (await (supabase
         .from('capstone_submissions') as unknown as DBChain)
-        .select('id, user_id, module_slug, status, reviewed_at')
+        .select('id, user_id, module_slug, status, is_public, reviewed_at')
         .eq('id', submissionId)
         .maybeSingle()) as unknown as {
         data:
-          | { id: string; user_id: string | null; module_slug: string; status: string; reviewed_at: string | null }
+          | {
+              id: string
+              user_id: string | null
+              module_slug: string
+              status: string
+              is_public: boolean | null
+              reviewed_at: string | null
+            }
           | null
         error: unknown
       }
@@ -418,6 +464,9 @@ export class ModerationService {
       }
 
       const alreadyReviewed = Boolean(current.reviewed_at)
+      // This review publishes a capstone that is not published yet (first approve, or an approve
+      // after an earlier reject). Approving an already published capstone again is not a change.
+      const publishedNow = action === 'approve' && !(current.status === 'reviewed' && current.is_public === true)
       const reviewedAtIso = new Date().toISOString()
 
       // 2. Always set status + visibility. Stamp reviewed_at/reviewed_by only on the first review so
@@ -452,14 +501,18 @@ export class ModerationService {
         action,
       })
 
-      // 3. Notify the learner — only on the first review, and only when we know who to notify.
-      if (!alreadyReviewed && current.user_id) {
+      // 3. Notify the learner — on the first review, or when a re-review publishes the capstone —
+      //    and only when we know who to notify.
+      if ((!alreadyReviewed || publishedNow) && current.user_id) {
         await this.dispatchCapstoneReviewedNotification(supabase, {
           submissionId,
           userId: current.user_id,
           moduleSlug: current.module_slug,
           isPublished: action === 'approve',
           reviewedAt: reviewedAtIso,
+          // The first review keeps the plain event id. A later review that publishes gets its own,
+          // or its in-app notice would be dropped as a duplicate of the first review's.
+          publishedOnReReview: alreadyReviewed,
         })
       }
 
@@ -473,7 +526,8 @@ export class ModerationService {
       }
 
       // A review can publish or unpublish the capstone: its public page renders per request, but
-      // its OG card is cached, so drop it (Growth R5 B13b).
+      // its OG card is cached, so drop it (Growth R5 B13b). The portfolio card shows the public
+      // project count, so it goes too.
       if (current.user_id) {
         try {
           const { data: owner } = await (supabase.from('users') as unknown as DBChain)
@@ -481,8 +535,11 @@ export class ModerationService {
             .eq('id', current.user_id)
             .maybeSingle() as unknown as { data: { username: string | null } | null }
           if (owner?.username) {
-            const { revalidateCapstoneOgCards } = await import('@/lib/og/revalidate-capstone-cards')
+            const { revalidateCapstoneOgCards, revalidatePortfolioOgCard } = await import(
+              '@/lib/og/revalidate-capstone-cards'
+            )
             revalidateCapstoneOgCards(owner.username, [current.module_slug])
+            revalidatePortfolioOgCard(owner.username)
           }
         } catch {
           // Non-fatal, like the revalidation above.
@@ -517,6 +574,8 @@ export class ModerationService {
       moduleSlug: string
       isPublished: boolean
       reviewedAt: string
+      /** A re-review that publishes a capstone the first review left unpublished. */
+      publishedOnReReview?: boolean
     }
   ): Promise<void> {
     try {
@@ -538,8 +597,16 @@ export class ModerationService {
 
       const username = typeof learner?.username === 'string' && learner.username ? learner.username : null
       const definition = getCapstoneDefinition(input.moduleSlug)
+      // The in-app row is keyed by this id. The first review's id is `capstone-reviewed-<id>`; the
+      // publishing re-review adds `-published` so the learner's bell gets the "published" notice
+      // beside the earlier "listing is off" one. Both keep the `capstone-reviewed-` prefix (the
+      // celebrated_at backfill and the Growth tab match on it). The celebration claim reads the
+      // two rows as one capstone (verifyCapstones in achievement-celebrations.ts): it celebrates
+      // at most once, through the `-published` row when there is one, and not at all if either
+      // row is already celebrated. The email is keyed by submission id, not by this.
+      const firstReviewEventId = `capstone-reviewed-${input.submissionId}`
       await globalNotificationDispatcher.dispatch({
-        id: `capstone-reviewed-${input.submissionId}`,
+        id: input.publishedOnReReview ? `${firstReviewEventId}-published` : firstReviewEventId,
         event: 'capstone.reviewed',
         userId: input.userId,
         userEmail: typeof learner?.email === 'string' ? learner.email : '',

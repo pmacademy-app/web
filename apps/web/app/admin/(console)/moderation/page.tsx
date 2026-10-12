@@ -1,19 +1,19 @@
 import React from 'react'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
-import { ModerationService } from '@/lib/admin/moderation-service'
+import { redirect } from 'next/navigation'
+import {
+  ModerationService,
+  moderationLastPagePath,
+  normalizeModerationSearchParams,
+  type ModerationUrlParams,
+} from '@/lib/admin/moderation-service'
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
 import { ModerationWorkspace, type ModerationListData } from '@/components/admin/ModerationWorkspace'
 
 export const revalidate = 0
 
 interface AdminModerationPageProps {
-  searchParams: Promise<{
-    tab?: string
-    capstone?: string
-    status?: string
-    q?: string
-    page?: string
-  }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 // Kept here rather than imported from the client workspace: a server component that
@@ -26,10 +26,7 @@ type Tab = (typeof MODERATION_TABS)[number]
  * the URL: `status` and `q` are passed through as-is because each service applies its
  * own default, and `page` is 1-based and clamped by the service.
  */
-async function loadTab(
-  tab: Tab,
-  params: { status?: string; q?: string; page?: string; capstone?: string }
-): Promise<ModerationListData> {
+async function loadTab(tab: Tab, params: ModerationUrlParams): Promise<ModerationListData> {
   const paging = { status: params.status ?? null, page: params.page ?? null }
 
   switch (tab) {
@@ -54,12 +51,17 @@ async function loadTab(
 }
 
 export default async function AdminModerationPage({ searchParams }: AdminModerationPageProps) {
-  const params = await searchParams
+  const params = normalizeModerationSearchParams(await searchParams)
   const tab: Tab = (MODERATION_TABS as readonly string[]).includes(params.tab ?? '')
     ? (params.tab as Tab)
     : 'testimonials'
 
   const data = await loadTab(tab, params)
+
+  // A page past the end (its last row was just reviewed, or a typed `?page=99`) would
+  // render an empty list with no pager: go to the last page that has rows instead.
+  const lastPagePath = moderationLastPagePath(tab, params, data.list)
+  if (lastPagePath) redirect(lastPagePath)
 
   return (
     <ModerationWorkspace

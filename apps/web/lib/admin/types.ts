@@ -700,6 +700,11 @@ export interface LearningSettings {
    * (lib/xp/xp.ts); older records are ignored. Written by the server, never by the form.
    */
   xpSettingsVersion?: number
+  /**
+   * Handed out with every read and echoed by the form on save: proof the form was loaded from the
+   * reconciled XP values. A save without it keeps the current XP numbers. Never stored.
+   */
+  xpFormVersion?: number
   // Streaks
   streakFreezeEnabled: boolean
   streakFreezeCostXp: number

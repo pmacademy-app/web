@@ -473,7 +473,15 @@ describe('Phase 1.5 — lifecycle cron treats ~70% and holds out ~30%, no duplic
     return {
       from: (table: string) => {
         if (table === 'users') return usersBuilder(users)
-        if (table === 'user_lesson_progress') return { select: () => ({ in: async () => ({ data: progressRows, error: null }) }) }
+        // The lifecycle run pages this read: select().in().order().order().range().
+        if (table === 'user_lesson_progress') {
+          const b: Record<string, unknown> = {}
+          b.select = () => b
+          b.in = () => b
+          b.order = () => b
+          b.range = async (from: number, to: number) => ({ data: progressRows.slice(from, to + 1), error: null })
+          return b
+        }
         if (table === 'user_notification_preferences') return { select: () => ({ in: async () => ({ data: [], error: null }) }) }
         if (table === 'email_suppressions') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
         if (table === 'email_queue') {

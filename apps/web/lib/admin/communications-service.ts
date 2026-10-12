@@ -7,7 +7,6 @@
  * (defensive try/catch with empty fallbacks so the UI degrades gracefully).
  */
 
-import { unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EMAIL_TEMPLATE_MAP, renderEmailTemplate } from '@/emails'
 import { AUTOMATION_METADATA, EmailAutomationsService } from '@/lib/notifications/automations/service'
@@ -15,6 +14,9 @@ import { DEFAULT_LIFECYCLE_HOLDOUT_PERCENT } from '@/lib/notifications/lifecycle
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
 import { fetchAllRows } from './fetch-all'
+import { ADMIN_CACHE_TAGS } from './cache-tags'
+import { cacheWithMaxAge } from './bounded-cache'
+import { buildIlikeOrFilter } from './search-filter'
 import {
   computeNudgeReadout,
   emptyNudgeReadout,
@@ -204,7 +206,7 @@ export class CommunicationsService {
       )
       if (status) query = query.eq('status', status)
       if (search) {
-        query = query.or(`to_email.ilike.%${search}%,template_key.ilike.%${search}%`)
+        query = query.or(buildIlikeOrFilter(['to_email', 'template_key'], search))
       }
       query = query.order('created_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -590,9 +592,10 @@ export class CommunicationsService {
     // The nudge readout is loaded and cached on its own so a failure there (or a cold cache)
     // never blanks the lifecycle sequence counts. It never throws: a failure degrades to the
     // zeroed readout with `nudgesFailed: true` (and is not cached, since the cached fn rejects).
+    // cacheWithMaxAge waits for the recompute of a stale entry, so that failure shows too.
     const nudgeReadoutPromise = (async () => {
       try {
-        const readout = await unstable_cache(
+        const readout = await cacheWithMaxAge(
           async () => {
             const db = createServiceRoleClient()
             // Bounded: only the nudge rows (two initial + two reminder event types).
@@ -651,7 +654,7 @@ export class CommunicationsService {
             })
           },
           ['admin-nudge-readout'],
-          { revalidate: 120, tags: ['admin-automations'] }
+          { revalidate: 120, tags: [ADMIN_CACHE_TAGS.automations] }
         )()
         return { ...readout, nudgesFailed: false }
       } catch (err) {

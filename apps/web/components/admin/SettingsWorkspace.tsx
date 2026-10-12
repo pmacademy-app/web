@@ -14,6 +14,7 @@ import {
 import { cn } from '@/lib/utils'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminConfirmDialog } from './AdminConfirmDialog'
+import { AdminErrorState } from './AdminErrorState'
 import { useAdminToast } from './admin-toast'
 import { apiPatch } from '@/lib/api/client'
 import { ProductSettingsSection } from './ProductSettingsSection'
@@ -44,6 +45,8 @@ export interface SettingsDataMap {
 export interface SettingsWorkspaceProps {
   initialSection: SettingsSectionKey
   initialData: SettingsDataMap
+  /** Sections the server could not read. Their `initialData` is placeholder defaults. */
+  failedSections?: SettingsSectionKey[]
 }
 
 const SECTIONS: Array<{ key: SettingsSectionKey; label: string; icon: React.ComponentType<{ className?: string }> }> = [
@@ -58,12 +61,16 @@ const SECTIONS: Array<{ key: SettingsSectionKey; label: string; icon: React.Comp
 export function SettingsWorkspace({
   initialSection,
   initialData,
+  failedSections = [],
 }: SettingsWorkspaceProps) {
   const router = useRouter()
   const { toast } = useAdminToast()
 
   const [activeSection, setActiveSection] = useState<SettingsSectionKey>(initialSection)
   const [sectionData, setSectionData] = useState<SettingsDataMap>(initialData)
+  // Fixed at mount, like `sectionData`: a section that failed to load holds defaults in state until
+  // the page is loaded again, so a later re-render must not turn it into an editable form.
+  const [unreadableSections] = useState(() => new Set(failedSections))
   const [dirtySections, setDirtySections] = useState<Set<SettingsSectionKey>>(new Set())
   const [savingSection, setSavingSection] = useState<SettingsSectionKey | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -202,6 +209,9 @@ export function SettingsWorkspace({
     [activeSection, dirtySections, router]
   )
 
+  // No form for a section that could not be read: saving defaults would overwrite the real record.
+  const formSection = unreadableSections.has(activeSection) ? null : activeSection
+
   return (
     <div className="space-y-6">
       {/* Top Single Header for Entire Settings Workspace */}
@@ -252,7 +262,16 @@ export function SettingsWorkspace({
         aria-labelledby={`settings-tab-${activeSection}`}
         className="animate-in fade-in-0 duration-150"
       >
-        {activeSection === 'product' && (
+        {formSection === null && (
+          <div role="alert" data-testid="settings-load-failed">
+            <AdminErrorState
+              title="These settings could not be loaded"
+              description="The saved values are unchanged. Editing is unavailable until they load, so nothing here can overwrite them."
+              onRetry={() => window.location.reload()}
+            />
+          </div>
+        )}
+        {formSection === 'product' && (
           <ProductSettingsSection
             sectionKey="product"
             data={sectionData.product}
@@ -264,7 +283,7 @@ export function SettingsWorkspace({
             initialData={initialData.product}
           />
         )}
-        {activeSection === 'learning' && (
+        {formSection === 'learning' && (
           <LearningSettingsSection
             sectionKey="learning"
             data={sectionData.learning}
@@ -276,7 +295,7 @@ export function SettingsWorkspace({
             initialData={initialData.learning}
           />
         )}
-        {activeSection === 'email' && (
+        {formSection === 'email' && (
           <EmailSettingsSection
             sectionKey="email"
             data={sectionData.email}
@@ -288,10 +307,10 @@ export function SettingsWorkspace({
             initialData={initialData.email}
           />
         )}
-        {activeSection === 'notifications' && (
+        {formSection === 'notifications' && (
           <NotificationSettingsSection />
         )}
-        {activeSection === 'onboarding' && (
+        {formSection === 'onboarding' && (
           <OnboardingSettingsSection
             sectionKey="onboarding"
             data={sectionData.onboarding}
@@ -303,7 +322,7 @@ export function SettingsWorkspace({
             initialData={initialData.onboarding}
           />
         )}
-        {activeSection === 'feature-flags' && (
+        {formSection === 'feature-flags' && (
           <FeatureFlagsSection
             data={sectionData['feature-flags']}
             isSaving={savingSection !== null}

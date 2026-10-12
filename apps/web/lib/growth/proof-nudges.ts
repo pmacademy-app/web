@@ -6,12 +6,14 @@
  * if it still applies. Learners in the deterministic 30% holdout (per nudge) get neither, so the
  * effect can be measured, exactly like the lifecycle sequences.
  */
-import type { ProofState } from './proof-state'
+import { shouldPromptFellowRequest, type ProofState } from './proof-state'
 
 export const PROOF_NUDGE_KEYS = ['nudge.portfolio_ready', 'nudge.fellow_eligible'] as const
 export type ProofNudgeKey = (typeof PROOF_NUDGE_KEYS)[number]
 
 export const NUDGE_REMINDER_AFTER_MS = 7 * 24 * 60 * 60 * 1000
+/** How far short of seven days the reminder may go out (see nudgeRoundDue). */
+export const NUDGE_REMINDER_TOLERANCE_MS = 60 * 60 * 1000
 
 /** What has already happened for one (learner, nudge), from notification_events. */
 export interface NudgeHistory {
@@ -34,21 +36,12 @@ export const nudgeIdempotencyKey = (key: ProofNudgeKey, userId: string, round: '
 
 /**
  * The nudges that apply to a learner now, in priority order. The Fellow nudge is only for learners
- * who never had a request decided: not after a rejection (they can see and re-request in Settings,
- * and an unprompted "you qualify" reads badly), and not after an approval (that learner was a
- * Fellow; if they are not one now, the status was revoked). A Fellow granted and revoked by an
- * admin with no request leaves no trace here, so that rare case can still be nudged.
+ * who never had a request decided (`shouldPromptFellowRequest`, shared with the email next step).
  */
 export function applicableNudges(state: ProofState): ProofNudgeKey[] {
   const nudges: ProofNudgeKey[] = []
   if (state.portfolio.readyButPrivate) nudges.push('nudge.portfolio_ready')
-  if (
-    state.fellowState === 'eligible' &&
-    state.latestFellowRequestStatus !== 'rejected' &&
-    state.latestFellowRequestStatus !== 'approved'
-  ) {
-    nudges.push('nudge.fellow_eligible')
-  }
+  if (shouldPromptFellowRequest(state)) nudges.push('nudge.fellow_eligible')
   return nudges
 }
 
@@ -56,5 +49,10 @@ export function applicableNudges(state: ProofState): ProofNudgeKey[] {
 export function nudgeRoundDue(history: NudgeHistory, now: Date): 'initial' | 'reminder' | null {
   if (history.heldOut || history.remindedAt) return null
   if (!history.sentAt) return 'initial'
-  return now.getTime() - Date.parse(history.sentAt) >= NUDGE_REMINDER_AFTER_MS ? 'reminder' : null
+  // Both timestamps are run-start clocks, and a learner is evaluated once a day in their delivery
+  // hour. The run seven days on can start seconds earlier than the first did, so an exact
+  // comparison slips the reminder to day eight about half the time; an hour of tolerance does not.
+  return now.getTime() - Date.parse(history.sentAt) >= NUDGE_REMINDER_AFTER_MS - NUDGE_REMINDER_TOLERANCE_MS
+    ? 'reminder'
+    : null
 }

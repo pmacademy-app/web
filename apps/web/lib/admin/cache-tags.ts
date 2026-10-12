@@ -22,10 +22,6 @@ export const REVALIDATABLE_ADMIN_TAGS: readonly AdminCacheTag[] = Object.freeze(
   ADMIN_CACHE_TAGS.automations,
 ])
 
-export function isRevalidatableAdminTag(value: unknown): value is AdminCacheTag {
-  return typeof value === 'string' && (REVALIDATABLE_ADMIN_TAGS as readonly string[]).includes(value)
-}
-
 /**
  * Expires every cache entry carrying `tag`. `{ expire: 0 }` rather than the `'max'`
  * stale-while-revalidate profile: the admin who just acted reloads straight away and must

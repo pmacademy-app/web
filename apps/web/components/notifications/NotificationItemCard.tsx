@@ -86,7 +86,7 @@ export function NotificationItemCard({
             {item.title}
           </h4>
 
-          <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground shrink-0 mt-0.5">
+          <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground shrink-0 mt-0.5">
             <Clock className="w-2.5 h-2.5" />
             {formattedTime}
           </span>
@@ -99,13 +99,13 @@ export function NotificationItemCard({
         <div className="flex items-center justify-between text-[10px] pt-1">
           <div className="flex items-center gap-1.5">
             <span
-              className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${categoryBadge.className}`}
+              className={`text-[11px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${categoryBadge.className}`}
             >
               {categoryBadge.label}
             </span>
 
             {isUrgent && (
-              <span className="text-[9px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
+              <span className="text-[11px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
                 Urgent
               </span>
             )}
@@ -131,7 +131,7 @@ export function NotificationItemCard({
             }}
             title="Mark as read"
             aria-label="Mark notification as read"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-md transition-opacity cursor-pointer"
+            className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100 p-2 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-md transition-opacity cursor-pointer"
           >
             <Check className="w-3 h-3" />
           </button>
@@ -151,14 +151,30 @@ export function NotificationItemCard({
       : 'bg-primary/5 border-primary/20 text-foreground shadow-xs hover:border-primary/40 hover:bg-primary/10'
   }`
 
-  const card = item.deepLink ? (
+  const handleLinkClick = () => {
+    handleInteraction()
+    onNavigate?.()
+  }
+  const linkClassName = `block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardClassName}`
+
+  // The API sends an in-app path or a clean absolute https URL (an admin broadcast can carry
+  // one). An absolute URL leaves the app, so it is a plain anchor in a new tab, not a route.
+  const card = item.deepLink && isExternalHttpsUrl(item.deepLink) ? (
+      <a
+        href={item.deepLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleLinkClick}
+        className={linkClassName}
+      >
+        {cardInner}
+        <span className="sr-only"> (opens in a new tab)</span>
+      </a>
+  ) : item.deepLink ? (
       <Link
         href={item.deepLink}
-        onClick={() => {
-          handleInteraction()
-          onNavigate?.()
-        }}
-        className={`block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${cardClassName}`}
+        onClick={handleLinkClick}
+        className={linkClassName}
       >
         {cardInner}
       </Link>
@@ -202,6 +218,11 @@ const ShareButton = dynamic(
   () => import('@/components/portfolio/ShareButton').then((mod) => mod.ShareButton),
   { ssr: false, loading: () => <span aria-hidden="true" className="inline-block h-8 w-24 rounded-lg bg-muted/40" /> },
 )
+
+/** True for an absolute `https://` URL; in-app paths (and anything else) stay with `Link`. */
+function isExternalHttpsUrl(href: string): boolean {
+  return /^https:\/\//i.test(href)
+}
 
 const ACTION_LINK =
   'inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary'

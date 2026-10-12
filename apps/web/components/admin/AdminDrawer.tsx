@@ -66,7 +66,7 @@ function AdminDrawer({
                 <button
                   type="button"
                   aria-label="Close"
-                  className="rounded-lg p-1.5 text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg"
+                  className="-mt-1.5 -mr-1.5 inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg sm:m-0 sm:size-auto sm:p-1.5"
                 >
                   <XIcon className="w-4 h-4" />
                 </button>

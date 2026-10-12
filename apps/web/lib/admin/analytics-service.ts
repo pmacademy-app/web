@@ -1,4 +1,3 @@
-import { unstable_cache } from 'next/cache'
 
 import { createServiceRoleClient } from '../supabase'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -33,6 +32,7 @@ import {
   type AdminModuleDef,
 } from './analytics-rpc'
 import { ADMIN_CACHE_TAGS } from './cache-tags'
+import { cacheWithMaxAge } from './bounded-cache'
 import { getOrderedModuleSlugs } from './curriculum-aggregation'
 import { CURRICULUM_MODULE_META } from './curriculum-meta'
 import { fetchAllRows } from './fetch-all'
@@ -60,6 +60,11 @@ export const ANALYTICS_CACHE_SECONDS = 90
  * idempotency_key prefixes of celebratable achievement notifications. Restated from
  * ACHIEVEMENT_CELEBRATION_KEY_PREFIXES (lib/notifications/in-app/achievement-celebrations.ts)
  * so analytics does not import the notification stack; analytics-growth.test.ts pins them.
+ *
+ * These count notification rows, not achievements. A capstone rejected and then published on
+ * re-review has two rows (`capstone-reviewed-<id>` and `…-published`) and a re-granted Fellow has
+ * one per grant: each counts as created, and the row retired when its sibling is claimed counts
+ * as claimed too (same `celebrated_at`). So such an achievement is 2 created / 2 claimed, not 1 / 1.
  */
 export const GROWTH_CELEBRATION_KEY_PREFIXES = [
   'certificate-generated-',
@@ -176,10 +181,47 @@ export async function fetchGrowthData(
   }
 }
 
+const ANALYTICS_RANGE_KEYS: ReadonlySet<string> = new Set<AdminDateRangeKey>(['today', '7d', '30d', '90d', 'custom'])
+const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/
+
+export interface AnalyticsRangeInput {
+  rangeKey: AdminDateRangeKey
+  from: string | null
+  to: string | null
+}
+
+/**
+ * Reduces caller-supplied range inputs to ones that resolve without throwing and give a
+ * bounded cache key, as the dashboard does (`resolveDashboardRange` / `rangeKeyParts`):
+ * a preset drops from/to, and an unknown key or a custom range whose bounds are missing
+ * or not `YYYY-MM-DD` dates falls back to the default 30 days.
+ */
+export function normalizeAnalyticsRange(
+  rangeKey?: string | null,
+  from?: string | null,
+  to?: string | null
+): AnalyticsRangeInput {
+  const fallback: AnalyticsRangeInput = { rangeKey: '30d', from: null, to: null }
+  if (!rangeKey || !ANALYTICS_RANGE_KEYS.has(rangeKey)) return fallback
+  if (rangeKey !== 'custom') return { rangeKey: rangeKey as AdminDateRangeKey, from: null, to: null }
+  if (typeof from !== 'string' || typeof to !== 'string' || !DATE_KEY_RE.test(from) || !DATE_KEY_RE.test(to)) {
+    return fallback
+  }
+  try {
+    const range = resolveRange('custom', from, to)
+    if (Number.isNaN(range.start.getTime()) || Number.isNaN(range.end.getTime())) return fallback
+  } catch {
+    return fallback
+  }
+  return { rangeKey: 'custom', from, to }
+}
+
 /**
  * Thrown inside the cached function when a computed workspace is marked `failed`.
  * unstable_cache does not store a rejection, so a partial result is never served for the
  * next 90s; the caller unwraps it and returns the uncached payload for this request.
+ * `cacheWithMaxAge` delivers the rejection on a stale entry as well, where unstable_cache
+ * alone would swallow it and keep serving the last healthy workspace.
  */
 class UncachedAnalyticsFailure extends Error {
   constructor(readonly data: AdminAnalyticsWorkspaceData) {
@@ -198,8 +240,13 @@ export function reviveAnalyticsWorkspaceData(data: AdminAnalyticsWorkspaceData):
 
 export class AnalyticsService {
   /**
-   * Returns the analytics workspace, cached for 90s under the `admin-analytics` tag and
-   * keyed by rangeKey/from/to/tab. A result with `failed: true` is never cached.
+   * Returns the analytics workspace, cached for 90s under the `admin-analytics` tag. A
+   * result with `failed: true` is never cached, and a stale entry is recomputed before it
+   * is returned (see ./bounded-cache).
+   *
+   * The key is the normalized range plus growth vs every other tab: only the growth tab
+   * changes what is computed, so the other five share one entry. The `tab` echoed in the
+   * payload is set after the cache read, so it is always the tab that was asked for.
    *
    * The cached function uses the service-role client only; it must never read request
    * cookies or headers (next/headers), which unstable_cache forbids.
@@ -210,25 +257,24 @@ export class AnalyticsService {
     to?: string | null
     tab?: AdminAnalyticsTab
   }): Promise<AdminAnalyticsWorkspaceData> {
-    const rangeKey = params?.rangeKey || '30d'
-    const from = params?.from ?? null
-    const to = params?.to ?? null
+    const { rangeKey, from, to } = normalizeAnalyticsRange(params?.rangeKey, params?.from, params?.to)
     const tab = params?.tab || 'overview'
     const compute = () => this.computeWorkspaceData({ rangeKey, from, to, tab })
+    const rangeParts = rangeKey === 'custom' ? [rangeKey, from ?? '', to ?? ''] : [rangeKey]
 
     try {
-      const cached = unstable_cache(
+      const cached = cacheWithMaxAge(
         async () => {
           const data = await compute()
           if (data.failed) throw new UncachedAnalyticsFailure(data)
           return data
         },
-        ['admin-analytics', rangeKey, from ?? '', to ?? '', tab],
+        ['admin-analytics', ...rangeParts, tab === 'growth' ? 'growth' : 'base'],
         { revalidate: ANALYTICS_CACHE_SECONDS, tags: [ADMIN_CACHE_TAGS.analytics] }
       )
-      return reviveAnalyticsWorkspaceData(await cached())
+      return { ...reviveAnalyticsWorkspaceData(await cached()), tab }
     } catch (err) {
-      if (err instanceof UncachedAnalyticsFailure) return err.data
+      if (err instanceof UncachedAnalyticsFailure) return { ...err.data, tab }
       // The data cache itself failed (not the queries): serve this request uncached.
       console.warn('[AnalyticsService] analytics cache unavailable, computing uncached:', err)
       return compute()
@@ -308,6 +354,8 @@ export class AnalyticsService {
       ] = await Promise.all([
         // #1 Levels, streaks, total users, public portfolios
         fetchUserStats(supabase),
+        // Every paged read below is ordered by its range column and then its primary key:
+        // without a total order, pages past the 1000-row cap can overlap or skip rows.
         // Users joined in current range
         fetchAllRows<{ id: string; created_at: string }>((from, to) =>
           supabase
@@ -315,6 +363,8 @@ export class AnalyticsService {
             .select('id, created_at')
             .gte('created_at', rangeStartIso)
             .lte('created_at', rangeEndIso)
+            .order('created_at')
+            .order('id')
             .range(from, to)
         ),
         // Users joined in previous range
@@ -324,6 +374,8 @@ export class AnalyticsService {
             .select('id')
             .gte('created_at', prevStartIso)
             .lte('created_at', prevEndIso)
+            .order('created_at')
+            .order('id')
             .range(from, to)
         ),
         // XP events in range
@@ -333,6 +385,8 @@ export class AnalyticsService {
             .select('user_id, xp_amount, source_type, created_at')
             .gte('created_at', rangeStartIso)
             .lte('created_at', rangeEndIso)
+            .order('created_at')
+            .order('id')
             .range(from, to)
         ),
         // XP events in previous range
@@ -342,6 +396,8 @@ export class AnalyticsService {
             .select('user_id, xp_amount')
             .gte('created_at', prevStartIso)
             .lte('created_at', prevEndIso)
+            .order('created_at')
+            .order('id')
             .range(from, to)
         ),
         // #6 Users active in range, and whether each was active before it
@@ -352,6 +408,8 @@ export class AnalyticsService {
             .from('xp_events')
             .select('user_id, created_at')
             .gte('created_at', mauCutoff.toISOString())
+            .order('created_at')
+            .order('id')
             .range(from, to)
         ),
         // Lesson completions in range
@@ -362,6 +420,9 @@ export class AnalyticsService {
             .eq('status', 'completed')
             .gte('completed_at', rangeStartIso)
             .lte('completed_at', rangeEndIso)
+            .order('completed_at')
+            .order('user_id')
+            .order('lesson_id')
             .range(from, to)
         ),
         // Lesson completions in previous range
@@ -372,6 +433,9 @@ export class AnalyticsService {
             .eq('status', 'completed')
             .gte('completed_at', prevStartIso)
             .lte('completed_at', prevEndIso)
+            .order('completed_at')
+            .order('user_id')
+            .order('lesson_id')
             .range(from, to)
         ),
         // #10 Module drop-offs, course completion, first-lesson funnel
@@ -383,6 +447,8 @@ export class AnalyticsService {
             .select('user_id, is_correct, attempted_at')
             .gte('attempted_at', rangeStartIso)
             .lte('attempted_at', rangeEndIso)
+            .order('attempted_at')
+            .order('id')
             .range(from, to)
         ),
         // #12 Capstone submissions in range
@@ -394,6 +460,8 @@ export class AnalyticsService {
             .select('id, user_id, issued_at')
             .gte('issued_at', rangeStartIso)
             .lte('issued_at', rangeEndIso)
+            .order('issued_at')
+            .order('id')
             .range(from, to)
         ),
         // Certificates in previous range
@@ -403,12 +471,14 @@ export class AnalyticsService {
             .select('id')
             .gte('issued_at', prevStartIso)
             .lte('issued_at', prevEndIso)
+            .order('issued_at')
+            .order('id')
             .range(from, to)
         ),
         // #15 All certificates (count only, for the funnel)
         supabase.from('certificates').select('id', { count: 'exact', head: true }),
-        // Badges count
-        supabase.from('user_badges').select('id', { count: 'exact', head: true }),
+        // Badges count (user_badges has no `id` column; its key is user_id + badge_id)
+        supabase.from('user_badges').select('user_id', { count: 'exact', head: true }),
         // #17 Flashcard SRS rows and distinct learners
         fetchFlashcardStats(supabase),
         // C6 growth head counts, only for the growth tab

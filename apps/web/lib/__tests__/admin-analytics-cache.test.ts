@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
  * B4: the analytics workspace is served from the Next.js data cache (90s, tag
- * `admin-analytics`, keyed by rangeKey/from/to/tab). The fake unstable_cache below
+ * `admin-analytics`, keyed by the range and by growth vs every other tab). The fake unstable_cache below
  * behaves like the real one where it matters: it JSON-serializes stored values (so
  * Dates come back as strings) and never stores a rejection.
  */
@@ -38,6 +38,7 @@ vi.mock('../supabase', () => ({ createServiceRoleClient: vi.fn() }))
 
 import { AnalyticsService, ANALYTICS_CACHE_SECONDS, reviveAnalyticsWorkspaceData } from '../admin/analytics-service'
 import type { AdminAnalyticsWorkspaceData } from '../admin/types'
+import { createServiceRoleClient } from '../supabase'
 
 type ComputeParams = { rangeKey: string; from: string | null; to: string | null; tab: string }
 
@@ -77,7 +78,7 @@ afterEach(() => {
 })
 
 describe('AnalyticsService.getAnalyticsWorkspaceData cache', () => {
-  it('caches for 90s under the admin-analytics tag, keyed by rangeKey/from/to/tab', async () => {
+  it('caches for 90s under the admin-analytics tag, keyed by range and growth vs the rest', async () => {
     await AnalyticsService.getAnalyticsWorkspaceData({
       rangeKey: 'custom',
       from: '2026-09-01',
@@ -86,13 +87,14 @@ describe('AnalyticsService.getAnalyticsWorkspaceData cache', () => {
     })
     expect(ANALYTICS_CACHE_SECONDS).toBe(90)
     expect(cacheState.calls).toHaveLength(1)
-    expect(cacheState.calls[0].keyParts).toEqual(['admin-analytics', 'custom', '2026-09-01', '2026-09-30', 'learning'])
+    expect(cacheState.calls[0].keyParts).toEqual(['v1', 'admin-analytics', 'custom', '2026-09-01', '2026-09-30', 'base'])
     expect(cacheState.calls[0].options).toEqual({ revalidate: 90, tags: ['admin-analytics'] })
   })
 
   it('applies the same defaults as before (30d, overview) to the key', async () => {
     await AnalyticsService.getAnalyticsWorkspaceData()
-    expect(cacheState.calls[0].keyParts).toEqual(['admin-analytics', '30d', '', '', 'overview'])
+    // A preset ignores from/to, so they are not in its key.
+    expect(cacheState.calls[0].keyParts).toEqual(['v1', 'admin-analytics', '30d', 'base'])
     expect(compute).toHaveBeenCalledWith({ rangeKey: '30d', from: null, to: null, tab: 'overview' })
   })
 
@@ -110,12 +112,66 @@ describe('AnalyticsService.getAnalyticsWorkspaceData cache', () => {
     expect(second.overview.kpis.totalUsers).toBe(42)
   })
 
-  it('keeps separate entries per tab and per custom range', async () => {
+  it('keeps separate entries for growth and per custom range', async () => {
     await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab: 'overview' })
-    await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab: 'learning' })
+    await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab: 'growth' })
     await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: 'custom', from: '2026-01-01', to: '2026-01-31' })
     await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: 'custom', from: '2026-02-01', to: '2026-02-28' })
     expect(compute).toHaveBeenCalledTimes(4)
+  })
+
+  it('shares one entry across the non-growth tabs and still echoes the requested tab', async () => {
+    const tabs = ['overview', 'learners', 'learning', 'engagement', 'outcomes'] as const
+    for (const tab of tabs) {
+      const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab })
+      expect(data.tab).toBe(tab)
+    }
+    expect(compute).toHaveBeenCalledTimes(1)
+    expect(cacheState.store.size).toBe(1)
+
+    // Growth carries extra data, so it has its own entry and its own tab echo.
+    expect((await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab: 'growth' })).tab).toBe('growth')
+    expect(compute).toHaveBeenCalledTimes(2)
+  })
+
+  it('echoes the requested tab on a failed, uncached result too', async () => {
+    compute.mockImplementation(async (params: ComputeParams) => workspace({ ...params, tab: 'overview' }, true))
+    const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d', tab: 'learning' })
+    expect(data.failed).toBe(true)
+    expect(data.tab).toBe('learning')
+  })
+
+  it('a preset range ignores from/to, so they cannot multiply cache keys', async () => {
+    await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '7d', from: '2026-01-01', to: '2026-01-31' })
+    await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '7d', from: 'x', to: 'y' })
+    expect(compute).toHaveBeenCalledTimes(1)
+    expect(compute).toHaveBeenCalledWith({ rangeKey: '7d', from: null, to: null, tab: 'overview' })
+    expect(cacheState.calls[0].keyParts).toEqual(['v1', 'admin-analytics', '7d', 'base'])
+  })
+
+  it.each([
+    ['an unknown range key', { rangeKey: 'forever', from: null, to: null }],
+    ['unparseable custom dates', { rangeKey: 'custom', from: 'abc', to: 'def' }],
+    ['a custom range with one bound', { rangeKey: 'custom', from: '2026-01-01', to: null }],
+    ['a custom bound that is not a plain date', { rangeKey: 'custom', from: '2026-01-01T00:00:00Z', to: '2026-01-31' }],
+  ])('falls back to the default range for %s, with a bounded key', async (_label, params) => {
+    const data = await AnalyticsService.getAnalyticsWorkspaceData(params as never)
+    expect(data.failed).toBeUndefined()
+    expect(compute).toHaveBeenCalledWith({ rangeKey: '30d', from: null, to: null, tab: 'overview' })
+    expect(cacheState.calls[0].keyParts).toEqual(['v1', 'admin-analytics', '30d', 'base'])
+  })
+
+  it('does not throw on unparseable custom dates when the real computation runs', async () => {
+    vi.restoreAllMocks()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.mocked(createServiceRoleClient).mockImplementation(() => {
+      throw new Error('no database in this test')
+    })
+    // No database here: the computation degrades to its failed fallback, but it must get
+    // that far instead of throwing a RangeError out of the page.
+    const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: 'custom', from: 'abc', to: 'def' })
+    expect(data.range.key).toBe('30d')
+    expect(data.range.start).toBeInstanceOf(Date)
   })
 
   it('never caches a failed result: it is returned as-is and recomputed next time', async () => {

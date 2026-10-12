@@ -23,6 +23,8 @@ export const XP_VALUES: XpValuesConfig = {
 let cachedSettings: XpValuesConfig | null = null
 let cacheTimestamp = 0
 const CACHE_TTL_MS = 30_000
+/** After a failed settings read the cached values are served this long before the next attempt. */
+const ERROR_RETRY_MS = 5_000
 
 /** The admin learning-settings key, written by Settings → Learning (lib/admin/settings-service.ts). */
 export const LEARNING_SETTINGS_KEY = 'learning_settings'
@@ -89,8 +91,32 @@ async function readSettingsValue(client: SettingsClient, key: string): Promise<R
   return data?.value && typeof data.value === 'object' ? data.value : null
 }
 
+/** One uncached read in source order (see getRuntimeXpValues). Throws on a read error; null = no record. */
+async function readConfiguredXpValues(client: SettingsClient): Promise<XpValuesConfig | null> {
+  const admin = await readSettingsValue(client, LEARNING_SETTINGS_KEY)
+  const source =
+    admin && admin.xpSettingsVersion === XP_SETTINGS_VERSION
+      ? admin
+      : await readSettingsValue(client, LEGACY_LEARNING_SETTINGS_KEY)
+  return source ? resolveXpValues(source) : null
+}
+
+/**
+ * The XP values in effect, read now, for callers that must not mistake a fallback for the real
+ * thing (the admin settings form). Throws when the settings cannot be read, instead of returning
+ * the last good values or the static defaults as getRuntimeXpValues does. Never served from the
+ * cache (which may hold such a fallback) and a failure leaves the cache as it was.
+ */
+export async function readRuntimeXpValuesStrict(supabaseClient: unknown): Promise<XpValuesConfig> {
+  const resolved = (await readConfiguredXpValues(supabaseClient as SettingsClient)) ?? XP_VALUES
+  cachedSettings = resolved
+  cacheTimestamp = Date.now()
+  return resolved
+}
+
 /**
  * Loads the XP values admins configured, with a 30s cache, falling back safely to XP_VALUES.
+ * A failed read keeps the last good values and is retried after a few seconds.
  *
  * Source order: the admin settings (`learning_settings`) once saved by the reconciled form
  * (`xpSettingsVersion` 2), else the legacy `learning` record this reader always used, else the
@@ -108,20 +134,19 @@ export async function getRuntimeXpValues(
   if (!supabaseClient) return cachedSettings || XP_VALUES
 
   try {
-    const client = supabaseClient as SettingsClient
-    const admin = await readSettingsValue(client, LEARNING_SETTINGS_KEY)
-    const source =
-      admin && admin.xpSettingsVersion === XP_SETTINGS_VERSION
-        ? admin
-        : await readSettingsValue(client, LEGACY_LEARNING_SETTINGS_KEY)
-    if (source) {
-      const resolved = resolveXpValues(source)
+    const resolved = await readConfiguredXpValues(supabaseClient as SettingsClient)
+    if (resolved) {
       cachedSettings = resolved
       cacheTimestamp = now
       return resolved
     }
   } catch (err) {
-    console.warn('[getRuntimeXpValues] Fallback to static XP defaults:', err)
+    // A failed read is not a reason to change what learners earn: keep the last good values (the
+    // static defaults only if there never were any) and read again after a short backoff.
+    console.warn('[getRuntimeXpValues] Settings read failed; serving the last known XP values:', err)
+    cachedSettings = cachedSettings || XP_VALUES
+    cacheTimestamp = now - CACHE_TTL_MS + ERROR_RETRY_MS
+    return cachedSettings
   }
 
   cachedSettings = XP_VALUES

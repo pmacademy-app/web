@@ -249,7 +249,7 @@ export async function evaluateAndAwardBadges(
           occurredAt: new Date().toISOString(),
           payload: {
             userId,
-            badgeId: badgeDef.key,
+            badgeKey: badgeDef.key,
             badgeName: badgeDef.name,
             badgeDescription: badgeDef.description,
             // For the share action (Growth R5 B4): only a public portfolio can be shared.

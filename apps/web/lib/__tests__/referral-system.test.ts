@@ -13,7 +13,11 @@
  * 9. Zero-PII analytics compliance
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+const notify = vi.hoisted(() => ({ createInApp: vi.fn() }))
+vi.mock('@/lib/notifications/in-app/service', () => ({ createInAppNotification: notify.createInApp }))
+
 import {
   resolveReferralCode,
   createReferralAttribution,
@@ -21,12 +25,15 @@ import {
   getUserReferralStats,
   REFERRAL_ACTIVATION_XP,
 } from '../referral/referral-service'
+import { SettingsService } from '../admin/settings-service'
+import type { LearningSettings } from '../admin/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
 describe('Phase 7: Referral & Organic Growth System', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    notify.createInApp.mockResolvedValue({ success: true })
   })
 
   // ─── 1. Referral Code Resolution ───────────────────────────────────────────
@@ -290,6 +297,97 @@ describe('Phase 7: Referral & Organic Growth System', () => {
 
   // ─── 3. Reward Activation Upon First Lesson Completion ─────────────────────
   describe('3. First Lesson Completion Reward Activation', () => {
+    beforeEach(() => {
+      vi.spyOn(SettingsService, 'getLearningSettings').mockResolvedValue({ xpReferralReward: 50 } as unknown as LearningSettings)
+    })
+    afterEach(() => vi.restoreAllMocks())
+
+    /** A pending referral whose XP insert and status update are recorded in call order. */
+    const pendingReferral = (opts: { xpInsertError?: { code?: string; message: string } } = {}) => {
+      const calls: string[] = []
+      const updateChain = {
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({ data: [{ id: 'ref-order-1' }], error: null }),
+      }
+      const update = vi.fn().mockImplementation(() => {
+        calls.push('status')
+        return updateChain
+      })
+      const chainFor = (table: string, data: unknown = null) => {
+        const chain: Record<string, unknown> = {}
+        const fn = vi.fn().mockReturnValue(chain)
+        for (const method of ['select', 'eq', 'ilike', 'in', 'gte', 'order', 'limit']) chain[method] = fn
+        chain.single = vi.fn().mockResolvedValue({ data, error: null })
+        chain.maybeSingle = vi.fn().mockResolvedValue({ data, error: null })
+        chain.insert = vi.fn().mockImplementation(() => {
+          if (table === 'xp_events') calls.push('xp')
+          return Promise.resolve({ error: table === 'xp_events' ? opts.xpInsertError ?? null : null })
+        })
+        chain.update = update
+        return chain
+      }
+      const supabase = {
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === 'referrals') {
+            return {
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({
+                      data: { id: 'ref-order-1', referrer_id: 'referrer-owner', status: 'signed_up' },
+                      error: null,
+                    }),
+                  }),
+                }),
+              }),
+              update,
+            }
+          }
+          return chainFor(table, table === 'users' ? { username: 'newlearner', name: 'New Learner' } : null)
+        }),
+      } as unknown as SupabaseClient<Database>
+      return { supabase, calls, update }
+    }
+
+    it('pays the XP before marking the referral rewarded', async () => {
+      const { supabase, calls } = pendingReferral()
+
+      const result = await onFirstLessonCompletedReferralCheck(supabase, 'learner-uid-1')
+
+      expect(result).toMatchObject({ rewarded: true, xpAwarded: 50 })
+      expect(calls).toEqual(['xp', 'status'])
+    })
+
+    it('leaves the referral pending when the reward setting cannot be read', async () => {
+      const settings = vi.spyOn(SettingsService, 'getLearningSettings').mockRejectedValue(new Error('settings down'))
+      const { supabase, calls } = pendingReferral()
+
+      const result = await onFirstLessonCompletedReferralCheck(supabase, 'learner-uid-1')
+
+      expect(settings).toHaveBeenCalledWith({ strict: true })
+      expect(result).toEqual({ rewarded: false, reason: 'reward_unavailable' })
+      // Nothing paid at a guessed amount, and the row is still `signed_up` for a later retry.
+      expect(calls).toEqual([])
+    })
+
+    it('leaves the referral pending when the XP award fails', async () => {
+      const { supabase, calls } = pendingReferral({ xpInsertError: { code: 'XX000', message: 'ledger down' } })
+
+      const result = await onFirstLessonCompletedReferralCheck(supabase, 'learner-uid-1')
+
+      expect(result).toEqual({ rewarded: false, reason: 'xp_award_failed' })
+      expect(calls).toEqual(['xp'])
+    })
+
+    it('still marks the referral rewarded when the XP was already paid (a concurrent or earlier run)', async () => {
+      const { supabase, calls } = pendingReferral({ xpInsertError: { code: '23505', message: 'duplicate key value' } })
+
+      const result = await onFirstLessonCompletedReferralCheck(supabase, 'learner-uid-1')
+
+      expect(result.rewarded).toBe(true)
+      expect(calls).toEqual(['xp', 'status'])
+    })
+
     it('activates referral reward and sets status to rewarded', async () => {
       const updateChain = {
         eq: vi.fn().mockReturnThis(),
@@ -438,6 +536,158 @@ describe('Phase 7: Referral & Organic Growth System', () => {
       expect(insertedXpEvents[0].source_type).toBe('referral')
       expect(insertedXpEvents[0].xp_amount).toBe(50)
       expect(insertedXpEvents[0].source_id).toBe('ref-row-unique-99')
+    })
+  })
+
+  // ─── 3b. A failed activation is completed on a later lesson ───────────────
+  // The caller runs the check on every lesson completion while the referral is still `signed_up`
+  // (lib/academy/lessons-db.ts), so whatever stopped the first attempt is retried. However often
+  // it runs, the referrer is paid once, the status flips once and one notification goes out.
+  describe('3b. Activation retried on a later lesson', () => {
+    const REFERRAL = 'ref-retry-1'
+    const REFERRER = 'referrer-owner'
+    const LEARNER = 'learner-uid-1'
+
+    /** A referral row and an XP ledger that keep their state across calls, with failure switches. */
+    const referralDb = (opts: { referral?: boolean } = {}) => {
+      const state = {
+        status: 'signed_up',
+        hasReferral: opts.referral ?? true,
+        xpEvents: [] as Array<{ user_id: string; source_type: string; source_id: string; xp_amount: number }>,
+        xpInsertError: null as { code?: string; message: string } | null,
+        statusUpdateError: null as { message: string } | null,
+        statusUpdates: 0,
+        reads: [] as string[],
+      }
+      const supabase = {
+        from: vi.fn().mockImplementation((table: string) => {
+          const filters: Record<string, unknown> = {}
+          let update: Record<string, unknown> | null = null
+          const runUpdate = () => {
+            if (state.statusUpdateError) return { data: null, error: state.statusUpdateError }
+            // Compare-and-set, as the real statement: only a row still `signed_up` is updated.
+            if (filters.id !== REFERRAL || filters.status !== state.status) return { data: [], error: null }
+            state.status = String(update?.status)
+            state.statusUpdates += 1
+            return { data: [{ id: REFERRAL }], error: null }
+          }
+          const chain: Record<string, unknown> = {}
+          chain.select = () => {
+            if (update) return Promise.resolve(runUpdate())
+            state.reads.push(table)
+            return chain
+          }
+          chain.eq = (col: string, value: unknown) => {
+            filters[col] = value
+            return chain
+          }
+          chain.limit = () => chain
+          chain.maybeSingle = async () => {
+            if (table === 'referrals') {
+              const pending = state.hasReferral && filters.referred_user_id === LEARNER && filters.status === state.status
+              return { data: pending ? { id: REFERRAL, referrer_id: REFERRER, status: state.status } : null, error: null }
+            }
+            if (table === 'xp_events') {
+              const found = state.xpEvents.find(
+                (e) => e.user_id === filters.user_id && e.source_type === filters.source_type && e.source_id === filters.source_id
+              )
+              return { data: found ? { id: 'xp-1' } : null, error: null }
+            }
+            if (table === 'users') return { data: { username: 'newlearner', name: 'New Learner', total_xp: 0 }, error: null }
+            return { data: null, error: null }
+          }
+          chain.insert = async (row: (typeof state.xpEvents)[number]) => {
+            if (table !== 'xp_events') return { error: null }
+            if (state.xpInsertError) return { error: state.xpInsertError }
+            state.xpEvents.push(row)
+            return { error: null }
+          }
+          chain.update = (values: Record<string, unknown>) => {
+            update = values
+            return chain
+          }
+          return chain
+        }),
+      } as unknown as SupabaseClient<Database>
+      return { supabase, state }
+    }
+
+    beforeEach(() => {
+      vi.spyOn(SettingsService, 'getLearningSettings').mockResolvedValue({ xpReferralReward: 50 } as unknown as LearningSettings)
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+    })
+    afterEach(() => vi.restoreAllMocks())
+
+    it('pays once and notifies once when lesson 1 failed on the reward setting and lesson 2 succeeds', async () => {
+      const { supabase, state } = referralDb()
+      vi.spyOn(SettingsService, 'getLearningSettings').mockRejectedValueOnce(new Error('settings down'))
+
+      const first = await onFirstLessonCompletedReferralCheck(supabase, LEARNER)
+      expect(first).toEqual({ rewarded: false, reason: 'reward_unavailable' })
+      expect(state).toMatchObject({ status: 'signed_up', xpEvents: [] })
+      expect(notify.createInApp).not.toHaveBeenCalled()
+
+      const second = await onFirstLessonCompletedReferralCheck(supabase, LEARNER)
+      expect(second).toEqual({ rewarded: true, referrerId: REFERRER, xpAwarded: 50 })
+
+      // A third completion finds nothing pending.
+      expect(await onFirstLessonCompletedReferralCheck(supabase, LEARNER)).toEqual({ rewarded: false, reason: 'no_pending_referral' })
+
+      expect(state.xpEvents).toEqual([{ user_id: REFERRER, source_type: 'referral', xp_amount: 50, source_id: REFERRAL }])
+      expect(state).toMatchObject({ status: 'rewarded', statusUpdates: 1 })
+      expect(notify.createInApp).toHaveBeenCalledTimes(1)
+      expect(notify.createInApp).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: REFERRER, idempotencyKey: `referral-reward-${REFERRAL}` })
+      )
+    })
+
+    it('pays once when lesson 1 failed on the XP insert and lesson 2 succeeds', async () => {
+      const { supabase, state } = referralDb()
+      state.xpInsertError = { code: 'XX000', message: 'ledger down' }
+
+      expect(await onFirstLessonCompletedReferralCheck(supabase, LEARNER)).toEqual({ rewarded: false, reason: 'xp_award_failed' })
+      expect(state).toMatchObject({ status: 'signed_up', xpEvents: [], statusUpdates: 0 })
+
+      state.xpInsertError = null
+      expect((await onFirstLessonCompletedReferralCheck(supabase, LEARNER)).rewarded).toBe(true)
+
+      expect(state.xpEvents).toHaveLength(1)
+      expect(state).toMatchObject({ status: 'rewarded', statusUpdates: 1 })
+      expect(notify.createInApp).toHaveBeenCalledTimes(1)
+    })
+
+    it('completes a referral whose XP was paid but whose status update failed, without a second award', async () => {
+      const { supabase, state } = referralDb()
+      state.statusUpdateError = { message: 'update timed out' }
+
+      expect(await onFirstLessonCompletedReferralCheck(supabase, LEARNER)).toEqual({ rewarded: false, reason: 'update_failed' })
+      // Paid, but not shown as rewarded and nobody told yet.
+      expect(state.xpEvents).toHaveLength(1)
+      expect(state.status).toBe('signed_up')
+      expect(notify.createInApp).not.toHaveBeenCalled()
+
+      state.statusUpdateError = null
+      // Any insert now would be a second award: make one fail loudly instead of passing unnoticed.
+      state.xpInsertError = { code: 'XX000', message: 'a second award was attempted' }
+      const retry = await onFirstLessonCompletedReferralCheck(supabase, LEARNER)
+
+      expect(retry).toEqual({ rewarded: true, referrerId: REFERRER, xpAwarded: 50 })
+      expect(state.xpEvents).toHaveLength(1)
+      expect(state).toMatchObject({ status: 'rewarded', statusUpdates: 1 })
+      expect(notify.createInApp).toHaveBeenCalledTimes(1)
+    })
+
+    it('costs one read and awards nothing when there is no pending referral', async () => {
+      const { supabase, state } = referralDb({ referral: false })
+      const settings = vi.spyOn(SettingsService, 'getLearningSettings')
+
+      expect(await onFirstLessonCompletedReferralCheck(supabase, LEARNER)).toEqual({ rewarded: false, reason: 'no_pending_referral' })
+
+      expect(state.reads).toEqual(['referrals'])
+      expect(supabase.from).toHaveBeenCalledTimes(1)
+      expect(settings).not.toHaveBeenCalled()
+      expect(state.xpEvents).toEqual([])
+      expect(notify.createInApp).not.toHaveBeenCalled()
     })
   })
 

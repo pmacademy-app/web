@@ -104,8 +104,14 @@ async function render(celebration: AchievementCelebration | null, opts: { strict
 // base-ui renders the dialog in a portal, so everything is queried from the body.
 const dialog = () => document.body.querySelector<HTMLElement>('[role="dialog"]')
 const dialogText = () => dialog()?.textContent ?? ''
+/** The text a sighted user reads: screen-reader-only spans are left out. */
+const visibleText = (el: Element) => {
+  const copy = el.cloneNode(true) as Element
+  copy.querySelectorAll('.sr-only').forEach((hidden) => hidden.remove())
+  return copy.textContent?.trim() ?? ''
+}
 const linkByText = (text: string) =>
-  Array.from(dialog()?.querySelectorAll('a') ?? []).find((a) => a.textContent?.trim() === text) ?? null
+  Array.from(dialog()?.querySelectorAll('a') ?? []).find((a) => visibleText(a) === text) ?? null
 const shareGroup = () => dialog()?.querySelector('[aria-label="Share this portfolio"]') ?? null
 const hrefs = () => Array.from(document.body.querySelectorAll('a')).map((a) => a.getAttribute('href') ?? '')
 
@@ -148,6 +154,9 @@ describe('AchievementCelebrationModal — certificate', () => {
     expect(href).toContain(encodeURIComponent(VERIFY_URL))
     expect(link!.getAttribute('target')).toBe('_blank')
     expect(link!.getAttribute('rel')).toBe('noopener noreferrer')
+    // The new tab is said in the link's name, not only in a mouse-only title.
+    expect(link!.querySelector('.sr-only')?.textContent).toBe(' (opens in a new tab)')
+    expect(link!.textContent).toBe('Add to LinkedIn Profile (opens in a new tab)')
   })
 
   it('names and describes the dialog, and shows the career title', async () => {

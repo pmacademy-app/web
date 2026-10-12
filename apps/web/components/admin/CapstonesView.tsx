@@ -7,12 +7,12 @@ import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminEmptyState } from './AdminEmptyState'
 import { CapstoneReviewDrawer } from './CapstoneReviewDrawer'
 import { computeReviewAge, type ReviewAgeTier } from '@/lib/admin/capstone-review-aging'
-import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
+import type { AdminCapstoneListRow, AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
 import type { ModerationParamsPatch } from './ModerationWorkspace'
 
 interface CapstonesViewProps {
   /** One server page, already filtered and in review-aging order (getCapstonesPage). */
-  capstones: AdminCapstoneRow[]
+  capstones: AdminCapstoneListRow[]
   /** Raw `status` URL param; unknown or absent means 'all'. */
   status: string | null
   onParamsChange: (patch: ModerationParamsPatch) => void
@@ -34,7 +34,7 @@ const STATUS_FILTERS = ['all', 'submitted', 'reviewed', 'draft']
  *   is stored as `reviewed` + `is_public: false`, which renders as the neutral
  *   "archived" badge with "Private" visibility — the accurate representation.
  */
-function capstoneStatusVariant(c: AdminCapstoneRow): string {
+function capstoneStatusVariant(c: AdminCapstoneListRow): string {
   if (c.status === 'submitted') return 'pending'
   if (c.status === 'reviewed') return c.isPublic ? 'published' : 'archived'
   return 'draft'
@@ -62,7 +62,7 @@ export function CapstonesView({
 
   const handleClose = () => pushParams({ capstone: undefined })
 
-  const columns: Column<AdminCapstoneRow>[] = [
+  const columns: Column<AdminCapstoneListRow>[] = [
     {
       header: 'Learner',
       cell: (c) => (

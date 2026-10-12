@@ -41,7 +41,7 @@ export function FirstSessionCelebrationModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         data-testid="first-session-celebration-modal"
-        className="sm:max-w-md p-6 text-center overflow-hidden"
+        className="sm:max-w-md p-6 text-center overflow-x-hidden"
       >
         {/* Celebration Trophy Icon */}
         <div className="flex justify-center pt-2 pb-1">

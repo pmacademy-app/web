@@ -53,7 +53,9 @@ import {
   ModerationService,
   buildIlikeOrFilter,
   escapeIlikeTerm,
+  moderationLastPagePath,
   normalizeModerationPaging,
+  normalizeModerationSearchParams,
 } from '@/lib/admin/moderation-service'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
@@ -91,6 +93,49 @@ describe('paging helpers', () => {
     )
     // Commas, parentheses and quotes cannot break out of the filter.
     expect(buildIlikeOrFilter(['name'], 'x,y)"z')).toBe('name.ilike."%x,y)\\"z%"')
+  })
+})
+
+describe('moderation URL helpers', () => {
+  it('keeps string search params and drops repeated or unknown ones', () => {
+    expect(
+      normalizeModerationSearchParams({ tab: 'portfolios', status: 'all', q: 'ada', page: '2', capstone: UUID, other: 'x' })
+    ).toEqual({ tab: 'portfolios', status: 'all', q: 'ada', page: '2', capstone: UUID })
+    // `?q=a&q=b` arrives as an array; a client view that calls q.trim() must never see it.
+    expect(normalizeModerationSearchParams({ tab: 'portfolios', q: ['a', 'b'], page: ['1', '2'] })).toEqual({
+      tab: 'portfolios',
+    })
+    expect(normalizeModerationSearchParams({})).toEqual({})
+  })
+
+  const list = (items: number, total: number, page: number, failed = false) => ({
+    items: Array.from({ length: items }),
+    total,
+    page,
+    pageSize: 25,
+    failed,
+  })
+
+  it('sends an empty page past the end to the last page, keeping tab, status, q and capstone', () => {
+    // 26 pending rows, the one on page 2 was just reviewed: 25 left, all on page 1.
+    expect(moderationLastPagePath('fellow-requests', { status: 'pending', page: '2' }, list(0, 25, 2))).toBe(
+      '/admin/moderation?tab=fellow-requests&status=pending'
+    )
+    expect(
+      moderationLastPagePath('portfolios', { status: 'all', q: 'a b', page: '99' }, list(0, 60, 99))
+    ).toBe('/admin/moderation?tab=portfolios&status=all&q=a+b&page=3')
+    expect(
+      moderationLastPagePath('capstones', { page: '9', capstone: UUID }, list(0, 26, 9))
+    ).toBe(`/admin/moderation?tab=capstones&page=2&capstone=${UUID}`)
+  })
+
+  it('leaves a normal page, an empty first page and a failed load alone', () => {
+    expect(moderationLastPagePath('testimonials', { page: '2' }, list(1, 26, 2))).toBeNull()
+    expect(moderationLastPagePath('testimonials', {}, list(0, 0, 1))).toBeNull()
+    expect(moderationLastPagePath('testimonials', { page: '4' }, list(0, 0, 4))).toBeNull()
+    expect(moderationLastPagePath('testimonials', { page: '2' }, list(0, 0, 2, true))).toBeNull()
+    // Never points back at the page that was just read (no redirect loop).
+    expect(moderationLastPagePath('testimonials', { page: '2' }, list(0, 60, 2))).toBeNull()
   })
 })
 
@@ -280,6 +325,9 @@ describe('ModerationService.getCapstonesPage', () => {
     expect(result.total).toBe(80)
     expect(result.items).toHaveLength(25)
     expect(result.items[0]).toMatchObject({ id: 'a0', learnerName: 'Ada', wordCount: 3 })
+    // The list renders the word count only: the essay itself stays on the server.
+    for (const item of result.items) expect(item).not.toHaveProperty('content')
+    expect(JSON.stringify(result.items)).not.toContain('one two three')
     // Both segments are counted exactly.
     const heads = queries.filter((q) => q.table === 'capstone_submissions' && isHead(q))
     expect(heads.map((q) => (ops(q, 'select')[0] as any)[1])).toEqual([
@@ -354,7 +402,8 @@ describe('ModerationService.getCapstoneById', () => {
     const [q] = queries.filter((x) => x.table === 'capstone_submissions')
     expect(ops(q, 'eq')).toEqual([['id', UUID]])
     expect(result.failed).toBe(false)
-    expect(result.capstone).toMatchObject({ id: UUID, learnerName: 'Ada', wordCount: 2 })
+    // The drawer's detail read still carries the essay.
+    expect(result.capstone).toMatchObject({ id: UUID, learnerName: 'Ada', wordCount: 2, content: 'a b' })
   })
 
   it('returns null for a missing row and failed on an error', async () => {

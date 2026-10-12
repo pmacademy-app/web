@@ -11,6 +11,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { runProofNudgesForPage, type NudgeCandidate } from '@/lib/growth/proof-nudges-run'
 import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 import { loadProofStates } from '@/lib/growth/proof-state-db'
+import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { BRAND } from '@/lib/brand'
 
@@ -44,6 +45,12 @@ export interface LifecycleRunResult {
   heldOut: number
   skippedTimezone: number
   skippedNoSegment: number
+  /**
+   * Pages of learners skipped entirely (no lifecycle email, no holdout, no nudge) because their
+   * progress or preferences could not be read. Also counted in `proofNudges.pagesSkipped`, which
+   * additionally counts pages where only the nudges could not be evaluated.
+   */
+  pagesSkipped: number
   proofNudges: {
     sent: Record<ProofNudgeKey, number>
     heldOut: number
@@ -64,6 +71,7 @@ function emptyResult(dryRun: boolean, paused: boolean): LifecycleRunResult {
     heldOut: 0,
     skippedTimezone: 0,
     skippedNoSegment: 0,
+    pagesSkipped: 0,
     proofNudges: {
       sent: { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 },
       heldOut: 0,
@@ -93,6 +101,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
   // The cron keeps its historical operation names and message prefix, so existing alerts match.
   const logOperation = (suffix: string) => (source === 'cron' ? `cron_lifecycle_${suffix}` : `admin_lifecycle_preview_${suffix}`)
   const logOrigin = source === 'cron' ? '/api/cron/lifecycle' : '/api/admin/automations/lifecycle-preview (dry run)'
+  const logPrefix = source === 'cron' ? '[cron/lifecycle]' : '[admin/lifecycle-preview]'
 
   // Global pause short-circuits the whole run (per-template toggles are still enforced
   // by enqueueNotificationItem for finer control). Digest schedule reuse: lifecycle
@@ -107,6 +116,8 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
   const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
   const supabase = createServiceRoleClient()
   const nowUtc = now ?? new Date()
+  // The proof-nudge automation toggles, read on first use and shared by every page of this run.
+  const nudgeToggles = new Map<ProofNudgeKey, boolean>()
 
   const startTime = Date.now()
 
@@ -115,7 +126,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
 
     for (let page = 0; page < MAX_PAGES; page++) {
       if (Date.now() - startTime > MAX_EXECUTION_MS) {
-        console.warn('[cron/lifecycle] Reached execution deadline, stopping pagination')
+        console.warn(`${logPrefix} Reached execution deadline, stopping pagination`)
         break
       }
 
@@ -159,18 +170,66 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
 
       // Batch-resolve, for this page only: notification preferences, and the two
       // learning-progress signals the segments need (has any progress row; has a
-      // completed lesson). Two lightweight queries per page — no N+1.
-      const [prefMap, progressRes] = await Promise.all([
-        getBatchUserNotificationPreferences(supabase, userIds),
-        supabase
-          .from('user_lesson_progress')
-          .select('user_id, status')
-          .in('user_id', userIds),
+      // completed lesson). Two lightweight queries per page — no N+1. The progress read is
+      // paged in a stable order (fetchAllRows): a page of learners can own more rows than one
+      // response holds (1000), and a cut-off read would make the late ones look never started.
+      const [prefRead, progressRes] = await Promise.all([
+        // Strict: a failed read must not stand in as "everyone opted in" (see the skip below).
+        getBatchUserNotificationPreferences(supabase, userIds, { strict: true }).then(
+          (map) => ({ map, error: null }),
+          (error: unknown) => ({ map: null, error }),
+        ),
+        fetchAllRows<{ user_id: string; status: string }>((lo, hi) =>
+          supabase
+            .from('user_lesson_progress')
+            .select('user_id, status')
+            .in('user_id', userIds)
+            .order('user_id')
+            .order('lesson_id')
+            .range(lo, hi)
+        ),
       ])
+
+      // Without the progress rows everyone here would look never started and get the D+1
+      // email, so a failed read skips the page (lifecycle and nudges) until the next run.
+      if (progressRes.error) {
+        result.pagesSkipped++
+        result.proofNudges.pagesSkipped++
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        const reason = (progressRes.error as { message?: string }).message ?? String(progressRes.error)
+        void logSystemError({
+          severity: 'error',
+          category: 'cron',
+          operation: logOperation('progress_query'),
+          message: `Learning progress read failed in ${logOrigin}; page skipped: ${reason}`,
+        })
+        lastSeenId = users[users.length - 1].id
+        if (users.length < BATCH_SIZE) break
+        continue
+      }
+
+      // Same for the preferences: with defaults standing in, a learner who opted out would be
+      // emailed and nudged, so a failed read also skips the page until the next run.
+      if (!prefRead.map) {
+        result.pagesSkipped++
+        result.proofNudges.pagesSkipped++
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        const reason = prefRead.error instanceof Error ? prefRead.error.message : String(prefRead.error)
+        void logSystemError({
+          severity: 'error',
+          category: 'cron',
+          operation: logOperation('preferences_query'),
+          message: `Notification preferences read failed in ${logOrigin}; page skipped: ${reason}`,
+        })
+        lastSeenId = users[users.length - 1].id
+        if (users.length < BATCH_SIZE) break
+        continue
+      }
+      const prefMap = prefRead.map
 
       const hasAnyProgress = new Set<string>()
       const hasCompletedLesson = new Set<string>()
-      for (const row of (progressRes.data || []) as Array<{ user_id: string; status: string }>) {
+      for (const row of progressRes.data) {
         if (!row.user_id) continue
         hasAnyProgress.add(row.user_id)
         if (row.status === 'completed') hasCompletedLesson.add(row.user_id)
@@ -284,21 +343,30 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
 
       // Proof nudges for this page. A failure here never stops the lifecycle run.
       try {
-        const nudges = await runProofNudgesForPage(supabase, nudgeCandidates, { now: nowUtc, dryRun })
+        const nudges = await runProofNudgesForPage(supabase, nudgeCandidates, { now: nowUtc, dryRun, enabled: nudgeToggles })
         result.proofNudges.sent['nudge.portfolio_ready'] += nudges.sent['nudge.portfolio_ready']
         result.proofNudges.sent['nudge.fellow_eligible'] += nudges.sent['nudge.fellow_eligible']
         result.proofNudges.heldOut += nudges.heldOut
         if (nudges.skipped) result.proofNudges.pagesSkipped++
+        if (nudges.failed > 0) {
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: logOperation('proof_nudges'),
+            message: `Proof nudges failed for ${nudges.failed} learner(s) in ${logOrigin}; they are retried on the next run`,
+          })
+        }
       } catch (nudgeErr) {
         result.proofNudges.pagesSkipped++
-        console.error('[cron/lifecycle] Proof nudges failed for a page:', nudgeErr)
+        console.error(`${logPrefix} Proof nudges failed for a page:`, nudgeErr)
       }
 
       lastSeenId = users[users.length - 1].id
       if (users.length < BATCH_SIZE) break
     }
   } catch (err) {
-    console.error('[cron/lifecycle] Failed to process lifecycle sequences:', err)
+    console.error(`${logPrefix} Failed to process lifecycle sequences:`, err)
     const { logSystemError } = await import('@/lib/monitoring/logger')
     void logSystemError({
       severity: 'error',

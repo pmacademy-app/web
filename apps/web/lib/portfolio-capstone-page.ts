@@ -5,9 +5,11 @@ import type { PublicCapstoneItem, PublicPortfolioPayload } from '@/lib/portfolio
  * visibility rule and the structured data are testable.
  *
  * Visibility: a capstone page exists only for a capstone the public portfolio itself shows
- * (portfolio public; submission submitted or reviewed and not opted out — the same rule
- * getPublicPortfolioData applies). Anything else is a 404, so the page reveals nothing the
- * portfolio does not, not even whether a private capstone exists.
+ * (portfolio public; submission submitted or reviewed, and public, i.e. not opted out — the same
+ * rule getPublicPortfolioData applies). A submitted capstone does not wait for its review: the
+ * owner decided on 2026-10-11 that it is public as soon as the portfolio and the capstone are.
+ * Anything else is a 404, so the page reveals nothing the portfolio does not, not even whether a
+ * private capstone exists.
  */
 export function findPublicCapstone(
   portfolio: PublicPortfolioPayload | null,

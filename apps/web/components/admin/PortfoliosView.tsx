@@ -254,15 +254,14 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
 
   return (
     <div className="space-y-6">
-      {/* Top KPI Cards */}
+      {/* Top KPI Cards: read-only. The filter buttons below switch the list. */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Pending Verification */}
         <div
-          onClick={() => setActiveTab('pending')}
-          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] ${
             activeTab === 'pending'
               ? 'bg-amber-500/10 border-amber-500/40 ring-1 ring-amber-500/30'
-              : 'bg-admin-surface border-admin-border hover:border-amber-500/30'
+              : 'bg-admin-surface border-admin-border'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -279,11 +278,10 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
 
         {/* Verified Portfolios */}
         <div
-          onClick={() => setActiveTab('verified')}
-          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] ${
             activeTab === 'verified'
               ? 'bg-emerald-500/10 border-emerald-500/40 ring-1 ring-emerald-500/30'
-              : 'bg-admin-surface border-admin-border hover:border-emerald-500/30'
+              : 'bg-admin-surface border-admin-border'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -300,11 +298,10 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
 
         {/* Total Public Portfolios */}
         <div
-          onClick={() => setActiveTab('all')}
-          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] cursor-pointer ${
+          className={`p-4 rounded-xl border transition-[color,background-color,border-color,box-shadow] ${
             activeTab === 'all'
               ? 'bg-admin-accent-soft/40 border-admin-accent/40 ring-1 ring-admin-accent/30'
-              : 'bg-admin-surface border-admin-border hover:border-admin-accent/30'
+              : 'bg-admin-surface border-admin-border'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -327,6 +324,7 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
           <button
             type="button"
             onClick={() => setActiveTab('pending')}
+            aria-pressed={activeTab === 'pending'}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'pending'
                 ? 'bg-amber-500/15 text-amber-500 border border-amber-500/25 shadow-xs'
@@ -343,6 +341,7 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
           <button
             type="button"
             onClick={() => setActiveTab('verified')}
+            aria-pressed={activeTab === 'verified'}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'verified'
                 ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/25 shadow-xs'
@@ -359,6 +358,7 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
           <button
             type="button"
             onClick={() => setActiveTab('all')}
+            aria-pressed={activeTab === 'all'}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-[color,background-color,border-color,box-shadow] inline-flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-admin-surface-raised text-admin-fg border border-admin-border shadow-xs'
@@ -382,7 +382,7 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search learner, handle, bio..."
             aria-label="Search portfolios"
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-admin-surface border border-admin-border text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 text-base sm:text-xs rounded-lg bg-admin-surface border border-admin-border text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent/50 transition-colors"
           />
         </div>
       </div>

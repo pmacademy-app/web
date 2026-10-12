@@ -128,7 +128,7 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
                     onClick={() => handleCopyLink(cap.id, cap.moduleSlug)}
                     aria-label={`Copy direct link to ${cap.title}`}
                     title="Copy direct link to this project"
-                    className="p-1.5 rounded-lg border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer inline-flex items-center gap-1 text-[11px]"
+                    className="min-h-10 min-w-10 justify-center px-2.5 sm:min-h-0 sm:min-w-0 sm:p-1.5 rounded-lg border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer inline-flex items-center gap-1 text-[11px]"
                   >
                     {isCopied ? (
                       <>
@@ -147,7 +147,7 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
 
               {/* Title & Deliverable Metadata */}
               <div className="space-y-2">
-                <h3 className="text-lg md:text-xl font-bold font-serif text-foreground leading-snug">
+                <h3 className="text-lg md:text-xl font-bold font-serif text-foreground leading-snug [overflow-wrap:anywhere]">
                   {username ? (
                     <Link
                       href={capstoneSharePath(username, cap.moduleSlug)}
@@ -196,9 +196,9 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
               <div className="space-y-2">
                 <div className="text-xs md:text-sm text-foreground/90 leading-relaxed font-serif bg-background/60 p-4 md:p-5 rounded-xl border border-border/60">
                   {isExpanded ? (
-                    <div className="whitespace-pre-line space-y-3">{cap.content}</div>
+                    <div className="whitespace-pre-line [overflow-wrap:anywhere] space-y-3">{cap.content}</div>
                   ) : (
-                    <div className="line-clamp-4 whitespace-pre-line">{cap.content}</div>
+                    <div className="line-clamp-4 whitespace-pre-line [overflow-wrap:anywhere]">{cap.content}</div>
                   )}
                 </div>
 
@@ -222,7 +222,7 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Candidate Reflection &amp; Learning Synthesis</span>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
+                  <p className="text-muted-foreground leading-relaxed italic [overflow-wrap:anywhere]">
                     &ldquo;{cap.reflection.content}&rdquo;
                   </p>
                 </div>

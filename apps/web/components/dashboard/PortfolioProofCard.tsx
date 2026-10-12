@@ -43,7 +43,7 @@ interface PortfolioProofCardProps {
   children?: React.ReactNode
 }
 
-const PILL_BASE = 'text-[9px] font-bold uppercase px-2 py-0.5 rounded border shrink-0'
+const PILL_BASE = 'text-[10px] sm:text-[9px] font-bold uppercase px-2 py-0.5 rounded border shrink-0'
 const PILL_SUCCESS = `${PILL_BASE} bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20`
 const PILL_WARNING = `${PILL_BASE} bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20`
 const PILL_NEUTRAL = `${PILL_BASE} bg-secondary text-muted-foreground border-border`

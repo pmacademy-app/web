@@ -30,7 +30,8 @@ describe('capstone OG card invalidation', () => {
   })
 
   it('runs wherever the portfolio card is invalidated, and when a review changes visibility', () => {
-    expect(source('app/api/settings/portfolio/route.ts')).toContain('revalidateCapstoneOgCards(result.settings.username)')
+    // Old and new handle; the behaviour is covered in og-card-canonical-path.test.ts.
+    expect(source('app/api/settings/portfolio/route.ts')).toContain('revalidateCapstoneOgCards(handle)')
     expect(source('lib/admin/service.ts').match(/revalidateCapstoneOgCards\(userRow\.username\)/g)).toHaveLength(2)
     expect(source('lib/admin/moderation-service.ts')).toContain('revalidateCapstoneOgCards(owner.username, [current.module_slug])')
   })

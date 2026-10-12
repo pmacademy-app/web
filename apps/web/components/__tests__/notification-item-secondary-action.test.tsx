@@ -122,3 +122,59 @@ describe('NotificationItemCard — secondary action', () => {
     expect(onNavigate).toHaveBeenCalledTimes(1)
   })
 })
+
+// The API returns either an in-app path or a clean absolute https URL (an admin broadcast can
+// carry one). Only the absolute URL leaves the app, so only it opens in a new tab.
+describe('NotificationItemCard — card link', () => {
+  const renderWithNavigate = (item: NotificationItem) => {
+    const onNavigate = vi.fn()
+    act(() => {
+      root.render(<NotificationItemCard item={item} onMarkRead={onMarkRead} onNavigate={onNavigate} />)
+    })
+    return onNavigate
+  }
+
+  const click = (link: Element) => {
+    const stop = (event: Event) => event.preventDefault()
+    document.addEventListener('click', stop)
+    act(() => {
+      link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+    document.removeEventListener('click', stop)
+  }
+
+  it('opens an absolute https link in a new tab, says so, and still marks read and closes the drawer', () => {
+    const onNavigate = renderWithNavigate({ ...base, deepLink: 'https://example.com/changelog?x=1' })
+
+    const link = container.querySelector('a')!
+    expect(link.getAttribute('href')).toBe('https://example.com/changelog?x=1')
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(link.querySelector('.sr-only')?.textContent).toBe(' (opens in a new tab)')
+
+    click(link)
+    expect(onMarkRead).toHaveBeenCalledWith('n1')
+    expect(onNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps an in-app path in the same tab, with the same click handling', () => {
+    const onNavigate = renderWithNavigate(base)
+
+    const link = container.querySelector('a')!
+    expect(link.getAttribute('href')).toBe('/p/ada')
+    expect(link.hasAttribute('target')).toBe(false)
+    expect(link.hasAttribute('rel')).toBe(false)
+    expect(link.textContent).not.toContain('opens in a new tab')
+
+    click(link)
+    expect(onMarkRead).toHaveBeenCalledWith('n1')
+    expect(onNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not treat http or protocol-relative links as external', () => {
+    for (const deepLink of ['http://example.com/x', '//example.com/x']) {
+      renderWithNavigate({ ...base, deepLink })
+      expect(container.querySelector('a')!.hasAttribute('target')).toBe(false)
+    }
+  })
+})

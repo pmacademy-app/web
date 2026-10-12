@@ -13,7 +13,7 @@ import { createRoot, type Root } from 'react-dom/client'
 // active tab, the URL (tab, status, q, page, capstone) drives every list, and changing the
 // tab, status or search resets to page 1. The views render the server page as-is.
 
-const nav = vi.hoisted(() => ({ search: '', push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }))
+const nav = vi.hoisted(() => ({ search: '', push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), redirect: vi.fn() }))
 const services = vi.hoisted(() => ({
   getModerationQueuePage: vi.fn(),
   getPrivateFeedbackPage: vi.fn(),
@@ -27,6 +27,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: nav.push, replace: nav.replace, refresh: nav.refresh, prefetch: vi.fn() }),
   useSearchParams: () => new URLSearchParams(nav.search),
   usePathname: () => '/admin/moderation',
+  redirect: nav.redirect,
 }))
 vi.mock('@/lib/api/client', () => ({ apiPost: vi.fn(), apiPatch: vi.fn() }))
 vi.mock('@/components/admin/admin-toast', () => ({ useAdminToast: () => ({ toast: vi.fn() }) }))
@@ -34,13 +35,20 @@ vi.mock('@/components/admin/CapstoneReviewDrawer', () => ({
   CapstoneReviewDrawer: ({ capstone, isOpen }: { capstone: { capstoneTitle: string } | null; isOpen: boolean }) =>
     isOpen ? <div data-testid="drawer">{capstone ? capstone.capstoneTitle : 'missing'}</div> : null,
 }))
+// Base UI's drawer portals out of the test container; the views only need its content.
+vi.mock('@/components/admin/AdminDrawer', () => ({
+  AdminDrawer: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
+    open ? <div data-testid="admin-drawer">{children}</div> : null,
+}))
 vi.mock('@/lib/admin/feedback-service', () => ({
   FeedbackAdminService: {
     getModerationQueuePage: services.getModerationQueuePage,
     getPrivateFeedbackPage: services.getPrivateFeedbackPage,
   },
 }))
-vi.mock('@/lib/admin/moderation-service', () => ({
+vi.mock('@/lib/admin/moderation-service', async (importOriginal) => ({
+  // The page uses the real URL helpers; only the database reads are replaced.
+  ...(await importOriginal<typeof import('@/lib/admin/moderation-service')>()),
   ModerationService: {
     getCapstonesPage: services.getCapstonesPage,
     getCapstoneById: services.getCapstoneById,
@@ -54,6 +62,8 @@ vi.mock('@/lib/admin/fellow-request-service', () => ({
 import { ModerationWorkspace, type ModerationListData } from '@/components/admin/ModerationWorkspace'
 import { apiPatch, apiPost } from '@/lib/api/client'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
+import type { TestimonialItem } from '@/lib/admin/feedback-service'
+import type { AdminFeedbackItem } from '@/components/admin/FeedbackListView'
 import AdminModerationPage from '@/app/admin/(console)/moderation/page'
 import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 
@@ -113,6 +123,38 @@ function fellowRequest(id: string): AdminFellowRequestItem {
   }
 }
 
+function testimonial(id: string, status: TestimonialItem['status'] = 'pending'): TestimonialItem {
+  return {
+    id,
+    userId: `u-${id}`,
+    authorName: `Author ${id}`,
+    authorRole: 'Learner',
+    sourceEvent: 'general',
+    content: `Quote ${id}`,
+    status,
+    isPublished: false,
+    reviewedBy: null,
+    reviewedAt: null,
+    createdAt: '2026-04-01T00:00:00Z',
+  }
+}
+
+function feedback(id: string, status = 'new'): AdminFeedbackItem {
+  return {
+    id,
+    userId: `u-${id}`,
+    authorName: `Author ${id}`,
+    authorEmail: `${id}@example.test`,
+    userExists: true,
+    category: 'bug',
+    sourceEvent: 'general',
+    content: `Note ${id}`,
+    rating: null,
+    status,
+    createdAt: '2026-04-01T00:00:00Z',
+  }
+}
+
 const page = <T,>(items: T[], extra: Partial<{ total: number; page: number; failed: boolean }> = {}) => ({
   items,
   total: extra.total ?? items.length,
@@ -129,6 +171,12 @@ beforeEach(() => {
   nav.push.mockReset()
   nav.replace.mockReset()
   nav.refresh.mockReset()
+  // The real redirect() throws to stop the render; the mock does the same.
+  nav.redirect.mockReset().mockImplementation((url: string) => {
+    throw new Error(`NEXT_REDIRECT ${url}`)
+  })
+  vi.mocked(apiPatch).mockReset()
+  vi.mocked(apiPost).mockReset()
   Object.values(services).forEach((fn) => fn.mockReset())
   container = document.createElement('div')
   document.body.appendChild(container)
@@ -193,6 +241,52 @@ describe('moderation page loads only the active tab', () => {
     services.getPortfoliosPage.mockResolvedValue({ ...page([]), counts: { all: 0, pending: 0, verified: 0 } })
     await AdminModerationPage({ searchParams: Promise.resolve({ tab: 'portfolios', q: 'ada' }) })
     expect(services.getPortfoliosPage).toHaveBeenCalledWith({ status: null, page: null, q: 'ada' })
+  })
+})
+
+describe('moderation page: a page past the end', () => {
+  it('redirects an emptied last page to the last page that has rows, keeping the filters', async () => {
+    // 26 pending requests, the only one on page 2 was just approved.
+    services.getQueuePage.mockResolvedValue(page([], { total: 25, page: 2 }))
+    await expect(
+      AdminModerationPage({ searchParams: Promise.resolve({ tab: 'fellow-requests', status: 'pending', page: '2' }) })
+    ).rejects.toThrow('NEXT_REDIRECT')
+    expect(nav.redirect).toHaveBeenCalledWith('/admin/moderation?tab=fellow-requests&status=pending')
+    // The redirect target is computed from the total already read: no second query.
+    expect(services.getQueuePage).toHaveBeenCalledTimes(1)
+  })
+
+  it('redirects a hand-typed page number on the portfolios tab, keeping the search', async () => {
+    services.getPortfoliosPage.mockResolvedValue({
+      ...page([], { total: 60, page: 99 }),
+      counts: { all: 60, pending: 60, verified: 0 },
+    })
+    await expect(
+      AdminModerationPage({ searchParams: Promise.resolve({ tab: 'portfolios', q: 'ada', page: '99' }) })
+    ).rejects.toThrow('NEXT_REDIRECT')
+    expect(nav.redirect).toHaveBeenCalledWith('/admin/moderation?tab=portfolios&q=ada&page=3')
+  })
+
+  it('renders the normal empty state on page 1 and for a list with no rows at all', async () => {
+    services.getQueuePage.mockResolvedValue(page([]))
+    const element = await AdminModerationPage({ searchParams: Promise.resolve({ tab: 'fellow-requests' }) })
+    expect(nav.redirect).not.toHaveBeenCalled()
+    act(() => root.render(element as React.ReactElement))
+    expect(container.textContent).toContain('No Fellow requests found')
+  })
+
+  it('passes repeated search params to the views as plain strings', async () => {
+    services.getPortfoliosPage.mockResolvedValue({ ...page([]), counts: { all: 0, pending: 0, verified: 0 } })
+    const element = await AdminModerationPage({
+      searchParams: Promise.resolve({ tab: 'portfolios', q: ['a', 'b'], status: ['all', 'verified'] }),
+    })
+    expect(services.getPortfoliosPage).toHaveBeenCalledWith({ status: null, page: null, q: null })
+    const props = (element as React.ReactElement<{ q: unknown; status: unknown }>).props
+    expect(props.q).toBe('')
+    expect(props.status).toBeNull()
+    // PortfoliosView calls q.trim(): it must render, not throw.
+    act(() => root.render(element as React.ReactElement))
+    expect(container.querySelector('input[aria-label="Search portfolios"]')).not.toBeNull()
   })
 })
 
@@ -386,6 +480,65 @@ describe('moderation mutations refetch the server page', () => {
     expect(nav.refresh).not.toHaveBeenCalled()
   })
 
+  it('refreshes after approving a testimonial so it leaves the pending list', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({ tab: 'testimonials', list: page([testimonial('t1')]) }, { status: 'pending' })
+    await act(async () => buttonByText('Approve').click())
+    expect(apiPatch).toHaveBeenCalledWith('/api/admin/feedback/t1', { action: 'approve', updatedContent: undefined })
+    expect(nav.refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not refresh when the testimonial action fails', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: false, error: { message: 'Nope' } } as never)
+    render({ tab: 'testimonials', list: page([testimonial('t1')]) }, { status: 'pending' })
+    await act(async () => buttonByText('Approve').click())
+    expect(nav.refresh).not.toHaveBeenCalled()
+    expect(container.textContent).toContain('Quote t1')
+  })
+
+  it('re-seeds the testimonial list when the server sends a fresh page', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({ tab: 'testimonials', list: page([testimonial('t1'), testimonial('t2')], { total: 2 }) }, { status: 'pending' })
+    await act(async () => buttonByText('Approve').click())
+    // Same tab, status and page (same key), new rows: what router.refresh() delivers.
+    render({ tab: 'testimonials', list: page([testimonial('t2')], { total: 1 }) }, { status: 'pending' })
+    expect(container.textContent).not.toContain('Quote t1')
+    expect(container.textContent).toContain('Quote t2')
+    expect(container.textContent).not.toContain('APPROVED')
+  })
+
+  const openFeedback = (id: string) =>
+    act(() => (container.querySelector(`[aria-label="Open feedback from Author ${id}"]`) as HTMLElement).click())
+
+  it('refreshes after changing a product feedback status so a status-filtered list and total update', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({ tab: 'feedback', list: page([feedback('f1')]) }, { status: 'new' })
+    openFeedback('f1')
+    await act(async () => buttonByText('Resolved').click())
+    expect(apiPatch).toHaveBeenCalledWith('/api/admin/feedback/f1', { action: 'update_status', status: 'resolved' })
+    expect(nav.refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not refresh when the product feedback status change fails', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: false, error: { message: 'Nope' } } as never)
+    render({ tab: 'feedback', list: page([feedback('f1')]) }, { status: 'new' })
+    openFeedback('f1')
+    await act(async () => buttonByText('Resolved').click())
+    expect(nav.refresh).not.toHaveBeenCalled()
+    expect(container.textContent).toContain('NEW')
+  })
+
+  it('re-seeds the product feedback list when the server sends a fresh page', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: true, status: 200, data: { success: true } } as never)
+    render({ tab: 'feedback', list: page([feedback('f1'), feedback('f2')], { total: 2 }) }, { status: 'new' })
+    openFeedback('f1')
+    await act(async () => buttonByText('Resolved').click())
+    // Same tab, status and page (same key), new rows: what router.refresh() delivers.
+    render({ tab: 'feedback', list: page([feedback('f2')], { total: 1 }) }, { status: 'new' })
+    expect(container.querySelector('[aria-label="Open feedback from Author f1"]')).toBeNull()
+    expect(container.querySelector('[aria-label="Open feedback from Author f2"]')).not.toBeNull()
+  })
+
   it('says "declined", not "rejected", in the Fellow request filters', () => {
     render({ tab: 'fellow-requests', list: page([fellowRequest('r1')]) })
     expect(buttonByText('declined')).toBeTruthy()
@@ -402,5 +555,202 @@ describe('moderation mutations refetch the server page', () => {
     await act(async () => buttonByText('Verify').click())
     expect(apiPost).toHaveBeenCalledWith('/api/admin/users/1/fellow-status', { isFellow: true })
     expect(nav.refresh).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('moderation tabs: manual activation', () => {
+  const tabs = () => Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
+  const press = (el: HTMLElement, key: string) =>
+    act(() => {
+      el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+    })
+
+  it('arrow keys move focus without loading a tab or adding history', () => {
+    render({ tab: 'testimonials', list: page([]) })
+    const [first, second, third] = tabs()
+    const last = tabs().at(-1)!
+    first.focus()
+    press(first, 'ArrowRight')
+    expect(document.activeElement).toBe(second)
+    press(second, 'ArrowRight')
+    expect(document.activeElement).toBe(third)
+    press(third, 'End')
+    expect(document.activeElement).toBe(last)
+    press(last, 'ArrowRight')
+    expect(document.activeElement).toBe(first)
+    press(first, 'ArrowLeft')
+    expect(document.activeElement).toBe(last)
+    press(last, 'Home')
+    expect(document.activeElement).toBe(first)
+
+    expect(nav.push).not.toHaveBeenCalled()
+    expect(nav.replace).not.toHaveBeenCalled()
+    // Focus moved, selection did not: the roving tabindex stays on the selected tab.
+    expect(first.getAttribute('aria-selected')).toBe('true')
+    expect(tabs().map((t) => t.tabIndex)).toEqual([0, -1, -1, -1, -1])
+  })
+
+  it('activating the focused tab (Enter and Space click a button) loads it once', () => {
+    render({ tab: 'testimonials', list: page([]) })
+    const [first, second] = tabs()
+    first.focus()
+    press(first, 'ArrowRight')
+    act(() => second.click())
+    expect(nav.push).toHaveBeenCalledTimes(1)
+    expect(nav.push).toHaveBeenCalledWith('/admin/moderation?tab=feedback', { scroll: false })
+  })
+
+  it('points aria-controls only at the panel that exists', () => {
+    render({ tab: 'capstones', list: page([]), capstone: null, capstoneFailed: false })
+    const controlled = tabs().filter((t) => t.hasAttribute('aria-controls'))
+    expect(controlled.length).toBe(1)
+    expect(controlled[0].textContent).toContain('Capstones')
+    const panel = document.getElementById(controlled[0].getAttribute('aria-controls')!)
+    expect(panel?.getAttribute('role')).toBe('tabpanel')
+  })
+
+  it('does not call product feedback read-only: the drawer sets a status', () => {
+    render({ tab: 'feedback', list: page([feedback('f1')]) })
+    expect(container.textContent).not.toContain('read-only')
+    expect(container.textContent).toContain('Open an item to mark it reviewed, planned, resolved or dismissed.')
+  })
+})
+
+describe('moderation search and filter changes made while a navigation is loading', () => {
+  const portfolios: ModerationListData = {
+    tab: 'portfolios',
+    list: { ...page([portfolio('1', false)]), counts: { all: 1, pending: 1, verified: 0 } },
+  }
+  const typeSearch = (text: string) => {
+    const input = container.querySelector('input[aria-label="Search portfolios"]') as HTMLInputElement
+    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    act(() => {
+      setValue.call(input, text)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+  }
+  /** The most recent navigation, whether it was a push or a replace. */
+  const lastNav = () => {
+    const calls = [
+      ...nav.push.mock.calls.map((c, i) => ({ url: c[0] as string, order: nav.push.mock.invocationCallOrder[i], kind: 'push' })),
+      ...nav.replace.mock.calls.map((c, i) => ({
+        url: c[0] as string,
+        order: nav.replace.mock.invocationCallOrder[i],
+        kind: 'replace',
+      })),
+    ]
+    const last = calls.sort((a, b) => a.order - b.order).at(-1)!
+    return { kind: last.kind, params: new URLSearchParams(last.url.split('?')[1]) }
+  }
+
+  it('keeps the status when the debounced search fires before the status navigation commits', () => {
+    vi.useFakeTimers()
+    nav.search = 'tab=portfolios'
+    render(portfolios)
+    typeSearch('ali')
+    // One act: the status push is still pending (the URL snapshot has not changed) when the
+    // search timer fires.
+    act(() => {
+      buttonByText('Verified0').click()
+      vi.advanceTimersByTime(400)
+    })
+    const { kind, params } = lastNav()
+    expect(params.get('status')).toBe('verified')
+    expect(params.get('q')).toBe('ali')
+    expect(params.get('tab')).toBe('portfolios')
+    // The pending status change was a push; replacing over it would lose its history entry.
+    expect(kind).toBe('push')
+  })
+
+  it('keeps the search when a status is chosen before the search navigation commits', () => {
+    vi.useFakeTimers()
+    nav.search = 'tab=portfolios'
+    render(portfolios)
+    typeSearch('ali')
+    act(() => {
+      vi.advanceTimersByTime(400)
+      buttonByText('Verified0').click()
+    })
+    const { params } = lastNav()
+    expect(params.get('status')).toBe('verified')
+    expect(params.get('q')).toBe('ali')
+  })
+
+  it('drops a typed search instead of cancelling a tab change that is loading', () => {
+    vi.useFakeTimers()
+    nav.search = 'tab=portfolios'
+    render(portfolios)
+    typeSearch('ali')
+    const tab = Array.from(container.querySelectorAll('[role="tab"]')).find((t) =>
+      t.textContent?.includes('Capstones')
+    ) as HTMLButtonElement
+    act(() => {
+      tab.click()
+      vi.advanceTimersByTime(400)
+    })
+    expect(nav.replace).not.toHaveBeenCalled()
+    expect(nav.push).toHaveBeenCalledTimes(1)
+    expect(nav.push).toHaveBeenCalledWith('/admin/moderation?tab=capstones', { scroll: false })
+  })
+
+  it('builds from the URL again once the navigation has settled', () => {
+    vi.useFakeTimers()
+    nav.search = 'tab=portfolios&status=verified'
+    render(portfolios, { status: 'verified' })
+    act(() => buttonByText('All Public1').click())
+    // The settled navigation asked for status=all, but the URL (as after Back) has no status.
+    nav.search = 'tab=portfolios'
+    render(portfolios)
+    typeSearch('ali')
+    act(() => {
+      vi.advanceTimersByTime(400)
+    })
+    const { kind, params } = lastNav()
+    expect(kind).toBe('replace')
+    expect(params.get('q')).toBe('ali')
+    expect(params.has('status')).toBe(false)
+  })
+})
+
+describe('moderation views: accessible names and states', () => {
+  it('names the Fellow decline reason and announces a failed review', async () => {
+    vi.mocked(apiPatch).mockResolvedValue({ ok: false, error: { message: 'Portfolio must be public' } } as never)
+    render({ tab: 'fellow-requests', list: page([fellowRequest('r1')]) })
+
+    act(() => buttonByText('Decline').click())
+    const reason = container.querySelector('input[placeholder="Reason (optional)"]')!
+    expect(reason.getAttribute('aria-label')).toBe('Reason for declining Learner r1 (optional)')
+
+    await act(async () => buttonByText('Confirm').click())
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe('Portfolio must be public')
+  })
+
+  it('names the testimonial edit button and its textarea', () => {
+    render({ tab: 'testimonials', list: page([testimonial('t1')]) })
+    const edit = container.querySelector('button[aria-label="Edit testimonial from Author t1"]') as HTMLButtonElement
+    expect(edit).not.toBeNull()
+    act(() => edit.click())
+    expect(container.querySelector('textarea')!.getAttribute('aria-label')).toBe('Testimonial text from Author t1')
+  })
+
+  it('marks the pressed portfolio filter, and the KPI cards are not click targets', () => {
+    nav.search = 'tab=portfolios&status=verified'
+    render(
+      {
+        tab: 'portfolios',
+        list: { ...page([portfolio('1', true)]), counts: { all: 3, pending: 2, verified: 1 } },
+      },
+      { status: 'verified' }
+    )
+    expect(buttonByText('Verified1').getAttribute('aria-pressed')).toBe('true')
+    expect(buttonByText('Pending Verification2').getAttribute('aria-pressed')).toBe('false')
+    expect(buttonByText('All Public3').getAttribute('aria-pressed')).toBe('false')
+
+    const kpi = Array.from(container.querySelectorAll('div')).find(
+      (d) => d.className.includes('rounded-xl') && d.textContent?.startsWith('Verified Fellows')
+    ) as HTMLDivElement
+    expect(kpi.className).not.toContain('cursor-pointer')
+    act(() => kpi.click())
+    expect(nav.push).not.toHaveBeenCalled()
   })
 })

@@ -218,7 +218,7 @@ export function NotificationCenterDrawer({
       role="dialog"
       aria-modal="true"
       aria-label="Notifications"
-      className="fixed top-16 left-4 right-4 max-w-[calc(100vw-32px)] max-h-[80vh] sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2.5 sm:w-96 sm:max-w-sm sm:max-h-[85vh] z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col focus:outline-none overflow-hidden animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none"
+      className="fixed top-16 left-4 right-4 max-w-[calc(100vw-32px)] max-h-[calc(100dvh-4rem-5.5rem-env(safe-area-inset-bottom))] sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2.5 sm:w-96 sm:max-w-sm lg:max-h-[85vh] z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col focus:outline-none overflow-hidden animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none"
     >
       {/* Clean Header */}
       <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
@@ -236,13 +236,13 @@ export function NotificationCenterDrawer({
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0 -mr-1.5 -my-1.5 sm:m-0">
           <Link
             href="/settings?tab=notifications"
             onClick={onClose}
             aria-label="Notification Preferences"
             title="Notification Preferences"
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+            className="size-10 sm:size-auto sm:p-1.5 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
           >
             <Settings className="w-4 h-4" />
           </Link>
@@ -252,7 +252,7 @@ export function NotificationCenterDrawer({
             type="button"
             onClick={onClose}
             aria-label="Close notification panel"
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+            className="size-11 sm:size-auto sm:p-1.5 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
           >
             <X className="w-4 h-4" />
           </button>
@@ -381,7 +381,7 @@ export function NotificationCenterDrawer({
           onClick={() => void refreshNotifications()}
           aria-label="Refresh notifications"
           title="Refresh notifications"
-          className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer"
+          className="size-10 sm:size-auto sm:p-1.5 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
         </button>

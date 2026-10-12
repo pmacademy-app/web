@@ -186,7 +186,7 @@ export function AdminHeader({
               type="button"
               onClick={onToggleMobileMenu}
               aria-label="Open admin navigation menu"
-              className="md:hidden p-1.5 rounded-lg border border-admin-border bg-admin-surface-raised text-admin-fg-muted hover:text-admin-fg transition-colors cursor-pointer"
+              className="md:hidden size-10 shrink-0 inline-flex items-center justify-center rounded-lg border border-admin-border bg-admin-surface-raised text-admin-fg-muted hover:text-admin-fg transition-colors cursor-pointer"
             >
               <Menu className="w-4 h-4" />
             </button>
@@ -225,16 +225,16 @@ export function AdminHeader({
               type="button"
               onClick={() => setBellOpen((prev) => !prev)}
               aria-label={hasAttention ? `${attentionTotal} items need attention` : 'No items need attention'}
-              className="relative p-2 rounded-lg text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors cursor-pointer"
+              className="relative size-10 sm:size-auto sm:p-2 inline-flex items-center justify-center rounded-lg text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors cursor-pointer"
             >
               <Bell className="w-4 h-4" />
               {hasAttention && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-admin-danger ring-2 ring-admin-surface" aria-hidden="true" />
+                <span className="absolute top-2.5 right-2.5 sm:top-1.5 sm:right-1.5 h-2 w-2 rounded-full bg-admin-danger ring-2 ring-admin-surface" aria-hidden="true" />
               )}
             </button>
 
             {bellOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-admin-surface border border-admin-border shadow-2xl p-4 z-50 animate-in fade-in-0 zoom-in-95 space-y-3">
+              <div className="fixed inset-x-4 top-16 mt-2 w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:w-96 rounded-2xl bg-admin-surface border border-admin-border shadow-2xl p-4 z-50 animate-in fade-in-0 zoom-in-95 space-y-3">
                 <div className="flex items-center justify-between border-b border-admin-border pb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-admin-fg">Actionable Attention</span>

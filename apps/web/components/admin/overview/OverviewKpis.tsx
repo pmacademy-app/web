@@ -17,8 +17,16 @@ function trend(value: number | null, positiveIsGood = true) {
  * The Verified Users card. It reads the Auth admin API, the slowest call on the page, so it
  * streams in behind its own Suspense boundary instead of holding back the other seven cards.
  */
-export async function OverviewVerifiedUsersKpi({ rangeKey, from, to }: OverviewRangeProps) {
-  const { verifiedUsers, verifiedUsersTrend, failed } = await loadDashboardVerifiedUsers(rangeKey, from, to)
+export async function OverviewVerifiedUsersKpi({
+  rangeKey,
+  from,
+  to,
+  slice,
+}: OverviewRangeProps & {
+  /** The load already started by OverviewKpis, so it runs alongside the other KPIs. */
+  slice?: ReturnType<typeof loadDashboardVerifiedUsers>
+}) {
+  const { verifiedUsers, verifiedUsersTrend, failed } = await (slice ?? loadDashboardVerifiedUsers(rangeKey, from, to))
 
   return (
     <AdminKpiCard
@@ -34,6 +42,12 @@ export async function OverviewVerifiedUsersKpi({ rangeKey, from, to }: OverviewR
 
 /** The 8-card KPI grid for the selected range. */
 export async function OverviewKpis({ rangeKey, from, to }: OverviewRangeProps) {
+  // Started before the await below, not when the card renders: the Auth call is the slowest on
+  // the page, and waiting for the other KPIs first would add their time to it.
+  const verifiedSlice = loadDashboardVerifiedUsers(rangeKey, from, to)
+  // Nothing awaits it until the card renders; mark a rejection handled so it is not reported as
+  // unhandled meanwhile. The card's own await still sees it.
+  verifiedSlice.catch(() => {})
   const { kpis, failed } = await loadDashboardKpis(rangeKey, from, to)
 
   return (
@@ -64,7 +78,7 @@ export async function OverviewKpis({ rangeKey, from, to }: OverviewRangeProps) {
           trend={trend(kpis.trends.newUsers)}
         />
         <Suspense fallback={<OverviewKpiCardSkeleton label="verified users" />}>
-          <OverviewVerifiedUsersKpi rangeKey={rangeKey} from={from} to={to} />
+          <OverviewVerifiedUsersKpi rangeKey={rangeKey} from={from} to={to} slice={verifiedSlice} />
         </Suspense>
         <AdminKpiCard
           title="Lessons Completed"

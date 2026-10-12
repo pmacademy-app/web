@@ -121,6 +121,10 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'learning',
       priorityLevel: 'medium',
+      // One email per completed module (the event id is per learner per module), decided by the
+      // email_queue unique index. Without a key the processor's (user, template, event type)
+      // lookup lets the first module's email suppress every later module's.
+      idempotencyKey: `module-completed:${event.id}`,
     })
   })
 
@@ -147,6 +151,9 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'achievements',
       priorityLevel: 'medium',
+      // One email per badge (the event id is per learner per badge), decided by the email_queue
+      // unique index rather than the (user, template, event type) lookup.
+      idempotencyKey: `badge-earned:${event.id}`,
     })
   })
 
@@ -168,6 +175,8 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'achievements',
       priorityLevel: 'high',
+      // One email per level reached (the event id is per learner per level), same as above.
+      idempotencyKey: `level-up:${event.id}`,
     })
   })
 

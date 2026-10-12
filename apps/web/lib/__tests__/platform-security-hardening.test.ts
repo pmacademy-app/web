@@ -13,8 +13,16 @@ import * as authLib from '../auth'
 import * as adminGuardLib from '../admin/guard'
 import * as supabaseLib from '../supabase'
 import * as flashcardsService from '../flashcards-service'
+import * as xpService from '../xp-service'
+import { SettingsService } from '../admin/settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+
+// The referral check reads the ledger before paying; the real functions stay in place unless a test overrides them.
+vi.mock('@/lib/xp-service', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../xp-service')>()
+  return { ...actual, hasXpEvent: vi.fn(actual.hasXpEvent), awardXp: vi.fn(actual.awardXp) }
+})
 
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn(),
@@ -349,9 +357,17 @@ describe('Platform Hardening, Security & Production Reliability', () => {
         }),
       } as unknown as SupabaseClient<Database>
 
+      // The reward is resolved and the ledger checked before the status flip. Here the concurrent
+      // winner has already paid, so this request must not pay again.
+      vi.spyOn(SettingsService, 'getLearningSettings').mockResolvedValue(
+        { xpReferralReward: 50 } as unknown as Awaited<ReturnType<typeof SettingsService.getLearningSettings>>
+      )
+      vi.mocked(xpService.hasXpEvent).mockResolvedValueOnce(true)
+
       const result = await onFirstLessonCompletedReferralCheck(mockSupabase, 'usr_new_learner')
       expect(result.rewarded).toBe(false)
       expect(result.reason).toBe('already_activated')
+      expect(xpService.awardXp).not.toHaveBeenCalled()
     })
   })
 })

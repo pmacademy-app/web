@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { deriveProofState, selectProofNextStep, type ProofStateInput, type ProofUserRow } from '@/lib/growth/proof-state'
+import {
+  deriveProofState,
+  selectProofNextStep,
+  shouldPromptFellowRequest,
+  type ProofStateInput,
+  type ProofUserRow,
+} from '@/lib/growth/proof-state'
 import { loadProofStates, PROOF_STATE_BATCH_SIZE } from '@/lib/growth/proof-state-db'
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 
@@ -59,6 +65,19 @@ describe('selectProofNextStep', () => {
         : next({ user: { ...completeProfile, is_fellow: true } })
     expect(step.kind).not.toBe('request_fellow')
   })
+
+  // The same guard as the Fellow nudge: a decided request is never followed by "you qualify".
+  it.each(['rejected', 'approved'] as const)(
+    'does not tell a learner whose latest request was %s that they qualify',
+    (status) => {
+      const state = deriveProofState(input({ latestFellowRequestStatus: status }))
+      expect(state.fellowState).toBe('eligible')
+      expect(shouldPromptFellowRequest(state)).toBe(false)
+      const step = selectProofNextStep(state)
+      expect(step.kind).not.toBe('request_fellow')
+      expect(step.text).not.toMatch(/fellow/i)
+    },
+  )
 
   it('points to the next capstone once its module is finished (the Growth module maps to metrics)', () => {
     const growth = getLessonIdsForModule('growth')

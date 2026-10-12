@@ -97,7 +97,6 @@ const EXEMPT_COMPONENTS = [
   'admin/admin-toast.tsx',
   'auth/ResendVerificationCard.tsx',
   'badges/BadgeNotification.tsx',
-  'capstones/CapstoneCard.tsx',
   'capstones/RichEditor.tsx',
   'capstones/SubmitConfirmationModal.tsx',
   'feedback/ContextualFeedbackModal.tsx',

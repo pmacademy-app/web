@@ -18,6 +18,9 @@ export function formatLift(lift: number): string {
   return `${rounded > 0 ? '+' : '−'}${Math.abs(rounded).toFixed(1)} pts`
 }
 
+/** Why a lift shows "n/a": the readout has no holdout arm to compare against. */
+const LIFT_UNAVAILABLE_REASON = 'No holdout group yet'
+
 interface AdminNudgeReadoutCardProps {
   nudges: AdminNudgeReadout[]
   retireReady: boolean
@@ -79,13 +82,23 @@ export function AdminNudgeReadoutCard({ nudges, retireReady, failed = false }: A
                     <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{n.reminded}</td>
                     <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.treatedRate)}</td>
                     <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg">{pct(n.holdoutRate)}</td>
-                    <td
-                      className={`px-4 py-2.5 text-right font-mono tabular-nums ${
-                        n.lift > 0 ? 'text-admin-success' : n.lift < 0 ? 'text-admin-danger' : 'text-admin-fg-muted'
-                      }`}
-                    >
-                      {formatLift(n.lift)}
-                    </td>
+                    {n.liftAvailable === false ? (
+                      // No holdout arm: there is no control to subtract, so a "0.0 pts" would mislead.
+                      <td className="px-4 py-2.5 text-right font-mono tabular-nums text-admin-fg-muted">
+                        <span title={LIFT_UNAVAILABLE_REASON}>
+                          <span aria-hidden="true">n/a</span>
+                          <span className="sr-only">n/a: {LIFT_UNAVAILABLE_REASON}</span>
+                        </span>
+                      </td>
+                    ) : (
+                      <td
+                        className={`px-4 py-2.5 text-right font-mono tabular-nums ${
+                          n.lift > 0 ? 'text-admin-success' : n.lift < 0 ? 'text-admin-danger' : 'text-admin-fg-muted'
+                        }`}
+                      >
+                        {formatLift(n.lift)}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

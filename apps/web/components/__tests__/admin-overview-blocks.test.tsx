@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 
-const { loaders, apiPost, refresh } = vi.hoisted(() => ({
+const { loaders, apiPost, refresh, toast } = vi.hoisted(() => ({
   loaders: {
     loadDashboardKpis: vi.fn(),
     loadDashboardVerifiedUsers: vi.fn(),
@@ -21,10 +21,12 @@ const { loaders, apiPost, refresh } = vi.hoisted(() => ({
   },
   apiPost: vi.fn(),
   refresh: vi.fn(),
+  toast: vi.fn(),
 }))
 
 vi.mock('@/lib/admin/dashboard-service', () => loaders)
 vi.mock('@/lib/api/client', () => ({ apiPost }))
+vi.mock('@/components/admin/admin-toast', () => ({ useAdminToast: () => ({ toast }) }))
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh, push: vi.fn(), replace: vi.fn() }),
 }))
@@ -120,6 +122,41 @@ describe('overview blocks', () => {
     expect(container.textContent).not.toContain('Verified Users')
   })
 
+  it('starts the verified-users load before the other KPIs resolve, and only once', async () => {
+    let resolveKpis!: (value: unknown) => void
+    loaders.loadDashboardKpis.mockReturnValue(new Promise((resolve) => (resolveKpis = resolve)))
+    loaders.loadDashboardVerifiedUsers.mockReturnValue(new Promise(() => {}))
+    const block = OverviewKpis(RANGE)
+
+    // Still waiting on the KPIs: the slow Auth call is already running alongside them.
+    expect(loaders.loadDashboardVerifiedUsers).toHaveBeenCalledWith('7d', null, null)
+
+    resolveKpis({ range: {}, kpis: KPIS, failed: false })
+    await renderBlock(block)
+    // The card awaits the promise it was handed instead of loading again.
+    expect(loaders.loadDashboardVerifiedUsers).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('[aria-label="Loading verified users"]')).not.toBeNull()
+  })
+
+  it('verified-users card uses a load handed to it, keeping its failed state', async () => {
+    await renderBlock(
+      OverviewVerifiedUsersKpi({
+        ...RANGE,
+        slice: Promise.resolve({ verifiedUsers: 77, verifiedUsersTrend: null, failed: false }),
+      })
+    )
+    expect(loaders.loadDashboardVerifiedUsers).not.toHaveBeenCalled()
+    expect(container.textContent).toContain('77')
+
+    await renderBlock(
+      OverviewVerifiedUsersKpi({
+        ...RANGE,
+        slice: Promise.resolve({ verifiedUsers: 0, verifiedUsersTrend: null, failed: true }),
+      })
+    )
+    expect(container.textContent).toContain('Unavailable')
+  })
+
   it('verified-users card renders its own slice, and says so when Auth failed', async () => {
     loaders.loadDashboardVerifiedUsers.mockResolvedValue({ verifiedUsers: 4321, verifiedUsersTrend: 25, failed: false })
     await renderBlock(OverviewVerifiedUsersKpi(RANGE))
@@ -213,6 +250,63 @@ describe('AdminDashboardRefreshButton', () => {
     expect(apiPost.mock.invocationCallOrder[0]).toBeLessThan(refresh.mock.invocationCallOrder[0])
     expect(button.disabled).toBe(true)
     expect(container.querySelector('svg')?.getAttribute('class')).toContain('animate-spin')
+    expect(container.querySelector('[role="status"]')?.textContent).toBe('Refreshing')
+    expect(toast).not.toHaveBeenCalled()
+  })
+
+  it('announces "Updated" once a clean refresh has finished', async () => {
+    vi.useFakeTimers()
+    try {
+      apiPost.mockResolvedValue({ ok: true, data: { revalidated: true }, status: 200 })
+      await act(async () => {
+        root.render(<AdminDashboardRefreshButton />)
+      })
+      const status = () => container.querySelector('[role="status"]')
+      expect(status()?.className).toContain('sr-only')
+      expect(status()?.textContent).toBe('')
+
+      await act(async () => {
+        container.querySelector('button')!.click()
+      })
+      await act(async () => {
+        vi.advanceTimersByTime(700)
+      })
+      expect(status()?.textContent).toBe('Updated')
+      expect(container.querySelector('button')!.disabled).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it.each([
+    [429, 'rate_limited', /Too many refreshes/],
+    [500, 'internal_error', /Could not clear the cached numbers/],
+  ])('shows an error toast and announces the failure on a %i', async (status, code, message) => {
+    vi.useFakeTimers()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      apiPost.mockResolvedValue({ ok: false, error: { kind: 'http', code, message: 'x', status } })
+      await act(async () => {
+        root.render(<AdminDashboardRefreshButton />)
+      })
+      await act(async () => {
+        container.querySelector('button')!.click()
+      })
+      expect(toast).toHaveBeenCalledTimes(1)
+      expect(toast).toHaveBeenCalledWith(expect.stringMatching(message), 'error')
+      // The page still refreshes, showing whatever the cache holds.
+      expect(refresh).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        vi.advanceTimersByTime(700)
+      })
+      const announced = container.querySelector('[role="status"]')?.textContent ?? ''
+      expect(announced).toMatch(message)
+      expect(announced).not.toBe('Updated')
+    } finally {
+      warn.mockRestore()
+      vi.useRealTimers()
+    }
   })
 
   it('still refreshes when the revalidate call fails', async () => {

@@ -78,6 +78,38 @@ describe('AdminNudgeReadoutCard', () => {
     expect(container.textContent).toContain('requested Fellow within 14 days')
   })
 
+  it('shows n/a with an explanation instead of a zero lift when nobody is held out', () => {
+    act(() =>
+      root.render(
+        <AdminNudgeReadoutCard
+          retireReady={false}
+          nudges={[
+            readout({ sent: 40, heldOut: 0, treatedRate: 0.25, holdoutRate: 0, lift: 0, liftAvailable: false }),
+            readout({
+              key: 'nudge.fellow_eligible',
+              name: 'Fellow eligible',
+              sent: 50,
+              heldOut: 20,
+              treatedRate: 0.1,
+              holdoutRate: 0.1,
+              lift: 0,
+              liftAvailable: true,
+            }),
+          ]}
+        />,
+      ),
+    )
+
+    const liftCell = container.querySelector('tr[data-nudge="nudge.portfolio_ready"] td:last-child')!
+    expect(liftCell.textContent).toContain('n/a')
+    expect(liftCell.textContent).not.toContain('pts')
+    expect(liftCell.textContent).toContain('No holdout group yet')
+    expect(liftCell.querySelector('[title="No holdout group yet"]')).not.toBeNull()
+    expect(liftCell.className).toContain('text-admin-fg-muted')
+    // A measured lift of zero is still a number.
+    expect(cells('nudge.fellow_eligible').slice(-1)).toEqual(['0.0 pts'])
+  })
+
   it('gates retiring the manual campaign scripts (B12), never the holdout', () => {
     act(() => root.render(<AdminNudgeReadoutCard retireReady={false} nudges={[readout({})]} />))
     let line = container.querySelector('[data-testid="nudge-retire-line"]')!

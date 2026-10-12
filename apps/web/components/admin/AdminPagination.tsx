@@ -42,7 +42,7 @@ export function AdminPagination({
       onClick={() => onPageChange(page)}
       aria-current={page === currentPage ? 'page' : undefined}
       className={cn(
-        'min-w-8 h-8 px-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50',
+        'min-w-10 h-10 sm:min-w-8 sm:h-8 px-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50',
         page === currentPage
           ? 'bg-admin-accent text-admin-accent-fg font-bold'
           : 'text-admin-fg-muted hover:bg-admin-surface-raised hover:text-admin-fg'
@@ -63,13 +63,13 @@ export function AdminPagination({
         <span />
       )}
 
-      <nav aria-label="Pagination" className="flex items-center gap-1">
+      <nav aria-label="Pagination" className="flex flex-wrap items-center justify-center gap-1">
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
           aria-label="Previous page"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
+          className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
         >
           <ChevronLeftIcon className="w-4 h-4" />
         </button>
@@ -81,7 +81,7 @@ export function AdminPagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
           aria-label="Next page"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
+          className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
         >
           <ChevronRightIcon className="w-4 h-4" />
         </button>

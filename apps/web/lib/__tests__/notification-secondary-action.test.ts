@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
+import { validateUsername } from '@/lib/portfolio'
 
 // Growth R5 / B0: the optional second action on an in-app notification. The column is free-form
 // jsonb, so the parser is the only gate between a stored value and a rendered link.
@@ -64,8 +65,21 @@ describe('parseNotificationSecondaryAction', () => {
     ['an http LinkedIn url', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'http://www.linkedin.com/profile/add' }],
     ['a LinkedIn url other than add-to-profile', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://www.linkedin.com/feed/' }],
     ['a username with a slash', { kind: 'share_portfolio', label: 'Share', username: '../admin' }],
+    ['a LinkedIn url with credentials', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://u:p@linkedin.com/profile/add' }],
+    ['a LinkedIn url with a username only', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://u@www.linkedin.com/profile/add' }],
+    ['a LinkedIn url with a port', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://www.linkedin.com:8443/profile/add' }],
+    ['a LinkedIn url with credentials and a port', { kind: 'linkedin_add_to_profile', label: 'Add', url: 'https://u:p@linkedin.com:8443/profile/add' }],
+    ['a username with a dot', { kind: 'share_portfolio', label: 'Share', username: 'ada.l' }],
+    ['a username shorter than 3', { kind: 'share_portfolio', label: 'Share', username: 'ab' }],
+    ['a username longer than 30', { kind: 'share_portfolio', label: 'Share', username: 'a'.repeat(31) }],
   ])('rejects %s', (_label, value) => {
     expect(parseNotificationSecondaryAction(value)).toBeNull()
+  })
+
+  // The share username follows the portfolio rule (validateUsername in lib/portfolio.ts).
+  it.each(['ada', 'Ada-L_9', 'a'.repeat(30)])('accepts the portfolio username %s', (username) => {
+    expect(validateUsername(username).isValid).toBe(true)
+    expect(parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username })).toMatchObject({ username })
   })
 })
 

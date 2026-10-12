@@ -58,9 +58,15 @@ vi.mock('@/lib/supabase', () => ({
 const { AdminConsoleService } = await import('../admin/service')
 const { POST: revalidatePost } = await import('../../app/api/admin/cache/revalidate/route')
 
-const ADMIN = { authorized: true, userId: 'admin-1', email: 'admin@prodily.app' }
+// The revalidate route is limited to 10 requests per minute per admin, and under vitest the
+// limiter (lib/rate-limit.ts) is an in-memory map that lives for the whole file with no reset
+// hook. Each test therefore signs in as its own admin, so the tests never share a budget and
+// adding requests here cannot start returning 429.
+let adminSeq = 0
 
 beforeEach(() => {
+  adminSeq += 1
+  const ADMIN = { authorized: true, userId: `admin-${adminSeq}`, email: 'admin@prodily.app' }
   unstableCacheCalls.length = 0
   fromCalls.length = 0
   countErrors = {}
@@ -83,7 +89,8 @@ describe('B4 — console shell context', () => {
     await AdminConsoleService.getConsoleShellContext()
 
     expect(unstableCacheCalls).toHaveLength(1)
-    expect(unstableCacheCalls[0].keyParts).toEqual(['admin-console-shell-context'])
+    // 'v1' is the payload version cacheWithMaxAge puts in front of every key.
+    expect(unstableCacheCalls[0].keyParts).toEqual(['v1', 'admin-console-shell-context'])
     expect(unstableCacheCalls[0].options).toEqual({ revalidate: 30, tags: ['admin-shell'] })
   })
 
@@ -205,6 +212,50 @@ describe('B4 — POST /api/admin/cache/revalidate', () => {
       expect(revalidateTag).not.toHaveBeenCalled()
     }
   )
+
+  it('names the allowed tags in the 400 for an unknown tag', async () => {
+    const res = await revalidatePost(revalidateReq({ tag: 'system_settings' }), noParams())
+
+    expect(JSON.stringify(await res.json())).toContain(
+      'tag must be one of: admin-dashboard, admin-analytics, admin-shell, admin-automations.'
+    )
+  })
+
+  it('declares its body schema and response contract', () => {
+    const source = readFileSync(
+      path.resolve(import.meta.dirname, '../../app/api/admin/cache/revalidate/route.ts'),
+      'utf8'
+    )
+    expect(source).toMatch(/body:\s*revalidateBodySchema/)
+    expect(source).toContain('AdminCacheRevalidateResponse')
+    expect(source).not.toContain('request.json()')
+  })
+
+  it('is rate limited to 10 per minute per admin, and logs an unexpected failure', () => {
+    const source = readFileSync(
+      path.resolve(import.meta.dirname, '../../app/api/admin/cache/revalidate/route.ts'),
+      'utf8'
+    )
+    const config = source.slice(source.indexOf('withRoute('), source.indexOf('async ({ actor, body })'))
+
+    expect(config).toMatch(/rateLimit:\s*\[/)
+    expect(config).toMatch(/actor\.kind === 'admin' \? `admin_cache_revalidate_\$\{actor\.userId\}` : null/)
+    expect(config).toMatch(/limit:\s*10,/)
+    expect(config).toMatch(/windowMs:\s*60 \* 1000/)
+    expect(source).toMatch(/console\.error\('\[API POST \/api\/admin\/cache\/revalidate\] Error:', error\)/)
+  })
+
+  it('answers 429 after ten requests from one admin, and not before', async () => {
+    for (let i = 0; i < 10; i += 1) {
+      const res = await revalidatePost(revalidateReq({ tag: 'admin-shell' }), noParams())
+      expect(res.status, `request ${i + 1}`).toBe(200)
+    }
+
+    const res = await revalidatePost(revalidateReq({ tag: 'admin-shell' }), noParams())
+
+    expect(res.status).toBe(429)
+    expect(revalidateTag).toHaveBeenCalledTimes(10)
+  })
 
   it('refuses an authenticated non-admin with 403', async () => {
     requireAdminUser.mockResolvedValue({

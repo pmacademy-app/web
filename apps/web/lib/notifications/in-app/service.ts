@@ -286,7 +286,9 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       const portfolioPath = publicPortfolioPath(payload)
       return {
         title: 'You are now a PM Fellow!',
-        body: 'Congratulations! Your PM Fellow badge is now live on your public portfolio.',
+        body: portfolioPath
+          ? 'Congratulations! Your PM Fellow badge is now live on your public portfolio.'
+          : 'Congratulations! Make your portfolio public to show your PM Fellow badge.',
         actionUrl: portfolioPath ?? PORTFOLIO_SETTINGS_HREF,
         ...withAction(
           portfolioPath

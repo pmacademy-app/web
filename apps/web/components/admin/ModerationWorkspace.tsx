@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useCallback, useOptimistic, useRef, useTransition } from 'react'
+import React, { useCallback, useEffect, useOptimistic, useRef, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ShieldAlert, MessageSquare, Lightbulb, FileCheck2, Globe, AlertTriangle, Award } from 'lucide-react'
+import { ShieldAlert, MessageSquare, Lightbulb, FileCheck2, Globe, Info, Award } from 'lucide-react'
 import { AdminPageShell } from './AdminPageShell'
 import { AdminLoadWarning } from './AdminLoadWarning'
 import { FeedbackModerationView } from './FeedbackModerationView'
@@ -13,7 +13,7 @@ import { FellowRequestsView } from './FellowRequestsView'
 import { AdminPagination } from './AdminPagination'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
 import type { AdminFeedbackItem } from './FeedbackListView'
-import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
+import type { AdminCapstoneListRow, AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
 import type { AdminPortfolioCounts, ModerationPage } from '@/lib/admin/moderation-service'
 
@@ -25,7 +25,8 @@ export type ModerationListData =
   | { tab: 'feedback'; list: ModerationPage<AdminFeedbackItem> }
   | {
       tab: 'capstones'
-      list: ModerationPage<AdminCapstoneRow>
+      /** List rows carry no essay; `capstone` is the full row for the review drawer. */
+      list: ModerationPage<AdminCapstoneListRow>
       capstone: AdminCapstoneRow | null
       capstoneFailed: boolean
     }
@@ -70,15 +71,24 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
   const [selectedTab, setSelectedTab] = useOptimistic<ModerationTab>(activeTab)
   const { list } = data
 
-  const navigate = useCallback(
-    (url: string, options?: ModerationNavOptions) => {
-      startTransition(() => {
-        if (options?.replace) router.replace(url, { scroll: false })
-        else router.push(url, { scroll: false })
-      })
-    },
-    [router]
-  )
+  // The query of a navigation that has been started but not committed. `useSearchParams()` only
+  // changes on commit, so a second change made meanwhile (the debounced search firing after a
+  // filter click, or the other way round) must build on this, not on the stale snapshot, or it
+  // would drop the first change. `push` records whether that navigation adds a history entry.
+  const pendingNavRef = useRef<{ query: string; push: boolean } | null>(null)
+  const committedQuery = searchParams.toString()
+  useEffect(() => {
+    // Committed (or abandoned): the URL snapshot is the truth again.
+    if (!isPending) pendingNavRef.current = null
+  }, [isPending, committedQuery])
+  useEffect(() => {
+    // Back/Forward makes the URL the truth at once, whatever was still loading.
+    const clear = () => {
+      pendingNavRef.current = null
+    }
+    window.addEventListener('popstate', clear)
+    return () => window.removeEventListener('popstate', clear)
+  }, [])
 
   /**
    * Applies a URL change. Changing the status or the search resets to page 1 (decision 5);
@@ -86,15 +96,33 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
    */
   const updateParams = useCallback(
     (patch: ModerationParamsPatch, options?: ModerationNavOptions) => {
-      const next = new URLSearchParams(searchParams.toString())
+      let next = new URLSearchParams(committedQuery)
+      let replace = options?.replace === true
+      const pending = pendingNavRef.current
+      if (pending) {
+        const pendingParams = new URLSearchParams(pending.query)
+        if ((pendingParams.get('tab') ?? activeTab) === activeTab) {
+          next = pendingParams
+          // Replacing while a push is still loading would swallow that push's history entry.
+          if (pending.push) replace = false
+        } else if (replace) {
+          // A typed search for a tab that is being left: drop it rather than cancel the tab change.
+          return
+        }
+      }
       if ('status' in patch || 'q' in patch) next.delete('page')
       for (const [key, value] of Object.entries(patch)) {
         if (value === undefined || value === '') next.delete(key)
         else next.set(key, value)
       }
-      navigate(`/admin/moderation?${next.toString()}`, options)
+      const query = next.toString()
+      pendingNavRef.current = { query, push: !replace }
+      startTransition(() => {
+        if (replace) router.replace(`/admin/moderation?${query}`, { scroll: false })
+        else router.push(`/admin/moderation?${query}`, { scroll: false })
+      })
     },
-    [navigate, searchParams]
+    [router, committedQuery, activeTab]
   )
 
   const handleTabChange = useCallback(
@@ -102,6 +130,7 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
       // Status values and search differ per tab, so a tab change starts from a clean list.
       const next = new URLSearchParams()
       next.set('tab', tab)
+      pendingNavRef.current = { query: next.toString(), push: true }
       startTransition(() => {
         setSelectedTab(tab)
         router.push(`/admin/moderation?${next.toString()}`, { scroll: false })
@@ -120,6 +149,9 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
   // the rows is re-seeded from the server instead of keeping the previous page.
   const listKey = `${activeTab}|${status ?? ''}|${q}|${list.page}`
 
+  // Manual activation: arrow keys only move focus, and Enter or Space (the button's own click)
+  // loads the tab. Each tab is a server navigation, so loading on every arrow press would run
+  // one load and add one history entry per tab passed over.
   const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, tab: ModerationTab) => {
     const index = TABS.findIndex((t) => t.id === tab)
     let nextIndex = index
@@ -130,9 +162,7 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
     else return
 
     e.preventDefault()
-    const nextTab = TABS[nextIndex]
-    handleTabChange(nextTab.id)
-    tabRefs.current[nextTab.id]?.focus()
+    tabRefs.current[TABS[nextIndex].id]?.focus()
   }
 
   return (
@@ -159,7 +189,8 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
               role="tab"
               id={`moderation-tab-${tab.id}`}
               aria-selected={isActive}
-              aria-controls={`moderation-panel-${tab.id}`}
+              // Only the loaded tab has a panel in the DOM.
+              aria-controls={tab.id === activeTab ? `moderation-panel-${tab.id}` : undefined}
               tabIndex={isActive ? 0 : -1}
               onClick={() => handleTabChange(tab.id)}
               onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
@@ -202,13 +233,11 @@ export function ModerationWorkspace({ data, status, q, selectedCapstoneId }: Mod
 
         {data.tab === 'feedback' && (
           <>
-            {/* Schema note (spec §5.9): product feedback has no moderation
-                status column, so approve/reject actions are not offered (G2).
-                The note is always visible so the read-only state is never
-                implied to be a temporary loading condition. */}
+            {/* Product feedback is triaged, not moderated: nothing here is published, so there
+                is no approve/reject. The drawer sets a triage status instead. */}
             <div className="flex items-center gap-2 rounded-xl border border-admin-border bg-admin-surface/50 px-4 py-3 text-xs text-admin-fg-muted">
-              <AlertTriangle className="w-4 h-4 text-admin-warning shrink-0" />
-              Product feedback is read-only this phase. Approve/reject actions require a backend status column.
+              <Info className="w-4 h-4 text-admin-info shrink-0" aria-hidden="true" />
+              Product feedback is never published, so there is nothing to approve or reject. Open an item to mark it reviewed, planned, resolved or dismissed.
             </div>
             <FeedbackListView key={listKey} initialFeedback={data.list.items} />
           </>

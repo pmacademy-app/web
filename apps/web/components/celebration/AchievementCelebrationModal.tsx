@@ -133,6 +133,7 @@ function CertificateCtas({
         className={buttonVariants({ size: 'lg' })}
       >
         Add to LinkedIn Profile
+        <span className="sr-only"> (opens in a new tab)</span>
         <ExternalLink aria-hidden="true" />
       </a>
       <Link
@@ -232,7 +233,7 @@ function CelebrationContent({
     <DialogContent
       data-testid="achievement-celebration-modal"
       data-kind={celebration.kind}
-      className="sm:max-w-md p-6 text-center overflow-hidden"
+      className="sm:max-w-md p-6 text-center overflow-x-hidden"
     >
       <div className="flex justify-center pt-2 pb-1">
         <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 via-primary to-primary text-white shadow-xl ring-4 ring-primary/20 animate-in zoom-in-75 fade-in duration-300 motion-reduce:animate-none">

@@ -59,11 +59,20 @@ describe('nudgeRoundDue', () => {
     expect(nudgeRoundDue({ sentAt: '2026-10-01T00:00:00Z', remindedAt: '2026-10-08T00:00:00Z', heldOut: false }, NOW)).toBeNull()
     expect(nudgeRoundDue({ sentAt: null, remindedAt: null, heldOut: true }, NOW)).toBeNull()
   })
+
+  // The first nudge is stamped with its run's clock; the run seven days later can start a few
+  // seconds earlier in the hour, which must not push the reminder to day eight.
+  it('allows the reminder up to an hour short of seven days, and no earlier', () => {
+    const sentAgo = (ms: number) => ({ sentAt: new Date(NOW.getTime() - ms).toISOString(), remindedAt: null, heldOut: false })
+    expect(nudgeRoundDue(sentAgo(NUDGE_REMINDER_AFTER_MS - 30_000), NOW)).toBe('reminder')
+    expect(nudgeRoundDue(sentAgo(NUDGE_REMINDER_AFTER_MS - 2 * 60 * 60 * 1000), NOW)).toBeNull()
+  })
 })
 
 describe('runProofNudgesForPage', () => {
   let events: Array<Record<string, unknown>>
   let historyFails: boolean
+  let insertError: { message: string } | null
 
   const client = () =>
     ({
@@ -75,6 +84,8 @@ describe('runProofNudgesForPage', () => {
         chain.then = (resolve: (v: unknown) => unknown) =>
           Promise.resolve(historyFails ? { data: null, error: { message: 'down' } } : { data: events, error: null }).then(resolve)
         chain.insert = (row: Record<string, unknown>) => {
+          // supabase-js reports a failed insert in the result; it does not throw.
+          if (insertError) return Promise.resolve({ error: insertError })
           events.push(row)
           return Promise.resolve({ error: null })
         }
@@ -89,6 +100,7 @@ describe('runProofNudgesForPage', () => {
   beforeEach(() => {
     events = []
     historyFails = false
+    insertError = null
     for (const fn of Object.values(mocks)) fn.mockReset()
     mocks.automationEnabled.mockResolvedValue(true)
     mocks.holdout.mockReturnValue(false)
@@ -153,6 +165,102 @@ describe('runProofNudgesForPage', () => {
     mocks.loadProofStates.mockResolvedValue(null)
     expect((await run()).skipped).toBe(true)
     expect(mocks.enqueue).not.toHaveBeenCalled()
+  })
+
+  it('resolves the automation toggles once per run when the caller shares them across pages', async () => {
+    const enabled = new Map()
+    await runProofNudgesForPage(client(), [candidate], { now: NOW, enabled })
+    await runProofNudgesForPage(client(), [candidate], { now: new Date(NOW.getTime() + DAY), enabled })
+    // Two nudge keys, read once each, not once per page.
+    expect(mocks.automationEnabled).toHaveBeenCalledTimes(2)
+  })
+
+  it('carries on with the rest of the page when one learner throws, and records nothing for that learner', async () => {
+    const OTHER = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    mocks.loadProofStates.mockResolvedValue(new Map([[USER, state()], [OTHER, state()]]))
+    mocks.enqueue.mockRejectedValueOnce(new Error('queue down')).mockResolvedValue({ success: true })
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const result = await runProofNudgesForPage(
+      client(),
+      [candidate, { id: OTHER, email: 'bo@example.test', name: 'Bo' }],
+      { now: NOW },
+    )
+
+    expect(result.sent['nudge.portfolio_ready']).toBe(1)
+    expect(result.failed).toBe(1)
+    // No row for the learner that failed, so the next run tries them again.
+    expect(events.map((e) => e.user_id)).toEqual([OTHER])
+    expect(error).toHaveBeenCalledTimes(1)
+    error.mockRestore()
+  })
+
+  // The row is what stops the learner being re-evaluated; if it was not written the learner is
+  // tried again next run, so this run must not report the nudge as sent.
+  it('counts a nudge whose record could not be written as failed, not sent', async () => {
+    insertError = { message: 'insert rejected' }
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const result = await run()
+
+    expect(result.sent['nudge.portfolio_ready']).toBe(0)
+    expect(result.failed).toBe(1)
+    expect(events).toEqual([])
+    expect(error).toHaveBeenCalledTimes(1)
+    error.mockRestore()
+  })
+
+  it('counts a holdout whose record could not be written as failed, not held out', async () => {
+    mocks.holdout.mockReturnValue(true)
+    insertError = { message: 'insert rejected' }
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const result = await run()
+
+    expect(result.heldOut).toBe(0)
+    expect(result.failed).toBe(1)
+    expect(mocks.enqueue).not.toHaveBeenCalled()
+    error.mockRestore()
+  })
+
+  it('a dry run never reaches the insert, so a failing one changes nothing', async () => {
+    insertError = { message: 'insert rejected' }
+
+    const result = await run({ dryRun: true })
+
+    expect(result).toMatchObject({ sent: { 'nudge.portfolio_ready': 1 }, failed: 0 })
+    expect(events).toEqual([])
+  })
+
+  it('records the channels that actually went out', async () => {
+    mocks.createInApp.mockResolvedValue({ success: false, reason: 'user_disabled_portfolio_in_app' })
+
+    const result = await run()
+
+    expect(result.sent['nudge.portfolio_ready']).toBe(1)
+    expect(events).toEqual([expect.objectContaining({ skipped_reason: null, channels_notified: ['email'] })])
+  })
+
+  it('does not count a nudge no channel delivered, but still records the learner as treated', async () => {
+    mocks.createInApp.mockResolvedValue({ success: false, reason: 'user_disabled_portfolio_in_app' })
+    mocks.enqueue.mockResolvedValue({ success: false, reason: "User disabled 'portfolio' notifications for channel 'email'" })
+
+    const result = await run()
+
+    expect(result.sent['nudge.portfolio_ready']).toBe(0)
+    // The readout's treated arm is everyone assigned to the nudge (a row with no skipped_reason),
+    // and the row is what stops the learner being re-evaluated every day.
+    expect(events).toEqual([expect.objectContaining({ event_type: 'nudge.portfolio_ready', skipped_reason: null, channels_notified: [] })])
+    await run({ now: new Date(NOW.getTime() + DAY) })
+    expect(mocks.enqueue).toHaveBeenCalledTimes(1)
+  })
+
+  it('counts an email an earlier run already queued as delivered', async () => {
+    mocks.createInApp.mockResolvedValue({ success: false, reason: 'insert_failed' })
+    mocks.enqueue.mockResolvedValue({ success: false, duplicate: true, reason: 'Duplicate notification event already queued or delivered' })
+
+    expect((await run()).sent['nudge.portfolio_ready']).toBe(1)
+    expect(events).toEqual([expect.objectContaining({ channels_notified: ['email'] })])
   })
 
   it('never calls Fellow a certificate or credential', async () => {

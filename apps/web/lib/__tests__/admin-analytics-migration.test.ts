@@ -70,11 +70,59 @@ describe('B5 admin analytics migration', () => {
     }
   })
 
+  it('treats a missing, null or non-array lesson_ids as an empty module', () => {
+    const def = definition('admin_lesson_completion_stats')
+    // jsonb_array_elements_text raises on a JSON null or scalar; COALESCE only covers SQL NULL.
+    expect(def).toMatch(
+      /jsonb_array_elements_text\(\s*CASE WHEN jsonb_typeof\(m\.value -> 'lesson_ids'\) = 'array'\s+THEN m\.value -> 'lesson_ids'\s+ELSE '\[\]'::jsonb\s+END\s*\)/
+    )
+    expect(def).not.toMatch(/jsonb_array_elements_text\(COALESCE/)
+  })
+
   it('adds no index that an earlier migration already defines', () => {
     expect(up).not.toMatch(/CREATE INDEX/i)
   })
 
   it.each(FUNCTIONS)('the rollback drops %s', (name, args) => {
     expect(down).toMatch(new RegExp(`DROP FUNCTION IF EXISTS ${esc(`public.${name}(${args})`)};`))
+  })
+})
+
+/** The overview funnel's distinct-learner counts (20261013000001) and its rollback. */
+describe('admin funnel distinct users migration', () => {
+  const funnelUp = code('20261013000001_admin_funnel_distinct_users.sql')
+  const funnelDown = code('rollback/20261013000001_admin_funnel_distinct_users.down.sql')
+  const sig = esc('public.admin_funnel_distinct_users()')
+
+  it('pins search_path, is read-only and runs as the caller', () => {
+    expect(funnelUp).toMatch(
+      /CREATE OR REPLACE FUNCTION public\.admin_funnel_distinct_users\(\)\s+RETURNS jsonb\s+LANGUAGE sql\s+STABLE/
+    )
+    expect(funnelUp).toMatch(/SET search_path = public, pg_temp/)
+    expect(funnelUp).not.toMatch(/SECURITY DEFINER/i)
+    expect(funnelUp).not.toMatch(/\b(INSERT|UPDATE|DELETE|TRUNCATE)\b/i)
+    expect(funnelUp).not.toMatch(/CREATE INDEX/i)
+  })
+
+  it('is revoked from clients, granted to service_role and postgres, and commented', () => {
+    expect(funnelUp).toMatch(new RegExp(`REVOKE ALL ON FUNCTION ${sig} FROM PUBLIC, anon, authenticated;`))
+    expect(funnelUp).toMatch(new RegExp(`GRANT EXECUTE ON FUNCTION ${sig} TO service_role, postgres;`))
+    expect(funnelUp).toMatch(new RegExp(`COMMENT ON FUNCTION ${sig} IS`))
+  })
+
+  it('counts distinct users per step, with the filters the funnel had', () => {
+    expect(funnelUp).toMatch(
+      /'first_lesson',\s*\(SELECT count\(DISTINCT p\.user_id\) FROM public\.user_lesson_progress p WHERE p\.status = 'completed'\)/
+    )
+    expect(funnelUp).toMatch(/'first_quiz',\s*\(SELECT count\(DISTINCT q\.user_id\) FROM public\.quiz_attempts q\)/)
+    expect(funnelUp).toMatch(
+      /'module_completion',\s*\(SELECT count\(DISTINCT c\.user_id\) FROM public\.capstone_submissions c WHERE c\.submitted_at IS NOT NULL\)/
+    )
+    // A bare row count is the bug this function replaces.
+    expect(funnelUp).not.toMatch(/count\(\*\)/)
+  })
+
+  it('the rollback drops the function', () => {
+    expect(funnelDown).toMatch(new RegExp(`DROP FUNCTION IF EXISTS ${sig};`))
   })
 })

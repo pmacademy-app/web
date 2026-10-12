@@ -31,6 +31,8 @@ export interface PageResult<T> {
  *
  * The million-row ceiling is a guard against a builder that ignores its window and
  * returns a full page forever; it is not a business limit.
+ *
+ * Not the same as `fetchAllRows` in lib/growth/fetch-all-rows.ts: this one throws on a failed page, that one returns `{ data, error }`.
  */
 export async function fetchAllRows<T>(
   buildPage: (from: number, to: number) => PromiseLike<PageResult<T>>

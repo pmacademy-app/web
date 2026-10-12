@@ -5,6 +5,7 @@ import { ArrowLeft, Award, Calendar, FileText, MessageSquare } from 'lucide-reac
 import { getDedupedPublicPortfolioData } from '@/lib/portfolio-db'
 import { formatCapstoneShareUrl, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { buildCapstoneJsonLd, findPublicCapstone } from '@/lib/portfolio-capstone-page'
+import { capstoneOgCardPath } from '@/lib/og/card-paths'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { BRAND } from '@/lib/brand'
 import { CapstoneShare } from '@/components/portfolio/CapstoneShare'
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { portfolio, capstone } = found
   const { username, name } = portfolio.user
   const url = formatCapstoneShareUrl(SITE_ORIGIN, username, capstone.moduleSlug)
-  const ogImageUrl = `${SITE_ORIGIN.replace(/\/$/, '')}/api/og/portfolio/${encodeURIComponent(username)}/capstones/${encodeURIComponent(capstone.moduleSlug)}`
+  const ogImageUrl = `${SITE_ORIGIN.replace(/\/$/, '')}${capstoneOgCardPath(username, capstone.moduleSlug)}`
   const title = `${capstone.title} | ${name} | Case Study`
   const description = `${name}'s ${capstone.deliverableType.toLowerCase()} for ${capstone.moduleTitle}, an applied product management capstone on ${BRAND.fullName}.`
 
@@ -98,7 +99,7 @@ export default async function PublicCapstonePage({ params }: PageProps) {
             <Award className="w-3.5 h-3.5" aria-hidden="true" />
             Module {capstone.moduleNumber} · {capstone.moduleTitle}
           </p>
-          <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground text-balance">{capstone.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground text-balance [overflow-wrap:anywhere]">{capstone.title}</h1>
           <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
             <span className="inline-flex items-center gap-1">
               <FileText className="w-3.5 h-3.5" aria-hidden="true" /> {capstone.deliverableType}
@@ -128,14 +129,14 @@ export default async function PublicCapstonePage({ params }: PageProps) {
         )}
 
         {/* Plain text, as on the portfolio: React escapes it, nothing is rendered as HTML. */}
-        <section className="text-sm text-foreground leading-relaxed whitespace-pre-line">{capstone.content}</section>
+        <section className="text-sm text-foreground leading-relaxed whitespace-pre-line [overflow-wrap:anywhere]">{capstone.content}</section>
 
         {capstone.reflection && (
           <section aria-labelledby="reflection" className="rounded-2xl border border-border bg-card p-5 space-y-2">
             <h2 id="reflection" className="text-sm font-bold font-serif text-foreground flex items-center gap-1.5">
               <MessageSquare className="w-4 h-4 text-primary" aria-hidden="true" /> Reflection
             </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+            <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line [overflow-wrap:anywhere]">
               &ldquo;{capstone.reflection.content}&rdquo;
             </p>
           </section>

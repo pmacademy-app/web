@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { requireAdmin } from '@/lib/api/actor'
+import type { AdminLifecyclePreviewResponse } from '@/lib/api/contracts/admin'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { runLifecycle } from '@/lib/growth/lifecycle-run'
@@ -42,7 +43,7 @@ export const POST = withRoute(
       const force = query.force === 'true'
       const run = await runLifecycle({ source: 'admin_preview', dryRun: true, force })
 
-      return NextResponse.json({
+      return NextResponse.json<AdminLifecyclePreviewResponse>({
         success: true,
         dryRun: true,
         force,
@@ -52,6 +53,7 @@ export const POST = withRoute(
         heldOut: run.heldOut,
         skippedTimezone: run.skippedTimezone,
         skippedNoSegment: run.skippedNoSegment,
+        pagesSkipped: run.pagesSkipped,
         nudges: run.proofNudges.sent,
         nudgesHeldOut: run.proofNudges.heldOut,
         nudgePagesSkipped: run.proofNudges.pagesSkipped,

@@ -138,6 +138,28 @@ describe('computeNudgeReadout', () => {
     expect(n.ready).toBe(false)
   })
 
+  it('an empty holdout has no control: lift is not available and the nudge is not ready', () => {
+    const k = 'nudge.portfolio_ready'
+    const events = Array.from({ length: NUDGE_RETIRE_MIN_TREATED + 50 }, (_, i) => sent(k, `u${i}`))
+    const r = computeNudgeReadout({ events, publicUserIds: events.map((e) => e.user_id), fellowRequests: [] })
+    const n = byKey(r).get(k)!
+    expect(n.sent).toBe(NUDGE_RETIRE_MIN_TREATED + 50)
+    expect(n.heldOut).toBe(0)
+    expect(n.treatedRate).toBe(1)
+    // Without a holdout the treated rate is not a lift.
+    expect(n.liftAvailable).toBe(false)
+    expect(n.lift).toBe(0)
+    expect(n.ready).toBe(false)
+    expect(r.retireReady).toBe(false)
+  })
+
+  it('marks lift available once the holdout has users', () => {
+    const k = 'nudge.portfolio_ready'
+    const r = computeNudgeReadout({ events: [sent(k, 'a'), held(k, 'b')], publicUserIds: ['a'], fellowRequests: [] })
+    expect(byKey(r).get(k)).toMatchObject({ liftAvailable: true, lift: 1 })
+    expect(emptyNudgeReadout().nudges.every((n) => n.liftAvailable === false)).toBe(true)
+  })
+
   describe('retire threshold', () => {
     const build = (treatedPortfolio: number, treatedFellow: number, holdoutConverts = false) => {
       const events: NudgeEventRow[] = []

@@ -8,6 +8,7 @@ import type {
   LearnerSubmittedCapstoneSummary,
 } from '@/lib/portfolio-db'
 import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio'
+import { portfolioOgCardPath } from '@/lib/og/card-paths'
 import { calculatePortfolioReadiness, calculatePortfolioVerification } from '@/lib/portfolio-readiness'
 import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
 import { PortfolioVerificationCard } from '@/components/settings/PortfolioVerificationCard'
@@ -295,7 +296,7 @@ function PortfolioSettingsFormContent({
                 onChange={(e) => handleChange('username', e.target.value)}
                 placeholder="johndoe"
                 required
-                className="w-full pl-10 pr-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+                className="w-full pl-10 pr-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
               />
             </div>
             <p className="text-[11px] text-muted-foreground">3–30 characters, letters, numbers, and hyphens.</p>
@@ -313,7 +314,7 @@ function PortfolioSettingsFormContent({
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="John Doe"
               required
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
         </div>
@@ -329,7 +330,7 @@ function PortfolioSettingsFormContent({
             onChange={(e) => handleChange('bio', e.target.value)}
             rows={3}
             placeholder="Product Manager passionate about user discovery, B2B SaaS growth, and data-driven execution."
-            className="w-full p-3 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 leading-relaxed resize-y"
+            className="w-full p-3 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 leading-relaxed resize-y"
           />
         </div>
 
@@ -364,7 +365,7 @@ function PortfolioSettingsFormContent({
               value={formData.linkedinUrl}
               onChange={(e) => handleChange('linkedinUrl', e.target.value)}
               placeholder="https://linkedin.com/in/username"
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
             />
           </div>
 
@@ -379,7 +380,7 @@ function PortfolioSettingsFormContent({
               value={formData.githubUrl}
               onChange={(e) => handleChange('githubUrl', e.target.value)}
               placeholder="https://github.com/username"
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
             />
           </div>
 
@@ -394,7 +395,7 @@ function PortfolioSettingsFormContent({
               value={formData.websiteUrl}
               onChange={(e) => handleChange('websiteUrl', e.target.value)}
               placeholder="https://yourwebsite.com"
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
             />
           </div>
         </div>
@@ -425,7 +426,7 @@ function PortfolioSettingsFormContent({
               id="setting-featured-capstone"
               value={formData.featuredCapstoneId || ''}
               onChange={(e) => handleChange('featuredCapstoneId', e.target.value || null)}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             >
               <option value="">None (Display standard chronological portfolio)</option>
               {submittedCapstones.map((cap) => (
@@ -483,13 +484,13 @@ function PortfolioSettingsFormContent({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
                     disabled={index === 0}
                     onClick={() => moveSection(index, 'up')}
                     aria-label={`Move ${info.label} up`}
-                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                    className="p-2 min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   >
                     <ArrowUp className="w-4 h-4" />
                   </button>
@@ -498,7 +499,7 @@ function PortfolioSettingsFormContent({
                     disabled={index === arr.length - 1}
                     onClick={() => moveSection(index, 'down')}
                     aria-label={`Move ${info.label} down`}
-                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                    className="p-2 min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   >
                     <ArrowDown className="w-4 h-4" />
                   </button>
@@ -548,7 +549,7 @@ function PortfolioSettingsFormContent({
 
             {formData.username && (
               <a
-                href={`/api/og/portfolio/${formData.username}`}
+                href={portfolioOgCardPath(formData.username)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline pt-1"

@@ -5,6 +5,8 @@
  * batch query over many learners could be cut off silently and the learners late in the batch
  * would look like they had done less. `page(from, to)` must apply `.range(from, to)` to a query
  * with a stable order. Stops at the first short page; a failed page fails the whole read.
+ *
+ * Not the same as `fetchAllRows` in lib/db/pagination.ts: this one returns `{ data, error }`, that one throws.
  */
 export const ROW_PAGE_SIZE = 1000
 const MAX_PAGES = 100

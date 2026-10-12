@@ -58,6 +58,13 @@ const MAX_CANDIDATES = 25
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+/**
+ * A re-review that publishes a capstone the first review left unpublished has its own event id,
+ * `capstone-reviewed-<submission id>-published` (lib/admin/moderation-service.ts), so one
+ * submission can own two rows.
+ */
+const CAPSTONE_PUBLISHED_SUFFIX = '-published'
+
 export interface ClaimAchievementCelebrationOptions {
   /** Injected clock, for tests. */
   now?: Date
@@ -69,8 +76,8 @@ interface Candidate {
   notificationId: string
   kind: AchievementCelebrationKind
   /**
-   * The idempotency key with its prefix removed: a certificate code, a submission id, a user id,
-   * or `<user id>-<module slug>`.
+   * The idempotency key with its prefix removed: a certificate code, a submission id (with
+   * `-published` for a publishing re-review), a user id, or `<user id>-<module slug>`.
    */
   subject: string
   createdAt: string
@@ -82,6 +89,11 @@ interface Candidate {
 interface VerifiedCandidate {
   notificationId: string
   celebration: AchievementCelebration
+  /**
+   * Other uncelebrated rows for the same achievement (older Fellow grants, a capstone's other
+   * review notice). Retired once this one is claimed, so the achievement never celebrates twice.
+   */
+  supersededIds?: string[]
 }
 
 type Client = SupabaseClient<Database>
@@ -197,6 +209,23 @@ async function verifyCertificates(
   })
 }
 
+/** The submission a capstone key names, lower-cased; null when the key is not `<uuid>` or `<uuid>-published`. */
+function capstoneSubmissionId(subject: string): string | null {
+  const id = subject.endsWith(CAPSTONE_PUBLISHED_SUFFIX) ? subject.slice(0, -CAPSTONE_PUBLISHED_SUFFIX.length) : subject
+  return UUID_PATTERN.test(id) ? id.toLowerCase() : null
+}
+
+/**
+ * One submission is one celebration, whichever of its two rows carries it:
+ * - if either row is already celebrated, the capstone has had its celebration: nothing more;
+ * - otherwise the published notice celebrates when it is a candidate (the first review's row may
+ *   be past the 14 day window by then), else the first review's row;
+ * - the row that does not celebrate is retired with the claim.
+ *
+ * A first-review row that the celebrated_at backfill stamped (a rejection notice read before
+ * Growth R5 went live) cannot be told from one that really celebrated, so a capstone published on
+ * re-review after that still gets no celebration. That is the safe side of the ambiguity.
+ */
 async function verifyCapstones(
   supabase: Client,
   userId: string,
@@ -204,7 +233,10 @@ async function verifyCapstones(
   portfolio: CelebrationPortfolio
 ): Promise<VerifiedCandidate[]> {
   // Shape-checked before it reaches the query: `id` is a uuid column.
-  const wellFormed = candidates.filter((candidate) => UUID_PATTERN.test(candidate.subject))
+  const wellFormed = candidates.flatMap((candidate) => {
+    const submissionId = capstoneSubmissionId(candidate.subject)
+    return submissionId ? [{ candidate, submissionId }] : []
+  })
   if (wellFormed.length === 0) return []
 
   // `capstone.reviewed` also fires for a rejection (status 'reviewed', is_public false),
@@ -215,7 +247,7 @@ async function verifyCapstones(
     .eq('user_id', userId)
     .eq('status', 'reviewed')
     .eq('is_public', true)
-    .in('id', [...new Set(wellFormed.map((candidate) => candidate.subject.toLowerCase()))])
+    .in('id', [...new Set(wellFormed.map((entry) => entry.submissionId))])
 
   if (error) {
     warnReadFailed('capstone verification', error)
@@ -223,12 +255,54 @@ async function verifyCapstones(
   }
 
   const byId = new Map((data || []).map((row) => [row.id.toLowerCase(), row]))
-  return wellFormed.flatMap((candidate) => {
-    const row = byId.get(candidate.subject.toLowerCase())
-    if (!row) return []
+  const published = wellFormed.filter((entry) => byId.has(entry.submissionId))
+  if (published.length === 0) return []
+
+  // Both rows of each submission, whatever their age or state: a row outside the candidate window
+  // still says whether the capstone has celebrated, and still has to be retired.
+  const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES.capstone
+  const groupKeys = published.flatMap(({ candidate }) => {
+    const firstReviewKey = candidate.subject.endsWith(CAPSTONE_PUBLISHED_SUFFIX)
+      ? candidate.subject.slice(0, -CAPSTONE_PUBLISHED_SUFFIX.length)
+      : candidate.subject
+    return [`${prefix}${firstReviewKey}`, `${prefix}${firstReviewKey}${CAPSTONE_PUBLISHED_SUFFIX}`]
+  })
+  const { data: groupRows, error: groupError } = await supabase
+    .from('in_app_notifications')
+    .select('id, idempotency_key, celebrated_at')
+    .eq('user_id', userId)
+    .in('idempotency_key', [...new Set(groupKeys)])
+
+  if (groupError) {
+    warnReadFailed('capstone notice read', groupError)
+    return []
+  }
+
+  const groups = new Map<string, { celebrated: boolean; uncelebratedIds: string[] }>()
+  for (const row of groupRows || []) {
+    const submissionId = row.idempotency_key ? capstoneSubmissionId(row.idempotency_key.slice(prefix.length)) : null
+    if (!submissionId) continue
+    const group = groups.get(submissionId) ?? { celebrated: false, uncelebratedIds: [] }
+    if (row.celebrated_at) group.celebrated = true
+    else group.uncelebratedIds.push(row.id)
+    groups.set(submissionId, group)
+  }
+
+  return published.flatMap(({ candidate, submissionId }) => {
+    const row = byId.get(submissionId)
+    const group = groups.get(submissionId)
+    if (!row || !group || group.celebrated) return []
+
+    // The published notice wins over the first review's row when both are candidates.
+    const isPublishedNotice = candidate.subject.endsWith(CAPSTONE_PUBLISHED_SUFFIX)
+    const publishedNoticeWaiting = published.some(
+      (other) => other.submissionId === submissionId && other.candidate.subject.endsWith(CAPSTONE_PUBLISHED_SUFFIX)
+    )
+    if (!isPublishedNotice && publishedNoticeWaiting) return []
 
     return {
       notificationId: candidate.notificationId,
+      supersededIds: group.uncelebratedIds.filter((id) => id !== candidate.notificationId),
       celebration: {
         kind: 'capstone',
         notificationId: candidate.notificationId,
@@ -322,11 +396,13 @@ function isOwnFellowGrantSubject(subject: string, userId: string): boolean {
 }
 
 /**
- * Marks older Fellow grant rows celebrated once the newest one has been, so the same status never
- * celebrates twice. Best-effort: if it fails, an older row could still celebrate on a later call,
- * so the failure is logged.
+ * Marks the other rows of an achievement celebrated once one of them has been (older Fellow grant
+ * rows, a capstone's other review notice), so the same achievement never celebrates twice. Only
+ * `celebrated_at` is set: a retired row stays unread in the bell. Best-effort: a failure is
+ * logged. An older Fellow row could then still celebrate on a later call; a capstone row could
+ * not, because its submission's other row is already celebrated (see verifyCapstones).
  */
-async function retireSupersededFellowRows(
+async function retireSupersededRows(
   supabase: Client,
   userId: string,
   notificationIds: string[],
@@ -339,7 +415,7 @@ async function retireSupersededFellowRows(
     .in('id', notificationIds)
     .is('celebrated_at', null)
     .select('id')
-  if (error) warnReadFailed('retire superseded fellow rows', error)
+  if (error) warnReadFailed('retire superseded rows', error)
 }
 
 /**
@@ -373,7 +449,8 @@ async function claimNotification(
 /**
  * Claims the caller's next unseen achievement and returns what to celebrate, or null.
  *
- * At most one celebration per call, and at most one notification row written. `userId`
+ * At most one celebration per call, and one notification row claimed (the other rows of that
+ * same achievement, if any, are retired with it). `userId`
  * must come from the authenticated session: every read and the claiming write are scoped
  * to it, so the result only ever describes the caller's own achievements.
  *
@@ -415,7 +492,6 @@ export async function claimNextAchievementCelebration(
     if (ofKind.length === 0) continue
 
     let verified: VerifiedCandidate[]
-    let supersededFellowIds: string[] = []
     if (kind === 'fellow') {
       // The key must name the caller, and the grant must still stand. One Fellow status is one
       // celebration: only the newest grant row is celebrated, even when a revoke and re-grant (or
@@ -425,9 +501,14 @@ export async function claimNextAchievementCelebration(
       )
       const newest = grants[grants.length - 1]
       verified = newest
-        ? [{ notificationId: newest.notificationId, celebration: { kind: 'fellow', notificationId: newest.notificationId, portfolio } }]
+        ? [
+            {
+              notificationId: newest.notificationId,
+              celebration: { kind: 'fellow', notificationId: newest.notificationId, portfolio },
+              supersededIds: grants.slice(0, -1).map((candidate) => candidate.notificationId),
+            },
+          ]
         : []
-      supersededFellowIds = grants.slice(0, -1).map((candidate) => candidate.notificationId)
     } else if (kind === 'certificate') {
       verified = await verifyCertificates(supabase, userId, ofKind, portfolio, resolveSiteOrigin(opts.siteOrigin))
     } else if (kind === 'capstone') {
@@ -445,8 +526,8 @@ export async function claimNextAchievementCelebration(
         now.toISOString()
       )
       if (outcome === 'claimed') {
-        if (supersededFellowIds.length > 0) {
-          await retireSupersededFellowRows(supabase, userId, supersededFellowIds, now.toISOString())
+        if (entry.supersededIds && entry.supersededIds.length > 0) {
+          await retireSupersededRows(supabase, userId, entry.supersededIds, now.toISOString())
         }
         return entry.celebration
       }

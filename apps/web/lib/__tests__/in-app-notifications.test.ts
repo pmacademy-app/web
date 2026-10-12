@@ -5,6 +5,11 @@ import {
   isChannelEnabledByPreferences,
 } from '../notifications'
 import { buildInAppContentFromEvent } from '../notifications/in-app/service'
+import { isSafeNotificationLink } from '../notifications/in-app/secondary-action'
+import {
+  getBatchUserNotificationPreferences,
+  NotificationPreferencesReadError,
+} from '../notifications/preferences/defaults'
 
 describe('In-App Notification System Unit Test Suite', () => {
   it('Feature flag IN_APP_NOTIFICATIONS_ENABLED is active by default', () => {
@@ -110,5 +115,72 @@ describe('In-App Notification System Unit Test Suite', () => {
     expect(res.today.length).toBe(1)
     expect(res.yesterday.length).toBe(1)
     expect(res.thisWeek.length).toBe(1)
+  })
+})
+
+// A failed batch read returns defaults (everyone opted in) unless the caller asks for `strict`,
+// which a bulk sender uses to skip the batch instead of mailing opted-out learners.
+describe('getBatchUserNotificationPreferences on a failed read', () => {
+  const failing = { from: () => ({ select: () => ({ in: async () => ({ data: null, error: { message: 'down' } }) }) }) }
+  const throwing = {
+    from: () => {
+      throw new Error('network')
+    },
+  }
+
+  it('falls back to default preferences by default', async () => {
+    const map = await getBatchUserNotificationPreferences(failing, ['u1'])
+    expect(map.get('u1')?.learning.email).toBe(true)
+  })
+
+  it.each([
+    ['an error result', failing],
+    ['a thrown error', throwing],
+  ])('strict: throws on %s', async (_label, supabase) => {
+    await expect(getBatchUserNotificationPreferences(supabase, ['u1'], { strict: true })).rejects.toBeInstanceOf(
+      NotificationPreferencesReadError,
+    )
+  })
+
+  it('strict: still resolves stored rows, and defaults for learners without one', async () => {
+    const ok = {
+      from: () => ({ select: () => ({ in: async () => ({ data: [{ user_id: 'u1', learning_email: false }], error: null }) }) }),
+    }
+    const map = await getBatchUserNotificationPreferences(ok, ['u1', 'u2'], { strict: true })
+    expect(map.get('u1')?.learning.email).toBe(false)
+    expect(map.get('u2')?.learning.email).toBe(true)
+  })
+})
+
+// GET /api/notifications returns a stored action_url only when it passes this check; otherwise
+// the item opens its category page.
+describe('isSafeNotificationLink', () => {
+  it.each(['/academy', '/settings?tab=portfolio', '/p/ada/capstones/discovery', 'https://example.com/launch?x=1'])(
+    'accepts %s',
+    (value) => {
+      expect(isSafeNotificationLink(value)).toBe(true)
+    },
+  )
+
+  it.each([
+    'javascript:alert(1)',
+    'JavaScript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'http://example.com',
+    '//evil.com',
+    '/\\evil.com',
+    'https://user:pass@evil.com',
+    'https://user@evil.com',
+    'https:evil.com',
+    'https:\\\\evil.com',
+    ' https://example.com',
+    'https://',
+    'academy',
+    '',
+    null,
+    undefined,
+    42,
+  ])('rejects %s', (value) => {
+    expect(isSafeNotificationLink(value)).toBe(false)
   })
 })

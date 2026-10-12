@@ -4,24 +4,11 @@ import { useState } from 'react'
 import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { apiPost } from '@/lib/api/client'
+import type { AdminLifecyclePreviewResponse } from '@/lib/api/contracts/admin'
 
 export const LIFECYCLE_PREVIEW_PATH = '/api/admin/automations/lifecycle-preview?force=true'
 
-export interface LifecyclePreviewResponse {
-  success: boolean
-  dryRun: true
-  force: boolean
-  paused: boolean
-  lifecycleQueued: number
-  queuedBySequence: Record<string, number>
-  heldOut: number
-  skippedTimezone: number
-  skippedNoSegment: number
-  nudges: Record<string, number>
-  nudgesHeldOut: number
-  nudgePagesSkipped: number
-  error?: string
-}
+export type LifecyclePreviewResponse = AdminLifecyclePreviewResponse
 
 /** Optional display names for sequence / nudge keys. Falls back to the key. */
 interface AdminLifecyclePreviewButtonProps {
@@ -107,8 +94,12 @@ export function AdminLifecyclePreviewButton({ names }: AdminLifecyclePreviewButt
 
             {(result.skippedTimezone > 0 || result.nudgePagesSkipped > 0) && (
               <p className="text-[11px] text-admin-fg-muted">
-                Skipped: {result.skippedTimezone} outside their delivery hour, {result.nudgePagesSkipped} nudge
-                page(s) that failed to load.
+                Skipped: {result.skippedTimezone} outside their delivery hour, {result.nudgePagesSkipped} page(s)
+                that failed to load
+                {(result.pagesSkipped ?? 0) > 0
+                  ? ` (${result.pagesSkipped} of them skipped entirely, lifecycle emails included)`
+                  : ''}
+                .
               </p>
             )}
           </div>

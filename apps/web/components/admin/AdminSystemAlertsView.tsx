@@ -160,7 +160,7 @@ export function AdminSystemAlertsView() {
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-admin-fg">System Errors &amp; Alerts</h2>
               {unackCriticalCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-fg text-[10px] font-extrabold motion-safe:animate-pulse">
+                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-fg text-[10px] font-extrabold">
                   {unackCriticalCount} Critical
                 </span>
               )}
@@ -209,7 +209,7 @@ export function AdminSystemAlertsView() {
             <select
               value={severityFilter}
               onChange={(e) => setSeverityFilter(e.target.value)}
-              className="px-2.5 py-1 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
+              className="px-2.5 py-1 text-base sm:text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
             >
               <option value="all">All Severities</option>
               <option value="critical">Critical</option>
@@ -223,7 +223,7 @@ export function AdminSystemAlertsView() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-2.5 py-1 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
+              className="px-2.5 py-1 text-base sm:text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
             >
               <option value="all">All Categories</option>
               <option value="auth">Auth</option>
@@ -253,7 +253,7 @@ export function AdminSystemAlertsView() {
               id="alert-kind-filter"
               value={kindFilter}
               onChange={(e) => setKindFilter(e.target.value)}
-              className="px-2.5 py-1 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
+              className="px-2.5 py-1 text-base sm:text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
             >
               {KIND_OPTIONS.map((kind) => (
                 <option key={kind} value={kind}>
@@ -271,7 +271,7 @@ export function AdminSystemAlertsView() {
               id="alert-retryability-filter"
               value={retryabilityFilter}
               onChange={(e) => setRetryabilityFilter(e.target.value)}
-              className="px-2.5 py-1 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
+              className="px-2.5 py-1 text-base sm:text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
             >
               {RETRYABILITY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
@@ -290,7 +290,7 @@ export function AdminSystemAlertsView() {
                 id="alert-provider-filter"
                 value={providerFilter}
                 onChange={(e) => setProviderFilter(e.target.value)}
-                className="px-2.5 py-1 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
+                className="px-2.5 py-1 text-base sm:text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg focus:outline-none"
               >
                 {providerOptions.map((provider) => (
                   <option key={provider} value={provider}>

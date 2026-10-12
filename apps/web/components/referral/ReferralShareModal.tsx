@@ -109,7 +109,7 @@ export function ReferralShareModal({
               type="text"
               readOnly
               value={referralLink}
-              className="flex-1 bg-transparent text-xs font-mono text-foreground focus:outline-hidden px-1 select-all"
+              className="flex-1 min-w-0 bg-transparent text-base sm:text-xs font-mono text-foreground focus:outline-hidden px-1 select-all"
             />
             <Button
               type="button"
@@ -135,7 +135,7 @@ export function ReferralShareModal({
         {/* Social Share Buttons */}
         <div className="space-y-2">
           <label className="text-xs font-semibold text-foreground">Quick Share to Socials</label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 *:w-full">
             <Button
               type="button"
               variant="outline"

@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { MessageSquare, CheckCircle, XCircle, Eye, EyeOff, Edit3, Check, X } from 'lucide-react'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminDataTable, Column } from './AdminDataTable'
@@ -34,7 +35,15 @@ export function FeedbackModerationView({
   // Site" chip + Publish/Unpublish actions below are the accurate equivalent.
   // No "Feature" action is offered because the data model cannot represent it.
   const { toast } = useAdminToast()
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [queue, setQueue] = useState<TestimonialItem[]>(initialQueue)
+  // Re-seed the optimistic copy when the server sends a fresh page (after router.refresh()).
+  const [seed, setSeed] = useState(initialQueue)
+  if (seed !== initialQueue) {
+    setSeed(initialQueue)
+    setQueue(initialQueue)
+  }
   const statusFilter = status && STATUS_FILTERS.includes(status) ? status : 'all'
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -76,6 +85,9 @@ export function FeedbackModerationView({
             }
           })
         )
+        // The list is server-paged and filtered by status: refetch so a moderated row leaves
+        // a status-filtered list and the total and pager stay right.
+        startRefresh(() => router.refresh())
       } else {
         // Without this the row silently kept its old state and the admin had no way
         // to tell the action had been refused.
@@ -119,6 +131,7 @@ export function FeedbackModerationView({
               <textarea
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
+                aria-label={`Testimonial text from ${item.authorName}`}
                 className="w-full text-xs p-2 rounded bg-admin-bg border border-admin-border text-admin-fg focus:outline-none focus:border-admin-accent"
                 rows={3}
               />
@@ -192,9 +205,10 @@ export function FeedbackModerationView({
                 }}
                 disabled={isLoading}
                 title="Edit Testimonial Content"
+                aria-label={`Edit testimonial from ${item.authorName}`}
                 className="p-1.5 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg border border-admin-border transition-colors"
               >
-                <Edit3 className="w-3.5 h-3.5" />
+                <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
               </button>
             )}
 

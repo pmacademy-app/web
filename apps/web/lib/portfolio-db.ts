@@ -489,7 +489,7 @@ export async function updatePortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string,
   settings: PortfolioSettingsData
-): Promise<{ success: boolean; settings: PortfolioSettingsData }> {
+): Promise<{ success: boolean; settings: PortfolioSettingsData; previousUsername: string | null }> {
   // 1. Validate username
   const usernameCheck = validateUsername(settings.username)
   if (!usernameCheck.isValid) {
@@ -565,6 +565,16 @@ export async function updatePortfolioSettings(
     }
   }
 
+  // The handle being replaced, so the caller can purge OG cards cached under it. Best-effort:
+  // a failed read only costs that purge, never the save.
+  let previousUsername: string | null = null
+  try {
+    const { data: before } = await supabase.from('users').select('username').eq('id', userId).maybeSingle()
+    previousUsername = before?.username || null
+  } catch {
+    previousUsername = null
+  }
+
   const { error: updateError } = await supabase
     .from('users')
     .update(updatePayload)
@@ -607,6 +617,7 @@ export async function updatePortfolioSettings(
 
   return {
     success: true,
+    previousUsername,
     settings: {
       username: cleanUsername,
       name: (updatePayload.name as string) || '',

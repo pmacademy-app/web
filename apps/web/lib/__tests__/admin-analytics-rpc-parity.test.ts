@@ -28,8 +28,9 @@ const state = vi.hoisted(() => ({
   tables: null as unknown as LegacyTables,
   lessons: [] as CurriculumEntry[],
   failRpc: new Set<string>(),
+  malformedRpc: new Set<string>(),
   failTables: new Set<string>(),
-  queries: [] as Array<{ table: string; filters: string[]; head: boolean }>,
+  queries: [] as Array<{ table: string; filters: string[]; head: boolean; orders: string[]; ranged: boolean }>,
   rpcCalls: [] as Array<{ fn: string; args?: Record<string, unknown> }>,
   rpcOrders: [] as Array<{ fn: string; col: string }>,
 }))
@@ -136,7 +137,7 @@ function thenable(run: () => Result) {
 
 function tableBuilder(table: string) {
   const preds: Array<(r: Row) => boolean> = []
-  const record = { table, filters: [] as string[], head: false }
+  const record = { table, filters: [] as string[], head: false, orders: [] as string[], ranged: false }
   state.queries.push(record)
   const asTime = (v: unknown) => (typeof v === 'string' ? ts(v) : NaN)
   let window: [number, number] | null = null
@@ -173,7 +174,12 @@ function tableBuilder(table: string) {
       preds.push((r) => r[col] != null && asTime(r[col]) < ts(val))
       return builder
     },
+    order(col: string) {
+      record.orders.push(col)
+      return builder
+    },
     range(from: number, to: number) {
+      record.ranged = true
       window = [from, to]
       return thenable(run)
     },
@@ -204,6 +210,7 @@ function rpc(fn: string, args?: Record<string, unknown>) {
   let orderBy: string | null = null
   const run = (window?: [number, number]): Result => {
     if (state.failRpc.has(fn)) return { data: null, error: { message: `function public.${fn} does not exist` } }
+    if (state.malformedRpc.has(fn)) return { data: { unexpected: true }, error: null }
     let data = answer()
     if (orderBy && Array.isArray(data)) {
       const col = orderBy
@@ -340,6 +347,7 @@ beforeEach(() => {
   state.tables = seeded.tables
   state.lessons = seeded.lessons
   state.failRpc = new Set()
+  state.malformedRpc = new Set()
   state.failTables = new Set()
   state.queries = []
   state.rpcCalls = []
@@ -377,7 +385,7 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
   })
 
   it('user stats: levels and streaks match, including null, 0, negative and out-of-range values', () => {
-    const stats = parseUserStats(sqlUserStats(state.tables.users))
+    const stats = parseUserStats(sqlUserStats(state.tables.users))!
     const legacy = legacyUserStats(state.tables.users)
     expect(stats.total).toBe(legacy.totalUsers)
     expect(stats.publicPortfolios).toBe(legacy.publicPortfolios)
@@ -398,7 +406,7 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     const total = state.tables.users.length
     const stats = parseLessonCompletionStats(
       sqlLessonCompletionStats(state.tables.user_lesson_progress, defs.map((d) => ({ slug: d.slug, lesson_ids: d.lessonIds })))
-    )
+    )!
     const legacy = legacyLessonStats(defs, state.tables.user_lesson_progress, total, state.lessons.length)
     expect(moduleDropOffsFromStats(defs, stats, total)).toEqual(legacy.moduleDropOffs)
     expect(courseCompletionsFromStats(stats, state.lessons.length)).toBe(legacy.courseCompletionsCount)
@@ -407,7 +415,7 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
   })
 
   it('lesson stats: no modules and no lessons give the same empty answers', () => {
-    const stats = parseLessonCompletionStats(sqlLessonCompletionStats(state.tables.user_lesson_progress, []))
+    const stats = parseLessonCompletionStats(sqlLessonCompletionStats(state.tables.user_lesson_progress, []))!
     const legacy = legacyLessonStats([], state.tables.user_lesson_progress, 10, 0)
     expect(moduleDropOffsFromStats([], stats, 10)).toEqual(legacy.moduleDropOffs)
     expect(courseCompletionsFromStats(stats, 0)).toBe(legacy.courseCompletionsCount)
@@ -417,7 +425,7 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     const range = resolveRange('90d')
     const fromIso = range.start.toISOString()
     const toIso = range.end.toISOString()
-    const caps = parseCapstoneStats(sqlCapstoneStats(state.tables.capstone_submissions, fromIso, toIso))
+    const caps = parseCapstoneStats(sqlCapstoneStats(state.tables.capstone_submissions, fromIso, toIso))!
     const legacyCaps = legacyCapstoneStats(state.tables.capstone_submissions, fromIso, toIso)
     expect(caps.submitted).toBe(legacyCaps.submitted)
     expect(caps.reviewed).toBe(legacyCaps.reviewed)
@@ -456,6 +464,17 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     )
   })
 
+  it('orders every paged table read, so pages past the row cap cannot overlap or skip', async () => {
+    await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d' })
+    const paged = state.queries.filter((q) => q.ranged)
+    expect(paged.length).toBeGreaterThan(0)
+    for (const q of paged) {
+      // The primary key is the last sort column: the range column alone can tie.
+      const key = q.table === 'user_lesson_progress' ? ['user_id', 'lesson_id'] : ['id']
+      expect(q.orders.slice(-key.length), `${q.table} paged read is unordered`).toEqual(key)
+    }
+  })
+
   it('the service source keeps fetchAllRows only for range-bounded queries', () => {
     const src = fs.readFileSync(path.resolve(__dirname, '../admin/analytics-service.ts'), 'utf8')
     const calls = src.split('fetchAllRows<').slice(1)
@@ -480,6 +499,54 @@ describe('B5 analytics RPC parity with the legacy JS reductions', () => {
     // Range-bounded data still loads.
     expect(data.engagement.xpEarned).toBeGreaterThan(0)
     expect(data.overview.kpis.lessonsCompleted).toBeGreaterThan(0)
+  })
+})
+
+describe('analytics RPC parsing: a malformed payload is null, never zeros', () => {
+  const userStats = () => sqlUserStats(state.tables.users) as unknown as Record<string, unknown>
+
+  it('user stats need total, public_portfolios, every level and every streak bucket', () => {
+    expect(parseUserStats(userStats())).not.toBeNull()
+    expect(parseUserStats({})).toBeNull()
+    expect(parseUserStats({ ...userStats(), total: undefined })).toBeNull()
+    expect(parseUserStats({ ...userStats(), public_portfolios: 'many' })).toBeNull()
+    expect(parseUserStats({ ...userStats(), levels: { '1': 3 } })).toBeNull()
+    expect(parseUserStats({ ...userStats(), streaks: [1, 2] })).toBeNull()
+    expect(parseUserStats({ ...userStats(), streaks: null })).toBeNull()
+  })
+
+  it('keeps real zeros and numeric strings', () => {
+    const zero = { total: 0, public_portfolios: '0', levels: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }, streaks: [0, 0, 0, 0, 0, 0] }
+    expect(parseUserStats(zero)).toEqual({ total: 0, publicPortfolios: 0, levels: [0, 0, 0, 0, 0], streaks: [0, 0, 0, 0, 0, 0] })
+    expect(parseFlashcardStats({ total: 0, distinct_users: 0 })).toEqual({ total: 0, distinctUsers: 0 })
+    expect(parseCapstoneStats({ submitted: 0, reviewed: 0, submitted_at: [] })).toEqual({ submitted: 0, reviewed: 0, submittedAt: [] })
+    expect(parseLessonCompletionStats({ distinct_users: 0, completion_histogram: [], modules: [] })).toEqual({
+      distinctUsers: 0,
+      histogram: [],
+      modules: new Map(),
+    })
+  })
+
+  it('lesson, capstone and flashcard stats reject missing or non-numeric keys', () => {
+    expect(parseLessonCompletionStats({ completion_histogram: [], modules: [] })).toBeNull()
+    expect(parseLessonCompletionStats({ distinct_users: 3, modules: [] })).toBeNull()
+    expect(parseLessonCompletionStats({ distinct_users: 3, completion_histogram: [{ lessons: 2 }], modules: [] })).toBeNull()
+    expect(
+      parseLessonCompletionStats({ distinct_users: 3, completion_histogram: [], modules: [{ idx: 1, started: 'x', completed: 1 }] })
+    ).toBeNull()
+    expect(parseCapstoneStats({ reviewed: 1, submitted_at: [] })).toBeNull()
+    expect(parseCapstoneStats({ submitted: 2, reviewed: 1 })).toBeNull()
+    expect(parseFlashcardStats({ total: 4 })).toBeNull()
+    expect(parseFlashcardStats({ total: null, distinct_users: 1 })).toBeNull()
+  })
+
+  it('a malformed RPC payload marks the workspace failed instead of caching zeros', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    // An object without the count keys, as a changed function would return.
+    state.malformedRpc.add('admin_flashcard_stats')
+    const data = await AnalyticsService.getAnalyticsWorkspaceData({ rangeKey: '30d' })
+    expect(data.failed).toBe(true)
+    expect(data.engagement.srsReviews).toBe(0)
   })
 })
 

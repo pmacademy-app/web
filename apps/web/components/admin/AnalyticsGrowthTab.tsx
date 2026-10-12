@@ -14,6 +14,14 @@ interface AnalyticsGrowthTabProps {
 export const GROWTH_GA_NOTE =
   'Share clicks by context (portfolio, badge, capstone, Fellow) are tracked in Google Analytics only.'
 
+/**
+ * "Claimed" counts rows by their celebrated_at stamp. The stamp is not always a celebration the
+ * learner saw: rows from before it existed were stamped when read in the bell, and an older
+ * Fellow row is stamped when a newer grant replaces it.
+ */
+export const CELEBRATIONS_CLAIMED_HINT =
+  'Rows marked celebrated in the range. Not all were shown: older rows were marked when read in the bell, and a Fellow row replaced by a newer grant is marked without being shown.'
+
 interface Step {
   label: string
   value: number
@@ -115,7 +123,7 @@ export function AnalyticsGrowthTab({ data }: AnalyticsGrowthTabProps) {
               {
                 label: 'Claimed',
                 value: celebrations.claimed,
-                hint: 'Counted by claim date.',
+                hint: CELEBRATIONS_CLAIMED_HINT,
               },
             ]}
           />

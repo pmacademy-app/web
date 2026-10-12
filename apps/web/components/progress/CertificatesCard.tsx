@@ -108,7 +108,7 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between text-xs font-bold font-mono">
+            <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-xs font-bold font-mono">
               <span className="text-foreground">Full Curriculum Certificate Eligibility</span>
               <span className="text-primary">{completedLessons} / 90 Lessons ({completedPercentage}%)</span>
             </div>

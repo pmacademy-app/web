@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }))
 
-import { AnalyticsGrowthTab, GROWTH_GA_NOTE } from '@/components/admin/AnalyticsGrowthTab'
+import { AnalyticsGrowthTab, CELEBRATIONS_CLAIMED_HINT, GROWTH_GA_NOTE } from '@/components/admin/AnalyticsGrowthTab'
 
 let container: HTMLDivElement
 let root: Root
@@ -73,6 +73,15 @@ describe('AnalyticsGrowthTab', () => {
     expect(text).toContain('Approved')
     expect(text).toContain('Declined')
     expect(text).not.toContain('Rejected')
+  })
+
+  it('does not claim that every claimed celebration was shown on its claim date', () => {
+    const text = render(growth())
+    expect(text).not.toContain('Counted by claim date')
+    expect(text).toContain(CELEBRATIONS_CLAIMED_HINT)
+    // The two cases that make "claimed" differ from "shown".
+    expect(CELEBRATIONS_CLAIMED_HINT).toMatch(/read in the bell/)
+    expect(CELEBRATIONS_CLAIMED_HINT).toMatch(/Fellow row replaced by a newer grant/)
   })
 
   it('never uses certificate or credential wording', () => {

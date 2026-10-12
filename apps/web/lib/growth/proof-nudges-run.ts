@@ -7,6 +7,7 @@ import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { isLifecycleHoldout } from '@/lib/notifications/lifecycle/holdout'
 import { BRAND } from '@/lib/brand'
 import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import type { ProofState } from './proof-state'
 import { loadProofStates } from './proof-state-db'
 import {
   EMPTY_NUDGE_HISTORY,
@@ -42,6 +43,12 @@ export interface NudgePageResult {
   heldOut: number
   /** The page could not be evaluated (a read failed); nothing was sent for it. */
   skipped: boolean
+  /**
+   * Learners whose nudge threw part-way, including a record that could not be written; nothing is
+   * recorded for them, so the next run retries (the in-app and email idempotency keys keep a
+   * retry from delivering twice).
+   */
+  failed: number
 }
 
 type Client = SupabaseClient<Database>
@@ -94,28 +101,42 @@ async function record(
   idempotencyKey: string,
   skippedReason: string | null,
   now: Date,
+  channels: Array<'in_app' | 'email'> = [],
 ): Promise<void> {
-  await supabase.from('notification_events').insert({
+  const { error } = await supabase.from('notification_events').insert({
     event_type: eventType,
     user_id: userId,
     payload: { idempotencyKey } as unknown as Json,
-    channels_notified: skippedReason ? [] : ['in_app', 'email'],
+    channels_notified: skippedReason ? [] : channels,
     skipped_reason: skippedReason,
     // The run's clock, so the seven-day reminder is measured against the same time base.
     created_at: now.toISOString(),
   })
+  // supabase-js returns a failed insert instead of throwing it. Without the row the learner is
+  // evaluated again next run, so the caller must count this as failed, not as sent or held out.
+  if (error) throw new Error(`notification_events insert failed for ${eventType}: ${error.message}`)
 }
 
 export async function runProofNudgesForPage(
   supabase: Client,
   candidates: NudgeCandidate[],
-  opts: { now: Date; dryRun?: boolean },
+  opts: {
+    now: Date
+    dryRun?: boolean
+    /**
+     * The automation toggles, shared by the caller across the pages of one run: filled here on
+     * first use, so the toggle read (an uncached HTTP call) happens once per run, not per page.
+     */
+    enabled?: Map<ProofNudgeKey, boolean>
+  },
 ): Promise<NudgePageResult> {
-  const result: NudgePageResult = { sent: { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }, heldOut: 0, skipped: false }
+  const result: NudgePageResult = { sent: { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 }, heldOut: 0, skipped: false, failed: 0 }
   if (candidates.length === 0) return result
 
-  const enabled = new Map<ProofNudgeKey, boolean>()
-  for (const key of PROOF_NUDGE_KEYS) enabled.set(key, await EmailAutomationsService.isAutomationEnabled(key))
+  const enabled = opts.enabled ?? new Map<ProofNudgeKey, boolean>()
+  for (const key of PROOF_NUDGE_KEYS) {
+    if (!enabled.has(key)) enabled.set(key, await EmailAutomationsService.isAutomationEnabled(key))
+  }
   if (![...enabled.values()].some(Boolean)) return result
 
   const ids = candidates.map((c) => c.id)
@@ -128,60 +149,89 @@ export async function runProofNudgesForPage(
     const state = states.get(candidate.id)
     if (!state) continue
 
-    for (const key of applicableNudges(state)) {
-      if (!enabled.get(key)) continue
-      const past = history.get(`${candidate.id}:${key}`) ?? EMPTY_NUDGE_HISTORY
-      const round = nudgeRoundDue(past, opts.now)
-      if (!round) continue
-
-      const idempotencyKey = nudgeIdempotencyKey(key, candidate.id, round)
-
-      // The holdout is decided once, at the first round, and recorded so it is never re-rolled.
-      if (round === 'initial' && isLifecycleHoldout(candidate.id, key)) {
-        result.heldOut++
-        if (!opts.dryRun) await record(supabase, candidate.id, nudgeEventType(key, 'initial'), idempotencyKey, 'nudge_holdout', opts.now)
-        break
-      }
-
-      result.sent[key]++
-      if (!opts.dryRun) {
-        const copy = COPY[key]
-        const userName = candidate.name || candidate.email.split('@')[0]
-        await createInAppNotification({
-          userId: candidate.id,
-          idempotencyKey,
-          category: 'portfolio',
-          title: copy.title,
-          body: round === 'reminder' ? `A quick reminder: ${copy.body}` : copy.body,
-          actionUrl: PORTFOLIO_SETTINGS_HREF,
-          priority: 'low',
-          preloadedPreferences: candidate.preferences,
-        })
-        await enqueueNotificationItem({
-          userId: candidate.id,
-          toEmail: candidate.email,
-          toName: userName,
-          channel: 'email',
-          templateKey: key,
-          templateVariables: {
-            userName,
-            nudge: key === 'nudge.portfolio_ready' ? 'portfolio_ready' : 'fellow_eligible',
-            isReminder: round === 'reminder',
-            ctaUrl: `${origin}${PORTFOLIO_SETTINGS_HREF}`,
-          },
-          eventId: idempotencyKey,
-          idempotencyKey,
-          eventType: key,
-          category: 'portfolio',
-          priorityLevel: 'low',
-          preloadedPreferences: candidate.preferences,
-        })
-        await record(supabase, candidate.id, nudgeEventType(key, round), idempotencyKey, null, opts.now)
-      }
-      // One nudge per learner per run.
-      break
+    // One learner's failure must not drop the rest of the page.
+    try {
+      await nudgeCandidate(supabase, candidate, state, history, enabled, origin, opts, result)
+    } catch (err) {
+      result.failed++
+      console.error(`[proof-nudges] Nudge failed for user ${candidate.id}:`, err)
     }
   }
 
   return result
+}
+
+async function nudgeCandidate(
+  supabase: Client,
+  candidate: NudgeCandidate,
+  state: ProofState,
+  history: Map<string, NudgeHistory>,
+  enabled: Map<ProofNudgeKey, boolean>,
+  origin: string,
+  opts: { now: Date; dryRun?: boolean },
+  result: NudgePageResult,
+): Promise<void> {
+  for (const key of applicableNudges(state)) {
+    if (!enabled.get(key)) continue
+    const past = history.get(`${candidate.id}:${key}`) ?? EMPTY_NUDGE_HISTORY
+    const round = nudgeRoundDue(past, opts.now)
+    if (!round) continue
+
+    const idempotencyKey = nudgeIdempotencyKey(key, candidate.id, round)
+
+    // The holdout is decided once, at the first round, and recorded so it is never re-rolled.
+    if (round === 'initial' && isLifecycleHoldout(candidate.id, key)) {
+      if (!opts.dryRun) await record(supabase, candidate.id, nudgeEventType(key, 'initial'), idempotencyKey, 'nudge_holdout', opts.now)
+      result.heldOut++
+      return
+    }
+
+    if (opts.dryRun) {
+      result.sent[key]++
+      return
+    }
+
+    const copy = COPY[key]
+    const userName = candidate.name || candidate.email.split('@')[0]
+    const inApp = await createInAppNotification({
+      userId: candidate.id,
+      idempotencyKey,
+      category: 'portfolio',
+      title: copy.title,
+      body: round === 'reminder' ? `A quick reminder: ${copy.body}` : copy.body,
+      actionUrl: PORTFOLIO_SETTINGS_HREF,
+      priority: 'low',
+      preloadedPreferences: candidate.preferences,
+    })
+    const email = await enqueueNotificationItem({
+      userId: candidate.id,
+      toEmail: candidate.email,
+      toName: userName,
+      channel: 'email',
+      templateKey: key,
+      templateVariables: {
+        userName,
+        nudge: key === 'nudge.portfolio_ready' ? 'portfolio_ready' : 'fellow_eligible',
+        isReminder: round === 'reminder',
+        ctaUrl: `${origin}${PORTFOLIO_SETTINGS_HREF}`,
+      },
+      eventId: idempotencyKey,
+      idempotencyKey,
+      eventType: key,
+      category: 'portfolio',
+      priorityLevel: 'low',
+      preloadedPreferences: candidate.preferences,
+    })
+    // The channels that really went out. A duplicate email is one an earlier run queued before it
+    // could write this row. The row itself is written whatever the channels: it marks the learner
+    // as assigned to the nudge (the readout's treated arm, which must not depend on preferences)
+    // and stops the daily re-evaluation.
+    const channels: Array<'in_app' | 'email'> = []
+    if (inApp?.success) channels.push('in_app')
+    if (email?.success || email?.duplicate) channels.push('email')
+    await record(supabase, candidate.id, nudgeEventType(key, round), idempotencyKey, null, opts.now, channels)
+    if (channels.length > 0) result.sent[key]++
+    // One nudge per learner per run.
+    return
+  }
 }

@@ -22,7 +22,9 @@ WHERE is_read = true
     OR idempotency_key LIKE 'module-completed-%'
   );
 
--- The claim reads a learner's uncelebrated achievement rows; keep that lookup narrow.
+-- The claim reads a learner's uncelebrated achievement rows. The predicate is wider than that:
+-- it covers every uncelebrated row that has an idempotency key, of any notification type, since
+-- only achievement rows are ever stamped. The index is ordered per learner, not achievement-only.
 CREATE INDEX IF NOT EXISTS in_app_notifications_uncelebrated_idx
   ON public.in_app_notifications (user_id, created_at)
   WHERE celebrated_at IS NULL AND idempotency_key IS NOT NULL;

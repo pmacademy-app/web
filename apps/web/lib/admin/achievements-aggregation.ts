@@ -58,6 +58,12 @@ export interface AdminCapstoneRow {
   publicPath: string | null
 }
 
+/**
+ * A capstone row in the moderation list. The essay is not sent to the client for the list
+ * (the table shows `wordCount` only); the review drawer loads the full `AdminCapstoneRow`.
+ */
+export type AdminCapstoneListRow = Omit<AdminCapstoneRow, 'content'>
+
 export interface AdminPortfolioRow {
   userId: string
   learnerName: string

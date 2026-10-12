@@ -9,8 +9,10 @@
  * - `nudge.portfolio_ready`: a user converts when their portfolio is *currently* public. There is
  *   no published-at timestamp, so this outcome is not time-bound (the UI says so).
  *
- * Lift = treated rate − holdout rate. A nudge is `ready` once it has at least
- * NUDGE_RETIRE_MIN_TREATED treated users and a positive lift. When both nudges are ready
+ * Lift = treated rate − holdout rate. It needs a control: with nobody held out there is no
+ * holdout rate to subtract, so lift is reported as not available (`liftAvailable: false`,
+ * `lift: 0`) instead of the treated rate. A nudge is `ready` once it has at least
+ * NUDGE_RETIRE_MIN_TREATED treated users, a non-empty holdout and a positive lift. When both nudges are ready
  * (`retireReady`), the manual campaign scripts they replace can be retired (decision B12).
  * The gate never retires the holdout itself: the holdout stays as the ongoing control.
  */
@@ -45,9 +47,11 @@ export interface AdminNudgeReadout {
   treatedRate: number
   /** Share (0..1) of held-out users who converted. */
   holdoutRate: number
-  /** treatedRate − holdoutRate (can be negative). */
+  /** treatedRate − holdoutRate (can be negative). 0 when `liftAvailable` is false. */
   lift: number
-  /** sent ≥ NUDGE_RETIRE_MIN_TREATED and lift > 0: this nudge has proved itself. */
+  /** False when nobody is held out, so there is no control and `lift` is not a measurement. */
+  liftAvailable?: boolean
+  /** sent ≥ NUDGE_RETIRE_MIN_TREATED, a non-empty holdout and lift > 0: this nudge has proved itself. */
   ready: boolean
 }
 
@@ -123,7 +127,9 @@ export function computeNudgeReadout(input: NudgeReadoutInput): NudgeReadoutResul
 
     const treatedRate = rate(treatedConverted, treated.size)
     const holdoutRate = rate(holdoutConverted, holdout.size)
-    const lift = treatedRate - holdoutRate
+    // An empty holdout would make holdoutRate 0 and the "lift" just the treated rate.
+    const liftAvailable = holdout.size > 0
+    const lift = liftAvailable ? treatedRate - holdoutRate : 0
     return {
       key,
       name: input.names?.[key] ?? key,
@@ -133,7 +139,8 @@ export function computeNudgeReadout(input: NudgeReadoutInput): NudgeReadoutResul
       treatedRate,
       holdoutRate,
       lift,
-      ready: treated.size >= NUDGE_RETIRE_MIN_TREATED && lift > 0,
+      liftAvailable,
+      ready: treated.size >= NUDGE_RETIRE_MIN_TREATED && liftAvailable && lift > 0,
     }
   })
 

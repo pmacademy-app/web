@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   isGlobalPause: vi.fn(),
   writes: [] as Array<{ table: string; op: string }>,
   usersError: null as { message: string } | null,
+  progressError: null as { message: string } | null,
   logSystemError: vi.fn(),
   buckets: new Map<string, number>(),
 }))
@@ -80,7 +81,15 @@ function fakeSupabase() {
         b.limit = async () => (mocks.usersError ? { data: null, error: mocks.usersError } : { data: USERS, error: null })
         return b
       }
-      if (table === 'user_lesson_progress') return { ...writes, select: () => ({ in: async () => ({ data: [], error: null }) }) }
+      if (table === 'user_lesson_progress') {
+        // The run pages this read: select().in().order().order().range().
+        const b: Record<string, unknown> = { ...writes }
+        b.select = () => b
+        b.in = () => b
+        b.order = () => b
+        b.range = async () => (mocks.progressError ? { data: null, error: mocks.progressError } : { data: [], error: null })
+        return b
+      }
       return writes
     },
   }
@@ -98,6 +107,7 @@ const preview = (query = '?force=true') =>
 beforeEach(() => {
   mocks.writes = []
   mocks.usersError = null
+  mocks.progressError = null
   mocks.buckets.clear()
   mocks.logSystemError.mockReset()
   mocks.requireAdminUser.mockReset().mockResolvedValue(ADMIN)
@@ -125,6 +135,8 @@ describe('POST /api/admin/automations/lifecycle-preview', () => {
       queuedBySequence: { 'lifecycle.d1_never_started': 2 },
       nudges: { 'nudge.portfolio_ready': 2, 'nudge.fellow_eligible': 1 },
       nudgesHeldOut: 1,
+      pagesSkipped: 0,
+      nudgePagesSkipped: 0,
     })
     expect(mocks.enqueue).not.toHaveBeenCalled()
     expect(mocks.writes).toEqual([])
@@ -184,6 +196,27 @@ describe('POST /api/admin/automations/lifecycle-preview', () => {
     expect(entry.message).not.toContain('/api/cron/lifecycle')
   })
 
+  it('reports a page skipped by a failed progress read, logged as the admin preview', async () => {
+    mocks.progressError = { message: 'progress unavailable' }
+
+    const body = await (await preview()).json()
+
+    expect(body).toMatchObject({ lifecycleQueued: 0, heldOut: 0, pagesSkipped: 1, nudgePagesSkipped: 1 })
+    expect(mocks.runNudges).not.toHaveBeenCalled()
+    expect(mocks.writes).toEqual([])
+    expect(mocks.logSystemError.mock.calls[0][0].operation).toBe('admin_lifecycle_preview_progress_query')
+  })
+
+  it('prefixes its console output as the admin preview, not as the cron', async () => {
+    mocks.runNudges.mockRejectedValue(new Error('nudges down'))
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    expect((await preview()).status).toBe(200)
+
+    expect(error).toHaveBeenCalledWith('[admin/lifecycle-preview] Proof nudges failed for a page:', expect.any(Error))
+    error.mockRestore()
+  })
+
   it('refuses the cron secret: the preview is admin only', async () => {
     process.env.CRON_SECRET = 'test-cron-secret'
     mocks.requireAdminUser.mockResolvedValue({ authorized: false, error: 'Authentication required', statusCode: 401 })
@@ -198,5 +231,21 @@ describe('POST /api/admin/automations/lifecycle-preview', () => {
 
     expect([401, 403]).toContain(res.status)
     expect(mocks.runNudges).not.toHaveBeenCalled()
+  })
+})
+
+describe('lifecycle preview response contract', () => {
+  it('the route and the button share one response type from the admin contracts', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const read = (rel: string) => readFileSync(resolve(import.meta.dirname, '../..', rel), 'utf8')
+
+    expect(read('lib/api/contracts/admin.ts')).toContain('export interface AdminLifecyclePreviewResponse')
+    expect(read('app/api/admin/automations/lifecycle-preview/route.ts')).toMatch(
+      /NextResponse\.json<AdminLifecyclePreviewResponse>\(/
+    )
+    const button = read('components/admin/AdminLifecyclePreviewButton.tsx')
+    expect(button).toContain("from '@/lib/api/contracts/admin'")
+    expect(button).not.toMatch(/interface LifecyclePreviewResponse/)
   })
 })
