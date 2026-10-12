@@ -74,6 +74,7 @@ regexes = [
   '''xkeysib-SECRET1''',                      # api-error-contract.test.ts
   '''test_brevo_api_key_123''',               # brevo-email-infrastructure.test.ts
   '''bcast-1724345000-abc1234''',             # learning-settings-runtime.test.ts — an idempotency key, not a credential
+  '''fellow-granted-u1-1''',                  # fellow-history.test.ts — a notification idempotency key (event name, test user id, counter), read 2026-10-12
   '''s1gnatureV4lu3''',                       # error-taxonomy.test.ts — JWT with a literal fake signature
   '''whsec_abc123xyz456''',                   # system-monitoring.test.ts
   '''TestPlaceholderSignatureXXXXXXXX''',     # sensitive-data-redaction.test.ts
