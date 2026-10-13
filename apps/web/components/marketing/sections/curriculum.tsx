@@ -15,33 +15,29 @@ import {
   SECTION_TITLE,
   SECTION_Y,
 } from '@/components/marketing/styles'
-import { HOME_CAPSTONES, padIndex } from '@/config/marketing'
+import { padIndex } from '@/config/marketing'
 import { MODULES } from '@/config/content'
 
 /**
  * Curriculum section: a numbered ledger, 01 to 09 (homepage redesign, UI-6).
  *
- * Server component. Each row pairs a module with the capstone it ends in, so the
- * section says one thing: the path is sequenced and every step produces work. The
- * old card grid and its coloured skill pills are gone; a single skill-coloured dot
- * per capstone is the only colour.
+ * Server component. Each row is a module with its lesson count and estimated time,
+ * so the section says one thing: the path is sequenced. Capstone titles are not
+ * repeated here; the proof section's wall already lists them. The old card grid and
+ * its coloured skill pills are gone.
  *
- * This section and the hero are the only places on the homepage that state the
- * 90 lesson / 9 module counts. `CurriculumViewTracker` keeps the curriculum-view
+ * The heading avoids restating the 90 lesson / 9 module counts, which the hero sub
+ * already carries. `CurriculumViewTracker` keeps the curriculum-view
  * event firing once on entry; `<Reveal>` animates the header and the ledger as two
  * blocks rather than staggering nine rows.
  */
 export function CurriculumSection() {
-  const rows = MODULES.map((module) => {
-    const capstone = HOME_CAPSTONES.find((c) => c.number === module.number)
-    return {
-      number: module.number,
-      title: module.title,
-      lessonCount: module.lessonCount,
-      capstoneTitle: capstone?.title ?? '',
-      skill: capstone?.skill ?? 'strategy',
-    }
-  })
+  const rows = MODULES.map((module) => ({
+    number: module.number,
+    title: module.title,
+    lessonCount: module.lessonCount,
+    estimatedTime: module.estimatedTime,
+  }))
 
   return (
     <section
@@ -57,7 +53,7 @@ export function CurriculumSection() {
             CURRICULUM
           </p>
           <h2 id="curriculum-heading" className={`${SECTION_TITLE} mb-5`}>
-            90 lessons across 9 modules, in order.
+            From first principles to a full case study.
           </h2>
           <p className={SECTION_LEAD}>Each module ends in a capstone.</p>
         </Reveal>

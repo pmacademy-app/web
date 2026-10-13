@@ -37,15 +37,6 @@ const ENTER = 'animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out-q
 /** Entry animation for LCP candidates. Transform only, so the text paints opaque. */
 const ENTER_OPAQUE = 'animate-in slide-in-from-bottom-2 duration-700 ease-out-quint fill-mode-both motion-reduce:animate-none'
 
-/**
- * The two course counts. The label strings are asserted by
- * `marketing-homepage-phase0c.test.ts`, so they stay literal.
- */
-const ANCHORS = [
-  { value: '90 Lessons', detail: 'Across nine modules' },
-  { value: '9 Capstones', detail: 'One at the end of each module' },
-] as const
-
 export function HeroSection() {
   return (
     <section
@@ -83,17 +74,6 @@ export function HeroSection() {
                 />
               </TrackedLink>
             </div>
-
-            <dl className={`${ENTER} delay-300 flex gap-10 border-t border-border pt-6`}>
-              {ANCHORS.map((anchor) => (
-                <div key={anchor.value} className="space-y-1">
-                  <dt className="text-body font-semibold tabular-nums text-foreground">
-                    {anchor.value}
-                  </dt>
-                  <dd className="text-body-sm text-ink-muted">{anchor.detail}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
           <div className={`${ENTER} delay-300 lg:col-span-7`}>

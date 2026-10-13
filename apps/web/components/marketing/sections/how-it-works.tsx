@@ -48,7 +48,8 @@ interface LoopStep {
   visual: ReactNode
 }
 
-const FIRST_CAPSTONE = HOME_CAPSTONES[0]
+/** Capstone 3 (the PRD), so this mock differs from the hero's Capstone 1 page. */
+const APPLY_CAPSTONE = HOME_CAPSTONES.find((c) => c.number === 3)
 
 const LOOP: LoopStep[] = [
   {
@@ -67,8 +68,8 @@ const LOOP: LoopStep[] = [
   },
   {
     verb: 'Apply',
-    line: 'Each module ends in a capstone you write and keep in your portfolio.',
-    description: `Illustration of a capstone document titled ${FIRST_CAPSTONE?.title ?? 'Product Opportunity Brief'}, written by ${SAMPLE_LEARNER_NAME}.`,
+    line: 'Write the module capstone and keep it in your portfolio.',
+    description: `Illustration of a capstone document titled ${APPLY_CAPSTONE?.title ?? 'Product Requirements Document'}, written by ${SAMPLE_LEARNER_NAME}.`,
     visual: <ApplyVisual />,
   },
   {
@@ -270,13 +271,13 @@ function ApplyVisual() {
   return (
     <div className={PAPER}>
       <div className="flex items-center justify-between gap-3">
-        <p className="text-caption font-semibold text-primary">Capstone {padIndex(1)}</p>
+        <p className="text-caption font-semibold text-primary">Capstone {padIndex(APPLY_CAPSTONE?.number ?? 3)}</p>
         <p className="text-caption text-ink-muted">{SAMPLE_LEARNER_NAME}</p>
       </div>
       <p className="mt-2 font-sans text-lg font-semibold leading-snug tracking-[-0.015em] text-foreground text-balance">
-        {FIRST_CAPSTONE?.title ?? 'Product Opportunity Brief'}
+        {APPLY_CAPSTONE?.title ?? 'Product Requirements Document'}
       </p>
-      {['Problem Statement', 'Jobs-To-Be-Done', 'Success Metrics'].map((heading) => (
+      {['In-Scope & Out-of-Scope', 'User Stories & Acceptance Criteria', 'Edge Cases & Error Handling'].map((heading) => (
         <div key={heading} className="mt-4">
           <p className="text-caption font-semibold text-foreground">{heading}</p>
           <div className="mt-2">

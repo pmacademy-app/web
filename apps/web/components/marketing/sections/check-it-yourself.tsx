@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 
 import { TrackedLink } from '@/components/marketing/tracked-link'
@@ -10,12 +9,7 @@ import {
   SECTION_TITLE,
   SECTION_Y,
 } from '@/components/marketing/styles'
-import {
-  SAMPLE_CERTIFICATE_LABEL,
-  SAMPLE_CERTIFICATE_SRC,
-  SAMPLE_LEARNER_NAME,
-  SAMPLE_PORTFOLIO_PATH,
-} from '@/config/marketing'
+import { SAMPLE_PORTFOLIO_PATH } from '@/config/marketing'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 
 /**
@@ -23,8 +17,9 @@ import { FeedbackAdminService } from '@/lib/admin/feedback-service'
  *
  * `PublishedTestimonialsSection` renders only at three or more published rows. Below
  * that, this takes its place with things a visitor can verify directly: the public
- * curriculum, a labelled sample certificate, and a real public portfolio. It makes no
- * claim about other learners, so it carries no quotes, names or ratings.
+ * curriculum and a real public portfolio. The sample certificate is left out because
+ * "What you leave with" already shows it. It makes no claim about other learners, so
+ * it carries no quotes, names or ratings.
  *
  * The count comes from the same cached service call as the testimonials section, so
  * the two never disagree. A failed lookup counts as zero and shows this fallback.
@@ -63,7 +58,7 @@ export async function CheckItYourselfSection() {
 
         <ul className="divide-y divide-border">
           <li className={ROW}>
-            <p className={STATEMENT}>All 90 lessons are public.</p>
+            <p className={STATEMENT}>Every lesson is public.</p>
             <TrackedLink
               href="/curriculum"
               event="home_secondary_cta_click"
@@ -75,22 +70,6 @@ export async function CheckItYourselfSection() {
             </TrackedLink>
           </li>
 
-          <li className={ROW}>
-            <p className={STATEMENT}>See a sample certificate.</p>
-            <figure className="w-full max-w-[280px] sm:w-[220px]">
-              <Image
-                src={SAMPLE_CERTIFICATE_SRC}
-                alt={`${SAMPLE_CERTIFICATE_LABEL} issued to ${SAMPLE_LEARNER_NAME}`}
-                width={2200}
-                height={1400}
-                sizes="(min-width: 640px) 220px, 280px"
-                className="h-auto w-full rounded-md border border-border bg-surface"
-              />
-              <figcaption className="mt-2 text-caption text-ink-muted">
-                {SAMPLE_CERTIFICATE_LABEL}
-              </figcaption>
-            </figure>
-          </li>
 
           <li className={ROW}>
             <p className={STATEMENT}>See a real portfolio.</p>

@@ -158,8 +158,10 @@ describe('Phase 0.C — claims are traceable to the repository', () => {
     const moduleSlugs = [...capstones.matchAll(/moduleSlug:\s*'([a-z]+)'/g)].map((m) => m[1])
     expect(new Set(moduleSlugs).size).toBe(9)
 
-    expect(code(read('components/marketing/sections/hero.tsx'))).toContain('90 Lessons')
-    expect(code(read('components/marketing/sections/hero.tsx'))).toContain('9 Capstones')
+    // Changed deliberately: the hero states the counts once, in its sub line, instead of
+    // a separate "90 Lessons / 9 Capstones" row that repeated it.
+    expect(code(read('components/marketing/sections/hero.tsx'))).toMatch(/90 lessons/i)
+    expect(code(read('components/marketing/sections/hero.tsx'))).toMatch(/9 capstones/i)
   })
 
   it('does not invent learner counts, ratings or outcome statistics', () => {

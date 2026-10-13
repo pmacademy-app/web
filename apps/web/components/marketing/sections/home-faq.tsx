@@ -16,9 +16,10 @@ import type { FAQItem } from '@/types'
  * Short homepage FAQ.
  *
  * Reuses existing answers from FAQ_ITEMS, picked by question text, and writes none of
- * its own. Left out on purpose: the AI question (the homepage makes no AI claims either
- * way), the certification question (the certificate has its own section), and the
- * "get started" and prior-experience questions, which the page already answers.
+ * its own. Only questions the page does not already answer: "What will I build?",
+ * "What is the public portfolio?" and "How long does it take?" would repeat the proof,
+ * portfolio and curriculum sections. The AI question stays off too (the homepage makes
+ * no AI claims either way), as does the certification question.
  *
  * Native <details>/<summary>: keyboard and screen-reader support come from the browser,
  * and the section stays a server component with no client JavaScript.
@@ -27,9 +28,8 @@ import type { FAQItem } from '@/types'
 const HOME_FAQ_QUESTIONS = [
   'Is Prodily really free?',
   'Who is Prodily for?',
-  'How long does it take?',
-  'What will I build?',
-  'What is the public portfolio?',
+  'Do I need prior PM experience?',
+  'How do I get started?',
 ] as const
 
 export const HOME_FAQ_ITEMS: FAQItem[] = HOME_FAQ_QUESTIONS.map((question) =>

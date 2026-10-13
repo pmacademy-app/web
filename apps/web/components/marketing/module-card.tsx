@@ -7,10 +7,8 @@ export interface ModuleLedgerRowProps {
   index: string
   title: string
   lessonCount: number
-  /** Capstone display title (from HOME_CAPSTONES, never the raw config title). */
-  capstoneTitle: string
-  /** Competency cluster id; resolves to `var(--color-skill-<skill>)`. */
-  skill: string
+  /** Estimated study time from MODULES, e.g. "4–5 hrs". */
+  estimatedTime: string
   className?: string
 }
 
@@ -21,22 +19,22 @@ export interface ModuleLedgerRowProps {
  * markup, no hover lift, no shadow. Render inside an `<ol>`; the numeral is decorative
  * because the list already conveys order.
  *
- * Layout: numeral, then module (title and lesson count), then the capstone the module
- * ends in. Stacks under the numeral on phones, three columns from `md` up.
+ * Layout: numeral, module title, then lesson count and study time. The capstone titles
+ * are deliberately not repeated here; the proof section's wall already lists them.
+ * Stacks under the numeral on phones, the meta sits right-aligned from `md` up.
  */
 export function ModuleLedgerRow({
   number,
   index,
   title,
   lessonCount,
-  capstoneTitle,
-  skill,
+  estimatedTime,
   className,
 }: ModuleLedgerRowProps) {
   return (
     <li
       className={cn(
-        'grid grid-cols-[3.5rem_1fr] gap-x-4 gap-y-3 py-6 sm:grid-cols-[5rem_1fr] md:grid-cols-[6rem_minmax(0,1fr)_minmax(0,1fr)] md:items-baseline md:gap-x-8 md:py-8',
+        'grid grid-cols-[3.5rem_1fr] gap-x-4 gap-y-1 py-5 sm:grid-cols-[5rem_1fr] md:grid-cols-[6rem_minmax(0,1fr)_auto] md:items-baseline md:gap-x-8 md:py-6',
         className,
       )}
     >
@@ -44,25 +42,14 @@ export function ModuleLedgerRow({
         {index}
       </span>
 
-      <div className="min-w-0">
-        <h3 className="text-h4 font-semibold leading-snug text-foreground text-balance">
-          <span className="sr-only">Module {number}: </span>
-          {title}
-        </h3>
-        <p className="mt-1 text-body-sm text-ink-muted">{lessonCount} lessons</p>
-      </div>
+      <h3 className="min-w-0 text-h4 font-semibold leading-snug text-foreground text-balance">
+        <span className="sr-only">Module {number}: </span>
+        {title}
+      </h3>
 
-      <div className="col-start-2 min-w-0 md:col-start-3">
-        <p className="text-caption font-medium text-ink-muted">Capstone</p>
-        <p className="mt-1 flex items-baseline gap-2.5 text-body text-foreground text-pretty">
-          <span
-            aria-hidden="true"
-            className="relative top-[-0.1em] size-2 shrink-0 rounded-full"
-            style={{ backgroundColor: `var(--color-skill-${skill})` }}
-          />
-          <span>{capstoneTitle}</span>
-        </p>
-      </div>
+      <p className="col-start-2 text-body-sm tabular-nums text-ink-muted md:col-start-3 md:text-right">
+        {lessonCount} lessons · {estimatedTime}
+      </p>
     </li>
   )
 }
