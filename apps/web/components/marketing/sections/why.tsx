@@ -1,82 +1,76 @@
-import { FeatureCard } from '@/components/marketing/feature-card'
+import { IllustrationCaption } from '@/components/marketing/illustration-caption'
 import { Reveal } from '@/components/marketing/motion/reveal'
+import { HeroCtaLink } from '@/components/marketing/sections/hero-cta'
+import { WhyCompareToggle } from '@/components/marketing/sections/why-compare-toggle'
 import {
+  BAND_PLAIN,
   CONTAINER,
-  EYEBROW,
-  EYEBROW_RULE,
   SECTION_LEAD,
   SECTION_TITLE,
   SECTION_Y,
 } from '@/components/marketing/styles'
-
-const COMPARISON_CARDS = [
-  {
-    icon: 'Shuffle',
-    title: 'Fragmented Self-Study',
-    description: 'YouTube, Reddit, blogs, and scattered frameworks. Lots of information, but no coherent sequence or body of work.',
-    variant: 'default' as const,
-  },
-  {
-    icon: 'GraduationCap',
-    title: 'Expensive Bootcamps',
-    description: 'Structured and guided, but often costly, with the price of a program becoming a barrier to getting started.',
-    variant: 'default' as const,
-  },
-  {
-    icon: 'BookOpen',
-    title: 'Prodily PM Academy',
-    description: 'A structured curriculum with interactive practice, applied capstones, skill tracking, and a portfolio you can keep building.',
-    variant: 'comparison-highlighted' as const,
-  },
-]
+import {
+  HOME_CAPSTONES,
+  SAMPLE_CERTIFICATE_LABEL,
+  SAMPLE_CERTIFICATE_SRC,
+  SAMPLE_LEARNER_NAME,
+  padIndex,
+} from '@/config/marketing'
 
 /**
- * Why PM Academy section — Sprint 2 §9 + Sprint 3 why copy.
+ * Why section: structure without the tuition (homepage redesign).
  *
- * ## B12-B — server component
+ * Server component. The three comparison cards are replaced by one before/after
+ * comparison (`WhyCompareToggle`, a small client island): the same Sample Learner as
+ * a course certificate, then as a public portfolio with the real capstone titles.
+ * Capstone data is resolved here and passed down as plain props so the island never
+ * imports `config/marketing.ts`.
  *
- * Two `motion.div` wrappers, one `useInView` and a `STAGGER_CONTAINER`, all to fade the
- * header in and stagger three cards. `<Reveal>` does both: once for the header, once per
- * card with a `delay` that reproduces `staggerChildren: 0.08`. `FeatureCard` was already
- * a server component, so nothing in this section reaches the client bundle now.
+ * Desktop: copy and the signup CTA on the left, the comparison on the right.
+ * Phone: copy, comparison, then CTA, so the CTA follows the evidence.
  */
 export function WhySection() {
+  const capstones = HOME_CAPSTONES.map((c) => ({
+    number: c.number,
+    index: padIndex(c.number),
+    title: c.title,
+    skill: c.skill,
+  }))
+
   return (
     <section
       id="why"
       aria-labelledby="why-heading"
-      className={`bg-transparent ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      data-home-section="why"
+      className={`${BAND_PLAIN} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className={CONTAINER}>
-        {/* Header */}
-        <Reveal amount={0.3} className="max-w-[800px] mx-auto text-center mb-16 flex flex-col items-center">
-          <div className={`${EYEBROW} mb-4`}>
-            <span aria-hidden="true" className={EYEBROW_RULE} />
-            THE TRADE-OFF YOU SHOULDN&apos;T HAVE TO MAKE
-          </div>
-          <h2
-            id="why-heading"
-            className={`${SECTION_TITLE} mb-5`}
-          >
-            Self-study gives you information. Bootcamps give you structure. Prodily gives you a path to practice and proof.
+      <div className={`${CONTAINER} grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-x-12 lg:gap-y-10`}>
+        <Reveal amount={0.3} className="lg:col-span-5 lg:row-start-1">
+          <h2 id="why-heading" className={`${SECTION_TITLE} mb-5`}>
+            Structure without the tuition.
           </h2>
-          <p className={`${SECTION_LEAD} max-w-[680px]`}>
-            Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output, without putting the core learning path behind a paywall.
+          <p className={SECTION_LEAD}>
+            Self-study has no sequence. Bootcamps cost money. Prodily gives you the sequence and
+            the work, free.
           </p>
         </Reveal>
 
-        {/* Comparison cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch pt-3">
-          {COMPARISON_CARDS.map((card, i) => (
-            <Reveal key={card.title} amount={0.2} delay={i * 80} className="h-full">
-              <FeatureCard
-                icon={card.icon}
-                title={card.title}
-                description={card.description}
-                variant={card.variant}
-              />
-            </Reveal>
-          ))}
+        <Reveal
+          amount={0.2}
+          delay={80}
+          className="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1"
+        >
+          <WhyCompareToggle
+            learnerName={SAMPLE_LEARNER_NAME}
+            capstones={capstones}
+            certificateSrc={SAMPLE_CERTIFICATE_SRC}
+            certificateLabel={SAMPLE_CERTIFICATE_LABEL}
+            caption={<IllustrationCaption as="figcaption" className="mt-3" />}
+          />
+        </Reveal>
+
+        <div className="lg:col-span-5 lg:row-start-2 lg:self-start">
+          <HeroCtaLink location="why" />
         </div>
       </div>
     </section>

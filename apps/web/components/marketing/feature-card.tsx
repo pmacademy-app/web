@@ -13,8 +13,8 @@ interface FeatureCardProps {
 }
 
 /**
- * Reusable feature card — icon + title + description.
- * Used in: Why section (comparison), Experience feature list, Community grid.
+ * Reusable feature card: icon, title, description. Flat surface, hairline border.
+ * No homepage section uses it after the redesign; kept for its API.
  */
 export function FeatureCard({
   icon,
@@ -28,12 +28,12 @@ export function FeatureCard({
   const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[icon]
 
   const cardClasses = cn(
-    'relative flex h-full flex-col gap-5 p-6 lg:p-7 rounded-xl border',
-    'transition-[transform,box-shadow,border-color] duration-300 ease-out-quint',
-    'hover:-translate-y-0.5 motion-reduce:transition-colors motion-reduce:hover:translate-y-0',
+    'relative flex h-full flex-col gap-5 p-6 lg:p-7 rounded-lg border bg-surface',
+    'transition-[background-color,border-color] duration-200 ease-out-quint',
+    // Flat by design (homepage redesign UI-7): no glow, no tinted shadow, no lift.
     variant === 'default'
-      ? 'bg-surface border-border hover:border-border-strong hover:shadow-[0_12px_32px_-12px_rgba(23,26,23,0.16)]'
-      : 'bg-surface border-primary/60 shadow-glow-primary hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-primary)_18%,transparent),0_16px_40px_-16px_color-mix(in_srgb,var(--color-primary)_45%,transparent)]',
+      ? 'border-border hover:border-border-strong'
+      : 'border-primary/60 hover:border-primary',
     className,
   )
 
@@ -42,7 +42,7 @@ export function FeatureCard({
       {/* Highlighted badge */}
       {variant === 'comparison-highlighted' && (
         <div className="absolute -top-3 left-6">
-          <span className="text-caption font-semibold text-primary-foreground bg-primary px-2.5 py-1 rounded-full shadow-xs">
+          <span className="text-caption font-semibold text-primary-foreground bg-primary px-2.5 py-1 rounded-full">
             Free forever
           </span>
         </div>

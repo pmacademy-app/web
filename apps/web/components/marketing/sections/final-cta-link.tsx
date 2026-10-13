@@ -5,31 +5,50 @@
  *
  * Same split as `HeroCtaLink`, same reason: `trackHeroCTAClick` is an event handler, and
  * isolating it leaves the rest of the section on the server. The event and its
- * `'final_cta'` argument are unchanged — B12-B excludes analytics changes.
+ * `'final_cta'` argument are unchanged.
  *
- * The `whileHover`/`whileTap` scale that used to wrap this in a `motion.div` is CSS.
+ * Flat pill, no hover sweep: the closing band is quiet on purpose, and the press
+ * feedback (`active:scale`) comes from BUTTON_PRIMARY.
+ *
+ * Signed-in visitors see "Go to dashboard", matching `HeroCtaLink`. `useSessionCta`
+ * returns false until the session check answers, so server HTML and first client
+ * render agree. Both states share one footprint, so the swap does not shift layout.
  */
 
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-import { trackHeroCTAClick } from '@/lib/analytics'
+import { useSessionCta } from '@/hooks/use-session-cta'
+import { trackDashboardCTAClick, trackHeroCTAClick } from '@/lib/analytics'
 import { ARROW_NUDGE, BUTTON_PRIMARY } from '@/components/marketing/styles'
 
+/** Same footprint for both labels, so the authenticated swap does not shift layout. */
+const SIZE = 'w-full sm:w-auto sm:min-w-[15.5rem] px-8'
+
 export function FinalCtaLink() {
+  const { authenticated } = useSessionCta()
+
+  if (authenticated) {
+    return (
+      <Link
+        href="/dashboard"
+        onClick={() => trackDashboardCTAClick('final_cta')}
+        className={`${BUTTON_PRIMARY} ${SIZE}`}
+      >
+        <span>Go to dashboard</span>
+        <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+      </Link>
+    )
+  }
+
   return (
     <Link
       href="/signup"
       onClick={() => trackHeroCTAClick('final_cta')}
-      className={`${BUTTON_PRIMARY} overflow-hidden w-full sm:w-auto px-8`}
+      className={`${BUTTON_PRIMARY} ${SIZE}`}
     >
-      {/* Light sweep on hover. Hover-capable pointers only, so it never sticks on touch. */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 -translate-x-full [@media(hover:hover)]:group-hover:translate-x-full transition-transform duration-700 ease-out-quint bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none motion-reduce:hidden"
-      />
-      <span className="relative">Start Learning Free</span>
-      <ArrowRight size={16} aria-hidden="true" className={`relative ${ARROW_NUDGE}`} />
+      <span>Start Learning Free</span>
+      <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
     </Link>
   )
 }

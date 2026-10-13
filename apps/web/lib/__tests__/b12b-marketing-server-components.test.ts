@@ -56,6 +56,20 @@ const LANDING_MODULES = [
   // last framer-motion import on `/`, and once the sections stopped loading the engine
   // it ran after first paint and registered as a layout shift.
   'components/layout/navbar.tsx',
+  // Homepage redesign. New sections, islands and the modules they pull in, all held to
+  // the same no-animation-engine rule.
+  'components/marketing/sections/belief-band.tsx',
+  'components/marketing/sections/what-you-leave-with.tsx',
+  'components/marketing/sections/skill-radar-section.tsx',
+  'components/marketing/sections/skill-radar-toggle.tsx',
+  'components/marketing/sections/why-compare-toggle.tsx',
+  'components/marketing/sections/check-it-yourself.tsx',
+  'components/marketing/sections/home-faq.tsx',
+  'components/marketing/tracked-link.tsx',
+  'components/marketing/section-view-tracker.tsx',
+  'components/marketing/illustration-caption.tsx',
+  'hooks/use-session-cta.ts',
+  'config/marketing.ts',
 ]
 
 /**
@@ -77,6 +91,18 @@ const SERVER_SECTIONS = [
   'components/marketing/sections/sample-lesson.tsx',
   'components/marketing/sections/how-it-works.tsx',
   'components/marketing/sections/published-testimonials.tsx',
+  // Homepage redesign (changed deliberately). `hero-workbench` and `portfolio-showcase`
+  // were client islands with auto-advancing timers; they are now static illustrations
+  // with no client requirement, so they move here from the islands list.
+  'components/marketing/sections/hero-workbench.tsx',
+  'components/marketing/sections/portfolio-showcase.tsx',
+  // New homepage sections. Interactivity lives in the small toggles listed as islands.
+  'components/marketing/sections/belief-band.tsx',
+  'components/marketing/sections/what-you-leave-with.tsx',
+  'components/marketing/sections/skill-radar-section.tsx',
+  'components/marketing/sections/check-it-yourself.tsx',
+  'components/marketing/sections/home-faq.tsx',
+  'components/marketing/illustration-caption.tsx',
 ]
 
 /** Strips comments so a doc note naming framer-motion is not mistaken for an import. */
@@ -125,8 +151,12 @@ describe('B12-B — section bodies are server components', () => {
   it('the client islands that remain each declare the boundary explicitly', () => {
     const islands = [
       'components/marketing/sections/hero-cta.tsx',
-      'components/marketing/sections/hero-workbench.tsx',
-      'components/marketing/sections/portfolio-showcase.tsx',
+      // Homepage redesign: hero-workbench and portfolio-showcase left this list (now
+      // server components, pinned in SERVER_SECTIONS); the new islands joined it.
+      'components/marketing/sections/skill-radar-toggle.tsx',
+      'components/marketing/sections/why-compare-toggle.tsx',
+      'components/marketing/tracked-link.tsx',
+      'components/marketing/section-view-tracker.tsx',
       'components/marketing/sections/curriculum-view-tracker.tsx',
       'components/marketing/sections/journey-timeline.tsx',
       'components/marketing/sections/final-cta-link.tsx',
@@ -160,9 +190,9 @@ describe('B12-B — behaviour preserved across the split', () => {
   })
 
   it('timers that swap content still consult the reduced-motion preference', () => {
+    // Homepage redesign: hero-workbench and portfolio-showcase no longer swap content on
+    // a timer (they are static server components), so they left this list.
     for (const rel of [
-      'components/marketing/sections/hero-workbench.tsx',
-      'components/marketing/sections/portfolio-showcase.tsx',
       'components/marketing/sections/journey-timeline.tsx',
       'components/marketing/sections/experience.tsx',
     ]) {

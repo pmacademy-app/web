@@ -1,97 +1,88 @@
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-import { ModuleCard } from '@/components/marketing/module-card'
-import { MODULES } from '@/config/content'
+import { ModuleLedgerRow } from '@/components/marketing/module-card'
 import { Reveal } from '@/components/marketing/motion/reveal'
+import { TrackedLink } from '@/components/marketing/tracked-link'
+import { CurriculumViewTracker } from '@/components/marketing/sections/curriculum-view-tracker'
 import {
   ARROW_NUDGE,
-  BUTTON_PRIMARY,
+  BAND_MUTED,
   CONTAINER,
   EYEBROW,
   EYEBROW_RULE,
+  LINK_QUIET,
   SECTION_LEAD,
   SECTION_TITLE,
   SECTION_Y,
 } from '@/components/marketing/styles'
-import { CurriculumViewTracker } from '@/components/marketing/sections/curriculum-view-tracker'
+import { HOME_CAPSTONES, padIndex } from '@/config/marketing'
+import { MODULES } from '@/config/content'
 
 /**
- * Curriculum section — Sprint 2 §11 + Sprint 3 curriculum copy.
- * 3×3 ModuleCard grid with stats bar.
+ * Curriculum section: a numbered ledger, 01 to 09 (homepage redesign, UI-6).
  *
- * ## B12-B — server component
+ * Server component. Each row pairs a module with the capstone it ends in, so the
+ * section says one thing: the path is sequenced and every step produces work. The
+ * old card grid and its coloured skill pills are gone; a single skill-coloured dot
+ * per capstone is the only colour.
  *
- * Three `motion.div` wrappers plus a `useInView` that was doing double duty: driving the
- * grid's stagger and firing the GA4 curriculum-view event. Those are now separate
- * concerns — `<Reveal>` for the animation, `<CurriculumViewTracker>` for the event — so
- * the nine `ModuleCard`s and all the copy render on the server. The stagger keeps its
- * original row/column shape: 100 ms per row, 50 ms per column.
+ * This section and the hero are the only places on the homepage that state the
+ * 90 lesson / 9 module counts. `CurriculumViewTracker` keeps the curriculum-view
+ * event firing once on entry; `<Reveal>` animates the header and the ledger as two
+ * blocks rather than staggering nine rows.
  */
 export function CurriculumSection() {
+  const rows = MODULES.map((module) => {
+    const capstone = HOME_CAPSTONES.find((c) => c.number === module.number)
+    return {
+      number: module.number,
+      title: module.title,
+      lessonCount: module.lessonCount,
+      capstoneTitle: capstone?.title ?? '',
+      skill: capstone?.skill ?? 'strategy',
+    }
+  })
+
   return (
     <section
       id="curriculum"
       aria-labelledby="curriculum-heading"
-      className={`bg-transparent ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      data-home-section="curriculum"
+      className={`${BAND_MUTED} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
-        {/* Header */}
-        <Reveal amount={0.3} className="text-center mb-12 flex flex-col items-center">
-          <div className={`${EYEBROW} mb-4`}>
+        <Reveal amount={0.3} className="mb-12 max-w-[46rem] lg:mb-16">
+          <p className={`${EYEBROW} mb-5`}>
             <span aria-hidden="true" className={EYEBROW_RULE} />
-            COMPLETE LEARNING PATH
-          </div>
-          <h2
-            id="curriculum-heading"
-            className={`${SECTION_TITLE} mb-4 max-w-[760px]`}
-          >
-            Nine modules. Ninety lessons. One coherent path.
-          </h2>
-          <p className={`${SECTION_LEAD} max-w-[600px]`}>
-            Start with product thinking fundamentals and build toward discovery, execution, strategy, leadership, and technical fluency. Each module builds on the last and ends with applied work.
+            CURRICULUM
           </p>
+          <h2 id="curriculum-heading" className={`${SECTION_TITLE} mb-5`}>
+            90 lessons across 9 modules, in order.
+          </h2>
+          <p className={SECTION_LEAD}>Each module ends in a capstone.</p>
         </Reveal>
 
         <CurriculumViewTracker />
 
-        {/* Module grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10 items-stretch">
-          {MODULES.map((module, index) => (
-            <Reveal
-              key={module.number}
-              amount={0.15}
-              delay={Math.floor(index / 3) * 100 + (index % 3) * 50}
-              className="h-full"
-            >
-              <ModuleCard module={module} className="h-full" />
-            </Reveal>
-          ))}
-        </div>
-
-        {/* CTAs */}
-        <Reveal
-          amount={0.5}
-          delay={100}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center"
-        >
-          <Link href="/curriculum" className={BUTTON_PRIMARY}>
-            Explore Full Curriculum
-            <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
-          </Link>
-          <Link
-            href="/lessons/lesson-001"
-            className="
-              text-body-sm font-medium text-ink-muted hover:text-foreground
-              underline-offset-4 hover:underline
-              transition-colors duration-200
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs
-              px-2 py-1
-            "
-          >
-            or preview a free lesson →
-          </Link>
+        <Reveal amount={0.1}>
+          <ol className="divide-y divide-border border-y border-border">
+            {rows.map((row) => (
+              <ModuleLedgerRow key={row.number} index={padIndex(row.number)} {...row} />
+            ))}
+          </ol>
         </Reveal>
+
+        <div className="mt-10">
+          <TrackedLink
+            href="/curriculum"
+            event="home_secondary_cta_click"
+            args={{ location: 'curriculum', target: 'curriculum' }}
+            className={LINK_QUIET}
+          >
+            See every lesson in the curriculum
+            <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+          </TrackedLink>
+        </div>
       </div>
     </section>
   )
