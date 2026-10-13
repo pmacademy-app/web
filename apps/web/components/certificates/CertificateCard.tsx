@@ -22,7 +22,7 @@ interface CertificateCardProps {
  * Designed to read as a genuine professional PM credential both on the
  * verification page and as a standalone printed/PDF export:
  * - Clear visual hierarchy: issuer → recipient → credential → milestones.
- * - Serif display type for the recipient name (Fraunces via font-serif).
+ * - Display type for the recipient name (`font-serif`, which maps to Inter).
  * - Double-frame border treatment with brand accent.
  * - Verification QR code encoding the exact /verify/[certificateId] URL.
  * - Print-safe: the whole card is wrapped in `.certificate-print-container`

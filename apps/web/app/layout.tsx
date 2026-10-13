@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
 import { ConsentGatedAnalytics } from '@/components/legal/ConsentGatedAnalytics'
@@ -15,14 +15,6 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
-  preload: true,
-})
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-fraunces',
-  axes: ['opsz', 'SOFT', 'WONK'],
   preload: true,
 })
 
@@ -129,7 +121,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable}`}
+      className={inter.variable}
       suppressHydrationWarning
     >
       <head>
