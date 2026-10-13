@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { TrackedLink } from '@/components/marketing/tracked-link'
 import { FOOTER_LINK_GROUPS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
@@ -7,8 +8,10 @@ import { CookiePreferencesButton } from '@/components/legal/CookiePreferencesBut
 import { GRIEVANCE_CONTACT, LEGAL_OPERATOR, operatorAddressLabel, operatorDescription } from '@/lib/legal/legal-config'
 
 /**
- * Marketing site footer — Sprint 2 §20 + Sprint 3 footer copy.
+ * Marketing site footer.
  * 5-column desktop, 3-column tablet, 2-column mobile.
+ * Stays a server component; each group link is a small TrackedLink island that
+ * fires footer_link_click with its group and label.
  */
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -25,7 +28,7 @@ export function Footer() {
               <BrandLogo variant="full" size="sm" />
             </div>
             <p className="text-body-sm text-ink-muted leading-relaxed max-w-[260px]">
-              Prodily PM Academy — a structured path to learn product management, build product work, and create proof of your skills.
+              Prodily PM Academy. A structured path to learn product management, build product work, and create proof of your skills.
             </p>
           </div>
 
@@ -36,9 +39,14 @@ export function Footer() {
               </h3>
               <ul className="space-y-3">
                 {group.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
+                  <li key={link.href}>
+                    <TrackedLink
                       href={link.href}
+                      event="footer_link_click"
+                      args={{ group: group.heading, label: link.label }}
+                      {...(link.href.startsWith('http')
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
+                        : {})}
                       className="
                         inline-block text-body-sm text-ink-muted
                         hover:text-foreground hover:translate-x-0.5
@@ -48,7 +56,7 @@ export function Footer() {
                       "
                     >
                       {link.label}
-                    </Link>
+                    </TrackedLink>
                   </li>
                 ))}
               </ul>
