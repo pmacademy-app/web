@@ -58,18 +58,15 @@ export default async function ReviewsPage() {
     initialReviews = []
   }
 
+  // No rating markup: there is no measured rating to report, and a hardcoded one is a
+  // fabricated claim (homepage plan P0-5). A Product without offers, reviews or a rating
+  // is invalid for rich results, so the page is described as a plain WebPage instead.
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: 'Prodily PM Academy',
-    description: 'Learn product. Build the work. Show the proof. Free permanently.',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: initialReviews.length > 0 ? String(initialReviews.length) : '1',
-      bestRating: '5',
-      worstRating: '1',
-    },
+    '@type': 'WebPage',
+    name: 'Learner Reviews | Prodily PM Academy',
+    description: 'Read real learner feedback about the Prodily Product Management learning experience.',
+    url: `${siteUrl}/reviews`,
   }
 
   return (
