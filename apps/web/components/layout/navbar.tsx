@@ -29,7 +29,7 @@ function Logo() {
       aria-label={`${BRAND.fullName} home`}
       className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
     >
-      <BrandLogo variant="full" size="sm" priority />
+      <BrandLogo variant="mark-prodily" size="sm" priority />
     </Link>
   )
 }

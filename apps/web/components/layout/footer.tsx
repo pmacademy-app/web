@@ -26,7 +26,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-12 mb-12">
           <div className="col-span-2 md:col-span-3 xl:col-span-1">
             <div className="flex items-center mb-4">
-              <BrandLogo variant="full" size="sm" />
+              <BrandLogo variant="mark-prodily" size="sm" />
             </div>
             <p className="text-body-sm text-ink-muted leading-relaxed max-w-[260px]">
               Prodily PM Academy. A structured path to learn product management, build product work, and create proof of your skills.

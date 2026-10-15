@@ -28,28 +28,39 @@ const SIZE_CONFIG = {
   sm: {
     full: 'h-9 w-auto',
     icon: 'h-8 w-8',
-    text: 'text-base font-bold',
+    text: 'text-[1.375rem]',
+    gap: 'gap-2',
     badge: 'text-[10px] px-1.5 py-0.5',
   },
   md: {
     full: 'h-12 w-auto',
     icon: 'h-10 w-10',
-    text: 'text-lg font-bold',
+    text: 'text-[1.625rem]',
+    gap: 'gap-2.5',
     badge: 'text-xs px-2 py-0.5',
   },
   lg: {
     full: 'h-16 w-auto',
     icon: 'h-12 w-12',
-    text: 'text-xl font-bold',
+    text: 'text-[2rem]',
+    gap: 'gap-3',
     badge: 'text-xs px-2 py-0.5',
   },
   xl: {
     full: 'h-24 w-auto sm:h-28 lg:h-32',
     icon: 'h-16 w-16',
-    text: 'text-2xl font-bold',
+    text: 'text-[2.75rem]',
+    gap: 'gap-3.5',
     badge: 'text-sm px-2.5 py-1',
   },
 } as const
+
+/**
+ * The wordmark: the word "Prodily" set live in Plus Jakarta Sans ExtraBold
+ * (`font-wordmark`, loaded in app/layout.tsx at that one weight). Its geometric
+ * shapes and soft terminals echo the rounded arch of the mark. No "PM Academy" line.
+ */
+const WORDMARK_TEXT = 'font-wordmark font-extrabold leading-none tracking-[-0.035em]'
 
 export function BrandLogo({
   variant = 'full',
@@ -62,17 +73,18 @@ export function BrandLogo({
 }: BrandLogoProps) {
   if (variant === 'mark-prodily') {
     return (
-      <span className={cn('inline-flex items-center gap-2.5 select-none', className)}>
+      <span className={cn('inline-flex items-center select-none', SIZE_CONFIG[size].gap, className)}>
         <Image
           src={onDark ? BRAND.assets.logoMarkOnDark : BRAND.assets.logoMarkSvg}
-          alt={`${BRAND.company} mark`}
+          alt=""
+          aria-hidden="true"
           width={BRAND.assets.logoMarkDimensions.width}
           height={BRAND.assets.logoMarkDimensions.height}
           priority={priority}
           className={cn('object-contain', SIZE_CONFIG[size].icon, imageClassName)}
         />
         <span className="flex items-center gap-2">
-          <span className={cn('font-display tracking-tight', onDark ? 'text-slate-100' : 'text-foreground', SIZE_CONFIG[size].text)}>
+          <span className={cn(WORDMARK_TEXT, onDark ? 'text-slate-100' : 'text-foreground', SIZE_CONFIG[size].text)}>
             {BRAND.company}
           </span>
           {badgeText && (

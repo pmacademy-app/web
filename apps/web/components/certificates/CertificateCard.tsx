@@ -9,7 +9,7 @@ import {
   getCertificatePresentation,
   TEST_CERTIFICATE_EXPLANATION,
 } from '@/lib/certificates/presentation'
-import { StaticBrandLogo } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { BRAND } from '@/lib/brand'
 
 interface CertificateCardProps {
@@ -66,7 +66,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       {/* Header: Logo, Issuer Line & Credential ID */}
       <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-8 md:px-12 pt-6 sm:pt-8 md:pt-10 pb-6 border-b border-border">
         <div className="space-y-1.5">
-          <StaticBrandLogo size="md" />
+          <BrandMarkProdily size="md" />
           <p className="text-[11px] font-semibold text-muted-foreground tracking-wide">
             {BRAND.certificateIssuerLine}
           </p>
