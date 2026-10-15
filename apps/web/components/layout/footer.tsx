@@ -5,6 +5,7 @@ import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { SocialLinks } from '@/components/brand/SocialLinks'
 import { CookiePreferencesButton } from '@/components/legal/CookiePreferencesButton'
+import { HideOnHome } from '@/components/layout/hide-on-home'
 import { GRIEVANCE_CONTACT, LEGAL_OPERATOR, operatorAddressLabel, operatorDescription } from '@/lib/legal/legal-config'
 
 /**
@@ -95,7 +96,21 @@ export function Footer() {
         {/* Operator identity & grievance contact.
             Rendered from lib/legal/legal-config.ts so the site never presents the
             brand name as a registered company. Until real operator details are
-            supplied, the honest default below is what visitors see. */}
+            supplied, the honest default below is what visitors see.
+            Left off the homepage at the owner's request (a link to the full details
+            on /privacy takes its place); every other page still shows it. */}
+        <HideOnHome
+          fallback={
+            <div className="pt-6 mt-6 border-t border-border">
+              <Link
+                href="/privacy#grievance"
+                className="text-caption text-ink-muted underline underline-offset-4 hover:text-foreground"
+              >
+                Operator and grievance contact
+              </Link>
+            </div>
+          }
+        >
         <div className="pt-6 mt-6 border-t border-border space-y-1.5">
           <p className="text-caption text-ink-muted leading-relaxed max-w-[720px]">
             {operatorDescription(BRAND.fullName)}
@@ -121,6 +136,7 @@ export function Footer() {
             .
           </p>
         </div>
+        </HideOnHome>
       </div>
     </footer>
   )
