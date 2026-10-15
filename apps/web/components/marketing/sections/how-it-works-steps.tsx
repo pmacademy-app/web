@@ -70,8 +70,9 @@ export function HowItWorksSteps({ steps, visuals, intro }: HowItWorksStepsProps)
           if (Number.isFinite(index)) setActive(index)
         }
       },
-      // A one-line band at 45% of the viewport height.
-      { rootMargin: '-45% 0px -55% 0px', threshold: 0 },
+      // A one-line band at 55% of the viewport height (from the top), so a step activates
+      // a little before mid-screen.
+      { rootMargin: '-55% 0px -45% 0px', threshold: 0 },
     )
     items.forEach((item) => observer.observe(item))
     return () => observer.disconnect()
@@ -81,7 +82,10 @@ export function HowItWorksSteps({ steps, visuals, intro }: HowItWorksStepsProps)
     <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-12">
       <div className="min-w-0 lg:col-span-5">
         {intro}
-        <ol ref={listRef}>
+        {/* lg:pb-48 keeps the grid taller than the sticky panel while the last step is
+            active; without it the grid ends just under step 04 and pushes the panel up
+            under the navbar. */}
+        <ol ref={listRef} className="lg:pb-48">
           {steps.map((step, index) => {
             const isActive = !enhanced || index === active
             return (
