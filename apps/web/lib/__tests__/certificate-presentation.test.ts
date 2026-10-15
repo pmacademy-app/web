@@ -5,10 +5,14 @@
  */
 import { describe, it, expect } from 'vitest'
 import { BRAND } from '@/lib/brand'
-import { TEST_CERTIFICATE_PREFIX, isTestCertificateCode } from '@/lib/certificates'
+import { TEST_CERTIFICATE_PREFIX, generateCredentialJsonLd, isTestCertificateCode } from '@/lib/certificates'
+import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
 import * as certificatesDb from '@/lib/certificates-db'
 import {
+  CERTIFICATE_COMPLETION_STATEMENT,
+  CERTIFICATE_RECIPIENT_LEAD_IN,
   TEST_CERTIFICATE_LABEL,
+  getCertificateRowCopy,
   getCertificatePresentation,
   getVerifyPageCopy,
 } from '@/lib/certificates/presentation'
@@ -87,5 +91,65 @@ describe('getVerifyPageCopy', () => {
       expect(text).not.toMatch(/verified|official|certificate of completion/i)
       expect(text).not.toContain('Grace Grad')
     }
+  })
+})
+
+describe('certificate brand and claims', () => {
+  it('names the issuer "Prodily", never PM Academy', () => {
+    const copy = getVerifyPageCopy(input(REAL_CODE))
+    expect(copy.metaDescription).toBe(
+      `Official Prodily Certificate of Completion for Grace Grad (Principal PM, 90 lessons completed). Certificate ID: ${REAL_CODE}.`,
+    )
+    const row = getCertificateRowCopy({
+      type: 'full_curriculum',
+      module_slug: null,
+      lessons_completed: 90,
+      level: 10,
+      career_title: 'Principal PM',
+      issued_at: '2026-10-01T00:00:00.000Z',
+    })
+    expect(row.title).toBe('Prodily Full Curriculum Completion Certificate')
+
+    const linkedIn = new URL(
+      buildLinkedInCertificationUrl({
+        certificateCode: REAL_CODE,
+        careerTitle: 'Principal PM',
+        issuedAt: '2026-10-01T00:00:00.000Z',
+        verificationUrl: 'https://prodily.example/verify/' + REAL_CODE,
+      }),
+    )
+    expect(linkedIn.searchParams.get('name')).toBe('Prodily: Product Management Certificate (Principal PM)')
+
+    const jsonLd = generateCredentialJsonLd({
+      certificateCode: REAL_CODE,
+      learnerName: 'Grace Grad',
+      careerTitle: 'Principal PM',
+      issuedAt: '2026-10-01T00:00:00.000Z',
+      verificationUrl: 'https://prodily.example/verify/' + REAL_CODE,
+      portfolioUrl: 'https://prodily.example/p/grace',
+      siteOrigin: 'https://prodily.example',
+    })
+    expect(jsonLd.name).toBe('Prodily Product Management Completion Credential')
+    expect(jsonLd.recognizedBy).toMatchObject({ name: 'Prodily' })
+
+    for (const text of [
+      copy.metaTitle,
+      copy.metaDescription,
+      copy.footerLine,
+      row.title,
+      row.detail,
+      linkedIn.searchParams.get('name') ?? '',
+      String(jsonLd.name),
+      CERTIFICATE_RECIPIENT_LEAD_IN,
+      CERTIFICATE_COMPLETION_STATEMENT,
+    ]) {
+      expect(text).not.toContain('PM Academy')
+    }
+  })
+
+  it('certifies completion of the 90 lessons only, with no capstone or mastery claim', () => {
+    expect(CERTIFICATE_RECIPIENT_LEAD_IN).toBe('This credential is awarded to')
+    expect(CERTIFICATE_COMPLETION_STATEMENT).toBe('for completing all 90 lessons across 9 modules of the curriculum.')
+    expect(CERTIFICATE_COMPLETION_STATEMENT).not.toMatch(/mastery|capstone|requirements/i)
   })
 })

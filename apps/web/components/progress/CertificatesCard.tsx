@@ -103,7 +103,7 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
               Certificate Eligibility &amp; Progress
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Earn your official PM Academy Completion Certificate by completing all 90 lessons across the 9 core modules.
+              Earn your official Prodily Completion Certificate by completing all 90 lessons across the 9 core modules.
             </p>
           </div>
 

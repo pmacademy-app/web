@@ -113,7 +113,8 @@ describe('CertificatesCard', () => {
     const row = rowFor(REAL_CODE)
 
     expect(row.querySelector('span')?.textContent).toBe(`Verified Credential • ${REAL_CODE}`)
-    expect(row.querySelector('h3')?.textContent).toBe('Prodily PM Academy Full Curriculum Completion Certificate')
+    expect(row.querySelector('h3')?.textContent).toBe('Prodily Full Curriculum Completion Certificate')
+    expect(container.textContent).not.toContain('PM Academy')
     expect(row.querySelector('p')?.textContent).toMatch(
       /^Issued on .+ for completing all 90 lessons and reaching Level 9 \(Principal PM\)\.$/
     )

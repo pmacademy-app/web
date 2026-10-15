@@ -24,7 +24,7 @@ export function VerificationBadge({ certificateCode, issuedAt }: VerificationBad
         <div>
           <div className="flex items-center gap-1.5 font-bold text-xs">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Official PM Academy Credential Verified</span>
+            <span>Official Prodily Credential Verified</span>
           </div>
           <p className="text-[11px] opacity-90 mt-0.5 font-sans">
             Immutable proof of completion. Issued on {formattedDate}.

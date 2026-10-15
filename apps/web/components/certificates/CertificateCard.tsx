@@ -6,6 +6,8 @@ import { ShieldCheck, Award, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
 import { generateQrCodeSvg } from '@/lib/certificates'
 import {
+  CERTIFICATE_COMPLETION_STATEMENT,
+  CERTIFICATE_RECIPIENT_LEAD_IN,
   getCertificatePresentation,
   TEST_CERTIFICATE_EXPLANATION,
 } from '@/lib/certificates/presentation'
@@ -100,7 +102,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             <span className="h-px w-14 bg-primary/30" />
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            {isTest ? 'This test certificate was generated for' : 'This credential certifies that'}
+            {isTest ? 'This test certificate was generated for' : CERTIFICATE_RECIPIENT_LEAD_IN}
           </p>
         </div>
 
@@ -121,14 +123,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </h1>
 
         <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          {isTest ? (
-            TEST_CERTIFICATE_EXPLANATION
-          ) : (
-            <>
-              has successfully fulfilled all curriculum requirements, demonstrating mastery in product
-              strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
-            </>
-          )}
+          {isTest ? TEST_CERTIFICATE_EXPLANATION : CERTIFICATE_COMPLETION_STATEMENT}
         </p>
 
         {/* Level & Milestone Pill */}
@@ -138,7 +133,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           </span>
           <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
             Level {levelInfo.level} · {lessonsCompleted} Lessons Completed · {modulesCompleted}{' '}
-            Modules Mastered
+            Modules Completed
           </span>
         </div>
       </div>
