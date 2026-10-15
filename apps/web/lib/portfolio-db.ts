@@ -8,6 +8,7 @@
  */
 
 import { CURRICULUM_LESSON_COUNT, countCompletedModules } from '@/lib/curriculum-registry'
+import { BRAND } from '@/lib/brand'
 import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, TablesUpdate } from '@/lib/supabase'
@@ -270,7 +271,7 @@ export async function getPublicPortfolioData(
     user: {
       id: user.id,
       username: user.username || username,
-      name: user.name || user.username || 'PM Academy Learner',
+      name: user.name || user.username || BRAND.learnerFallbackName,
       bio: user.bio ?? null,
       avatarUrl: resolveAvatarPublicUrl(user.avatar_url) ?? null,
       linkedinUrl: user.linkedin_url ?? null,

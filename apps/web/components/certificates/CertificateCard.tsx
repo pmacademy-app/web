@@ -156,10 +156,10 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         {/* Signatory */}
         <div className="text-center space-y-1 px-4">
           <div className="font-serif italic font-bold text-lg md:text-xl text-primary tracking-wide">
-            {BRAND.fullName} Academic Board
+            {BRAND.certificateSignatory.name}
           </div>
           <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
-            {isTest ? 'Not a valid credential' : 'Official Credential Verification Signatory'}
+            {isTest ? 'Not a valid credential' : BRAND.certificateSignatory.title}
           </span>
         </div>
 

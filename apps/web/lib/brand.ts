@@ -30,9 +30,12 @@ export const BRAND = {
   emailFromAddress:
     process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
     'welcome@prodily.adityagangwani.me',
-  certificateIssuerLine: 'Issued by Prodily · PM Academy',
+  certificateIssuerLine: 'Issued by Prodily',
+  // The person who signs certificates. There is no academic board, so the card names
+  // the founder rather than an institution.
+  certificateSignatory: { name: 'Aditya Gangwani', title: 'Founder, Prodily' },
   certificateCodePrefix: 'PMA',
-  learnerFallbackName: 'PM Academy Learner',
+  learnerFallbackName: 'Prodily Learner',
   colors: {
     primary: TOKENS.colors.primary,
     foreground: TOKENS.colors.foreground,

@@ -116,7 +116,7 @@ function buildCertificateInsert(
     certificate_code: certificateCode,
     type: normalizedType,
     module_slug: moduleSlug,
-    learner_name: user.name || user.username || 'PM Academy Learner',
+    learner_name: user.name || user.username || BRAND.learnerFallbackName,
     level: levelInfo.level,
     career_title: levelInfo.title,
     total_xp: user.total_xp || 0,
