@@ -67,7 +67,7 @@ describe('buildCapstoneJsonLd', () => {
         authorName: 'Ada Lovelace',
         portfolioUrl: 'https://prodily.example/p/ada',
         pageUrl: 'https://prodily.example/p/ada/capstones/discovery',
-        publisherName: 'Prodily PM Academy',
+        publisherName: 'Prodily',
       }),
     ).toMatchObject({
       '@type': 'CreativeWork',

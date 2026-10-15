@@ -3,7 +3,7 @@ import { TOKENS } from '@/theme/tokens'
 export const BRAND = {
   company: 'Prodily',
   product: 'PM Academy',
-  fullName: 'Prodily PM Academy',
+  fullName: 'Prodily',
   shortName: 'PM Academy',
   tagline: 'Learn product. Build the work. Show the proof.',
   positioning: '90 lessons · 9 capstones · Public portfolio · Free, permanently.',
@@ -20,7 +20,7 @@ export const BRAND = {
   // contact now live in `lib/legal/legal-config.ts`, where they are explicitly
   // configured rather than inferred from branding.
   certificateIssuer: 'Prodily',
-  adminName: 'Prodily PM Academy Admin',
+  adminName: 'Prodily Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
@@ -42,8 +42,8 @@ export const BRAND = {
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Free Product Management Course with a Portfolio | Prodily PM Academy',
-    titleTemplate: '%s | Prodily PM Academy',
+    homeTitle: 'Free Product Management Course with a Portfolio | Prodily',
+    titleTemplate: '%s | Prodily',
     description:
       'A structured, free path to learn product management, practice through applied capstones, and build a public portfolio that proves your product thinking.',
     shortDescription:

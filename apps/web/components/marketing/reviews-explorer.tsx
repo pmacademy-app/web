@@ -162,7 +162,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
       <ContextualFeedbackModal
         isOpen={modalOpen}
         promptKey="reviews_page_submission"
-        title="Submit a Review for Prodily PM Academy"
+        title="Submit a Review for Prodily"
         description="Share your feedback on the curriculum, assignments, and mental models to help other learners."
         sourceEvent="reviews_page_manual"
         onClose={() => setModalOpen(false)}

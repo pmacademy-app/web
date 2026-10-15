@@ -42,6 +42,24 @@ describe('Phase 2 Structured Data, GEO & AEO Unit Test Suite', () => {
     expect(s.length).toBeGreaterThanOrEqual(96)
   })
 
+  it('brands every title, page metadata and schema name as "Prodily", never PM Academy', () => {
+    expect(BRAND.fullName).toBe('Prodily')
+    expect(BRAND.metadata.homeTitle).toBe('Free Product Management Course with a Portfolio | Prodily')
+    expect(BRAND.metadata.titleTemplate).toBe('%s | Prodily')
+    expect(BRAND.adminName).toBe('Prodily Admin')
+    expect(getEducationalOrganizationSchema().name).toBe('Prodily')
+    expect(getWebSiteSchema().name).toBe('Prodily')
+    expect(getCourseSchema().provider.name).toBe('Prodily')
+
+    const pages = [homeMetadata, aboutMetadata, contactMetadata, curriculumMetadata, privacyMetadata, termsMetadata]
+    for (const meta of pages) {
+      expect(JSON.stringify(meta)).not.toContain('PM Academy')
+    }
+    for (const schema of [getEducationalOrganizationSchema(), getWebSiteSchema(), getCourseSchema(), getAboutPageSchema()]) {
+      expect(JSON.stringify(schema)).not.toContain('PM Academy')
+    }
+  })
+
   it('EducationalOrganization schema is valid and complete', () => {
     const org = getEducationalOrganizationSchema()
     expect(org['@type']).toBe('EducationalOrganization')

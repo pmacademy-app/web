@@ -8,14 +8,14 @@ import { CheckCircle2, ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'About Prodily PM Academy',
+  title: 'About Prodily',
   description:
     "Learn why Prodily exists and how we're making structured product management education more accessible.",
   alternates: {
     canonical: `${siteUrl}/about`,
   },
   openGraph: {
-    title: 'About Prodily PM Academy',
+    title: 'About Prodily',
     description:
       "Learn why Prodily exists and how we're making structured product management education more accessible.",
     url: `${siteUrl}/about`,
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
       url: BRAND.assets.ogImage,
       width: BRAND.assets.ogImageDimensions.width,
       height: BRAND.assets.ogImageDimensions.height,
-      alt: 'About Prodily PM Academy',
+      alt: 'About Prodily',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About Prodily PM Academy',
+    title: 'About Prodily',
     description: 'Learn why Prodily exists and our mission to make PM education accessible.',
     images: [BRAND.assets.ogImage],
   },
@@ -49,7 +49,7 @@ export default function AboutPage() {
           Make serious product management education accessible to everyone.
         </h1>
         <p className="text-base md:text-lg text-ink-muted leading-relaxed">
-          Prodily PM Academy exists to give aspiring product managers a structured way to learn, practice, and build proof of their product thinking without putting the core curriculum behind a paywall.
+          Prodily exists to give aspiring product managers a structured way to learn, practice, and build proof of their product thinking without putting the core curriculum behind a paywall.
         </p>
       </div>
 

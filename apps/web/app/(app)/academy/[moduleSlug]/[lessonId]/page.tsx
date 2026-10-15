@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // Only public sample lessons should be indexed
     robots: isSample ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: {
-      title: `Lesson ${globalOrder}: ${lesson.title} | Prodily PM Academy`,
+      title: `Lesson ${globalOrder}: ${lesson.title} | Prodily`,
       description,
       url: lessonUrl,
       type: 'article',

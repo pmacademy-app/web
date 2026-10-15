@@ -207,9 +207,13 @@ describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'pmacademyapp@gmail.com',
-        subject: '[PM Academy Support Inquiry] Curriculum Question',
+        subject: '[Prodily Support Inquiry] Curriculum Question',
       })
     )
+    const sent = mockSendEmail.mock.calls[0][0] as { subject: string; html: string; text: string }
+    for (const field of [sent.subject, sent.html, sent.text]) {
+      expect(field).not.toContain('PM Academy')
+    }
   })
 
   it('/api/contact rate limits excessive requests from single IP/key', async () => {
@@ -325,7 +329,7 @@ describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
         from: 'Alice <alice@example.com>',
         to: ['hello@prodily.adityagangwani.me'],
         subject: 'Inbound Webhook Test Inquiry',
-        text: 'Hello PM Academy support team!',
+        text: 'Hello Prodily support team!',
       },
     }
     const req = new NextRequest('http://localhost:3000/api/email/webhooks', {

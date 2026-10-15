@@ -9,18 +9,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'Terms of Service for Prodily PM Academy outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
+  description: 'Terms of Service for Prodily outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
   alternates: {
     canonical: `${siteUrl}/terms`,
   },
   openGraph: {
-    title: 'Terms of Service | Prodily PM Academy',
-    description: 'Prodily PM Academy terms of service, acceptable use, and platform policies.',
+    title: 'Terms of Service | Prodily',
+    description: 'Prodily terms of service, acceptable use, and platform policies.',
     url: `${siteUrl}/terms`,
     type: 'website',
-    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily PM Academy' }],
+    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Terms of Service | Prodily PM Academy', images: [BRAND.assets.ogImage] },
+  twitter: { card: 'summary_large_image', title: 'Terms of Service | Prodily', images: [BRAND.assets.ogImage] },
 }
 
 export default function TermsPage() {

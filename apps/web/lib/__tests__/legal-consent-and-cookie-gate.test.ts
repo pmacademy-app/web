@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
+import { BRAND } from '@/lib/brand'
 
 /**
  * Phase 1 (P0) of the September 2026 Legal, Privacy & Education-Platform audit.
@@ -319,7 +320,7 @@ describe('P0-4 — legal operator identity and grievance contact', () => {
     // unconfigured one. This is the fallback an unconfigured deployment gets.
     expect(LEGAL_OPERATOR.isRegisteredEntity).toBe(false)
     expect(LEGAL_OPERATOR.legalName).toBeNull()
-    expect(operatorDescription('Prodily PM Academy')).toContain('not a registered company')
+    expect(operatorDescription(BRAND.fullName)).toContain('not a registered company')
     expect(isLegalOperatorConfigured()).toBe(false)
   })
 
@@ -368,7 +369,7 @@ describe('P0-4 — operator wording once real details are supplied', () => {
   it('names the proprietor and denies incorporation, in the agreed wording', async () => {
     const { operatorDescription: describe_ } = await loadConfigWith(SOLE_PROPRIETOR_ENV)
 
-    expect(describe_('Prodily PM Academy')).toBe(
+    expect(describe_(BRAND.fullName)).toBe(
       'Prodily is operated by Aditya Gangwani as a sole proprietor. ' +
         'Prodily is not a separately incorporated company or registered entity.'
     )
@@ -376,7 +377,7 @@ describe('P0-4 — operator wording once real details are supplied', () => {
 
   it('never calls an unregistered proprietorship a company', async () => {
     const { operatorDescription: describe_ } = await loadConfigWith(SOLE_PROPRIETOR_ENV)
-    const text = describe_('Prodily PM Academy')
+    const text = describe_(BRAND.fullName)
 
     expect(text).toContain('not a separately incorporated company')
     // No corporate form is ever claimed. "incorporated" is excluded from this list
@@ -441,7 +442,7 @@ describe('P0-4 — operator wording once real details are supplied', () => {
       ...SOLE_PROPRIETOR_ENV,
       NEXT_PUBLIC_LEGAL_PROPRIETOR_NAME: '',
     })
-    expect(describe_('Prodily PM Academy')).toContain('not a registered company')
+    expect(describe_(BRAND.fullName)).toContain('not a registered company')
   })
 
   it('the deployed env files carry the confirmed values', () => {
@@ -462,6 +463,19 @@ describe('P0-4 — operator wording once real details are supplied', () => {
       expect(src).toContain('id="grievance"')
       expect(src).toContain('GRIEVANCE_CONTACT.acknowledgementDays')
       expect(src).toContain('GRIEVANCE_CONTACT.resolutionDays')
+    }
+  })
+
+  it('the brand in every legal statement is just "Prodily"', () => {
+    expect(BRAND.fullName).toBe('Prodily')
+    expect(operatorDescription(BRAND.fullName)).toMatch(/^Prodily is /)
+    for (const src of [
+      read('app/(marketing)/privacy/page.tsx'),
+      read('app/(marketing)/terms/page.tsx'),
+      read('components/layout/footer.tsx'),
+      read('lib/legal/legal-config.ts'),
+    ]) {
+      expect(src).not.toContain('PM Academy')
     }
   })
 

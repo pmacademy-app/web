@@ -29,7 +29,7 @@ export function Footer() {
               <BrandLogo variant="mark-prodily" size="sm" />
             </div>
             <p className="text-body-sm text-ink-muted leading-relaxed max-w-[260px]">
-              Prodily PM Academy. A structured path to learn product management, build product work, and create proof of your skills.
+              Prodily. A structured path to learn product management, build product work, and create proof of your skills.
             </p>
           </div>
 

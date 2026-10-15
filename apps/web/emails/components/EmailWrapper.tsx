@@ -80,9 +80,6 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
                     <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1F6B4E', letterSpacing: '-0.02em', display: 'block' }}>
                       {BRAND.company}
                     </span>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#70685A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {BRAND.product}
-                    </span>
                   </td>
                 </tr>
               </table>

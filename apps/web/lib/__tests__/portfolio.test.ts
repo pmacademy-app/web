@@ -64,7 +64,7 @@ describe('Public Portfolio Unit Test Suite', () => {
         siteOrigin: 'https://prodily.adityagangwani.me',
       })
 
-      expect(jsonLd.description).toBe("Jordan Lee's Product Management portfolio and skill radar on Prodily PM Academy.")
+      expect(jsonLd.description).toBe("Jordan Lee's Product Management portfolio and skill radar on Prodily.")
       expect((jsonLd.description as string).toLowerCase()).not.toContain('verified')
       expect(jsonLd.worksFor).toBeUndefined()
       expect(jsonLd.jobTitle).toBeUndefined()

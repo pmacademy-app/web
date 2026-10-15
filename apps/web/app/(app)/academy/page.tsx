@@ -34,7 +34,7 @@ import { AcademyNavigationRetention } from '@/components/curriculum/AcademyNavig
 
 export const metadata: Metadata = {
   title: 'Curriculum',
-  description: 'All 90 PM Academy lessons across 9 modules: theory, quizzes, flashcards, and reflections.',
+  description: 'All 90 Prodily lessons across 9 modules: theory, quizzes, flashcards, and reflections.',
 }
 
 function groupByModule(lessons: CurriculumEntry[]): Map<string, CurriculumEntry[]> {
