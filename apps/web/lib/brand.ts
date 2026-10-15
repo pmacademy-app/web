@@ -2,9 +2,9 @@ import { TOKENS } from '@/theme/tokens'
 
 export const BRAND = {
   company: 'Prodily',
-  product: 'PM Academy',
+  product: 'Prodily',
   fullName: 'Prodily',
-  shortName: 'PM Academy',
+  shortName: 'Prodily',
   tagline: 'Learn product. Build the work. Show the proof.',
   positioning: '90 lessons · 9 capstones · Public portfolio · Free, permanently.',
   domain: 'prodily.adityagangwani.me',

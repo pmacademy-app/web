@@ -73,7 +73,7 @@ export function SkillRadar({
     <div className={cn('flex flex-col gap-6', className)}>
       {/* Screen-reader text summary */}
       <p className="sr-only">
-        Skill radar showing PM Academy progress across 7 competencies:{' '}
+        Skill radar showing Prodily progress across 7 competencies:{' '}
         {SKILL_CLUSTER_IDS.map((c) => `${SKILL_LABELS[c]}: ${values[c]}%`).join(', ')}.
       </p>
 

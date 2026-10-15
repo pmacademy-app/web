@@ -781,7 +781,7 @@ export default function LessonPageContent({
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: `Completed Module ${moduleNumber} on PM Academy`,
+                      title: `Completed Module ${moduleNumber} on Prodily`,
                       url: window.location.href,
                     }).catch(() => {})
                   } else {

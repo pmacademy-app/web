@@ -58,7 +58,7 @@ const SIZE_CONFIG = {
 /**
  * The wordmark: the word "Prodily" set live in Plus Jakarta Sans ExtraBold
  * (`font-wordmark`, loaded in app/layout.tsx at that one weight). Its geometric
- * shapes and soft terminals echo the rounded arch of the mark. No "PM Academy" line.
+ * shapes and soft terminals echo the rounded arch of the mark. No subtitle line under the word.
  */
 const WORDMARK_TEXT = 'font-wordmark font-extrabold leading-none tracking-[-0.035em]'
 

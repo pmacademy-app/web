@@ -207,10 +207,10 @@ describe('Admin Settings Unit Test Suite', () => {
 
   it('SettingsService.updateProductSettings merges partial updates and preserves existing values', async () => {
     const updated = await SettingsService.updateProductSettings({
-      siteName: 'Prodily PM Academy Custom',
+      siteName: 'Prodily Custom',
       maintenanceMode: true,
     })
-    expect(updated.siteName).toBe('Prodily PM Academy Custom')
+    expect(updated.siteName).toBe('Prodily Custom')
     expect(updated.maintenanceMode).toBe(true)
     expect(typeof updated.contactEmail).toBe('string')
     expect(typeof updated.sessionTimeoutMinutes).toBe('number')

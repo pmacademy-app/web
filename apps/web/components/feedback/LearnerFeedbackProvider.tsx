@@ -15,7 +15,7 @@ import { ContextualFeedbackModal } from './ContextualFeedbackModal'
 export function LearnerFeedbackProvider() {
   const [modalOpen, setModalOpen] = useState(false)
   const [promptKey, setPromptKey] = useState('usage_1hr')
-  const [title, setTitle] = useState('Help Us Improve PM Academy')
+  const [title, setTitle] = useState('Help Us Improve Prodily')
 
   const triggerPrompt = (key: string) => {
     if (key === 'module_complete') {
@@ -25,7 +25,7 @@ export function LearnerFeedbackProvider() {
     } else if (key === 'header_feedback' || key === 'manual') {
       setTitle('Share Your Feedback & Review')
     } else {
-      setTitle('Enjoying PM Academy?')
+      setTitle('Enjoying Prodily?')
     }
     setPromptKey(key)
     setModalOpen(true)

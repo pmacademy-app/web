@@ -10,7 +10,7 @@ import {
   LessonProgressInput,
 } from '../skillRadar'
 
-describe('PM Academy Skill Radar Engine Test Suite', () => {
+describe('Prodily Skill Radar Engine Test Suite', () => {
   describe('Lesson Contribution Scoring Formula', () => {
     it('returns 0 points for not_started lessons', () => {
       expect(getLessonContribution('not_started')).toBe(0)

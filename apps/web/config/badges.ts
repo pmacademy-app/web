@@ -1,5 +1,5 @@
 /**
- * PM Academy — Centralized Badge & Achievement Configuration (PRD.md §4.9)
+ * Prodily — Centralized Badge & Achievement Configuration (PRD.md §4.9)
  *
  * Configurable badge rules and metadata for automatic evaluation.
  * Pure configuration object with zero hardcoding in UI or API handlers.
@@ -176,8 +176,8 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   // Completion Badges
   {
     key: 'pm_academy_graduate',
-    name: 'PM Academy Graduate',
-    description: 'Completed all 90 curriculum lessons and 9 capstones.',
+    name: 'Prodily Graduate',
+    description: 'Completed all 90 curriculum lessons.',
     category: 'completion',
     icon: 'GraduationCap',
     targetGoal: 90,

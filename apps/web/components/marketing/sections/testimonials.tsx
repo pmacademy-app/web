@@ -119,7 +119,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
                   <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs">
                     <div className="space-y-0.5">
                       <p className="font-bold text-foreground">{item.authorName}</p>
-                      <p className="text-[11px] text-primary">{item.role || 'Verified PM Academy Learner'}</p>
+                      <p className="text-[11px] text-primary">{item.role || 'Prodily Learner'}</p>
                     </div>
                     {item.createdAt && (
                       <span className="text-[10px] text-muted-foreground">
@@ -164,7 +164,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
                     <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs">
                       <div className="space-y-0.5">
                         <p className="font-bold text-foreground">{item.authorName}</p>
-                        <p className="text-[11px] text-primary">{item.role || 'Verified PM Academy Learner'}</p>
+                        <p className="text-[11px] text-primary">{item.role || 'Prodily Learner'}</p>
                       </div>
                       {item.createdAt && (
                         <span className="text-[10px] text-muted-foreground">
@@ -194,7 +194,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
         isOpen={modalOpen}
         promptKey="public_review_submission"
         title="Submit a Public Learner Review"
-        description="Share your learning experience with the PM Academy community."
+        description="Share your learning experience with the Prodily community."
         onClose={() => setModalOpen(false)}
       />
     </section>

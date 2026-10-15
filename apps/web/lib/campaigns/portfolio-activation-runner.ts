@@ -1,5 +1,5 @@
 /**
- * Prodily PM Academy — Portfolio Activation Campaign Runner & Scheduler Service
+ * Prodily — Portfolio Activation Campaign Runner & Scheduler Service
  *
  * Campaign ID: portfolio_activation_sep_2026
  *

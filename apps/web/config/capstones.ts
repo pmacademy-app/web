@@ -494,7 +494,7 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
     competencyCluster: 'strategy',
     deliverableType: 'Comprehensive Portfolio Case Study',
     scenario:
-      'This is your final PM Academy milestone. Choose a product problem (or expand one of your earlier deliverables) and construct a complete, end-to-end Product Case Study that you would present in a PM hiring manager interview or attach to your portfolio.',
+      'This is your final Prodily milestone. Choose a product problem (or expand one of your earlier deliverables) and construct a complete, end-to-end Product Case Study that you would present in a PM hiring manager interview or attach to your portfolio.',
     instructions: [
       'Synthesize problem discovery, user research, product strategy, PRD specifications, prioritization, design considerations, and growth metrics.',
       'Format as a high-caliber case study suitable for portfolio display.',

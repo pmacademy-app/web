@@ -1,5 +1,5 @@
 /**
- * PM Academy Admin Console Data Types & Interfaces
+ * Prodily Admin Console Data Types & Interfaces
  */
 
 export type AdminModuleKey =

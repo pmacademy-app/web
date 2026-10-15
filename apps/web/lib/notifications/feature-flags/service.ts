@@ -3,7 +3,7 @@ import { describeDbError } from '@/lib/monitoring/db-error'
 import type { StandardFeatureFlagKey, FeatureFlagRecord } from './types'
 
 /**
- * Default feature flag values for PM Academy Notification Platform.
+ * Default feature flag values for Prodily Notification Platform.
  *
  * Communication strategy:
  * - In-App Notifications = Primary channel for all learning events

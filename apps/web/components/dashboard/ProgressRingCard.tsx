@@ -100,7 +100,7 @@ export function ProgressRingCard({
       <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground border-t border-border/50 pt-3">
         <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
         <span>
-          {totalLessons - completedLessons} lessons remaining to finish PM Academy.
+          {totalLessons - completedLessons} lessons remaining to finish Prodily.
         </span>
       </div>
     </div>

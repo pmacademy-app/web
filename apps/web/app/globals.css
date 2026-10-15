@@ -1,5 +1,5 @@
 /**
- * PM Academy — Global Styles & Design System
+ * Prodily — Global Styles & Design System
  *
  * Implements every Sprint 1 design token.
  * In Tailwind v4, all theme configuration lives here via @theme.
@@ -520,7 +520,7 @@ body {
   padding: 1rem 0;
 }
 
-/* PM Academy Print & PDF Export Styles */
+/* Prodily Print & PDF Export Styles */
 @media print {
   @page {
     size: landscape;

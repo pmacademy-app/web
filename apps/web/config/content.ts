@@ -1,5 +1,5 @@
 /**
- * PM Academy marketing content — single source of truth.
+ * Prodily marketing content — single source of truth.
  *
  * All copy is verbatim from Sprint 3: Content & Communication System.
  * Do NOT rewrite, paraphrase, or invent alternatives.

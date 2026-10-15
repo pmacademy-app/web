@@ -8,7 +8,7 @@ import {
   XP_VALUES,
 } from '../xp'
 
-describe('PM Academy XP & Level Engine Test Suite', () => {
+describe('Prodily XP & Level Engine Test Suite', () => {
   describe('calculateLevel (Level & Career Title Computation)', () => {
     it('returns Level 1 for 0 XP', () => {
       const info = calculateLevel(0)
