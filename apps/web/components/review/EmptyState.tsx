@@ -33,7 +33,7 @@ export function EmptyState({ type }: EmptyStateProps) {
     <SharedEmptyState
       icon={Lock}
       title="No Flashcards Unlocked Yet"
-      description="Flashcards unlock automatically as you complete lessons in the PM Academy curriculum. Complete your first lesson to unlock flashcard decks!"
+      description="Flashcards unlock automatically as you complete lessons in the Prodily curriculum. Complete your first lesson to unlock flashcard decks!"
       className="max-w-xl mx-auto shadow-sm bg-card border-solid"
       action={
         <Link

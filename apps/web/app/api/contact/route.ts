@@ -97,7 +97,7 @@ export const POST = withRoute(
     const safeMessageHtml = escapeHtml(cleanMessage).replace(/\n/g, '<br />')
     const userTypeText = user ? `Authenticated User (ID: ${user.id})` : 'Anonymous Homepage Visitor'
 
-    const emailSubject = `[PM Academy Support Inquiry] ${cleanSubject}`
+    const emailSubject = `[Prodily Support Inquiry] ${cleanSubject}`
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -116,7 +116,7 @@ export const POST = withRoute(
         </head>
         <body>
           <div class="card">
-            <div class="header">New Contact Inquiry — PM Academy</div>
+            <div class="header">New Contact Inquiry — Prodily</div>
             <table class="meta-table">
               <tr><td class="meta-label">From:</td><td><strong>${safeName}</strong> (&lt;<a href="mailto:${safeEmail}">${safeEmail}</a>&gt;)</td></tr>
               <tr><td class="meta-label">Subject:</td><td>${safeSubject}</td></tr>
@@ -128,14 +128,14 @@ export const POST = withRoute(
               ${safeMessageHtml}
             </div>
             <div class="footer">
-              Prodily PM Academy Support System • Automated Dispatch to pmacademyapp@gmail.com
+              Prodily Support System • Automated Dispatch to pmacademyapp@gmail.com
             </div>
           </div>
         </body>
       </html>
     `
 
-    const textContent = `New Contact Inquiry — PM Academy\n\nFrom: ${cleanName} (${cleanEmail})\nSubject: ${cleanSubject}\nCategory: ${cleanCategory}\nSubmitter: ${userTypeText}\nMessage ID: ${data.id}\n\nMessage:\n${cleanMessage}`
+    const textContent = `New Contact Inquiry — Prodily\n\nFrom: ${cleanName} (${cleanEmail})\nSubject: ${cleanSubject}\nCategory: ${cleanCategory}\nSubmitter: ${userTypeText}\nMessage ID: ${data.id}\n\nMessage:\n${cleanMessage}`
 
     let emailSent = false
     try {

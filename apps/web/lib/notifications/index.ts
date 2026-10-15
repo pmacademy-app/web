@@ -1,5 +1,5 @@
 /**
- * PM Academy Notification Platform Foundation Barrel Export
+ * Prodily Notification Platform Foundation Barrel Export
  */
 
 export * from './types'

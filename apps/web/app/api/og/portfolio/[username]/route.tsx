@@ -191,7 +191,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 textTransform: 'uppercase',
               }}
             >
-              <span>{BRAND.company} · PM Academy</span>
+              <span>{BRAND.company}</span>
             </div>
           </div>
         ),

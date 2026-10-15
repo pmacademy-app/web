@@ -205,13 +205,18 @@ export function getAboutPageSchema() {
 }
 
 /**
- * 7. FAQPage Schema for Homepage
+ * 7. FAQPage Schema
+ *
+ * Defaults to the full FAQ_ITEMS list (used by /faq). The optional items argument lets
+ * a page mark up only the questions it renders.
  */
-export function getFAQPageSchema() {
+export function getFAQPageSchema(
+  items: ReadonlyArray<{ question: string; answer: string }> = FAQ_ITEMS
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: FAQ_ITEMS.map((item) => ({
+    mainEntity: items.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {

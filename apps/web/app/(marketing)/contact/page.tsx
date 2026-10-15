@@ -8,29 +8,29 @@ import { Mail, Heart, ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Contact Prodily PM Academy',
+  title: 'Contact Prodily',
   description:
-    'Have a question, need support, or want to share feedback? Contact the Prodily PM Academy team.',
+    'Have a question, need support, or want to share feedback? Contact the Prodily team.',
   alternates: {
     canonical: `${siteUrl}/contact`,
   },
   openGraph: {
-    title: 'Contact Prodily PM Academy',
+    title: 'Contact Prodily',
     description:
-      'Have a question, need support, or want to share feedback? Contact the Prodily PM Academy team.',
+      'Have a question, need support, or want to share feedback? Contact the Prodily team.',
     url: `${siteUrl}/contact`,
     type: 'website',
     images: [{
       url: BRAND.assets.ogImage,
       width: BRAND.assets.ogImageDimensions.width,
       height: BRAND.assets.ogImageDimensions.height,
-      alt: 'Prodily PM Academy',
+      alt: 'Prodily',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact Prodily PM Academy',
-    description: 'Get in touch with the Prodily PM Academy team.',
+    title: 'Contact Prodily',
+    description: 'Get in touch with the Prodily team.',
     images: [BRAND.assets.ogImage],
   },
 }

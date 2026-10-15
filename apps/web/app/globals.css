@@ -1,5 +1,5 @@
 /**
- * PM Academy — Global Styles & Design System
+ * Prodily — Global Styles & Design System
  *
  * Implements every Sprint 1 design token.
  * In Tailwind v4, all theme configuration lives here via @theme.
@@ -241,6 +241,8 @@
   /* Fonts — Unified Modern Sans-Serif Typography */
   --font-sans:    var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Brand wordmark only (the word "Prodily" beside the mark). */
+  --font-wordmark: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   --font-heading: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif:   var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
@@ -317,6 +319,9 @@
   --shadow-md:           var(--shadow-md);
   --shadow-glow-primary: var(--shadow-glow-primary);
   --shadow-glow-accent:  var(--shadow-glow-accent);
+  /* Marketing depth (homepage round 2): primary-tinted, defined per mode below */
+  --shadow-tinted:       var(--shadow-tinted);
+  --shadow-tinted-lg:    var(--shadow-tinted-lg);
 
   /* Typography Scale (Sprint 1 §5) */
   --text-display-xl: 3.5rem;    /* 56px */
@@ -515,7 +520,7 @@ body {
   padding: 1rem 0;
 }
 
-/* PM Academy Print & PDF Export Styles */
+/* Prodily Print & PDF Export Styles */
 @media print {
   @page {
     size: landscape;
@@ -634,6 +639,258 @@ body {
   }
   .animate-progress-fill {
     transform: scaleX(1);
+  }
+}
+
+/* ─── Marketing depth and surface effects (homepage round 2) ────────────────
+   Recipes are exposed as class names through components/marketing/styles.ts.
+   Rules for everything below:
+   - No colour literals: tokens plus color-mix(in oklch, ...) only.
+   - Motion is transform/opacity (plus one registered angle for conic-border),
+     and every moving part is off under prefers-reduced-motion: reduce.
+   - Pseudo-element budget per host, so effects can be combined safely:
+       spotlight ::before   glare ::after   conic-border ::after
+       bg-dot-grid ::before band-deep ::after
+     Do not put two effects that share a pseudo-element on the same element.
+---------------------------------------------------------------------------- */
+
+/* Tinted elevation. Light mode: soft green-tinted layers, never black.
+   Dark mode: a primary tint would read as a glow, so shadows sink toward a
+   green-black instead. */
+:root {
+  --shadow-tinted:
+    0 1px 2px color-mix(in oklch, var(--color-primary) 8%, transparent),
+    0 10px 28px -12px color-mix(in oklch, var(--color-primary) 18%, transparent);
+  --shadow-tinted-lg:
+    0 1px 2px color-mix(in oklch, var(--color-primary) 8%, transparent),
+    0 16px 40px -16px color-mix(in oklch, var(--color-primary) 20%, transparent),
+    0 40px 80px -32px color-mix(in oklch, var(--color-primary) 22%, transparent);
+}
+
+.dark {
+  --shadow-tinted:
+    0 1px 2px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 60%, transparent),
+    0 10px 28px -12px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 70%, transparent);
+  --shadow-tinted-lg:
+    0 1px 2px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 60%, transparent),
+    0 16px 40px -16px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 75%, transparent),
+    0 40px 80px -32px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 80%, transparent);
+}
+
+/* Static film grain: greyscale SVG feTurbulence tile, fully URL-encoded (the
+   filter reference is %23, so no literal hash sits in this file). Intended for
+   a fixed, pointer-events-none layer at very low opacity. Never animated. */
+@utility bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  background-repeat: repeat;
+}
+
+/* Static dot grid, faded out from the upper middle. Painted on ::before so the
+   mask never touches the host's content; safe to put on a whole section. */
+@utility bg-dot-grid {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      color-mix(in oklch, var(--color-foreground) 12%, transparent) 1px,
+      transparent 1.5px
+    );
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black, transparent 70%);
+    mask-image: radial-gradient(ellipse at 50% 30%, black, transparent 70%);
+  }
+}
+
+/* Pointer spotlight. --x / --y are set in px by <SpotlightGroup> on the hovered
+   [data-spotlight] element; without JS the glow sits centred. Fine pointers only;
+   hidden entirely under reduced motion. */
+@utility spotlight {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      240px circle at var(--x, 50%) var(--y, 50%),
+      color-mix(in oklch, var(--color-primary) 12%, transparent),
+      transparent 70%
+    );
+    transition: opacity 300ms var(--ease-out-quint);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::before {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      display: none;
+    }
+  }
+}
+
+/* Glare: a diagonal light band sweeps across once on hover (700ms). It snaps
+   back off-canvas without a transition, so leaving never replays it. */
+@utility glare {
+  position: relative;
+  overflow: hidden;
+  --glare-tint: color-mix(in oklch, white 38%, transparent);
+
+  &:where(.dark *) {
+    --glare-tint: color-mix(in oklch, white 9%, transparent);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 35%,
+      var(--glare-tint) 50%,
+      transparent 65%
+    );
+    transform: translateX(-110%);
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    &:hover::after {
+      transform: translateX(110%);
+      transition: transform 700ms var(--ease-out-quint);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* Rotating conic ring (PM Fellow tile only). The angle is a registered custom
+   property so the gradient can turn; under reduced motion it stays a static
+   accent-to-primary border. Ring width: --conic-border-width (default 1.5px). */
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes conic-border-spin {
+  to { --border-angle: 360deg; }
+}
+
+@utility conic-border {
+  position: relative;
+  isolation: isolate;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: var(--conic-border-width, 1.5px);
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--border-angle),
+      var(--color-accent),
+      var(--color-primary),
+      color-mix(in oklch, var(--color-primary) 25%, transparent),
+      var(--color-primary),
+      var(--color-accent)
+    );
+    -webkit-mask:
+      linear-gradient(black 0 0) content-box,
+      linear-gradient(black 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(black 0 0) content-box,
+      linear-gradient(black 0 0);
+    mask-composite: exclude;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &::after {
+      animation: conic-border-spin 6s linear infinite;
+    }
+  }
+}
+
+/* Shiny text: a primary highlight sweeps through the glyphs, then rests. Only
+   applied when motion is allowed, so the reduced-motion and forced-colours
+   fallback is ordinary text in the host's colour. Short labels only. */
+@keyframes shiny-text-sweep {
+  0%        { background-position: 150% 0; }
+  60%, 100% { background-position: -50% 0; }
+}
+
+@utility shiny-text {
+  @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    background-image: linear-gradient(
+      110deg,
+      currentColor 40%,
+      var(--color-primary) 50%,
+      currentColor 60%
+    );
+    background-size: 200% 100%;
+    background-repeat: repeat-x;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shiny-text-sweep 5s var(--ease-out-quint) infinite;
+  }
+}
+
+/* Deep closing band. Light: primary green with primary-foreground text.
+   Dark: the dark primary is a light mint, so the band re-points --color-primary
+   to a deep green and --color-primary-foreground to the cream foreground.
+   Because the colour utilities read these variables, text-primary-foreground,
+   bg-primary-foreground, text-primary, text-ink-muted, border-border and the
+   focus ring inside the band all stay legible in both modes.
+   A static grain layer sits on ::after, under the content. */
+@utility band-deep {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  --color-ink-muted: color-mix(in oklch, var(--color-primary-foreground) 86%, transparent);
+  --color-border: color-mix(in oklch, var(--color-primary-foreground) 24%, transparent);
+  --color-focus: var(--color-primary-foreground);
+
+  &:where(.dark *) {
+    --color-primary: color-mix(in oklch, var(--color-primary-soft) 80%, var(--color-primary-hover));
+    --color-primary-foreground: var(--color-foreground);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
   }
 }
 

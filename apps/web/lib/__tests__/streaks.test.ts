@@ -9,7 +9,7 @@ import {
   StreakData,
 } from '../streaks'
 
-describe('PM Academy Streak Engine Test Suite', () => {
+describe('Prodily Streak Engine Test Suite', () => {
   describe('Timezone Date Utilities & Boundary Math', () => {
     it('formats date to YYYY-MM-DD in local timezones correctly', () => {
       const date = new Date('2026-08-05T01:30:00Z')

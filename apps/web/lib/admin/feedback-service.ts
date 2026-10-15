@@ -117,8 +117,8 @@ export class FeedbackAdminService {
       return {
         id: item.id,
         userId: item.user_id,
-        authorName: itemExt.author_name || userMeta?.name || (item.user_id ? 'Deleted Learner' : 'PM Academy Learner'),
-        authorRole: itemExt.author_role || 'PM Academy Learner',
+        authorName: itemExt.author_name || userMeta?.name || (item.user_id ? 'Deleted Learner' : 'Prodily Learner'),
+        authorRole: itemExt.author_role || 'Prodily Learner',
         sourceEvent: item.source_event,
         content: item.content,
         status: item.status as 'pending' | 'approved' | 'rejected',
@@ -374,8 +374,8 @@ export class FeedbackAdminService {
 
             return rows.map((t) => ({
               id: t.id,
-              authorName: t.author_name || (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Learner',
-              role: t.author_role || 'Verified PM Academy Learner',
+              authorName: t.author_name || (t.user_id ? userMap.get(t.user_id) : null) || 'Prodily Learner',
+              role: t.author_role || 'Prodily Learner',
               content: t.content,
               createdAt: t.created_at,
             }))

@@ -2,9 +2,9 @@ import { TOKENS } from '@/theme/tokens'
 
 export const BRAND = {
   company: 'Prodily',
-  product: 'PM Academy',
-  fullName: 'Prodily PM Academy',
-  shortName: 'PM Academy',
+  product: 'Prodily',
+  fullName: 'Prodily',
+  shortName: 'Prodily',
   tagline: 'Learn product. Build the work. Show the proof.',
   positioning: '90 lessons · 9 capstones · Public portfolio · Free, permanently.',
   domain: 'prodily.adityagangwani.me',
@@ -20,7 +20,7 @@ export const BRAND = {
   // contact now live in `lib/legal/legal-config.ts`, where they are explicitly
   // configured rather than inferred from branding.
   certificateIssuer: 'Prodily',
-  adminName: 'Prodily PM Academy Admin',
+  adminName: 'Prodily Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
@@ -30,17 +30,20 @@ export const BRAND = {
   emailFromAddress:
     process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
     'welcome@prodily.adityagangwani.me',
-  certificateIssuerLine: 'Issued by Prodily · PM Academy',
+  certificateIssuerLine: 'Issued by Prodily',
+  // The person who signs certificates. There is no academic board, so the card names
+  // the founder rather than an institution.
+  certificateSignatory: { name: 'Aditya Gangwani', title: 'Founder, Prodily' },
   certificateCodePrefix: 'PMA',
-  learnerFallbackName: 'PM Academy Learner',
+  learnerFallbackName: 'Prodily Learner',
   colors: {
     primary: TOKENS.colors.primary,
     foreground: TOKENS.colors.foreground,
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Prodily PM Academy | Learn Product Management by Building',
-    titleTemplate: '%s | Prodily PM Academy',
+    homeTitle: 'Free Product Management Course with a Portfolio | Prodily',
+    titleTemplate: '%s | Prodily',
     description:
       'A structured, free path to learn product management, practice through applied capstones, and build a public portfolio that proves your product thinking.',
     shortDescription:

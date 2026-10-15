@@ -1,95 +1,96 @@
-import Link from 'next/link'
-import { CheckCircle2 } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 import { Reveal } from '@/components/marketing/motion/reveal'
+import { TrackedLink } from '@/components/marketing/tracked-link'
 import { FinalCtaLink } from '@/components/marketing/sections/final-cta-link'
-import { BUTTON_SECONDARY, CONTAINER, SECTION_LEAD } from '@/components/marketing/styles'
+import {
+  ARROW_NUDGE,
+  BAND_DEEP,
+  CONTAINER,
+  DISPLAY_TITLE,
+  LINK_QUIET,
+  SECTION_Y,
+} from '@/components/marketing/styles'
+import { cn } from '@/lib/utils'
 
 interface FinalCTASectionProps {
   showTrustStrip?: boolean
 }
 
+/** Focus ring on the deep band: the band re-points --color-focus to primary-foreground; offset in band colour. */
+const BAND_FOCUS = 'focus-visible:ring-offset-primary'
+
 /**
- * Final CTA section — Minimalist, elegant layout with direct action controls.
+ * Final CTA, the closing band of the homepage (round 2).
  *
- * ## B12-B — server component
+ * Server component. One deep green band (BAND_DEEP: primary background, static grain,
+ * colour tokens re-pointed inside so text, borders and focus rings stay legible in
+ * light and dark). It absorbs the former belief band: the brand line is the display
+ * heading, its first two sentences softer and the last at full strength so the eye
+ * lands on the outcome. Beside it (below on a phone) sit the offer and the two
+ * actions, bottom-aligned with the heading; a hairline rule runs the full height of
+ * the heading so the column reads as a deliberate panel, not leftover space. What a
+ * learner earns is shown once, in the "What you leave with" section, not repeated here.
  *
- * The whole section was `'use client'` for two things: a `whileInView` fade on the
- * container and a `whileHover`/`whileTap` scale on the primary button. The first is now
- * `<Reveal>` (IntersectionObserver plus a CSS transition), the second is CSS
- * `hover:scale`. The analytics click handler is the only genuine client requirement and
- * lives in `FinalCtaLink`; the event it fires is unchanged.
+ * Contrast on the light band (white on primary green): full text about 6.4:1, the
+ * softer heading lines (80%) about 4.8:1, ink-muted (86%) about 5.4:1. The dark-mode
+ * band is a deep green with foreground text, higher still.
+ *
+ * Client code is limited to two islands: `FinalCtaLink` (signup, fires
+ * `trackHeroCTAClick('final_cta')`) and a `TrackedLink` to the first lesson.
  */
 export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps) {
   return (
     <section
       id="final-cta"
       aria-labelledby="cta-heading"
-      className="relative py-24 lg:py-32 overflow-hidden border-t border-border/80 bg-transparent scroll-mt-24 lg:scroll-mt-28 isolate"
+      data-home-section="final-cta"
+      className={`${SECTION_Y} ${BAND_DEEP} scroll-mt-24 lg:scroll-mt-28`}
     >
-      {/* Subtle ambient light for soft depth. Tinted from the primary token, drifts
-          slowly, and holds still for reduced-motion users. */}
-      <div
-        aria-hidden="true"
-        className="absolute left-1/2 top-1/2 -z-10 h-[460px] w-[760px] max-w-[140vw] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-      >
-        <div className="h-full w-full rounded-full blur-3xl bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-primary)_13%,transparent),transparent)] animate-ambient motion-reduce:animate-none" />
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 pointer-events-none bg-[radial-gradient(color-mix(in_srgb,var(--color-primary)_9%,transparent)_1px,transparent_1px)] bg-[size:22px_22px] [mask-image:radial-gradient(ellipse_55%_60%_at_50%_50%,#000_20%,transparent_75%)]"
-      />
-      <div className={`relative ${CONTAINER}`}>
+      <div className={CONTAINER}>
         <Reveal
           amount={0.3}
-          className="max-w-[720px] mx-auto text-center flex flex-col items-center"
+          className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-stretch lg:gap-x-12"
         >
-          {/* Trust Strip — only shown when specified */}
-          {showTrustStrip && (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border text-xs text-ink-muted font-medium mb-5 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
-              Built for the first wave of learners. Help shape what comes next.
-            </div>
-          )}
+          <div className="lg:col-span-7">
+            {showTrustStrip && (
+              <p className="mb-5 text-body-sm font-medium text-ink-muted">
+                Built for the first wave of learners. Help shape what comes next.
+              </p>
+            )}
 
-          {/* Headline */}
-          <h2
-            id="cta-heading"
-            className="font-display text-[2rem] sm:text-5xl lg:text-[3.25rem] font-semibold text-foreground tracking-[-0.035em] leading-[1.08] text-balance"
-          >
-            Build the portfolio that shows what you can do.
-          </h2>
-
-          {/* Subtitle */}
-          <p className={`mt-5 max-w-[560px] ${SECTION_LEAD}`}>
-            Ninety lessons, nine applied capstones, and a portfolio you keep. No fee, no
-            trial, no card.
-          </p>
-
-          {/* CTA Action Group */}
-          <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-            <FinalCtaLink />
-
-            {/* Same secondary as the hero: read the product before committing to it. */}
-            <Link href="/lessons/lesson-001" className={`${BUTTON_SECONDARY} w-full sm:w-auto`}>
-              <span>Read a sample lesson</span>
-            </Link>
+            <h2 id="cta-heading" className={cn(
+                DISPLAY_TITLE,
+                'text-[clamp(2.75rem,5.2vw,4.75rem)] leading-[1.02] text-primary-foreground',
+              )}>
+              <span className="block text-primary-foreground/80">Learn product.</span>
+              <span className="block text-primary-foreground/80">Build the work.</span>
+              <span className="block">Show the proof.</span>
+            </h2>
           </div>
 
-          {/* Minimalist Trust Features */}
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-ink-muted">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-primary" />
-              90 lessons
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-primary" />
-              9 applied capstones
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-primary" />
-              Public portfolio
-            </span>
+          <div className="flex min-w-0 flex-col justify-end border-t border-border pt-8 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+            <p className="text-[1.5rem] font-semibold leading-snug tracking-[-0.015em] text-primary-foreground sm:text-[1.75rem]">
+              Start your portfolio today.
+            </p>
+            <p className="mt-1.5 text-body sm:text-body-lg text-ink-muted">Free. No trial, no card.</p>
+
+            <div className="mt-8 flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+              <FinalCtaLink />
+              <TrackedLink
+                href="/lessons/lesson-001"
+                event="home_secondary_cta_click"
+                args={{ location: 'final_cta', target: 'sample_lesson' }}
+                className={cn(
+                  LINK_QUIET,
+                  BAND_FOCUS,
+                  'justify-center text-primary-foreground decoration-primary-foreground/50 sm:justify-start',
+                )}
+              >
+                <span>Read the first lesson</span>
+                <ArrowRight size={15} aria-hidden="true" className={ARROW_NUDGE} />
+              </TrackedLink>
+            </div>
           </div>
         </Reveal>
       </div>

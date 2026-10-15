@@ -30,7 +30,7 @@ export function SuccessState() {
           You are on the waitlist.
         </h3>
         <p className="text-body-sm text-locked max-w-[400px]">
-          We will send preview lessons, beta updates, and launch access when PM Academy opens.
+          We will send preview lessons, beta updates, and launch access when Prodily opens.
         </p>
       </div>
 

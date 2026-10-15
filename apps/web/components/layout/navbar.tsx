@@ -1,14 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Menu, X, Coffee, ArrowRight } from 'lucide-react'
 import { useScrolled } from '@/hooks/use-scrolled'
-import { trackHeroCTAClick } from '@/lib/analytics'
-import { NAV_LINKS } from '@/config/navigation'
+import { useSessionCta } from '@/hooks/use-session-cta'
+import {
+  trackDashboardCTAClick,
+  trackHeroCTAClick,
+  trackNavLinkClick,
+  trackNavLoginClick,
+  type NavSurface,
+} from '@/lib/analytics'
+import { DASHBOARD_HREF, LOGIN_HREF, NAV_LINKS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
+
+const FOCUS_RING =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 
@@ -16,10 +26,10 @@ function Logo() {
   return (
     <Link
       href="/"
-      aria-label={`${BRAND.fullName} — Home`}
+      aria-label={`${BRAND.fullName} home`}
       className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
     >
-      <BrandLogo variant="full" size="sm" priority />
+      <BrandLogo variant="mark-prodily" size="sm" priority />
     </Link>
   )
 }
@@ -38,10 +48,11 @@ function NavLink({
   return (
     <Link
       href={href}
+      onClick={() => trackNavLinkClick(label, href, 'desktop')}
       className={cn(
         'group relative transition-colors duration-200',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs',
-        'px-2.5 py-1.5',
+        'inline-flex items-center min-h-11 px-2.5',
         weight === 'primary' && 'text-body-sm font-semibold text-foreground hover:text-primary',
         weight === 'secondary' && 'text-body-sm font-medium text-ink-muted hover:text-foreground',
         weight === 'tertiary' && 'text-body-sm font-normal text-ink-muted hover:text-foreground',
@@ -52,50 +63,102 @@ function NavLink({
       {/* Underline that grows from the centre on hover. Transform only. */}
       <span
         aria-hidden="true"
-        className="absolute inset-x-2.5 -bottom-px h-px origin-center scale-x-0 bg-current opacity-60 transition-transform duration-300 ease-out-quint group-hover:scale-x-100 motion-reduce:transition-none"
+        className="absolute inset-x-2.5 bottom-2.5 h-px origin-center scale-x-0 bg-current opacity-60 transition-transform duration-300 ease-out-quint group-hover:scale-x-100 motion-reduce:transition-none"
       />
     </Link>
   )
 }
 
-// ─── CTA Button ───────────────────────────────────────────────────────────────
+// ─── Session-aware CTA ────────────────────────────────────────────────────────
 
-function CTAButton({
-  size = 'md',
-  location,
-  onClick,
+const CTA_BASE = cn(
+  'group inline-flex items-center justify-center gap-1.5 font-semibold rounded-full whitespace-nowrap',
+  'bg-primary text-primary-foreground hover:bg-primary-hover',
+  'active:scale-[0.97]',
+  'transition-[background-color,transform] duration-200 ease-out-quint',
+  'motion-reduce:transition-colors motion-reduce:active:scale-100',
+  FOCUS_RING,
+)
+
+const CTA_ARROW =
+  'opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-[transform,opacity] duration-200 ease-out-quint motion-reduce:transition-none motion-reduce:group-hover:translate-x-0'
+
+/**
+ * "Start Learning Free" for visitors, "Go to dashboard" once the session check says the
+ * visitor is signed in. Both links sit in the same grid cell and only visibility
+ * changes, so the cell is always as wide as the longer label and the header never
+ * reflows when the answer arrives. `invisible` also removes the hidden link from the
+ * tab order and the accessibility tree.
+ */
+function SessionCTA({
+  authenticated,
+  size,
+  onNavigate,
 }: {
-  size?: 'sm' | 'md'
-  location: Parameters<typeof trackHeroCTAClick>[0]
-  onClick?: () => void
+  authenticated: boolean
+  size: 'md' | 'lg'
+  onNavigate?: () => void
 }) {
-  const handleClick = () => {
-    trackHeroCTAClick(location)
-    onClick?.()
-  }
+  // Both sizes give a 44px target. The desktop pill keeps its compact padding and type
+  // so the taller hit area does not make the bar feel heavier.
+  const sizing = size === 'md' ? 'min-h-11 px-4 text-[13px]' : 'min-h-11 px-5 text-sm w-full'
 
   return (
+    <span className={cn('grid', size === 'lg' && 'w-full')}>
+      <Link
+        href="/signup"
+        aria-hidden={authenticated || undefined}
+        tabIndex={authenticated ? -1 : undefined}
+        onClick={() => {
+          trackHeroCTAClick('nav')
+          onNavigate?.()
+        }}
+        className={cn(CTA_BASE, sizing, '[grid-area:1/1]', authenticated && 'invisible')}
+      >
+        <span>Start Learning Free</span>
+        <ArrowRight size={13} aria-hidden="true" className={CTA_ARROW} />
+      </Link>
+      <Link
+        href={DASHBOARD_HREF}
+        aria-hidden={!authenticated || undefined}
+        tabIndex={authenticated ? undefined : -1}
+        onClick={() => {
+          trackDashboardCTAClick('nav')
+          onNavigate?.()
+        }}
+        className={cn(CTA_BASE, sizing, '[grid-area:1/1]', !authenticated && 'invisible')}
+      >
+        <span>Go to dashboard</span>
+        <ArrowRight size={13} aria-hidden="true" className={CTA_ARROW} />
+      </Link>
+    </span>
+  )
+}
+
+/** Quiet sign-in link for returning learners (P0-6). */
+function LoginLink({
+  surface,
+  hidden,
+  onNavigate,
+  className,
+}: {
+  surface: NavSurface
+  hidden: boolean
+  onNavigate?: () => void
+  className?: string
+}) {
+  return (
     <Link
-      href="/signup"
-      onClick={handleClick}
-      className={cn(
-        'group relative inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg',
-        'bg-primary text-primary-foreground',
-        'shadow-[0_1px_2px_rgba(23,26,23,0.12),inset_0_1px_0_rgba(255,255,255,0.18)]',
-        'hover:bg-primary-hover hover:shadow-[0_6px_18px_-6px_rgba(31,107,78,0.5),inset_0_1px_0_rgba(255,255,255,0.18)]',
-        'active:scale-[0.97]',
-        'transition-[background-color,box-shadow,transform] duration-200 ease-out-quint',
-        'motion-reduce:transition-colors motion-reduce:active:scale-100',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        size === 'md' ? 'h-9 px-4 text-xs sm:text-[13px]' : 'h-8 px-3 text-xs',
-      )}
+      href={LOGIN_HREF}
+      aria-hidden={hidden || undefined}
+      tabIndex={hidden ? -1 : undefined}
+      onClick={() => {
+        trackNavLoginClick(surface)
+        onNavigate?.()
+      }}
+      className={cn(className, hidden && 'invisible')}
     >
-      <span>Start Learning Free</span>
-      <ArrowRight
-        size={13}
-        aria-hidden="true"
-        className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-[transform,opacity] duration-200 ease-out-quint motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-      />
+      Log in
     </Link>
   )
 }
@@ -103,15 +166,32 @@ function CTAButton({
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 
 /**
- * Marketing site top navigation — Sprint 2 §7 + Sprint 3 navigation copy.
- * Sticky top, height 72px desktop / 64px mobile.
- * Scrolled state: border-bottom + backdrop-blur fades in.
+ * Marketing site top navigation.
+ * Fixed top, height 72px desktop / 64px mobile.
+ * Scrolled state: border-bottom and backdrop blur fade in.
+ * Signed-in visitors see "Go to dashboard" in place of signup, and no "Log in".
  */
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const isScrolled = useScrolled(16)
+  const { authenticated } = useSessionCta()
+
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
 
   const closeMenu = () => setMenuOpen(false)
+
+  // Modal focus handling: move focus into the sheet when it opens, and hand it back to
+  // the menu toggle when it closes (Escape, overlay, close button or a link).
+  useEffect(() => {
+    if (!menuOpen) return
+    closeButtonRef.current?.focus()
+    const trigger = menuButtonRef.current
+    return () => {
+      trigger?.focus()
+    }
+  }, [menuOpen])
 
   // Lock page scroll behind the open sheet so the page does not scroll under a finger
   // dragging inside the menu. Restores whatever overflow value was there before.
@@ -124,15 +204,67 @@ export function Navbar() {
     }
   }, [menuOpen])
 
+  // Focus containment: Escape closes, Tab and Shift+Tab wrap inside the sheet, and the
+  // page behind it (main content and site footer) is made inert so neither pointer nor
+  // assistive tech can reach it while the modal is open.
   useEffect(() => {
     if (!menuOpen) return
+
+    const background = [
+      document.querySelector<HTMLElement>('#main-content'),
+      document.querySelector<HTMLElement>('footer[aria-label="Site footer"]'),
+    ].filter((el): el is HTMLElement => el !== null && !el.inert)
+    background.forEach((el) => {
+      el.inert = true
+    })
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMenuOpen(false)
+        return
+      }
+      if (e.key !== 'Tab') return
+      const sheet = sheetRef.current
+      if (!sheet) return
+      const focusable = Array.from(
+        sheet.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.getClientRects().length > 0)
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      const inside = active instanceof Node && sheet.contains(active)
+      if (e.shiftKey && (active === first || !inside)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && (active === last || !inside)) {
+        e.preventDefault()
+        first.focus()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      background.forEach((el) => {
+        el.inert = false
+      })
+    }
+  }, [menuOpen])
+
+  // The sheet is mobile only. If the viewport grows past lg while it is open, close it so
+  // the scroll lock and inert background never linger on desktop.
+  useEffect(() => {
+    if (!menuOpen) return
+    // The toggle is lg:hidden, so the sheet can only open below lg; listening for the
+    // change is enough.
+    const mql = window.matchMedia('(min-width: 1024px)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setMenuOpen(false)
+    }
+    mql.addEventListener('change', handleChange)
+    return () => mql.removeEventListener('change', handleChange)
   }, [menuOpen])
 
   return (
@@ -143,9 +275,9 @@ export function Navbar() {
           'fixed top-0 left-0 right-0 z-[50]',
           'animate-in fade-in slide-in-from-top-2 duration-200 fill-mode-both motion-reduce:animate-none',
           'h-16 lg:h-[72px]',
-          'border-b transition-[background-color,border-color,box-shadow] duration-300',
+          'border-b transition-[background-color,border-color] duration-300',
           isScrolled
-            ? 'bg-background/80 supports-[backdrop-filter]:bg-background/70 backdrop-blur-md backdrop-saturate-150 border-border/80 shadow-[0_1px_12px_-6px_rgba(23,26,23,0.12)]'
+            ? 'bg-background/80 supports-[backdrop-filter]:bg-background/70 backdrop-blur-md backdrop-saturate-150 border-border/80'
             : 'bg-transparent border-transparent',
         )}
       >
@@ -160,12 +292,22 @@ export function Navbar() {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-2.5">
-            <CTAButton location="nav" />
+          <div className="hidden lg:flex items-center gap-2">
+            <LoginLink
+              surface="desktop"
+              hidden={authenticated}
+              className={cn(
+                'inline-flex items-center min-h-11 px-3 rounded-full text-body-sm font-medium text-ink-muted',
+                'hover:text-foreground transition-colors duration-200',
+                FOCUS_RING,
+              )}
+            />
+            <SessionCTA authenticated={authenticated} size="md" />
           </div>
 
           {/* Mobile Menu Toggle */}
           <button
+            ref={menuButtonRef}
             type="button"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
@@ -196,12 +338,14 @@ export function Navbar() {
 
             {/* Sheet */}
             <div
+              ref={sheetRef}
               id="mobile-menu"
               role="dialog"
+              aria-modal="true"
               aria-label="Navigation menu"
               className="
                 fixed top-0 right-0 bottom-0 z-[60]
-                w-[min(20rem,85vw)] bg-surface border-l border-border shadow-md
+                w-[min(20rem,85vw)] bg-surface border-l border-border
                 flex flex-col pt-16 pb-8 px-6 overflow-y-auto
                 lg:hidden
                 animate-in slide-in-from-right duration-300 ease-out-quint fill-mode-both
@@ -210,6 +354,7 @@ export function Navbar() {
             >
               {/* Close */}
               <button
+                ref={closeButtonRef}
                 type="button"
                 aria-label="Close menu"
                 onClick={closeMenu}
@@ -235,10 +380,13 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    onClick={closeMenu}
+                    onClick={() => {
+                      trackNavLinkClick(link.label, link.href, 'mobile')
+                      closeMenu()
+                    }}
                     style={{ animationDelay: `${80 + index * 35}ms` }}
                     className={cn(
-                      'px-3 py-2.5 rounded-md transition-colors duration-[120ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      'flex items-center min-h-11 px-3 rounded-md transition-colors duration-[120ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
                       'animate-in fade-in slide-in-from-right-3 duration-300 ease-out-quint fill-mode-both motion-reduce:animate-none',
                       link.weight === 'primary' && 'text-body font-semibold text-foreground',
                       link.weight === 'secondary' && 'text-body font-medium text-foreground',
@@ -252,7 +400,7 @@ export function Navbar() {
                 ))}
               </nav>
 
-              {/* Support & CTA */}
+              {/* Support, sign in & CTA */}
               <div className="mt-auto flex flex-col gap-2.5">
                 <a
                   href="https://buymeacoffee.com/prodily"
@@ -260,8 +408,8 @@ export function Navbar() {
                   rel="noopener noreferrer"
                   onClick={closeMenu}
                   className="
-                    w-full inline-flex items-center justify-center gap-2 px-4 py-2.5
-                    bg-warning-bg text-warning font-semibold text-sm rounded-lg
+                    w-full inline-flex items-center justify-center gap-2 min-h-11 px-4
+                    bg-warning-bg text-warning font-semibold text-sm rounded-full
                     border border-accent/30 hover:border-accent/60
                     transition-colors duration-200
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -271,7 +419,21 @@ export function Navbar() {
                   <span>Buy Me a Coffee</span>
                 </a>
 
-                <CTAButton size="md" location="nav" onClick={closeMenu} />
+                {!authenticated && (
+                  <LoginLink
+                    surface="mobile"
+                    hidden={false}
+                    onNavigate={closeMenu}
+                    className={cn(
+                      'w-full inline-flex items-center justify-center h-11 px-5 rounded-full',
+                      'border border-border bg-surface text-sm font-semibold text-foreground',
+                      'hover:border-border-strong hover:bg-surface-muted transition-colors duration-200',
+                      FOCUS_RING,
+                    )}
+                  />
+                )}
+
+                <SessionCTA authenticated={authenticated} size="lg" onNavigate={closeMenu} />
               </div>
             </div>
           </>

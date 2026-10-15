@@ -11,14 +11,14 @@ import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Learner Reviews | Prodily PM Academy',
+  title: 'Learner Reviews',
   description:
     'Read real learner feedback about the Prodily Product Management learning experience.',
   alternates: {
     canonical: `${siteUrl}/reviews`,
   },
   openGraph: {
-    title: 'Learner Reviews | Prodily PM Academy',
+    title: 'Learner Reviews',
     description:
       'Read real learner feedback about the Prodily Product Management learning experience.',
     url: `${siteUrl}/reviews`,
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
         url: BRAND.assets.ogImage,
         width: BRAND.assets.ogImageDimensions.width,
         height: BRAND.assets.ogImageDimensions.height,
-        alt: 'Prodily PM Academy Reviews',
+        alt: 'Prodily Reviews',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Learner Reviews | Prodily PM Academy',
-    description: 'Read what learners say about Prodily PM Academy.',
+    title: 'Learner Reviews',
+    description: 'Read what learners say about Prodily.',
     images: [BRAND.assets.ogImage],
   },
 }
@@ -58,18 +58,15 @@ export default async function ReviewsPage() {
     initialReviews = []
   }
 
+  // No rating markup: there is no measured rating to report, and a hardcoded one is a
+  // fabricated claim (homepage plan P0-5). A Product without offers, reviews or a rating
+  // is invalid for rich results, so the page is described as a plain WebPage instead.
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: 'Prodily PM Academy',
-    description: 'Learn product. Build the work. Show the proof. Free permanently.',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: initialReviews.length > 0 ? String(initialReviews.length) : '1',
-      bestRating: '5',
-      worstRating: '1',
-    },
+    '@type': 'WebPage',
+    name: 'Learner Reviews | Prodily',
+    description: 'Read real learner feedback about the Prodily Product Management learning experience.',
+    url: `${siteUrl}/reviews`,
   }
 
   return (

@@ -20,7 +20,49 @@ declare global {
 
 // ─── Event definitions ────────────────────────────────────────────────────────
 
-type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'final_cta'
+export type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community' | 'final_cta'
+
+// ─── Marketing homepage (redesign) ───────────────────────────────────────────
+
+/** `data-home-section` values observed by SectionViewTracker. */
+export type HomeSection =
+  | 'hero'
+  | 'proof'
+  | 'leave-with'
+  | 'skill-radar'
+  | 'sample-lesson'
+  | 'how-it-works'
+  | 'curriculum'
+  | 'why'
+  | 'testimonials'
+  | 'faq'
+  | 'final-cta'
+
+/** Where on the homepage a secondary (non-signup) CTA sits. */
+export type HomeSecondaryCTALocation =
+  | 'hero'
+  | 'proof'
+  | 'leave_with'
+  | 'sample_lesson'
+  | 'how_it_works'
+  | 'curriculum'
+  | 'why'
+  | 'check_it_yourself'
+  | 'final_cta'
+
+export type HomeSecondaryCTATarget =
+  | 'sample_lesson'
+  | 'curriculum'
+  | 'sample_portfolio'
+  | 'verify_certificate'
+  | 'glossary'
+  | 'frameworks'
+
+export type RadarPreviewState = 'module_1' | 'module_9'
+export type WhyCompareState = 'certificate' | 'portfolio'
+export type NavSurface = 'desktop' | 'mobile'
+/** Where a signed-in visitor saw the "Go to dashboard" swap of the signup CTA. */
+export type DashboardCTALocation = HeroCTALocation
 
 /**
  * `auto` = entrance auto-launch (gated off), `manual` = reopened by the learner,
@@ -43,9 +85,19 @@ type EventMap = {
   waitlist_signup:          Record<string, never>
   hero_cta_click:           { location: HeroCTALocation }
   curriculum_view:          Record<string, never>
-  portfolio_view:           Record<string, never>
   faq_expand:               { question_index: number }
   scroll_90_percent:        Record<string, never>
+
+  // ─── Marketing homepage (redesign) ───────────────────────────────────────
+  home_section_view:           { section: HomeSection }
+  home_secondary_cta_click:    { location: HomeSecondaryCTALocation; target: HomeSecondaryCTATarget }
+  sample_lesson_card_click:    { lesson_slug: string; position: number }
+  radar_preview_toggle:        { state: RadarPreviewState }
+  why_compare_toggle:          { state: WhyCompareState }
+  nav_link_click:              { label: string; href: string; surface: NavSurface }
+  nav_login_click:             { surface: NavSurface }
+  footer_link_click:           { group: string; label: string; href: string }
+  dashboard_cta_click:         { location: DashboardCTALocation }
   quick_start_opened:       { mode: QuickStartMode }
   quick_start_step_viewed:  { step: number; step_title: string }
   quick_start_completed:    Record<string, never>
@@ -152,11 +204,6 @@ export function trackCurriculumView() {
   trackEvent('curriculum_view')
 }
 
-/** Fired once when the Portfolio section enters the viewport. */
-export function trackPortfolioView() {
-  trackEvent('portfolio_view')
-}
-
 /**
  * Fired when an FAQ accordion item is opened.
  * @param questionIndex - 0-based index of the question
@@ -168,6 +215,57 @@ export function trackFAQExpand(questionIndex: number) {
 /** Fired once when the user scrolls to 90% of the page height. */
 export function trackScroll90Percent() {
   trackEvent('scroll_90_percent')
+}
+
+// ─── Marketing homepage trackers (redesign) ─────────────────────────────────
+// GA4 is consent-gated, so these under-report; read them as relative signals.
+
+/** Fired once per page view when a `[data-home-section]` block first enters the viewport. */
+export function trackHomeSectionView(section: HomeSection) {
+  trackEvent('home_section_view', { section })
+}
+
+/** Fired when a non-signup homepage CTA is clicked (sample lesson, curriculum, sample portfolio...). */
+export function trackHomeSecondaryCTAClick(
+  location: HomeSecondaryCTALocation,
+  target: HomeSecondaryCTATarget,
+) {
+  trackEvent('home_secondary_cta_click', { location, target })
+}
+
+/** Fired when a sample lesson card is clicked. `position` is 1-based. */
+export function trackSampleLessonCardClick(lessonSlug: string, position: number) {
+  trackEvent('sample_lesson_card_click', { lesson_slug: lessonSlug, position })
+}
+
+/** Fired when the Skill Radar concept preview is switched between states. */
+export function trackRadarPreviewToggle(state: RadarPreviewState) {
+  trackEvent('radar_preview_toggle', { state })
+}
+
+/** Fired when the Why section before/after toggle is switched. */
+export function trackWhyCompareToggle(state: WhyCompareState) {
+  trackEvent('why_compare_toggle', { state })
+}
+
+/** Fired when a marketing nav link is clicked. */
+export function trackNavLinkClick(label: string, href: string, surface: NavSurface) {
+  trackEvent('nav_link_click', { label, href, surface })
+}
+
+/** Fired when the marketing nav "Log in" link is clicked. */
+export function trackNavLoginClick(surface: NavSurface) {
+  trackEvent('nav_login_click', { surface })
+}
+
+/** Fired when a footer link is clicked. */
+export function trackFooterLinkClick(group: string, label: string, href: string) {
+  trackEvent('footer_link_click', { group, label, href })
+}
+
+/** Fired when a signed-in visitor clicks the "Go to dashboard" swap of a signup CTA. */
+export function trackDashboardCTAClick(location: DashboardCTALocation) {
+  trackEvent('dashboard_cta_click', { location })
 }
 
 /** Fired when Quick Start product tour opens automatically or manually. */

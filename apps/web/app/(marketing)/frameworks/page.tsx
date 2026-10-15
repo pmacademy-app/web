@@ -10,14 +10,14 @@ import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Product Management Frameworks & Mental Models | Prodily',
+  title: { absolute: 'Product Management Frameworks & Mental Models | Prodily' },
   description:
     'Explore practical product management mental models for discovery, prioritization, strategy, execution, leadership, and product decision-making.',
   alternates: {
     canonical: `${siteUrl}/frameworks`,
   },
   openGraph: {
-    title: 'Product Management Frameworks & Mental Models | Prodily',
+    title: { absolute: 'Product Management Frameworks & Mental Models | Prodily' },
     description:
       'Explore practical product management mental models for discovery, prioritization, strategy, execution, leadership, and product decision-making.',
     url: `${siteUrl}/frameworks`,
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
         url: BRAND.assets.ogImage,
         width: BRAND.assets.ogImageDimensions.width,
         height: BRAND.assets.ogImageDimensions.height,
-        alt: 'Prodily PM Academy Frameworks',
+        alt: 'Prodily Frameworks',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Product Management Frameworks & Mental Models | Prodily',
+    title: { absolute: 'Product Management Frameworks & Mental Models | Prodily' },
     description: 'Explore practical product management mental models for decision-making.',
     images: [BRAND.assets.ogImage],
   },
@@ -44,9 +44,9 @@ export default function FrameworksPage() {
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     '@id': `${siteUrl}/frameworks#termset`,
-    name: 'Prodily PM Academy Original Frameworks & Mental Models',
+    name: 'Prodily Original Frameworks & Mental Models',
     description:
-      'Proprietary Product Management frameworks and diagnostic models taught in the Prodily PM Academy 90-lesson curriculum.',
+      'Proprietary Product Management frameworks and diagnostic models taught in the Prodily 90-lesson curriculum.',
     url: `${siteUrl}/frameworks`,
     hasDefinedTerm: FRAMEWORKS.map((fw) => ({
       '@type': 'DefinedTerm',

@@ -51,7 +51,7 @@ export const DirectMessageEmail: React.FC<DirectMessageEmailProps> = ({
 
       <p style={{ fontSize: '13px', color: '#9EA59D', marginTop: '24px', borderTop: '1px solid #E6E1D6', paddingTop: '16px' }}>
         Best regards,<br />
-        <strong>The {BRAND.shortName} Team</strong>
+        <strong>The {BRAND.company} Team</strong>
       </p>
     </EmailWrapper>
   )

@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync, existsSync } from 'node:fs'
 import path from 'node:path'
 
+import { HOME_CAPSTONES } from '@/config/marketing'
+
 /**
  * Phase 0.C — the homepage sells what exists.
  *
@@ -27,22 +29,76 @@ function code(source: string): string {
 
 const PAGE = 'app/(marketing)/page.tsx'
 
+/**
+ * Homepage redesign (changed deliberately): the page now composes eleven sections
+ * plus two analytics islands, in a fixed order that leads with proof. The original
+ * eight sections are all still rendered; the assertion now also pins their order.
+ * Changed deliberately (round 2): `CheckItYourselfSection` folded into the FAQ and
+ * `BeliefBandSection` folded into the final CTA; both section files were deleted.
+ */
+const HOME_COMPOSITION = [
+  'PageAnalytics',
+  'SectionViewTracker',
+  'HeroSection',
+  'PortfolioSection',
+  'WhatYouLeaveWithSection',
+  'SkillRadarSection',
+  'SampleLessonSection',
+  'HowItWorksSection',
+  'CurriculumSection',
+  'WhySection',
+  'PublishedTestimonialsSection',
+  'HomeFaqSection',
+  'FinalCTASection',
+] as const
+
+/**
+ * Every homepage section file plus the islands and data they render.
+ * Changed deliberately (round 2): belief-band and check-it-yourself were deleted; the
+ * learning-loop step island and the shared spotlight island joined.
+ */
+const HOME_SECTION_FILES = [
+  'components/marketing/sections/hero.tsx',
+  'components/marketing/sections/hero-cta.tsx',
+  'components/marketing/sections/hero-workbench.tsx',
+  'components/marketing/sections/portfolio.tsx',
+  'components/marketing/sections/portfolio-showcase.tsx',
+  'components/marketing/sections/portfolio-artifacts.ts',
+  'components/marketing/sections/what-you-leave-with.tsx',
+  'components/marketing/sections/skill-radar-section.tsx',
+  'components/marketing/sections/skill-radar-toggle.tsx',
+  'components/marketing/sections/sample-lesson.tsx',
+  'components/marketing/sections/how-it-works.tsx',
+  'components/marketing/sections/how-it-works-steps.tsx',
+  'components/marketing/sections/curriculum.tsx',
+  'components/marketing/sections/why.tsx',
+  'components/marketing/sections/why-compare-toggle.tsx',
+  'components/marketing/sections/published-testimonials.tsx',
+  'components/marketing/sections/home-faq.tsx',
+  'components/marketing/sections/final-cta.tsx',
+  'components/marketing/sections/final-cta-link.tsx',
+  'components/marketing/spotlight-group.tsx',
+]
+
 describe('Phase 0.C — landing page composition', () => {
-  it('composes the seven planned sections and nothing more', () => {
+  it('composes the planned sections, each once, in the planned order', () => {
     const source = code(read(PAGE))
 
-    for (const section of [
-      'HeroSection',
-      'SampleLessonSection',
-      'HowItWorksSection',
-      'PortfolioSection',
-      'CurriculumSection',
-      'WhySection',
-      'PublishedTestimonialsSection',
-      'FinalCTASection',
-    ]) {
-      expect(source, `${section} is not rendered`).toContain(`<${section} />`)
+    let previous = -1
+    for (const section of HOME_COMPOSITION) {
+      const tag = `<${section} />`
+      const at = source.indexOf(tag)
+      expect(at, `${section} is not rendered`).toBeGreaterThan(-1)
+      expect(source.indexOf(tag, at + 1), `${section} is rendered twice`).toBe(-1)
+      expect(at, `${section} is out of order`).toBeGreaterThan(previous)
+      previous = at
     }
+  })
+
+  it('renders no section components beyond the planned list', () => {
+    const source = code(read(PAGE))
+    const rendered = [...source.matchAll(/<([A-Z][A-Za-z]*)\s*\/>/g)].map((m) => m[1])
+    expect(rendered).toEqual([...HOME_COMPOSITION])
   })
 
   it('no longer composes the two sections the audit found redundant', () => {
@@ -92,12 +148,9 @@ describe('Phase 0.C — CTAs resolve to real destinations', () => {
 })
 
 describe('Phase 0.C — claims are traceable to the repository', () => {
-  const marketingSources = [
-    'components/marketing/sections/hero.tsx',
-    'components/marketing/sections/how-it-works.tsx',
-    'components/marketing/sections/portfolio.tsx',
-    'components/marketing/sections/final-cta.tsx',
-  ].map((rel) => ({ rel, source: code(read(rel)) }))
+  // Homepage redesign (changed deliberately): widened from four files to every homepage
+  // section file, so new sections are held to the same claims policy.
+  const marketingSources = HOME_SECTION_FILES.map((rel) => ({ rel, source: code(read(rel)) }))
 
   it('the 90-lesson and 9-capstone anchors match the shipped content and config', () => {
     const curriculum = JSON.parse(
@@ -109,8 +162,10 @@ describe('Phase 0.C — claims are traceable to the repository', () => {
     const moduleSlugs = [...capstones.matchAll(/moduleSlug:\s*'([a-z]+)'/g)].map((m) => m[1])
     expect(new Set(moduleSlugs).size).toBe(9)
 
-    expect(code(read('components/marketing/sections/hero.tsx'))).toContain('90 Lessons')
-    expect(code(read('components/marketing/sections/hero.tsx'))).toContain('9 Capstones')
+    // Changed deliberately: the hero states the counts once, in its sub line, instead of
+    // a separate "90 Lessons / 9 Capstones" row that repeated it.
+    expect(code(read('components/marketing/sections/hero.tsx'))).toMatch(/90 lessons/i)
+    expect(code(read('components/marketing/sections/hero.tsx'))).toMatch(/9 capstones/i)
   })
 
   it('does not invent learner counts, ratings or outcome statistics', () => {
@@ -142,6 +197,23 @@ describe('Phase 0.C — claims are traceable to the repository', () => {
       for (const pattern of overpromises) {
         expect(source, `${rel} overpromises an outcome: ${pattern}`).not.toMatch(pattern)
       }
+    }
+  })
+
+  it('never says capstones are reviewed, graded, given feedback or verified', () => {
+    // Homepage redesign: capstones are self-directed work. Only the PM Fellow request is
+    // reviewed by a person, and that claim is about the portfolio, not a capstone.
+    const claim = /capstone[^.]{0,80}\b(reviewed|graded|feedback|verified)\b/i
+    for (const { rel, source } of marketingSources) {
+      expect(source, `${rel} claims capstones are reviewed`).not.toMatch(claim)
+    }
+  })
+
+  it('does not sell AI as a feature or mention interviews', () => {
+    // Homepage redesign: no AI feature claims and no interview promises on the homepage.
+    for (const { rel, source } of marketingSources) {
+      expect(source, `${rel} mentions AI`).not.toMatch(/\bAI\b/)
+      expect(source, `${rel} mentions interviews`).not.toMatch(/\binterview/i)
     }
   })
 
@@ -201,14 +273,9 @@ describe('Phase 0.C — design tokens replace ad-hoc hex', () => {
     // `theme/tokens.ts` and `app/globals.css` are the single source of truth for colour.
     // CI already blocks the four brand hexes; this covers the neutrals the audit found
     // hardcoded across the hero, portfolio and final CTA (#70685A, #DED8CB, #F2EFE7).
-    for (const rel of [
-      'components/marketing/sections/hero.tsx',
-      'components/marketing/sections/portfolio.tsx',
-      'components/marketing/sections/final-cta.tsx',
-      'components/marketing/sections/sample-lesson.tsx',
-      'components/marketing/sections/how-it-works.tsx',
-      'components/marketing/sections/published-testimonials.tsx',
-    ]) {
+    // Homepage redesign (changed deliberately): widened to every homepage section file
+    // and the page itself.
+    for (const rel of [...HOME_SECTION_FILES, PAGE, 'config/marketing.ts']) {
       const hexes = code(read(rel)).match(/#[0-9a-fA-F]{6}\b/g) ?? []
       expect(hexes, `${rel} hardcodes ${hexes.join(', ')}`).toEqual([])
     }
@@ -228,16 +295,9 @@ describe('Phase 0.C — copy follows the house separator convention', () => {
   const stripComments = (source: string) =>
     source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
 
-  const HOMEPAGE_SECTIONS = [
-    'components/marketing/sections/hero.tsx',
-    'components/marketing/sections/sample-lesson.tsx',
-    'components/marketing/sections/how-it-works.tsx',
-    'components/marketing/sections/portfolio.tsx',
-    'components/marketing/sections/curriculum.tsx',
-    'components/marketing/sections/why.tsx',
-    'components/marketing/sections/published-testimonials.tsx',
-    'components/marketing/sections/final-cta.tsx',
-  ]
+  // Homepage redesign (changed deliberately): widened to every homepage section file
+  // and the page itself.
+  const HOMEPAGE_SECTIONS = [...HOME_SECTION_FILES, PAGE, 'config/marketing.ts']
 
   it.each(HOMEPAGE_SECTIONS)('%s uses no em dashes in rendered copy', (rel) => {
     const copy = stripComments(read(rel))
@@ -274,5 +334,22 @@ describe('Phase 0.C — accessibility and motion floors', () => {
     ]) {
       expect(read(rel), rel).toContain('motion-reduce:')
     }
+  })
+})
+
+describe('Homepage capstone list is the real nine, safely titled', () => {
+  it('HOME_CAPSTONES lists nine capstones', () => {
+    expect(HOME_CAPSTONES).toHaveLength(9)
+  })
+
+  it('no homepage capstone title mentions interviews or sells AI', () => {
+    for (const capstone of HOME_CAPSTONES) {
+      expect(capstone.title, `capstone ${capstone.number}`).not.toMatch(/interview|AI/i)
+    }
+  })
+
+  it('capstone 9 is shown as the End-to-End Product Case Study', () => {
+    const ninth = HOME_CAPSTONES.find((capstone) => capstone.number === 9)
+    expect(ninth?.title).toBe('End-to-End Product Case Study')
   })
 })

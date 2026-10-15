@@ -1,23 +1,16 @@
 import { Reveal } from '@/components/marketing/motion/reveal'
-import {
-  CARD,
-  CONTAINER,
-  EYEBROW,
-  EYEBROW_RULE,
-  SECTION_TITLE,
-  SECTION_Y,
-} from '@/components/marketing/styles'
+import { BAND_PLAIN, CARD, CONTAINER, SECTION_TITLE, SECTION_Y } from '../styles'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 
 /**
- * Published learner testimonials — Phase 0.C.
+ * Published learner testimonials (Phase 0.C).
  *
  * ## The rule this component exists to enforce
  *
  * `docs/IMPLEMENTATION_PLAN.md` §Phase 0.C sets a binding claims policy: no invented
- * testimonials, statistics or outcomes. Prodily does have a real source — testimonials
+ * testimonials, statistics or outcomes. Prodily does have a real source: testimonials
  * a learner submitted and an admin approved and published, served by
- * `FeedbackAdminService.getPublishedTestimonials()` — and the homepage was not using it.
+ * `FeedbackAdminService.getPublishedTestimonials()`, and the homepage was not using it.
  *
  * So this renders real rows or nothing at all. The `MINIMUM_TO_RENDER` threshold is the
  * important part: one or two approved quotes on a landing page reads as "we found
@@ -52,15 +45,12 @@ export async function PublishedTestimonialsSection() {
   return (
     <section
       id="testimonials"
+      data-home-section="testimonials"
       aria-labelledby="testimonials-heading"
-      className={`${SECTION_Y} bg-transparent border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`${BAND_PLAIN} ${SECTION_Y} border-t border-border scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         <Reveal amount={0.25} className="max-w-[640px] mb-12">
-          <div className={`${EYEBROW} mb-4`}>
-            <span aria-hidden="true" className={EYEBROW_RULE} />
-            FROM LEARNERS
-          </div>
           <h2
             id="testimonials-heading"
             className={SECTION_TITLE}

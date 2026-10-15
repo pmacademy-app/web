@@ -123,7 +123,7 @@ export const GET = withRoute(
       renderUnsubscribeHtml({
         title: `Unsubscribed | ${BRAND.fullName}`,
         heading: 'You have been unsubscribed',
-        message: 'You will no longer receive non-essential notification emails from Prodily PM Academy. Essential security and account updates will still be delivered.',
+        message: 'You will no longer receive non-essential notification emails from Prodily. Essential security and account updates will still be delivered.',
         success: true,
       }),
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }

@@ -2,7 +2,7 @@ import type { UserNotificationPreferences } from './types'
 import type { NotificationCategory, NotificationChannel } from '../types'
 
 /**
- * Default notification preferences aligned with the finalized PM Academy communication strategy.
+ * Default notification preferences aligned with the finalized Prodily communication strategy.
  *
  * Communication hierarchy:
  *   PRIMARY  → In-App Notifications (all learning events)

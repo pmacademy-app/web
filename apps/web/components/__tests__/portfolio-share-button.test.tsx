@@ -130,7 +130,7 @@ describe('ShareButton — fellow context', () => {
     const url = new URL(openedUrl())
     expect(url.searchParams.get('url')).toBe(CANONICAL_URL)
     expect(url.searchParams.get('text')).toBe(
-      'I was selected as a PM Fellow at Prodily PM Academy. Here is my Product Management portfolio:',
+      'I was selected as a PM Fellow at Prodily. Here is my Product Management portfolio:',
     )
   })
 
@@ -179,7 +179,7 @@ describe('ShareButton — social intents', () => {
     expect(url.origin + url.pathname).toBe('https://twitter.com/intent/tweet')
     expect(url.searchParams.get('url')).toBe(CANONICAL_URL)
     const text = url.searchParams.get('text') ?? ''
-    expect(text).toBe("Jane Doe's Product Management portfolio on Prodily PM Academy")
+    expect(text).toBe("Jane Doe's Product Management portfolio on Prodily")
     expect(text).not.toMatch(/\bmy\b/i)
     // Encoded on the wire, not just parseable.
     expect(openedUrl()).toContain(`url=${encodeURIComponent(CANONICAL_URL)}`)
@@ -193,7 +193,7 @@ describe('ShareButton — social intents', () => {
     await click(byLabel('Share on X (opens in a new window)'))
 
     const raw = openedUrl()
-    const expectedText = `${trickyName}'s Product Management portfolio on Prodily PM Academy`
+    const expectedText = `${trickyName}'s Product Management portfolio on Prodily`
     expect(raw).toContain(`text=${encodeURIComponent(expectedText)}&url=`)
     // No raw & or # leaked from the name into the query string.
     expect(raw).not.toContain('Ana &')
@@ -270,7 +270,7 @@ describe('ShareButton — primary action', () => {
     expect(share).toHaveBeenCalledTimes(1)
     expect(share.mock.calls[0][0]).toMatchObject({
       url: CANONICAL_URL,
-      text: "Jane Doe's Product Management portfolio on Prodily PM Academy",
+      text: "Jane Doe's Product Management portfolio on Prodily",
     })
     expect(writeText).not.toHaveBeenCalled()
     expect(primaryButton()?.textContent).toContain('Share Portfolio')
@@ -409,7 +409,7 @@ describe('ShareButton — capstone context', () => {
     const url = new URL(openedUrl())
     expect(url.searchParams.get('url')).toBe(`${CANONICAL_URL}/capstones/discovery`)
     expect(url.searchParams.get('text')).toBe(
-      'Jane Doe\'s "Problem Discovery Brief" product management case study on Prodily PM Academy',
+      'Jane Doe\'s "Problem Discovery Brief" product management case study on Prodily',
     )
     expect(url.searchParams.get('text')).not.toMatch(/\bmy\b/i)
   })

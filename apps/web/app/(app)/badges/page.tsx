@@ -34,7 +34,7 @@ export default async function BadgesGalleryPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider mb-1">
-            <Trophy className="w-4 h-4" /> PM Academy Achievements
+            <Trophy className="w-4 h-4" /> Prodily Achievements
           </div>
           <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground">
             Badge & Milestone Gallery

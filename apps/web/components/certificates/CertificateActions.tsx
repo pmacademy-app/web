@@ -61,8 +61,8 @@ export function CertificateActions({
     if (typeof navigator !== 'undefined' && 'share' in navigator && typeof navigator.share === 'function') {
       try {
         await navigator.share({
-          title: `PM Academy Certificate ${certificateCode}`,
-          text: `Verify my official Product Management Completion Credential on PM Academy!`,
+          title: `Prodily Certificate ${certificateCode}`,
+          text: `Verify my official Product Management Completion Credential on Prodily!`,
           url: verificationUrl,
         })
         return

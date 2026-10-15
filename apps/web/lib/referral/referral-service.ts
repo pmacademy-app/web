@@ -1,5 +1,5 @@
 /**
- * PM Academy — Phase 7 Referral & Attribution Service
+ * Prodily — Phase 7 Referral & Attribution Service
  *
  * Manages privacy-conscious referral attribution, self-referral prevention,
  * rate limiting, and reward automation upon first lesson completion.

@@ -1,5 +1,5 @@
 /**
- * Typed Event Payloads for PM Academy Notification Platform
+ * Typed Event Payloads for Prodily Notification Platform
  */
 
 export interface LessonCompletedPayload {

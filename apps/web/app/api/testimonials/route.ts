@@ -54,7 +54,7 @@ export const POST = withRoute(
     const cleanContent = content.trim().substring(0, 1500)
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : 5
     const cleanHeadline = typeof headline === 'string' ? headline.trim().substring(0, 150) : null
-    const cleanRole = typeof authorRole === 'string' ? authorRole.trim().substring(0, 100) : 'PM Academy Learner'
+    const cleanRole = typeof authorRole === 'string' ? authorRole.trim().substring(0, 100) : 'Prodily Learner'
 
     const supabase = createServiceRoleClient()
 

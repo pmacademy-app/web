@@ -1,5 +1,5 @@
 /**
- * Core Types for PM Academy Notification Platform Foundation
+ * Core Types for Prodily Notification Platform Foundation
  */
 
 export type NotificationPriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'bulk'

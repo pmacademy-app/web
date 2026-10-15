@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript types for PM Academy.
+ * Shared TypeScript types for Prodily.
  * These types are the contract between config, components, and the API.
  * All marketing content conforms to these shapes.
  */

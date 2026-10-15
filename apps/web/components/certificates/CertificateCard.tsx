@@ -6,10 +6,12 @@ import { ShieldCheck, Award, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
 import { generateQrCodeSvg } from '@/lib/certificates'
 import {
+  CERTIFICATE_COMPLETION_STATEMENT,
+  CERTIFICATE_RECIPIENT_LEAD_IN,
   getCertificatePresentation,
   TEST_CERTIFICATE_EXPLANATION,
 } from '@/lib/certificates/presentation'
-import { StaticBrandLogo } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { BRAND } from '@/lib/brand'
 
 interface CertificateCardProps {
@@ -22,7 +24,7 @@ interface CertificateCardProps {
  * Designed to read as a genuine professional PM credential both on the
  * verification page and as a standalone printed/PDF export:
  * - Clear visual hierarchy: issuer → recipient → credential → milestones.
- * - Serif display type for the recipient name (Fraunces via font-serif).
+ * - Display type for the recipient name (`font-serif`, which maps to Inter).
  * - Double-frame border treatment with brand accent.
  * - Verification QR code encoding the exact /verify/[certificateId] URL.
  * - Print-safe: the whole card is wrapped in `.certificate-print-container`
@@ -66,7 +68,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       {/* Header: Logo, Issuer Line & Credential ID */}
       <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-8 md:px-12 pt-6 sm:pt-8 md:pt-10 pb-6 border-b border-border">
         <div className="space-y-1.5">
-          <StaticBrandLogo size="md" />
+          <BrandMarkProdily size="md" />
           <p className="text-[11px] font-semibold text-muted-foreground tracking-wide">
             {BRAND.certificateIssuerLine}
           </p>
@@ -100,7 +102,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             <span className="h-px w-14 bg-primary/30" />
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            {isTest ? 'This test certificate was generated for' : 'This credential certifies that'}
+            {isTest ? 'This test certificate was generated for' : CERTIFICATE_RECIPIENT_LEAD_IN}
           </p>
         </div>
 
@@ -121,14 +123,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </h1>
 
         <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          {isTest ? (
-            TEST_CERTIFICATE_EXPLANATION
-          ) : (
-            <>
-              has successfully fulfilled all curriculum requirements, demonstrating mastery in product
-              strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
-            </>
-          )}
+          {isTest ? TEST_CERTIFICATE_EXPLANATION : CERTIFICATE_COMPLETION_STATEMENT}
         </p>
 
         {/* Level & Milestone Pill */}
@@ -138,7 +133,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           </span>
           <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
             Level {levelInfo.level} · {lessonsCompleted} Lessons Completed · {modulesCompleted}{' '}
-            Modules Mastered
+            Modules Completed
           </span>
         </div>
       </div>
@@ -156,10 +151,10 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         {/* Signatory */}
         <div className="text-center space-y-1 px-4">
           <div className="font-serif italic font-bold text-lg md:text-xl text-primary tracking-wide">
-            {BRAND.fullName} Academic Board
+            {BRAND.certificateSignatory.name}
           </div>
           <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
-            {isTest ? 'Not a valid credential' : 'Official Credential Verification Signatory'}
+            {isTest ? 'Not a valid credential' : BRAND.certificateSignatory.title}
           </span>
         </div>
 

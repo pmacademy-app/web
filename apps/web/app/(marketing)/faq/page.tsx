@@ -10,14 +10,14 @@ import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Product Management Academy FAQ | Prodily',
+  title: { absolute: 'Product Management Academy FAQ | Prodily' },
   description:
     "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
   alternates: {
     canonical: `${siteUrl}/faq`,
   },
   openGraph: {
-    title: 'Product Management Academy FAQ | Prodily',
+    title: { absolute: 'Product Management Academy FAQ | Prodily' },
     description:
       "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
     url: `${siteUrl}/faq`,
@@ -27,14 +27,14 @@ export const metadata: Metadata = {
         url: BRAND.assets.ogImage,
         width: BRAND.assets.ogImageDimensions.width,
         height: BRAND.assets.ogImageDimensions.height,
-        alt: 'Prodily PM Academy FAQ',
+        alt: 'Prodily FAQ',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Product Management Academy FAQ | Prodily',
-    description: 'Frequently asked questions about the free 90-lesson PM Academy curriculum.',
+    title: { absolute: 'Product Management Academy FAQ | Prodily' },
+    description: 'Frequently asked questions about the free 90-lesson Prodily curriculum.',
     images: [BRAND.assets.ogImage],
   },
 }

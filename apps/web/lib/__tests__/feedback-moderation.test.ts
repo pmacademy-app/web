@@ -185,9 +185,10 @@ describe('Phase 2 — Feedback & Moderation Data Mapping Integrity', () => {
       const item4 = queue.find((q) => q.id === 'test-4')
       expect(item4?.authorName).toBe('Deleted Learner')
 
-      // 5. Anonymous feedback (user_id is null) -> 'PM Academy Learner'
+      // 5. Anonymous feedback (user_id is null) -> 'Prodily Learner'
       const item5 = queue.find((q) => q.id === 'test-5')
-      expect(item5?.authorName).toBe('PM Academy Learner')
+      expect(item5?.authorName).toBe('Prodily Learner')
+      expect(item5?.authorName).not.toContain('PM Academy')
     })
   })
 
@@ -241,7 +242,9 @@ describe('Phase 2 — Feedback & Moderation Data Mapping Integrity', () => {
       expect(published[0].authorName).toBe('Sarah Connor')
       expect(published[0].role).toBe('Senior PM')
       expect(published[1].authorName).toBe('techlead_pm')
-      expect(published[1].role).toBe('Verified PM Academy Learner')
+      expect(published[1].role).toBe('Prodily Learner')
+      expect(published[1].role).not.toContain('PM Academy')
+      expect(published[1].role).not.toContain('Verified')
     })
   })
 

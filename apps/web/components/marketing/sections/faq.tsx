@@ -99,7 +99,7 @@ export function FAQSection() {
           >
             <h3 className="text-h4 font-semibold text-foreground">Serious PM Education</h3>
             <p className="text-body-sm text-ink-muted leading-relaxed">
-              We built PM Academy to make high-quality product management education accessible to everyone. No tricks, no hidden paywalls.
+              We built Prodily to make high-quality product management education accessible to everyone. No tricks, no hidden paywalls.
             </p>
             <div className="pt-4 border-t border-border space-y-2">
               <div className="flex items-center gap-2 text-body-sm text-foreground">

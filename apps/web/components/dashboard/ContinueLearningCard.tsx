@@ -36,7 +36,7 @@ export function ContinueLearningCard({
               Congratulations! All 90 Lessons Completed 👑
             </h2>
             <p className="text-sm text-muted-foreground">
-              You have completed every lesson in PM Academy! Review past lessons, practice flashcards, or inspect your competency radar.
+              You have completed every lesson in Prodily! Review past lessons, practice flashcards, or inspect your competency radar.
             </p>
           </div>
 

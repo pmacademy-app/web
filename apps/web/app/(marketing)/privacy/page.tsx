@@ -10,18 +10,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'Comprehensive Privacy Policy for Prodily PM Academy detailing Supabase RLS security, learner data collection, analytics practices, and account deletion rights.',
+  description: 'Comprehensive Privacy Policy for Prodily detailing Supabase RLS security, learner data collection, analytics practices, and account deletion rights.',
   alternates: {
     canonical: `${siteUrl}/privacy`,
   },
   openGraph: {
-    title: 'Privacy Policy | Prodily PM Academy',
-    description: 'Prodily PM Academy privacy policy, data protection, and learner rights.',
+    title: 'Privacy Policy | Prodily',
+    description: 'Prodily privacy policy, data protection, and learner rights.',
     url: `${siteUrl}/privacy`,
     type: 'website',
-    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily PM Academy' }],
+    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Privacy Policy | Prodily PM Academy', images: [BRAND.assets.ogImage] },
+  twitter: { card: 'summary_large_image', title: 'Privacy Policy | Prodily', images: [BRAND.assets.ogImage] },
 }
 
 export default function PrivacyPage() {

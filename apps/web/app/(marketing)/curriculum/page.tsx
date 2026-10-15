@@ -13,14 +13,14 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Product Management Curriculum: 90 Lessons | Prodily',
+  title: { absolute: 'Product Management Curriculum: 90 Lessons | Prodily' },
   description:
     "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
   alternates: {
     canonical: `${siteUrl}/curriculum`,
   },
   openGraph: {
-    title: 'Product Management Curriculum: 90 Lessons | Prodily',
+    title: { absolute: 'Product Management Curriculum: 90 Lessons | Prodily' },
     description:
       "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
     url: `${siteUrl}/curriculum`,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         url: BRAND.assets.ogImage,
         width: BRAND.assets.ogImageDimensions.width,
         height: BRAND.assets.ogImageDimensions.height,
-        alt: 'Prodily PM Academy Curriculum',
+        alt: 'Prodily Curriculum',
       },
     ],
   },

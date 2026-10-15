@@ -1,127 +1,108 @@
 /**
- * Landing page hero (B12-B — server component).
+ * Landing page hero (server component).
  *
- * ## What changed and why
+ * One idea: learn product management, leave with proof. Round 2 layout is an
+ * editorial split with no orphan column: the pill, H1, sub and the two calls to action
+ * sit on the left (6 of 12 columns), vertically centred against the visual on the
+ * right (6 of 12), a layered capstone page with a portfolio card and a Skill Radar
+ * card (see hero-workbench.tsx). A static, masked dot grid sits behind the section.
  *
- * B12-A measured this page at 529.1 KB of gzipped JavaScript against the 345 KB every
- * other route shares, with 171.7 KB of the difference being framer-motion, and mobile
- * Lighthouse at 44 with a 7.7 s LCP. The hero was the largest single contributor: its
- * entire left column — eyebrow, headline, subheadline, CTAs, value anchors — was inside
- * `motion.div` wrappers purely to fade and slide on mount, which made the whole section
- * a client component and put an animation engine in front of the LCP element.
- *
- * The wrappers are gone; the animation is not. Entry motion is now `animate-in` from
- * tw-animate-css, which is CSS and therefore runs at first paint instead of waiting for
- * 683 KB of JavaScript to parse and execute. Two client islands remain, each for a real
- * reason: `HeroCtaLink` because it fires an analytics event, and `HeroWorkbench` because
- * it owns a timer and interactive state.
+ * The pill ("Learn at your own pace") carries the only motion in the copy column: a
+ * slow highlight sweep (SHINY_TEXT), plain text under reduced motion. The H1 itself
+ * gets no effect. "Free" is already in the sub, so the hero adds no separate "Free"
+ * line; that line lives in the closing band.
  *
  * ## The headline deliberately does not fade
  *
  * An element at `opacity: 0` is not eligible to be the Largest Contentful Paint, so a
- * fade-in on the h1 moves LCP to the end of the animation. The headline and subheadline
- * therefore animate transform only (`slide-in-from-bottom-*` with no `fade-in`), which
- * paints them opaque on the first frame. Decorative elements around them still fade.
- * This is the one visual difference from the previous implementation, and it is the
- * difference the batch exists to make.
+ * fade-in on the h1 would move LCP to the end of the animation. The headline and sub
+ * therefore animate transform only (ENTER_OPAQUE: `slide-in-from-bottom` with no
+ * fade), which paints them opaque on the first frame. Secondary elements may fade.
+ *
+ * Client JavaScript: HeroCtaLink (analytics and the signed-in swap) and the TrackedLink
+ * on the sample lesson button. Everything else, including the visual, is server HTML.
  */
 
-import Link from 'next/link'
+import { ArrowRight, Clock3 } from 'lucide-react'
 
 import { HeroCtaLink } from '@/components/marketing/sections/hero-cta'
 import { HeroWorkbench } from '@/components/marketing/sections/hero-workbench'
-import { ARROW_NUDGE, BUTTON_SECONDARY, CONTAINER } from '@/components/marketing/styles'
+import { TrackedLink } from '@/components/marketing/tracked-link'
+import {
+  ARROW_NUDGE,
+  BAND_MUTED,
+  BUTTON_SECONDARY,
+  CONTAINER,
+  DISPLAY_LEAD,
+  DISPLAY_TITLE,
+  DOT_GRID,
+  SHINY_TEXT,
+} from '@/components/marketing/styles'
+import { cn } from '@/lib/utils'
 
-/** Entry animation for decorative copy. Safe to fade — not an LCP candidate. */
+/** Entry animation for secondary elements. Safe to fade: not an LCP candidate. */
 const ENTER = 'animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out-quint fill-mode-both motion-reduce:animate-none'
 
 /** Entry animation for LCP candidates. Transform only, so the text paints opaque. */
 const ENTER_OPAQUE = 'animate-in slide-in-from-bottom-2 duration-700 ease-out-quint fill-mode-both motion-reduce:animate-none'
 
 /**
- * The four value anchors under the CTAs. The label strings are asserted against the
- * shipped content by `marketing-homepage-phase0c.test.ts`, so they stay literal.
+ * The hero H1 shares a half-width column with nothing else, so it steps down from the
+ * full DISPLAY_TITLE clamp (88px) to 64px at most: three short lines, never four.
  */
-const ANCHORS = [
-  { value: '90 Lessons', detail: '9 complete modules' },
-  { value: '9 Capstones', detail: 'Real PM deliverables' },
-  { value: '7 Competencies', detail: 'Skill progress tracking' },
-  { value: '₹0 Tuition', detail: 'Free, permanently', highlight: true },
-] as const
+const HERO_TITLE = cn(DISPLAY_TITLE, 'text-[clamp(2.625rem,4.6vw,4rem)] leading-[1.02]')
 
 export function HeroSection() {
   return (
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-24 overflow-hidden bg-transparent"
+      data-home-section="hero"
+      className={`${BAND_MUTED} ${DOT_GRID} overflow-x-clip pt-28 pb-16 sm:pt-32 sm:pb-20 lg:pt-32 lg:pb-24`}
     >
-
-      {/* Ambient glow behind the workbench. Slow drift, transform only, off for
-          reduced motion. Gives the product visual depth without a drop-shadow stack. */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-32 right-[-10%] h-[520px] w-[620px] rounded-full pointer-events-none opacity-70 blur-3xl bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-primary)_14%,transparent),transparent)] animate-ambient motion-reduce:animate-none"
-      />
-
-      <div className={`relative ${CONTAINER} max-w-[1180px]`}>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-
-          {/* ── Left Column: Value Proposition & CTAs ────────────────────────── */}
-          <div className="lg:col-span-6 flex flex-col gap-6">
-
-            {/* Main Headline */}
-            <h1
-              id="hero-heading"
-              className={`${ENTER_OPAQUE} delay-75 font-display text-[2.375rem] sm:text-5xl lg:text-[3.375rem] font-semibold text-foreground leading-[1.08] tracking-[-0.035em] text-balance`}
+      <div className={CONTAINER}>
+        <div className="grid grid-cols-1 items-center gap-12 md:gap-14 lg:grid-cols-12 lg:gap-10">
+          <div className="flex min-w-0 flex-col items-start lg:col-span-6">
+            <p
+              className={`${ENTER} inline-flex items-center rounded-full border border-border bg-surface/80 px-3.5 py-1 text-body-sm font-medium text-foreground shadow-tinted`}
             >
-              The structured path from “I want to break into PM” to a{' '}
-              <span className="text-primary [box-decoration-break:clone] bg-[linear-gradient(transparent_68%,var(--color-primary-soft)_68%)]">
-                portfolio that proves you can
-              </span>
-              .
-            </h1>
-
-            {/* Subheadline */}
-            <p className={`${ENTER_OPAQUE} delay-150 text-body sm:text-body-lg text-ink-muted leading-relaxed max-w-[520px] text-pretty`}>
-              Ninety lessons that build product judgment, and nine capstone deliverables
-              that turn it into work you can show. Free, permanently.
+              <Clock3 size={14} aria-hidden="true" className="mr-2 shrink-0 text-primary" />
+              <span className={SHINY_TEXT}>Learn at your own pace</span>
             </p>
 
-            {/* Action Buttons */}
-            <div className={`${ENTER} delay-200 flex flex-col sm:flex-row sm:items-center gap-3 pt-1`}>
+            <h1 id="hero-heading" className={`${ENTER_OPAQUE} mt-6 ${HERO_TITLE}`}>
+              Learn product management.{' '}
+              <span className="block text-primary">Leave with proof.</span>
+            </h1>
+
+            <p className={`${ENTER_OPAQUE} delay-100 mt-6 ${DISPLAY_LEAD} max-w-[34ch]`}>
+              90 lessons and 9 capstones build a public portfolio you can share. Free,
+              permanently.
+            </p>
+
+            <div
+              className={`${ENTER} delay-200 mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center`}
+            >
               <HeroCtaLink />
-
-              {/* Secondary CTA points at a real lesson rather than the curriculum index.
-                  All 90 lessons are already public, and reading one is a lower-commitment,
-                  higher-evidence second step than scanning a module list. */}
-              <Link href="/lessons/lesson-001" className={BUTTON_SECONDARY}>
+              <TrackedLink
+                href="/lessons/lesson-001"
+                event="home_secondary_cta_click"
+                args={{ location: 'hero', target: 'sample_lesson' }}
+                className={BUTTON_SECONDARY}
+              >
                 <span>Read a sample lesson</span>
-                <span aria-hidden="true" className={`text-ink-muted group-hover:text-foreground ${ARROW_NUDGE}`}>
-                  →
-                </span>
-              </Link>
+                <ArrowRight
+                  size={16}
+                  aria-hidden="true"
+                  className={`text-ink-muted group-hover:text-foreground ${ARROW_NUDGE}`}
+                />
+              </TrackedLink>
             </div>
-
-            {/* Key Value Anchors */}
-            <dl className={`${ENTER} delay-300 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5 pt-6 mt-1 border-t border-border/80`}>
-              {ANCHORS.map((anchor) => (
-                <div key={anchor.value} className="space-y-1">
-                  <dt
-                    className={`text-sm font-semibold font-mono tracking-tight ${
-                      'highlight' in anchor ? 'text-primary' : 'text-foreground'
-                    }`}
-                  >
-                    {anchor.value}
-                  </dt>
-                  <dd className="text-xs text-ink-muted leading-snug">{anchor.detail}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
-          {/* ── Right Column: Interactive Product Workbench ─────────────────── */}
-          <HeroWorkbench />
+          <div className={`${ENTER} delay-300 min-w-0 lg:col-span-6`}>
+            <HeroWorkbench />
+          </div>
         </div>
       </div>
     </section>

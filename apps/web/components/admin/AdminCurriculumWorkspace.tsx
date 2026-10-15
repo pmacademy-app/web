@@ -88,7 +88,7 @@ export function AdminCurriculumWorkspace({
   return (
     <AdminPageShell
       title="Curriculum"
-      description={`Browse the ${initialModules.length}-module PM Academy curriculum, inspect lessons, and preview learner content.`}
+      description={`Browse the ${initialModules.length}-module Prodily curriculum, inspect lessons, and preview learner content.`}
       icon={BookOpen}
       kpiGridClassName="lg:grid-cols-5"
       kpis={

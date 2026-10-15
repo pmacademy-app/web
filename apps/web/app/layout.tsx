@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
 import { ConsentGatedAnalytics } from '@/components/legal/ConsentGatedAnalytics'
@@ -18,11 +18,12 @@ const inter = Inter({
   preload: true,
 })
 
-const fraunces = Fraunces({
+// Wordmark only: the word "Prodily" beside the logo mark. One weight, so it stays small.
+const wordmark = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  weight: '800',
   display: 'swap',
-  variable: '--font-fraunces',
-  axes: ['opsz', 'SOFT', 'WONK'],
+  variable: '--font-jakarta',
   preload: true,
 })
 
@@ -129,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable}`}
+      className={`${inter.variable} ${wordmark.variable}`}
       suppressHydrationWarning
     >
       <head>

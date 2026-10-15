@@ -113,7 +113,7 @@ export function generatePersonJsonLd({
     '@type': 'Person',
     name: name || username,
     alternateName: username,
-    description: bio || `${name || username}'s Product Management portfolio and skill radar on Prodily PM Academy.`,
+    description: bio || `${name || username}'s Product Management portfolio and skill radar on Prodily.`,
     url: profileUrl,
   }
 

@@ -1,43 +1,69 @@
 'use client'
 
 /**
- * The hero's primary call to action (B12-B).
+ * The homepage signup call to action (B12-B island, reused after the proof section).
  *
- * Split out of `hero.tsx` for one reason: `trackHeroCTAClick` is an event handler, and
- * an event handler is the only thing in the hero's left column that genuinely requires
- * the client. Isolating it here lets the rest of the column — headline, subheadline,
- * value anchors, the whole LCP surface — render on the server.
+ * A client island because it fires an analytics event on click and asks whether the
+ * visitor is signed in. Everything around it renders on the server.
  *
- * The analytics call is unchanged. B12-B explicitly excludes analytics changes, so this
- * fires exactly the same event with exactly the same argument as before; only the module
- * boundary moved.
+ * Signed-in visitors see "Go to dashboard" instead. `useSessionCta` returns false until
+ * the session check answers, so the server HTML and the first client render agree on
+ * the signup link. Both states share one pill and a minimum width wide enough for the
+ * longer label, so the swap changes the words and not the layout. The trailing arrow
+ * sits in its own small circle (ARROW_BUBBLE, button-in-button) that nudges on hover.
  *
- * The hover and tap feedback that used to be `whileHover`/`whileTap` on a wrapping
- * `motion.div` is now CSS `hover:scale-[1.025] active:scale-[0.975]`, matching what the
- * shared Button primitive already does. `motion-reduce:` opts out.
+ * `location` defaults to 'hero'. The hero path keeps its original literal call so the
+ * existing event and its guard test are unchanged; the proof section passes 'portfolio'
+ * and the Why section passes 'why', so every signup CTA on the page shares one label.
  */
 
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-import { trackHeroCTAClick } from '@/lib/analytics'
-import { ARROW_NUDGE, BUTTON_PRIMARY } from '@/components/marketing/styles'
+import { useSessionCta } from '@/hooks/use-session-cta'
+import { trackDashboardCTAClick, trackHeroCTAClick } from '@/lib/analytics'
+import { ARROW_BUBBLE, BUTTON_PRIMARY } from '@/components/marketing/styles'
 
-export function HeroCtaLink() {
+type HeroCtaLocation = 'hero' | 'portfolio' | 'why'
+
+interface HeroCtaLinkProps {
+  location?: HeroCtaLocation
+}
+
+/** Same footprint for both labels, so the authenticated swap does not shift layout. */
+const SIZE = 'sm:min-w-[13.5rem]'
+
+export function HeroCtaLink({ location = 'hero' }: HeroCtaLinkProps) {
+  const { authenticated } = useSessionCta()
+
+  if (authenticated) {
+    return (
+      <Link
+        href="/dashboard"
+        onClick={() => trackDashboardCTAClick(location)}
+        className={`${BUTTON_PRIMARY} ${SIZE}`}
+      >
+        <span>Go to dashboard</span>
+        <span aria-hidden="true" className={ARROW_BUBBLE}>
+          <ArrowRight size={15} strokeWidth={2.25} />
+        </span>
+      </Link>
+    )
+  }
+
   return (
     <Link
       href="/signup"
-      onClick={() => trackHeroCTAClick('hero')}
-      className={`${BUTTON_PRIMARY} overflow-hidden`}
+      onClick={() => {
+        if (location === 'hero') trackHeroCTAClick('hero')
+        else trackHeroCTAClick(location)
+      }}
+      className={`${BUTTON_PRIMARY} ${SIZE}`}
     >
-      {/* Light sweep on hover. Hover-capable pointers only, so it never sticks on touch. */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 -translate-x-full [@media(hover:hover)]:group-hover:translate-x-full transition-transform duration-700 ease-out-quint bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none motion-reduce:hidden"
-      />
-
-      <span className="relative">Start Learning Free</span>
-      <ArrowRight size={16} aria-hidden="true" className={`relative ${ARROW_NUDGE}`} />
+      <span>Start Learning Free</span>
+      <span aria-hidden="true" className={ARROW_BUBBLE}>
+          <ArrowRight size={15} strokeWidth={2.25} />
+        </span>
     </Link>
   )
 }

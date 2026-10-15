@@ -30,7 +30,7 @@ describe('buildPortfolioShareIntents', () => {
   })
 
   it('shares the same third-person text as the portfolio page', () => {
-    expect(portfolioShareText('Jordan', 'Prodily PM Academy')).toBe("Jordan's Product Management portfolio on Prodily PM Academy")
+    expect(portfolioShareText('Jordan', 'Prodily')).toBe("Jordan's Product Management portfolio on Prodily")
   })
 })
 

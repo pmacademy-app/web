@@ -17,7 +17,7 @@ interface ContextualFeedbackModalProps {
 export function ContextualFeedbackModal({
   isOpen,
   promptKey,
-  title = 'Help Us Improve PM Academy',
+  title = 'Help Us Improve Prodily',
   description = 'Your thoughts help shape the future of our product management curriculum.',
   sourceEvent = 'usage_1hr',
   onClose,
@@ -86,7 +86,7 @@ export function ContextualFeedbackModal({
             content,
             rating,
             headline,
-            authorRole: authorRole || 'PM Academy Learner',
+            authorRole: authorRole || 'Prodily Learner',
             allowPublicFeature,
           }),
         })
@@ -153,7 +153,7 @@ export function ContextualFeedbackModal({
             <h3 className="text-lg font-bold text-foreground">Thank You!</h3>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto">
               {feedbackType === 'public'
-                ? 'Your review has been submitted for moderation. Thank you for supporting PM Academy!'
+                ? 'Your review has been submitted for moderation. Thank you for supporting Prodily!'
                 : 'Your feedback has been saved privately for our curriculum team.'}
             </p>
           </div>
@@ -283,7 +283,7 @@ export function ContextualFeedbackModal({
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={
                   feedbackType === 'public'
-                    ? 'Share your experience with PM Academy...'
+                    ? 'Share your experience with Prodily...'
                     : 'What worked well? What could be improved?'
                 }
                 className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
@@ -299,7 +299,7 @@ export function ContextualFeedbackModal({
                   className="mt-0.5 rounded border-border text-primary focus:ring-primary cursor-pointer"
                 />
                 <span className="text-xs text-muted-foreground leading-snug">
-                  I explicitly authorize PM Academy to feature this review publicly on the homepage after review.
+                  I explicitly authorize Prodily to feature this review publicly on the homepage after review.
                 </span>
               </label>
             )}

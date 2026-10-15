@@ -130,7 +130,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
             Certificate Code Unverified
           </h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The certificate identifier <strong className="font-mono text-foreground">{certificateId}</strong> was not found in the official {BRAND.product} verification registry.
+            The certificate identifier <strong className="font-mono text-foreground">{certificateId}</strong> was not found in the official {BRAND.company} verification registry.
           </p>
           <Link
             href="/"
@@ -261,10 +261,10 @@ export default async function CertificateVerificationPage({ params }: PageProps)
 
             <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
               <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-primary" /> Modules Mastered
+                <Layers className="w-3.5 h-3.5 text-primary" /> Modules Completed
               </span>
               <div className="text-xl font-bold text-foreground">{cert.modulesCompleted} / 9</div>
-              <span className="text-[10px] text-emerald-500 font-semibold">Capstones Passed</span>
+              <span className="text-[10px] text-emerald-500 font-semibold">Every lesson finished</span>
             </div>
 
             <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">

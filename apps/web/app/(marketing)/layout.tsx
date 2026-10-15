@@ -13,12 +13,6 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="relative min-h-[100dvh] bg-background text-foreground">
-      {/* Mathematical architectural grid across all marketing pages, navbar, and sections */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-primary)_5%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_srgb,var(--color-primary)_5%,transparent)_1px,transparent_1px)] bg-[size:3.5rem_3.5rem]"
-      />
-
       {/* Skip link — must be the first focusable element */}
       <a
         href="#main-content"
@@ -43,6 +37,15 @@ export default function MarketingLayout({
       <div className="relative z-10">
         <Footer />
       </div>
+
+      {/* Static film grain over every marketing page. It sits above the content
+          (z-20, below the navbar and dialogs) because the section bands are opaque
+          and would hide it otherwise; pointer-events-none and a few percent opacity
+          keep it from affecting interaction or text contrast. Not animated. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-20 bg-grain opacity-[0.035] dark:opacity-[0.05]"
+      />
     </div>
   )
 }

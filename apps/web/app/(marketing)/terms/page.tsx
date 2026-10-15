@@ -9,18 +9,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'Terms of Service for Prodily PM Academy outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
+  description: 'Terms of Service for Prodily outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
   alternates: {
     canonical: `${siteUrl}/terms`,
   },
   openGraph: {
-    title: 'Terms of Service | Prodily PM Academy',
-    description: 'Prodily PM Academy terms of service, acceptable use, and platform policies.',
+    title: 'Terms of Service | Prodily',
+    description: 'Prodily terms of service, acceptable use, and platform policies.',
     url: `${siteUrl}/terms`,
     type: 'website',
-    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily PM Academy' }],
+    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Terms of Service | Prodily PM Academy', images: [BRAND.assets.ogImage] },
+  twitter: { card: 'summary_large_image', title: 'Terms of Service | Prodily', images: [BRAND.assets.ogImage] },
 }
 
 export default function TermsPage() {
@@ -124,7 +124,7 @@ export default function TermsPage() {
           </h2>
           <div className="space-y-3 text-xs">
             <p>
-              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks ({BRAND.company}, {BRAND.product}), and brand assets are the exclusive intellectual property of the Platform operator and protected by copyright and intellectual property laws.
+              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks ({BRAND.company}), and brand assets are the exclusive intellectual property of the Platform operator and protected by copyright and intellectual property laws.
             </p>
             <p>
               <strong className="text-foreground font-semibold">Learner-Generated Content:</strong> You retain 100% ownership of your written capstone projects, self-reflection responses, and portfolio summaries. By setting your portfolio to public, you grant {BRAND.fullName} a non-exclusive, worldwide license to render and display your public portfolio page.

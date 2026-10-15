@@ -1,13 +1,17 @@
 import type { Metadata } from 'next'
 
 import { PageAnalytics } from '@/components/marketing/page-analytics'
+import { SectionViewTracker } from '@/components/marketing/section-view-tracker'
 import { HeroSection } from '@/components/marketing/sections/hero'
+import { PortfolioSection } from '@/components/marketing/sections/portfolio'
+import { WhatYouLeaveWithSection } from '@/components/marketing/sections/what-you-leave-with'
+import { SkillRadarSection } from '@/components/marketing/sections/skill-radar-section'
 import { SampleLessonSection } from '@/components/marketing/sections/sample-lesson'
 import { HowItWorksSection } from '@/components/marketing/sections/how-it-works'
-import { PortfolioSection } from '@/components/marketing/sections/portfolio'
 import { CurriculumSection } from '@/components/marketing/sections/curriculum'
 import { WhySection } from '@/components/marketing/sections/why'
 import { PublishedTestimonialsSection } from '@/components/marketing/sections/published-testimonials'
+import { HomeFaqSection } from '@/components/marketing/sections/home-faq'
 import { FinalCTASection } from '@/components/marketing/sections/final-cta'
 import { BRAND } from '@/lib/brand'
 
@@ -22,48 +26,27 @@ export const metadata: Metadata = {
 /**
  * Marketing landing page.
  *
- * ## Phase 0.C — what changed and why
+ * The page leads with proof and closes on one deep band. In order: the hero, the proof
+ * wall of capstone work, what you leave with, the skill radar, a sample lesson, the
+ * learning loop (read, recall, apply, retain), the curriculum, the comparison, published
+ * testimonials, the FAQ (which carries the "check it yourself" links), and the closing
+ * call to action, which also carries the brand tagline.
+ * Every section is a server component; the only client code is the analytics islands
+ * and a few small interactive pieces inside sections (toggles, the learning-loop step
+ * tracker, the pointer spotlight). Each section marks itself with a `data-home-section`
+ * attribute, and the single `SectionViewTracker` reports a view event once per section.
  *
- * The audit in `docs/IMPLEMENTATION_PLAN.md` §Phase 0.C measured 2,152 lines across the
- * marketing sections, with `experience.tsx` (453) and `journey-timeline.tsx` (213)
- * carrying the explanatory load through prose and interactive widgets. The page
- * explained the product at length instead of showing it, and left several shipping
- * capabilities unmentioned.
+ * `PublishedTestimonialsSection` renders only when at least three real approved rows
+ * exist, and `SampleLessonSection` renders nothing if its data is unavailable, so the
+ * page closes up rather than showing empty shells. The learning loop reads a real public
+ * lesson and falls back to static visuals if it cannot.
  *
- * Seven sections now, each answering exactly one question:
+ * The homepage FAQ is visible content only and carries no FAQPage JSON-LD: `/faq`
+ * already marks up the same questions, and duplicate FAQPage markup across URLs is
+ * discouraged.
  *
- *   1. Hero              — what is it, who is it for, what do I get?
- *   2. Proof-by-sample   — is the content any good?        (new: shows real lessons)
- *   3. How it works      — what makes this different?      (replaces the 453-line demo)
- *   4. What you build    — what is the outcome?
- *   5. Curriculum        — is it substantial?
- *   6. Why Prodily       — why not YouTube or a bootcamp?
- *   7. Start             — why now?
- *
- * Published testimonials sit between 6 and 7 and render only when at least three real
- * approved rows exist; otherwise the section returns null and the page closes up.
- *
- * ## What was removed from the page, and what was not removed from the repository
- *
- * `ExperienceSection` and `JourneySection` are no longer composed here: the first is
- * replaced by `HowItWorksSection`, and the second told the same progression story as
- * `CurriculumSection`. Both component files remain in the repository. They are still
- * covered by the B12-B server-component test and the B11-C button-rule allowlist, they
- * are reusable on a deeper page, and deleting them would mean editing test
- * infrastructure that has nothing to do with this phase.
- *
- * ## Rendering
- *
- * Previously this rendered no data at all. `SampleLessonSection` reads compiled lesson
- * JSON and `PublishedTestimonialsSection` reads an `unstable_cache`-wrapped query, so
- * the page now has two build-time data dependencies. Both are cached, neither blocks the
- * hero, and both degrade to rendering nothing if their source is unavailable.
- *
- * The hourly value below is a ceiling, not the effective one: the testimonials query
- * carries its own 30-minute cache, and Next takes the shortest revalidate on the page —
- * `next build` reports `/` at 30m. That is the correct behaviour (a published
- * testimonial should not wait an hour to appear) and is noted here so the number in this
- * file is not mistaken for the number in production.
+ * The hourly revalidate is a ceiling: the testimonials query carries a shorter cache
+ * of its own, and Next uses the shortest revalidate on the page.
  */
 export const revalidate = 3600
 
@@ -71,29 +54,18 @@ export default function MarketingPage() {
   return (
     <>
       <PageAnalytics />
+      <SectionViewTracker />
 
-      {/* 1 — What is it, who is it for, what do I get? */}
       <HeroSection />
-
-      {/* 2 — Is the content any good? Shown, not claimed. */}
-      <SampleLessonSection />
-
-      {/* 3 — What makes the learning different? */}
-      <HowItWorksSection />
-
-      {/* 4 — What do I walk away with? */}
       <PortfolioSection />
-
-      {/* 5 — Is it substantial? */}
+      <WhatYouLeaveWithSection />
+      <SkillRadarSection />
+      <SampleLessonSection />
+      <HowItWorksSection />
       <CurriculumSection />
-
-      {/* 6 — Why this rather than the alternatives? */}
       <WhySection />
-
-      {/* 7a — Real approved testimonials, or nothing at all. */}
       <PublishedTestimonialsSection />
-
-      {/* 7b — Why now? */}
+      <HomeFaqSection />
       <FinalCTASection />
     </>
   )

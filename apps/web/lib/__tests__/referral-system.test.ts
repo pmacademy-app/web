@@ -1,5 +1,5 @@
 /**
- * PM Academy — Phase 7 Referral & Organic Growth Test Suite
+ * Prodily — Phase 7 Referral & Organic Growth Test Suite
  *
  * Tests:
  * 1. Referral code resolution (username, UUID, case-insensitivity)

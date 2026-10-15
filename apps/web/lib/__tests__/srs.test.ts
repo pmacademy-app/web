@@ -10,7 +10,7 @@ import {
   UserFlashcardSRSRow,
 } from '../srs'
 
-describe('PM Academy SM-2 Spaced Repetition Engine Test Suite', () => {
+describe('Prodily SM-2 Spaced Repetition Engine Test Suite', () => {
   describe('Ease Factor Calculations', () => {
     it('increases ease factor on perfect recall (rating 5)', () => {
       const newEf = updateEaseFactor(2.5, 5)
