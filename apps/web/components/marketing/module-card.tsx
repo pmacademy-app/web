@@ -22,6 +22,8 @@ export interface ModuleLedgerRowProps {
  * Layout: numeral, module title, then lesson count and study time. The capstone titles
  * are deliberately not repeated here; the proof section's wall already lists them.
  * Stacks under the numeral on phones, the meta sits right-aligned from `md` up.
+ * Rows are compact (round 2): about 56px each on desktop, so the nine modules read
+ * as one ledger instead of a page of air.
  */
 export function ModuleLedgerRow({
   number,
@@ -34,11 +36,11 @@ export function ModuleLedgerRow({
   return (
     <li
       className={cn(
-        'grid grid-cols-[3.5rem_1fr] gap-x-4 gap-y-1 py-5 sm:grid-cols-[5rem_1fr] md:grid-cols-[6rem_minmax(0,1fr)_auto] md:items-baseline md:gap-x-8 md:py-6',
+        'grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-4 gap-y-0.5 py-3.5 sm:grid-cols-[4rem_minmax(0,1fr)] md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:items-baseline md:gap-x-6 md:py-4',
         className,
       )}
     >
-      <span aria-hidden="true" className="font-sans text-[1.5rem] font-semibold leading-none tracking-[-0.015em] tabular-nums text-ink-muted sm:text-[2rem]">
+      <span aria-hidden="true" className="font-sans text-[1.25rem] font-semibold leading-none tracking-[-0.015em] tabular-nums text-ink-muted sm:text-[1.5rem]">
         {index}
       </span>
 

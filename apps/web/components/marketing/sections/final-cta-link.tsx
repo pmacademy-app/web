@@ -7,8 +7,12 @@
  * isolating it leaves the rest of the section on the server. The event and its
  * `'final_cta'` argument are unchanged.
  *
- * Flat pill, no hover sweep: the closing band is quiet on purpose, and the press
- * feedback (`active:scale`) comes from BUTTON_PRIMARY.
+ * Inverse pill for the deep closing band (BAND_DEEP): `bg-primary-foreground` with
+ * `text-primary`, which the band keeps legible in light and dark (about 6.4:1 on the
+ * light band). The trailing arrow sits in ARROW_BUBBLE, re-tinted from the button's own
+ * text colour so the circle shows on the light pill. Press feedback (`active:scale`)
+ * comes from BUTTON_PRIMARY; the focus ring is the band's re-pointed focus colour,
+ * offset in the band colour so it reads against the green.
  *
  * Signed-in visitors see "Go to dashboard", matching `HeroCtaLink`. `useSessionCta`
  * returns false until the session check answers, so server HTML and first client
@@ -20,10 +24,22 @@ import { ArrowRight } from 'lucide-react'
 
 import { useSessionCta } from '@/hooks/use-session-cta'
 import { trackDashboardCTAClick, trackHeroCTAClick } from '@/lib/analytics'
-import { ARROW_NUDGE, BUTTON_PRIMARY } from '@/components/marketing/styles'
+import { ARROW_BUBBLE, BUTTON_PRIMARY } from '@/components/marketing/styles'
+import { cn } from '@/lib/utils'
 
-/** Same footprint for both labels, so the authenticated swap does not shift layout. */
-const SIZE = 'w-full sm:w-auto sm:min-w-[15.5rem] px-8'
+/**
+ * BUTTON_PRIMARY inverted for the deep band. Same footprint for both labels (min width),
+ * so the authenticated swap does not shift layout.
+ */
+const INVERSE = cn(
+  BUTTON_PRIMARY,
+  'w-full sm:w-auto sm:min-w-[15.5rem] justify-between',
+  'bg-primary-foreground text-primary hover:bg-primary-foreground/90',
+  'focus-visible:ring-offset-primary',
+)
+
+/** ARROW_BUBBLE re-tinted for a light pill: the circle takes the button's text colour at low alpha. */
+const BUBBLE = cn(ARROW_BUBBLE, 'bg-primary/10')
 
 export function FinalCtaLink() {
   const { authenticated } = useSessionCta()
@@ -33,10 +49,12 @@ export function FinalCtaLink() {
       <Link
         href="/dashboard"
         onClick={() => trackDashboardCTAClick('final_cta')}
-        className={`${BUTTON_PRIMARY} ${SIZE}`}
+        className={INVERSE}
       >
         <span>Go to dashboard</span>
-        <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+        <span aria-hidden="true" className={BUBBLE}>
+          <ArrowRight size={15} />
+        </span>
       </Link>
     )
   }
@@ -45,10 +63,12 @@ export function FinalCtaLink() {
     <Link
       href="/signup"
       onClick={() => trackHeroCTAClick('final_cta')}
-      className={`${BUTTON_PRIMARY} ${SIZE}`}
+      className={INVERSE}
     >
       <span>Start Learning Free</span>
-      <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+      <span aria-hidden="true" className={BUBBLE}>
+        <ArrowRight size={15} />
+      </span>
     </Link>
   )
 }

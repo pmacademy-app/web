@@ -1,15 +1,18 @@
 import { ArrowRight } from 'lucide-react'
 
 import { Reveal } from '@/components/marketing/motion/reveal'
+import { SpotlightGroup } from '@/components/marketing/spotlight-group'
 import {
   ARROW_NUDGE,
   BAND_MUTED,
-  CARD,
-  CARD_INTERACTIVE,
   CONTAINER,
+  GLARE,
   SECTION_LEAD,
   SECTION_TITLE,
   SECTION_Y,
+  SHELL,
+  SHELL_CORE,
+  SPOTLIGHT,
 } from '@/components/marketing/styles'
 import { TrackedLink } from '@/components/marketing/tracked-link'
 import { fetchCompiledLesson, fetchCurriculumData } from '@/lib/lesson-loader'
@@ -33,9 +36,30 @@ import { fetchCompiledLesson, fetchCurriculumData } from '@/lib/lesson-loader'
  * ## Rendering
  *
  * A server component reading the same compiled JSON the lesson pages read, on a page
- * with `revalidate = 3600`. The only client code is the `TrackedLink` wrapper that
- * reports which card was opened (`sample_lesson_card_click`, 1-based position).
+ * with `revalidate = 3600`. The client code is the `TrackedLink` wrapper that
+ * reports which card was opened (`sample_lesson_card_click`, 1-based position) and the
+ * `SpotlightGroup` island that feeds the pointer glow.
+ *
+ * ## Surface (round 2)
+ *
+ * The lead card sits in the double bezel (SHELL tray + SHELL_CORE). Every card carries
+ * SPOTLIGHT (pointer glow, `::before`) and GLARE (one light sweep on hover, `::after`);
+ * the two effects use different pseudo-elements, so they can share one element. Both
+ * are fine-pointer only and off under reduced motion.
  */
+
+/**
+ * Hover and focus treatment shared by every sample card: the border darkens. The two
+ * secondary cards also rise 2px (CARD_LIFT); the lead stays seated in its tray. The
+ * ring sits on the muted band, so it offsets against the band colour.
+ */
+const CARD_MOTION = `
+  transition-[border-color,translate] duration-300 ease-out-quint
+  hover:border-border-strong motion-reduce:transition-colors
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted
+`
+
+const CARD_LIFT = 'hover:-translate-y-0.5 motion-reduce:hover:translate-y-0'
 
 /** Kept in sync with `SAMPLE_LESSON_IDS` in the academy lesson route. */
 const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih'] as const
@@ -87,7 +111,10 @@ interface SampleLesson {
   title: string
   order: number
   minutes: number
+  /** Lead card: up to ~200 characters of the opening paragraph. */
   opening: string
+  /** Secondary cards: the opening paragraph cut to about one line. */
+  line: string
 }
 
 async function loadSamples(): Promise<SampleLesson[]> {
@@ -111,13 +138,16 @@ async function loadSamples(): Promise<SampleLesson[]> {
 
       const index = curriculum.lessons.findIndex((l) => l.id === id)
 
+      const plain = toPlainText(firstParagraph.text)
+
       return {
         id,
         slug: entry.slug,
         title: entry.title,
         order: index >= 0 ? index + 1 : entry.order,
         minutes: entry.estimatedReadingTime,
-        opening: excerpt(toPlainText(firstParagraph.text), 200),
+        opening: excerpt(plain, 200),
+        line: excerpt(plain, 110),
       }
     })
   )
@@ -142,34 +172,37 @@ export async function SampleLessonSection() {
       className={`${BAND_MUTED} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
-        <Reveal amount={0.2} className="mb-12 lg:mb-16">
+        <Reveal amount={0.2} className="mb-10 lg:mb-12">
           <h2 id="sample-heading" className={`${SECTION_TITLE} mb-4`}>
             Read a lesson first.
           </h2>
           <p className={SECTION_LEAD}>Three full lessons. No account.</p>
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
+        <SpotlightGroup className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
           {/* Lead sample, given the width because its opening paragraph is the argument. */}
           <Reveal amount={0.15} className="h-full lg:col-span-7">
-            <TrackedLink
-              href={`/lessons/${lead.slug}`}
-              event="sample_lesson_card_click"
-              args={{ lessonSlug: lead.slug, position: 1 }}
-              className={`group flex h-full flex-col justify-between gap-10 p-7 lg:p-10 ${CARD} ${CARD_INTERACTIVE} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus`}
-            >
-              <div className="space-y-5">
-                <LessonMeta order={lead.order} minutes={lead.minutes} />
-                <h3 className="font-sans text-[clamp(1.375rem,2.4vw,1.875rem)] font-semibold leading-[1.18] tracking-[-0.015em] text-foreground text-balance">
-                  {lead.title}
-                </h3>
-                {/* The lesson's own words, read from compiled content, not a paraphrase. */}
-                <p className="max-w-[56ch] border-l-2 border-primary/30 pl-4 text-body leading-relaxed text-ink-muted text-pretty transition-colors duration-200 group-hover:border-primary motion-reduce:transition-none">
-                  {lead.opening}
-                </p>
-              </div>
-              <ReadCue label="Read the lesson" />
-            </TrackedLink>
+            <div className={`${SHELL} h-full`}>
+              <TrackedLink
+                href={`/lessons/${lead.slug}`}
+                event="sample_lesson_card_click"
+                args={{ lessonSlug: lead.slug, position: 1 }}
+                data-spotlight=""
+                className={`group flex h-full flex-col justify-between gap-10 p-7 lg:p-10 ${SHELL_CORE} ${SPOTLIGHT} ${GLARE} ${CARD_MOTION}`}
+              >
+                <div className="space-y-5">
+                  <LessonMeta order={lead.order} minutes={lead.minutes} />
+                  <h3 className="font-sans text-[clamp(1.375rem,2.4vw,1.875rem)] font-semibold leading-[1.18] tracking-[-0.015em] text-foreground text-balance">
+                    {lead.title}
+                  </h3>
+                  {/* The lesson's own words, read from compiled content, not a paraphrase. */}
+                  <p className="max-w-[56ch] border-l-2 border-primary/30 pl-4 text-body leading-relaxed text-ink-muted text-pretty transition-colors duration-200 group-hover:border-primary motion-reduce:transition-none">
+                    {lead.opening}
+                  </p>
+                </div>
+                <ReadCue label="Read the lesson" />
+              </TrackedLink>
+            </div>
           </Reveal>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-5">
@@ -179,20 +212,26 @@ export async function SampleLessonSection() {
                   href={`/lessons/${sample.slug}`}
                   event="sample_lesson_card_click"
                   args={{ lessonSlug: sample.slug, position: index + 2 }}
-                  className={`group flex h-full flex-col justify-between gap-8 p-6 lg:p-7 ${CARD} ${CARD_INTERACTIVE} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus`}
+                  data-spotlight=""
+                  className={`group flex h-full flex-col justify-between gap-8 rounded-[1.25rem] border border-border bg-surface p-6 shadow-tinted lg:p-7 ${SPOTLIGHT} ${GLARE} ${CARD_MOTION} ${CARD_LIFT}`}
                 >
                   <div className="space-y-3">
                     <LessonMeta order={sample.order} minutes={sample.minutes} />
                     <h3 className="font-sans text-[1.25rem] font-semibold leading-snug tracking-[-0.015em] text-foreground text-balance">
                       {sample.title}
                     </h3>
+                    {/* The lesson's own opening, cut to one line, from the same compiled
+                        content as the lead card. */}
+                    <p className="line-clamp-2 text-body-sm leading-relaxed text-ink-muted text-pretty">
+                      {sample.line}
+                    </p>
                   </div>
                   <ReadCue label="Read it" />
                 </TrackedLink>
               </Reveal>
             ))}
           </div>
-        </div>
+        </SpotlightGroup>
       </div>
     </section>
   )

@@ -22,7 +22,9 @@ import {
  *
  * Server component. The three comparison cards are replaced by one before/after
  * comparison (`WhyCompareToggle`, a small client island): the same Sample Learner as
- * a course certificate, then as a public portfolio with the real capstone titles.
+ * a generic course certificate, then as a public portfolio showing the kinds of
+ * artefacts on the page (deliverable types, no capstone titles, which the proof wall
+ * already lists). Both states sit in one double-bezel frame.
  * Capstone data is resolved here and passed down as plain props so the island never
  * imports `config/marketing.ts`.
  *
@@ -35,6 +37,7 @@ export function WhySection() {
     index: padIndex(c.number),
     title: c.title,
     skill: c.skill,
+    deliverableType: c.deliverableType,
   }))
 
   return (
@@ -44,7 +47,7 @@ export function WhySection() {
       data-home-section="why"
       className={`${BAND_PLAIN} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className={`${CONTAINER} grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-x-12 lg:gap-y-10`}>
+      <div className={`${CONTAINER} grid grid-cols-1 gap-10 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-10`}>
         <Reveal amount={0.3} className="lg:col-span-5 lg:row-start-1">
           <h2 id="why-heading" className={`${SECTION_TITLE} mb-5`}>
             Structure without the tuition.

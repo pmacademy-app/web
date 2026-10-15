@@ -47,16 +47,37 @@ export function CurriculumSection() {
       className={`${BAND_MUTED} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
-        <Reveal amount={0.3} className="mb-12 max-w-[46rem] lg:mb-16">
-          <p className={`${EYEBROW} mb-5`}>
-            <span aria-hidden="true" className={EYEBROW_RULE} />
-            CURRICULUM
-          </p>
-          <h2 id="curriculum-heading" className={`${SECTION_TITLE} mb-5`}>
-            From first principles to a full case study.
-          </h2>
-          <p className={SECTION_LEAD}>Each module ends in a capstone.</p>
-        </Reveal>
+        {/* Header split like the proof section: heading left, the capstone line and the
+            full-curriculum link right, so the right half of the row is not empty. Below
+            `lg` the right column stacks under the heading behind a hairline. */}
+        <div className="mb-10 grid grid-cols-1 gap-8 lg:mb-12 lg:grid-cols-12 lg:items-end lg:gap-12">
+          <Reveal amount={0.3} className="min-w-0 lg:col-span-7">
+            <p className={`${EYEBROW} mb-5`}>
+              <span aria-hidden="true" className={EYEBROW_RULE} />
+              CURRICULUM
+            </p>
+            <h2 id="curriculum-heading" className={SECTION_TITLE}>
+              From first principles to a full case study.
+            </h2>
+          </Reveal>
+
+          <Reveal
+            amount={0.3}
+            delay={80}
+            className="min-w-0 border-t border-border pt-6 lg:col-span-5 lg:border-t-0 lg:border-l lg:pl-10 lg:pt-0"
+          >
+            <p className={SECTION_LEAD}>Each module ends in a capstone.</p>
+            <TrackedLink
+              href="/curriculum"
+              event="home_secondary_cta_click"
+              args={{ location: 'curriculum', target: 'curriculum' }}
+              className={`${LINK_QUIET} mt-2`}
+            >
+              See every lesson in the curriculum
+              <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+            </TrackedLink>
+          </Reveal>
+        </div>
 
         <CurriculumViewTracker />
 
@@ -67,18 +88,6 @@ export function CurriculumSection() {
             ))}
           </ol>
         </Reveal>
-
-        <div className="mt-10">
-          <TrackedLink
-            href="/curriculum"
-            event="home_secondary_cta_click"
-            args={{ location: 'curriculum', target: 'curriculum' }}
-            className={LINK_QUIET}
-          >
-            See every lesson in the curriculum
-            <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
-          </TrackedLink>
-        </div>
       </div>
     </section>
   )

@@ -30,9 +30,11 @@ function code(source: string): string {
 const PAGE = 'app/(marketing)/page.tsx'
 
 /**
- * Homepage redesign (changed deliberately): the page now composes thirteen sections
+ * Homepage redesign (changed deliberately): the page now composes eleven sections
  * plus two analytics islands, in a fixed order that leads with proof. The original
  * eight sections are all still rendered; the assertion now also pins their order.
+ * Changed deliberately (round 2): `CheckItYourselfSection` folded into the FAQ and
+ * `BeliefBandSection` folded into the final CTA; both section files were deleted.
  */
 const HOME_COMPOSITION = [
   'PageAnalytics',
@@ -46,18 +48,19 @@ const HOME_COMPOSITION = [
   'CurriculumSection',
   'WhySection',
   'PublishedTestimonialsSection',
-  'CheckItYourselfSection',
   'HomeFaqSection',
-  'BeliefBandSection',
   'FinalCTASection',
 ] as const
 
-/** Every homepage section file plus the islands and data they render. */
+/**
+ * Every homepage section file plus the islands and data they render.
+ * Changed deliberately (round 2): belief-band and check-it-yourself were deleted; the
+ * learning-loop step island and the shared spotlight island joined.
+ */
 const HOME_SECTION_FILES = [
   'components/marketing/sections/hero.tsx',
   'components/marketing/sections/hero-cta.tsx',
   'components/marketing/sections/hero-workbench.tsx',
-  'components/marketing/sections/belief-band.tsx',
   'components/marketing/sections/portfolio.tsx',
   'components/marketing/sections/portfolio-showcase.tsx',
   'components/marketing/sections/portfolio-artifacts.ts',
@@ -66,14 +69,15 @@ const HOME_SECTION_FILES = [
   'components/marketing/sections/skill-radar-toggle.tsx',
   'components/marketing/sections/sample-lesson.tsx',
   'components/marketing/sections/how-it-works.tsx',
+  'components/marketing/sections/how-it-works-steps.tsx',
   'components/marketing/sections/curriculum.tsx',
   'components/marketing/sections/why.tsx',
   'components/marketing/sections/why-compare-toggle.tsx',
   'components/marketing/sections/published-testimonials.tsx',
-  'components/marketing/sections/check-it-yourself.tsx',
   'components/marketing/sections/home-faq.tsx',
   'components/marketing/sections/final-cta.tsx',
   'components/marketing/sections/final-cta-link.tsx',
+  'components/marketing/spotlight-group.tsx',
 ]
 
 describe('Phase 0.C — landing page composition', () => {

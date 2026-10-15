@@ -1,5 +1,5 @@
 import { Reveal } from '@/components/marketing/motion/reveal'
-import { BAND_MUTED, CARD, CONTAINER, SECTION_TITLE, SECTION_Y } from '../styles'
+import { BAND_PLAIN, CARD, CONTAINER, SECTION_TITLE, SECTION_Y } from '../styles'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 
 /**
@@ -47,7 +47,7 @@ export async function PublishedTestimonialsSection() {
       id="testimonials"
       data-home-section="testimonials"
       aria-labelledby="testimonials-heading"
-      className={`${BAND_MUTED} ${SECTION_Y} scroll-mt-24 lg:scroll-mt-28`}
+      className={`${BAND_PLAIN} ${SECTION_Y} border-t border-border scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         <Reveal amount={0.25} className="max-w-[640px] mb-12">

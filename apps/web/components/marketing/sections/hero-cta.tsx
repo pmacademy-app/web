@@ -9,7 +9,8 @@
  * Signed-in visitors see "Go to dashboard" instead. `useSessionCta` returns false until
  * the session check answers, so the server HTML and the first client render agree on
  * the signup link. Both states share one pill and a minimum width wide enough for the
- * longer label, so the swap changes the words and not the layout.
+ * longer label, so the swap changes the words and not the layout. The trailing arrow
+ * sits in its own small circle (ARROW_BUBBLE, button-in-button) that nudges on hover.
  *
  * `location` defaults to 'hero'. The hero path keeps its original literal call so the
  * existing event and its guard test are unchanged; the proof section passes 'portfolio'
@@ -21,7 +22,7 @@ import { ArrowRight } from 'lucide-react'
 
 import { useSessionCta } from '@/hooks/use-session-cta'
 import { trackDashboardCTAClick, trackHeroCTAClick } from '@/lib/analytics'
-import { ARROW_NUDGE, BUTTON_PRIMARY } from '@/components/marketing/styles'
+import { ARROW_BUBBLE, BUTTON_PRIMARY } from '@/components/marketing/styles'
 
 type HeroCtaLocation = 'hero' | 'portfolio' | 'why'
 
@@ -43,7 +44,9 @@ export function HeroCtaLink({ location = 'hero' }: HeroCtaLinkProps) {
         className={`${BUTTON_PRIMARY} ${SIZE}`}
       >
         <span>Go to dashboard</span>
-        <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+        <span aria-hidden="true" className={ARROW_BUBBLE}>
+          <ArrowRight size={15} strokeWidth={2.25} />
+        </span>
       </Link>
     )
   }
@@ -58,7 +61,9 @@ export function HeroCtaLink({ location = 'hero' }: HeroCtaLinkProps) {
       className={`${BUTTON_PRIMARY} ${SIZE}`}
     >
       <span>Start Learning Free</span>
-      <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
+      <span aria-hidden="true" className={ARROW_BUBBLE}>
+          <ArrowRight size={15} strokeWidth={2.25} />
+        </span>
     </Link>
   )
 }

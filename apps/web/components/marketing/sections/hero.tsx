@@ -1,10 +1,16 @@
 /**
  * Landing page hero (server component).
  *
- * One idea: learn product management, leave with proof. The H1 runs across most of the
- * container in display type above everything else; the sub, the two calls to action and
- * the course counts sit in a narrow left column, and the visual (one captioned capstone
- * page) takes the right. No ambient glows, no gradients, no auto-advancing mock.
+ * One idea: learn product management, leave with proof. Round 2 layout is an
+ * editorial split with no orphan column: the pill, H1, sub and the two calls to action
+ * sit on the left (6 of 12 columns), vertically centred against the visual on the
+ * right (6 of 12), a layered capstone page with a portfolio card and a Skill Radar
+ * card (see hero-workbench.tsx). A static, masked dot grid sits behind the section.
+ *
+ * The pill ("Learn at your own pace") carries the only motion in the copy column: a
+ * slow highlight sweep (SHINY_TEXT), plain text under reduced motion. The H1 itself
+ * gets no effect. "Free" is already in the sub, so the hero adds no separate "Free"
+ * line; that line lives in the closing band.
  *
  * ## The headline deliberately does not fade
  *
@@ -17,7 +23,7 @@
  * on the sample lesson button. Everything else, including the visual, is server HTML.
  */
 
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Clock3 } from 'lucide-react'
 
 import { HeroCtaLink } from '@/components/marketing/sections/hero-cta'
 import { HeroWorkbench } from '@/components/marketing/sections/hero-workbench'
@@ -29,7 +35,10 @@ import {
   CONTAINER,
   DISPLAY_LEAD,
   DISPLAY_TITLE,
+  DOT_GRID,
+  SHINY_TEXT,
 } from '@/components/marketing/styles'
+import { cn } from '@/lib/utils'
 
 /** Entry animation for secondary elements. Safe to fade: not an LCP candidate. */
 const ENTER = 'animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out-quint fill-mode-both motion-reduce:animate-none'
@@ -37,28 +46,43 @@ const ENTER = 'animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out-q
 /** Entry animation for LCP candidates. Transform only, so the text paints opaque. */
 const ENTER_OPAQUE = 'animate-in slide-in-from-bottom-2 duration-700 ease-out-quint fill-mode-both motion-reduce:animate-none'
 
+/**
+ * The hero H1 shares a half-width column with nothing else, so it steps down from the
+ * full DISPLAY_TITLE clamp (88px) to 64px at most: three short lines, never four.
+ */
+const HERO_TITLE = cn(DISPLAY_TITLE, 'text-[clamp(2.625rem,4.6vw,4rem)] leading-[1.02]')
+
 export function HeroSection() {
   return (
     <section
       id="hero"
       aria-labelledby="hero-heading"
       data-home-section="hero"
-      className={`${BAND_MUTED} pt-28 pb-20 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32`}
+      className={`${BAND_MUTED} ${DOT_GRID} overflow-x-clip pt-28 pb-16 sm:pt-32 sm:pb-20 lg:pt-32 lg:pb-24`}
     >
       <div className={CONTAINER}>
-        <h1 id="hero-heading" className={`${ENTER_OPAQUE} ${DISPLAY_TITLE}`}>
-          Learn product management.{' '}
-          <span className="block text-primary">Leave with proof.</span>
-        </h1>
+        <div className="grid grid-cols-1 items-center gap-12 md:gap-14 lg:grid-cols-12 lg:gap-10">
+          <div className="flex min-w-0 flex-col items-start lg:col-span-6">
+            <p
+              className={`${ENTER} inline-flex items-center rounded-full border border-border bg-surface/80 px-3.5 py-1 text-body-sm font-medium text-foreground shadow-tinted`}
+            >
+              <Clock3 size={14} aria-hidden="true" className="mr-2 shrink-0 text-primary" />
+              <span className={SHINY_TEXT}>Learn at your own pace</span>
+            </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-14 lg:mt-14 lg:grid-cols-12 lg:gap-12">
-          <div className="flex flex-col gap-8 lg:col-span-5">
-            <p className={`${ENTER_OPAQUE} delay-100 ${DISPLAY_LEAD}`}>
+            <h1 id="hero-heading" className={`${ENTER_OPAQUE} mt-6 ${HERO_TITLE}`}>
+              Learn product management.{' '}
+              <span className="block text-primary">Leave with proof.</span>
+            </h1>
+
+            <p className={`${ENTER_OPAQUE} delay-100 mt-6 ${DISPLAY_LEAD} max-w-[34ch]`}>
               90 lessons and 9 capstones build a public portfolio you can share. Free,
               permanently.
             </p>
 
-            <div className={`${ENTER} delay-200 flex flex-col gap-3 sm:flex-row sm:items-center`}>
+            <div
+              className={`${ENTER} delay-200 mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center`}
+            >
               <HeroCtaLink />
               <TrackedLink
                 href="/lessons/lesson-001"
@@ -76,7 +100,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className={`${ENTER} delay-300 lg:col-span-7`}>
+          <div className={`${ENTER} delay-300 min-w-0 lg:col-span-6`}>
             <HeroWorkbench />
           </div>
         </div>

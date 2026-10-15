@@ -37,10 +37,14 @@ interface SkillRadarToggleProps {
   after: SkillValues
   /** Caption line under the figure. Passed from the server section. */
   caption: string
+  /** Persona credit in the window bar (SAMPLE_LEARNER_NAME). Passed from the server section. */
+  learnerName: string
 }
 
-export function SkillRadarToggle({ before, after, caption }: SkillRadarToggleProps) {
-  const [state, setState] = useState<RadarPreviewState>('module_1')
+export function SkillRadarToggle({ before, after, caption, learnerName }: SkillRadarToggleProps) {
+  // Opens on Module 9 so the first view shows growth, with Module 1 as the dashed
+  // ghost. Analytics fire only when the visitor changes the state (see `select`).
+  const [state, setState] = useState<RadarPreviewState>('module_9')
   const isAfter = state === 'module_9'
   const values = isAfter ? after : before
   const label = isAfter ? 'Module 9' : 'Module 1'
@@ -52,9 +56,10 @@ export function SkillRadarToggle({ before, after, caption }: SkillRadarTogglePro
   }
 
   return (
-    <figure className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <span className="text-body-sm font-semibold text-ink-muted">Concept preview</span>
+    <figure className="flex flex-col">
+      {/* Window bar: label left, toggle right. Wraps under ~360px. */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-5 py-3 sm:px-6">
+        <span className="text-body-sm font-semibold text-ink-muted">Concept preview · {learnerName}</span>
         <div role="group" aria-label="Show sample radar after" className={SEGMENT_GROUP}>
           {OPTIONS.map((option) => (
             <Button
@@ -76,8 +81,10 @@ export function SkillRadarToggle({ before, after, caption }: SkillRadarTogglePro
         Showing the sample radar after {label}.
       </p>
 
-      <div className="grid items-center gap-8 sm:grid-cols-[minmax(0,320px)_minmax(0,1fr)] sm:gap-10">
-        <div aria-hidden="true" className="mx-auto w-full max-w-[320px] [&_svg]:h-auto [&_svg]:max-w-full">
+      {/* Radar beside its legend when the card is wide (tablet), stacked when it sits
+          in the half-width column on desktop or on a phone. */}
+      <div className="grid items-center gap-3 px-5 pt-3 sm:px-6 @[36rem]:grid-cols-[minmax(0,300px)_minmax(0,1fr)] @[36rem]:gap-10">
+        <div aria-hidden="true" className="mx-auto w-full max-w-[300px] [&_svg]:h-auto [&_svg]:max-w-full">
           <SkillRadar
             key={state}
             values={values}
@@ -87,9 +94,12 @@ export function SkillRadarToggle({ before, after, caption }: SkillRadarTogglePro
           />
         </div>
 
-        <ul aria-label="Skills on the radar" className="flex flex-col gap-3">
+        <ul
+          aria-label="Skills on the radar"
+          className="flex flex-wrap justify-center gap-x-5 gap-y-2.5 @[36rem]:flex-col @[36rem]:justify-start"
+        >
           {SKILL_CLUSTER_IDS.map((cluster) => (
-            <li key={cluster} className="flex items-center gap-3 text-body-sm">
+            <li key={cluster} className="flex min-w-0 items-center gap-2.5 text-body-sm">
               <span
                 aria-hidden="true"
                 className="size-2.5 shrink-0 rounded-full"
@@ -101,7 +111,7 @@ export function SkillRadarToggle({ before, after, caption }: SkillRadarTogglePro
         </ul>
       </div>
 
-      <figcaption className="text-caption leading-snug text-ink-muted">
+      <figcaption className="mt-6 border-t border-border/70 px-5 py-3.5 text-caption leading-snug text-ink-muted sm:px-6">
         {isAfter ? 'Dashed outline shows Module 1. ' : null}
         {caption}
       </figcaption>

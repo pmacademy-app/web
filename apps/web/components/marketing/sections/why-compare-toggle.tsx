@@ -8,17 +8,20 @@
  * props from the server parent (`config/marketing.ts` imports the capstone templates,
  * so it must not be imported here), including the caption node.
  *
- * Both panels are always rendered into the same grid cell, so the figure is as tall
- * as the taller panel in either state and switching never shifts the page. The
+ * Both panels are always rendered into the same grid cell inside one double-bezel
+ * frame (SHELL / SHELL_CORE), so the figure is as tall as the taller panel in either
+ * state and switching never shifts the page. The drawn, generic certificate stretches
+ * to that height inside a thin mat (wording centred, date and signature line pinned to
+ * the bottom), so the shell hugs the drawing instead of framing empty space. The
  * hidden panel is `inert` and `aria-hidden`. The crossfade is CSS opacity only and is
  * removed under `prefers-reduced-motion`.
  */
 
-import Image from 'next/image'
+import { Award } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { SEGMENT_GROUP, SEGMENT_OPTION } from '@/components/marketing/styles'
+import { SEGMENT_GROUP, SEGMENT_OPTION, SHELL, SHELL_CORE } from '@/components/marketing/styles'
 import { trackWhyCompareToggle, type WhyCompareState } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
 
@@ -29,13 +32,16 @@ export interface WhyCompareCapstone {
   title: string
   /** Competency cluster id; resolves to `var(--color-skill-<skill>)`. */
   skill: string
+  /** Deliverable type from the capstone definition ("Full PRD"). */
+  deliverableType: string
 }
 
 export interface WhyCompareToggleProps {
   learnerName: string
   capstones: readonly WhyCompareCapstone[]
-  certificateSrc: string
-  certificateLabel: string
+  /** Still accepted from the server parent; no longer drawn (the portfolio page shows no certificate). */
+  certificateSrc?: string
+  certificateLabel?: string
   /** Rendered as the figure caption; pass `<IllustrationCaption as="figcaption" />`. */
   caption: ReactNode
 }
@@ -45,17 +51,12 @@ const OPTIONS: ReadonlyArray<{ value: WhyCompareState; label: string }> = [
   { value: 'portfolio', label: 'Portfolio with artefacts' },
 ]
 
-/** Capstone rows shown in the portfolio panel; the rest collapse into one muted line. */
-const VISIBLE_CAPSTONES = 4
-
 const PANEL =
   'col-start-1 row-start-1 transition-opacity duration-200 ease-out-quint motion-reduce:transition-none'
 
 export function WhyCompareToggle({
   learnerName,
   capstones,
-  certificateSrc,
-  certificateLabel,
   caption,
 }: WhyCompareToggleProps) {
   const [state, setState] = useState<WhyCompareState>('certificate')
@@ -74,8 +75,10 @@ export function WhyCompareToggle({
     .slice(0, 2)
     .toUpperCase()
 
-  const visibleCapstones = capstones.slice(0, VISIBLE_CAPSTONES)
-  const hiddenCount = capstones.length - visibleCapstones.length
+  // One chip per deliverable type (first capstone's skill colour wins); no titles here.
+  const artefacts = capstones.filter(
+    (capstone, i) => capstones.findIndex((c) => c.deliverableType === capstone.deliverableType) === i,
+  )
   const currentLabel = OPTIONS.find((option) => option.value === state)?.label ?? ''
 
   return (
@@ -108,36 +111,52 @@ export function WhyCompareToggle({
       </p>
 
       <figure id={panelId} className="m-0">
-        <div className="grid">
-          {/* (a) A plain course-completion certificate. Generic on purpose. */}
-          <div
-            aria-hidden={state !== 'certificate'}
-            inert={state !== 'certificate'}
-            className={cn(
-              PANEL,
-              'flex items-center',
-              state === 'certificate' ? 'opacity-100' : 'opacity-0',
-            )}
-          >
-            <div className="w-full rounded-lg border border-border bg-surface px-6 py-12 text-center sm:px-10 sm:py-16">
-              <p className="text-caption font-medium uppercase tracking-[0.14em] text-ink-muted">
-                Certificate of completion
-              </p>
-              <p className="mt-5 font-sans text-[clamp(1.5rem,2.8vw,2rem)] font-semibold leading-tight tracking-[-0.015em] text-foreground">
-                {learnerName}
-              </p>
-              <div aria-hidden="true" className="mx-auto mt-5 h-px w-16 bg-border" />
-              <p className="mt-5 text-body text-ink-muted">Online PM course.</p>
-            </div>
-          </div>
+        <div className={SHELL}>
+          <div className={cn(SHELL_CORE, 'grid')}>
+            {/* (a) A plain course-completion certificate. Generic on purpose: a name on paper. */}
+            <div
+              aria-hidden={state !== 'certificate'}
+              inert={state !== 'certificate'}
+              className={cn(
+                PANEL,
+                'flex bg-surface-muted/60 p-2.5 sm:p-3',
+                state === 'certificate' ? 'opacity-100' : 'opacity-0',
+              )}
+            >
+              <div className="flex w-full flex-col rounded-md border border-border bg-surface p-1.5 shadow-tinted">
+                <div className="flex flex-1 flex-col rounded-[0.25rem] border border-border px-5 pb-5 pt-7 text-center sm:px-10 sm:pb-6 sm:pt-9">
+                  <div className="my-auto">
+                    <p className="text-caption font-medium uppercase tracking-[0.14em] text-ink-muted">
+                      Certificate of completion
+                    </p>
+                    <p className="mt-5 text-body-sm italic text-ink-muted">This certifies that</p>
+                    <p className="mt-2 font-sans text-[clamp(1.5rem,2.8vw,2rem)] font-semibold leading-tight tracking-[-0.015em] text-foreground">
+                      {learnerName}
+                    </p>
+                    <div aria-hidden="true" className="mx-auto mt-4 h-px w-16 bg-border" />
+                    <p className="mt-4 text-body text-ink-muted">Online PM course.</p>
+                  </div>
 
-          {/* (b) A public portfolio page with the real capstone titles. */}
-          <div
-            aria-hidden={state !== 'portfolio'}
-            inert={state !== 'portfolio'}
-            className={cn(PANEL, state === 'portfolio' ? 'opacity-100' : 'opacity-0')}
-          >
-            <div className="rounded-lg border border-border bg-surface">
+                  <div
+                    aria-hidden="true"
+                    className="mx-auto mt-8 grid w-full max-w-sm grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-4"
+                  >
+                    <div className="border-t border-border pt-1.5 text-caption text-ink-muted">Date</div>
+                    <span className="flex size-11 items-center justify-center rounded-full border border-dashed border-border-strong text-ink-muted">
+                      <Award size={18} strokeWidth={1.5} />
+                    </span>
+                    <div className="border-t border-border pt-1.5 text-caption text-ink-muted">Signature</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* (b) A public portfolio page: the same learner, the deliverable types and skill colours. */}
+            <div
+              aria-hidden={state !== 'portfolio'}
+              inert={state !== 'portfolio'}
+              className={cn(PANEL, 'flex flex-col', state === 'portfolio' ? 'opacity-100' : 'opacity-0')}
+            >
               <div className="flex items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
                 <span
                   aria-hidden="true"
@@ -151,40 +170,23 @@ export function WhyCompareToggle({
                 </div>
               </div>
 
-              <ol className="divide-y divide-border px-5 sm:px-6">
-                {visibleCapstones.map((capstone) => (
-                  <li key={capstone.number} className="flex items-baseline gap-3 py-2.5">
-                    <span aria-hidden="true" className="w-6 shrink-0 font-mono text-caption tabular-nums text-ink-muted">
-                      {capstone.index}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="relative top-[-0.1em] size-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: `var(--color-skill-${capstone.skill})` }}
-                    />
-                    <span className="min-w-0 text-body-sm text-foreground">{capstone.title}</span>
-                  </li>
-                ))}
-                {hiddenCount > 0 ? (
-                  <li className="py-2.5 pl-9 text-body-sm text-ink-muted">
-                    + {hiddenCount} more capstones
-                  </li>
-                ) : null}
-              </ol>
-
-              <div className="flex items-center gap-4 border-t border-border px-5 py-4 sm:px-6">
-                <Image
-                  src={certificateSrc}
-                  alt={`${certificateLabel} for ${learnerName}`}
-                  width={88}
-                  height={56}
-                  sizes="88px"
-                  className="h-14 w-[88px] shrink-0 rounded-sm border border-border object-cover"
-                />
-                <p className="text-body-sm text-ink-muted">
-                  <span className="font-semibold text-foreground">{certificateLabel}</span>
-                  {' '}attached to the same page.
-                </p>
+              <div className="flex flex-1 flex-col px-5 py-5 sm:px-6">
+                <p className="text-caption text-ink-muted">Artefacts on the page</p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {artefacts.map((artefact) => (
+                    <li
+                      key={artefact.deliverableType}
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-muted/60 px-3 py-1.5 text-body-sm text-foreground"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="size-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: `var(--color-skill-${artefact.skill})` }}
+                      />
+                      {artefact.deliverableType}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>

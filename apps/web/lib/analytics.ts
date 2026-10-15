@@ -27,7 +27,6 @@ export type HeroCTALocation = 'nav' | 'hero' | 'why' | 'portfolio' | 'community'
 /** `data-home-section` values observed by SectionViewTracker. */
 export type HomeSection =
   | 'hero'
-  | 'belief'
   | 'proof'
   | 'leave-with'
   | 'skill-radar'
@@ -36,7 +35,6 @@ export type HomeSection =
   | 'curriculum'
   | 'why'
   | 'testimonials'
-  | 'check-it-yourself'
   | 'faq'
   | 'final-cta'
 

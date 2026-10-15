@@ -18,7 +18,6 @@ import { trackHomeSectionView, type HomeSection } from '@/lib/analytics'
 
 const SECTIONS: ReadonlySet<string> = new Set<HomeSection>([
   'hero',
-  'belief',
   'proof',
   'leave-with',
   'skill-radar',
@@ -27,7 +26,6 @@ const SECTIONS: ReadonlySet<string> = new Set<HomeSection>([
   'curriculum',
   'why',
   'testimonials',
-  'check-it-yourself',
   'faq',
   'final-cta',
 ])
