@@ -12,15 +12,24 @@
  * crossing a client boundary and without adding a line of JavaScript to the page.
  * Anything that varies per call site (spacing, alignment) stays at the call site.
  *
- * ## Shape and type rules (homepage redesign)
+ * ## Shape, depth and type rules (homepage round 2)
  *
- * - Interactive controls are pills (`rounded-full`); surfaces are flat, square-ish
- *   cards (`rounded-lg`, hairline border, no shadow). No glow shadows anywhere.
- * - One typeface: Inter throughout. Headlines get weight and tight tracking, not a second font.
- * - Sections are separated by alternating background bands (BAND_PLAIN / BAND_MUTED),
- *   not hairline rules.
- * - Motion is CSS only, transform/opacity only, and every recipe that moves has a
- *   `motion-reduce:` fallback.
+ * - Interactive controls are pills (`rounded-full`). Plain cards stay flat (CARD).
+ * - Major artefacts (mocks, bento tiles, the hero visual) use the double bezel:
+ *   an outer SHELL (tinted tray, hairline ring, p-1.5, 1.5rem radius) holding a
+ *   SHELL_CORE (own surface, concentric smaller radius, tinted shadow).
+ * - Shadows are tinted from --color-primary (SHADOW_TINTED / SHADOW_TINTED_LG), never
+ *   black and never a glow. In dark mode they sink toward green-black instead.
+ * - One typeface: Inter throughout. Headlines get weight and tight tracking.
+ * - Sections are separated by alternating background bands (BAND_PLAIN / BAND_MUTED);
+ *   the closing band is BAND_DEEP.
+ * - Motion is CSS only, transform/opacity only (Tailwind v4 translate-/scale-
+ *   utilities set the `translate`/`scale` properties, so transitions list those, not
+ *   `transform`), and every recipe that moves is off
+ *   under prefers-reduced-motion (in the recipe or in app/globals.css).
+ * - The effect recipes (SPOTLIGHT, GLARE, CONIC_BORDER, DOT_GRID, BAND_DEEP) each own
+ *   a pseudo-element; see the "Marketing depth" block in app/globals.css before
+ *   stacking two on one element.
  *
  * `faq`, `frameworks` and `reviews` pages import BUTTON_PRIMARY and BUTTON_SECONDARY,
  * so those names and their roles must stay stable.
@@ -29,16 +38,16 @@
 /** Horizontal page container shared by every marketing section. */
 export const CONTAINER = 'max-w-[1120px] mx-auto px-5 lg:px-8'
 
-/** Vertical rhythm for a standard section. Generous, so each section reads as one idea. */
-export const SECTION_Y = 'py-20 sm:py-24 lg:py-32'
+/** Vertical rhythm for a standard section. Tightened in round 2 so screens carry content, not air. */
+export const SECTION_Y = 'py-16 sm:py-20 lg:py-24'
 
 /** Full-bleed section background bands. Alternate these between sections. */
 export const BAND_PLAIN = 'bg-background'
 export const BAND_MUTED = 'bg-surface-muted'
 
-/** Mono eyebrow label above a section heading. Use on at most two homepage sections. */
+/** Small uppercase eyebrow label (Inter) above a section heading. Use on at most two homepage sections. */
 export const EYEBROW =
-  'inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-[0.14em] text-primary'
+  'inline-flex items-center gap-2 text-xs font-sans font-semibold uppercase tracking-[0.14em] text-primary'
 
 /** Small leading rule that precedes eyebrow text. */
 export const EYEBROW_RULE = 'h-px w-5 bg-primary/50'
@@ -66,7 +75,7 @@ export const DISPLAY_LEAD =
 export const NUMERAL =
   'font-display tabular-nums text-[clamp(2.5rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em] text-primary'
 
-/** Resting card surface. Flat: hairline border, no shadow. */
+/** Resting card surface for small, secondary cards. Flat: hairline border, no shadow. */
 export const CARD = 'rounded-lg bg-surface border border-border'
 
 /**
@@ -85,7 +94,7 @@ export const BUTTON_PRIMARY = `
   bg-primary text-primary-foreground font-semibold text-sm rounded-full whitespace-nowrap
   hover:bg-primary-hover
   active:scale-[0.97]
-  transition-[background-color,transform] duration-200 ease-out-quint
+  transition-[background-color,scale] duration-200 ease-out-quint
   motion-reduce:transition-colors motion-reduce:active:scale-100
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background
 `
@@ -97,7 +106,7 @@ export const BUTTON_SECONDARY = `
   border border-border
   hover:border-border-strong hover:bg-surface-muted
   active:scale-[0.97]
-  transition-[background-color,border-color,transform] duration-200 ease-out-quint
+  transition-[background-color,border-color,scale] duration-200 ease-out-quint
   motion-reduce:transition-colors motion-reduce:active:scale-100
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background
 `
@@ -134,4 +143,81 @@ export const SEGMENT_OPTION = `
 
 /** Trailing arrow that nudges right on hover of its `group` parent. */
 export const ARROW_NUDGE =
-  'transition-transform duration-200 ease-out-quint group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0'
+  'transition-[translate] duration-200 ease-out-quint group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0'
+
+/* ─── Depth (double bezel) ─────────────────────────────────────────────────── */
+
+/**
+ * Outer tray of the double bezel: a primary-tinted surface with a hairline ring and
+ * 6px of padding. Put exactly one SHELL_CORE inside. `min-w-0` keeps it from forcing
+ * grid/flex tracks wider than the viewport.
+ */
+export const SHELL =
+  'min-w-0 rounded-[1.5rem] p-1.5 ring-1 ring-border bg-[color-mix(in_oklch,var(--color-primary)_6%,var(--color-surface-muted))]'
+
+/** Inner core of the double bezel: own surface, concentric radius (1.5rem - p-1.5), tinted shadow. */
+export const SHELL_CORE =
+  'min-w-0 rounded-[calc(1.5rem-0.375rem)] bg-surface border border-border/60 shadow-tinted overflow-hidden'
+
+/** Soft primary-tinted elevation for a single surface. */
+export const SHADOW_TINTED = 'shadow-tinted'
+
+/** Deeper tinted elevation for the top sheet of a layered composition (hero cascade). */
+export const SHADOW_TINTED_LG = 'shadow-tinted-lg'
+
+/**
+ * Button-in-button trailing icon holder for BUTTON_PRIMARY (and the inverse button on
+ * BAND_DEEP). Wrap the arrow icon in a span with this class as the last child of a
+ * `group` button; it sits flush with the pill's right padding (`-mr-3.5` against
+ * px-6 / h-12) and nudges up-right on hover.
+ */
+export const ARROW_BUBBLE = `
+  -mr-3.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full
+  bg-primary-foreground/15
+  transition-[translate,scale] duration-300 ease-out-quint
+  group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105
+  motion-reduce:transition-none motion-reduce:group-hover:translate-x-0
+  motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:scale-100
+`
+
+/** ARROW_BUBBLE for light-surface buttons (BUTTON_SECONDARY): a muted circle instead of a translucent one. */
+export const ARROW_BUBBLE_QUIET = `
+  -mr-3.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full
+  bg-surface-muted text-foreground
+  transition-[translate,scale] duration-300 ease-out-quint
+  group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105
+  motion-reduce:transition-none motion-reduce:group-hover:translate-x-0
+  motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:scale-100
+`
+
+/* ─── Surface effects (defined in app/globals.css) ─────────────────────────── */
+
+/**
+ * Deep closing band: primary background, primary-foreground text, static grain.
+ * Re-points colour tokens inside itself, so text-ink-muted, border-border,
+ * bg-primary-foreground / text-primary (inverse button) and focus rings stay legible
+ * in light and dark. Combine with SECTION_Y at the call site.
+ */
+export const BAND_DEEP = 'band-deep'
+
+/**
+ * Pointer spotlight on a card. Add `data-spotlight` to the same element and wrap the
+ * grid in <SpotlightGroup> (components/marketing/spotlight-group.tsx) so the glow
+ * follows the pointer. Fine pointers only; off under reduced motion. Uses ::before.
+ */
+export const SPOTLIGHT = 'spotlight'
+
+/** One diagonal light sweep on hover (images, sample lesson cards). Clips overflow. Uses ::after. */
+export const GLARE = 'glare'
+
+/**
+ * Slowly rotating accent-to-primary ring (PM Fellow tile only). Static ring under
+ * reduced motion. Give the host a border radius. Uses ::after.
+ */
+export const CONIC_BORDER = 'conic-border'
+
+/** Static dot grid faded out from the upper middle. Safe on a whole section (paints on ::before). */
+export const DOT_GRID = 'bg-dot-grid'
+
+/** Highlight sweep through short label text (the hero pill only, never a heading). Plain text under reduced motion. */
+export const SHINY_TEXT = 'shiny-text'
