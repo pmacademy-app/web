@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import crypto from 'crypto'
 import { POST } from '../../app/api/auth/send-email-hook/route'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
-import { getFromEmail } from '../../lib/email'
+import { getFromEmail, formatFromEmail, parseFromEmail } from '../../lib/email'
 import { BRAND } from '@/lib/brand'
 
 describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
@@ -20,15 +20,40 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
   }
 
   describe('Canonical Sender Verification', () => {
-    it('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
+    it('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL with Team Prodily', () => {
       delete process.env.RESEND_FROM_EMAIL
-      expect(getFromEmail()).toBe('Prodily <welcome@prodily.adityagangwani.me>')
+      expect(getFromEmail()).toBe('Team Prodily <welcome@prodily.adityagangwani.me>')
       expect(BRAND.emailFromAddress).toBe('welcome@prodily.adityagangwani.me')
 
       process.env.RESEND_FROM_EMAIL = 'custom@prodily.adityagangwani.me'
-      expect(getFromEmail()).toBe('Prodily <custom@prodily.adityagangwani.me>')
+      expect(getFromEmail()).toBe('Team Prodily <custom@prodily.adityagangwani.me>')
 
       delete process.env.RESEND_FROM_EMAIL
+    })
+
+    it('parseFromEmail correctly parses bare email addresses without duplicating email as name', () => {
+      // When env var is just a bare email:
+      const parsed = parseFromEmail('welcome@prodily.adityagangwani.me')
+      expect(parsed).toEqual({
+        name: 'Team Prodily',
+        email: 'welcome@prodily.adityagangwani.me',
+      })
+
+      // When an explicit display name is provided:
+      const parsedExplicit = parseFromEmail('Founder Aditya <aditya@prodily.adityagangwani.me>')
+      expect(parsedExplicit).toEqual({
+        name: 'Founder Aditya',
+        email: 'aditya@prodily.adityagangwani.me',
+      })
+    })
+
+    it('formatFromEmail formats bare email addresses into RFC 5322 format', () => {
+      expect(formatFromEmail('welcome@prodily.adityagangwani.me')).toBe(
+        'Team Prodily <welcome@prodily.adityagangwani.me>'
+      )
+      expect(formatFromEmail('Founder Aditya <aditya@prodily.adityagangwani.me>')).toBe(
+        'Founder Aditya <aditya@prodily.adityagangwani.me>'
+      )
     })
   })
 

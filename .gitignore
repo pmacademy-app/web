@@ -52,14 +52,6 @@ apps/web/scripts/local-campaigns/
 apps/web/scripts/logs/
 apps/web/scripts/send-jolly-recovery-email.ts
 
-# Master plan, audit & task documents (never commit)
-CONTENT_UPDATE.md
-PORTFOLIO_PHASE1.md
-FIXES.md
-PRODILY_GROWTH_AUDIT.md
-PRODILY_GROWTH_IMPLEMENTATION_PLAN.md
-tasks/
-
 # Testing, coverage & build caches
 coverage/
 .nyc_output/

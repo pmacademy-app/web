@@ -11,6 +11,7 @@ import { globalProviderRegistry, sendEmailWithFailover } from '../providers'
 import type { ProviderSendResult } from '../providers/types'
 import { sanitizeStructuredPayload, maskEmailAddress } from '@/lib/monitoring/redaction'
 import { renderEmailTemplate } from '../../../emails'
+import { getFromEmail } from '@/lib/email'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
@@ -671,6 +672,7 @@ async function processSingleBatch(
           templateVersion: 1,
           variables: {
             ...templateVariables,
+            fromEmail: (templateVariables.fromEmail as string) || getFromEmail(),
             subject,
             html: renderedHtml,
             text: renderedText,
