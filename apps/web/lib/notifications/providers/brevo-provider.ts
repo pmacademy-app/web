@@ -2,7 +2,7 @@ import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, Pro
 import type { NotificationChannel } from '../types'
 import { BRAND } from '@/lib/brand'
 import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
-import { maskEmail } from '@/lib/email'
+import { maskEmail, parseFromEmail } from '@/lib/email'
 
 /**
  * Brevo (formerly Sendinblue) Transactional Email Provider Implementation.
@@ -38,10 +38,9 @@ export class BrevoProvider implements NotificationProvider {
     }
 
     try {
-      const fromEmail = (payload.variables.fromEmail as string) || (process.env.BREVO_FROM_EMAIL || process.env.RESEND_FROM_EMAIL)?.trim()
-      const senderName = fromEmail ? (fromEmail.split('<')[0].trim() || BRAND.emailFromName) : BRAND.emailFromName
-      const senderEmailMatch = fromEmail?.match(/<([^>]+)>/)
-      const senderEmail = senderEmailMatch ? senderEmailMatch[1] : (fromEmail || BRAND.emailFromAddress)
+      const { name: senderName, email: senderEmail } = parseFromEmail(
+        payload.variables.fromEmail as string | undefined
+      )
 
       const headers: Record<string, string> = {}
       if (payload.variables.suppressListUnsubscribe !== true) {

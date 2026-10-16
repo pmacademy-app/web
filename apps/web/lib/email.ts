@@ -14,15 +14,39 @@ export interface EmailRecipient {
   name?: string
 }
 
-export function getFromEmail(): string {
-  const envFrom = (process.env.BREVO_FROM_EMAIL || process.env.RESEND_FROM_EMAIL)?.trim()
-  if (envFrom) {
-    if (envFrom.includes('<') && envFrom.includes('>')) {
-      return envFrom
-    }
-    return `${BRAND.emailFromName} <${envFrom}>`
+/**
+ * Formats a sender identity into the canonical RFC 5322 "Display Name <email@domain>" format.
+ * Defaults to `BRAND.emailFromName` ("Team Prodily") if no name is provided in the input or env vars.
+ */
+export function formatFromEmail(rawFrom?: string, defaultName = BRAND.emailFromName): string {
+  const from = rawFrom?.trim() || (process.env.BREVO_FROM_EMAIL || process.env.RESEND_FROM_EMAIL)?.trim()
+  if (!from) {
+    return `${defaultName} <${BRAND.emailFromAddress}>`
   }
-  return `${BRAND.emailFromName} <${BRAND.emailFromAddress}>`
+  const match = from.match(/^(.*?)\s*<([^>]+)>$/)
+  if (match) {
+    const name = match[1].trim() || defaultName
+    const email = match[2].trim()
+    return `${name} <${email}>`
+  }
+  return `${defaultName} <${from}>`
+}
+
+/**
+ * Parses a sender string (either "Name <email@domain>" or bare "email@domain")
+ * into discrete name and email components, ensuring `name` defaults to `BRAND.emailFromName`.
+ */
+export function parseFromEmail(rawFrom?: string, defaultName = BRAND.emailFromName): { name: string; email: string } {
+  const formatted = formatFromEmail(rawFrom, defaultName)
+  const match = formatted.match(/^(.*?)\s*<([^>]+)>$/)
+  if (match) {
+    return { name: match[1].trim() || defaultName, email: match[2].trim() }
+  }
+  return { name: defaultName, email: rawFrom?.trim() || BRAND.emailFromAddress }
+}
+
+export function getFromEmail(): string {
+  return formatFromEmail()
 }
 
 export interface SendEmailResult {

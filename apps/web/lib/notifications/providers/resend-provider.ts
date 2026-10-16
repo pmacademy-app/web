@@ -2,7 +2,7 @@ import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, Pro
 import type { NotificationChannel } from '../types'
 import { BRAND } from '@/lib/brand'
 import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
-import { maskEmail } from '@/lib/email'
+import { maskEmail, formatFromEmail } from '@/lib/email'
 
 /**
  * Resend Email Provider Implementation.
@@ -12,7 +12,6 @@ import { maskEmail } from '@/lib/email'
 export class ResendProvider implements NotificationProvider {
   public readonly name = 'resend'
   public readonly supportedChannels: NotificationChannel[] = ['email']
-  private defaultFrom = `${BRAND.emailFromName} <${BRAND.emailFromAddress}>`
 
   public async send(payload: ProviderSendPayload): Promise<ProviderSendResult> {
     const recipientEmail = payload.recipient.email
@@ -39,10 +38,9 @@ export class ResendProvider implements NotificationProvider {
     }
 
     try {
-      const fromEmail =
-        (payload.variables.fromEmail as string) ||
-        (process.env.RESEND_FROM_EMAIL || process.env.BREVO_FROM_EMAIL)?.trim() ||
-        this.defaultFrom
+      const fromEmail = formatFromEmail(
+        payload.variables.fromEmail as string | undefined
+      )
 
       const headers: Record<string, string> = {}
       if (payload.variables.suppressListUnsubscribe !== true) {
