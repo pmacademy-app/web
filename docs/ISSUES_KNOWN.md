@@ -2,7 +2,7 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Current Branch:** `main`  
-**Last Updated:** September 14, 2026  
+**Last Updated:** October 17, 2026  
 
 ---
 
@@ -24,16 +24,18 @@
 ### 🟠 Active Incident Follow-Up
 
 #### ISSUE-23: Signup Abuse Cleanup Pending Approval
-- **Status**: 🟠 Mitigated, cleanup awaiting explicit approval
-- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
-- **Required Action**: (1) decide on a CAPTCHA provider before reopening signups, (2) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
+- **Status**: 🟠 Mitigated — **state changed since this entry was written; re-verify**
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)).
+- **State observed 2026-10-17 (read-only check of production)**: `product_settings.allowSignups` is **`true`** and `requireEmailVerification` is `false`, so signups are open again. The flagged accounts are **no longer present**: `public.users` held 490 rows and `auth.users` 496 (6 unconfirmed signups with no profile row), with no cluster of zero-engagement accounts on 2026-09-06/07. The approval/removal decision is not recorded in this file.
+- **Required Action**: record who reopened signups and how the 1,233 accounts were removed; confirm the Turnstile CAPTCHA is enforced on signup in production; decide whether `requireEmailVerification` should stay off.
 - **Note**: the root-cause fixes (signup rate limiting, pre-dispatch daily quota enforcement, provider failover) are implemented and test-passing. Deployment requires migrations `20260907000001` and `20260908000001`.
 
 #### ISSUE-24: Signup Abuse Recurrence & Brevo Failover Failure (2026-09-09)
 - **Status**: 🟠 Fixed in code on `main` (`10a21a5`) — **not verified in production**
 - **Description**: The 2026-09-06 controls did not hold. Unauthenticated signup traffic again exhausted Brevo's allowance with no corresponding `public.users` rows, and Resend did not take over. Root causes: the auth hook sent email outside all governance; Brevo reports credit exhaustion as HTTP 400 + `not_enough_credits`, which the status-only classifier read as permanent and refused to fail over on; the per-IP limit keyed on the spoofable leftmost `X-Forwarded-For`; the limiter was non-atomic and failed open; `refCode` triggered a pre-verification welcome email.
 - **Required Action**: apply migration `20260909000001_signup_abuse_email_governance.sql` to staging, exercise signup and provider failover there, then promote. **The code depends on this migration** — until it is applied, `consume_rate_limit` does not exist and fail-closed paths return 429.
-- **Note**: full root-cause analysis, per-batch impact and remaining gaps are in [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md). Gaps confirmed still open during the 2026-09-10 reconciliation: `/api/auth/login` and `/api/auth/update-password` have no rate limiting, `/api/auth/telemetry` still reads the leftmost `X-Forwarded-For`, and two raw Resend `fetch` calls still lack timeouts.
+- **Note**: full root-cause analysis, per-batch impact and remaining gaps are in [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md). Gaps found during the 2026-09-10 reconciliation: `/api/auth/login` and `/api/auth/update-password` had no rate limiting, `/api/auth/telemetry` read the leftmost `X-Forwarded-For`, and two raw Resend `fetch` calls lacked timeouts.
+- **Update 2026-10-17**: the login and update-password gaps were closed by commit `09b86d6` (2026-09-10). Both routes now use the persistent, fail-closed limiter (10/15 min per IP, 5/15 min per email or user); see `lib/__tests__/b5-abuse-controls.test.ts`. Those tests mock the limiter, so they prove the route wiring, not the SQL. Still open: `/api/auth/telemetry` is limited per server instance only, and the password-reset request (`app/(auth)/reset-password/page.tsx`) calls Supabase directly with no app-level limit or CAPTCHA. The live schema contains `consume_rate_limit`, so the migration dependency above is satisfied.
 
 #### ISSUE-25: Unpatched Next.js critical advisories block the CI audit gate
 - **Status**: 🟢 **Resolved 2026-09-14** — `next` upgraded 16.2.12 → 16.3.5; both advisories cleared and the audit gate passes
@@ -48,6 +50,7 @@
 - **Impact**: the prefix is truncated and not directly usable, but it is a substantial fragment of a live credential published in the repository, and it materially narrows a brute-force search.
 - **Required Action**: **rotate `RESEND_API_KEY` in Vercel and Resend.** Removing the literal from the working tree (done) does not remove it from history; rotation is the only remedy.
 - **Note**: the fixture is now synthetic and the redaction test still passes. `.gitleaks.toml` allowlists only the `re_TestPlaceholder` markers, so a real key reintroduced into a test fails the scan.
+- **History trace (2026-10-17)**: the string sits in one test file, present in commits `f839ef3` (2026-08-26), `895fcae`, `bed231c` and `3b684e5`, and removed in `4ee9a95` (2026-09-14). It is not at HEAD and no other real-looking secret was found in the full history. It is reachable from `main` and every remote branch. Repository visibility and forks were not checked, and nothing records that the key has been rotated. A new owner should rotate regardless, and may prefer a fresh squashed repository.
 
 #### ISSUE-27: Supabase auth-hook query-string secret
 - **Status**: 🟢 **Resolved in code 2026-09-14** — **post-deploy verification still required**
@@ -75,6 +78,21 @@
 - **Description**: On 2026-09-14/15 at least two sessions worked `b10a-b14b/error-boundaries-logout-ci-security` at the same time — the B7 route-migration work and a lesson-quiz content rewrite. Symptoms observed: files reverting under an active session (`docs/HARDENING_LEDGER.md` lost 571 committed lines in the working tree; `settings.test.ts` reverted to a pre-migration assertion), and repeated unexplained `content/lessons/**` churn.
 - **Impact**: the B7 session ran `git checkout content/` three times to clear what it believed was build churn. That discards **uncommitted** work in `content/`, so the content session may have lost in-progress edits at those moments. All committed work from both sessions survived and is present in HEAD.
 - **Required Action**: give concurrent sessions separate branches or worktrees. If one branch must be shared, each session should stage or commit before the other runs any `git checkout`, and neither should run a path-wide `git checkout` over directories it does not own.
+
+#### ISSUE-30: Admin guard trusted the editable `users.email`
+- **Status**: 🟡 Fixed in code and migration on branch `fix/admin-guard-and-rpc-grants` — **not merged, not applied, not verified in production**
+- **Description**: `lib/admin/guard.ts` decided `ADMIN_EMAILS` membership from `public.users.email`, read with the service role. The `users` UPDATE policy (`20260728000002_create_user_state.sql`) has no column limit, the privileged-column trigger (`20261010000001`) did not cover `email`, and email uniqueness is case-sensitive. A signed-in learner could therefore rewrite their own `users.email` to an admin address (or a case variant) through PostgREST and pass the guard. `/api/admin/*` is exempt from the proxy check (`proxy.ts`), so the API routes depended on this guard alone; the console pages were not affected because they use the auth email.
+- **Fix**: the guard now matches `ADMIN_EMAILS` against the verified auth-session email (`authUser.email`). Migration `20261017000001_admin_guard_email_and_rpc_grants.sql` also makes the privileged-column trigger reject `authenticated`/`anon` changes to `users.email`. The only legitimate writer, the email-change confirmation in `app/api/auth/callback/route.ts`, uses the service-role client and is unaffected. Regression tests: `lib/__tests__/admin-guard-trusted-email.test.ts` (three of its tests fail against the old guard).
+- **Not verified**: whether the live exploit worked was deliberately not tested, because proving it would modify production data. Column grants on the live `users` table were not inspected.
+- **Required Action**: merge the branch (the `deploy-supabase` CI job applies the migration to production on merge to `main`); then, on staging first if possible, confirm a learner cannot update their own `users.email`, that an email change still completes through the confirmation link, and that a learner whose profile email matches an admin address gets 403 from `/api/admin/*`.
+- **Open follow-ups**: `app/api/admin/users/[id]/route.ts` still checks `isAdminEmail(targetUser.email)` for the target's profile email; 15 admin routes without guard keywords were not individually reviewed; 17 admin mutation routes do not call `logAdminAction`.
+
+#### ISSUE-31: Governance RPCs executable by the anon role
+- **Status**: 🟡 Fixed in migration on branch `fix/admin-guard-and-rpc-grants` — **not merged, not applied**
+- **Description**: `20260909000001_signup_abuse_email_governance.sql` revoked `claim_email_send`, `finalize_email_send`, `consume_rate_limit`, `reserve_provider_email_quota`, `release_provider_email_quota`, `mark_provider_exhausted` and `is_provider_exhausted` from `PUBLIC` only. Supabase grants EXECUTE to `anon` and `authenticated` explicitly, so those grants survived. These are SECURITY DEFINER functions: anyone holding the public anon key could exhaust a victim's rate-limit bucket, tamper with the email ledger and quota counters, or mark Brevo/Resend as exhausted for the UTC day (halting platform email).
+- **Confirmed**: on 2026-10-17 a read-only call to `is_provider_exhausted` with the anon key returned HTTP 200. The other six use the identical revoke pattern; they were not called because they write.
+- **Fix**: migration `20261017000001_admin_guard_email_and_rpc_grants.sql` revokes all seven from `PUBLIC, anon, authenticated` and grants EXECUTE to `service_role` only. Every caller (`lib/rate-limit.ts`, `lib/email-governance.ts`, `lib/notifications/providers/provider-quota.ts`) already uses the service-role client.
+- **Required Action**: after the migration is applied, confirm an anon-key call to `is_provider_exhausted` is rejected and that signup, login rate limiting and the email queue still work.
 
 ---
 
