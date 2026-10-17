@@ -67,8 +67,12 @@ async function resolveRequireAdminUser(
     }
   }
 
-  // Evaluate Admin authorization: ADMIN_EMAILS env var OR database users.is_admin = true
-  const isEnvAdmin = isAdminEmail(typedUserRow.email)
+  // Evaluate Admin authorization: ADMIN_EMAILS env var OR database users.is_admin = true.
+  //
+  // The ADMIN_EMAILS match must use the identity from the verified auth session, never
+  // `users.email`: that column is an app profile field a signed-in learner can edit through
+  // PostgREST, so trusting it would let them claim an admin address.
+  const isEnvAdmin = isAdminEmail(authUser.email)
   const isDbAdmin = Boolean(typedUserRow.is_admin)
 
   const isAuthorizedAdmin = isEnvAdmin || isDbAdmin
@@ -89,15 +93,17 @@ async function resolveRequireAdminUser(
     }
   }
 
+  const trustedEmail = authUser.email || typedUserRow.email
+
   return {
     result: {
       authorized: true,
       userId: authUser.id,
-      email: typedUserRow.email,
+      email: trustedEmail,
     },
     loggedAudit: false,
     userId: authUser.id,
-    userEmail: typedUserRow.email,
+    userEmail: trustedEmail,
   }
 }
 
