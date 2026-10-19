@@ -157,7 +157,7 @@ export const POST = withRoute(
 
       // 4. Trigger Canonical Supabase Auth Resend Flow
       // Supabase Auth will invoke our Auth Hook (/api/auth/send-email-hook)
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app'
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
         email: targetEmail,

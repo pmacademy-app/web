@@ -12,7 +12,7 @@ Background jobs, queue processing, broadcasts, and periodic maintenance are exec
 - **Scheduler Engine**: GitHub Actions (`.github/workflows/notification-scheduler.yml`).
 - **Timezone**: All schedules are configured in UTC to execute at intended **India Standard Time (IST / UTC+5:30)** windows.
 - **Authentication**: All cron Route Handlers enforce Bearer token authentication matching `CRON_SECRET` (`Authorization: Bearer ${CRON_SECRET}`).
-- **Target Host**: URLs are constructed using `PRODUCTION_SITE_URL` or `APP_URL` repository secrets, falling back to `https://prodily.adityagangwani.me`.
+- **Target Host**: URLs are constructed using `PRODUCTION_SITE_URL` or `APP_URL` repository secrets, falling back to `https://prodily.app`.
 
 ---
 

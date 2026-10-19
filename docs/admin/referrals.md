@@ -18,7 +18,7 @@ This guide explains the technical attribution lifecycle, anti-abuse mechanisms, 
 
 ```
                     1. INVITE LINK
-[ Referrer User ] ────────────────► [ Peer visits https://prodily.adityagangwani.me/signup?ref=handle ]
+[ Referrer User ] ────────────────► [ Peer visits https://prodily.app/signup?ref=handle ]
                                                 │
                                                 ▼ 2a. IMMEDIATE ATTRIBUTION (primary path)
                                     Signup form reads ?ref= from the URL and submits it

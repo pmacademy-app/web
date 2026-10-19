@@ -116,7 +116,7 @@ describe('B2: Public Portfolio XSS & Untrusted JSON-LD Serialization Security Su
         linkedinUrl: 'https://linkedin.com/in/attacker',
         githubUrl: 'https://github.com/attacker',
         websiteUrl: 'https://attacker.io',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       }
 
       const personSchema = generatePersonJsonLd(maliciousOptions)
@@ -144,7 +144,7 @@ describe('B2: Public Portfolio XSS & Untrusted JSON-LD Serialization Security Su
         githubUrl: 'https://github.com/hacker',
         websiteUrl: 'https://hacker.io',
         isFellow: false,
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       const serialized = safeJsonLd(profilePageSchema)

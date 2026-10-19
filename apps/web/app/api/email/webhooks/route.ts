@@ -483,7 +483,7 @@ export async function POST(request: Request) {
         html: `
           <h2>Direct Inbound Email Received</h2>
           <p><strong>From:</strong> ${escapeHtml(senderName)} (&lt;<a href="mailto:${escapeHtml(senderEmail)}">${escapeHtml(senderEmail)}</a>&gt;)</p>
-          <p><strong>To:</strong> hello@prodily.adityagangwani.me</p>
+          <p><strong>To:</strong> hello@prodily.app</p>
           <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
           <p><strong>Database Record ID:</strong> <code>${insertedId || 'N/A'}</code></p>
           <hr />
@@ -492,7 +492,7 @@ export async function POST(request: Request) {
             ${htmlBody || escapeHtml(finalMessageBody).replace(/\n/g, '<br />')}
           </blockquote>
         `,
-        text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.adityagangwani.me\nSubject: ${subject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${finalMessageBody}`,
+        text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.app\nSubject: ${subject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${finalMessageBody}`,
       })
     } catch (forwardErr) {
       log.warnException('email.webhook.forward_failed', forwardErr)

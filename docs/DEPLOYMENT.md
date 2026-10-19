@@ -26,7 +26,7 @@
 
 | Variable Name | Exposure | Description / Required Format |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Public (Client + Server) | Canonical URL (`https://prodily.adityagangwani.me`) |
+| `NEXT_PUBLIC_SITE_URL` | Public (Client + Server) | Canonical URL (`https://prodily.app`) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Public (Client + Server) | Supabase project URL (`https://<id>.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (Client + Server) | Supabase anon JWT public key |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Public (Client) | Google Analytics 4 measurement ID; when unset, `<GoogleAnalytics>` is not rendered |
@@ -36,7 +36,7 @@
 | `BREVO_FROM_EMAIL` | **Server Only** | Verified Brevo sender email |
 | `BREVO_WEBHOOK_SECRET` | **Server Only** | Shared secret verifying Brevo webhook calls (plain header compare, not HMAC) |
 | `RESEND_API_KEY` | **Server Only** | Resend API key (`re_...`) |
-| `RESEND_FROM_EMAIL` | **Server Only** | Verified sender email (`welcome@prodily.adityagangwani.me`) |
+| `RESEND_FROM_EMAIL` | **Server Only** | Verified sender email (`welcome@prodily.app`) |
 | `RESEND_WEBHOOK_SECRET` | **Server Only** | Svix webhook secret (`whsec_...`) |
 | `SEND_EMAIL_HOOK_SECRET` | **Server Only** | Secret verifying Supabase Auth Send Email Hook calls |
 | `CRON_SECRET` | **Server Only** | Bearer secret authorizing GitHub Actions cron routes |

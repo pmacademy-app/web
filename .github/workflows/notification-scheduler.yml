@@ -38,7 +38,7 @@ jobs:
       - name: Trigger Process Queue Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/process-email-queue" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -58,7 +58,7 @@ jobs:
       - name: Trigger Process Broadcasts Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X GET "${SITE_URL}/api/cron/process-broadcasts" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -76,7 +76,7 @@ jobs:
       - name: Trigger Retry Failed Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/retry-failed" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -93,7 +93,7 @@ jobs:
       - name: Trigger Daily Reminder Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/daily-reminder" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -114,7 +114,7 @@ jobs:
       - name: Trigger Weekly Recap Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/weekly-recap" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -135,7 +135,7 @@ jobs:
       - name: Trigger Lifecycle Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/lifecycle" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
@@ -152,7 +152,7 @@ jobs:
       - name: Trigger Cleanup Endpoint
         run: |
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
-          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/cleanup" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \

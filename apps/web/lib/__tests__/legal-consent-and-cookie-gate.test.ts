@@ -363,7 +363,7 @@ describe('P0-4 — operator wording once real details are supplied', () => {
       'Cozystay Inspire, 6th Main Road, A.K. Colony Mathikere Extension, Bangalore, Karnataka 560054',
     NEXT_PUBLIC_GRIEVANCE_OFFICER_NAME: 'Aditya Gangwani',
     NEXT_PUBLIC_GRIEVANCE_OFFICER_TITLE: 'Founder & Grievance Officer',
-    NEXT_PUBLIC_GRIEVANCE_EMAIL: 'hello@prodily.adityagangwani.me',
+    NEXT_PUBLIC_GRIEVANCE_EMAIL: 'hello@prodily.app',
   }
 
   it('names the proprietor and denies incorporation, in the agreed wording', async () => {
@@ -426,7 +426,7 @@ describe('P0-4 — operator wording once real details are supplied', () => {
     expect(operator.address).toContain('Bangalore, Karnataka 560054')
     expect(grievance.officerName).toBe('Aditya Gangwani')
     expect(grievance.officerTitle).toBe('Founder & Grievance Officer')
-    expect(grievance.email).toBe('hello@prodily.adityagangwani.me')
+    expect(grievance.email).toBe('hello@prodily.app')
   })
 
   it('still demands a registration id from an operator that claims to be registered', async () => {

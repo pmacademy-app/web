@@ -401,7 +401,7 @@ export class BroadcastService {
     )
 
     const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app'
 
     let sent = 0
     let failed = 0

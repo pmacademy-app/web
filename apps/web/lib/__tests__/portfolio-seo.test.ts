@@ -383,23 +383,23 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
         linkedinUrl: 'https://www.linkedin.com/in/marcusvance',
         githubUrl: 'https://github.com/marcusvance',
         websiteUrl: 'https://marcusvance.io',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
         isFellow: true,
       })
 
       expect(schema['@context']).toBe('https://schema.org')
       expect(schema['@type']).toBe('ProfilePage')
-      expect(schema['@id']).toBe('https://prodily.adityagangwani.me/p/mvance#profilepage')
-      expect(schema.url).toBe('https://prodily.adityagangwani.me/p/mvance')
+      expect(schema['@id']).toBe('https://prodily.app/p/mvance#profilepage')
+      expect(schema.url).toBe('https://prodily.app/p/mvance')
       expect(schema.name).toBe('Marcus Vance | Product Management Fellow at Prodily | Portfolio')
 
       const mainEntity = schema.mainEntity as Record<string, unknown>
       expect(mainEntity['@type']).toBe('Person')
-      expect(mainEntity['@id']).toBe('https://prodily.adityagangwani.me/p/mvance#person')
+      expect(mainEntity['@id']).toBe('https://prodily.app/p/mvance#person')
       expect(mainEntity.name).toBe('Marcus Vance')
       expect(mainEntity.alternateName).toBe('mvance')
       expect(mainEntity.jobTitle).toBe('Product Management Fellow')
-      expect(mainEntity.url).toBe('https://prodily.adityagangwani.me/p/mvance')
+      expect(mainEntity.url).toBe('https://prodily.app/p/mvance')
       expect(mainEntity.sameAs).toEqual([
         'https://www.linkedin.com/in/marcusvance',
         'https://github.com/marcusvance',
@@ -411,13 +411,13 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
       const personSchema = generatePersonJsonLd({
         name: 'Elena Rostova',
         username: 'erostova',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
         isFellow: true,
       })
       const profileSchema = generateProfilePageJsonLd({
         name: 'Elena Rostova',
         username: 'erostova',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
         isFellow: true,
       })
 
@@ -437,7 +437,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
         linkedinUrl: 'https://www.linkedin.com/in/sarahchen',
         githubUrl: 'https://github.com/sarahchen',
         websiteUrl: 'https://sarahchen.dev',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(schemaWithAllLinks.sameAs).toEqual([
@@ -452,7 +452,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
         linkedinUrl: '',
         githubUrl: null,
         websiteUrl: '   ',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(schemaWithNoLinks.sameAs).toBeUndefined()
@@ -462,7 +462,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
         name: 'Bad Link User',
         username: 'badlink',
         linkedinUrl: 'not-a-valid-url',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(schemaWithInvalidUrl.sameAs).toBeUndefined()

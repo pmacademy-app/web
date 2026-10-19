@@ -30,7 +30,7 @@ export const POST = withRoute(
       variables?: Record<string, unknown>
     }
     const templateKey = body.templateKey || 'auth.welcome'
-    const toEmail = body.toEmail || admin.email || 'admin@prodily.adityagangwani.me'
+    const toEmail = body.toEmail || admin.email || 'admin@prodily.app'
 
     const sampleVariables: Record<string, unknown> = {
       userName: 'Prodily Admin Tester',
