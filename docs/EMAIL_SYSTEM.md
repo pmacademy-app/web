@@ -134,7 +134,7 @@ The admin HTML template editor (`AdminTemplateEditor.tsx`, `/admin/communication
 Starting September 2026, Prodily standardized a strict deliverability configuration for founder broadcasts and high-priority lifecycle outreach. This setup was tested and verified to achieve direct **Primary Inbox** placement in Gmail rather than being shunted into Promotions.
 
 ### 1. From & Reply-To Alignment
-- **Strict Domain Alignment:** Outgoing `From` and `Reply-To` addresses must match the authenticated domain (e.g. `Aditya Gangwani <aditya@prodily.adityagangwani.me>` with `Reply-To: aditya@prodily.adityagangwani.me`).
+- **Strict Domain Alignment:** Outgoing `From` and `Reply-To` addresses must match the authenticated domain (e.g. `Aditya Gangwani <aditya@prodily.app>` with `Reply-To: aditya@prodily.app`).
 - **Never Cross-Wire Webmail:** Avoid pointing `Reply-To` to external free webmail providers (e.g. `@gmail.com`) when `From` is on a custom domain. Mismatched Reply-To is heavily weighted by Bayesian filters as automated bulk/marketing activity.
 
 ### 2. Header & Tag Hygiene (`suppressListUnsubscribe` & `suppressMarketingTags`)
@@ -148,5 +148,5 @@ Starting September 2026, Prodily standardized a strict deliverability configurat
 - **No Hidden Preheaders:** Never include zero-pixel hidden preview text divs (`display:none; font-size:1px; line-height:1px; max-height:0; opacity:0;`). Email scanners immediately identify this CSS pattern as commercial marketing.
 - **No Heavy Marketing CTA Buttons:** Avoid large background-colored button blocks (`<table ... bgcolor="#1F6B4E">` or styled `<button>` tags). Use clean, natural inline typography and text links (`Continue your journey →`).
 - **Dual Synchronized Multipart Payload:** Every HTML email must be accompanied by an identical, unformatted `text/plain` alternative payload.
-- **Minimal Link Footprint:** Limit hyperlinks to the essential destination and a canonical, unstyled footer unsubscribe link (`Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications`).
+- **Minimal Link Footprint:** Limit hyperlinks to the essential destination and a canonical, unstyled footer unsubscribe link (`Manage Preferences · Unsubscribe: https://prodily.app/settings?tab=notifications`).
 

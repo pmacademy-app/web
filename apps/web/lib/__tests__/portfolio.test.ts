@@ -43,13 +43,13 @@ describe('Public Portfolio Unit Test Suite', () => {
         avatarUrl: 'https://example.com/avatar.jpg',
         linkedinUrl: 'https://linkedin.com/in/arivera',
         githubUrl: 'https://github.com/arivera',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(jsonLd['@context']).toBe('https://schema.org')
       expect(jsonLd['@type']).toBe('Person')
       expect(jsonLd.name).toBe('Alex Rivera')
-      expect(jsonLd.url).toBe('https://prodily.adityagangwani.me/p/arivera')
+      expect(jsonLd.url).toBe('https://prodily.app/p/arivera')
       expect(jsonLd.worksFor).toBeUndefined()
       expect(jsonLd.jobTitle).toBeUndefined()
       expect(Array.isArray(jsonLd.sameAs)).toBe(true)
@@ -61,7 +61,7 @@ describe('Public Portfolio Unit Test Suite', () => {
         name: 'Jordan Lee',
         username: 'jordanl',
         bio: null,
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(jsonLd.description).toBe("Jordan Lee's Product Management portfolio and skill radar on Prodily.")
@@ -73,8 +73,8 @@ describe('Public Portfolio Unit Test Suite', () => {
 
   describe('Share URL Formatting', () => {
     it('formatPortfolioShareUrl returns clean canonical URL', () => {
-      const url = formatPortfolioShareUrl('https://prodily.adityagangwani.me/', 'arivera')
-      expect(url).toBe('https://prodily.adityagangwani.me/p/arivera')
+      const url = formatPortfolioShareUrl('https://prodily.app/', 'arivera')
+      expect(url).toBe('https://prodily.app/p/arivera')
     })
   })
 })

@@ -231,7 +231,7 @@ export default function LoginPage() {
     <div className="container mx-auto px-4 py-16 max-w-sm">
       <div className="text-center mb-8 flex flex-col items-center">
         <a
-          href="https://prodily.adityagangwani.me"
+          href="https://prodily.app"
           aria-label="Go to Prodily homepage"
           className="mb-4 inline-flex items-center justify-center rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >

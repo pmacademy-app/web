@@ -40,7 +40,7 @@ describe('Production Remediation Invariants', () => {
   })
 
   it('Admin Verification Email renders branded template and embeds verified callback URL cleanly', async () => {
-    const mockVerificationUrl = 'https://prodily.adityagangwani.me/api/auth/callback?token_hash=mock_hash&type=signup'
+    const mockVerificationUrl = 'https://prodily.app/api/auth/callback?token_hash=mock_hash&type=signup'
     const renderedVerification = await renderEmailTemplate('auth.verify_email', {
       userName: 'Test Admin Learner',
       verificationUrl: mockVerificationUrl,

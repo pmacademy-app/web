@@ -100,7 +100,7 @@ export const POST = withRoute(
 
       // 3. Execution Path: Generate link for auth.verify_email
       if (templateKey === 'auth.verify_email') {
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app'
 
         const linkRes = await supabase.auth.admin.generateLink({
           type: 'magiclink',
@@ -128,7 +128,7 @@ export const POST = withRoute(
       // 4. Production Email Queue Enqueue & Immediate Resend Dispatch Flow
       const templateVars: Record<string, unknown> = {
         userName: recipientName,
-        appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
+        appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app',
         ...(customVerificationUrl ? { verificationUrl: customVerificationUrl } : {}),
         ...customVariables,
       }

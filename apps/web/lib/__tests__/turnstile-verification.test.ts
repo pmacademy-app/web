@@ -194,7 +194,7 @@ describe('Turnstile Server-Side Verification Unit Tests', () => {
         JSON.stringify({
           success: true,
           challenge_ts: '2026-09-10T23:59:00Z',
-          hostname: 'prodily.adityagangwani.me',
+          hostname: 'prodily.app',
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       )
@@ -203,7 +203,7 @@ describe('Turnstile Server-Side Verification Unit Tests', () => {
     const result = await verifyTurnstileToken('valid_cf_token', '198.51.100.22')
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.hostname).toBe('prodily.adityagangwani.me')
+      expect(result.hostname).toBe('prodily.app')
       expect(result.challengeTs).toBe('2026-09-10T23:59:00Z')
     }
   })

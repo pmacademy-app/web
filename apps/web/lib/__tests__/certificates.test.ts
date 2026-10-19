@@ -31,22 +31,22 @@ describe('Certificates & Credentials System 2.0 Unit Test Suite', () => {
         learnerName: 'Sarah Connor',
         careerTitle: 'Senior Product Manager',
         issuedAt: '2026-08-05T00:00:00Z',
-        verificationUrl: 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4',
-        portfolioUrl: 'https://prodily.adityagangwani.me/p/sconnor',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        verificationUrl: 'https://prodily.app/verify/PMA-2026-A1B2C3D4',
+        portfolioUrl: 'https://prodily.app/p/sconnor',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(jsonLd['@context']).toBe('https://schema.org')
       expect(jsonLd['@type']).toBe('EducationalOccupationalCredential')
       expect(jsonLd.identifier).toBe('PMA-2026-A1B2C3D4')
       expect((jsonLd.grantee as { name: string }).name).toBe('Sarah Connor')
-      expect(jsonLd.url).toBe('https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4')
+      expect(jsonLd.url).toBe('https://prodily.app/verify/PMA-2026-A1B2C3D4')
     })
   })
 
   describe('QR Code SVG Generator', () => {
     it('generateQrCodeSvg outputs clean SVG vector markup containing rectangles for verification URL', () => {
-      const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4'
+      const verifyUrl = 'https://prodily.app/verify/PMA-2026-A1B2C3D4'
       const svg = generateQrCodeSvg(verifyUrl, 100)
 
       expect(svg).toContain('<svg')
@@ -58,7 +58,7 @@ describe('Certificates & Credentials System 2.0 Unit Test Suite', () => {
   describe('LinkedIn Certification Add-to-Profile URL Builder', () => {
     it('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile URL with full parameters', () => {
       const certCode = 'PMA-2026-B87F129C'
-      const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-B87F129C'
+      const verifyUrl = 'https://prodily.app/verify/PMA-2026-B87F129C'
       const issuedAt = '2026-08-08T00:00:00.000Z'
 
       const linkedinUrl = buildLinkedInCertificationUrl({

@@ -7,7 +7,7 @@ import { getFromEmail, formatFromEmail, parseFromEmail } from '../../lib/email'
 import { BRAND } from '@/lib/brand'
 
 describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
-  const siteUrl = 'https://prodily.adityagangwani.me'
+  const siteUrl = 'https://prodily.app'
   const initialHookSecret = process.env.SEND_EMAIL_HOOK_SECRET
 
   async function parseRes(res: Response) {
@@ -20,39 +20,39 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
   }
 
   describe('Canonical Sender Verification', () => {
-    it('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL with Team Prodily', () => {
+    it('getFromEmail returns canonical verified domain welcome@prodily.app and respects RESEND_FROM_EMAIL with Team Prodily', () => {
       delete process.env.RESEND_FROM_EMAIL
-      expect(getFromEmail()).toBe('Team Prodily <welcome@prodily.adityagangwani.me>')
-      expect(BRAND.emailFromAddress).toBe('welcome@prodily.adityagangwani.me')
+      expect(getFromEmail()).toBe('Team Prodily <welcome@prodily.app>')
+      expect(BRAND.emailFromAddress).toBe('welcome@prodily.app')
 
-      process.env.RESEND_FROM_EMAIL = 'custom@prodily.adityagangwani.me'
-      expect(getFromEmail()).toBe('Team Prodily <custom@prodily.adityagangwani.me>')
+      process.env.RESEND_FROM_EMAIL = 'custom@prodily.app'
+      expect(getFromEmail()).toBe('Team Prodily <custom@prodily.app>')
 
       delete process.env.RESEND_FROM_EMAIL
     })
 
     it('parseFromEmail correctly parses bare email addresses without duplicating email as name', () => {
       // When env var is just a bare email:
-      const parsed = parseFromEmail('welcome@prodily.adityagangwani.me')
+      const parsed = parseFromEmail('welcome@prodily.app')
       expect(parsed).toEqual({
         name: 'Team Prodily',
-        email: 'welcome@prodily.adityagangwani.me',
+        email: 'welcome@prodily.app',
       })
 
       // When an explicit display name is provided:
-      const parsedExplicit = parseFromEmail('Founder Aditya <aditya@prodily.adityagangwani.me>')
+      const parsedExplicit = parseFromEmail('Founder Aditya <aditya@prodily.app>')
       expect(parsedExplicit).toEqual({
         name: 'Founder Aditya',
-        email: 'aditya@prodily.adityagangwani.me',
+        email: 'aditya@prodily.app',
       })
     })
 
     it('formatFromEmail formats bare email addresses into RFC 5322 format', () => {
-      expect(formatFromEmail('welcome@prodily.adityagangwani.me')).toBe(
-        'Team Prodily <welcome@prodily.adityagangwani.me>'
+      expect(formatFromEmail('welcome@prodily.app')).toBe(
+        'Team Prodily <welcome@prodily.app>'
       )
-      expect(formatFromEmail('Founder Aditya <aditya@prodily.adityagangwani.me>')).toBe(
-        'Founder Aditya <aditya@prodily.adityagangwani.me>'
+      expect(formatFromEmail('Founder Aditya <aditya@prodily.app>')).toBe(
+        'Founder Aditya <aditya@prodily.app>'
       )
     })
   })
@@ -60,12 +60,12 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
   describe('Canonical Callback URL Generation', () => {
     it('buildAuthCallbackUrl generates canonical callback URLs with token_hash and type', () => {
       const signupUrl = buildAuthCallbackUrl(siteUrl, 'hash_abc123', 'signup')
-      expect(signupUrl).toBe('https://prodily.adityagangwani.me/api/auth/callback?token_hash=hash_abc123&type=signup&next=%2Fverified')
+      expect(signupUrl).toBe('https://prodily.app/api/auth/callback?token_hash=hash_abc123&type=signup&next=%2Fverified')
 
       const recoveryUrl = buildAuthCallbackUrl(siteUrl, 'hash_pwd456', 'recovery')
-      expect(recoveryUrl).toBe('https://prodily.adityagangwani.me/api/auth/callback?token_hash=hash_pwd456&type=recovery&next=%2Freset-password%3Fmode%3Dupdate')
+      expect(recoveryUrl).toBe('https://prodily.app/api/auth/callback?token_hash=hash_pwd456&type=recovery&next=%2Freset-password%3Fmode%3Dupdate')
 
-      const customRedirect = buildAuthCallbackUrl(siteUrl, 'hash_789', 'signup', 'https://prodily.adityagangwani.me/api/auth/callback?next=/custom-destination')
+      const customRedirect = buildAuthCallbackUrl(siteUrl, 'hash_789', 'signup', 'https://prodily.app/api/auth/callback?next=/custom-destination')
       expect(customRedirect).toContain('token_hash=hash_789')
       expect(customRedirect).toContain('type=signup')
       expect(customRedirect).toContain('next=%2Fcustom-destination')

@@ -117,6 +117,6 @@ describe('Phase 1 Technical SEO Foundation Unit Test Suite', () => {
   })
 
   it('Public support email is standardized to BRAND.supportEmail', () => {
-    expect(BRAND.supportEmail).toBe('hello@prodily.adityagangwani.me')
+    expect(BRAND.supportEmail).toBe('hello@prodily.app')
   })
 })

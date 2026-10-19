@@ -28,7 +28,7 @@ export const POST = withRoute(
       }
 
       const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
+        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app'
 
       const sampleVars: Record<string, unknown> = {
         userName: recipient_name || 'Alex Chen',

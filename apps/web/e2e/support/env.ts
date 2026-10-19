@@ -24,7 +24,7 @@
 import { test } from '@playwright/test'
 
 /** Hosts these specs must never write to, whatever the environment says. */
-const PRODUCTION_HOSTS = ['prodily.adityagangwani.me']
+const PRODUCTION_HOSTS = ['prodily.app']
 
 export interface StagingCredentials {
   email: string
@@ -40,7 +40,7 @@ export function baseUrl(): string {
  * Throws if the target looks like production.
  *
  * Matches on hostname rather than a substring of the URL, so a staging host that merely
- * contains the production name (`staging.prodily.adityagangwani.me` would, as a
+ * contains the production name (`staging.prodily.app` would, as a
  * substring) is judged on what it actually is. An unparseable URL is treated as unsafe:
  * a guard that cannot tell where it is pointing has not cleared anything.
  */

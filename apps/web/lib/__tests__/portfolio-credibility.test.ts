@@ -118,7 +118,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
         name: 'Sarah Chen',
         username: 'sarahchen',
         bio: 'Product Manager building SaaS.',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(jsonLd.worksFor).toBeUndefined()
@@ -131,7 +131,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
         username: 'sarahchen',
         title: 'Chief Product Officer',
         bio: 'Product Manager building SaaS.',
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(jsonLd.jobTitle).toBeUndefined()
@@ -143,7 +143,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
         name: 'Sarah Chen',
         username: 'sarahchen',
         bio: null,
-        siteOrigin: 'https://prodily.adityagangwani.me',
+        siteOrigin: 'https://prodily.app',
       })
 
       expect(typeof jsonLd.description).toBe('string')

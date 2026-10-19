@@ -220,7 +220,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 #### ISSUE-01: Resend Outbound Webhook Verification in Live Production
 - **Status**: ⚠️ Production Behavior / Integration Requiring Real-World Verification
 - **Description**: Webhook handler (`/api/email/webhooks`) is implemented with Svix HMAC signature verification (`verifySvixSignature`), database event logging, and bounce alert forwarding.
-- **Required Verification**: Requires setting endpoint URL (`https://prodily.adityagangwani.me/api/email/webhooks`) and `RESEND_WEBHOOK_SECRET` in production Vercel environment variables.
+- **Required Verification**: Requires setting endpoint URL (`https://prodily.app/api/email/webhooks`) and `RESEND_WEBHOOK_SECRET` in production Vercel environment variables.
 
 #### ISSUE-02: Supabase Auth Hook Live Production Triggers
 - **Status**: ⚠️ Production Behavior / Integration Requiring Real-World Verification

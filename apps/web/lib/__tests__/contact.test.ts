@@ -327,7 +327,7 @@ describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
       data: {
         email_id: 'em_test_123',
         from: 'Alice <alice@example.com>',
-        to: ['hello@prodily.adityagangwani.me'],
+        to: ['hello@prodily.app'],
         subject: 'Inbound Webhook Test Inquiry',
         text: 'Hello Prodily support team!',
       },

@@ -7,7 +7,7 @@ export const BRAND = {
   shortName: 'Prodily',
   tagline: 'Learn product. Build the work. Show the proof.',
   positioning: '90 lessons · 9 capstones · Public portfolio · Free, permanently.',
-  domain: 'prodily.adityagangwani.me',
+  domain: 'prodily.app',
   social: {
     linkedin: 'https://www.linkedin.com/company/prodilypmacademy',
     twitter: 'https://x.com/prodily_pm',
@@ -23,13 +23,13 @@ export const BRAND = {
   adminName: 'Prodily Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
-  supportEmail: 'hello@prodily.adityagangwani.me',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.app',
+  supportEmail: 'hello@prodily.app',
   // NOTE: emailFromAddress uses the Resend verified sender domain.
   emailFromName: process.env.RESEND_FROM_NAME || process.env.BREVO_FROM_NAME || 'Team Prodily',
   emailFromAddress:
     process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
-    'welcome@prodily.adityagangwani.me',
+    'welcome@prodily.app',
   certificateIssuerLine: 'Issued by Prodily',
   // The person who signs certificates. There is no academic board, so the card names
   // the founder rather than an institution.

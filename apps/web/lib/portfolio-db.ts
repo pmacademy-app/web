@@ -608,7 +608,7 @@ export async function updatePortfolioSettings(
         payload: {
           userId,
           username: cleanUsername,
-          portfolioUrl: `https://prodily.adityagangwani.me/p/${cleanUsername}`,
+          portfolioUrl: `https://prodily.app/p/${cleanUsername}`,
         },
       })
     } catch (dispatchErr) {

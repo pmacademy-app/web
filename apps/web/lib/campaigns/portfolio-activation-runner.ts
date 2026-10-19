@@ -20,7 +20,7 @@ export const CAMPAIGN_ID = 'portfolio_activation_sep_2026'
 export const CAMPAIGN_TITLE = 'Prodily Public Portfolio & First Capstone Campaign'
 export const DEFAULT_SUBJECT = 'Your Prodily portfolio is ready'
 export const DEFAULT_PREVIEW_TEXT = "I wanted to point out something that's already available on your Prodily account."
-export const DEFAULT_FROM_EMAIL = 'Aditya from Prodily <aditya@prodily.adityagangwani.me>'
+export const DEFAULT_FROM_EMAIL = 'Aditya from Prodily <aditya@prodily.app>'
 export const DEFAULT_REPLY_TO = 'prodilypm@gmail.com'
 
 export const EXCLUDED_EMAILS = new Set<string>([

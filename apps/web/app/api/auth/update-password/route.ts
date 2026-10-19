@@ -125,13 +125,13 @@ export const POST = withRoute(
 
       const origin = request.headers.get('origin') || ''
       const referer = request.headers.get('referer') || ''
-      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://prodily.adityagangwani.me').replace(/\/$/, '')
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://prodily.app').replace(/\/$/, '')
     
       let expectedHost = ''
       try {
         expectedHost = new URL(siteUrl).host
       } catch {
-        expectedHost = 'prodily.adityagangwani.me'
+        expectedHost = 'prodily.app'
       }
 
       const reqHost = request.headers.get('host') || ''
