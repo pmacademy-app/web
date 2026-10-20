@@ -15,7 +15,22 @@ export type UserProfile = Database['public']['Tables']['users']['Row']
 export async function ensureUserProfile(
   supabase: SupabaseClient<Database>,
   user: User,
-  extra?: { name?: string; timezone?: string; provider?: string; consent?: ConsentRecord | null }
+  extra?: {
+    name?: string
+    timezone?: string
+    provider?: string
+    /**
+     * `undefined` (omitted): derive consent from auth metadata (Flow A signup).
+     * `null`: no consent was given; the columns stay NULL even if metadata has some.
+     */
+    consent?: ConsentRecord | null
+    /**
+     * Do not send the welcome email now. Used for a Google sign-up that still owes
+     * consent: the welcome goes out from the consent gate once they accept (see
+     * `dispatchWelcomeEmailIfNeeded`), so a declined account never gets one.
+     */
+    skipWelcome?: boolean
+  }
 ): Promise<UserProfile | null> {
   const { data: existing } = await supabase
     .from('users')
@@ -37,7 +52,7 @@ export async function ensureUserProfile(
   // uses — and is recovered here. `null` for any path that never presented the
   // agreement (OAuth, legacy accounts): the columns stay NULL rather than
   // recording a consent that did not happen.
-  const consent = extra?.consent ?? consentFromAuthMetadata(user.user_metadata)
+  const consent = extra?.consent !== undefined ? extra.consent : consentFromAuthMetadata(user.user_metadata)
 
   const { data: inserted, error } = await supabase
     .from('users')
@@ -62,7 +77,9 @@ export async function ensureUserProfile(
     return null
   }
 
-  await dispatchWelcomeEmailIfNeeded(supabase, user, name, timezone)
+  if (!extra?.skipWelcome) {
+    await dispatchWelcomeEmailIfNeeded(supabase, user, name, timezone)
+  }
   return inserted
 }
 
@@ -70,7 +87,7 @@ export async function ensureUserProfile(
  * Dispatches welcome email for newly registered or newly verified user.
  * Idempotency key `welcome-${user.id}` guarantees exactly-once queueing.
  */
-async function dispatchWelcomeEmailIfNeeded(
+export async function dispatchWelcomeEmailIfNeeded(
   supabase: SupabaseClient<Database>,
   user: User,
   name?: string | null,

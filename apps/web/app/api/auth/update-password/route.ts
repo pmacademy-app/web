@@ -4,7 +4,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { clearSessionCookies } from '@/lib/auth/session-cookies'
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
-import { createAuthenticatedServerClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { isNetworkFailure } from '@/lib/auth/errors'
@@ -37,6 +37,29 @@ function resolveUserRateLimitKey(accessToken: string | null | undefined, refresh
   const tokenToHash = accessToken || refreshToken || 'unknown'
   const hash = crypto.createHash('sha256').update(tokenToHash).digest('hex').slice(0, 32)
   return `token:${hash}`
+}
+
+/**
+ * Records that the account now has a password. A Google-only account that sets one through
+ * the reset link gets no 'email' identity, so Settings would otherwise keep treating it as
+ * Google-only. Best effort: the password change already succeeded, so a failure is logged
+ * and never surfaced. GoTrue merges app_metadata keys, so only the flag is sent.
+ */
+async function markPasswordSet(user: { id: string; app_metadata?: Record<string, unknown> } | null | undefined) {
+  if (!user?.id || user.app_metadata?.password_set === true) return
+  try {
+    const { error } = await createServiceRoleClient().auth.admin.updateUserById(user.id, {
+      app_metadata: { password_set: true },
+    })
+    if (error) throw error
+  } catch (err) {
+    void logSystemError({
+      severity: 'warning',
+      category: 'auth',
+      operation: 'update_password_mark_password_set_failed',
+      message: err instanceof Error ? err.message : String((err as { message?: unknown })?.message ?? err),
+    })
+  }
 }
 
 /** Helper to delete recovery cookies cleanly across all response paths */
@@ -213,9 +236,10 @@ export const POST = withRoute(
       // 5. Attempt password update with the current access token.
       if (accessToken) {
         const userClient = createAuthenticatedServerClient(accessToken)
-        const { error } = await userClient.auth.updateUser({ password: newPassword })
+        const { data: updated, error } = await userClient.auth.updateUser({ password: newPassword })
 
         if (!error) {
+          await markPasswordSet(updated?.user)
           const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
           clearRecoveryCookies(response)
           return response
@@ -282,7 +306,7 @@ export const POST = withRoute(
 
       // 7. Retry with the freshly obtained access token
       const retryClient = createAuthenticatedServerClient(refreshData.session.access_token)
-      const { error: retryError } = await retryClient.auth.updateUser({ password: newPassword })
+      const { data: retryUpdated, error: retryError } = await retryClient.auth.updateUser({ password: newPassword })
 
       if (retryError) {
         const isExpected = isExpectedTokenInvalidation(retryError)
@@ -300,6 +324,7 @@ export const POST = withRoute(
         return response
       }
 
+      await markPasswordSet(retryUpdated?.user)
       const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
       clearRecoveryCookies(response)
       return response

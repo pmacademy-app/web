@@ -160,7 +160,9 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# Google sign-in returns to /api/auth/callback (no query string today). The `**` wildcard keeps
+# the entry valid if a query string or trailing path is ever added.
+additional_redirect_urls = ["https://127.0.0.1:3000", "http://127.0.0.1:3000/api/auth/callback**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -352,6 +354,25 @@ url = ""
 # If enabled, the nonce check will be skipped. Required for local sign in with Google auth.
 skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
+email_optional = false
+
+# Google sign-in ("Continue with Google"). Off locally by default. To try it, create an
+# OAuth client in Google Cloud with the redirect URI
+# http://127.0.0.1:54321/auth/v1/callback, export GOOGLE_CLIENT_ID and
+# GOOGLE_CLIENT_SECRET, set enabled = true, and set NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
+# plus OAUTH_STATE_SECRET in apps/web/.env.local. See docs/DEPLOYMENT.md.
+[auth.external.google]
+enabled = false
+client_id = "env(GOOGLE_CLIENT_ID)"
+# DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
+secret = "env(GOOGLE_CLIENT_SECRET)"
+# Overrides the default auth callback URL derived from auth.external_url.
+redirect_uri = ""
+# Overrides the default auth provider URL.
+url = ""
+# Only needed for ID-token sign-in. The app uses the redirect (PKCE) flow, so keep the check.
+skip_nonce_check = false
+# Google always returns an email address; the account model depends on it.
 email_optional = false
 
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.

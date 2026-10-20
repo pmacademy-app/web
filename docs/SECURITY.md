@@ -45,7 +45,7 @@ All user-owned database tables enforce strict RLS policies:
 
 ### CSRF / Origin-Referer Scope
 
-An Origin/Referer header check exists today on exactly **one** route: `POST /api/auth/update-password`. It is not a platform-wide CSRF policy — signup, login, and change-email do not currently enforce it.
+An Origin/Referer header check exists today on exactly **two** routes: `POST /api/auth/update-password` and `POST /api/auth/complete-consent` (the Google consent gate, which can delete a fresh account). It is not a platform-wide CSRF policy. Signup, login, and change-email do not currently enforce it.
 
 ---
 
@@ -56,6 +56,23 @@ An Origin/Referer header check exists today on exactly **one** route: `POST /api
 - **3 signups / 24 hours** per canonicalized email — Gmail `local+tag@gmail.com` addresses collapse to `local@gmail.com` before the check, closing the specific alias-abuse pattern seen in the incident.
 
 No CAPTCHA/bot-challenge provider is configured anywhere in the codebase today. If signup abuse resumes after the above limits, that is the next control to add.
+
+---
+
+## 3b. Google Sign-In (OAuth) Controls (added 2026-10-20)
+
+Google sign-in is behind `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` (off by default; `GET /api/auth/google` returns 404 while off). Setup and rollout are in [`DEPLOYMENT.md`](DEPLOYMENT.md) §5.
+
+- **PKCE, server side.** `GET /api/auth/google` starts a PKCE flow with a dedicated Supabase client (`lib/auth/oauth-pkce.ts`). The code verifier never reaches browser JavaScript: it is stored in the `prodily_oauth_pkce` cookie (httpOnly, `SameSite=Lax`, `Secure` in production, `path=/api/auth`, 10 minutes). The callback reads it back for the code exchange. A missing verifier fails the sign-in; there is no verifier-less fallback.
+- **Signed intent.** Consent ticks, referral code and the `next` path travel in `prodily_oauth_intent`, a JSON payload signed with HMAC-SHA256 under `OAUTH_STATE_SECRET` (server only, 32+ chars) and compared with `timingSafeEqual` (`lib/auth/oauth-intent.ts`). Same cookie options as the verifier. The callback rejects a bad signature, an expired or future `iat`, and an off-origin `next` (`sanitizeNextPath`). If the secret is missing while the flag is on, the start route fails closed with `/login?error=oauth_unavailable`. Both cookies are cleared on every callback exit. Neither uses the `sb-` prefix, which stays reserved for the session cookies (B13-A).
+- **Abuse gates.** The start route is rate limited per client IP (persistent limiter, fail closed) and redirects to `/login?error=oauth_rate_limited` instead of returning JSON. New Google accounts are held to the same rules as email signup: the admin `allowSignups` switch and the `signup_global` aggregate limit. A new account that hits either is deleted (only while its profile row is still missing; otherwise all its sessions are revoked) and sent to `/login?error=signups_closed` or `signup_limited`. Turnstile does not apply, because Google has already verified the person and the email address.
+- **Consent gate.** Consent is only ever recorded server side with `buildConsentRecord()`. A Google account created without both acknowledgements (for example from the login page) is held by `proxy.ts` on `/signup/complete-consent`: app pages redirect there and learner APIs return 403 `CONSENT_REQUIRED`. Only accounts with `auth_provider = 'google'` and no `terms_accepted_at` are gated; legacy password accounts with no recorded consent are never gated. `POST /api/auth/complete-consent` (learner actor, rate limited) accepts or declines. Decline deletes the account only when it is a fresh, unused Google-only account (created in the last 30 minutes, every identity is Google, no recorded consent, no learning activity); otherwise it only signs out. Session cookies are cleared either way.
+- **Existing accounts.** A Google sign-in that matches an existing account never changes its consent record or provider. Settings refuses password-based changes for Google-only accounts with 400 `PASSWORD_NOT_SET` instead of a misleading wrong-password error.
+- **CSP.** No change: the flow is plain top-level navigation, and `form-action` / `navigate-to` are not set.
+- **Consent from the button only counts on a same-origin navigation.** `terms=1&age=1` on the start route is trusted only when `Sec-Fetch-Site` is `same-origin` (or, without that header, the Referer is the site's own `/signup`). A crafted third-party link produces an intent without consent, so the user confirms on the gate.
+- **Admins cannot use Google.** An `is_admin` account that signs in with Google is signed out and sent to `/login?error=oauth_admin_blocked`.
+- **Pre-account takeover defence.** Email verification is permanently OFF for password signup (owner decision), so a password account may have been created by someone who does not own the address. When Supabase links a Google identity into an existing password account (link less than 10 minutes old, account older than the link), the first Google sign-in: rotates the password to a random value and sets `app_metadata.password_set = false`; signs out every other session; and posts a critical in-app security notification. The real owner keeps access through Google; to use a password again they use Forgot password. Each step is logged with the user id only and the sign-in continues if a step fails. Follow-up: send this notice as an email as well (today it is in-app only, and is skipped if in-app notifications are switched off).
+- **Learners cannot edit provider or consent columns.** Migration `20261020000001` extends `guard_privileged_user_columns` so `auth_provider` and the consent columns can only be written by the service role.
 
 ---
 

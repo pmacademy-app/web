@@ -208,7 +208,8 @@ describe('B7-G1 — migration scope', () => {
   it('leaves every earlier wave intact', () => {
     // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
     expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(7)
-    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
+    // 10 auth routes since Google sign-in added auth/google and auth/complete-consent.
+    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(10)
     expect(migrated.filter((f) => f.startsWith('settings/'))).toHaveLength(11)
   })
 

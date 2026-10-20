@@ -3,7 +3,7 @@
 import { useState, useTransition, Suspense, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,12 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { trackReferralSignupCompleted } from '@/lib/analytics'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/TurnstileWidget'
 import { MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
+import { LegalConsentFields } from '@/components/auth/LegalConsentFields'
+import { GoogleButton } from '@/components/auth/GoogleButton'
+import { buildGoogleStartHref, isGoogleAuthEnabled } from '@/lib/auth/google-auth'
+
+// Build-time inlined flag, so this is constant for the life of the bundle.
+const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
 
 const signupSchema = z.object({
   name: z
@@ -49,6 +55,20 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>
 
+/**
+ * Visual order of the fields. With Google enabled the consent boxes register (and
+ * render) above the email form, so react-hook-form's built-in focus, which follows
+ * registration order, would jump to Terms on a failed email submit. Focus follows the
+ * email form instead; with the flag off this matches the old registration order.
+ */
+const FOCUS_ORDER: readonly (keyof SignupFormValues)[] = [
+  'name',
+  'email',
+  'password',
+  'acceptedTerms',
+  'confirmedMinimumAge',
+]
+
 function SignupFormContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -65,9 +85,12 @@ function SignupFormContent() {
   const {
     register,
     handleSubmit,
+    control,
+    setFocus,
     formState: { errors },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
+    shouldFocusError: false,
     defaultValues: {
       name: '',
       email: '',
@@ -77,6 +100,13 @@ function SignupFormContent() {
       acceptedTerms: false as unknown as true,
       confirmedMinimumAge: false as unknown as true,
     },
+  })
+
+  // Google skips the email form, so both acknowledgements must already be ticked
+  // before its button becomes usable. The server re-checks them via the signed intent.
+  const [acceptedTermsValue, confirmedAgeValue] = useWatch({
+    control,
+    name: ['acceptedTerms', 'confirmedMinimumAge'],
   })
 
   const handleSignup = (values: SignupFormValues) => {
@@ -160,27 +190,50 @@ function SignupFormContent() {
   // function on every parent render would tear the widget down and re-render it —
   // and because a fresh widget solves and calls back with a NEW token, that cycle
   // never settles. Only the setters are referenced, and React guarantees those are
-  // stable, so there is no stale closure to worry about.
+  // stable, so there is no stale closure to worry about. They are listed as deps only
+  // so the React Compiler can verify the memoization; listing them changes nothing.
   const handleTurnstileSuccess = useCallback((token: string) => {
     setTurnstileToken(token)
     setTurnstileError(null)
-  }, [])
+  }, [setTurnstileToken, setTurnstileError])
 
   const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken('')
     setTurnstileError('Security verification expired. Please complete the check again.')
-  }, [])
+  }, [setTurnstileToken, setTurnstileError])
 
   const handleTurnstileError = useCallback(() => {
     setTurnstileToken('')
-  }, [])
+  }, [setTurnstileToken])
+
+  const focusFirstError = (fieldErrors: FieldErrors<SignupFormValues>) => {
+    const first = FOCUS_ORDER.find((name) => fieldErrors[name])
+    if (first) setFocus(first)
+  }
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    handleSubmit(handleSignup)(e)
+    handleSubmit(handleSignup, focusFirstError)(e)
   }
 
   const isLoading = isPending
+
+  const googleConsentGiven = acceptedTermsValue === true && confirmedAgeValue === true
+  const googleHref = buildGoogleStartHref({
+    consent: true,
+    ref: refCode,
+    next: searchParams.get('next'),
+  })
+
+  const consentFields = (
+    <LegalConsentFields
+      termsInputProps={register('acceptedTerms')}
+      ageInputProps={register('confirmedMinimumAge')}
+      termsError={errors.acceptedTerms?.message}
+      ageError={errors.confirmedMinimumAge?.message}
+      disabled={isLoading}
+    />
+  )
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
@@ -281,6 +334,31 @@ function SignupFormContent() {
             </AuthErrorNotice>
           )}
 
+          {GOOGLE_AUTH_ENABLED && (
+            <>
+              {consentFields}
+
+              <div className="space-y-2">
+                <GoogleButton
+                  href={googleHref}
+                  disabled={!googleConsentGiven || isLoading}
+                  aria-describedby={googleConsentGiven ? undefined : 'google-consent-hint'}
+                />
+                {!googleConsentGiven && (
+                  <p id="google-consent-hint" className="text-center text-[11px] leading-relaxed text-muted-foreground">
+                    Tick both boxes above to continue with Google.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                <span>or sign up with email</span>
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+              </div>
+            </>
+          )}
+
           <form onSubmit={onFormSubmit} className="space-y-4" noValidate>
             <div>
               <label htmlFor="signup-name" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
@@ -345,68 +423,7 @@ function SignupFormContent() {
               )}
             </div>
 
-            {/* Legal acknowledgements — required before an account can be created. */}
-            <div className="space-y-3 pt-1">
-              <div>
-                <label htmlFor="signup-accept-terms" className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    id="signup-accept-terms"
-                    type="checkbox"
-                    disabled={isLoading}
-                    aria-describedby={errors.acceptedTerms ? 'accept-terms-error' : undefined}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-                    {...register('acceptedTerms')}
-                  />
-                  <span className="text-xs leading-relaxed text-muted-foreground">
-                    I have read and agree to the{' '}
-                    <Link
-                      href="/terms"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-primary hover:underline"
-                    >
-                      Terms of Service
-                    </Link>{' '}
-                    and{' '}
-                    <Link
-                      href="/privacy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-primary hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </span>
-                </label>
-                {errors.acceptedTerms && (
-                  <p id="accept-terms-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
-                    {errors.acceptedTerms.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="signup-confirm-age" className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    id="signup-confirm-age"
-                    type="checkbox"
-                    disabled={isLoading}
-                    aria-describedby={errors.confirmedMinimumAge ? 'confirm-age-error' : undefined}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-                    {...register('confirmedMinimumAge')}
-                  />
-                  <span className="text-xs leading-relaxed text-muted-foreground">
-                    I confirm I am at least {MINIMUM_SIGNUP_AGE} years old.
-                  </span>
-                </label>
-                {errors.confirmedMinimumAge && (
-                  <p id="confirm-age-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
-                    {errors.confirmedMinimumAge.message}
-                  </p>
-                )}
-              </div>
-            </div>
+            {!GOOGLE_AUTH_ENABLED && consentFields}
 
             <div className="py-1">
               <TurnstileWidget

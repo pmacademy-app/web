@@ -266,16 +266,28 @@ describe('P0-1 — consent records and existing users', () => {
 
 describe('P0-2 — the signup form presents the acknowledgements', () => {
   const signupSrc = read('app/(auth)/signup/page.tsx')
+  // The checkbox markup lives in a shared component (also used by the Google consent
+  // gate), so the markup assertions read the page and the component together. The
+  // page must still render that component.
+  const consentFieldsSrc = read('components/auth/LegalConsentFields.tsx')
+  const signupFormSrc = `${signupSrc}
+${consentFieldsSrc}`
+
+  it('the signup page renders the shared consent fields', () => {
+    expect(signupSrc).toContain('<LegalConsentFields')
+    expect(signupSrc).toContain("register('acceptedTerms')")
+    expect(signupSrc).toContain("register('confirmedMinimumAge')")
+  })
 
   it('renders a required Terms/Privacy checkbox linking to both documents', () => {
-    expect(signupSrc).toContain('id="signup-accept-terms"')
-    expect(signupSrc).toContain('href="/terms"')
-    expect(signupSrc).toContain('href="/privacy"')
+    expect(signupFormSrc).toContain('id="signup-accept-terms"')
+    expect(signupFormSrc).toContain('href="/terms"')
+    expect(signupFormSrc).toContain('href="/privacy"')
   })
 
   it('renders an age self-certification checkbox', () => {
-    expect(signupSrc).toContain('id="signup-confirm-age"')
-    expect(signupSrc).toContain('MINIMUM_SIGNUP_AGE')
+    expect(signupFormSrc).toContain('id="signup-confirm-age"')
+    expect(signupFormSrc).toContain('MINIMUM_SIGNUP_AGE')
   })
 
   it('leaves both boxes unticked by default — a pre-ticked box is not consent', () => {

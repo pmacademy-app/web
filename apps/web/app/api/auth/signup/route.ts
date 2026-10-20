@@ -14,6 +14,11 @@ import { log } from '@/lib/monitoring/log'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import {
+  SIGNUP_GLOBAL_LIMIT_KEY,
+  AGGREGATE_SIGNUP_WINDOW_MS,
+  aggregateSignupCeiling,
+} from '@/lib/auth/signup-limits'
 import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 
 export const runtime = 'nodejs'
@@ -54,23 +59,8 @@ const signupSchema = z.object({
 const IP_SIGNUP_LIMIT = { windowMs: 15 * 60 * 1000, limit: 5, failClosed: true } // 5 signups / 15 min / IP
 const EMAIL_SIGNUP_LIMIT = { windowMs: 24 * 60 * 60 * 1000, limit: 3, failClosed: true } // 3 / 24h / canonical email
 
-/**
- * Platform-wide signup ceiling per hour.
- *
- * This is the layer that stops a campaign rotating both IPs and addresses, because
- * the key is constant — rotation buys nothing. The threshold is derived from the
- * operator's own configured daily email allowance rather than invented: signups are
- * the dominant consumer of that allowance, so one hour's share of it is the honest
- * ceiling. The floor keeps a conservatively-configured limit from blocking a normal
- * day's organic signups (baseline before the incident was 1-49 signups/day).
- */
-const AGGREGATE_SIGNUP_WINDOW_MS = 60 * 60 * 1000
-const AGGREGATE_SIGNUP_FLOOR = 15
-
-function aggregateSignupCeiling(dailyEmailLimit: number): number {
-  const derived = Math.ceil((Number.isFinite(dailyEmailLimit) && dailyEmailLimit > 0 ? dailyEmailLimit : 100) / 24)
-  return Math.max(AGGREGATE_SIGNUP_FLOOR, derived)
-}
+// The platform-wide hourly ceiling (`signup_global`) lives in lib/auth/signup-limits.ts,
+// shared with the Google OAuth callback so both signup methods draw on one bucket.
 
 /**
  * Whether a GoTrue error means the email already has an account.
@@ -219,7 +209,7 @@ export const POST = withRoute(
 
       const [emailLimit, aggregateLimit] = await Promise.all([
         evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
-        evaluatePersistentRateLimit('signup_global', {
+        evaluatePersistentRateLimit(SIGNUP_GLOBAL_LIMIT_KEY, {
           windowMs: AGGREGATE_SIGNUP_WINDOW_MS,
           limit: aggregateSignupCeiling(dailyEmailLimit),
           failClosed: true,

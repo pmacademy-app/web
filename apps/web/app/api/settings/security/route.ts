@@ -3,6 +3,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import { hasPasswordIdentity, type ServiceClient } from '@/lib/auth/oauth-account-guard'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 export const runtime = 'nodejs'
@@ -25,6 +26,37 @@ function describePasswordUpdateError(error: { code?: string; message?: string })
     default:
       return null
   }
+}
+
+/**
+ * Google-only accounts have no password to re-verify, so the usual "current password"
+ * errors would be misleading. Only reached after a password check has already failed.
+ */
+/**
+ * Whether the account can re-verify with a password: an 'email' identity, or the
+ * app_metadata.password_set flag that update-password and change-password record (a Google
+ * account that set a password via the reset link gets no 'email' identity). TRUE on any lookup
+ * failure so an outage falls back to the plain password check.
+ */
+async function accountHasPassword(admin: ServiceClient, userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await admin.auth.admin.getUserById(userId)
+    if (error || !data?.user) return true
+    return hasPasswordIdentity(data.user)
+  } catch {
+    return true
+  }
+}
+
+function passwordNotSetResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+      code: 'PASSWORD_NOT_SET',
+      error: 'Your account signs in with Google. Set a password from the reset password link first.',
+    },
+    { status: 400 }
+  )
 }
 
 export const POST = withRoute(
@@ -88,6 +120,9 @@ export const POST = withRoute(
     const confirmPassword = body.confirmPassword
 
     if (!currentPassword || typeof currentPassword !== 'string' || !currentPassword.trim()) {
+      if (!(await accountHasPassword(createServiceRoleClient(), userId))) {
+        return passwordNotSetResponse()
+      }
       return NextResponse.json(
         { success: false, error: 'Current password is required.' },
         { status: 400 }
@@ -132,6 +167,9 @@ export const POST = withRoute(
     })
 
     if (verifyError) {
+      if (!(await accountHasPassword(supabase, userId))) {
+        return passwordNotSetResponse()
+      }
       return NextResponse.json(
         { success: false, error: 'Current password is incorrect.' },
         { status: 400 }
@@ -143,8 +181,11 @@ export const POST = withRoute(
     }
 
     // 2. Update user's password securely through Supabase Auth Admin API
+    // password_set keeps Settings from treating a Google account that now has a password as
+    // Google-only (see accountHasPassword).
     const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
       password: newPassword,
+      app_metadata: { password_set: true },
     })
 
     if (updateError) {

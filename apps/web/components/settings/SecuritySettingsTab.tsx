@@ -1,18 +1,97 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Shield, Key, Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff, Mail, Send } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Shield, ShieldCheck, Key, Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff, Mail, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { useDirtyFormGuard } from '@/hooks/use-dirty-form-guard'
 import { showClientToast } from '@/lib/events/client-event-bus'
+import { logout } from '@/lib/auth/logout'
 import type {
   ChangeEmailGetResponse,
   ChangeEmailPostResponse,
   SecurityUpdateResponse,
 } from '@/lib/api/contracts/settings'
+
+const CHANGE_EMAIL_PATH = '/api/settings/security/change-email'
+
+/**
+ * The GET also reports whether the account has a password identity. Google-only
+ * accounts have none, so the current-password checks below can never pass for them.
+ * Optional so an older server response (no field) keeps the old behaviour.
+ */
+type SecurityEmailState = ChangeEmailGetResponse & { hasPassword?: boolean }
+
+/** Stable code the settings routes return when a Google-only account has no password. */
+const PASSWORD_NOT_SET_CODE = 'PASSWORD_NOT_SET'
+
+/** Reads the shared change-email query. SWR dedupes the request across both cards. */
+function useSecurityEmailState() {
+  const query = useApiQuery<SecurityEmailState>(CHANGE_EMAIL_PATH)
+  // Only an explicit `false` means Google-only. Loading, errors and older servers
+  // all fall back to the normal password forms.
+  const managedByGoogle = query.data?.hasPassword === false
+  return { ...query, managedByGoogle }
+}
+
+/** The "request a reset link" page. Signed-in users are bounced from it, hence the logout. */
+const RESET_PASSWORD_PATH = '/reset-password'
+
+/**
+ * Shown on both cards for accounts that sign in with Google and have no password yet.
+ * The forms stay visible: once a password is set through the reset email they work.
+ * The reset page only serves signed-out visitors, so the action logs out first and
+ * then lands there.
+ */
+function ManagedByGoogleNotice({ email }: { email: string | null }) {
+  const router = useRouter()
+  const [leaving, setLeaving] = useState(false)
+
+  const handleSetPassword = async () => {
+    if (leaving) return
+    setLeaving(true)
+    // logout() always navigates, even when a step fails, so there is nothing to undo here.
+    await logout(router, { redirectTo: RESET_PASSWORD_PATH })
+  }
+
+  return (
+    <div
+      role="note"
+      className="flex items-start gap-2.5 rounded-xl border border-border bg-secondary/50 p-3 text-xs text-muted-foreground"
+    >
+      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+      <div className="space-y-1.5 leading-relaxed">
+        <p className="font-semibold text-foreground">Managed by Google</p>
+        <p>
+          Your account signs in with Google, so it has no Prodily password yet. To add a password,
+          we&apos;ll log you out and take you to the reset page, where you can request a reset link for
+          {email ? (
+            <>
+              {' '}
+              <span className="font-mono text-foreground">{email}</span>.
+            </>
+          ) : (
+            ' your email.'
+          )}{' '}
+          After that you can change your password and email here.
+        </p>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          onClick={handleSetPassword}
+          loading={leaving}
+          className="h-auto p-0 text-xs"
+        >
+          {leaving ? 'Logging out...' : 'Log out and set a password'}
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 function ChangeEmailCard() {
   const [emailPassword, setEmailPassword] = useState('')
@@ -25,8 +104,8 @@ function ChangeEmailCard() {
   const isEmailDirty = emailPassword.length > 0 || newEmail.length > 0
   useDirtyFormGuard(isEmailDirty)
 
-  const { data: emailData, isLoading: loadingEmail, mutate: mutateEmail } =
-    useApiQuery<ChangeEmailGetResponse>('/api/settings/security/change-email')
+  const { data: emailData, isLoading: loadingEmail, mutate: mutateEmail, managedByGoogle } =
+    useSecurityEmailState()
 
   const currentEmail = emailData?.email ?? null
 
@@ -51,7 +130,7 @@ function ChangeEmailCard() {
     setEmailErrorMsg(null)
 
     try {
-      const result = await apiPost<ChangeEmailPostResponse>('/api/settings/security/change-email', {
+      const result = await apiPost<ChangeEmailPostResponse>(CHANGE_EMAIL_PATH, {
         currentPassword: emailPassword,
         newEmail,
       })
@@ -62,6 +141,8 @@ function ChangeEmailCard() {
         const errorText = result.error.message
         setEmailErrorMsg(errorText)
         showClientToast('Email Change Failed', errorText, 'error')
+        // The server knows better than our cached state: refresh so the notice shows.
+        if (result.error.code === PASSWORD_NOT_SET_CODE) void mutateEmail()
         return
       }
 
@@ -99,6 +180,8 @@ function ChangeEmailCard() {
           </p>
         </div>
       </div>
+
+      {managedByGoogle && <ManagedByGoogleNotice email={currentEmail} />}
 
       <div className="space-y-1.5 max-w-md">
         <span className="block text-xs font-semibold text-foreground">Current Email</span>
@@ -195,6 +278,7 @@ export function SecuritySettingsTab() {
   const [successMessage, setSuccessMessage] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const saveCountRef = React.useRef(0)
+  const { data: securityEmailData, mutate: mutateSecurityState, managedByGoogle } = useSecurityEmailState()
 
   const isPasswordDirty = currentPassword.length > 0 || newPassword.length > 0 || confirmPassword.length > 0
   useDirtyFormGuard(isPasswordDirty)
@@ -249,6 +333,7 @@ export function SecuritySettingsTab() {
         const errorText = result.error.message
         setErrorMessage(errorText)
         showClientToast('Password Update Failed', errorText, 'error')
+        if (result.error.code === PASSWORD_NOT_SET_CODE) void mutateSecurityState()
         return
       }
 
@@ -295,6 +380,8 @@ export function SecuritySettingsTab() {
             </p>
           </div>
         </div>
+
+        {managedByGoogle && <ManagedByGoogleNotice email={securityEmailData?.email ?? null} />}
 
         <div className="space-y-4">
           {/* Current Password */}

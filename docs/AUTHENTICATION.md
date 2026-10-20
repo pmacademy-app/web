@@ -81,6 +81,20 @@ routes also returned the full session in their JSON bodies (`F-SEC-8`).
 - The signup form reads `?ref=` from the current URL and submits it directly in the signup request body; the server (`app/api/auth/signup/route.ts`) uses that value if present, **falling back to the `prodily_referrer` cookie** only when the body doesn't include one (`refCode = parsed.data.refCode || request.cookies.get('prodily_referrer')?.value || null`).
 - `createReferralAttribution()` links the new account to the referrer in `public.referrals` (preventing self-referrals and capping at 10 signups/24h). See [`docs/admin/referrals.md`](admin/referrals.md).
 
+### D. Google Sign-In ("Continue with Google")
+
+Off unless `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` at build time. Security controls are in [`SECURITY.md`](SECURITY.md) §3b, setup in [`DEPLOYMENT.md`](DEPLOYMENT.md) §5.
+
+1. **Button.** `/signup` shows the Terms/Privacy and age boxes (`components/auth/LegalConsentFields.tsx`) above both methods. `components/auth/GoogleButton.tsx` stays disabled until both are ticked, then links to `/api/auth/google?terms=1&age=1` (plus `ref` and `next` when present). `/login` shows the same button without the boxes and says "New here? You'll confirm our Terms and age on the next step." `/admin/login` has no Google option.
+2. **Start** (`app/api/auth/google/route.ts`). Rate limit, then a PKCE `signInWithOAuth({ provider: 'google' })` with `redirectTo` set to `/api/auth/callback`. The verifier goes into `prodily_oauth_pkce` and the signed intent (terms, age, ref, next, iat) into `prodily_oauth_intent`, then the browser is redirected to Google.
+3. **Callback** (`app/api/auth/callback/route.ts`, `?code` branch). Verifies both cookies before exchanging the code, exchanges it with the stored verifier, and checks whether a `public.users` row already exists **before** `ensureUserProfile`.
+   - New user: enforce `allowSignups` and `signup_global`, then create the profile with `auth_provider = 'google'` and, if the intent carried both ticks, the server-built consent record. Referral attribution uses the signed `ref`, falling back to the `prodily_referrer` cookie.
+   - Existing user (including a password user whose Google identity was linked by email): profile, consent and referral are left untouched.
+   - Session cookies are set as for password login, the OAuth cookies are cleared, and the user goes to `next`, or to `/signup/complete-consent` when the account is Google with no consent.
+4. **Consent gate** (`app/(auth)/signup/complete-consent/page.tsx`). Same boxes as signup. "Agree and Continue" posts `{ decision: 'accept', next }` to `/api/auth/complete-consent`, which records consent and returns the redirect. "Cancel and delete my new account" asks for confirmation, then posts `decline`: a fresh unused Google-only account is deleted, otherwise the user is only signed out; both land on `/login?error=consent_declined`.
+5. **Errors** shown on `/login`: `oauth_cancelled`, `oauth_failed`, `oauth_rate_limited`, `oauth_unavailable`, `signups_closed`, `signup_limited`, `consent_declined`.
+6. **Settings.** `GET /api/settings/security/change-email` returns `hasPassword`. When it is `false`, Settings > Security shows "Managed by Google" on both cards and explains how to add a password with the reset email. The change-password and change-email routes answer 400 `PASSWORD_NOT_SET` for these accounts.
+
 ---
 
 ## 3. Platform Settings & Access Controls
@@ -235,6 +249,7 @@ The other eight auth routes are on the wrapper.
 | **Persistent 60s Rate Limiter** | `lib/rate-limit.ts`, `public.rate_limits` | 🟢 Verified in Production |
 | **Supabase Auth Hook Handler** | `app/api/auth/send-email-hook/route.ts` | 🟢 Verified in Production |
 | **Email Change & `/email-verified` Flow** | `app/api/settings/security/change-email/route.ts`, `app/api/auth/callback/route.ts`, `app/(auth)/email-verified/page.tsx` | 🟢 Verified in Production |
+| **Google Sign-In & Consent Gate** | `app/api/auth/google/route.ts`, `app/api/auth/callback/route.ts`, `app/(auth)/signup/complete-consent/page.tsx`, `proxy.ts` | 🟡 Built, flag OFF (not yet enabled in any environment) |
 
 ---
 
