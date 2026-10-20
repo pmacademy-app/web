@@ -6,6 +6,9 @@ interface QuizOptionProps {
   state: 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled'
   onClick: () => void
   disabled?: boolean
+  /** Roving tabindex from the parent radiogroup; omitted means default tab order. */
+  tabIndex?: number
+  ref?: React.Ref<HTMLButtonElement>
 }
 
 export default function QuizOption({
@@ -14,6 +17,8 @@ export default function QuizOption({
   state,
   onClick,
   disabled = false,
+  tabIndex,
+  ref,
 }: QuizOptionProps) {
   let borderClasses = 'border-border bg-card text-foreground hover:border-foreground/30 hover:bg-accent/30'
   let textClasses = 'text-foreground'
@@ -39,6 +44,9 @@ export default function QuizOption({
 
   return (
     <button
+      ref={ref}
+      type="button"
+      tabIndex={tabIndex}
       role="radio"
       aria-checked={state === 'selected' || state === 'correct'}
       disabled={disabled || state === 'disabled'}

@@ -28,6 +28,14 @@ export function QualitySelector({ onSelect, disabled = false }: QualitySelectorP
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (disabled) return
+      // Leave digits alone while the learner is typing in a field, and when a
+      // modifier is held so browser and OS shortcuts (Ctrl+1 and so on) still work.
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      const target = e.target
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable) return
+      }
       if (['0', '1', '2', '3', '4', '5'].includes(e.key)) {
         e.preventDefault()
         onSelect(parseInt(e.key, 10) as SRSRating)

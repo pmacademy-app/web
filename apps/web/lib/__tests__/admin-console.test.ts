@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { AdminConsoleService } from '../admin/service'
-import { isAdminEmail, isAdminUser } from '../admin/authorization'
+import { isAdminUser } from '../admin/authorization'
 import { ADMIN_NAV, ADMIN_NAV_BUILT, isAdminNavItemActive, getAdminSectionLabel, type AdminNavItem } from '../admin/navigation'
 import { LayoutDashboard, Users } from 'lucide-react'
 
@@ -132,26 +132,7 @@ describe('Admin Console Unit Test Suite', () => {
     }
   })
 
-  it('Admin RBAC evaluates ADMIN_EMAILS environment variable', () => {
-    const originalEnv = process.env.ADMIN_EMAILS
-    process.env.ADMIN_EMAILS = 'admin1@pmacademy.com, superadmin@pmacademy.com ,'
-
-    expect(isAdminEmail('admin1@pmacademy.com')).toBe(true)
-    expect(isAdminEmail('superadmin@pmacademy.com')).toBe(true)
-    expect(isAdminEmail('learner@pmacademy.com')).toBe(false)
-    expect(isAdminEmail('ADMIN1@pmacademy.com')).toBe(true)
-    expect(isAdminEmail('Admin1@PMAcademy.com')).toBe(true)
-    expect(isAdminEmail('')).toBe(false)
-    expect(isAdminEmail(null)).toBe(false)
-    expect(isAdminEmail(undefined)).toBe(false)
-
-    process.env.ADMIN_EMAILS = originalEnv
-  })
-
-  it('Admin RBAC grants access via users.is_admin database flag', async () => {
-    const originalEnv = process.env.ADMIN_EMAILS
-    process.env.ADMIN_EMAILS = ''
-
+  it('Admin RBAC grants access via users.is_admin database flag only', async () => {
     const mockClient = (isAdminRow: boolean | null) =>
       ({
         from: () => ({
@@ -166,32 +147,19 @@ describe('Admin Console Unit Test Suite', () => {
         }),
       }) as unknown as Parameters<typeof isAdminUser>[0]
 
-    expect(await isAdminUser(mockClient(true), 'user-1', 'someone@pmacademy.com')).toBe(true)
-    expect(await isAdminUser(mockClient(false), 'user-1', 'someone@pmacademy.com')).toBe(false)
-    expect(await isAdminUser(mockClient(null), 'user-1', 'someone@pmacademy.com')).toBe(false)
-
-    process.env.ADMIN_EMAILS = originalEnv
+    expect(await isAdminUser(mockClient(true), 'user-1')).toBe(true)
+    expect(await isAdminUser(mockClient(false), 'user-1')).toBe(false)
+    expect(await isAdminUser(mockClient(null), 'user-1')).toBe(false)
   })
 
-  it('Admin RBAC short-circuits to ADMIN_EMAILS without a database call', async () => {
-    const originalEnv = process.env.ADMIN_EMAILS
-    process.env.ADMIN_EMAILS = 'boss@pmacademy.com'
+  it('Admin RBAC treats a missing users row as not an admin', async () => {
+    const mockClient = {
+      from: () => ({
+        select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }),
+      }),
+    } as unknown as Parameters<typeof isAdminUser>[0]
 
-    let dbCalled = false
-    const mockClient = () =>
-      ({
-        from: () => {
-          dbCalled = true
-          return {
-            select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { is_admin: false }, error: null }) }) }),
-          }
-        },
-      }) as unknown as Parameters<typeof isAdminUser>[0]
-
-    expect(await isAdminUser(mockClient(), 'user-1', 'boss@pmacademy.com')).toBe(true)
-    expect(dbCalled).toBe(false)
-
-    process.env.ADMIN_EMAILS = originalEnv
+    expect(await isAdminUser(mockClient, 'user-1')).toBe(false)
   })
 
   it('ADMIN_NAV contains all primary workspaces with unique valid icons and built routes', () => {

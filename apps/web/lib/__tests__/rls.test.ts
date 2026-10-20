@@ -99,6 +99,105 @@ describe('Supabase Row Level Security (RLS) Policy Test Suite', () => {
     expect(down).not.toMatch(/WITH CHECK/i)
   })
 
+  it('1c. PR-01 locks learner RPCs, public_profiles, open policies and testimonials inserts', () => {
+    const migrationsDir = path.resolve(process.cwd(), '../../supabase/migrations')
+    const name = '20261018000001_lockdown_public_grants'
+    const code = (file: string) => fs.readFileSync(path.join(migrationsDir, file), 'utf-8').replace(/--.*$/gm, '')
+    const up = code(`${name}.sql`)
+    const down = code(`rollback/${name}.down.sql`)
+    const validation = code('validation/20261018000001_lockdown_validation.sql')
+
+    const syncXp = 'public.sync_user_xp(uuid)'
+    const quizRpc = 'public.record_lesson_quiz_completion(uuid, text, int, int, int, jsonb, int, int)'
+
+    expect(up).toContain('SET search_path = public, pg_temp;')
+
+    // SEC-01: both RPCs are service-role only, with explicit signatures.
+    for (const fn of [syncXp, quizRpc]) {
+      expect(up).toContain(`REVOKE ALL ON FUNCTION ${fn} FROM PUBLIC, anon, authenticated;`)
+      expect(up).toContain(`GRANT EXECUTE ON FUNCTION ${fn} TO service_role;`)
+    }
+
+    // SEC-01 / SEC-22: search_path pinned on sync_user_xp and both XP trigger functions.
+    for (const fn of [syncXp, 'public.update_user_xp_and_level()', 'public.sync_user_xp_and_level_on_update()']) {
+      expect(up).toContain(`ALTER FUNCTION ${fn} SET search_path = public, pg_temp;`)
+    }
+
+    // SEC-02: the RLS-bypassing view is dropped.
+    expect(up).toContain('DROP VIEW IF EXISTS public.public_profiles;')
+
+    // SEC-03 / SEC-06: open FOR ALL policies dropped and end-user table privileges revoked.
+    expect(up).toContain(
+      'DROP POLICY IF EXISTS "Service role has full access to email_broadcasts" ON public.email_broadcasts;',
+    )
+    expect(up).toContain(
+      'DROP POLICY IF EXISTS "Service role has full access to fellow_requests" ON public.fellow_requests;',
+    )
+    expect(up).toContain('REVOKE ALL ON public.email_broadcasts FROM anon, authenticated;')
+    expect(up).toContain('REVOKE ALL ON public.fellow_requests FROM anon, authenticated;')
+
+    // SEC-05: learner INSERT policy on testimonials dropped; the read policies are untouched.
+    expect(up).toContain('DROP POLICY IF EXISTS "Users can submit feedback" ON public.testimonials;')
+    expect(up).not.toMatch(/DROP POLICY[^;]*"(Public can read published testimonials|Users can view own feedback)"/)
+
+    // Future functions start closed.
+    expect(up).toContain(
+      'ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;',
+    )
+
+    // Nothing is granted to the end-user roles anywhere in the forward migration.
+    expect(up).not.toMatch(/GRANT[^;]*TO[^;]*\b(anon|authenticated|PUBLIC)\b/)
+    expect(up).not.toMatch(/CREATE (OR REPLACE )?(VIEW|POLICY)/i)
+
+    // Self-check: fails when either RPC is still executable or the view survived.
+    const selfCheck = up.slice(up.indexOf('DO $$'))
+    expect(selfCheck).toContain("has_function_privilege(v_role, v_fn, 'EXECUTE')")
+    expect(selfCheck).toContain("to_regclass('public.public_profiles') IS NOT NULL")
+    expect(selfCheck).toContain("ARRAY['anon', 'authenticated']")
+    expect(selfCheck).toMatch(/END \$\$;\s*$/)
+
+    // The normal rollback only restores default function privileges (the outage-plausible part).
+    // It never re-creates public_profiles and never re-opens the closed holes.
+    expect(down).toContain('ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT EXECUTE ON FUNCTIONS TO PUBLIC;')
+    expect(down).toContain(
+      'ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon, authenticated;',
+    )
+    expect(down).not.toMatch(/public_profiles|CREATE (OR REPLACE )?(VIEW|POLICY)|ON FUNCTION\b|GRANT ALL/i)
+
+    // The hole-reopening restores live in a separate file, all commented out, and that file
+    // never re-creates public_profiles either.
+    const reopenRaw = fs.readFileSync(path.join(migrationsDir, 'rollback/20261018000001_reopen_holes.down.sql'), 'utf-8')
+    const reopen = reopenRaw.replace(/--.*$/gm, '')
+    expect(reopen.trim()).toBe('')
+    expect(reopenRaw).toMatch(/DANGER/)
+    expect(reopenRaw).toContain(`-- GRANT EXECUTE ON FUNCTION ${quizRpc} TO authenticated;`)
+    expect(reopenRaw).toContain('-- CREATE POLICY "Service role has full access to email_broadcasts"')
+    expect(reopenRaw).toContain('-- CREATE POLICY "Service role has full access to fellow_requests"')
+    expect(reopenRaw).toContain('-- CREATE POLICY "Users can submit feedback"')
+    expect(reopenRaw).not.toMatch(/CREATE (OR REPLACE )?VIEW public\.public_profiles/i)
+
+    // Forensics: read-only transactions, the pre-deploy evidence queries included.
+    const forensics = code('validation/20261018000001_forensics.sql')
+    const txStarts = forensics.match(/BEGIN TRANSACTION READ ONLY;/g) ?? []
+    expect(txStarts.length).toBeGreaterThanOrEqual(2)
+    expect(forensics.match(/ROLLBACK;/g)).toHaveLength(txStarts.length)
+    expect(forensics).not.toMatch(/\b(INSERT|UPDATE|DELETE|TRUNCATE|DROP|ALTER|GRANT|REVOKE|COMMIT)\b/)
+    expect(forensics).toContain("table_name = 'public_profiles'")
+    expect(forensics).toContain('p.proowner::regrole')
+    for (const table of ['xp_events', 'user_lesson_progress', 'certificates', 'testimonials', 'email_broadcasts']) {
+      expect(forensics).toContain(`public.${table}`)
+    }
+
+    // Validation runs in a rolled-back transaction and raises on every failed check.
+    expect(validation).toMatch(/^\s*BEGIN;/)
+    expect(validation).toMatch(/ROLLBACK;\s*$/)
+    expect(validation).toContain('RAISE EXCEPTION')
+    expect(validation).toContain('allowlist text[]')
+    expect(validation).toContain('SET LOCAL ROLE anon;')
+    expect(validation).toContain('SET LOCAL ROLE authenticated;')
+    expect(validation).toContain('WHEN insufficient_privilege THEN')
+  })
+
   it('2. User-scoped unauthenticated client is denied unauthorized table access', async () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

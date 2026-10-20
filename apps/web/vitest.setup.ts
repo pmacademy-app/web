@@ -6,7 +6,6 @@ if (process.env.ALLOW_LIVE_DB_TESTS !== 'true') {
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'mock-anon-key'
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key'
 }
-process.env.ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'admin@prodily.app,owner@prodily.app'
 process.env.CRON_SECRET = process.env.CRON_SECRET || 'test-cron-secret'
 process.env.TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA'
 process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'

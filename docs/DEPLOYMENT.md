@@ -40,7 +40,6 @@
 | `RESEND_WEBHOOK_SECRET` | **Server Only** | Svix webhook secret (`whsec_...`) |
 | `SEND_EMAIL_HOOK_SECRET` | **Server Only** | Secret verifying Supabase Auth Send Email Hook calls |
 | `CRON_SECRET` | **Server Only** | Bearer secret authorizing GitHub Actions cron routes |
-| `ADMIN_EMAILS` | **Server Only** | Comma-separated list of admin email addresses |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public (Client + Server) | Cloudflare Turnstile site key. **Required for a production build** — it is inlined into the client bundle at build time, so `next.config.ts` fails the build when it is absent (see [`SECURITY.md`](SECURITY.md)) |
 | `TURNSTILE_SECRET_KEY` | **Server Only** | Cloudflare Turnstile secret used for the server-side Siteverify call. Never prefix with `NEXT_PUBLIC_`; when missing in production the signup and resend-verification routes fail closed |
 | `DEV_TURNSTILE_BYPASS` | **Server Only** (local dev) | Optional. `true` skips Turnstile verification. Ignored whenever `NODE_ENV=production`, so it cannot weaken a deployed environment. Do **not** set it in Vercel |
@@ -64,7 +63,7 @@
 
 **Not an env var:** `IN_APP_NOTIFICATIONS_ENABLED` is a **database-backed feature flag** (`system_settings.feature_flags`, default **ON**), toggled from the admin console — it governs all in-app notifications including Phase 8's `capstone.reviewed`. Do not add it to `.env.*`. **Do not set `REDIS_URL`** — Prodily uses Postgres for rate limits and the email queue; Redis is intentionally not a dependency.
 
-The required-for-production variables (the first 17 rows, through `TURNSTILE_SECRET_KEY`) are confirmed present in `apps/web/.env.example` and read in current code. The remaining rows are Phase 4/6/7 experiment flags (OFF by default) and operational/optional variables — all safe to leave unset. No stale/removed variables found.
+The required-for-production variables (the first 16 rows, through `TURNSTILE_SECRET_KEY`) are confirmed present in `apps/web/.env.example` and read in current code. The remaining rows are Phase 4/6/7 experiment flags (OFF by default) and operational/optional variables, all safe to leave unset. `ADMIN_EMAILS` was removed; see §2.1.
 
 > **Never commit real values.** `.env.example` carries names and formats only; the
 > production values live in the Vercel project environment. `TURNSTILE_SECRET_KEY` in
@@ -77,6 +76,47 @@ The required-for-production variables (the first 17 rows, through `TURNSTILE_SEC
 > verification build that is never served, so it does not need the real keys — but the
 > guard still applies to it, which is why the fallback exists rather than an exemption.
 > If you add the real values as repository secrets they take precedence automatically.
+
+### 2.1 Admin access (database flag, not an env var)
+
+`ADMIN_EMAILS` is **no longer used**. Admin status comes only from `public.users.is_admin`
+(the proxy also trusts the server-signed `app_metadata.is_admin` claim). You can remove
+`ADMIN_EMAILS` from the Vercel environment after the step below; leaving it set does nothing.
+
+**Backfill step, run once BEFORE deploying the admin-by-flag change.** Use the owner-only
+snippet
+[`supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql`](../supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql)
+in the Supabase SQL editor (staging first if you can). Never move it into
+`supabase/migrations/` and never commit real addresses or ids. Run one step at a time (select
+the step, run the selection). Full steps:
+[`pending-approval/README.md`](../supabase/migrations/pending-approval/README.md).
+
+1. **Review candidates.** Paste the addresses from the current `ADMIN_EMAILS` value in Vercel
+   into STEP 1 (read-only) and run it. Email verification is off and login auto-confirms, so
+   a confirmed address proves nothing: decide which accounts are genuinely yours from
+   `created_at`, `last_sign_in_at` and `provider`.
+2. **Paste UUIDs.** Copy the `user_id` of each verified account into STEP 2 and STEP 3. The
+   snippet promotes by id only, never by email, and refuses to run with the placeholder id.
+3. **Dry run.** Run STEP 2 (read-only preview of the resulting roster), then STEP 3 as
+   shipped. STEP 3 ends with `ROLLBACK;`, so it changes nothing.
+4. **COMMIT.** When the preview is exactly right, change STEP 3's final `ROLLBACK;` to
+   `COMMIT;`, run it again, then run STEP 4 and check the final roster.
+5. Deploy. After deploy, sign in to `/admin` with each admin account to confirm access.
+
+From then on, grant or remove admin access from `/admin/users`. The console refuses to let
+an admin demote themselves and refuses to demote the last remaining admin. The delete API
+returns 403 for an account with `is_admin = true`; demote it first, then delete it.
+
+**Recovery if no admin is left.** If every admin ends up demoted (or the backfill was
+skipped), nobody can reach the console to fix it. Restore one account from the Supabase SQL
+editor, which runs as `postgres` and is allowed past the privileged-column trigger:
+
+```sql
+UPDATE public.users SET is_admin = true WHERE id = '<uuid>';
+```
+
+Look up the id first (`SELECT id, email, created_at, last_sign_in_at FROM auth.users WHERE
+lower(email) = lower('<your email>');`) and make sure the account is genuinely yours.
 
 ---
 
@@ -134,7 +174,7 @@ Phases 6, 7 and 8 are code-complete with all experiment flags **off by default**
 
 | Variable | Required? | Recommended production value/state | Why |
 |---|---|---|---|
-| Core (Supabase, email, `CRON_SECRET`, `ADMIN_EMAILS`, Turnstile, `NEXT_PUBLIC_SITE_URL`) | **Yes** | Set (see §2) | App does not function / build without them |
+| Core (Supabase, email, `CRON_SECRET`, Turnstile, `NEXT_PUBLIC_SITE_URL`) | **Yes** | Set (see §2) | App does not function / build without them |
 | Legal `NEXT_PUBLIC_LEGAL_*`, grievance | Recommended before public launch | Set to the confirmed operator identity | Legal pages otherwise show "not registered" wording |
 | `RECUT_EXPERIMENT_ENABLED` | No | **unset / `false`** | Keeps Phase 4 recut OFF (control) |
 | `MODULE_ENTRY_UNLOCK_ENABLED` | No | **unset / `false`** | Keeps Phase 6 unlock OFF (global-sequential lock) |

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminEmail } from '@/lib/admin/authorization'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
@@ -353,15 +352,13 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   /**
-   * Resolves admin authorization for the current user:
-   * 1. ADMIN_EMAILS environment variable (0 DB calls)
-   * 2. user.app_metadata.is_admin signed JWT claim (0 DB calls)
-   * 3. Lazy fallback to users table (only when accessing /admin area and claims are absent)
+   * Resolves admin authorization for the current user. Email addresses never grant admin:
+   * 1. user.app_metadata.is_admin signed JWT claim (0 DB calls)
+   * 2. Lazy fallback to users.is_admin (only when accessing the /admin area and the claim is absent)
    */
   async function isAdmin(): Promise<boolean> {
     if (!user) return false
-    if (isAdminEmail(user.email)) return true
-    if (user.app_metadata?.is_admin) return true
+    if (user.app_metadata?.is_admin === true) return true
 
     // For non-admin learner paths, skip DB query — downstream learner components handle authorization
     if (!isAdminArea && !isAdminLoginPage) {

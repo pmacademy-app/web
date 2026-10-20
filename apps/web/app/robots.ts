@@ -16,13 +16,15 @@ export default function robots(): MetadataRoute.Robots {
           '/terms',
           '/curriculum',
           '/frameworks',
-          '/glossary',
           '/lessons/',
           '/p/',
+          // Public OG image generator must stay crawlable even though /api/ is disallowed.
+          '/api/og/',
         ],
         disallow: [
           '/dashboard',
-          '/review',
+          // `$` anchors the match so the public /reviews page stays crawlable.
+          '/review$',
           '/progress',
           '/settings',
           '/leaderboard',
@@ -33,7 +35,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/academy/',
           '/login',
-          '/app',
         ],
       },
     ],

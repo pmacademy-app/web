@@ -15,7 +15,7 @@ The System Workspace provides comprehensive operational visibility into backend 
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin/system` from the sidebar.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 
 ---
 

@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
-import { getUserStreakStatus } from '@/lib/streaks-db'
+import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks-db'
+import { logSystemError } from '@/lib/monitoring/logger'
 import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
 import { CAPSTONE_DEFINITIONS, getCurriculumModuleForCapstone } from '@/config/capstones'
@@ -91,7 +92,17 @@ export default async function DashboardPage() {
     profilePromise,
     progressPromise,
     fetchCurriculumData(),
-    getUserStreakStatus(supabase, authUser.id),
+    // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
+    getUserStreakStatus(supabase, authUser.id).catch((err) => {
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'dashboard_streak_read',
+        message: String(err),
+        userId: authUser.id,
+      })
+      return notStartedStreakStatus()
+    }),
     getReviewQueueData(supabase, authUser.id),
     capstonesPromise,
     (supabase

@@ -53,12 +53,12 @@ describe('Phase 3 Information Architecture & Internal Linking Test Suite', () =>
     expect(resourceHrefs?.includes('/lessons/lesson-001')).toBe(true)
   })
 
-  it('robots.txt allows /frameworks and /glossary', () => {
+  it('robots.txt allows /frameworks and drops the retired /glossary', () => {
     const r = robots()
     const ruleGroup = Array.isArray(r.rules) ? r.rules[0] : r.rules
     const allowList = Array.isArray(ruleGroup.allow) ? ruleGroup.allow : [ruleGroup.allow]
     expect(allowList.includes('/frameworks')).toBe(true)
-    expect(allowList.includes('/glossary')).toBe(true)
+    expect(allowList.includes('/glossary')).toBe(false)
   })
 
   it('XML Sitemap contains at least 97 public URLs including /frameworks and public portfolios', async () => {

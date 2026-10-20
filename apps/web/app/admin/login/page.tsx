@@ -14,7 +14,7 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
  *
  * This app has a SINGLE authentication system: this page authenticates the
  * user with the same Supabase account used for the learner side. After
- * authentication, authorization (ADMIN_EMAILS OR users.is_admin) is verified
+ * authentication, authorization (users.is_admin database flag) is verified
  * server-side before routing:
  *   - authorized  -> /admin
  *   - unauthorized-> /admin/access-denied
@@ -29,7 +29,7 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
  * It now posts credentials to `POST /api/auth/login`, the same route the learner side
  * uses, which authenticates server-side and sets the cookies directly. The session never
  * exists in this page. Authorization is unchanged: `/api/admin/verify` still runs the
- * server-side RBAC guard (ADMIN_EMAILS OR users.is_admin) before the console opens, and
+ * server-side RBAC guard (users.is_admin database flag) before the console opens, and
  * a successful login is not by itself admin access.
  */
 export default function AdminLoginPage() {
@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
       }
 
       // Verify authorization before entering the console. This endpoint runs
-      // the server-side RBAC guard (ADMIN_EMAILS OR users.is_admin).
+      // the server-side RBAC guard (users.is_admin database flag).
       const verify = await apiGet<{ authorized?: boolean }>('/api/admin/verify')
       // A failed verification call is not authorization; fall through to the
       // access-denied page and let the proxy have the final say.

@@ -108,29 +108,53 @@ export async function enqueueNotificationItem(
   }
 
   // 3. Suppression Check (Non-critical emails only)
+  //
+  // Fails closed: when the read errors we cannot tell whether the address unsubscribed or
+  // bounced, so the send is blocked rather than treated as "not suppressed" (CQ-03).
   if (!isCritical && params.channel === 'email' && params.toEmail) {
+    let suppressed = false
+    let readFailed = false
     try {
-      const { data: suppression } = await supabase
+      const { data: suppression, error: suppressionError } = await supabase
         .from('email_suppressions')
         .select('id')
         .eq('email', params.toEmail.trim().toLowerCase())
         .maybeSingle()
 
-      if (suppression && (suppression as { id: string }).id) {
-        await recordSkippedEvent(supabase, params, 'email_suppressed')
-        return { success: false, reason: 'Recipient email address is suppressed' }
+      if (suppressionError) {
+        readFailed = true
+      } else {
+        suppressed = Boolean(suppression && (suppression as { id: string }).id)
       }
     } catch {
-      // Non-fatal read check falls through
+      readFailed = true
+    }
+
+    if (readFailed) {
+      await recordSkippedEvent(supabase, params, 'suppression_check_failed')
+      return { success: false, reason: 'Suppression check failed; send blocked' }
+    }
+    if (suppressed) {
+      await recordSkippedEvent(supabase, params, 'email_suppressed')
+      return { success: false, reason: 'Recipient email address is suppressed' }
     }
   }
 
   // 4. User Preferences Check
+  //
+  // Strict read: a failed read must not stand in as the defaults, which would mail a
+  // learner who opted out (CQ-03). A missing row still resolves to the defaults.
   const allowBypass = globalPriorityMatrix.evaluatePreferenceBypass(priorityLevel)
   if (!allowBypass && !isCritical) {
-    const userPrefs =
-      params.preloadedPreferences ||
-      (await getResolvedUserNotificationPreferences(supabase, params.userId))
+    let userPrefs = params.preloadedPreferences
+    if (!userPrefs) {
+      try {
+        userPrefs = await getResolvedUserNotificationPreferences(supabase, params.userId, { strict: true })
+      } catch {
+        await recordSkippedEvent(supabase, params, 'preferences_read_failed')
+        return { success: false, reason: 'Notification preferences read failed; send blocked' }
+      }
+    }
     const isAllowed = isChannelEnabledByPreferences(userPrefs, params.category, params.channel)
     if (!isAllowed) {
       await recordSkippedEvent(supabase, params, `user_preference_disabled:${params.category}`)

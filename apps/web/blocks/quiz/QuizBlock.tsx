@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useId } from 'react';
 import { Trophy, ArrowRight, RotateCcw, Zap, CheckCircle2, Check, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import QuizOption from '@/components/quiz/QuizOption';
@@ -17,6 +17,27 @@ interface QuizQuestion {
   objectivesTested?: number[];
 }
 
+// Elements that already act on Enter / Space themselves.
+const NATIVE_ACTIVATION_SELECTOR =
+  'button, a, input, textarea, select, [contenteditable="true"], [contenteditable=""]';
+
+// Where focus should land after the next render. Confirming disables the
+// option buttons, advancing disables the action button until a new option is
+// picked, and finishing or retrying swaps the whole view, so in each case focus
+// is moved on purpose instead of dropping to the page body.
+type PendingFocus = 'action' | 'question' | 'summary' | null;
+
+function focusIsInside(root: HTMLElement | null): boolean {
+  const active = typeof document !== 'undefined' ? document.activeElement : null;
+  return Boolean(root && active && root.contains(active));
+}
+
+function isTextEntryTarget(el: Element): boolean {
+  const tag = el.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+  return el instanceof HTMLElement && el.isContentEditable;
+}
+
 export default function QuizBlock({ block }: BlockProps) {
   const totalQuestions = (block.questions || []).length;
   const lessonCtx = useLessonContextSafe();
@@ -26,9 +47,16 @@ export default function QuizBlock({ block }: BlockProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   // Ref mirrors attempts state for reliable access in async callbacks
-  const attemptsRef = React.useRef<{ question_id: string; selected_option: number; is_correct: boolean }[]>([]);
+  const attemptsRef = useRef<{ question_id: string; selected_option: number; is_correct: boolean }[]>([]);
 
   const [quizFinished, setQuizFinished] = useState(false);
+  const quizRootRef = useRef<HTMLDivElement>(null);
+  const questionTextRef = useRef<HTMLDivElement>(null);
+  const actionRowRef = useRef<HTMLDivElement>(null);
+  const summaryHeadingRef = useRef<HTMLHeadingElement>(null);
+  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pendingFocusRef = useRef<PendingFocus>(null);
+  const summaryScoreId = useId();
   const [submitting, setSubmitting] = useState(false);
 
   const [shuffledQuestions] = useState<(QuizQuestion & { shuffledOptions: { text: string; originalIndex: number }[] })[]>(() => {
@@ -55,6 +83,7 @@ export default function QuizBlock({ block }: BlockProps) {
     setIsConfirmed(false);
     setCorrectCount(0);
     attemptsRef.current = [];
+    pendingFocusRef.current = 'question';
     setQuizFinished(false);
     setSubmitting(false);
   };
@@ -81,6 +110,12 @@ export default function QuizBlock({ block }: BlockProps) {
 
     attemptsRef.current = [...attemptsRef.current, newAttempt];
 
+    // The focused option is about to be disabled; hand focus to the action
+    // button (now "Next Question" / "Finish Quiz") so Enter keeps working.
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
+    if (active && active.getAttribute('role') === 'radio' && quizRootRef.current?.contains(active)) {
+      pendingFocusRef.current = 'action';
+    }
     setIsConfirmed(true);
   }, [selectedOption, isConfirmed, currentQuestion]);
 
@@ -88,10 +123,12 @@ export default function QuizBlock({ block }: BlockProps) {
     if (!isConfirmed) return;
 
     if (currentIndex + 1 < totalQuestions) {
+      if (focusIsInside(quizRootRef.current)) pendingFocusRef.current = 'question';
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
       setIsConfirmed(false);
     } else {
+      pendingFocusRef.current = 'summary';
       setQuizFinished(true);
       // Submit all attempts via lesson context (v2 route) if available.
       // Use attemptsRef which has already been updated synchronously.
@@ -105,50 +142,105 @@ export default function QuizBlock({ block }: BlockProps) {
     }
   }, [isConfirmed, currentIndex, totalQuestions, lessonCtx]);
 
-  // Keyboard navigation & accessibility keys
+  // Apply any focus move requested by the handlers above once the new view is
+  // in the DOM.
   useEffect(() => {
+    const pending = pendingFocusRef.current;
+    if (!pending) return;
+    pendingFocusRef.current = null;
+    if (pending === 'summary') {
+      summaryHeadingRef.current?.focus();
+    } else if (pending === 'question') {
+      questionTextRef.current?.focus({ preventScroll: true });
+    } else {
+      const actionButton = actionRowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])');
+      actionButton?.focus({ preventScroll: true });
+    }
+  });
+
+  // Keyboard shortcuts are scoped to the quiz: the handler sits on the quiz
+  // container (onKeyDown below), so keys pressed elsewhere on the page are
+  // never captured. Digits and arrows pick an option; Enter / Space confirm or
+  // advance, unless the key landed on a control that already acts on it.
+  const handleQuizKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (quizFinished || !currentQuestion) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-        return;
-      }
+    // Leave browser and OS shortcuts (Ctrl+1, Alt+Arrow and so on) alone.
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      // Hotkeys: '1', '2', '3', '4' for options
-      if (!isConfirmed && ['1', '2', '3', '4'].includes(e.key)) {
-        const idx = parseInt(e.key, 10) - 1;
-        if (idx < currentQuestion.shuffledOptions.length) {
-          setSelectedOption(idx);
-        }
-      }
+    const target = e.target instanceof Element ? e.target : null;
+    if (target && isTextEntryTarget(target)) return;
 
-      // Hotkey: Arrow keys for selection
-      if (!isConfirmed) {
-        if (e.key === 'ArrowDown') {
-          setSelectedOption((prev) =>
-            prev === null ? 0 : Math.min(currentQuestion.shuffledOptions.length - 1, prev + 1)
-          );
-        } else if (e.key === 'ArrowUp') {
-          setSelectedOption((prev) =>
-            prev === null ? 0 : Math.max(0, prev - 1)
-          );
-        }
-      }
+    const optionCount = currentQuestion.shuffledOptions.length;
+    const focusedOptionIndex = optionRefs.current.findIndex((el) => el !== null && el === target);
 
-      // Hotkey: Space / Enter to confirm or advance
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (selectedOption !== null && !isConfirmed) {
-          handleConfirm();
-        } else if (isConfirmed) {
-          handleNext();
-        }
-      }
+    // Radiogroup pattern: picking an option by key also moves focus to it, so
+    // the focused option and the selected option never disagree.
+    const selectAndFocus = (idx: number) => {
+      setSelectedOption(idx);
+      optionRefs.current[idx]?.focus({ preventScroll: true });
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isConfirmed, selectedOption, currentQuestion, handleConfirm, handleNext, quizFinished]);
+    // Hotkeys: '1', '2', '3', '4' for options
+    if (!isConfirmed && ['1', '2', '3', '4'].includes(e.key)) {
+      const idx = parseInt(e.key, 10) - 1;
+      if (idx < optionCount) {
+        e.preventDefault();
+        selectAndFocus(idx);
+      }
+      return;
+    }
+
+    // Hotkey: Arrow keys move through the options
+    const isNextKey = e.key === 'ArrowDown' || e.key === 'ArrowRight';
+    const isPrevKey = e.key === 'ArrowUp' || e.key === 'ArrowLeft';
+    if (!isConfirmed && (isNextKey || isPrevKey)) {
+      e.preventDefault();
+      const from = focusedOptionIndex >= 0 ? focusedOptionIndex : selectedOption;
+      const idx =
+        from === null
+          ? 0
+          : isNextKey
+            ? Math.min(optionCount - 1, from + 1)
+            : Math.max(0, from - 1);
+      selectAndFocus(idx);
+      return;
+    }
+
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    // A held key would otherwise confirm and then skip straight past the result.
+    if (e.repeat) {
+      e.preventDefault();
+      return;
+    }
+
+    // Enter on a focused option confirms it once it is the selected one, the
+    // way Enter submits a form from a radio button. Space keeps its native
+    // behaviour of picking the option.
+    if (e.key === 'Enter' && focusedOptionIndex >= 0 && !isConfirmed) {
+      e.preventDefault();
+      if (selectedOption === focusedOptionIndex) {
+        handleConfirm();
+      } else {
+        setSelectedOption(focusedOptionIndex);
+      }
+      return;
+    }
+
+    // Space / Enter elsewhere in the quiz confirm or advance. Any other focused
+    // button, link or field handles these keys natively, so acting here as
+    // well would fire the action twice.
+    const nativeControl = target?.closest(NATIVE_ACTIVATION_SELECTOR);
+    if (nativeControl && e.currentTarget.contains(nativeControl)) {
+      return;
+    }
+    e.preventDefault();
+    if (selectedOption !== null && !isConfirmed) {
+      handleConfirm();
+    } else if (isConfirmed) {
+      handleNext();
+    }
+  };
 
   if (totalQuestions === 0) {
     return (
@@ -185,10 +277,17 @@ export default function QuizBlock({ block }: BlockProps) {
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold font-serif text-foreground">
+          {/* Focus lands here when the quiz finishes, so keyboard and screen
+              reader users hear the result instead of losing their place. */}
+          <h2
+            ref={summaryHeadingRef}
+            tabIndex={-1}
+            aria-describedby={summaryScoreId}
+            className="text-2xl md:text-3xl font-bold font-serif text-foreground rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
             {isPerfect ? 'Flawless Victory!' : 'Quiz Completed!'}
           </h2>
-          <p className="text-muted-foreground text-sm">
+          <p id={summaryScoreId} role="status" className="text-muted-foreground text-sm">
             You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
             <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
           </p>
@@ -257,8 +356,26 @@ export default function QuizBlock({ block }: BlockProps) {
 
   const optionLetters: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
 
+  let resultAnnouncement = '';
+  if (isConfirmed && selectedOption !== null) {
+    const answeredCorrectly =
+      currentQuestion.shuffledOptions[selectedOption]?.originalIndex === currentQuestion.correctAnswer;
+    const correctText = currentQuestion.options[currentQuestion.correctAnswer] ?? '';
+    resultAnnouncement = answeredCorrectly
+      ? 'Correct'
+      : `Incorrect. The correct answer is ${correctText}.`;
+  }
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in my-6" role="group" aria-label="Lesson Quiz">
+    <div
+      ref={quizRootRef}
+      className="max-w-3xl mx-auto space-y-6 animate-fade-in my-6 outline-none"
+      role="group"
+      aria-label="Lesson Quiz"
+      tabIndex={-1}
+      onKeyDown={handleQuizKeyDown}
+    >
+
       {/* Progress & Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
@@ -268,6 +385,12 @@ export default function QuizBlock({ block }: BlockProps) {
           <h2 className="text-sm font-semibold text-muted-foreground mt-0.5">
             Question {currentIndex + 1} of {totalQuestions}
           </h2>
+          {/* Announces the result of each confirmed answer to screen readers.
+              Kept mounted so the change in text is what gets announced. It is
+              absolutely positioned (sr-only), so it does not affect layout. */}
+          <div role="status" aria-live="polite" className="sr-only">
+            {resultAnnouncement}
+          </div>
         </div>
         <div className="text-xs font-bold text-muted-foreground px-3 py-1 rounded bg-muted border border-border">
           Score: {correctCount} / {totalQuestions}
@@ -284,7 +407,11 @@ export default function QuizBlock({ block }: BlockProps) {
 
       {/* Question Card */}
       <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
-        <div className="text-base md:text-lg font-bold text-foreground font-serif leading-relaxed">
+        <div
+          ref={questionTextRef}
+          tabIndex={-1}
+          className="text-base md:text-lg font-bold text-foreground font-serif leading-relaxed rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
           {currentQuestion.question}
         </div>
 
@@ -292,6 +419,9 @@ export default function QuizBlock({ block }: BlockProps) {
         <div className="grid grid-cols-1 gap-3" role="radiogroup" aria-label="Answer Options">
           {currentQuestion.shuffledOptions.map((optionObj, idx) => {
             const letter = optionLetters[idx] || 'A';
+            // Roving tabindex: only the selected option (or the first one when
+            // nothing is selected) is in the tab order; arrows reach the rest.
+            const isTabStop = selectedOption === null ? idx === 0 : idx === selectedOption;
             let optionState: 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled' = 'default';
 
             if (isConfirmed) {
@@ -313,6 +443,10 @@ export default function QuizBlock({ block }: BlockProps) {
                 text={optionObj.text}
                 state={optionState}
                 disabled={isConfirmed}
+                tabIndex={isTabStop ? 0 : -1}
+                ref={(el) => {
+                  optionRefs.current[idx] = el;
+                }}
                 onClick={() => handleOptionClick(idx)}
               />
             );
@@ -321,7 +455,7 @@ export default function QuizBlock({ block }: BlockProps) {
 
         {/* Action Button & Explanation */}
         <div className="pt-4 border-t border-border flex flex-col gap-4">
-          <div className="flex justify-end">
+          <div ref={actionRowRef} className="flex justify-end">
             {!isConfirmed ? (
               <Button
                 disabled={selectedOption === null}

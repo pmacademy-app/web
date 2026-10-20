@@ -17,9 +17,8 @@ It is structured around three core operational pillars:
 
 ### Access Control & Authorization
 - **Proxy Middleware Check (`apps/web/proxy.ts`):** Edge-level route protection requiring an authenticated session and admin status (with a fast-path JWT `app_metadata.is_admin` claim check before falling back to the DB).
-- **Server-Side Authorization Guard (`lib/admin/guard.ts`):** `requireAdminUser(request)` and `logAdminAction()` are enforced on every `/api/admin/**` endpoint, with per-request result caching. (`lib/admin/authorization.ts` holds the small `isAdminEmail()`/`isAdminUser()` helpers `guard.ts` imports — it is not itself the enforcement layer.) A user is authorized if:
-  - Their email is in the `ADMIN_EMAILS` environment variable, **or**
-  - Their database record has `users.is_admin === true`.
+- **Server-Side Authorization Guard (`lib/admin/guard.ts`):** `requireAdminUser(request)` and `logAdminAction()` are enforced on every `/api/admin/**` endpoint, with per-request result caching. (`lib/admin/authorization.ts` holds the small `isAdminUser()` helper used by the console layout; it is not itself the enforcement layer.) A user is authorized only if their database record has `users.is_admin === true`. There is no email allowlist; the old `ADMIN_EMAILS` environment variable is no longer used.
+- **Granting and removing admin access:** use the role toggle in `/admin/users`. Admins who used to come from `ADMIN_EMAILS` are migrated once with the owner-run snippet `supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql` (run it before deploying). The delete API refuses (403) to delete an account with `is_admin = true`, so demote an admin before deleting the account.
 - **Immutable Audit Logging:** Mutations trigger `logAdminAction()`, persisting structured event logs into `public.admin_audit_logs`.
 
 ---

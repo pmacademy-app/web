@@ -384,88 +384,46 @@ describe('T1.2 — Admin User Deletion Security & Hierarchy', () => {
     expect(json.error).toContain('Admins cannot delete their own account')
   })
 
-  it('blocks deletion of primary environment-configured superadmins with 403', async () => {
-    process.env.ADMIN_EMAILS = 'superadmin@prodily.app,owner@prodily.app'
-
+  it.each([
+    { label: 'a long-standing admin', target: { id: 'target-owner-id', email: 'owner@prodily.app', is_admin: true } },
+    { label: 'a promoted admin', target: { id: 'target-admin-id', email: 'targetadmin@prodily.app', is_admin: true } },
+  ])('refuses to delete $label (users.is_admin = true) with 403', async ({ target }) => {
     vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
       authorized: true,
       userId: 'acting-admin-id',
       email: 'acting-admin@prodily.app',
     })
 
+    const mockDeleteUser = vi.fn().mockResolvedValue({ data: { user: null }, error: null })
     const mockSupabase = {
       from: (table: string) => {
         if (table === 'users') {
           return {
             select: () => ({
               eq: () => ({
-                maybeSingle: () =>
-                  Promise.resolve({
-                    data: { id: 'target-superadmin', email: 'superadmin@prodily.app', is_admin: true },
-                    error: null,
-                  }),
+                maybeSingle: () => Promise.resolve({ data: target, error: null }),
               }),
             }),
           }
         }
         return { select: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }) }
       },
+      auth: { admin: { deleteUser: mockDeleteUser } },
     }
     vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(mockSupabase as unknown as SupabaseClient<Database>)
 
-    const req = new NextRequest('http://localhost:3000/api/admin/users/target-superadmin', {
+    const req = new NextRequest(`http://localhost:3000/api/admin/users/${target.id}`, {
       method: 'DELETE',
     })
 
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: 'target-superadmin' }) })
+    const res = await adminUserDelete(req, { params: Promise.resolve({ id: target.id }) })
     expect(res.status).toBe(403)
     const json = await res.json()
-    expect(json.error).toContain('Primary system administrators cannot be deleted via the API')
-  })
-
-  it('blocks lower-level admin from deleting another admin with 403', async () => {
-    process.env.ADMIN_EMAILS = 'superadmin@prodily.app'
-
-    // Acting admin is promoted DB admin, NOT an env admin
-    vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
-      authorized: true,
-      userId: 'promoted-admin-id',
-      email: 'dbadmin@prodily.app',
-    })
-
-    const mockSupabase = {
-      from: (table: string) => {
-        if (table === 'users') {
-          return {
-            select: () => ({
-              eq: () => ({
-                maybeSingle: () =>
-                  Promise.resolve({
-                    data: { id: 'target-admin-id', email: 'targetadmin@prodily.app', is_admin: true },
-                    error: null,
-                  }),
-              }),
-            }),
-          }
-        }
-        return { select: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }) }
-      },
-    }
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(mockSupabase as unknown as SupabaseClient<Database>)
-
-    const req = new NextRequest('http://localhost:3000/api/admin/users/target-admin-id', {
-      method: 'DELETE',
-    })
-
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: 'target-admin-id' }) })
-    expect(res.status).toBe(403)
-    const json = await res.json()
-    expect(json.error).toContain('Superadmin privileges required to delete an administrator account')
+    expect(json.error).toContain('Administrators cannot be deleted')
+    expect(mockDeleteUser).not.toHaveBeenCalled()
   })
 
   it('deletes both application data and Supabase Auth user when admin deletes a learner', async () => {
-    process.env.ADMIN_EMAILS = 'superadmin@prodily.app'
-
     vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
       authorized: true,
       userId: 'superadmin-id',

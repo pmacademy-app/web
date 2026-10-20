@@ -15,7 +15,7 @@ The Curriculum Workspace allows administrators to inspect the full 9-module, 90-
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin/curriculum` from the sidebar (or use route alias `/admin/content`).
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 
 ---
 

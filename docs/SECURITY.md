@@ -10,10 +10,11 @@
 Access to administrative features and Route Handlers (`/admin`, `/api/admin/*`) is governed by:
 
 1. **Proxy Middleware Protection (`apps/web/proxy.ts`)**: Intercepts requests to `/admin` routes and checks the authenticated Supabase JWT session. As a fast path, it also trusts a `user.app_metadata?.is_admin` JWT claim before falling back to the database check.
-2. **`lib/admin/guard.ts` — the actual per-request enforcement layer**: `requireAdminUser()` (used by every `/api/admin/**` route handler) and `logAdminAction()`, with per-request result caching via a `WeakMap`. It imports `isAdminEmail()` from `lib/admin/authorization.ts` (a small helper file — the enforcement logic itself lives in `guard.ts`, not `authorization.ts`).
-   - **Environment Override**: Checks if `user.email` matches `ADMIN_EMAILS` environment variable (comma-separated list).
-   - **Database Role Check**: Checks if `users.is_admin === true` in PostgreSQL.
-   - Either condition alone grants access.
+2. **`lib/admin/guard.ts`, the actual per-request enforcement layer**: `requireAdminUser()` (used by every `/api/admin/**` route handler) and `logAdminAction()`, with per-request result caching via a `WeakMap`.
+   - **Database Role Check (the only rule)**: access is granted only when `users.is_admin === true` in PostgreSQL, read with the service-role client. `lib/admin/authorization.ts` exposes the same rule as `isAdminUser()` for the console layout.
+   - **No email allowlist**: the `ADMIN_EMAILS` environment variable is no longer read anywhere. The verified auth email is still recorded in audit logs, but it never grants access.
+   - **Changing admin status**: only the service role or `postgres` can change `users.is_admin` (the `guard_privileged_user_columns` trigger rejects `authenticated` and `anon`). Grant or remove access from the admin console. The one-time migration from the old env list is the owner-run snippet `supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql`.
+   - **Admin deletion**: `DELETE /api/admin/users/[id]` returns 403 for any account with `is_admin = true`. An admin must be demoted before the account can be deleted.
 
 ---
 

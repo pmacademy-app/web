@@ -9,6 +9,7 @@ import {
 } from './streaks'
 import { getRuntimeXpValues } from '../xp'
 import { awardXp, hasXpEvent } from '../xp-service'
+import { MS_PER_DAY } from '../time'
 
 export interface WeeklySummaryData {
   daysStudied: number
@@ -142,6 +143,20 @@ export async function updateUserStreak(
   }
 }
 
+/** Summary shown for a learner who has no streak profile yet. */
+export function notStartedStreakStatus(): StreakStatusSummary {
+  return {
+    status: 'not_started',
+    effectiveCurrentStreak: 0,
+    longestStreak: 0,
+    streakFreezesAvailable: 0,
+    isTodayCompleted: false,
+    lastActivityDate: '',
+    daysSinceLastActivity: 0,
+    statusMessage: 'Start your first streak today by completing a lesson!',
+  }
+}
+
 export async function getUserStreakStatus(
   supabase: SupabaseClient<Database>,
   userId: string
@@ -150,19 +165,15 @@ export async function getUserStreakStatus(
     .from('users')
     .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
-  if (profileError || !userProfile) {
-    return {
-      status: 'not_started',
-      effectiveCurrentStreak: 0,
-      longestStreak: 0,
-      streakFreezesAvailable: 0,
-      isTodayCompleted: false,
-      lastActivityDate: '',
-      daysSinceLastActivity: 0,
-      statusMessage: 'Start your first streak today by completing a lesson!',
-    }
+  // CQ-01: a failed read must not look like a learner with no streak. Callers
+  // decide how to degrade; a genuinely missing row is still "not started".
+  if (profileError) {
+    throw new Error('Streak profile read failed: ' + profileError.message)
+  }
+  if (!userProfile) {
+    return notStartedStreakStatus()
   }
 
   const { timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date } = userProfile
@@ -207,13 +218,17 @@ export async function getWeeklySummary(
   const timezone = user?.timezone || 'UTC'
   const now = new Date()
 
+  // Step back by calendar day from the learner's local "today" so the window is
+  // always 7 distinct consecutive dates, whatever the time of day or UTC offset.
+  const todayLocal = getLocalDateString(timezone, now)
+  const [year, month, day] = todayLocal.split('-').map(Number)
   const past7Days: string[] = []
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 84600000)
-    past7Days.push(getLocalDateString(timezone, d))
+    past7Days.push(new Date(Date.UTC(year, month - 1, day - i)).toISOString().slice(0, 10))
   }
 
-  const sevenDaysAgoIso = new Date(now.getTime() - 8 * 84600000).toISOString()
+  // One extra day of slack covers any UTC offset; rows are bucketed by local date below.
+  const sevenDaysAgoIso = new Date(now.getTime() - 8 * MS_PER_DAY).toISOString()
   const { data: xpEvents } = await supabase
     .from('xp_events')
     .select('source_type, xp_amount, created_at')
@@ -227,8 +242,14 @@ export async function getWeeklySummary(
     .eq('status', 'completed')
     .gte('completed_at', sevenDaysAgoIso)
 
-  const events = xpEvents || []
-  const completedLessons = progressRows || []
+  // The query bound is 8 days wide, so totals count only rows whose local date
+  // falls inside the 7 day window shown to the learner.
+  const windowDays = new Set(past7Days)
+  const inWindow = (iso: string | null | undefined): boolean =>
+    !!iso && windowDays.has(getLocalDateString(timezone, new Date(iso)))
+
+  const events = (xpEvents || []).filter((event) => inWindow(event.created_at))
+  const completedLessons = (progressRows || []).filter((row) => inWindow(row.completed_at))
 
   const dailyXpMap = new Map<string, number>()
   let totalXpEarned = 0

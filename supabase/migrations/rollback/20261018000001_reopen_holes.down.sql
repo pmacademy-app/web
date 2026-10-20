@@ -1,0 +1,53 @@
+-- !!! DANGER: THIS FILE RE-OPENS KNOWN SECURITY HOLES. DO NOT RUN IT AS A ROUTINE ROLLBACK. !!!
+--
+-- Companion to rollback/20261018000001_lockdown_public_grants.down.sql. That file is the normal
+-- rollback and only restores default function privileges. This file puts back the access that
+-- 20261018000001_lockdown_public_grants.sql removed on purpose:
+--
+--   SEC-01  learners can call sync_user_xp and record_lesson_quiz_completion directly, so they
+--           can rewrite their own XP and record quiz results for any lesson and any user id.
+--   SEC-03  anyone holding the public anon key can read, write and delete email_broadcasts.
+--   SEC-06  anyone holding the public anon key can read, write and delete fellow_requests.
+--   SEC-05  learners can insert testimonials directly, including published ones, skipping
+--           moderation.
+--
+-- No app code needs any of this: every caller uses the service-role client. Only run it if a
+-- caller outside this repo is proven to depend on one of these grants, run only the section for
+-- that one item, record why, and re-apply the forward migration as soon as that caller is fixed.
+--
+-- public_profiles (SEC-02) is intentionally NOT re-created. Nothing reads it, and re-creating
+-- it under Supabase's default table privileges would expose an RLS-bypassing view over
+-- public.users to the anon key.
+--
+-- Every statement is commented out so that running the whole file by accident does nothing.
+-- Uncomment only the section you need. Originals: 20260925000002:137, :287;
+-- 20260826000003:62-66; 20260905000001:47-51; 20260809000000:20-23.
+
+-- SEC-01: RPCs callable by learners
+-- GRANT EXECUTE ON FUNCTION public.sync_user_xp(uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.record_lesson_quiz_completion(uuid, text, int, int, int, jsonb, int, int) TO authenticated;
+
+-- SEC-03: email_broadcasts open to every role
+-- DROP POLICY IF EXISTS "Service role has full access to email_broadcasts" ON public.email_broadcasts;
+-- CREATE POLICY "Service role has full access to email_broadcasts"
+--   ON public.email_broadcasts
+--   FOR ALL
+--   USING (true)
+--   WITH CHECK (true);
+-- GRANT ALL ON public.email_broadcasts TO anon, authenticated;
+
+-- SEC-06: fellow_requests open to every role
+-- DROP POLICY IF EXISTS "Service role has full access to fellow_requests" ON public.fellow_requests;
+-- CREATE POLICY "Service role has full access to fellow_requests"
+--   ON public.fellow_requests
+--   FOR ALL
+--   USING (true)
+--   WITH CHECK (true);
+-- GRANT ALL ON public.fellow_requests TO anon, authenticated;
+
+-- SEC-05: learner testimonials insert
+-- DROP POLICY IF EXISTS "Users can submit feedback" ON public.testimonials;
+-- CREATE POLICY "Users can submit feedback"
+--   ON public.testimonials FOR INSERT
+--   TO authenticated
+--   WITH CHECK (auth.uid() = user_id OR user_id IS NULL);

@@ -11,6 +11,7 @@ import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { log } from '@/lib/monitoring/log'
+import { logSystemError } from '@/lib/monitoring/logger'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
@@ -69,6 +70,23 @@ const AGGREGATE_SIGNUP_FLOOR = 15
 function aggregateSignupCeiling(dailyEmailLimit: number): number {
   const derived = Math.ceil((Number.isFinite(dailyEmailLimit) && dailyEmailLimit > 0 ? dailyEmailLimit : 100) / 24)
   return Math.max(AGGREGATE_SIGNUP_FLOOR, derived)
+}
+
+/**
+ * Whether a GoTrue error means the email already has an account.
+ *
+ * GoTrue's wording differs by endpoint and version: `signUp` has said "User already
+ * registered", while `admin.createUser` says "A user with this email address has already
+ * been registered" (code `email_exists`, HTTP 422). Matching the code first and the
+ * message as a fallback keeps both flows on the non-enumerating response.
+ */
+const EXISTING_ACCOUNT_CODES = new Set(['email_exists', 'user_already_exists'])
+const EXISTING_ACCOUNT_MESSAGE = /already (been )?registered|already in use|already exists/i
+
+function isExistingAccountError(error: { message?: string | null; code?: string | null } | null | undefined): boolean {
+  if (!error) return false
+  if (error.code && EXISTING_ACCOUNT_CODES.has(error.code)) return true
+  return EXISTING_ACCOUNT_MESSAGE.test(error.message ?? '')
 }
 
 /**
@@ -256,13 +274,7 @@ export const POST = withRoute(
         })
 
         const isExistingAccount =
-          Boolean(
-            error && (
-              error.message?.toLowerCase().includes('already registered') ||
-              error.message?.toLowerCase().includes('already in use') ||
-              error.message?.toLowerCase().includes('already exists')
-            )
-          ) ||
+          isExistingAccountError(error) ||
           Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
 
         if (isExistingAccount) {
@@ -310,12 +322,7 @@ export const POST = withRoute(
         })
 
         if (createError) {
-          const isExisting =
-            createError.message?.toLowerCase().includes('already registered') ||
-            createError.message?.toLowerCase().includes('already in use') ||
-            createError.message?.toLowerCase().includes('already exists')
-
-          if (isExisting) {
+          if (isExistingAccountError(createError)) {
             // Non-enumerating response: direct user to login without revealing account existence or bypassing auth.
             return NextResponse.json({
               success: true,
@@ -325,13 +332,23 @@ export const POST = withRoute(
             })
           }
 
-          return NextResponse.json(
-            {
-              error: createError.message || 'Registration failed.',
-              code: createError.code || 'SIGNUP_FAILED',
-            },
-            { status: 400 }
-          )
+          // SEC-17: the provider message can carry database internals (table names,
+          // constraint text). Keep it in the server-side log and return the classifier's
+          // static copy, exactly as Flow A does. The classified response carries only our
+          // own message and code, never the raw provider text.
+          void logSystemError({
+            severity: 'error',
+            category: 'auth',
+            operation: 'signup_create_user',
+            message: createError.message || 'admin.createUser failed without a message',
+            details: { flow: 'B', providerCode: createError.code ?? null },
+          })
+
+          return apiClassifiedAuthError({
+            cause: createError,
+            context: 'signup',
+            status: 400,
+          })
         }
 
         const user = createData.user

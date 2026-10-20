@@ -355,7 +355,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
       expect(disallows).toContain('/admin')
       expect(disallows).toContain('/dashboard')
       expect(disallows).toContain('/settings')
-      expect(disallows).toContain('/review')
+      expect(disallows).toContain('/review$')
       expect(disallows).toContain('/api/')
     })
 

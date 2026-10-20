@@ -8,6 +8,7 @@
  */
 
 import { createServiceRoleClient } from '@/lib/supabase'
+import { logSystemError } from '@/lib/monitoring/logger'
 import type { Json } from '@/types/database'
 import { applyUserFilters, countMatchingUsers, sampleMatchingUsers } from './user-filter-query'
 import type { AdminUserFilters } from './types'
@@ -78,6 +79,44 @@ export interface BatchExecuteResult {
 }
 
 /* ─── Service ────────────────────────────────────────────────────────────── */
+
+const PORTFOLIO_ACTIVATION_CAMPAIGN_ID = 'portfolio_activation_sep_2026'
+
+/**
+ * CQ-02: true for the portfolio activation campaign, whose dedicated runner is
+ * disabled. It reads users without paging, stops at the first 50 auth users,
+ * swallows read errors and sends outside the email queue. Sending it through
+ * executeBroadcastBatch would instead mail the generic filter audience, so both
+ * the cron path and the manual execute path refuse it.
+ */
+export function isPortfolioActivationBroadcast(b: {
+  name?: string | null
+  template_key?: string | null
+  recipient_filters?: unknown
+}): boolean {
+  const filters = (b.recipient_filters ?? {}) as Record<string, unknown>
+  return (
+    b.template_key === 'marketing.portfolio_activation' ||
+    b.name === PORTFOLIO_ACTIVATION_CAMPAIGN_ID ||
+    b.name === 'Prodily Public Portfolio & First Capstone Campaign' ||
+    filters.campaignId === PORTFOLIO_ACTIVATION_CAMPAIGN_ID ||
+    filters.target === PORTFOLIO_ACTIVATION_CAMPAIGN_ID
+  )
+}
+
+/** Thrown by executeBroadcastBatch for a campaign that must not be sent (CQ-02). */
+export class BroadcastRefusedError extends Error {
+  readonly broadcastId: string
+
+  constructor(broadcastId: string, message: string) {
+    super(message)
+    this.name = 'BroadcastRefusedError'
+    this.broadcastId = broadcastId
+  }
+}
+
+const PORTFOLIO_ACTIVATION_DISABLED_REASON =
+  'runner disabled until it pages reads, pages listUsers past 50, throws on read errors and sends through the queue (CQ-02)'
 
 export class BroadcastService {
   /**
@@ -312,6 +351,12 @@ export class BroadcastService {
         status: broadcast.status,
       }
     }
+    if (isPortfolioActivationBroadcast(broadcast)) {
+      throw new BroadcastRefusedError(
+        broadcastId,
+        `Portfolio activation campaign ${broadcastId} cannot be sent: ${PORTFOLIO_ACTIVATION_DISABLED_REASON}`
+      )
+    }
 
     const currentBatchIndex = broadcast.last_batch_index
     const targetBatchIndex = currentBatchIndex + 1
@@ -506,19 +551,24 @@ export class BroadcastService {
 
       for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: Record<string, unknown> }>) {
         try {
-          const isPortfolioActivation =
-            b.template_key === 'marketing.portfolio_activation' ||
-            b.name === 'portfolio_activation_sep_2026' ||
-            b.name === 'Prodily Public Portfolio & First Capstone Campaign' ||
-            b.recipient_filters?.campaignId === 'portfolio_activation_sep_2026' ||
-            b.recipient_filters?.target === 'portfolio_activation_sep_2026'
-
-          if (isPortfolioActivation) {
-            const { executePortfolioActivationCampaign } = await import('@/lib/campaigns/portfolio-activation-runner')
-            await executePortfolioActivationCampaign(supabase, b.id)
-          } else {
-            await this.executeBroadcastBatch(b.id)
+          if (isPortfolioActivationBroadcast(b)) {
+            // CQ-02: mark the row failed so the cron stops picking it up. Never fall
+            // through to executeBroadcastBatch (it refuses this campaign anyway).
+            const { error: markError } = await supabase
+              .from('email_broadcasts')
+              .update({ status: 'failed', updated_at: new Date().toISOString() })
+              .eq('id', b.id)
+            void logSystemError({
+              severity: 'warning',
+              category: 'cron',
+              operation: 'broadcast_portfolio_activation_disabled',
+              message:
+                `Portfolio activation campaign ${b.id} skipped: ${PORTFOLIO_ACTIVATION_DISABLED_REASON}` +
+                (markError ? `; marking it failed also failed: ${markError.message}` : ''),
+            })
+            continue
           }
+          await this.executeBroadcastBatch(b.id)
           processed++
         } catch (err) {
           console.error(`[BroadcastService] Failed to execute scheduled broadcast ${b.id}:`, err)

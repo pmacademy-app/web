@@ -15,7 +15,7 @@ The Users workspace allows administrators to search, inspect, troubleshoot, and 
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin/users` from the sidebar.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 - **Direct User Links:** Any user can be directly opened using `/admin/users?userId=<UUID>`.
 
 ---
@@ -101,6 +101,7 @@ The Users workspace allows administrators to search, inspect, troubleshoot, and 
 #### 2. Delete User Account
 - **Location:** Footer of the User Detail Drawer $\rightarrow$ **[ Delete Account ]**.
 - **Effect:** Permanently deletes the user record from `auth.users` and cascades through all related tables in PostgreSQL.
+- **Admins cannot be deleted:** the API returns 403 ("Administrators cannot be deleted. Remove their admin access first.") for any account with `is_admin = true`. Switch the role toggle to **Learner** first, then delete. You also cannot delete your own account.
 - **Confirmation:** Requires typing or confirming the deletion dialog. **Permanently irreversible.**
 
 ---
