@@ -94,6 +94,9 @@ export default function PrivacyPage() {
               <strong className="text-foreground">Authentication Credentials:</strong> When registering, we store your email address and authentication identity securely.
             </li>
             <li>
+              <strong className="text-foreground">Sign in with Google (optional):</strong> If you choose Continue with Google, Google shares your email address, your name, and your profile picture (avatar) with us so we can create and sign in to your account. We do not receive your Google password, and we do not access your contacts, Gmail, Drive, or any other Google data. Before the account can be used you confirm our Terms and the minimum age requirement, and you can delete the account at any time.
+            </li>
+            <li>
               <strong className="text-foreground">Learner Profile:</strong> Your optional display name, handle (username), avatar image, bio, target role, target company, career stage, and professional links (LinkedIn, GitHub, Twitter). Profiles are <strong className="text-foreground">private by default</strong> unless you explicitly enable public portfolio sharing.
             </li>
             <li>
@@ -154,6 +157,10 @@ export default function PrivacyPage() {
             <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
               <span className="font-bold text-xs text-foreground">Supabase Inc. (Database & Auth Infrastructure)</span>
               <p className="text-xs">Stores encrypted user profiles, application state, and handles authentication sessions.</p>
+            </div>
+            <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
+              <span className="font-bold text-xs text-foreground">Google LLC (Optional Sign-In)</span>
+              <p className="text-xs">Only used if you choose Continue with Google. Google confirms your identity and shares your email address, name, and avatar with us. Its handling of your Google account is governed by Google&apos;s own privacy policy.</p>
             </div>
             <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
               <span className="font-bold text-xs text-foreground">Resend Inc. (Transactional Email Delivery)</span>

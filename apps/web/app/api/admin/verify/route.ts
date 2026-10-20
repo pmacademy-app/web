@@ -7,7 +7,7 @@ import { withRoute } from '@/lib/api/with-route'
  *
  * Used by the admin login page immediately after sign-in to decide between
  * entering the console (/admin) or showing the access denied page. The check
- * runs the full server-side RBAC guard (ADMIN_EMAILS OR users.is_admin) and is
+ * runs the full server-side RBAC guard (users.is_admin database flag) and is
  * audit-logged on denial.
  *
  * **This is the one admin route that must not be `allow: ['admin']`.** Its whole

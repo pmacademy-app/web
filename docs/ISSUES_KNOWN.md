@@ -85,7 +85,7 @@
 - **Fix**: the guard now matches `ADMIN_EMAILS` against the verified auth-session email (`authUser.email`). Migration `20261017000001_admin_guard_email_and_rpc_grants.sql` also makes the privileged-column trigger reject `authenticated`/`anon` changes to `users.email`. The only legitimate writer, the email-change confirmation in `app/api/auth/callback/route.ts`, uses the service-role client and is unaffected. Regression tests: `lib/__tests__/admin-guard-trusted-email.test.ts` (three of its tests fail against the old guard).
 - **Not verified**: whether the live exploit worked was deliberately not tested, because proving it would modify production data. Column grants on the live `users` table were not inspected.
 - **Required Action**: merge the branch (the `deploy-supabase` CI job applies the migration to production on merge to `main`); then, on staging first if possible, confirm a learner cannot update their own `users.email`, that an email change still completes through the confirmation link, and that a learner whose profile email matches an admin address gets 403 from `/api/admin/*`.
-- **Open follow-ups**: `app/api/admin/users/[id]/route.ts` still checks `isAdminEmail(targetUser.email)` for the target's profile email; 15 admin routes without guard keywords were not individually reviewed; 17 admin mutation routes do not call `logAdminAction`.
+- **Open follow-ups**: the `isAdminEmail(targetUser.email)` check in `app/api/admin/users/[id]/route.ts` is removed by ISSUE-32 (the email allowlist is gone entirely); 15 admin routes without guard keywords were not individually reviewed; 17 admin mutation routes do not call `logAdminAction`.
 
 #### ISSUE-31: Governance RPCs executable by the anon role
 - **Status**: 🟡 Fixed in migration on branch `fix/admin-guard-and-rpc-grants` — **not merged, not applied**
@@ -93,6 +93,12 @@
 - **Confirmed**: on 2026-10-17 a read-only call to `is_provider_exhausted` with the anon key returned HTTP 200. The other six use the identical revoke pattern; they were not called because they write.
 - **Fix**: migration `20261017000001_admin_guard_email_and_rpc_grants.sql` revokes all seven from `PUBLIC, anon, authenticated` and grants EXECUTE to `service_role` only. Every caller (`lib/rate-limit.ts`, `lib/email-governance.ts`, `lib/notifications/providers/provider-quota.ts`) already uses the service-role client.
 - **Required Action**: after the migration is applied, confirm an anon-key call to `is_provider_exhausted` is rejected and that signup, login rate limiting and the email queue still work.
+
+#### ISSUE-32: Admin access came from an env email allowlist
+- **Status**: 🟡 Fixed in code on branch `fix/phase1-stop-the-bleeding`. **Not merged, backfill not run, not verified in production.**
+- **Description**: admin status was granted if the signed-in email appeared in the `ADMIN_EMAILS` environment variable, in addition to `users.is_admin`. Email verification is off in production and login auto-confirms accounts, so an address match was a weak signal, and two sources of truth made the admin roster hard to audit. The user-delete API also used the env list to define a "superadmin" tier.
+- **Fix**: admin status now comes only from `public.users.is_admin` (the proxy keeps the server-signed `app_metadata.is_admin` fast path). `ADMIN_EMAILS` is no longer read and was removed from `.env.example` and the docs. `DELETE /api/admin/users/[id]` returns 403 for any account with `is_admin = true`; an admin must be demoted first.
+- **Required Action**: BEFORE deploying, the owner runs `supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql` in the Supabase SQL editor: list candidate accounts for the old `ADMIN_EMAILS` addresses (read-only), confirm from `created_at`, `last_sign_in_at` and provider which are genuinely theirs (a confirmed email proves nothing while login auto-confirms), then promote those user ids (never by email) after a dry run. See `docs/DEPLOYMENT.md` §2.1. After deploy, sign in to `/admin` with each admin account, then remove `ADMIN_EMAILS` from Vercel.
 
 ---
 

@@ -15,7 +15,7 @@ The Platform Settings Workspace manages global platform configuration stored in 
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin/settings` from the sidebar (or use route alias `/admin/feature-flags` for feature flags).
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 - **Persistence:** Changes are persisted to PostgreSQL via `PATCH /api/admin/settings?section=<key>`.
 
 ---

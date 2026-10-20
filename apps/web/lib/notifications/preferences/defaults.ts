@@ -181,14 +181,27 @@ export function mapDbRowToNotificationPreferences(
   }
 }
 
+/** A strict preferences read failed; the caller should skip the send or batch, not assume defaults. */
+export class NotificationPreferencesReadError extends Error {
+  constructor(reason: string) {
+    super(reason)
+    this.name = 'NotificationPreferencesReadError'
+  }
+}
+
 /**
  * Resolves persisted notification preferences for a user from `user_notification_preferences`.
- * If no record is found or an error occurs, cleanly falls back to default preferences.
+ * A missing record resolves to the defaults.
+ *
+ * A failed read also resolves to the defaults unless `strict` is set, which treats a learner
+ * who opted out as opted in. A sender passes `strict` to get a NotificationPreferencesReadError
+ * instead and block the send.
  */
 export async function getResolvedUserNotificationPreferences(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
-  userId: string
+  userId: string,
+  { strict = false }: { strict?: boolean } = {}
 ): Promise<UserNotificationPreferences> {
   const defaults = createDefaultNotificationPreferences(userId)
   if (!userId || !supabase) return defaults
@@ -200,21 +213,23 @@ export async function getResolvedUserNotificationPreferences(
       .eq('user_id', userId)
       .maybeSingle()
 
-    if (error || !row) {
+    if (error) {
+      if (strict) {
+        throw new NotificationPreferencesReadError((error as { message?: string }).message || 'preferences read failed')
+      }
       return defaults
     }
 
-    return mapDbRowToNotificationPreferences(userId, row as Record<string, unknown>)
-  } catch {
-    return defaults
-  }
-}
+    if (!row) return defaults
 
-/** A strict batch preferences read failed; the caller should skip the batch, not assume defaults. */
-export class NotificationPreferencesReadError extends Error {
-  constructor(reason: string) {
-    super(reason)
-    this.name = 'NotificationPreferencesReadError'
+    return mapDbRowToNotificationPreferences(userId, row as Record<string, unknown>)
+  } catch (err) {
+    if (strict) {
+      throw err instanceof NotificationPreferencesReadError
+        ? err
+        : new NotificationPreferencesReadError(err instanceof Error ? err.message : 'preferences read failed')
+    }
+    return defaults
   }
 }
 

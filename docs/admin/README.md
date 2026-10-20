@@ -16,8 +16,8 @@ These guides are written for:
 
 ### Access Requirements
 To access the Admin Panel:
-1. You must sign in with an account whose email is listed in `ADMIN_EMAILS`, **or**
-2. Your account must have `is_admin = true` in PostgreSQL.
+1. Your account must have `is_admin = true` in `public.users`. This is the only rule; the old `ADMIN_EMAILS` environment variable is no longer used.
+2. An existing admin grants or removes access with the role toggle in `/admin/users`. The first admins are set once by the owner with `supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql` (see that folder's README).
 3. Access is located at `/admin` (or `http://localhost:3000/admin` in development).
 
 ---

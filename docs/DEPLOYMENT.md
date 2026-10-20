@@ -40,10 +40,11 @@
 | `RESEND_WEBHOOK_SECRET` | **Server Only** | Svix webhook secret (`whsec_...`) |
 | `SEND_EMAIL_HOOK_SECRET` | **Server Only** | Secret verifying Supabase Auth Send Email Hook calls |
 | `CRON_SECRET` | **Server Only** | Bearer secret authorizing GitHub Actions cron routes |
-| `ADMIN_EMAILS` | **Server Only** | Comma-separated list of admin email addresses |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public (Client + Server) | Cloudflare Turnstile site key. **Required for a production build** — it is inlined into the client bundle at build time, so `next.config.ts` fails the build when it is absent (see [`SECURITY.md`](SECURITY.md)) |
 | `TURNSTILE_SECRET_KEY` | **Server Only** | Cloudflare Turnstile secret used for the server-side Siteverify call. Never prefix with `NEXT_PUBLIC_`; when missing in production the signup and resend-verification routes fail closed |
 | `DEV_TURNSTILE_BYPASS` | **Server Only** (local dev) | Optional. `true` skips Turnstile verification. Ignored whenever `NODE_ENV=production`, so it cannot weaken a deployed environment. Do **not** set it in Vercel |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Public (Client + Server) | Google sign-in flag. Only the exact string `true` enables it; default `false`. **Inlined at build time**, so a change needs a redeploy, not a restart. While off, the button is hidden and `/api/auth/google` returns 404. See §5 |
+| `OAUTH_STATE_SECRET` | **Server Only** | At least 32 random characters (`openssl rand -base64 48`). HMAC key for the signed Google intent cookie. Never prefix with `NEXT_PUBLIC_`. With the flag on and this missing or short, Google sign-in fails closed (`/login?error=oauth_unavailable`). See §5 |
 | `RECUT_EXPERIMENT_ENABLED` | **Server Only** | Phase 4 A/B flag (`lib/academy/experiment.ts`). **Defaults to control** when unset/`false`. Leave unset to keep OFF |
 | `RECUT_EXPERIMENT_TREATMENT_PCT` | **Server Only** | Optional split 0–100 (default 50). No effect while the flag is off |
 | `MODULE_ENTRY_UNLOCK_ENABLED` | **Server Only** | Phase 6 cohort flag (`lib/academy/module-entry-unlock.ts`). **Defaults to control** (global-sequential lock) when unset/`false`. Leave unset to keep OFF |
@@ -64,7 +65,7 @@
 
 **Not an env var:** `IN_APP_NOTIFICATIONS_ENABLED` is a **database-backed feature flag** (`system_settings.feature_flags`, default **ON**), toggled from the admin console — it governs all in-app notifications including Phase 8's `capstone.reviewed`. Do not add it to `.env.*`. **Do not set `REDIS_URL`** — Prodily uses Postgres for rate limits and the email queue; Redis is intentionally not a dependency.
 
-The required-for-production variables (the first 17 rows, through `TURNSTILE_SECRET_KEY`) are confirmed present in `apps/web/.env.example` and read in current code. The remaining rows are Phase 4/6/7 experiment flags (OFF by default) and operational/optional variables — all safe to leave unset. No stale/removed variables found.
+The required-for-production variables (the first 16 rows, through `TURNSTILE_SECRET_KEY`) are confirmed present in `apps/web/.env.example` and read in current code. The remaining rows are Phase 4/6/7 experiment flags (OFF by default) and operational/optional variables, all safe to leave unset. `ADMIN_EMAILS` was removed; see §2.1.
 
 > **Never commit real values.** `.env.example` carries names and formats only; the
 > production values live in the Vercel project environment. `TURNSTILE_SECRET_KEY` in
@@ -77,6 +78,47 @@ The required-for-production variables (the first 17 rows, through `TURNSTILE_SEC
 > verification build that is never served, so it does not need the real keys — but the
 > guard still applies to it, which is why the fallback exists rather than an exemption.
 > If you add the real values as repository secrets they take precedence automatically.
+
+### 2.1 Admin access (database flag, not an env var)
+
+`ADMIN_EMAILS` is **no longer used**. Admin status comes only from `public.users.is_admin`
+(the proxy also trusts the server-signed `app_metadata.is_admin` claim). You can remove
+`ADMIN_EMAILS` from the Vercel environment after the step below; leaving it set does nothing.
+
+**Backfill step, run once BEFORE deploying the admin-by-flag change.** Use the owner-only
+snippet
+[`supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql`](../supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql)
+in the Supabase SQL editor (staging first if you can). Never move it into
+`supabase/migrations/` and never commit real addresses or ids. Run one step at a time (select
+the step, run the selection). Full steps:
+[`pending-approval/README.md`](../supabase/migrations/pending-approval/README.md).
+
+1. **Review candidates.** Paste the addresses from the current `ADMIN_EMAILS` value in Vercel
+   into STEP 1 (read-only) and run it. Email verification is off and login auto-confirms, so
+   a confirmed address proves nothing: decide which accounts are genuinely yours from
+   `created_at`, `last_sign_in_at` and `provider`.
+2. **Paste UUIDs.** Copy the `user_id` of each verified account into STEP 2 and STEP 3. The
+   snippet promotes by id only, never by email, and refuses to run with the placeholder id.
+3. **Dry run.** Run STEP 2 (read-only preview of the resulting roster), then STEP 3 as
+   shipped. STEP 3 ends with `ROLLBACK;`, so it changes nothing.
+4. **COMMIT.** When the preview is exactly right, change STEP 3's final `ROLLBACK;` to
+   `COMMIT;`, run it again, then run STEP 4 and check the final roster.
+5. Deploy. After deploy, sign in to `/admin` with each admin account to confirm access.
+
+From then on, grant or remove admin access from `/admin/users`. The console refuses to let
+an admin demote themselves and refuses to demote the last remaining admin. The delete API
+returns 403 for an account with `is_admin = true`; demote it first, then delete it.
+
+**Recovery if no admin is left.** If every admin ends up demoted (or the backfill was
+skipped), nobody can reach the console to fix it. Restore one account from the Supabase SQL
+editor, which runs as `postgres` and is allowed past the privileged-column trigger:
+
+```sql
+UPDATE public.users SET is_admin = true WHERE id = '<uuid>';
+```
+
+Look up the id first (`SELECT id, email, created_at, last_sign_in_at FROM auth.users WHERE
+lower(email) = lower('<your email>');`) and make sure the account is genuinely yours.
 
 ---
 
@@ -134,7 +176,7 @@ Phases 6, 7 and 8 are code-complete with all experiment flags **off by default**
 
 | Variable | Required? | Recommended production value/state | Why |
 |---|---|---|---|
-| Core (Supabase, email, `CRON_SECRET`, `ADMIN_EMAILS`, Turnstile, `NEXT_PUBLIC_SITE_URL`) | **Yes** | Set (see §2) | App does not function / build without them |
+| Core (Supabase, email, `CRON_SECRET`, Turnstile, `NEXT_PUBLIC_SITE_URL`) | **Yes** | Set (see §2) | App does not function / build without them |
 | Legal `NEXT_PUBLIC_LEGAL_*`, grievance | Recommended before public launch | Set to the confirmed operator identity | Legal pages otherwise show "not registered" wording |
 | `RECUT_EXPERIMENT_ENABLED` | No | **unset / `false`** | Keeps Phase 4 recut OFF (control) |
 | `MODULE_ENTRY_UNLOCK_ENABLED` | No | **unset / `false`** | Keeps Phase 6 unlock OFF (global-sequential lock) |
@@ -167,3 +209,53 @@ Automated tests (2627 passing) cover the logic; these are the checks a human mus
 4. Deploy the application code.
 5. Confirm experiment flags unset/`false` and `IN_APP_NOTIFICATIONS_ENABLED` on.
 6. Smoke-test auth, email, admin console, capstone review, and the experiment readout.
+
+---
+
+## 5. Google sign-in ("Continue with Google")
+
+The code ships **off**. Nothing changes for users until the flag is turned on.
+
+> **Before Production:** apply migration `20261020000001` (provider and consent column
+> guard) and run its validation script on staging. Check that in-app notifications are
+> on, because the Google link takeover defence notifies the owner in-app
+> (see [`SECURITY.md`](SECURITY.md) §3b).
+
+### 5.1 Variables
+
+- `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED`: `true` to enable, anything else is off (`.env.example` ships `false`). It is a `NEXT_PUBLIC_` variable, so Next **inlines it at build time** into both the client bundle and server code. Changing it in Vercel does nothing until you **redeploy** (trigger a new build).
+- `OAUTH_STATE_SECRET`: **server only**, at least 32 random characters. Generate with `openssl rand -base64 48`. Use a different value per environment (Preview and Production). Rotating it only invalidates Google sign-ins that are in flight (the signed cookie lives 10 minutes).
+- Supabase holds the Google client id and secret (dashboard, below). They are not app env vars. For local Supabase, `supabase/config.toml` reads `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` and keeps `[auth.external.google] enabled = false`.
+
+### 5.2 Google Cloud console
+
+1. APIs & Services > OAuth consent screen: app name Prodily, support email, links to `https://prodily.app/privacy` and `https://prodily.app/terms`, scopes `openid`, `email`, `profile` only. Publish the app (Testing mode only allows listed test users).
+2. APIs & Services > Credentials > Create OAuth client ID > **Web application**.
+   - Authorized JavaScript origins: not needed. This is a server-side redirect flow, so leave it empty.
+   - Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback` (the Supabase callback, not the app's). Local: `http://127.0.0.1:54321/auth/v1/callback`.
+3. Copy the client id and secret into Supabase (next step). Do not put them in the repo.
+
+### 5.3 Supabase dashboard
+
+1. Authentication > Sign In / Providers > Google: enable, paste the client id and secret, save.
+2. Authentication > URL Configuration > Redirect URLs. The app sends Google users back to `/api/auth/callback` on the origin they started from (`redirectTo` has no query string; `next`, consent and referral travel in the signed cookie). Supabase only redirects to URLs on this allowlist, so add each origin with the **`/api/auth/callback**` wildcard**. The wildcard keeps the entry valid if the callback ever gains a query string or trailing path, so nobody has to remember to update the dashboard:
+   - `https://prodily.app/api/auth/callback**`
+   - Vercel Preview deployments get a new hostname each time, so use a glob: `https://*-<team-slug>.vercel.app/**`
+   - local: `http://localhost:3000/api/auth/callback**` and `http://127.0.0.1:3000/api/auth/callback**`
+
+   Without a matching entry, Supabase falls back to the Site URL and the sign-in lands on the homepage with no session.
+3. Leave "Confirm email" as it is. Google addresses arrive verified, and Supabase links a Google identity to an existing account with the same verified email.
+
+### 5.4 Rollout order
+
+1. **Merge with the flag OFF.** The deploy is inert: no button, `/api/auth/google` returns 404, and the consent gate only affects Google accounts (there are none yet).
+2. Set `OAUTH_STATE_SECRET` in Vercel for Preview and Production.
+3. Complete §5.2 and §5.3 (provider enabled, redirect URLs with the wildcard).
+4. **Preview first:** set `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` for the Preview environment only and redeploy the preview. Check:
+   - signup: the Google button stays disabled until both boxes are ticked; a new account lands on the dashboard with consent recorded;
+   - login with a new Google account: lands on `/signup/complete-consent`; "Agree and Continue" records consent; "Cancel and delete my new account" removes the fresh account and returns to `/login?error=consent_declined`;
+   - login with Google for an existing password user: same account, no gate, consent untouched;
+   - cancelling at Google returns to `/login?error=oauth_cancelled`;
+   - Settings > Security for a Google-only account shows "Managed by Google".
+5. **Then Production**, once the "Before Production" checks above are done: set the flag to `true` for Production and redeploy. Smoke-test one sign-in.
+6. **Rollback:** set the flag back to `false` and redeploy. Google-only users then cannot sign in until it is re-enabled, but they can set a password through the reset password page and use email login.

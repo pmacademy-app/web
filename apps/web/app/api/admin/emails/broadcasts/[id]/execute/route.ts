@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { BroadcastService } from '@/lib/admin/broadcast-service'
+import { BroadcastService, BroadcastRefusedError } from '@/lib/admin/broadcast-service'
 
 export const runtime = 'nodejs'
 
@@ -33,6 +33,10 @@ export const POST = withRoute(
 
       return NextResponse.json({ success: true, data: result })
     } catch (err) {
+      // CQ-02: a campaign the service refuses to send is a conflict, not a server fault.
+      if (err instanceof BroadcastRefusedError) {
+        return NextResponse.json({ error: err.message }, { status: 409 })
+      }
       return NextResponse.json(
         { error: adminErrorMessage(err, 'Internal server error') },
         { status: 500 }

@@ -16,6 +16,11 @@ import { AuthSuccessNotice } from '@/components/auth/AuthSuccessNotice'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
+import { GoogleButton } from '@/components/auth/GoogleButton'
+import { buildGoogleStartHref, isGoogleAuthEnabled } from '@/lib/auth/google-auth'
+
+// Build-time inlined flag, so this is constant for the life of the bundle.
+const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
 
 const loginSchema = z.object({
   email: z
@@ -32,6 +37,74 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
+const nonRetryable = (code: ClassifiedAuthError['code'], message: string): ClassifiedAuthError => ({
+  code,
+  message,
+  retryable: false,
+  isNetworkError: false,
+})
+
+/**
+ * Plain-language copy for the `?error=` codes the auth callback and the Google start
+ * route redirect here with. Unknown codes show nothing rather than a vague failure.
+ */
+const LOGIN_ERROR_PARAMS: Record<string, ClassifiedAuthError> = {
+  auth_failed: {
+    code: 'AUTH_INVALID_CREDENTIALS',
+    message: 'Authentication failed. Please try again.',
+    retryable: true,
+    isNetworkError: false,
+  },
+  verification_failed: {
+    code: 'AUTH_EMAIL_NOT_CONFIRMED',
+    message: 'Your verification link has expired or was already used. Please request a new one below.',
+    retryable: false,
+    isNetworkError: false,
+    requiresAction: 'verify_email',
+  },
+  oauth_cancelled: nonRetryable(
+    'AUTH_UNKNOWN_ERROR',
+    'Google sign-in was cancelled. You can try again or log in with your email.'
+  ),
+  oauth_failed: {
+    code: 'AUTH_PROVIDER_UNAVAILABLE',
+    message: 'We could not sign you in with Google. Please try again.',
+    retryable: true,
+    isNetworkError: false,
+  },
+  oauth_rate_limited: {
+    code: 'AUTH_RATE_LIMITED',
+    message: 'Too many sign-in attempts. Please wait a few minutes and try again.',
+    retryable: true,
+    isNetworkError: false,
+  },
+  oauth_unavailable: nonRetryable(
+    'AUTH_PROVIDER_UNAVAILABLE',
+    'Google sign-in is not available right now. Please log in with your email instead.'
+  ),
+  signups_closed: nonRetryable(
+    'AUTH_UNKNOWN_ERROR',
+    'New learner registrations are currently closed. Please check back later.'
+  ),
+  signup_limited: nonRetryable(
+    'AUTH_RATE_LIMITED',
+    'We are getting a lot of new signups right now. Please try again in an hour.'
+  ),
+  oauth_admin_blocked: nonRetryable(
+    'AUTH_UNKNOWN_ERROR',
+    'Admin accounts must sign in with email and password.'
+  ),
+  consent_declined: nonRetryable(
+    'AUTH_UNKNOWN_ERROR',
+    'You need to accept the Terms and confirm your age to continue. You have been signed out.'
+  ),
+}
+
+function authErrorFromParam(param: string | null): ClassifiedAuthError | null {
+  if (!param || !Object.prototype.hasOwnProperty.call(LOGIN_ERROR_PARAMS, param)) return null
+  return { ...LOGIN_ERROR_PARAMS[param] }
+}
+
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -39,23 +112,8 @@ function LoginForm() {
   const resetSuccess = searchParams.get('reset') === 'success'
   const verifiedSuccess = searchParams.get('verified') === 'true'
 
-  const [authError, setAuthError] = useState<ClassifiedAuthError | null>(
-    authErrorParam === 'auth_failed'
-      ? {
-          code: 'AUTH_INVALID_CREDENTIALS',
-          message: 'Authentication failed. Please try again.',
-          retryable: true,
-          isNetworkError: false,
-        }
-      : authErrorParam === 'verification_failed'
-      ? {
-          code: 'AUTH_EMAIL_NOT_CONFIRMED',
-          message: 'Your verification link has expired or was already used. Please request a new one below.',
-          retryable: false,
-          isNetworkError: false,
-          requiresAction: 'verify_email',
-        }
-      : null
+  const [authError, setAuthError] = useState<ClassifiedAuthError | null>(() =>
+    authErrorFromParam(authErrorParam)
   )
   const [attemptedEmail, setAttemptedEmail] = useState<string>('')
   const [isPending, startTransition] = useTransition()
@@ -151,6 +209,23 @@ function LoginForm() {
             <ResendVerificationCard email={attemptedEmail || getValues('email')} />
           )}
         </div>
+      )}
+
+      {GOOGLE_AUTH_ENABLED && (
+        <>
+          <div className="space-y-2">
+            <GoogleButton href={buildGoogleStartHref({ next: searchParams.get('next') })} />
+            <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+              New here? You&apos;ll confirm our Terms and age on the next step.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" aria-hidden="true" />
+            <span>or log in with email</span>
+            <span className="h-px flex-1 bg-border" aria-hidden="true" />
+          </div>
+        </>
       )}
 
       <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-4" noValidate>

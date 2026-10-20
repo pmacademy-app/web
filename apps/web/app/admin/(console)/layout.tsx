@@ -20,8 +20,9 @@ export const metadata = {
  * Server-side authorization guard for every Admin Console page.
  *
  * Runs in addition to the middleware RBAC check (defense in depth). Reads the
- * active session and verifies authorization against ADMIN_EMAILS AND the
- * `users.is_admin` database flag before rendering the console shell.
+ * active session and verifies authorization against the `users.is_admin`
+ * database flag (the only source of admin status) before rendering the
+ * console shell.
  */
 export default async function AdminConsoleLayout({ children }: { children: React.ReactNode }) {
   const user = await getServerUser()
@@ -33,7 +34,7 @@ export default async function AdminConsoleLayout({ children }: { children: React
   const accessToken = cookieStore.get('sb-access-token')?.value
   const supabase = accessToken ? createAuthenticatedServerClient(accessToken) : createServiceRoleClient()
 
-  const authorized = await isAdminUser(supabase, user.id, user.email)
+  const authorized = await isAdminUser(supabase, user.id)
   if (!authorized) {
     redirect('/admin/access-denied')
   }

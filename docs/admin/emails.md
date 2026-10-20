@@ -15,7 +15,7 @@ The Email Operations workspace provides full operational control over outbound e
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin/communications` from the sidebar (or use route alias `/admin/emails`).
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 
 ---
 

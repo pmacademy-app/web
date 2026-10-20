@@ -17,7 +17,7 @@ The Operations Dashboard is the primary home screen for platform administrators.
 ## 2. Access & Permissions
 
 - **Path:** Navigate to `/admin` from the sidebar or top navigation.
-- **Permissions:** Accessible to any authenticated user with `is_admin = true` or listed in `ADMIN_EMAILS`.
+- **Permissions:** Accessible to any authenticated user with `users.is_admin = true` (there is no email allowlist).
 - **Keyboard Shortcut:** Press `Cmd+K` (macOS) or `Ctrl+K` (Windows/Linux) from any admin screen to open Global Search.
 
 ---

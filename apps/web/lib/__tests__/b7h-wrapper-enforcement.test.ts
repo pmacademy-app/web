@@ -199,9 +199,11 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // achievement celebration is claimed server-side with a compare-and-set (also on `withRoute`).
   // 133 since Admin R6 added `admin/automations/lifecycle-preview/route.ts` (an admin dry run of
   // the lifecycle job) and `admin/cache/revalidate/route.ts` (admin cache refresh), both on `withRoute`.
-  it('accounts for all 133 routes', () => {
-    expect(files).toHaveLength(133)
-    expect(migrated).toHaveLength(130)
+  // 135 since Google sign-in added `auth/google/route.ts` (starts the OAuth flow) and
+  // `auth/complete-consent/route.ts` (the consent gate's answer), both on `withRoute`.
+  it('accounts for all 135 routes', () => {
+    expect(files).toHaveLength(135)
+    expect(migrated).toHaveLength(132)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
@@ -218,7 +220,8 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
 
     // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
     expect(inGroup('cron/')).toBe(7)
-    expect(inGroup('auth/')).toBe(8)
+    // 10 auth routes since Google sign-in added auth/google and auth/complete-consent.
+    expect(inGroup('auth/')).toBe(10)
     expect(inGroup('settings/')).toBe(11)
     expect(inGroup('admin/')).toBe(63)
   })

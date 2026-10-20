@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { getUserXpSummary } from '@/lib/xp-service'
-import { getUserStreakStatus } from '@/lib/streaks-db'
+import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks-db'
+import { logSystemError } from '@/lib/monitoring/logger'
 import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
@@ -39,7 +40,17 @@ export default async function MetricsProgressPage() {
       data: Array<{ lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' }> | null
     }>,
     getUserXpSummary(supabase, user.id),
-    getUserStreakStatus(supabase, user.id),
+    // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
+    getUserStreakStatus(supabase, user.id).catch((err) => {
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'progress_metrics_streak_read',
+        message: String(err),
+        userId: user.id,
+      })
+      return notStartedStreakStatus()
+    }),
   ])
 
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0

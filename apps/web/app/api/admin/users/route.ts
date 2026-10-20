@@ -51,8 +51,28 @@ export const PATCH = withRoute(
         return NextResponse.json({ error: 'Missing targetUserId or makeAdmin parameters' }, { status: 400 })
       }
 
-      const success = await AdminConsoleService.toggleUserAdminRole(targetUserId, makeAdmin)
-      if (!success) {
+      // Lockout guard 1: an admin cannot remove their own admin access. Another admin
+      // has to do it, so the console always keeps at least the person acting on it.
+      if (!makeAdmin && targetUserId === admin.userId) {
+        return NextResponse.json(
+          { error: 'You cannot remove your own admin access. Ask another administrator.' },
+          { status: 400 }
+        )
+      }
+
+      // Lockout guard 2 (inside the service): refuse a demotion that would leave zero
+      // admins. See toggleUserAdminRole for the residual race between two demotions.
+      const outcome = await AdminConsoleService.toggleUserAdminRole(targetUserId, makeAdmin)
+      if (outcome === 'not_found') {
+        return NextResponse.json({ error: 'User not found.' }, { status: 404 })
+      }
+      if (outcome === 'last_admin') {
+        return NextResponse.json(
+          { error: 'This is the last administrator. Promote another admin before removing this one.' },
+          { status: 409 }
+        )
+      }
+      if (outcome !== 'updated') {
         return NextResponse.json({ error: 'Failed to update user admin status' }, { status: 500 })
       }
 
@@ -61,7 +81,8 @@ export const PATCH = withRoute(
         admin.email,
         makeAdmin ? 'grant_admin_role' : 'revoke_admin_role',
         'user',
-        targetUserId
+        targetUserId,
+        { makeAdmin }
       )
 
       return NextResponse.json({ success: true, targetUserId, makeAdmin })

@@ -11,8 +11,14 @@ import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { log } from '@/lib/monitoring/log'
+import { logSystemError } from '@/lib/monitoring/logger'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import {
+  SIGNUP_GLOBAL_LIMIT_KEY,
+  AGGREGATE_SIGNUP_WINDOW_MS,
+  aggregateSignupCeiling,
+} from '@/lib/auth/signup-limits'
 import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 
 export const runtime = 'nodejs'
@@ -53,22 +59,24 @@ const signupSchema = z.object({
 const IP_SIGNUP_LIMIT = { windowMs: 15 * 60 * 1000, limit: 5, failClosed: true } // 5 signups / 15 min / IP
 const EMAIL_SIGNUP_LIMIT = { windowMs: 24 * 60 * 60 * 1000, limit: 3, failClosed: true } // 3 / 24h / canonical email
 
-/**
- * Platform-wide signup ceiling per hour.
- *
- * This is the layer that stops a campaign rotating both IPs and addresses, because
- * the key is constant — rotation buys nothing. The threshold is derived from the
- * operator's own configured daily email allowance rather than invented: signups are
- * the dominant consumer of that allowance, so one hour's share of it is the honest
- * ceiling. The floor keeps a conservatively-configured limit from blocking a normal
- * day's organic signups (baseline before the incident was 1-49 signups/day).
- */
-const AGGREGATE_SIGNUP_WINDOW_MS = 60 * 60 * 1000
-const AGGREGATE_SIGNUP_FLOOR = 15
+// The platform-wide hourly ceiling (`signup_global`) lives in lib/auth/signup-limits.ts,
+// shared with the Google OAuth callback so both signup methods draw on one bucket.
 
-function aggregateSignupCeiling(dailyEmailLimit: number): number {
-  const derived = Math.ceil((Number.isFinite(dailyEmailLimit) && dailyEmailLimit > 0 ? dailyEmailLimit : 100) / 24)
-  return Math.max(AGGREGATE_SIGNUP_FLOOR, derived)
+/**
+ * Whether a GoTrue error means the email already has an account.
+ *
+ * GoTrue's wording differs by endpoint and version: `signUp` has said "User already
+ * registered", while `admin.createUser` says "A user with this email address has already
+ * been registered" (code `email_exists`, HTTP 422). Matching the code first and the
+ * message as a fallback keeps both flows on the non-enumerating response.
+ */
+const EXISTING_ACCOUNT_CODES = new Set(['email_exists', 'user_already_exists'])
+const EXISTING_ACCOUNT_MESSAGE = /already (been )?registered|already in use|already exists/i
+
+function isExistingAccountError(error: { message?: string | null; code?: string | null } | null | undefined): boolean {
+  if (!error) return false
+  if (error.code && EXISTING_ACCOUNT_CODES.has(error.code)) return true
+  return EXISTING_ACCOUNT_MESSAGE.test(error.message ?? '')
 }
 
 /**
@@ -201,7 +209,7 @@ export const POST = withRoute(
 
       const [emailLimit, aggregateLimit] = await Promise.all([
         evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
-        evaluatePersistentRateLimit('signup_global', {
+        evaluatePersistentRateLimit(SIGNUP_GLOBAL_LIMIT_KEY, {
           windowMs: AGGREGATE_SIGNUP_WINDOW_MS,
           limit: aggregateSignupCeiling(dailyEmailLimit),
           failClosed: true,
@@ -256,13 +264,7 @@ export const POST = withRoute(
         })
 
         const isExistingAccount =
-          Boolean(
-            error && (
-              error.message?.toLowerCase().includes('already registered') ||
-              error.message?.toLowerCase().includes('already in use') ||
-              error.message?.toLowerCase().includes('already exists')
-            )
-          ) ||
+          isExistingAccountError(error) ||
           Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
 
         if (isExistingAccount) {
@@ -310,12 +312,7 @@ export const POST = withRoute(
         })
 
         if (createError) {
-          const isExisting =
-            createError.message?.toLowerCase().includes('already registered') ||
-            createError.message?.toLowerCase().includes('already in use') ||
-            createError.message?.toLowerCase().includes('already exists')
-
-          if (isExisting) {
+          if (isExistingAccountError(createError)) {
             // Non-enumerating response: direct user to login without revealing account existence or bypassing auth.
             return NextResponse.json({
               success: true,
@@ -325,13 +322,23 @@ export const POST = withRoute(
             })
           }
 
-          return NextResponse.json(
-            {
-              error: createError.message || 'Registration failed.',
-              code: createError.code || 'SIGNUP_FAILED',
-            },
-            { status: 400 }
-          )
+          // SEC-17: the provider message can carry database internals (table names,
+          // constraint text). Keep it in the server-side log and return the classifier's
+          // static copy, exactly as Flow A does. The classified response carries only our
+          // own message and code, never the raw provider text.
+          void logSystemError({
+            severity: 'error',
+            category: 'auth',
+            operation: 'signup_create_user',
+            message: createError.message || 'admin.createUser failed without a message',
+            details: { flow: 'B', providerCode: createError.code ?? null },
+          })
+
+          return apiClassifiedAuthError({
+            cause: createError,
+            context: 'signup',
+            status: 400,
+          })
         }
 
         const user = createData.user

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
 import { POST as signupPOST } from '../../app/api/auth/signup/route'
@@ -13,6 +13,10 @@ vi.mock('@/lib/rate-limit', () => ({
 }))
 
 // Supabase mock: token 'mock-learner-token' = verified learner, 'mock-unverified-token' = unverified learner, 'mock-admin-token' = admin
+// Row returned by `users` maybeSingle() reads (the proxy's lazy is_admin fallback). Null by
+// default so existing tests keep their behaviour; set per test when the row matters.
+let mockUsersRow: Record<string, unknown> | null = null
+
 const mockGetUser = vi.fn(async (token: string) => {
   if (token === 'mock-unverified-token') {
     return {
@@ -26,9 +30,16 @@ const mockGetUser = vi.fn(async (token: string) => {
       error: null,
     }
   }
+  if (token === 'mock-former-env-admin-token') {
+    // Address that used to sit in ADMIN_EMAILS; no signed is_admin claim.
+    return {
+      data: { user: { id: 'former-admin-id', email: 'admin@prodily.app', email_confirmed_at: '2026-01-01', user_metadata: {}, app_metadata: {} } },
+      error: null,
+    }
+  }
   if (token === 'mock-admin-token') {
     return {
-      data: { user: { id: 'admin-id', email: 'admin@example.com', email_confirmed_at: '2026-01-01', user_metadata: {} } },
+      data: { user: { id: 'admin-id', email: 'admin@example.com', email_confirmed_at: '2026-01-01', user_metadata: {}, app_metadata: { is_admin: true } } },
       error: null,
     }
   }
@@ -58,7 +69,7 @@ vi.mock('@supabase/supabase-js', () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+          maybeSingle: vi.fn(async () => ({ data: mockUsersRow, error: null })),
         }),
       }),
       insert: () => ({
@@ -68,11 +79,6 @@ vi.mock('@supabase/supabase-js', () => ({
       }),
     }),
   }),
-}))
-
-// isAdminEmail: only 'admin@example.com' qualifies via env check
-vi.mock('@/lib/admin/authorization', () => ({
-  isAdminEmail: (email: string | undefined) => email === 'admin@example.com',
 }))
 
 // SettingsService mock — controllable per test
@@ -99,6 +105,7 @@ vi.mock('@/lib/security/turnstile', () => ({
 
 describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
   beforeEach(() => {
+    mockUsersRow = null
     mockSettings.maintenanceMode = false
     mockSettings.allowSignups = true
     mockSettings.requireEmailVerification = false
@@ -321,5 +328,47 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toContain('/login')
     })
+  })
+})
+
+describe('Proxy admin RBAC ignores ADMIN_EMAILS', () => {
+  const originalEnv = process.env.ADMIN_EMAILS
+
+  beforeEach(() => {
+    mockUsersRow = null
+    mockSettings.maintenanceMode = false
+    mockSettings.allowSignups = true
+    mockSettings.requireEmailVerification = false
+  })
+
+  afterEach(() => {
+    if (originalEnv === undefined) delete process.env.ADMIN_EMAILS
+    else process.env.ADMIN_EMAILS = originalEnv
+    mockUsersRow = null
+  })
+
+  it('redirects a former env-admin to access-denied when the claim is absent and users.is_admin is false', async () => {
+    process.env.ADMIN_EMAILS = 'admin@prodily.app'
+    mockUsersRow = { is_admin: false, curriculum_access_override: false }
+
+    const req = new NextRequest('https://prodily.app/admin', {
+      headers: { cookie: 'sb-access-token=mock-former-env-admin-token' },
+    })
+    const res = await proxy(req)
+
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/admin/access-denied')
+  })
+
+  it('lets the same user in once users.is_admin is true', async () => {
+    process.env.ADMIN_EMAILS = 'admin@prodily.app'
+    mockUsersRow = { is_admin: true, curriculum_access_override: false }
+
+    const req = new NextRequest('https://prodily.app/admin', {
+      headers: { cookie: 'sb-access-token=mock-former-env-admin-token' },
+    })
+    const res = await proxy(req)
+
+    expect(res.headers.get('location') ?? '').not.toContain('/admin/access-denied')
   })
 })

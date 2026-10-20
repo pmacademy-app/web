@@ -8,8 +8,9 @@ import * as supabaseModule from '../supabase'
 import type { Database } from '@/lib/supabase'
 
 /**
- * Security regression: the admin guard must decide ADMIN_EMAILS membership from the verified
- * auth identity, not from `public.users.email`, which a signed-in learner can edit.
+ * Security regression: the admin guard grants access only from the users.is_admin database
+ * flag. No email address, whether from the verified auth session or from `public.users.email`
+ * (which a signed-in learner can edit), ever grants admin access.
  */
 
 function authUser(id: string, email: string): User {
@@ -32,16 +33,18 @@ function serviceClient(row: { is_admin: boolean; email: string }) {
   } as unknown as SupabaseClient<Database>
 }
 
-describe('requireAdminUser trusts the auth email, not users.email', () => {
+describe('requireAdminUser ignores emails entirely', () => {
   const originalEnv = process.env.ADMIN_EMAILS
 
   beforeEach(() => {
     vi.restoreAllMocks()
-    process.env.ADMIN_EMAILS = 'boss@example.com'
   })
 
   afterEach(() => {
-    process.env.ADMIN_EMAILS = originalEnv
+    vi.restoreAllMocks()
+    // Restore the legacy env var exactly; tests below set it to prove it is ignored.
+    if (originalEnv === undefined) delete process.env.ADMIN_EMAILS
+    else process.env.ADMIN_EMAILS = originalEnv
   })
 
   it('denies a learner whose users.email was rewritten to an admin address', async () => {
@@ -71,32 +74,35 @@ describe('requireAdminUser trusts the auth email, not users.email', () => {
     expect(result.authorized).toBe(false)
   })
 
-  it('allows an ADMIN_EMAILS admin identified by the auth session email', async () => {
+  it('denies a former env-admin email whose users.is_admin is false', async () => {
+    // The legacy variable is set to this exact address: the old code would have let it in.
+    process.env.ADMIN_EMAILS = 'admin@prodily.app'
     vi.spyOn(authModule, 'getAuthenticatedUserFromRequest').mockResolvedValue(
-      authUser('usr-boss', 'Boss@Example.com')
+      authUser('usr-boss', 'admin@prodily.app')
     )
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
-      serviceClient({ is_admin: false, email: 'stale-profile@example.com' })
+      serviceClient({ is_admin: false, email: 'admin@prodily.app' })
     )
 
     const result = await requireAdminUser(new Request('http://localhost:3000/api/admin/summary'))
 
-    expect(result.authorized).toBe(true)
-    expect(result.userId).toBe('usr-boss')
-    expect(result.email).toBe('Boss@Example.com')
+    expect(result.authorized).toBe(false)
+    expect(result.statusCode).toBe(403)
   })
 
-  it('still allows a database is_admin admin regardless of email', async () => {
+  it('allows a database is_admin admin regardless of email', async () => {
     vi.spyOn(authModule, 'getAuthenticatedUserFromRequest').mockResolvedValue(
       authUser('usr-db-admin', 'dbadmin@example.com')
     )
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
-      serviceClient({ is_admin: true, email: 'dbadmin@example.com' })
+      serviceClient({ is_admin: true, email: 'stale-profile@example.com' })
     )
 
     const result = await requireAdminUser(new Request('http://localhost:3000/api/admin/summary'))
 
     expect(result.authorized).toBe(true)
+    expect(result.userId).toBe('usr-db-admin')
+    expect(result.email).toBe('dbadmin@example.com')
   })
 })
 

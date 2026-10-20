@@ -60,14 +60,14 @@ describe('Phase 1 Technical SEO Foundation Unit Test Suite', () => {
     const allowList = Array.isArray(ruleGroup.allow) ? ruleGroup.allow : [ruleGroup.allow]
     const disallowList = Array.isArray(ruleGroup.disallow) ? ruleGroup.disallow : [ruleGroup.disallow]
 
-    const expectedAllows = ['/', '/about', '/contact', '/privacy', '/terms', '/curriculum', '/lessons/', '/p/']
+    const expectedAllows = ['/', '/about', '/contact', '/privacy', '/terms', '/curriculum', '/lessons/', '/p/', '/api/og/']
     for (const path of expectedAllows) {
       expect(allowList.includes(path)).toBe(true)
     }
 
     const expectedDisallows = [
       '/dashboard',
-      '/review',
+      '/review$',
       '/progress',
       '/settings',
       '/leaderboard',
@@ -78,11 +78,15 @@ describe('Phase 1 Technical SEO Foundation Unit Test Suite', () => {
       '/api/',
       '/academy/',
       '/login',
-      '/app',
     ]
     for (const path of expectedDisallows) {
       expect(disallowList.includes(path)).toBe(true)
     }
+
+    // An unanchored '/review' prefix would also block the public /reviews page.
+    expect(disallowList.includes('/review')).toBe(false)
+    // '/app' is a route group, not a URL, so it has no business in robots.txt.
+    expect(disallowList.includes('/app')).toBe(false)
 
     expect(robotRules.sitemap).toBe(`${expectedSiteUrl}/sitemap.xml`)
   })

@@ -453,6 +453,8 @@ describe('B10-B/B10-C — adoption boundary', () => {
           // the typed client is how this codebase calls a server route.
           hit === 'app/admin/login/page.tsx' ||
           hit === 'components/quick-start/QuickStartContext.tsx' ||
+          // Google sign-in consent gate posts to /api/auth/complete-consent.
+          hit === 'app/(auth)/signup/complete-consent/page.tsx' ||
           hit === 'lib/api/hooks.ts',
         `Unexpected import in ${hit}`
       ).toBe(true)

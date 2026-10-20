@@ -63,6 +63,7 @@ export const POST = withRoute(
     let remindersSkippedTimezone = 0
     let remindersSkippedActiveToday = 0
     let remindersSkippedNoDueCards = 0
+    let skippedPages = 0
 
     const startTime = Date.now()
 
@@ -116,8 +117,25 @@ export const POST = withRoute(
         if (users.length === 0) break
 
         const userIds = users.map((u) => u.id)
-        // Batch resolve notification preferences for this entire page (anti-N+1)
-        const prefMap = await getBatchUserNotificationPreferences(supabase, userIds)
+        // Batch resolve notification preferences for this entire page (anti-N+1).
+        // Strict: with defaults standing in for a failed read, a learner who opted out
+        // would be mailed, so a failed read skips the page until the next run (CQ-03).
+        let prefMap: Awaited<ReturnType<typeof getBatchUserNotificationPreferences>>
+        try {
+          prefMap = await getBatchUserNotificationPreferences(supabase, userIds, { strict: true })
+        } catch (prefErr) {
+          skippedPages++
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: 'cron_daily_reminder_preferences',
+            message: `Notification preferences read failed in /api/cron/daily-reminder; page skipped: ${prefErr instanceof Error ? prefErr.message : String(prefErr)}`,
+          })
+          lastSeenId = users[users.length - 1].id
+          if (users.length < BATCH_SIZE) break
+          continue
+        }
 
         const { getUserLocalTime } = await import('@/lib/notifications/timezone')
 
@@ -214,6 +232,7 @@ export const POST = withRoute(
       remindersSkippedTimezone,
       remindersSkippedActiveToday,
       remindersSkippedNoDueCards,
+      skippedPages,
     })
   }
 )

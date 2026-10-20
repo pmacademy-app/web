@@ -17,7 +17,7 @@ All metrics are computed live from PostgreSQL tables (`xp_events`, `user_lesson_
 ## 2. Access & Global Controls
 
 - **Path:** Navigate to `/admin/analytics` from the sidebar.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 - **Date Range Selector:** Scope metrics to `Today`, `7D`, `30D`, `90D`, or `Custom`.
 - **CSV Data Export:** Click the **[ Export CSV ]** button in the header to download the aggregated dataset for external analysis.
 

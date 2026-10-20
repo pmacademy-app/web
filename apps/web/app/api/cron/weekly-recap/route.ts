@@ -66,6 +66,7 @@ export const POST = withRoute(
     let recapsQueued = 0
     let recapsSkippedTimezone = 0
     let recapsSkippedNoActivity = 0
+    let skippedPages = 0
 
     const startTime = Date.now()
     const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -114,7 +115,7 @@ export const POST = withRoute(
         const userIds = users.map((u) => u.id)
 
         // Batch fetch in parallel: weekly XP events, weekly completed lessons, and notification preferences
-        const [xpRes, lessonRes, prefMap] = await Promise.all([
+        const [xpRes, lessonRes, prefRead] = await Promise.all([
           // Paged: a week of XP events for a whole page of learners can pass the 1000-row cap.
           fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((lo, hi) =>
             supabase
@@ -131,8 +132,30 @@ export const POST = withRoute(
             .in('user_id', userIds)
             .eq('status', 'completed')
             .gte('completed_at', weekStartDate),
-          getBatchUserNotificationPreferences(supabase, userIds),
+          // Strict: a failed read must not stand in as "everyone opted in" (see the skip below).
+          getBatchUserNotificationPreferences(supabase, userIds, { strict: true }).then(
+            (map) => ({ map, error: null }),
+            (error: unknown) => ({ map: null, error }),
+          ),
         ])
+
+        // With defaults standing in for a failed read, a learner who opted out would be
+        // mailed, so a failed read skips the page until the next run (CQ-03).
+        if (!prefRead.map) {
+          skippedPages++
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          const reason = prefRead.error instanceof Error ? prefRead.error.message : String(prefRead.error)
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: 'cron_weekly_recap_preferences',
+            message: `Notification preferences read failed in /api/cron/weekly-recap; page skipped: ${reason}`,
+          })
+          lastSeenId = users[users.length - 1].id
+          if (users.length < BATCH_SIZE) break
+          continue
+        }
+        const prefMap = prefRead.map
 
         const xpMap = new Map<string, number>()
         // Distinct UTC days with any XP this week: the recap's "days studied".
@@ -251,6 +274,7 @@ export const POST = withRoute(
       recapsQueued,
       recapsSkippedTimezone,
       recapsSkippedNoActivity,
+      skippedPages,
     })
   }
 )

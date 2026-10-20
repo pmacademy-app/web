@@ -16,7 +16,7 @@ The Unified Communications Workspace consolidates all student messaging channels
 
 - **Path:** Navigate to `/admin/communications` from the sidebar.
 - **Route Aliases:** `/admin/emails` (→ `?tab=queue`), `/admin/notifications` (→ `?tab=in-app`, internally remapped from a "notifications" alias), `/admin/templates`, and `/admin/announcements` (→ `?tab=announcements`) automatically redirect into this workspace.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist).
 
 ---
 

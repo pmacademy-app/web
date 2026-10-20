@@ -12,6 +12,7 @@ import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { NotificationToast } from '@/components/notifications/NotificationToast'
 import { useQuickStart } from '@/components/quick-start/QuickStartContext'
+import { TopbarAvatar } from '@/components/layout/TopbarAvatar'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -228,19 +229,7 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
               </svg>
 
               {/* Circular Avatar */}
-              <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted/40 flex items-center justify-center border border-border/80 shadow-xs">
-                {userProfile.avatar_url || !userProfile.name || userProfile.name.toLowerCase().includes('aditya') ? (
-                  <img
-                    src={userProfile.avatar_url || '/avatars/aditya.png'}
-                    alt={userProfile.name || 'User avatar'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs select-none">
-                    {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-3.5 h-3.5" />}
-                  </div>
-                )}
-              </div>
+              <TopbarAvatar name={userProfile.name} avatarUrl={userProfile.avatar_url} />
             </div>
           </button>
 

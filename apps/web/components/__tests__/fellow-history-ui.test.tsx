@@ -135,7 +135,9 @@ describe('Fellow request history (C4)', () => {
     act(() => toggle!.click())
     expect(toggle!.getAttribute('aria-expanded')).toBe('true')
     const list = container.querySelector('ol')!
-    expect(list.closest(`#${CSS.escape(toggle!.getAttribute('aria-controls') ?? '')}`)).not.toBeNull()
+    const controlsId = toggle!.getAttribute('aria-controls') ?? ''
+    expect(controlsId).not.toBe('')
+    expect(container.querySelector(`[id="${controlsId}"]`)?.contains(list)).toBe(true)
     const items = Array.from(list.querySelectorAll('li')).map((li) => li.textContent ?? '')
     expect(items).toHaveLength(5)
     expect(items[0]).toContain('Request declined')

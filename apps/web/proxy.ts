@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminEmail } from '@/lib/admin/authorization'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
@@ -31,6 +30,8 @@ const AUTH_PAGE_TARGET_LEARNER = '/dashboard'
 const AUTH_PAGE_TARGET_ADMIN = '/admin'
 const ADMIN_LOGIN_PAGE = '/admin/login'
 const ACCESS_DENIED_PAGE = '/admin/access-denied'
+// Google sign-ups who have not yet accepted the Terms and confirmed their age land here.
+const CONSENT_GATE_PAGE = '/signup/complete-consent'
 
 /**
  * Attaches refreshed session cookies to a redirect/next response so a token
@@ -130,6 +131,10 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
 
   // Route classification ----------------------------------------------------
+  // The consent gate sits under /signup but is only for signed-in users, so it is
+  // handled before the general auth-page bounce below.
+  const isConsentGatePage = path === CONSENT_GATE_PAGE
+
   // Auth pages are public and route authenticated users away.
   const isGeneralAuthPage =
     path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/reset-password')
@@ -325,7 +330,13 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
   }
 
-  let cachedUserData: { is_admin?: boolean; curriculum_access_override?: boolean } | null = null
+  type ProfileData = {
+    is_admin?: boolean
+    curriculum_access_override?: boolean
+    auth_provider?: string
+    terms_accepted_at?: string | null
+  }
+  let cachedUserData: ProfileData | null = null
   async function loadUserProfileData() {
     if (!user) return null
     if (cachedUserData !== null) return cachedUserData
@@ -340,10 +351,10 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
       const { data } = await authorizedClient
         .from('users')
-        .select('is_admin, curriculum_access_override')
+        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at')
         .eq('id', user.id)
         .maybeSingle()
-      cachedUserData = (data || {}) as { is_admin?: boolean; curriculum_access_override?: boolean }
+      cachedUserData = (data || {}) as ProfileData
       return cachedUserData
     } catch (err) {
       console.error('[proxy] User profile database check error:', err)
@@ -353,15 +364,13 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   /**
-   * Resolves admin authorization for the current user:
-   * 1. ADMIN_EMAILS environment variable (0 DB calls)
-   * 2. user.app_metadata.is_admin signed JWT claim (0 DB calls)
-   * 3. Lazy fallback to users table (only when accessing /admin area and claims are absent)
+   * Resolves admin authorization for the current user. Email addresses never grant admin:
+   * 1. user.app_metadata.is_admin signed JWT claim (0 DB calls)
+   * 2. Lazy fallback to users.is_admin (only when accessing the /admin area and the claim is absent)
    */
   async function isAdmin(): Promise<boolean> {
     if (!user) return false
-    if (isAdminEmail(user.email)) return true
-    if (user.app_metadata?.is_admin) return true
+    if (user.app_metadata?.is_admin === true) return true
 
     // For non-admin learner paths, skip DB query — downstream learner components handle authorization
     if (!isAdminArea && !isAdminLoginPage) {
@@ -378,6 +387,45 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     const profileData = await loadUserProfileData()
     return Boolean(profileData?.curriculum_access_override)
+  }
+
+  /**
+   * True only for a Google sign-up whose profile has no recorded Terms/age consent.
+   *
+   * The verified user's provider list is checked first, so password users never pay for
+   * a profile query here. A merged password account keeps auth_provider 'email' and is
+   * never gated, nor is a legacy password user with null consent. A failed or missing
+   * profile read answers false: the gate fails open rather than locking learners out.
+   */
+  let consentFailOpenLogged = false
+  async function needsConsent(): Promise<boolean> {
+    if (!user) return false
+    const providers = user.app_metadata?.providers
+    const signedInWithGoogle =
+      user.app_metadata?.provider === 'google' || (Array.isArray(providers) && providers.includes('google'))
+    if (!signedInWithGoogle) return false
+
+    const profileData = await loadUserProfileData()
+    // auth_provider is NOT NULL, so its absence means the read failed or the row is missing.
+    if (profileData?.auth_provider === undefined) {
+      if (!consentFailOpenLogged) {
+        consentFailOpenLogged = true
+        console.warn('[proxy] consent gate failed open: profile unavailable', { userId: user.id })
+      }
+      return false
+    }
+    return profileData.auth_provider === 'google' && profileData.terms_accepted_at == null
+  }
+
+  // ── Consent gate page: signed-in Google users without consent only ───────
+  if (isConsentGatePage) {
+    if (!user) return withReferralCookie(NextResponse.redirect(new URL('/login', request.url)), refParam)
+
+    const response = (await needsConsent())
+      ? passThrough(request, requestId)
+      : NextResponse.redirect(new URL(AUTH_PAGE_TARGET_LEARNER, request.url))
+    const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+    return withReferralCookie(sessionRes, refParam)
   }
 
   // ── Password Reset Update Mode (Recovery session in progress) ────────────
@@ -450,6 +498,18 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       )
     }
 
+    // 3. Google sign-ups must accept the Terms before using learner APIs.
+    if (!(await isAdmin()) && (await needsConsent())) {
+      const response = NextResponse.json(
+        {
+          error: 'Please accept the Terms and confirm your age before continuing.',
+          code: 'CONSENT_REQUIRED',
+        },
+        { status: 403 }
+      )
+      return newSession ? withSessionCookies(response, newSession) : response
+    }
+
     if (newSession) {
       return withReferralCookie(withSessionCookies(passThrough(request, requestId), newSession), refParam)
     }
@@ -488,6 +548,15 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       // Email verification enforcement
       if (productSettings.requireEmailVerification && !user.email_confirmed_at) {
         const response = NextResponse.redirect(new URL('/login?error=email_not_confirmed', request.url))
+        const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+        return withReferralCookie(sessionRes, refParam)
+      }
+
+      // Google sign-ups must accept the Terms before anything else, onboarding included.
+      if (await needsConsent()) {
+        const gateUrl = new URL(CONSENT_GATE_PAGE, request.url)
+        gateUrl.searchParams.set('next', path)
+        const response = NextResponse.redirect(gateUrl)
         const sessionRes = newSession ? withSessionCookies(response, newSession) : response
         return withReferralCookie(sessionRes, refParam)
       }

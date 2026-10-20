@@ -108,7 +108,6 @@ RESEND_FROM_EMAIL=welcome@prodily.app
 RESEND_WEBHOOK_SECRET=whsec_your_webhook_secret
 SEND_EMAIL_HOOK_SECRET=your_auth_hook_secret
 CRON_SECRET=your_cron_secret_token
-ADMIN_EMAILS=admin@example.com
 ```
 
 > [!CAUTION]
@@ -128,9 +127,9 @@ The **Prodily Admin Panel** is a centralized operational control center located 
   1. **Proxy Middleware (`proxy.ts`)**: Rejects unauthenticated requests and redirects non-admins to `/admin/login` or `/admin/access-denied`.
   2. **Server-Side Layout Guard (`app/admin/(console)/layout.tsx`)**: Re-verifies active session authorization via `isAdminUser()` before rendering the shell.
   3. **Server-Side API Guard (`requireAdminUser()`)**: Enforces admin authorization on 100% of `/api/admin/**` route handlers before executing database queries or mutations.
-- **Authorization Criteria**: A user is granted admin access if:
-  - Their email is listed in the comma-separated `ADMIN_EMAILS` environment variable; **OR**
-  - Their account has `is_admin = true` in the `public.users` PostgreSQL table.
+- **Authorization Criteria**: A user is an admin only if their row in `public.users` has `is_admin = true`. The proxy also trusts the server-signed `app_metadata.is_admin` claim as a fast path. There is no email allowlist: the old `ADMIN_EMAILS` environment variable is no longer used.
+- **Granting and removing access**: use the role toggle in the admin console (`/admin/users`). To migrate admins from the old `ADMIN_EMAILS` list, run the owner-only snippet [`supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql`](supabase/migrations/pending-approval/admin_backfill_from_admin_emails.sql) in the Supabase SQL editor before deploying.
+- **Deleting an admin**: the delete API refuses (403) to delete any account with `is_admin = true`. Demote the account first, then delete it.
 
 ### Core Workspaces & Capabilities
 
@@ -151,7 +150,7 @@ The Admin Console has 19 route folders; several are thin redirects into a unifie
 | **Settings** | `/admin/settings` | Product settings, runtime XP values, notification defaults, feature flag toggles, onboarding goal options. |
 
 ### Configuration & Security Considerations
-- **Environment**: Ensure `ADMIN_EMAILS` is configured with authorized administrator email addresses.
+- **Admin roster**: Admin status lives in the database (`users.is_admin`), not in an environment variable. Review the roster from `/admin/users`.
 - **Audit Logging**: All administrative actions (user role changes, progress resets, deletions, settings modifications, feature flag toggles, broadcasts, and email sends) automatically record structured metadata in `admin_audit_logs`.
 - **Search Engine Isolation**: The entire `/admin` route tree is marked with `robots: { index: false, follow: false }` to prevent indexing.
 

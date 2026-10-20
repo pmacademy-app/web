@@ -215,26 +215,17 @@ const HABITS: { label: ReactNode; line: string }[] = [
     label: (
       <>
         <TrackedLink
-          href="/glossary"
-          event="home_secondary_cta_click"
-          args={{ location: 'how_it_works', target: 'glossary' }}
-          className={HABIT_LINK}
-        >
-          Glossary
-        </TrackedLink>{' '}
-        and{' '}
-        <TrackedLink
           href="/frameworks"
           event="home_secondary_cta_click"
           args={{ location: 'how_it_works', target: 'frameworks' }}
           className={HABIT_LINK}
         >
-          frameworks
+          Frameworks
         </TrackedLink>
         .
       </>
     ),
-    line: 'Look up any term.',
+    line: 'Look up any framework.',
   },
 ]
 

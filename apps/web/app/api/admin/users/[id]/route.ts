@@ -2,7 +2,6 @@ import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { logAdminAction } from '@/lib/admin/guard'
-import { isAdminEmail } from '@/lib/admin/authorization'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
@@ -66,25 +65,13 @@ export const DELETE = withRoute(
         return NextResponse.json({ error: 'User not found.' }, { status: 404 })
       }
 
-      const targetIsAdmin = Boolean(targetUser.is_admin) || isAdminEmail(targetUser.email)
-      const actorIsSuperAdmin = isAdminEmail(admin.email)
-
-      // 3. Admin hierarchy protection
-      if (targetIsAdmin) {
-        // Prevent deletion of environment-configured superadmins
-        if (isAdminEmail(targetUser.email)) {
-          return NextResponse.json(
-            { error: 'Primary system administrators cannot be deleted via the API.' },
-            { status: 403 }
-          )
-        }
-        // Only superadmins can delete promoted database administrators
-        if (!actorIsSuperAdmin) {
-          return NextResponse.json(
-            { error: 'Superadmin privileges required to delete an administrator account.' },
-            { status: 403 }
-          )
-        }
+      // 3. Admin protection: no administrator account can be deleted through the API.
+      // An admin must be demoted (users.is_admin = false) before the account can be removed.
+      if (targetUser.is_admin === true) {
+        return NextResponse.json(
+          { error: 'Administrators cannot be deleted. Remove their admin access first.' },
+          { status: 403 }
+        )
       }
 
       // 4. Cascade delete application data (user tables, badges, certificates delinking, queue)

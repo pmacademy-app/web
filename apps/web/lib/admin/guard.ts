@@ -1,6 +1,5 @@
 import { createServiceRoleClient } from '../supabase'
 import { getAuthenticatedUserFromRequest } from '../auth'
-import { isAdminEmail } from './authorization'
 
 export interface AdminAuthResult {
   authorized: boolean
@@ -67,15 +66,10 @@ async function resolveRequireAdminUser(
     }
   }
 
-  // Evaluate Admin authorization: ADMIN_EMAILS env var OR database users.is_admin = true.
-  //
-  // The ADMIN_EMAILS match must use the identity from the verified auth session, never
-  // `users.email`: that column is an app profile field a signed-in learner can edit through
-  // PostgREST, so trusting it would let them claim an admin address.
-  const isEnvAdmin = isAdminEmail(authUser.email)
-  const isDbAdmin = Boolean(typedUserRow.is_admin)
-
-  const isAuthorizedAdmin = isEnvAdmin || isDbAdmin
+  // Admin authorization comes only from the database flag users.is_admin. No email address,
+  // from the auth session or from `users.email`, ever grants admin access. The flag is
+  // protected from self-promotion by the guard_privileged_user_columns trigger.
+  const isAuthorizedAdmin = typedUserRow.is_admin === true
 
   if (!isAuthorizedAdmin) {
     if (!options?.silent) {

@@ -6,15 +6,12 @@ import * as supabaseModule from '../supabase'
 import type { Database } from '@/lib/supabase'
 
 describe('Authentication & Session Lookup Deduplication', () => {
-  const originalEnv = process.env.ADMIN_EMAILS
-
   beforeEach(() => {
     vi.restoreAllMocks()
-    process.env.ADMIN_EMAILS = ''
   })
 
   afterEach(() => {
-    process.env.ADMIN_EMAILS = originalEnv
+    vi.restoreAllMocks()
   })
 
   describe('1. Request-Scoped API Auth Deduplication (WeakMap Cache)', () => {

@@ -26,6 +26,7 @@ const {
   mockSetSession,
   mockUpdateUser,
   mockEvaluateRateLimit,
+  mockGetUserById,
 } = vi.hoisted(() => ({
   mockCookieGet: vi.fn(),
   mockSignInWithPassword: vi.fn(),
@@ -35,6 +36,7 @@ const {
   mockSetSession: vi.fn(),
   mockUpdateUser: vi.fn(),
   mockEvaluateRateLimit: vi.fn(),
+  mockGetUserById: vi.fn(),
 }))
 
 vi.mock('next/headers', () => ({
@@ -60,6 +62,7 @@ vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(() => ({
     auth: {
       signInWithPassword: mockSignInWithPassword,
+      admin: { getUserById: mockGetUserById },
     },
     from: vi.fn(() => ({
       select: vi.fn(() => ({
@@ -88,6 +91,10 @@ import { POST, GET } from '../../app/api/settings/security/change-email/route'
 import * as authLib from '../auth'
 
 const mockUser = { id: 'usr_test_123', email: 'learner@example.com' }
+const googleOnly = {
+  data: { user: { ...mockUser, identities: [{ provider: 'google' }], app_metadata: { providers: ['google'] } } },
+  error: null,
+}
 
 function makeRequest(body: Record<string, unknown>) {
   return new Request('https://prodily.app/api/settings/security/change-email', {
@@ -108,6 +115,10 @@ describe('Change Email API Endpoint', () => {
     )
     mockEvaluateRateLimit.mockResolvedValue({ success: true, remaining: 4, resetInMs: 60000 })
     mockUsersEqMaybeSingle.mockResolvedValue({ data: null, error: null })
+    mockGetUserById.mockResolvedValue({
+      data: { user: { ...mockUser, identities: [{ provider: 'email' }], app_metadata: { providers: ['email'] } } },
+      error: null,
+    })
     mockCookieGet.mockImplementation((name: string) => {
       if (name === 'sb-access-token') return { value: 'valid-access-token' }
       if (name === 'sb-refresh-token') return { value: 'valid-refresh-token' }
@@ -122,6 +133,64 @@ describe('Change Email API Endpoint', () => {
     const json = await res.json()
     expect(json.success).toBe(true)
     expect(json.email).toBe('learner@example.com')
+    expect(json.hasPassword).toBe(true)
+  })
+
+  it('GET reports hasPassword false for a Google-only account', async () => {
+    mockGetUserById.mockResolvedValue(googleOnly)
+    const res = await GET(new Request('https://prodily.app/api/settings/security/change-email'))
+    expect((await res.json()).hasPassword).toBe(false)
+  })
+
+  it('GET reports hasPassword true for a Google account flagged password_set', async () => {
+    mockGetUserById.mockResolvedValue({
+      data: { user: { ...googleOnly.data.user, app_metadata: { providers: ['google'], password_set: true } } },
+      error: null,
+    })
+    const res = await GET(new Request('https://prodily.app/api/settings/security/change-email'))
+    expect((await res.json()).hasPassword).toBe(true)
+  })
+
+  it('GET reports hasPassword true when the identity lookup fails', async () => {
+    mockGetUserById.mockResolvedValue({ data: { user: null }, error: { message: 'boom' } })
+    const res = await GET(new Request('https://prodily.app/api/settings/security/change-email'))
+    expect((await res.json()).hasPassword).toBe(true)
+  })
+
+  it('Google-only account: missing current password returns 400 PASSWORD_NOT_SET', async () => {
+    mockGetUserById.mockResolvedValue(googleOnly)
+    const res = await POST(makeRequest({ newEmail: 'new@example.com' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.code).toBe('PASSWORD_NOT_SET')
+    expect(json.error).toBe('Your account signs in with Google. Set a password from the reset password link first.')
+  })
+
+  it('Google-only account: failed password check returns 400 PASSWORD_NOT_SET', async () => {
+    mockGetUserById.mockResolvedValue(googleOnly)
+    mockSignInWithPassword.mockResolvedValue({ data: { user: null, session: null }, error: { message: 'Invalid login credentials' } })
+    const res = await POST(makeRequest({ currentPassword: 'guess', newEmail: 'new@example.com' }))
+    expect(res.status).toBe(400)
+    expect((await res.json()).code).toBe('PASSWORD_NOT_SET')
+    expect(mockUpdateUser).not.toHaveBeenCalled()
+  })
+
+  it('Google user who set a password via reset can change email', async () => {
+    mockGetUserById.mockResolvedValue(googleOnly)
+    mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
+    mockSetSession.mockResolvedValue({ data: {}, error: null })
+    mockUpdateUser.mockResolvedValue({ data: { user: mockUser }, error: null })
+    const res = await POST(makeRequest({ currentPassword: 'resetPassword123', newEmail: 'new@example.com' }))
+    expect(res.status).toBe(200)
+  })
+
+  it('getUserById error falls back to the incorrect-password message', async () => {
+    mockGetUserById.mockResolvedValue({ data: { user: null }, error: { message: 'boom' } })
+    mockSignInWithPassword.mockResolvedValue({ data: { user: null, session: null }, error: { message: 'Invalid login credentials' } })
+    const res = await POST(makeRequest({ currentPassword: 'guess', newEmail: 'new@example.com' }))
+    const json = await res.json()
+    expect(json.code).toBeUndefined()
+    expect(json.error).toBe('Current password is incorrect.')
   })
 
   it('GET rejects unauthenticated requests with 401', async () => {

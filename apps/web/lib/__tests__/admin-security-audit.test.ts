@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { User, SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminUser, logAdminAction } from '../admin/guard'
-import { isAdminEmail, isAdminUser } from '../admin/authorization'
+import { isAdminUser } from '../admin/authorization'
 import * as authModule from '../auth'
 import * as supabaseModule from '../supabase'
 import { GET as searchGet } from '@/app/api/admin/search/route'
@@ -9,15 +9,12 @@ import { NextRequest } from 'next/server'
 import type { Database } from '@/lib/supabase'
 
 describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests', () => {
-  const originalEnv = process.env.ADMIN_EMAILS
-
   beforeEach(() => {
     vi.restoreAllMocks()
-    process.env.ADMIN_EMAILS = ''
   })
 
   afterEach(() => {
-    process.env.ADMIN_EMAILS = originalEnv
+    vi.restoreAllMocks()
   })
 
   it('requireAdminUser rejects unauthenticated requests with 401', async () => {
@@ -67,7 +64,7 @@ describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests',
     expect(result.error).toContain('Admin privileges required')
   })
 
-  it('requireAdminUser authorizes valid admin users via email or database flag', async () => {
+  it('requireAdminUser authorizes admin users via the users.is_admin database flag', async () => {
     const mockAdmin: User = {
       id: 'usr-admin',
       email: 'superadmin@prodily.app',
@@ -78,8 +75,6 @@ describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests',
     }
 
     vi.spyOn(authModule, 'getAuthenticatedUserFromRequest').mockResolvedValue(mockAdmin)
-
-    process.env.ADMIN_EMAILS = 'superadmin@prodily.app'
 
     const mockClient = {
       from: () => ({
@@ -104,19 +99,7 @@ describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests',
     expect(result.email).toBe('superadmin@prodily.app')
   })
 
-  it('isAdminEmail correctly parses comma-separated lists and handles case insensitivity', () => {
-    process.env.ADMIN_EMAILS = 'lead@prodily.app, manager@prodily.app, CEO@PRODILY.APP'
-
-    expect(isAdminEmail('lead@prodily.app')).toBe(true)
-    expect(isAdminEmail('LEAD@prodily.app')).toBe(true)
-    expect(isAdminEmail('manager@prodily.app')).toBe(true)
-    expect(isAdminEmail('ceo@prodily.app')).toBe(true)
-    expect(isAdminEmail('learner@prodily.app')).toBe(false)
-    expect(isAdminEmail('')).toBe(false)
-    expect(isAdminEmail(null)).toBe(false)
-  })
-
-  it('isAdminUser evaluates database is_admin when email is not in env list', async () => {
+  it('isAdminUser evaluates only the database is_admin flag', async () => {
     const mockAdminClient = {
       from: () => ({
         select: () => ({
@@ -137,8 +120,29 @@ describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests',
       }),
     } as unknown as SupabaseClient<Database>
 
-    expect(await isAdminUser(mockAdminClient, 'usr-admin', 'admin@example.com')).toBe(true)
-    expect(await isAdminUser(mockLearnerClient, 'usr-learner', 'learner@example.com')).toBe(false)
+    expect(await isAdminUser(mockAdminClient, 'usr-admin')).toBe(true)
+    expect(await isAdminUser(mockLearnerClient, 'usr-learner')).toBe(false)
+  })
+
+  it('isAdminUser denies a listed legacy env email when users.is_admin is false', async () => {
+    const originalEnv = process.env.ADMIN_EMAILS
+    process.env.ADMIN_EMAILS = 'admin@prodily.app'
+    try {
+      const client = {
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({ data: { is_admin: false }, error: null }),
+            }),
+          }),
+        }),
+      } as unknown as SupabaseClient<Database>
+
+      expect(await isAdminUser(client, 'usr-former-env-admin')).toBe(false)
+    } finally {
+      if (originalEnv === undefined) delete process.env.ADMIN_EMAILS
+      else process.env.ADMIN_EMAILS = originalEnv
+    }
   })
 
   it('logAdminAction writes audit records to admin_audit_logs with structured metadata', async () => {
@@ -200,8 +204,6 @@ describe('Phase 7 — Admin Security, Authorization & Audit Logging Unit Tests',
   })
 
   it('GET /api/admin/search returns empty category arrays when query is too short', async () => {
-    process.env.ADMIN_EMAILS = 'admin@prodily.app'
-
     const mockAdmin: User = {
       id: 'admin-id',
       email: 'admin@prodily.app',

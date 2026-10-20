@@ -32,11 +32,16 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
   const mockSignInWithPassword = vi.fn()
   const mockUpdateUserById = vi.fn()
   const mockAdminSignOut = vi.fn()
+  const mockGetUserById = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
     mockEvaluatePersistentRateLimit.mockResolvedValue({ success: true, remaining: 4, resetInMs: 900000 })
     mockAdminSignOut.mockResolvedValue({ data: null, error: null })
+    mockGetUserById.mockResolvedValue({
+      data: { user: { ...mockUser, identities: [{ provider: 'email' }], app_metadata: { providers: ['email'] } } },
+      error: null,
+    })
     vi.mocked(authLib.getAuthenticatedUserFromRequest).mockResolvedValue(
       mockUser as unknown as import('@supabase/supabase-js').User
     )
@@ -46,6 +51,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
         admin: {
           updateUserById: mockUpdateUserById,
           signOut: mockAdminSignOut,
+          getUserById: mockGetUserById,
         },
       },
     } as unknown as ReturnType<typeof supabaseLib.createServiceRoleClient>)
@@ -197,6 +203,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
 
     expect(mockUpdateUserById).toHaveBeenCalledWith('usr_test_123', {
       password: 'freshNewPassword456',
+      app_metadata: { password_set: true },
     })
 
     // D-3 audit fix: every other session/refresh token for this user is revoked,
@@ -317,5 +324,83 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.success).toBe(true)
+  })
+
+  describe('Google-only accounts (no password identity)', () => {
+    const googleOnly = {
+      data: { user: { ...mockUser, identities: [{ provider: 'google' }], app_metadata: { providers: ['google'] } } },
+      error: null,
+    }
+    const invalidLogin = { data: { user: null, session: null }, error: { message: 'Invalid login credentials' } }
+
+    function changeRequest(body: Record<string, unknown>) {
+      return new Request('https://prodily.app/api/settings/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    }
+
+    it('11. returns 400 PASSWORD_NOT_SET when the current password check fails', async () => {
+      mockGetUserById.mockResolvedValue(googleOnly)
+      mockSignInWithPassword.mockResolvedValue(invalidLogin)
+
+      const res = await POST(changeRequest({ currentPassword: 'guess', newPassword: 'freshNewPassword456' }))
+      expect(res.status).toBe(400)
+      const json = await res.json()
+      expect(json.code).toBe('PASSWORD_NOT_SET')
+      expect(json.error).toBe('Your account signs in with Google. Set a password from the reset password link first.')
+      expect(mockUpdateUserById).not.toHaveBeenCalled()
+    })
+
+    it('12. returns 400 PASSWORD_NOT_SET when no current password is sent', async () => {
+      mockGetUserById.mockResolvedValue(googleOnly)
+
+      const res = await POST(changeRequest({ newPassword: 'freshNewPassword456' }))
+      expect(res.status).toBe(400)
+      expect((await res.json()).code).toBe('PASSWORD_NOT_SET')
+      expect(mockSignInWithPassword).not.toHaveBeenCalled()
+    })
+
+    it('13. a Google user who set a password via reset succeeds without an identity lookup', async () => {
+      mockGetUserById.mockResolvedValue(googleOnly)
+      mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
+      mockUpdateUserById.mockResolvedValue({ data: { user: mockUser }, error: null })
+
+      const res = await POST(changeRequest({ currentPassword: 'resetPassword123', newPassword: 'freshNewPassword456' }))
+      expect(res.status).toBe(200)
+      expect(mockGetUserById).not.toHaveBeenCalled()
+    })
+
+    it('14. a getUserById error falls back to the old incorrect-password message', async () => {
+      mockGetUserById.mockResolvedValue({ data: { user: null }, error: { message: 'boom' } })
+      mockSignInWithPassword.mockResolvedValue(invalidLogin)
+
+      const res = await POST(changeRequest({ currentPassword: 'guess', newPassword: 'freshNewPassword456' }))
+      expect(res.status).toBe(400)
+      const json = await res.json()
+      expect(json.code).toBeUndefined()
+      expect(json.error).toBe('Current password is incorrect.')
+    })
+
+    it('16. a Google account flagged password_set gets the incorrect-password message, not PASSWORD_NOT_SET', async () => {
+      mockGetUserById.mockResolvedValue({
+        data: { user: { ...googleOnly.data.user, app_metadata: { providers: ['google'], password_set: true } } },
+        error: null,
+      })
+      mockSignInWithPassword.mockResolvedValue(invalidLogin)
+
+      const res = await POST(changeRequest({ currentPassword: 'typo', newPassword: 'freshNewPassword456' }))
+      const json = await res.json()
+      expect(json.code).toBeUndefined()
+      expect(json.error).toBe('Current password is incorrect.')
+    })
+
+    it('15. password accounts keep the incorrect-password message', async () => {
+      mockSignInWithPassword.mockResolvedValue(invalidLogin)
+
+      const res = await POST(changeRequest({ currentPassword: 'guess', newPassword: 'freshNewPassword456' }))
+      expect((await res.json()).error).toBe('Current password is incorrect.')
+    })
   })
 })

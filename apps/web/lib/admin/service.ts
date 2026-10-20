@@ -959,17 +959,70 @@ export class AdminConsoleService {
   /**
    * Toggles the admin status of a target user.
    *
+   * Returns:
+   * - 'updated' when a row matched and was written,
+   * - 'not_found' when no users row has that id,
+   * - 'last_admin' when the demotion would leave zero users with is_admin = true,
+   * - 'failed' on any read or write error (fail closed: nothing is assumed written).
+   *
+   * Residual race: the last-admin check and the update are two statements, not one
+   * transaction. Two admins demoting each other at the same moment can both pass the
+   * check and leave zero admins. Recovery is the owner-run backfill snippet in
+   * supabase/migrations/pending-approval/. Closing it fully needs a DB-side guard.
+   *
    * Note: the `users` table has no `updated_at` column, so the update payload
    * only touches `is_admin` (writing `updated_at` would fail the whole update).
    */
-  public static async toggleUserAdminRole(targetUserId: string, makeAdmin: boolean): Promise<boolean> {
+  public static async toggleUserAdminRole(
+    targetUserId: string,
+    makeAdmin: boolean
+  ): Promise<'updated' | 'not_found' | 'last_admin' | 'failed'> {
     const supabase = createServiceRoleClient()
-    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
-    const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
+
+    if (!makeAdmin) {
+      type TargetChain = {
+        select: (cols: string) => {
+          eq: (col: string, val: string) => {
+            maybeSingle: () => Promise<{ data: { id: string; is_admin: boolean | null } | null; error: unknown }>
+          }
+        }
+      }
+      const { data: target, error: targetError } = await (supabase.from('users') as unknown as TargetChain)
+        .select('id, is_admin')
+        .eq('id', targetUserId)
+        .maybeSingle()
+      if (targetError) return 'failed'
+      if (!target) return 'not_found'
+
+      if (target.is_admin === true) {
+        type CountChain = {
+          select: (cols: string, opts: { count: 'exact'; head: true }) => {
+            eq: (col: string, val: boolean) => Promise<{ count: number | null; error: unknown }>
+          }
+        }
+        const { count, error: countError } = await (supabase.from('users') as unknown as CountChain)
+          .select('id', { count: 'exact', head: true })
+          .eq('is_admin', true)
+        if (countError || count === null) return 'failed'
+        if (count <= 1) return 'last_admin'
+      }
+    }
+
+    type DBUpdateChain = {
+      update: (data: Record<string, unknown>) => {
+        eq: (col: string, val: string) => {
+          select: (cols: string) => Promise<{ data: Array<{ id: string }> | null; error: unknown }>
+        }
+      }
+    }
+    const { data, error } = await (supabase.from('users') as unknown as DBUpdateChain)
       .update({ is_admin: makeAdmin })
       .eq('id', targetUserId)
+      .select('id')
 
-    return !error
+    if (error) return 'failed'
+    if (!data || data.length === 0) return 'not_found'
+    return 'updated'
   }
 
   /**

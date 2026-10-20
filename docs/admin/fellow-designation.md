@@ -24,7 +24,7 @@ Both paths existed side-by-side in the codebase as of this writing, with no depr
 - **Path A (requests):** `/admin/moderation` → **Fellow Requests** tab.
 - **Path B (legacy browse):** `/admin/moderation` → **Portfolio Verification** tab (`?tab=portfolios`). `/admin/portfolios` redirects here.
 - **Path C (direct toggle):** `/admin/users/[id]` → `UserFellowToggle` in the User Detail Drawer.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`) for all three.
+- **Permissions:** Admin role required (`users.is_admin = true`; there is no email allowlist) for all three.
 
 ---
 

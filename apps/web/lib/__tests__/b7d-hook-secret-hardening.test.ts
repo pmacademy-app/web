@@ -260,7 +260,10 @@ describe('B7-D — auth route migration scope', () => {
   it('migrates exactly the eight eligible auth routes', () => {
     const auth = routeFilesImporting('@/lib/api/with-route').filter((f) => f.startsWith('auth/'))
 
+    // Google sign-in later added auth/complete-consent and auth/google, both wrapped.
     expect(auth).toEqual([
+      'auth/complete-consent/route.ts',
+      'auth/google/route.ts',
       'auth/login/route.ts',
       'auth/logout/route.ts',
       'auth/refresh/route.ts',
@@ -293,7 +296,8 @@ describe('B7-D — auth route migration scope', () => {
   it('migrated exactly the eight auth routes in this wave', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
-    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
+    // 8 from this wave plus the 2 Google sign-in routes.
+    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(10)
   })
 
   it('every migrated auth route declares an explicit actor policy', () => {
