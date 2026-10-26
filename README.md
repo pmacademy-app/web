@@ -2,6 +2,8 @@
 
 Welcome to the **Prodily PM Academy** workspace (**Prodily** is the brand, **PM Academy** is the flagship product). This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, testing, and deployment workflows.
 
+Built by [Aditya Gangwani](https://adityagangwani.me/hire)
+
 ---
 
 ## 1. Project Overview & Scope
