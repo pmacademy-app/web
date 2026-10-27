@@ -1186,6 +1186,17 @@ describe('claimNextAchievementCelebration — modules', () => {
 })
 
 describe('POST /api/notifications/celebrations', () => {
+  // The route reads the real clock, so pin it to the fixtures' NOW. Without this the
+  // seeded notifications age past the recency window once NOW is far enough in the past.
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(NOW)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   const request = (body?: unknown) =>
     new Request(`https://prodily.app${ACHIEVEMENT_CELEBRATIONS_PATH}`, {
       method: 'POST',
