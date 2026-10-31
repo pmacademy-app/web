@@ -14,7 +14,7 @@
     "content:build": "node scripts/compile-content.js",
     "brand:generate": "npx tsx ../../scripts/brand/generate-assets.ts",
     "test:compiler": "cross-env NODE_PATH=./node_modules npx tsx ../../scripts/compiler/tests/compiler.test.ts",
-    "test:parity": "cross-env NODE_PATH=./node_modules npx tsx ../../scripts/compiler/tests/compare-v1-v2.ts",
+
     "test:xp": "vitest run lib/__tests__/xp.test.ts",
     "test:streaks": "vitest run lib/__tests__/streaks.test.ts",
     "test:radar": "vitest run lib/__tests__/skillRadar.test.ts",
@@ -54,7 +54,7 @@
     "test:middleware-auth": "vitest run lib/__tests__/middleware-auth.test.ts",
     "test:baseline": "vitest run lib/__tests__/baseline-aggregation.test.ts",
     "baseline:report": "npx tsx scripts/baseline-report.ts",
-    "benchmark": "npx tsx ../../scripts/benchmark-concurrency.ts",
+
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:a11y": "vitest run lib/__tests__/b11c-accessibility-gate.test.ts",
@@ -73,16 +73,16 @@
     "@supabase/supabase-js": "^2.110.8",
     "@types/qrcode": "^1.5.6",
     "@vercel/analytics": "^2.0.1",
-    "bail": "^2.0.2",
+
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
-    "hermes-parser": "^0.37.0",
+
     "isomorphic-dompurify": "^4.1.0",
-    "lightningcss": "^1.33.0",
+
     "lucide-react": "^1.27.0",
     "marked": "^18.0.7",
-    "mdn-data": "^2.33.0",
+
     "next": "16.4.3",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
@@ -100,12 +100,12 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@emnapi/core": "^1.11.3",
-    "@emnapi/runtime": "^1.11.3",
+
+
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/jsdom": "^30.0.0",
-    "@types/mdast": "^4.0.4",
+
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

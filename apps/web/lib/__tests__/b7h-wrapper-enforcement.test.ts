@@ -201,9 +201,9 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // the lifecycle job) and `admin/cache/revalidate/route.ts` (admin cache refresh), both on `withRoute`.
   // 135 since Google sign-in added `auth/google/route.ts` (starts the OAuth flow) and
   // `auth/complete-consent/route.ts` (the consent gate's answer), both on `withRoute`.
-  it('accounts for all 135 routes', () => {
-    expect(files).toHaveLength(135)
-    expect(migrated).toHaveLength(132)
+  it('accounts for all 133 routes', () => {
+    expect(files).toHaveLength(133)
+    expect(migrated).toHaveLength(130)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
@@ -223,7 +223,7 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     // 10 auth routes since Google sign-in added auth/google and auth/complete-consent.
     expect(inGroup('auth/')).toBe(10)
     expect(inGroup('settings/')).toBe(11)
-    expect(inGroup('admin/')).toBe(63)
+    expect(inGroup('admin/')).toBe(62)
   })
 
   it('leaves no route resolving admin authorization by hand', () => {
