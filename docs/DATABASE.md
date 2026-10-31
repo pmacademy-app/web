@@ -67,6 +67,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
 | `20260908000002_quota_key_utc.sql` | Pins `increment_daily_email_quota()` and `get_current_daily_email_count()` to the UTC day, matching the application side |
 | `20260923000001_signup_legal_consent.sql` | Signup consent columns on `public.users` (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum`) — all nullable, no backfill: NULL means the account predates consent capture and is **not** retroactively blocked |
+| `20261031000001_phase3_drop_unused_tables.sql` | Phase 3 dead code pruning: drops unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and unused RPC `sync_user_xp(uuid)`. |
 
 ---
 
@@ -81,7 +82,7 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.reflections`** — Qualitative learner reflections on lesson theory. (Previously mislabeled `user_reflections` in this doc.)
 - **`public.quiz_attempts`** — Individual quiz attempt records.
 - **`public.user_flashcard_srs`** — SM-2 spaced-repetition state per learner/flashcard.
-- **`public.bookmarks`** — Learner-saved lesson/framework bookmarks.
+- **`public.bookmarks`** — (Dropped in Phase 3 migration `20261031000001`)
 - **`public.badges`** — Badge catalog/definitions. **`public.user_badges`** — Per-user badge award rows.
 - **`public.capstone_submissions`** — Module capstone deliverables with moderation review status and per-submission `is_public` opt-out.
 

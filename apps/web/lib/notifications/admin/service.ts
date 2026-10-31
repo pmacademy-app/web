@@ -70,7 +70,7 @@ export class AdminFoundationService implements NotificationAdminServices {
         supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
         supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'processing'),
         supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
-        supabase.from('email_dead_letter').select('id', { count: 'exact', head: true }),
+        supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'dead_letter'),
       ])
 
       const rawItems = (itemsRes.data as Array<Record<string, unknown>>) || []
@@ -156,13 +156,34 @@ export class AdminFoundationService implements NotificationAdminServices {
     try {
       const supabase = createServiceRoleClient()
       const { data } = await supabase
-        .from('user_notification_timeline')
+        .from('email_queue')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(limit || 50)
 
-      if (data) return data as unknown as UserNotificationTimelineRecord[]
+      if (data) {
+        return (data as Array<Record<string, unknown>>).map((r) => ({
+          id: `tl-${r.id}`,
+          userId: String(r.user_id || ''),
+          eventId: r.event_id ? String(r.event_id) : undefined,
+          channel: 'email' as const,
+          templateKey: String(r.template_key || ''),
+          templateVersion: 1,
+          status: (r.status as QueueStatus) || 'pending',
+          priority: 'medium' as const,
+          queuedAt: String(r.created_at || new Date().toISOString()),
+          sentAt: r.processing_at ? String(r.processing_at) : undefined,
+          deliveredAt: r.delivered_at ? String(r.delivered_at) : undefined,
+          failedAt: r.failed_at ? String(r.failed_at) : undefined,
+          errorDetails: r.last_error ? String(r.last_error) : undefined,
+          resendId: r.resend_id ? String(r.resend_id) : undefined,
+          metadata: {
+            eventType: r.event_type || 'custom',
+          },
+          createdAt: String(r.created_at || new Date().toISOString()),
+        }))
+      }
     } catch (e) {
       console.error('[AdminFoundationService] Error querying user timeline:', e)
     }
