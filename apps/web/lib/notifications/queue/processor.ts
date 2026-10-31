@@ -31,6 +31,17 @@ export const DEFAULT_DISPATCH_CONCURRENCY = 5
 /** Maximum execution duration per batch invocation to guarantee completion within serverless bounds. */
 export const MAX_BATCH_EXECUTION_MS = 90_000 // 90 seconds
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+/**
+ * The value `email_queue.event_id` holds for an event id. The column is a uuid foreign
+ * key, so only a UUID is stored; any other id (most dispatcher ids are strings such as
+ * `badge-<user>-<key>`) is stored as null.
+ */
+function toStoredEventId(eventId: string | undefined): string | null {
+  return eventId && UUID_PATTERN.test(eventId) ? eventId : null
+}
+
 /**
  * Chains .eq('status', 'processing') if the query builder supports chained filters.
  * Mocks in unit tests that return plain non-builder promises will cleanly proceed without throwing.
@@ -170,40 +181,58 @@ export async function enqueueNotificationItem(
   if (params.idempotencyKey) {
     // Intentionally no SELECT here. Fall through to the insert.
   } else if (params.broadcastId) {
+    // `.limit(1)` keeps `.maybeSingle()` from erroring once two rows exist; without it
+    // the error was discarded and every later attempt inserted another copy (CQ-04).
     try {
-      const { data: rawExistingBroadcast } = await supabase
+      const { data: existingBroadcast, error: broadcastReadError } = await supabase
         .from('email_queue')
         .select('id')
         .eq('broadcast_id', params.broadcastId)
         .eq('user_id', params.userId)
+        .limit(1)
         .maybeSingle()
 
-      const existingB = rawExistingBroadcast as { id: string } | null
-      if (existingB && existingB.id) {
+      if (broadcastReadError) {
+        log.warn('queue.dedupe_read_failed', { branch: 'broadcast', reason: broadcastReadError.message })
+      } else if (existingBroadcast?.id) {
         await recordSkippedEvent(supabase, params, 'duplicate_broadcast_user')
-        return { success: false, duplicate: true, reason: 'Duplicate notification for broadcast already queued or delivered', queueId: existingB.id }
+        return { success: false, duplicate: true, reason: 'Duplicate notification for broadcast already queued or delivered', queueId: existingBroadcast.id }
       }
-    } catch {
+    } catch (err) {
       // Fall through to insert
+      log.warnException('queue.dedupe_read_failed', err, { branch: 'broadcast' })
     }
   } else if (params.eventId) {
+    // `email_queue.event_id` is a uuid column and only a UUID event id is ever stored
+    // (see the insert below), so the event id can only narrow the match when it is one.
+    // Other ids keep the (user, template, event type) match. Either way `.limit(1)`
+    // stops `.maybeSingle()` erroring on two or more rows and falling through to a
+    // duplicate insert (CQ-04).
+    const storedEventId = toStoredEventId(params.eventId)
     try {
-      const { data: rawExisting } = await supabase
+      let existingQuery = supabase
         .from('email_queue')
         .select('id')
         .eq('user_id', params.userId)
         .eq('template_key', params.templateKey)
         .eq('event_type', params.eventType)
+      if (storedEventId) {
+        existingQuery = existingQuery.eq('event_id', storedEventId)
+      }
+      const { data: existing, error: eventReadError } = await existingQuery
         .in('status', ['pending', 'processing', 'delivered'])
+        .limit(1)
         .maybeSingle()
 
-      const existing = rawExisting as { id: string } | null
-      if (existing && existing.id) {
+      if (eventReadError) {
+        log.warn('queue.dedupe_read_failed', { branch: 'event', reason: eventReadError.message })
+      } else if (existing?.id) {
         await recordSkippedEvent(supabase, params, 'duplicate_event_id')
         return { success: false, duplicate: true, reason: 'Duplicate notification event already queued or delivered', queueId: existing.id }
       }
-    } catch {
+    } catch (err) {
       // Fall through to insert if table query has temporary glitch
+      log.warnException('queue.dedupe_read_failed', err, { branch: 'event' })
     }
   }
 
@@ -218,7 +247,7 @@ export async function enqueueNotificationItem(
         to_name: params.toName || null,
         template_key: params.templateKey,
         template_variables: (params.templateVariables as unknown as import('@/lib/supabase').Json),
-        event_id: (params.eventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(params.eventId)) ? params.eventId : null,
+        event_id: toStoredEventId(params.eventId),
         event_type: params.eventType,
         priority: priorityDef.numericValue,
         status: 'pending',
@@ -507,7 +536,7 @@ async function processSingleBatch(
       })
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
-        void logErrorReport({
+        await logErrorReport({
           domain: 'queue',
           kind: 'config_missing',
           operation: 'queue.claim_rpc_unavailable',
@@ -789,8 +818,10 @@ async function processSingleBatch(
   // Operational Alert: repeated provider failures in a single batch
   if (failedCount >= 5) {
     try {
+      // Awaited: on a serverless runtime an un-awaited log can be dropped when the
+      // invocation ends, and this is the alert that says the provider is failing (CQ-13).
       const { logSystemError } = await import('@/lib/monitoring/logger')
-      void logSystemError({
+      await logSystemError({
         severity: 'error',
         category: 'queue',
         operation: 'email.repeated_provider_failures',
@@ -869,7 +900,7 @@ export async function processEmailQueue(
     if (!error && typeof count === 'number' && count > 200) {
       log.warn('queue.backlog_growth_detected', { backlogCount: count })
       const { logSystemError } = await import('@/lib/monitoring/logger')
-      void logSystemError({
+      await logSystemError({
         severity: 'warning',
         category: 'queue',
         operation: 'queue_backlog_growth',
@@ -1007,7 +1038,7 @@ async function handlePermanentFailure(
 
   try {
     const { logErrorReport } = await import('@/lib/monitoring/logger')
-    void logErrorReport({
+    await logErrorReport({
       domain: 'queue',
       kind: 'provider_rejected',
       operation: 'queue.dead_letter',

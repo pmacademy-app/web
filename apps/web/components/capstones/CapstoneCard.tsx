@@ -86,7 +86,7 @@ export function CapstoneCard({ item }: CapstoneCardProps) {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-              Module {String(moduleNumber).padStart(2, '0')}
+              Module {moduleNumber}
             </span>
             <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
               <Clock className="w-3 h-3" /> {estimatedHours}

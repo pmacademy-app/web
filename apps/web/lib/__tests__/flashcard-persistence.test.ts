@@ -93,6 +93,10 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
             filters[field] = val
             return queryBuilder
           }),
+          gte: vi.fn().mockImplementation((field: string, val: unknown) => {
+            filters[`${field}_gte`] = val
+            return queryBuilder
+          }),
           single: vi.fn().mockImplementation(async () => {
             if (currentFilterTable === 'users') {
               return { data: { timezone: 'UTC' }, error: null }
@@ -146,18 +150,18 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
               if (filters.status) {
                 rows = rows.filter((r) => r.status === filters.status)
               }
-              return resolve({ data: rows, error: null })
+              return resolve({ data: rows, count: rows.length, error: null })
             }
             if (currentFilterTable === 'user_flashcard_srs') {
               const rows = mockStore.srs.filter((r) => r.user_id === filters.user_id)
-              return resolve({ data: rows, error: null })
+              return resolve({ data: rows, count: rows.length, error: null })
             }
             if (currentFilterTable === 'xp_events') {
               let rows = mockStore.xpEvents.filter((r) => r.user_id === filters.user_id)
               if (filters.source_type) {
                 rows = rows.filter((r) => r.source_type === filters.source_type)
               }
-              return resolve({ data: rows, error: null })
+              return resolve({ data: rows, count: rows.length, error: null })
             }
             return resolve({ data: [], error: null })
           }),

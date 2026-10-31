@@ -121,8 +121,8 @@ describe('GoogleButton', () => {
 })
 
 describe('auth pages wire Google sign-in behind the flag', () => {
-  const signupSrc = read('app/(auth)/signup/page.tsx')
-  const loginSrc = read('app/(auth)/login/page.tsx')
+  const signupSrc = read('app/(auth)/signup/SignupForm.tsx')
+  const loginSrc = read('app/(auth)/login/LoginForm.tsx')
 
   it('signup gates the button on both consent fields', () => {
     expect(signupSrc).toContain('isGoogleAuthEnabled()')
@@ -165,6 +165,9 @@ describe('auth pages wire Google sign-in behind the flag', () => {
   it('auth page copy has no em-dashes', () => {
     for (const rel of [
       'app/(auth)/login/page.tsx',
+      'app/(auth)/login/LoginForm.tsx',
+      'app/(auth)/signup/page.tsx',
+      'app/(auth)/signup/SignupForm.tsx',
       'components/auth/GoogleButton.tsx',
       'components/auth/LegalConsentFields.tsx',
       'lib/auth/google-auth.ts',

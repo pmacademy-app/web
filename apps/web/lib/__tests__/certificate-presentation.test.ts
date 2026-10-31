@@ -53,7 +53,7 @@ describe('getCertificatePresentation', () => {
   it('words a TEST certificate as a test, not shareable', () => {
     expect(getCertificatePresentation(TEST_CODE)).toEqual({
       isTest: true,
-      statusLabel: 'Test certificate — not a valid credential',
+      statusLabel: 'Test certificate (not a valid credential)',
       isShareableCredential: false,
     })
   })

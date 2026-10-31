@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Shield, ArrowRight } from 'lucide-react'
-import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
+import { getAllCapstoneDefinitions } from '@/config/capstones'
 
 interface CapstonesOverviewCardProps {
   capstoneStatusByModule: Map<string, string>
@@ -26,7 +26,7 @@ export function CapstonesOverviewCard({ capstoneStatusByModule }: CapstonesOverv
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {Object.values(CAPSTONE_DEFINITIONS).map((cap) => {
+        {getAllCapstoneDefinitions().map((cap) => {
           const status = capstoneStatusByModule.get(cap.moduleSlug) || 'not_started'
           const isDone = status === 'submitted' || status === 'reviewed'
 

@@ -302,7 +302,7 @@ function mulberry32(seed: number): () => number {
  *     quiz, and there is no client/server hydration mismatch (the server picks; the client
  *     renders exactly what it was given);
  *   - the full 15-question bank is preserved on disk and the server still validates every
- *     submitted answer against all 15 (`recordQuizAttemptAction`), so answer validation and
+ *     submitted answer against all 15 (`submitQuizAttempt`), so answer validation and
  *     completion semantics are unchanged;
  *   - different learners get different (overlapping) samples, so the other 10 questions
  *     serve as variety across the cohort and as review material, rather than being deleted.

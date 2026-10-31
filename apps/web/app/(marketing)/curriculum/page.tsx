@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { MODULES } from '@/config/content'
 import { BRAND } from '@/lib/brand'
+import { MODULE_META_LIST, formatModuleHours } from '@/lib/curriculum/module-meta'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getCourseSchema } from '@/lib/schema'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
@@ -36,21 +36,6 @@ export const metadata: Metadata = {
   },
 }
 
-function getModuleSlugByNumber(num: number): string {
-  const map: Record<number, string> = {
-    1: 'foundations',
-    2: 'discovery',
-    3: 'strategy',
-    4: 'execution',
-    5: 'design',
-    6: 'growth',
-    7: 'technical',
-    8: 'leadership',
-    9: 'capstone',
-  }
-  return map[num] ?? `module-${num}`
-}
-
 export default async function CurriculumPage() {
   const [curriculumData, courseSchema] = await Promise.all([
     fetchCurriculumData(),
@@ -58,6 +43,8 @@ export default async function CurriculumPage() {
   ])
 
   const allLessons = curriculumData?.lessons ?? []
+  // Global lesson number (URL order) keyed by slug, so grouping by module keeps 1 to 90.
+  const globalOrderBySlug = new Map(allLessons.map((lesson, idx) => [lesson.slug, idx + 1]))
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-5xl space-y-12">
@@ -82,12 +69,11 @@ export default async function CurriculumPage() {
         </p>
       </div>
 
-      {/* 9 Modules List with All 90 Direct Lesson Links */}
+      {/* 9 Modules List with All 90 Direct Lesson Links, grouped by each lesson's own module */}
       <div className="space-y-10">
-        {MODULES.map((module) => {
-          const moduleSlug = getModuleSlugByNumber(module.number)
-          const startIdx = (module.number - 1) * 10
-          const moduleLessons = allLessons.slice(startIdx, startIdx + 10)
+        {MODULE_META_LIST.map((module) => {
+          const moduleSlug = module.slug
+          const moduleLessons = allLessons.filter((lesson) => lesson.module === moduleSlug)
 
           return (
             <section
@@ -104,7 +90,7 @@ export default async function CurriculumPage() {
                   </div>
                   <div>
                     <span className="text-xs font-mono uppercase tracking-wider font-bold text-ink-muted">
-                      Module {String(module.number).padStart(2, '0')}
+                      Module {module.number}
                     </span>
                     <h2
                       id={`heading-module-${module.number}`}
@@ -112,17 +98,20 @@ export default async function CurriculumPage() {
                     >
                       {module.title}
                     </h2>
+                    <p className="text-sm text-ink-muted leading-relaxed mt-1.5 max-w-2xl">
+                      {module.description}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-xs md:text-sm text-ink-muted font-medium">
                   <span className="flex items-center gap-1 font-mono">
                     <Clock className="w-3.5 h-3.5 text-primary" />
-                    {module.estimatedTime}
+                    {formatModuleHours(module.estimatedMinutes)}
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1 font-mono">
                     <BookOpen className="w-3.5 h-3.5 text-primary" />
-                    10 Lessons
+                    {module.lessonCount} Lessons
                   </span>
                 </div>
               </div>
@@ -145,15 +134,15 @@ export default async function CurriculumPage() {
                 </div>
               </div>
 
-              {/* All 10 Lessons Grid for this Module */}
+              {/* Lessons grid for this module */}
               <div className="pt-6 space-y-3">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-3">
-                  Module Lessons (10 Direct Links)
+                  Module Lessons
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {moduleLessons.map((lesson, idx) => {
-                    const globalOrder = startIdx + idx + 1
+                  {moduleLessons.map((lesson) => {
+                    const globalOrder = globalOrderBySlug.get(lesson.slug) ?? lesson.order
                     return (
                       <Link
                         key={lesson.id || lesson.slug}

@@ -269,7 +269,7 @@ function thenableBuilder(result: { data: unknown; error: unknown }) {
 
 function makeUser(n: number) {
   const id = `u-${String(n).padStart(4, '0')}`
-  return { id, email: `${id}@example.com`, name: id, current_streak: 0, last_streak_date: '2020-01-01', timezone: 'UTC', total_xp: 10 }
+  return { id, email: `${id}@example.com`, name: id, current_streak: 0, last_streak_date: new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10), timezone: 'UTC', total_xp: 10 }
 }
 
 const ONE_USER = [makeUser(1)]

@@ -79,7 +79,7 @@ export function UserPortfolioVerificationToggle({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-admin-fg">Portfolio Verification</span>
+              <span className="text-xs font-bold text-admin-fg">Profile complete check</span>
               <span
                 className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${
                   isVerified
@@ -87,7 +87,7 @@ export function UserPortfolioVerificationToggle({
                     : 'bg-admin-surface-raised text-admin-fg-muted border-admin-border'
                 }`}
               >
-                {isVerified ? 'Verified' : 'Not Verified'}
+                {isVerified ? 'Profile complete' : 'Incomplete'}
               </span>
               {override && (
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border bg-admin-warning-soft text-admin-warning border-admin-warning/30">

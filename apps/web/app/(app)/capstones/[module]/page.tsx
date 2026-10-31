@@ -50,6 +50,9 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [submitSuccessMsg, setSubmitSuccessMsg] = useState<string | null>(null)
+  // XP the server actually awarded for this submission (from the submit response). Null when
+  // the page was loaded after an earlier submission, so no figure is invented.
+  const [awardedXp, setAwardedXp] = useState<number | null>(null)
   const [isInstructionsCollapsed, setIsInstructionsCollapsed] = useState<boolean>(false)
 
   // Learner profile info for portfolio routing & privacy surface
@@ -60,6 +63,9 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
 
   // Initial fetched draft content
   const [serverInitialContent, setServerInitialContent] = useState<string>('')
+
+  // Signed-in learner id from the capstone payload; scopes the local draft backup (CQ-08).
+  const [userId, setUserId] = useState<string | null>(null)
 
   // Phase 7 (7.1): progress toward eligibility, for the locked-state preview.
   const [progress, setProgress] = useState<{
@@ -75,6 +81,9 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         const res = await fetch(`/api/capstones/${moduleSlug}`)
         if (res.ok) {
           const data = await res.json()
+          if (typeof data.userId === 'string' && data.userId) {
+            setUserId(data.userId)
+          }
           if (data.submission) {
             setServerInitialContent(data.submission.content || '')
             setSubmissionStatus(data.status || 'unlocked')
@@ -113,8 +122,10 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
     setContent,
     status: autosaveStatus,
     saveNow,
+    clearLocalDraft,
   } = useCapstoneAutosave({
     moduleSlug,
+    userId,
     initialContent: serverInitialContent,
     isLocked,
   })
@@ -144,9 +155,21 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         throw new Error(data.error || 'Submission failed.')
       }
 
+      // The draft is now a submission; drop the local backup so it cannot resurface.
+      clearLocalDraft()
       setSubmissionStatus('submitted')
       setSubmittedAt(data.submission?.submitted_at || new Date().toISOString())
-      setSubmitSuccessMsg(data.message || 'Capstone submitted successfully! 150 XP awarded.')
+      const xpEarned =
+        typeof data.xpEarned === 'number' && Number.isFinite(data.xpEarned) && data.xpEarned > 0
+          ? data.xpEarned
+          : null
+      setAwardedXp(xpEarned)
+      setSubmitSuccessMsg(
+        data.message ||
+          (xpEarned !== null
+            ? `Capstone submitted successfully! ${xpEarned} XP awarded.`
+            : 'Capstone submitted successfully!')
+      )
       setIsSubmitModalOpen(false)
 
       // Track Phase 4 analytics events safely (non-blocking, zero-PII)
@@ -246,11 +269,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             {remaining > 0 ? (
               <>
                 <strong className="text-foreground">{remaining} more lesson{remaining === 1 ? '' : 's'}</strong>{' '}
-                in this module and the workspace opens — then you submit for{' '}
-                <strong className="text-foreground">+150 XP</strong> and a portfolio artifact.
+                in this module and the workspace opens. Then you can submit it for capstone XP and a
+                portfolio artifact.
               </>
             ) : (
-              <>You&apos;re eligible — reopen this page to start your deliverable.</>
+              <>You&apos;re eligible. Reopen this page to start your deliverable.</>
             )}
           </p>
         </div>
@@ -356,7 +379,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
               className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all flex items-center gap-2"
             >
               <Send className="w-4 h-4" />
-              <span>Submit Deliverable (+150 XP)</span>
+              <span>Submit Deliverable</span>
             </button>
           )}
         </div>
@@ -375,9 +398,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
                   <h2 className="text-base md:text-lg font-bold font-serif text-foreground">
                     Your capstone is now part of your portfolio!
                   </h2>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
-                    +150 XP Awarded
-                  </span>
+                  {awardedXp !== null && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                      +{awardedXp} XP Awarded
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {userProfile?.isPortfolioPublic !== false ? (

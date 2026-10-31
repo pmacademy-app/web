@@ -6,12 +6,16 @@
  *
  * Uses stable les_XXXXXX IDs and queries the `lesson_id` column.
  * v2 counterpart to /api/lessons/[slug]/theory-read.
+ *
+ * SEC-08: an unknown lesson id is a 404 and a locked lesson a 403 (both enforced in
+ * `recordTheoryReadAction`, before any write).
  */
 
 import { z } from 'zod'
 
 import { requireUserId } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
+import { isLessonIdFormat } from '@/lib/academy/lesson-ids'
 import { recordTheoryReadAction } from '@/lib/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
@@ -32,8 +36,21 @@ export const POST = withRoute(
     summary: 'Unexpected failure recording a theory read',
     body: theoryReadSchema,
     onDenied: warnUnauthorized,
+    // SEC-08: theory XP is awarded once per lesson, so a learner needs at most a handful of
+    // calls per lesson. 60 an hour per learner leaves room for retries after a failed gate.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `lesson_theory_read_${actor.userId}` : null),
+        limit: 60,
+        windowMs: 60 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor, body, params }) => {
+    if (!isLessonIdFormat(params.lessonId)) {
+      throw new RouteError(404, 'NOT_FOUND', 'Lesson not found.')
+    }
+
     const serviceSupabase = createServiceRoleClient()
 
     const result = await recordTheoryReadAction(

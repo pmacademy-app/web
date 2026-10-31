@@ -1,7 +1,7 @@
 /**
  * Decorative marketing mockup of a module card.
- * Module 03 — Execution & Delivery, 42% progress.
- * aria-hidden — parent section provides a text summary.
+ * Module 4: Execution & Delivery, 42% progress.
+ * aria-hidden: the parent section provides a text summary.
  */
 export function ModuleCardPreview() {
   return (

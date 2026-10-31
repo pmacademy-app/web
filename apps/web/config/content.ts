@@ -8,99 +8,19 @@
  */
 
 import type {
-  MarketingModule,
   JourneyStage,
   FeatureItem,
   FAQItem,
   TestimonialItem,
   SkillRadarDemoData,
 } from '@/types'
+import {
+  COURSE_READING_HOURS,
+  COURSE_TOTALS,
+  COURSE_WORKLOAD_HOURS,
+} from '@/lib/curriculum/module-meta'
 
-// ─── Modules (Sprint 2 §11) ───────────────────────────────────────────────────
-
-export const MODULES: MarketingModule[] = [
-  {
-    number: 1,
-    title: 'Product Thinking Foundations',
-    skills: ['strategy', 'leadership'],
-    skillLabels: ['Strategy', 'Leadership'],
-    estimatedTime: '4–5 hrs',
-    lessonCount: 10,
-    outcome: 'Product judgment basics',
-  },
-  {
-    number: 2,
-    title: 'Users, Problems & Discovery',
-    skills: ['discovery', 'design'],
-    skillLabels: ['Discovery', 'Design & UX'],
-    estimatedTime: '5–6 hrs',
-    lessonCount: 10,
-    outcome: 'Research notes and opportunity brief',
-  },
-  {
-    number: 3,
-    title: 'Defining Products & PRDs',
-    skills: ['execution', 'leadership'],
-    skillLabels: ['Execution', 'Communication'],
-    estimatedTime: '5–6 hrs',
-    lessonCount: 10,
-    outcome: 'PRD draft',
-  },
-  {
-    number: 4,
-    title: 'Prioritization & Roadmaps',
-    skills: ['strategy', 'execution'],
-    skillLabels: ['Strategy', 'Execution'],
-    estimatedTime: '4–5 hrs',
-    lessonCount: 10,
-    outcome: 'Roadmap and trade-off memo',
-  },
-  {
-    number: 5,
-    title: 'Design, UX & Prototyping',
-    skills: ['design', 'discovery'],
-    skillLabels: ['Design & UX', 'Discovery'],
-    estimatedTime: '5–6 hrs',
-    lessonCount: 10,
-    outcome: 'Wireframe critique',
-  },
-  {
-    number: 6,
-    title: 'Metrics, Growth & Experiments',
-    skills: ['growth', 'technical'],
-    skillLabels: ['Metrics & Growth', 'Technical'],
-    estimatedTime: '5–6 hrs',
-    lessonCount: 10,
-    outcome: 'Metrics tree and experiment plan',
-  },
-  {
-    number: 7,
-    title: 'Technical Fluency for PMs',
-    skills: ['technical', 'execution'],
-    skillLabels: ['Technical', 'Execution'],
-    estimatedTime: '4–5 hrs',
-    lessonCount: 10,
-    outcome: 'API/platform decision brief',
-  },
-  {
-    number: 8,
-    title: 'Stakeholders & Leadership',
-    skills: ['leadership', 'strategy'],
-    skillLabels: ['Leadership', 'Communication'],
-    estimatedTime: '4–5 hrs',
-    lessonCount: 10,
-    outcome: 'Alignment plan',
-  },
-  {
-    number: 9,
-    title: 'Capstone & Career Portfolio',
-    skills: ['strategy', 'leadership'],
-    skillLabels: ['Strategy', 'Leadership'],
-    estimatedTime: '6–8 hrs',
-    lessonCount: 10,
-    outcome: 'Interview-ready case study',
-  },
-]
+// Module titles, order and study time live in lib/curriculum/module-meta.ts (MODULE_META).
 
 // ─── Journey Stages (Sprint 2 §10) ───────────────────────────────────────────
 
@@ -228,7 +148,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'How long does it take?',
     answer:
-      'The curriculum contains 90 lessons across nine modules. You can move at your own pace; the structure is designed for steady progress rather than cramming.',
+      `The curriculum contains ${COURSE_TOTALS.lessons} lessons across nine modules. Reading takes about ${COURSE_READING_HOURS} hours; with quizzes and reflections, plan on about ${COURSE_WORKLOAD_HOURS} hours in total. You can move at your own pace; the structure is designed for steady progress rather than cramming.`,
   },
   {
     question: 'What will I build?',

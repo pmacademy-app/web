@@ -16,8 +16,8 @@ interface DBChain {
 }
 
 export const metadata: Metadata = {
-  title: 'Certificates & Credentials | Progress',
-  description: 'Verified certificates and product management credential verification.',
+  title: 'Certificates | Progress',
+  description: 'Your certificates and their public verification links.',
 }
 
 export default async function CertificatesProgressPage() {
@@ -81,11 +81,11 @@ export default async function CertificatesProgressPage() {
         <div className="flex items-center gap-2 mt-2">
           <GraduationCap className="w-5 h-5 text-primary" />
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-            Verified Certificates &amp; Credentials
+            Certificates
           </h1>
         </div>
         <p className="text-xs md:text-sm text-muted-foreground mt-1">
-          Cryptographically verifiable credentials shareable directly to LinkedIn and hiring managers upon curriculum completion.
+          Awarded for completing all 90 lessons. Each certificate has a public verification link you can add to LinkedIn or send to hiring managers.
         </p>
       </div>
 

@@ -30,12 +30,12 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
       </ul>
       {/* Growth R5 B12a: frame the outcome from day one. */}
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        You&apos;re building a public PM portfolio recruiters can see.{' '}
+        You&apos;re building a public PM portfolio you can share with recruiters.{' '}
         <a href={`${appUrl}/settings?tab=portfolio`} style={{ color: '#1F6B4E', fontWeight: 600 }}>
           Set up your portfolio
         </a>
       </p>
-      <Button href={`${appUrl}/dashboard`}>Start Lesson 1</Button>
+      <Button href={`${appUrl}/dashboard`}>Open your dashboard</Button>
     </EmailWrapper>
   )
 }

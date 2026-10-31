@@ -81,7 +81,7 @@ afterEach(() => {
 async function loadSignupPage(flag: string) {
   vi.resetModules()
   vi.stubEnv('NEXT_PUBLIC_GOOGLE_AUTH_ENABLED', flag)
-  return (await import('@/app/(auth)/signup/page')).default
+  return (await import('@/app/(auth)/signup/SignupForm')).default
 }
 
 const googleLink = () =>

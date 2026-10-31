@@ -7,7 +7,7 @@
  */
 import { calculatePortfolioReadiness, portfolioReadinessInputFromUserRow } from '@/lib/portfolio-readiness'
 import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow'
-import { CAPSTONE_DEFINITIONS, getCurriculumModuleForCapstone, getCapstoneHref } from '@/config/capstones'
+import { getAllCapstoneDefinitions, getCurriculumModuleForCapstone, getCapstoneHref } from '@/config/capstones'
 import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 
 export interface ProofUserRow {
@@ -65,7 +65,8 @@ export function deriveProofState(input: ProofStateInput): ProofState {
   })
 
   const submittedSlugs = new Set(input.capstones.filter((c) => isSubmitted(c.status)).map((c) => c.module_slug))
-  const next = Object.values(CAPSTONE_DEFINITIONS).find((def) => {
+  // Curriculum order (Module 1..9), not the record's key order.
+  const next = getAllCapstoneDefinitions().find((def) => {
     if (submittedSlugs.has(def.moduleSlug)) return false
     const lessonIds = getLessonIdsForModule(getCurriculumModuleForCapstone(def.moduleSlug))
     return lessonIds.length > 0 && lessonIds.every((id) => completed.has(id))

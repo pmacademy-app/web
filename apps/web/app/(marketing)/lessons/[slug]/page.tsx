@@ -5,6 +5,8 @@ import { fetchCompiledLesson, fetchCurriculumData, resolveSlugToId } from '@/lib
 import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { BRAND } from '@/lib/brand'
+import { getModuleTitle } from '@/lib/curriculum/module-meta'
+import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { getLessonSchema, getBreadcrumbSchema } from '@/lib/schema'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
@@ -18,24 +20,6 @@ async function getLessonBySlug(slug: string) {
   const lessonId = await resolveSlugToId(slug)
   if (!lessonId) return null
   return await fetchCompiledLesson(lessonId)
-}
-
-function formatModuleName(moduleSlug: string): string {
-  const nameMap: Record<string, string> = {
-    'foundations': 'Product Thinking Foundations',
-    'discovery': 'Users, Problems & Discovery',
-    'strategy': 'Defining Products & PRDs',
-    'execution': 'Prioritization & Roadmaps',
-    'design': 'Design, UX & Prototyping',
-    'growth': 'Metrics, Growth & Experiments',
-    'technical': 'Technical Fluency for PMs',
-    'leadership': 'Stakeholders & Leadership',
-    'capstone': 'Capstone & Career Portfolio',
-  }
-  return nameMap[moduleSlug] ?? moduleSlug
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
 }
 
 export async function generateStaticParams() {
@@ -59,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const globalOrder = globalIdx >= 0 ? globalIdx + 1 : (parseInt(slug.replace(/^lesson-/, ''), 10) || lesson.order)
   const canonicalUrl = `${siteUrl}/lessons/${slug}`
   const pageTitle = `Lesson ${globalOrder}: ${lesson.title}`
-  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${formatModuleName(lesson.module)}).`
+  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${getModuleTitle(lesson.module)}).`
 
   return {
     title: pageTitle,
@@ -102,22 +86,33 @@ export default async function PublicLessonPage({ params }: PageProps) {
 
   const globalIdx = curriculum?.lessons.findIndex((l) => l.slug === slug || l.id === lesson.id) ?? -1
   const globalOrder = globalIdx >= 0 ? globalIdx + 1 : (parseInt(slug.replace(/^lesson-/, ''), 10) || lesson.order)
+  // Learner-facing copy uses the module-local pair ("Module 5 · Lesson 7"); the global
+  // number stays in the URL, metadata and the LearningResource schema only.
+  const position = getLessonPosition(
+    { id: lesson.id, module: lesson.module, order: lesson.order },
+    curriculum,
+  )
 
   const prevLesson = globalIdx > 0 ? curriculum?.lessons[globalIdx - 1] : null
   const nextLesson = globalIdx >= 0 && globalIdx < (curriculum?.lessons.length ?? 0) - 1 ? curriculum?.lessons[globalIdx + 1] : null
 
   // Structured Data (LearningResource & BreadcrumbList)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
-  const moduleTitle = formatModuleName(lesson.module)
+  const moduleTitle = getModuleTitle(lesson.module)
   const lessonSchema = getLessonSchema(lesson, globalOrder, slug)
 
   const breadcrumbItems = [
     { name: 'Home', url: siteUrl },
     { name: 'Curriculum', url: `${siteUrl}/curriculum` },
     { name: moduleTitle, url: `${siteUrl}/curriculum#module-${lesson.module}` },
-    { name: `Lesson ${globalOrder}`, url: `${siteUrl}/lessons/${slug}` },
+    { name: position.label, url: `${siteUrl}/lessons/${slug}` },
   ]
   const breadcrumbSchema = getBreadcrumbSchema(breadcrumbItems)
+
+  // Signup carries the learner back to this exact lesson in the app (through the
+  // one-screen onboarding). A locked lesson shows its own gate there.
+  const appLessonPath = `/academy/${lesson.module}/${lesson.id}`
+  const signupHref = `/signup?next=${encodeURIComponent(appLessonPath)}`
 
   // Slice first 8 theory-related blocks to construct a preview
   const previewBlocks = lesson.blocks
@@ -162,7 +157,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
             <ChevronRight className="w-3.5 h-3.5 text-ink-muted/60" aria-hidden="true" />
             <li>
               <span className="font-semibold text-foreground" aria-current="page">
-                Lesson {globalOrder}
+                {position.label}
               </span>
             </li>
           </ol>
@@ -176,10 +171,12 @@ export default async function PublicLessonPage({ params }: PageProps) {
           <span>Back to Curriculum</span>
         </Link>
         <div className="flex flex-wrap items-center gap-3 pt-1 text-sm text-ink-muted">
-          <span className="font-semibold text-primary">Module: {moduleTitle}</span>
-          <span>•</span>
-          <span>Lesson {globalOrder}</span>
-          <span>•</span>
+          <span className="font-semibold text-primary">
+            Module {position.moduleNumber}: {moduleTitle}
+          </span>
+          <span aria-hidden="true">•</span>
+          <span>Lesson {position.lessonNumber}</span>
+          <span aria-hidden="true">•</span>
           <span>{lesson.estimatedReadingTime} min read</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground leading-tight">
@@ -199,14 +196,14 @@ export default async function PublicLessonPage({ params }: PageProps) {
           Ready to test your product judgment?
         </h2>
         <p className="text-ink-muted text-sm max-w-md mx-auto leading-relaxed">
-          Take the interactive practice quiz for Lesson {globalOrder} and build your skill radar dashboard.
+          Take the interactive practice quiz for {position.label} and build your skill radar dashboard.
         </p>
         <div className="flex justify-center">
           <Link
-            href="/signup"
+            href={signupHref}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
-            <span>Start Lesson {globalOrder} Free</span>
+            <span>Start {position.label} free</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

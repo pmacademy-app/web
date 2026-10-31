@@ -193,8 +193,8 @@ describe('B11-A — Design System Foundation: High-Traffic Adoption Files', () =
    * and drop it from both allowlists.
    */
   const adoptionFiles = [
-    'app/(auth)/login/page.tsx',
-    'app/(auth)/signup/page.tsx',
+    'app/(auth)/login/LoginForm.tsx',
+    'app/(auth)/signup/SignupForm.tsx',
     'app/(auth)/reset-password/page.tsx',
     'components/settings/SecuritySettingsTab.tsx',
     'components/settings/ConfirmDestructiveAction.tsx',

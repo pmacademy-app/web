@@ -89,7 +89,7 @@ describe('Referral attribution cookie is gated on cookie consent', () => {
       path.resolve(import.meta.dirname, '../../app/(auth)/signup/page.tsx'),
       'utf8'
     )
-    expect(src).toContain("searchParams.get('ref')")
+    expect(src).toContain('params.ref')
     expect(src).toContain('refCode')
   })
 })

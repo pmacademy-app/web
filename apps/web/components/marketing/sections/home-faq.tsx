@@ -11,7 +11,6 @@ import {
   SECTION_Y,
 } from '@/components/marketing/styles'
 import { FAQ_ITEMS } from '@/config/content'
-import { SAMPLE_PORTFOLIO_PATH } from '@/config/marketing'
 import type { FAQItem } from '@/types'
 
 /**
@@ -24,30 +23,24 @@ import type { FAQItem } from '@/types'
  * no AI claims either way), as does the certification question.
  *
  * Native <details>/<summary>: keyboard and screen-reader support come from the browser,
- * and the section stays a server component. The only client code is the two
- * `TrackedLink`s.
+ * and the section stays a server component. The only client code is the
+ * `TrackedLink`.
  *
  * Round 2: the section also absorbs "Check it yourself" (formerly its own section).
- * Desktop: heading plus the two verifiable links on the left (sticky beside the
- * answers), questions on the right. Phone: heading, links, then questions. The links
- * always render; they make no claim about other learners, so they carry no quotes,
- * names or ratings, and they keep the `check_it_yourself` analytics location.
+ * Desktop: heading plus the verifiable link on the left (sticky beside the answers),
+ * questions on the right. Phone: heading, link, then questions. The link always
+ * renders; it makes no claim about other learners, so it carries no quotes, names or
+ * ratings, and it keeps the `check_it_yourself` analytics location. The sample
+ * portfolio item returns once the exemplar portfolio is finished (see
+ * SAMPLE_PORTFOLIO_PATH in config/marketing.ts).
  */
 
 const CHECK_ITEMS = [
   {
-    statement: 'Every lesson is public.',
+    statement: 'Lesson previews are public.',
     href: '/curriculum',
     label: 'Browse the curriculum',
     target: 'curriculum',
-  },
-  {
-    statement: 'Portfolios are public.',
-    href: SAMPLE_PORTFOLIO_PATH,
-    label: 'Open one',
-    /** "Open one" is vague out of context (screen-reader link lists); this completes it. */
-    srHint: ': a sample portfolio',
-    target: 'sample_portfolio',
   },
 ] as const
 
@@ -93,10 +86,7 @@ export function HomeFaqSection() {
                     args={{ location: 'check_it_yourself', target: item.target }}
                     className={`${LINK_QUIET} -mb-2`}
                   >
-                    <span>
-                      {item.label}
-                      {'srHint' in item ? <span className="sr-only">{item.srHint}</span> : null}
-                    </span>
+                    <span>{item.label}</span>
                     <ArrowRight size={15} aria-hidden="true" className={ARROW_NUDGE} />
                   </TrackedLink>
                 </li>

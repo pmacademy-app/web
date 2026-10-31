@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createServiceRoleClient, type Database } from '@/lib/supabase'
@@ -11,6 +12,8 @@ import {
   academyLessonPath,
 } from '@/lib/personalization/path-resolver'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
+import { validateUsername } from '@/lib/portfolio'
+import { trackProductEvent } from '@/lib/events/product-events'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -36,18 +39,12 @@ export interface OnboardingData {
 
 export async function checkUsernameAvailability(rawUsername: string, currentUserId?: string): Promise<{ available: boolean; error?: string }> {
   try {
-    const username = rawUsername.trim().toLowerCase()
-    if (!username) {
-      return { available: false, error: 'Username is required.' }
-    }
-    if (username.length < 3) {
-      return { available: false, error: 'Username must be at least 3 characters.' }
-    }
-    if (username.length > 24) {
-      return { available: false, error: 'Username must be at most 24 characters.' }
-    }
-    if (!/^[a-z0-9_]+$/.test(username)) {
-      return { available: false, error: 'Username can only contain lowercase letters, numbers, and underscores.' }
+    // CQ-24: the same rule as Settings > Portfolio (lib/portfolio.ts), reserved words included.
+    // Handles are stored lowercase by both writers.
+    const username = (rawUsername ?? '').trim().toLowerCase()
+    const check = validateUsername(username)
+    if (!check.isValid) {
+      return { available: false, error: check.reason ?? 'Invalid username.' }
     }
 
     const dbSupabase = createServiceRoleClient()
@@ -59,8 +56,10 @@ export async function checkUsernameAvailability(rawUsername: string, currentUser
 
     const { data, error } = await query.maybeSingle()
     if (error) {
+      // CQ-24: fail closed. Reporting "available" on an error let a taken handle through to the
+      // submit, where the unique index then rejected it.
       console.error('[checkUsernameAvailability] DB query error:', error.message)
-      return { available: true } // Non-blocking on query error
+      return { available: false, error: CHECK_UNAVAILABLE_ERROR }
     }
 
     if (data) {
@@ -70,9 +69,11 @@ export async function checkUsernameAvailability(rawUsername: string, currentUser
     return { available: true }
   } catch (err) {
     console.error('[checkUsernameAvailability] Exception:', err)
-    return { available: true }
+    return { available: false, error: CHECK_UNAVAILABLE_ERROR }
   }
 }
+
+const CHECK_UNAVAILABLE_ERROR = 'Could not check this username right now. Please try again.'
 
 /**
  * Phase 2 — record the furthest onboarding-wizard step a learner reached.
@@ -178,6 +179,19 @@ async function resolveRecommendedLessonPath(
   }
 }
 
+/**
+ * Runs `task` once the response has been sent, via after(). If after() cannot schedule it
+ * (called outside a request scope, as in a unit test that does not stub it), the task is
+ * awaited inline instead, so the event is still recorded. Only for tasks that never throw.
+ */
+async function recordAfterResponse(task: () => Promise<unknown>): Promise<void> {
+  try {
+    after(task)
+  } catch {
+    await task()
+  }
+}
+
 export async function submitOnboarding(data: OnboardingData) {
   try {
     const cookieStore = await cookies()
@@ -236,9 +250,14 @@ export async function submitOnboarding(data: OnboardingData) {
     // older client, or a resuming user's prefilled draft) it must still be well-formed, matching
     // the client and the later Settings → Portfolio validation. An absent value is written as NULL
     // and collected later; a malformed one is rejected rather than silently persisted.
+    // CQ-24: validated by validateUsername (lib/portfolio.ts), the rule Settings > Portfolio uses,
+    // so a reserved handle such as `admin` is refused here too. Stored lowercase, like Settings.
     const username = (data.username || '').trim().toLowerCase()
-    if (username && (username.length < 3 || username.length > 24 || !/^[a-z0-9_]+$/.test(username))) {
-      return { error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.' }
+    if (username) {
+      const usernameCheck = validateUsername(username)
+      if (!usernameCheck.isValid) {
+        return { error: usernameCheck.reason ?? 'Invalid username.' }
+      }
     }
 
     const name = (data.name || '').trim()
@@ -311,6 +330,16 @@ export async function submitOnboarding(data: OnboardingData) {
     if (metaError) {
       console.error('[onboarding/actions] Metadata update error:', metaError.message)
     }
+
+    // PROD-15: the profile write above succeeded, so onboarding is complete. Recorded after the
+    // response; trackProductEvent never throws.
+    await recordAfterResponse(() =>
+      trackProductEvent('onboarding_completed', userId, {
+        goal,
+        career_role: careerRole,
+        username_set: Boolean(username),
+      })
+    )
 
     // 3. Refresh user session to mint a new JWT with updated user_metadata and persist to HTTP-only cookies
     if (refreshToken) {

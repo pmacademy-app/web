@@ -310,8 +310,50 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
       expect(result.success).toBe(true)
     })
 
+    // CQ-05: only a missing RPC falls back to the non-atomic path. Any other RPC failure is a
+    // real fault: retrying it non-atomically could double-record attempts the RPC already wrote.
+    it('throws on a non-missing RPC failure instead of running the non-atomic fallback', async () => {
+      mockSupabase.rpc.mockRejectedValueOnce(new Error('connection reset by peer'))
+
+      await expect(
+        recordQuizAttemptAction(
+          mockSupabase as never,
+          'user-rpc-down',
+          'les_04ix6b',
+          [{ question_id: 'q-les_04ix6b-1', selected_option: 0 }]
+        )
+      ).rejects.toThrow('connection reset by peer')
+
+      const touchedTables = mockSupabase.from.mock.calls.map((c: unknown[]) => c[0])
+      expect(touchedTables).not.toContain('quiz_attempts')
+      expect(touchedTables).not.toContain('xp_events')
+    })
+
+    it('throws on an RPC error response whose code is not a missing-function code', async () => {
+      mockSupabase.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { code: '40001', message: 'could not serialize access' },
+      })
+
+      await expect(
+        recordQuizAttemptAction(
+          mockSupabase as never,
+          'user-rpc-error',
+          'les_04ix6b',
+          [{ question_id: 'q-les_04ix6b-1', selected_option: 0 }]
+        )
+      ).rejects.toThrow('record_lesson_quiz_completion failed (40001)')
+
+      const touchedTables = mockSupabase.from.mock.calls.map((c: unknown[]) => c[0])
+      expect(touchedTables).not.toContain('quiz_attempts')
+    })
+
     it('propagates XP errors instead of silently swallowing them in fallback path', async () => {
-      mockSupabase.rpc.mockRejectedValueOnce(new Error('RPC function not found'))
+      // PGRST202 is in MISSING_RPC_ERROR_CODES (lib/academy/lessons-db.ts): the fallback runs.
+      mockSupabase.rpc.mockResolvedValueOnce({
+        data: null,
+        error: { code: 'PGRST202', message: 'Could not find the function' },
+      })
       mockSupabase.from.mockImplementation((table: string) => {
         if (table === 'quiz_attempts') {
           return createChainableBuilder(null, null)
@@ -335,6 +377,9 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
           [{ question_id: 'q-les_04ix6b-1', selected_option: 0 }]
         )
       ).rejects.toThrow('Failed to record XP event')
+
+      const touchedTables = mockSupabase.from.mock.calls.map((c: unknown[]) => c[0])
+      expect(touchedTables).toContain('quiz_attempts')
     })
   })
 

@@ -241,7 +241,7 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
     vi.mocked(getDueCardsCount).mockResolvedValue(7)
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
       reminderSupabase({
-        users: [{ id: 'u-0001', email: 'lapsed@example.com', name: 'Lapsed', current_streak: 0, last_streak_date: '2020-01-01', timezone: 'UTC' }],
+        users: [{ id: 'u-0001', email: 'lapsed@example.com', name: 'Lapsed', current_streak: 0, last_streak_date: new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10), timezone: 'UTC' }],
         inserts,
       }) as never
     )
