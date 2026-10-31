@@ -25,7 +25,7 @@ const PUBLIC_LESSON_SLUG = 'lesson-001'
 /** Reads the signup CTA on a public lesson and returns the in-app lesson path it targets. */
 async function lessonCtaTarget(page: Page): Promise<{ href: string; next: string }> {
   await page.goto(`/lessons/${PUBLIC_LESSON_SLUG}`)
-  const cta = page.getByRole('link', { name: /start lesson \d+ free/i })
+  const cta = page.getByRole('link', { name: /start (?:module \d+ · )?lesson \d+ free/i })
   await expect(cta).toBeVisible()
 
   const href = await cta.getAttribute('href')
