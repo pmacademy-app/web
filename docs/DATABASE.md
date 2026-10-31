@@ -129,3 +129,17 @@ This section reflects the current `public` schema as generated in `apps/web/type
 
 ### Misc
 - **`public.waitlist`** — Pre-launch signup records.
+
+---
+
+## 4. Phase 3 Schema Cleanup Candidates (Dead Tables & Stored Procedures)
+
+A full multi-agent audit on branch `phase-3` cross-referenced every table and procedure in `supabase/migrations/` and `apps/web/types/database.ts` against application source code. The following objects have zero active callers, readers, or writers, and are scheduled for deprecation and removal in Phase 3 Batch 3-C (see [`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)):
+
+| Database Object | Type | Created In | Rationale for Removal |
+|---|---|---|---|
+| `public.weekly_leaderboard_snapshots` | Table | `20260805000006` | Never populated or queried; leaderboard aggregates user XP dynamically. |
+| `public.bookmarks` | Table | `20260728000002` | Unused legacy feature; superseded by progress tracking and flashcard queues. |
+| `public.email_dead_letter` | Table | `20260806000001` | Dead table; email errors are logged to `system_errors` and retained in `email_queue` with `status = 'failed'`. |
+| `public.user_notification_timeline` | Table | `20260806000001` | Redundant legacy timeline; in-app alerts are handled directly by `in_app_notifications`. |
+| `public.sync_user_xp(uuid)` | Stored Procedure / RPC | `20260805000001` | Unused function; trigger `update_user_xp_and_level()` handles automated XP summation. |

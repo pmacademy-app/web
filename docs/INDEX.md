@@ -43,6 +43,7 @@ All primary architectural documentation lives directly under `docs/`:
 | **Production Audits** | [`audits/`](audits/) | Stage 1–4 read-only audits (architecture, security, frontend/mobile, reliability/operations) and the two 2026-09 signup-abuse incident investigations. **Historical evidence** — findings are preserved as written and several are since fixed; each carries a status banner | 🟡 Historical |
 | **Architecture Baseline** | [`archive/PRODUCTION_BLUEPRINT.md`](archive/PRODUCTION_BLUEPRINT.md) | Target-architecture rationale behind the implementation plan. Superseded by `FINAL_IMPLEMENTATION_PLAN.md` for anything actionable | 🟡 Reference |
 | **Core Architecture** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | High-level system architecture, tech stack, directory boundaries, known debt | 🟢 Current |
+| **Dead Code & Tech Debt** | [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md) | Complete multi-agent dead code inventory, unused routes/services/tables, and Phase 3 cleanup blueprint | 🟡 Pending Execution |
 | **Product & Brand** | [`PRD.md`](PRD.md) | Product vision, target audience, brand rules, non-negotiable invariants | 🟢 Current |
 | **Engineering Rules** | [`RULES.md`](RULES.md) | Engineering guidelines, secret safety, verification standards, doc authority | 🟢 Current |
 | **Project Memory** | [`MEMORY.md`](MEMORY.md) | Core invariants, locked tech decisions, immutable data contracts | 🟢 Current |
