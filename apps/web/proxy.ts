@@ -18,7 +18,7 @@ import { resolveLessonAccess } from '@/lib/curriculum-access'
 // Next's file tracer cannot tell which files are needed and conservatively ships the
 // whole compiled corpus with the proxy: 94 of the 191 traced entries were
 // `content/dist` — all 90 lesson bodies plus the curriculum, glossary and id
-// registry — for a branch that only runs on authenticated /lessons/* requests.
+// registry — for a branch that only runs on authenticated /lessons/... requests.
 //
 // Importing the curriculum index directly is the same data (it is the very file
 // `fetchCurriculumData()` reads) resolved at build time instead, so the tracer ships
@@ -208,7 +208,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   // email verification, consent), but they still get their session refreshed here. Since
   // CQ-10 the request-side auth helpers only read the access token, so without this an admin
   // who stays on one console page past the one-hour token lifetime gets 401s from every
-  // console call. /api/auth/* keeps its fast path: those routes manage the session themselves.
+  // console call. /api/auth routes keeps its fast path: those routes manage the session themselves.
   const isAdminApi = path.startsWith('/api/admin/')
 
   // Maintenance page must always be reachable so learners see the correct message
@@ -241,7 +241,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     const accessToken = request.cookies.get('sb-access-token')?.value
     const refreshToken = request.cookies.get('sb-refresh-token')?.value
     if (accessToken || refreshToken) {
-      const slug = path.replace(/^\/lessons\//, '').replace(/\/.*$/, '')
+      const slug = path.replace(/^\/lessons\//, '').split('/')[0]
       const match = slug ? curriculum.lessons.find((l) => l.slug === slug) : null
       const academyUrl = match
         ? new URL(`/academy/${match.module}/${match.id}`, request.url)
