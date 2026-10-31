@@ -165,7 +165,7 @@ describe('lifecycle emails', () => {
 describe('Welcome email', () => {
   it('frames the public portfolio and links to setting it up, without calling capstones credentials', async () => {
     const { html, text } = await renderEmailTemplate('auth.welcome', { userName: 'Jordan', appUrl: 'https://prodily.example' })
-    expect(text).toMatch(/building a public PM portfolio recruiters can see/)
+    expect(text).toMatch(/building a public PM portfolio you can share with recruiters/)
     expect(html).toContain('https://prodily.example/settings?tab=portfolio')
     expect(text).not.toMatch(/credential/i)
   })

@@ -14,6 +14,7 @@ import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { BRAND } from '@/lib/brand'
+import { trackProductEvent } from '@/lib/events/product-events'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown; count?: number | null }>
@@ -186,6 +187,11 @@ export async function createReferralAttribution(
     console.error('[referral-service] Failed to insert referral record:', error)
     return { created: false, reason: 'db_insert_failed' }
   }
+
+  await trackProductEvent('referral_used', params.newUserId, {
+    referrer_id: referrer.id,
+    referral_id: inserted.id,
+  })
 
   return {
     created: true,

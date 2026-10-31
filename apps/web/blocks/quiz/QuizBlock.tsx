@@ -38,6 +38,14 @@ function isTextEntryTarget(el: Element): boolean {
   return el instanceof HTMLElement && el.isContentEditable;
 }
 
+/** Reads the XP figure from the quiz API result without trusting its shape. */
+function readServerXp(result: unknown): { xpEarned: number; isFirstAttempt: boolean } | null {
+  if (!result || typeof result !== 'object') return null;
+  const { xpEarned, isFirstAttempt } = result as { xpEarned?: unknown; isFirstAttempt?: unknown };
+  if (typeof xpEarned !== 'number' || !Number.isFinite(xpEarned) || xpEarned < 0) return null;
+  return { xpEarned: Math.floor(xpEarned), isFirstAttempt: isFirstAttempt === true };
+}
+
 export default function QuizBlock({ block }: BlockProps) {
   const totalQuestions = (block.questions || []).length;
   const lessonCtx = useLessonContextSafe();
@@ -58,6 +66,9 @@ export default function QuizBlock({ block }: BlockProps) {
   const pendingFocusRef = useRef<PendingFocus>(null);
   const summaryScoreId = useId();
   const [submitting, setSubmitting] = useState(false);
+  // XP as reported by the quiz API for this attempt. Null until the server answers (or when it
+  // does not report a figure), so the summary never shows a client-side guess.
+  const [serverXp, setServerXp] = useState<{ xpEarned: number; isFirstAttempt: boolean } | null>(null);
 
   const [shuffledQuestions] = useState<(QuizQuestion & { shuffledOptions: { text: string; originalIndex: number }[] })[]>(() => {
     const questions = block.questions || [];
@@ -86,6 +97,7 @@ export default function QuizBlock({ block }: BlockProps) {
     pendingFocusRef.current = 'question';
     setQuizFinished(false);
     setSubmitting(false);
+    setServerXp(null);
   };
 
   const handleOptionClick = (idx: number) => {
@@ -134,8 +146,10 @@ export default function QuizBlock({ block }: BlockProps) {
       // Use attemptsRef which has already been updated synchronously.
       if (lessonCtx?.onQuizComplete && attemptsRef.current.length > 0) {
         setSubmitting(true);
+        setServerXp(null);
         lessonCtx
           .onQuizComplete(attemptsRef.current)
+          .then((result) => setServerXp(readServerXp(result)))
           .catch((err) => console.error('[QuizBlock] Failed to submit quiz:', err))
           .finally(() => setSubmitting(false));
       }
@@ -255,9 +269,6 @@ export default function QuizBlock({ block }: BlockProps) {
   if (quizFinished) {
     const percentage = Math.round((correctCount / totalQuestions) * 100);
     const isPerfect = correctCount === totalQuestions;
-    const baseXP = correctCount * 5;
-    const bonusXP = isPerfect ? 25 : 0;
-    const totalXP = baseXP + bonusXP;
 
     return (
       <div className="max-w-xl mx-auto text-center py-8 space-y-8 animate-fade-in my-6">
@@ -293,31 +304,28 @@ export default function QuizBlock({ block }: BlockProps) {
           </p>
         </div>
 
-        {/* XP Earning breakdown card */}
-        <div className="rounded-xl border border-border bg-card p-6 max-w-sm mx-auto shadow-sm space-y-4">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">XP Breakdown</h3>
-          <div className="space-y-2.5">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Correct Answers ({correctCount})</span>
-              <span className="font-semibold text-foreground">+{baseXP} XP</span>
+        {/* XP card: shows only the figure the quiz API reported for this attempt. */}
+        {serverXp && (
+          <div className="rounded-xl border border-border bg-card p-6 max-w-sm mx-auto shadow-sm space-y-2">
+            <div className="flex justify-between items-center text-base font-bold text-foreground">
+              <span className="flex items-center gap-1.5">
+                <Zap className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                XP Gained
+              </span>
+              <span className="text-primary font-serif">+{serverXp.xpEarned} XP</span>
             </div>
-
-            {isPerfect && (
-              <div className="flex justify-between items-center text-sm text-amber-600 dark:text-amber-400 font-semibold border-t border-border pt-2">
-                <span className="flex items-center gap-1">
-                  <Zap className="h-4 w-4 shrink-0 fill-current" />
-                  First-Attempt Perfect Bonus
-                </span>
-                <span>+25 XP</span>
-              </div>
+            {serverXp.xpEarned === 0 && (
+              <p className="text-xs text-muted-foreground text-left">
+                No new XP this attempt.
+              </p>
             )}
-
-            <div className="flex justify-between items-center border-t border-border pt-2 text-base font-bold text-foreground">
-              <span>Total XP Gained</span>
-              <span className="text-primary font-serif">+{totalXP} XP</span>
-            </div>
+            {serverXp.xpEarned > 0 && isPerfect && serverXp.isFirstAttempt && (
+              <p className="text-xs text-muted-foreground text-left">
+                Includes the first-attempt perfect score bonus.
+              </p>
+            )}
           </div>
-        </div>
+        )}
 
         {/*
           Phase 3 (3.3): on completion the lesson shell takes over with the "Lesson

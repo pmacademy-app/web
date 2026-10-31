@@ -3,7 +3,12 @@
  *
  * Defines instructions, learning objectives, submission requirements,
  * and starter templates for all 9 module capstone projects.
+ *
+ * Module numbers and titles come from MODULE_META (lib/curriculum/module-meta.ts), so a
+ * capstone always shows the number and title of the module whose lessons gate it.
  */
+
+import { MODULE_META } from '@/lib/curriculum/module-meta'
 
 export interface CapstoneRequirement {
   id: string
@@ -31,8 +36,8 @@ export interface CapstoneDefinition {
 export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
   foundations: {
     moduleSlug: 'foundations',
-    moduleNumber: 1,
-    moduleTitle: 'Product Thinking Foundations',
+    moduleNumber: MODULE_META.foundations.number,
+    moduleTitle: MODULE_META.foundations.title,
     title: 'Product Opportunity Brief & Problem Definition',
     tagline: 'Transform a raw customer problem into an actionable, structured product opportunity brief.',
     estimatedHours: '2–3 hrs',
@@ -83,8 +88,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   discovery: {
     moduleSlug: 'discovery',
-    moduleNumber: 2,
-    moduleTitle: 'Users, Problems & Discovery',
+    moduleNumber: MODULE_META.discovery.number,
+    moduleTitle: MODULE_META.discovery.title,
     title: 'User Research Plan & Opportunity Solution Tree',
     tagline: 'Design customer discovery interviews and map insights onto an Opportunity Solution Tree.',
     estimatedHours: '3–4 hrs',
@@ -143,8 +148,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   strategy: {
     moduleSlug: 'strategy',
-    moduleNumber: 3,
-    moduleTitle: 'Defining Products & PRDs',
+    moduleNumber: MODULE_META.strategy.number,
+    moduleTitle: MODULE_META.strategy.title,
     title: 'Comprehensive Product Requirements Document (PRD)',
     tagline: 'Write an engineering-ready PRD with scope, user stories, acceptance criteria, and edge cases.',
     estimatedHours: '3–4 hrs',
@@ -204,8 +209,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   execution: {
     moduleSlug: 'execution',
-    moduleNumber: 4,
-    moduleTitle: 'Prioritization & Roadmaps',
+    moduleNumber: MODULE_META.execution.number,
+    moduleTitle: MODULE_META.execution.title,
     title: 'Quarterly Product Roadmap & Tradeoff Defense Memo',
     tagline: 'Prioritize feature bets using RICE/Kano frameworks and defend tradeoffs in an executive memo.',
     estimatedHours: '2–3 hrs',
@@ -258,8 +263,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   design: {
     moduleSlug: 'design',
-    moduleNumber: 5,
-    moduleTitle: 'Design, UX & Prototyping',
+    moduleNumber: MODULE_META.design.number,
+    moduleTitle: MODULE_META.design.title,
     title: 'UX Wireframe Critique & Interaction Design Spec',
     tagline: 'Audit a product interface, identify usability friction, and specify redesigned interaction flows.',
     estimatedHours: '3–4 hrs',
@@ -313,8 +318,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   metrics: {
     moduleSlug: 'metrics',
-    moduleNumber: 6,
-    moduleTitle: 'Metrics, Growth & Experiments',
+    moduleNumber: MODULE_META.growth.number,
+    moduleTitle: MODULE_META.growth.title,
     title: 'North Star Metric Tree & A/B Experiment Spec',
     tagline: 'Deconstruct a company North Star Metric into driver trees and design a rigorous A/B experiment.',
     estimatedHours: '3–4 hrs',
@@ -372,8 +377,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   technical: {
     moduleSlug: 'technical',
-    moduleNumber: 7,
-    moduleTitle: 'Technical Fluency for PMs',
+    moduleNumber: MODULE_META.technical.number,
+    moduleTitle: MODULE_META.technical.title,
     title: 'System Architecture & API Integration Tradeoff Brief',
     tagline: 'Evaluate technical architecture trade-offs and author an engineering alignment decision brief.',
     estimatedHours: '2–3 hrs',
@@ -435,8 +440,8 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   leadership: {
     moduleSlug: 'leadership',
-    moduleNumber: 8,
-    moduleTitle: 'Stakeholders & Leadership',
+    moduleNumber: MODULE_META.leadership.number,
+    moduleTitle: MODULE_META.leadership.title,
     title: 'Cross-Functional Stakeholder Alignment & Crisis Plan',
     tagline: 'Navigate stakeholder conflicts, align divergent incentives, and author an executive communication plan.',
     estimatedHours: '2–3 hrs',
@@ -486,10 +491,10 @@ export const CAPSTONE_DEFINITIONS: Record<string, CapstoneDefinition> = {
 
   capstone: {
     moduleSlug: 'capstone',
-    moduleNumber: 9,
-    moduleTitle: 'Capstone & Career Portfolio',
-    title: 'End-to-End Interview-Ready Product Case Study',
-    tagline: 'Synthesize all 9 modules into a comprehensive, interview-ready Product Case Study portfolio artifact.',
+    moduleNumber: MODULE_META.capstone.number,
+    moduleTitle: MODULE_META.capstone.title,
+    title: 'End-to-End Product Case Study',
+    tagline: 'Synthesize all 9 modules into an end-to-end product case study for your portfolio.',
     estimatedHours: '5–6 hrs',
     competencyCluster: 'strategy',
     deliverableType: 'Comprehensive Portfolio Case Study',

@@ -112,8 +112,8 @@ export const BUTTON_SECONDARY = `
 `
 
 /**
- * Quiet text link for secondary destinations ("See a real portfolio", "View the
- * curriculum"). Underline on hover; at least 44px tall so it stays a comfortable target.
+ * Quiet text link for secondary destinations ("Browse the curriculum", "See all
+ * questions"). Underline on hover; at least 44px tall so it stays a comfortable target.
  */
 export const LINK_QUIET = `
   group inline-flex items-center gap-1.5 min-h-11 text-sm font-semibold text-primary

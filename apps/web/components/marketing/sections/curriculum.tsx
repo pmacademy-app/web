@@ -16,7 +16,7 @@ import {
   SECTION_Y,
 } from '@/components/marketing/styles'
 import { padIndex } from '@/config/marketing'
-import { MODULES } from '@/config/content'
+import { MODULE_META_LIST, formatModuleHours } from '@/lib/curriculum/module-meta'
 
 /**
  * Curriculum section: a numbered ledger, 01 to 09 (homepage redesign, UI-6).
@@ -32,11 +32,11 @@ import { MODULES } from '@/config/content'
  * blocks rather than staggering nine rows.
  */
 export function CurriculumSection() {
-  const rows = MODULES.map((module) => ({
+  const rows = MODULE_META_LIST.map((module) => ({
     number: module.number,
     title: module.title,
     lessonCount: module.lessonCount,
-    estimatedTime: module.estimatedTime,
+    estimatedTime: formatModuleHours(module.estimatedMinutes),
   }))
 
   return (

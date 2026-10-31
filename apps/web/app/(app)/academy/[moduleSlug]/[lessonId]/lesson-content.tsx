@@ -56,6 +56,7 @@ import { useQuickStartOptional } from '@/components/quick-start/QuickStartContex
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePreview'
 import { getCapstoneHref } from '@/config/capstones'
+import { formatPositionLabel, lessonBreadcrumbLabels } from '@/lib/curriculum/lesson-position'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
 import {
   getCoreBlocks,
@@ -76,9 +77,11 @@ interface LessonPageContentProps {
   prevLessonUrl: string | null
   nextLessonUrl: string | null
   nextLessonTitle?: string | null   // title of the next lesson, for the completion CTA
-  globalOrder: number       // 1-indexed global curriculum position (1..90)
+  globalOrder: number       // 1-indexed global curriculum position (1..90); logic only, never shown
   moduleNumber: number      // 1-indexed module number (1..9)
-  moduleName: string        // formatted module display name
+  /** 1-indexed position of this lesson inside its module (UX-05 display number). */
+  moduleLessonNumber: number
+  moduleName: string        // module title from MODULE_META
   initialProgress?: LessonProgressV2 | null
   /**
    * Phase 4 A/B variant, resolved server-side (deterministic per user). `treatment` renders
@@ -488,6 +491,7 @@ export default function LessonPageContent({
   nextLessonTitle,
   globalOrder,
   moduleNumber,
+  moduleLessonNumber,
   moduleName,
   initialProgress,
   recutVariant = 'control',
@@ -578,15 +582,19 @@ export default function LessonPageContent({
   // the next non-lesson page.
   const quickStart = useQuickStartOptional()
 
-  // Sync breadcrumbs with topbar — use globalOrder for correct display
+  // Sync breadcrumbs with topbar, using module-local numbering (UX-05)
   useEffect(() => {
+    const crumbs = lessonBreadcrumbLabels(
+      { moduleNumber, moduleTitle: moduleName, lessonNumber: moduleLessonNumber },
+      lesson.title,
+    )
     setBreadcrumbs([
       { label: 'Curriculum', href: '/academy' },
-      { label: `Module ${String(moduleNumber).padStart(2, '0')}: ${moduleName}`, href: `/academy#${lesson.module}` },
-      { label: `Lesson ${globalOrder}: ${lesson.title}` },
+      { label: crumbs.module, href: `/academy#${lesson.module}` },
+      { label: crumbs.lesson },
     ])
     return () => setBreadcrumbs([])
-  }, [lesson, globalOrder, moduleNumber, moduleName, setBreadcrumbs])
+  }, [lesson, moduleNumber, moduleLessonNumber, moduleName, setBreadcrumbs])
 
 
   // Handle browser back/forward (popstate) between tabs
@@ -711,7 +719,7 @@ export default function LessonPageContent({
     setCompletedThisSession(true)
   }
 
-  // ── Lesson Mastered screen ────────────────────────────────────────────────
+  // ── Lesson Completed screen ────────────────────────────────────────────────
   if (completedThisSession) {
     // A module is complete when the globalOrder is divisible by 10 (lessons 10, 20, 30... 90)
     const isModuleComplete = globalOrder % 10 === 0
@@ -743,7 +751,6 @@ export default function LessonPageContent({
               <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                 Capstone Project Available
               </span>
-              <span className="text-xs font-bold text-emerald-500">+100 XP</span>
             </div>
             <h3 className="text-lg font-bold font-serif text-foreground">
               {moduleName} Capstone Project
@@ -810,7 +817,7 @@ export default function LessonPageContent({
         <div className="space-y-3">
           <h1 className="text-3xl font-bold font-serif text-foreground">Lesson Completed!</h1>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
-            You have mastered <strong>{lesson.title}</strong>. Your skill radar has been updated.
+            You completed <strong>{lesson.title}</strong>. Your skill radar has been updated.
           </p>
           {sessionQuizScore !== null && (
             <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -909,9 +916,9 @@ export default function LessonPageContent({
       {activeTab === 'theory' && (
         <div className="border-b border-border pb-6 mb-2">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary mb-3">
-            <span>Module {moduleNumber}: {moduleName}</span>
+            <span>{formatPositionLabel(moduleNumber, moduleLessonNumber)}</span>
             <span className="text-muted-foreground/40">•</span>
-            <span>Lesson {globalOrder}</span>
+            <span>{moduleName}</span>
             <span className="text-muted-foreground/40">•</span>
             {/* Phase 4 (§4.3, Step 6): honest estimate. Treatment shows the computed Core
                 reading time and labels it as Core; control keeps the authored figure. */}

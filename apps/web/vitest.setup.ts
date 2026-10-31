@@ -139,6 +139,14 @@ vi.mock('next/server', () => {
   return {
     NextRequest: MockNextRequest,
     NextResponse: MockNextResponse,
+    after: (fn: () => unknown) => {
+      try {
+        const res = fn()
+        if (res && typeof (res as Promise<unknown>).then === 'function') {
+          ;(res as Promise<unknown>).catch(() => {})
+        }
+      } catch {}
+    },
   }
 })
 

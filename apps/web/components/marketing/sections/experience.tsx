@@ -213,7 +213,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-foreground px-2.5 py-0.5 rounded font-semibold">
-                          Module 03 · Lesson 29
+                          Module 3 · Lesson 9
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock size={13} /> 6 min read
@@ -302,7 +302,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-foreground">
-                          Card 18 of 24 · Module 05 (Lesson 42)
+                          Card 18 of 24 · Module 5 · Lesson 2
                         </span>
                         <span className="text-[11px] text-[#70685A]">Next review: 3 days</span>
                       </div>
@@ -359,7 +359,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#EAF5EF] text-primary px-2 py-0.5 rounded font-semibold">
-                          Capstone Deliverable · Module 03 (Lesson 22)
+                          Capstone Deliverable · Module 3 · Lesson 2
                         </span>
                         <span className="font-mono font-semibold text-foreground">+150 XP</span>
                       </div>
@@ -404,7 +404,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-foreground px-2 py-0.5 rounded font-semibold">
-                          Product Teardown · Module 07 (Lesson 61)
+                          Product Teardown · Module 7 · Lesson 1
                         </span>
                         <span className="flex items-center gap-1 font-mono">
                           <Award size={13} className="text-primary" /> Diagnostic Study

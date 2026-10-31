@@ -1,7 +1,8 @@
 /**
  * Landing page hero (server component).
  *
- * One idea: learn product management, leave with proof. Round 2 layout is an
+ * One idea: learn product management, leave with a portfolio you can share. Round 2
+ * layout is an
  * editorial split with no orphan column: the pill, H1, sub and the two calls to action
  * sit on the left (6 of 12 columns), vertically centred against the visual on the
  * right (6 of 12), a layered capstone page with a portfolio card and a Skill Radar
@@ -72,12 +73,12 @@ export function HeroSection() {
 
             <h1 id="hero-heading" className={`${ENTER_OPAQUE} mt-6 ${HERO_TITLE}`}>
               Learn product management.{' '}
-              <span className="block text-primary">Leave with proof.</span>
+              <span className="block text-primary">Leave with a portfolio you can share.</span>
             </h1>
 
             <p className={`${ENTER_OPAQUE} delay-100 mt-6 ${DISPLAY_LEAD} max-w-[34ch]`}>
-              90 lessons and 9 capstones build a public portfolio you can share. Free,
-              permanently.
+              90 lessons and 9 capstones. You choose which deliverables to publish.
+              Free, permanently.
             </p>
 
             <div

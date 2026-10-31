@@ -1,9 +1,27 @@
-'use client'
-
 import Link from 'next/link'
 import { CheckCircle2, ArrowRight } from 'lucide-react'
+import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
 
-export default function VerifiedPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>
+
+/**
+ * Where "Set up your path" goes. A sanitized `?next=` (the lesson the learner was reading
+ * before signing up) is carried into onboarding so it can send them back there (S2).
+ */
+function verifiedOnboardingHref(rawNext: string | string[] | undefined): string {
+  const raw = Array.isArray(rawNext) ? rawNext[0] : rawNext
+  const next = sanitizeNextPath(raw?.trim(), '')
+  return next ? `/onboarding?next=${encodeURIComponent(next)}` : '/onboarding'
+}
+
+export default async function VerifiedPage({
+  searchParams = Promise.resolve({}),
+}: {
+  searchParams?: SearchParams
+} = {}) {
+  const params = (await searchParams) ?? {}
+  const onboardingHref = verifiedOnboardingHref(params.next)
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 animate-fade-in">
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 md:p-10 shadow-lg text-center space-y-6">
@@ -22,10 +40,10 @@ export default function VerifiedPage() {
 
         <div className="pt-4">
           <Link
-            href="/dashboard"
+            href={onboardingHref}
             className="inline-flex items-center justify-center w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all group"
           >
-            Go to Dashboard
+            Set up your path
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>

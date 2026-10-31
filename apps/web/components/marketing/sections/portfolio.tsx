@@ -2,13 +2,13 @@
  * Proof section: the public portfolio, then the nine capstones behind it (server component).
  *
  * Placed so the outcome arrives before the mechanics. It carries one of the page's two
- * eyebrows. The sample link goes to a real public portfolio (SAMPLE_PORTFOLIO_PATH),
- * not to signup.
+ * eyebrows. The sample portfolio link is held back until the exemplar portfolio is
+ * finished (SAMPLE_PORTFOLIO_PATH in config/marketing.ts).
  *
  * ## Layout (round 2)
  *
  * The header spans the container: the section heading and lead on the left, the wall's
- * own heading and the sample link on the right, bottom-aligned, so neither column is
+ * own heading and lead on the right, bottom-aligned, so neither column is
  * empty. The 3x3 wall then runs full width beneath it, and the signup CTA closes the
  * section once the proof has been shown.
  *
@@ -16,28 +16,21 @@
  * chooses to publish. Nothing here may describe them as checked, scored or marked.
  *
  * Client JavaScript here is limited to the islands it composes: Reveal (scroll entry),
- * SpotlightGroup (pointer glow on the wall), TrackedLink and HeroCtaLink (analytics on
- * click).
+ * SpotlightGroup (pointer glow on the wall) and HeroCtaLink (analytics on click).
  */
-
-import { ArrowRight } from 'lucide-react'
 
 import { HeroCtaLink } from '@/components/marketing/sections/hero-cta'
 import { PortfolioShowcase } from '@/components/marketing/sections/portfolio-showcase'
 import { Reveal } from '@/components/marketing/motion/reveal'
-import { TrackedLink } from '@/components/marketing/tracked-link'
 import {
-  ARROW_NUDGE,
   BAND_PLAIN,
   CONTAINER,
   EYEBROW,
   EYEBROW_RULE,
-  LINK_QUIET,
   SECTION_LEAD,
   SECTION_TITLE,
   SECTION_Y,
 } from '@/components/marketing/styles'
-import { SAMPLE_PORTFOLIO_PATH } from '@/config/marketing'
 
 export function PortfolioSection() {
   return (
@@ -74,15 +67,6 @@ export function PortfolioSection() {
               You write the opportunity brief, the PRD, the roadmap. You choose what goes
               public.
             </p>
-            <TrackedLink
-              href={SAMPLE_PORTFOLIO_PATH}
-              event="home_secondary_cta_click"
-              args={{ location: 'proof', target: 'sample_portfolio' }}
-              className={`${LINK_QUIET} mt-2`}
-            >
-              See a real portfolio
-              <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
-            </TrackedLink>
           </Reveal>
         </div>
 

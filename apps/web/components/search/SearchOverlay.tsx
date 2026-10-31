@@ -24,6 +24,8 @@ import {
   type CurriculumModuleIndex,
   type LessonAccessInfo,
 } from '@/lib/curriculum-access'
+import { getModuleMeta, getModuleTitle } from '@/lib/curriculum/module-meta'
+import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -165,19 +167,28 @@ async function loadCurriculumAccess(): Promise<AccessData | null> {
  * deduping to one entry per lesson, so the pure access resolver can find module boundaries. */
 function buildModuleIndexFromEntries(entries: SearchEntry[]): {
   index: CurriculumModuleIndex
-  lessonNumberById: Map<string, number>
+  /** "Module 3 · Lesson 2" per lesson id (UX-05: global numbers stay out of the UI). */
+  positionLabelById: Map<string, string>
 } {
   const seen = new Map<string, { id: string; module: string; order: number }>()
-  const lessonNumberById = new Map<string, number>()
   for (const e of entries) {
     if (!e.lessonId) continue
     if (!seen.has(e.lessonId)) {
       seen.set(e.lessonId, { id: e.lessonId, module: e.moduleName, order: e.lessonNumber })
     }
-    if (!lessonNumberById.has(e.lessonId)) lessonNumberById.set(e.lessonId, e.lessonNumber)
   }
   const curriculum = [...seen.values()].sort((a, b) => a.order - b.order)
-  return { index: buildCurriculumModuleIndex(curriculum), lessonNumberById }
+  const ordered = { lessons: curriculum }
+  const positionLabelById = new Map<string, string>()
+  for (const lesson of curriculum) {
+    positionLabelById.set(lesson.id, getLessonPosition(lesson, ordered).label)
+  }
+  return { index: buildCurriculumModuleIndex(curriculum), positionLabelById }
+}
+
+/** Compact module label for a result chip, from MODULE_META (D3). */
+function moduleChipLabel(slug: string): string {
+  return getModuleMeta(slug)?.shortTitle ?? getModuleTitle(slug)
 }
 
 // ─── Simple client-side search ───────────────────────────────────────────────
@@ -210,18 +221,6 @@ function searchEntries(
     .sort((a, b) => b.score - a.score)
     .slice(0, 16)
     .map((s) => s.entry)
-}
-
-const MODULE_NAMES: Record<string, string> = {
-  foundations: 'Foundations',
-  discovery: 'Discovery',
-  strategy: 'Strategy',
-  execution: 'Execution',
-  growth: 'Growth',
-  leadership: 'Leadership',
-  technical: 'Technical',
-  design: 'Design',
-  capstone: 'Capstone',
 }
 
 const QUICK_LINKS = [
@@ -532,17 +531,19 @@ export function SearchOverlay() {
                 const isLocked = info?.state === 'locked'
                 const isCompleted = info?.state === 'completed'
                 const isInProgress = info?.state === 'in_progress'
-                const prereqNumber =
+                const prereqLabel =
                   isLocked && info?.prerequisiteLessonId && derived
-                    ? derived.lessonNumberById.get(info.prerequisiteLessonId) ?? null
+                    ? derived.positionLabelById.get(info.prerequisiteLessonId) ?? null
                     : null
+                const positionLabel =
+                  derived?.positionLabelById.get(entry.lessonId) ?? `Lesson ${entry.lessonNumber}`
 
                 // A11y: describe the state in the accessible name so it is never colour-only.
                 const stateText = isCompleted
                   ? 'Completed'
                   : isLocked
-                    ? prereqNumber
-                      ? `Locked. Complete Lesson ${prereqNumber} first`
+                    ? prereqLabel
+                      ? `Locked. Complete ${prereqLabel} first`
                       : 'Locked'
                     : isInProgress
                       ? 'In progress'
@@ -554,7 +555,7 @@ export function SearchOverlay() {
                       type="button"
                       onClick={() => navigateTo(entry)}
                       onMouseEnter={() => dispatch({ type: 'SELECT_IDX', idx })}
-                      aria-label={`${entry.title}. Lesson ${entry.lessonNumber}, ${MODULE_NAMES[entry.moduleName] ?? entry.moduleName}. ${stateText}.`}
+                      aria-label={`${entry.title}. ${positionLabel}, ${getModuleTitle(entry.moduleName)}. ${stateText}.`}
                       className={`w-full flex items-start gap-3.5 px-4 sm:px-5 py-3 text-left transition-colors cursor-pointer border-l-2 ${
                         isSelected
                           ? 'bg-primary/10 border-primary'
@@ -581,7 +582,7 @@ export function SearchOverlay() {
                             {entry.title}
                           </span>
                           <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-muted/80 text-muted-foreground">
-                            Lesson {entry.lessonNumber} · {MODULE_NAMES[entry.moduleName] ?? entry.moduleName}
+                            {positionLabel} · {moduleChipLabel(entry.moduleName)}
                           </span>
                           {isCompleted && (
                             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -596,7 +597,7 @@ export function SearchOverlay() {
                           {isLocked && (
                             <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                               <Lock className="w-2.5 h-2.5" />
-                              {prereqNumber ? `Locked · complete Lesson ${prereqNumber}` : 'Locked'}
+                              {prereqLabel ? `Locked · complete ${prereqLabel}` : 'Locked'}
                             </span>
                           )}
                         </div>

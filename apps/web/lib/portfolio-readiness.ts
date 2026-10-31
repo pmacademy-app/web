@@ -170,7 +170,12 @@ export interface PortfolioVerificationStatus {
 }
 
 /**
- * Automatic Portfolio Verification eligibility (no admin approval required).
+ * Automatic "Profile complete" eligibility (no admin approval required).
+ *
+ * Stored and typed as portfolio "verification" for schema compatibility, but it
+ * measures profile completeness only (photo, bio, two links). It says nothing
+ * about identity or skill, so every UI surface labels it "Profile complete",
+ * never "Verified" (PROD-08a).
  *
  * Reuses the SAME avatar/bio completeness signals `calculatePortfolioReadiness`
  * already computes (via its `items` array) instead of re-deriving them, so the

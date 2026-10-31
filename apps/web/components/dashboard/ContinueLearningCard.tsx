@@ -6,10 +6,13 @@ export { FirstSessionKickoffCard }
 
 export interface NextLessonData {
   id: string
-  order: number
+  /** Module-local position from getLessonPosition, e.g. "Module 2 · Lesson 3" (W1). */
+  positionLabel: string
   title: string
+  /** Module slug, used for the lesson URL only. */
   module: string
-  moduleTitle?: string
+  /** Display title from MODULE_META, never the raw slug. */
+  moduleTitle: string
   estimatedTime: string
   progressPercentage?: number
 }
@@ -70,12 +73,12 @@ export function ContinueLearningCard({
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold font-serif text-foreground leading-tight">
-            Lesson {nextLesson.order}: {nextLesson.title}
+            {nextLesson.positionLabel}: {nextLesson.title}
           </h2>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span className="font-medium text-foreground/80">
-              Module: <span className="capitalize">{nextLesson.module.replace('-', ' ')}</span>
+              Module: {nextLesson.moduleTitle}
             </span>
             <span>•</span>
             <span>Est. Time: {nextLesson.estimatedTime}</span>

@@ -970,6 +970,41 @@ export type Database = {
         }
         Relationships: []
       }
+      product_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          occurred_at: string
+          properties: Json
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          occurred_at?: string
+          properties?: Json
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          occurred_at?: string
+          properties?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quiz_attempts: {
         Row: {
           attempted_at: string
@@ -2067,10 +2102,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      weekly_cohort_retention: {
+        Row: {
+          active_learners: number | null
+          active_week: string | null
+          cohort_size: number | null
+          cohort_week: string | null
+          week_offset: number | null
+        }
+        Relationships: []
+      }
+      weekly_mastering_learners: {
+        Row: {
+          mastering_learners: number | null
+          week_start: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      calculate_user_level: { Args: { p_xp: number }; Returns: number }
+      calculate_user_level:{ Args: { p_xp: number }; Returns: number }
       claim_email_queue_items: {
         Args: { p_batch_size: number }
         Returns: {

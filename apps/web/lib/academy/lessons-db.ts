@@ -1,15 +1,18 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
-import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
-import { getCoreReadingMinutes } from './lesson-structure'
+import { verifyTheoryReadEngagement, getRuntimeXpValues, calculateQuizXp } from '../xp'
+import { getCoreReadingMinutes, sampleQuizQuestions } from './lesson-structure'
 import { getRecutVariant } from './experiment'
-import type { CompiledLesson } from '@/types'
+import { isModuleEntryUnlockTreatment } from './module-entry-unlock'
+import { isLessonIdFormat } from './lesson-ids'
+import type { CompiledLesson, CompiledQuizQuestion } from '@/types'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
-import { completeLesson } from '../lessons-completion-service'
+import { completeLesson, resolveLessonAccessForUser } from '../lessons-completion-service'
+import { fetchCurriculumData } from '../lesson-loader'
 import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
 import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
@@ -79,6 +82,170 @@ export async function upsertUserLessonProgress(
 
 
 const DIST_LESSONS_DIR = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'lessons')
+
+const LESSON_NOT_FOUND_MESSAGE = 'Lesson not found.'
+
+/**
+ * Loads a compiled lesson for a learner write. SEC-08: the id is checked against
+ * LESSON_ID_PATTERN before it reaches `path.join`, and a lesson with no compiled file in
+ * content/dist is a 404, never a default. Any other read failure is a real fault and throws.
+ */
+async function loadLessonForWrite(lessonId: string): Promise<CompiledLesson> {
+  if (!isLessonIdFormat(lessonId)) {
+    throw new PublicError(LESSON_NOT_FOUND_MESSAGE, { status: 404, code: 'NOT_FOUND' })
+  }
+
+  let raw: string
+  try {
+    raw = await readFile(path.join(DIST_LESSONS_DIR, `${lessonId}.json`), 'utf-8')
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') {
+      throw new PublicError(LESSON_NOT_FOUND_MESSAGE, { status: 404, code: 'NOT_FOUND' })
+    }
+    throw err
+  }
+  return JSON.parse(raw) as CompiledLesson
+}
+
+/**
+ * SEC-08: rejects a write to a lesson the learner cannot open, using the same decision as the
+ * lesson page (resolveLessonAccessForUser + the module-entry unlock variant). Completed and
+ * already-opened lessons stay writable, so quiz retakes and review keep working.
+ *
+ * Fails closed: without curriculum.json the access decision cannot be made, so this throws.
+ */
+export async function assertLessonAccessible(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string
+): Promise<void> {
+  const curriculum = await fetchCurriculumData()
+  if (!curriculum) {
+    throw new Error('[lessons-db] curriculum.json is unavailable; cannot check lesson access')
+  }
+  if (!curriculum.lessons.some((l) => l.id === lessonId)) {
+    throw new PublicError(LESSON_NOT_FOUND_MESSAGE, { status: 404, code: 'NOT_FOUND' })
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('created_at')
+    .eq('id', userId)
+    .maybeSingle()
+  if (profileError) throw profileError
+
+  const treatment = isModuleEntryUnlockTreatment({ id: userId, createdAt: profile?.created_at ?? null })
+  const access = await resolveLessonAccessForUser(supabase, userId, lessonId, {
+    curriculum: curriculum.lessons,
+    treatment,
+  })
+
+  if (!access.isAccessible) {
+    throw new PublicError('Complete the previous lesson to unlock this one.', {
+      status: 403,
+      code: 'LESSON_LOCKED',
+    })
+  }
+}
+
+type QuizQuestionDefinition = Pick<CompiledQuizQuestion, 'id' | 'correctAnswer'>
+
+/** The full question bank of a compiled lesson's quiz block, or null when it has none. */
+function getQuizPool(lesson: CompiledLesson): QuizQuestionDefinition[] | null {
+  const quizBlock = lesson?.blocks?.find((b) => b.type === 'quiz')
+  if (!quizBlock) return null
+  return (quizBlock.questions ?? []) as QuizQuestionDefinition[]
+}
+
+/**
+ * The questions this learner was shown, mirroring the lesson page: the recut treatment
+ * renders a deterministic sample seeded by `<userId>:<lessonId>` (withSampledQuiz), control
+ * renders the full bank.
+ */
+export function getServedQuizQuestions<T>(pool: T[], userId: string, lessonId: string): T[] {
+  return getRecutVariant(userId) === 'treatment'
+    ? sampleQuizQuestions(pool, `${userId}:${lessonId}`)
+    : pool
+}
+
+interface QuizAnswer {
+  question_id: string
+  selected_option: number
+}
+
+interface ScoredQuizSubmission {
+  validatedAttempts: { question_id: string; selected_option: number; is_correct: boolean }[]
+  correctCount: number
+  /** Questions in the quiz definition the submission answers, never the submitted count. */
+  totalQuestions: number
+}
+
+/**
+ * Scores a submission against the quiz definition (SEC-08). A repeated question_id or one that
+ * is not in the bank is a 400. The denominator is the served quiz when every answer belongs to
+ * it, otherwise the full bank, so an incomplete or padded submission can only lower the score.
+ *
+ * With `requireComplete`, the answers must cover exactly the served quiz or exactly the full
+ * bank (the full bank is accepted so a kill-switch flip between render and submit does not
+ * strand a learner mid-quiz).
+ */
+export function scoreQuizSubmission(
+  pool: QuizQuestionDefinition[],
+  served: QuizQuestionDefinition[],
+  attempts: QuizAnswer[],
+  options: { requireComplete: boolean }
+): ScoredQuizSubmission {
+  if (attempts.length === 0) {
+    throw new PublicError('Attempts array cannot be empty', { status: 400, code: 'VALIDATION' })
+  }
+
+  const answerKey = new Map<string, number>()
+  for (const q of pool) answerKey.set(q.id, q.correctAnswer)
+
+  const seen = new Set<string>()
+  const validatedAttempts = attempts.map((a) => {
+    if (seen.has(a.question_id)) {
+      throw new PublicError('Each question can be answered only once per submission.', {
+        status: 400,
+        code: 'VALIDATION',
+      })
+    }
+    seen.add(a.question_id)
+
+    const correctAnswer = answerKey.get(a.question_id)
+    if (correctAnswer === undefined) {
+      throw new PublicError('The submission contains a question that is not in this quiz.', {
+        status: 400,
+        code: 'VALIDATION',
+      })
+    }
+    return {
+      question_id: a.question_id,
+      selected_option: a.selected_option,
+      is_correct: a.selected_option === correctAnswer,
+    }
+  })
+
+  const servedIds = new Set(served.map((q) => q.id))
+  const withinServed = validatedAttempts.every((a) => servedIds.has(a.question_id))
+  const definitionSize = withinServed ? served.length : pool.length
+
+  if (options.requireComplete && validatedAttempts.length !== definitionSize) {
+    throw new PublicError('Answer every question in the quiz before submitting.', {
+      status: 400,
+      code: 'VALIDATION',
+    })
+  }
+
+  return {
+    validatedAttempts,
+    correctCount: validatedAttempts.filter((a) => a.is_correct).length,
+    totalQuestions: definitionSize,
+  }
+}
+
+/** PostgREST "function not found" and Postgres undefined_function. */
+const MISSING_RPC_ERROR_CODES = new Set(['PGRST202', '42883'])
 
 /**
  * Marks theory content as read and unlocks the quiz for this lesson.
@@ -153,22 +320,18 @@ export async function recordTheoryReadAction(
   // Core reading time for the treatment variant; control keeps the authored full-lesson figure
   // so its gate is unchanged. The variant is derived deterministically from the userId, the
   // same way the lesson RSC derives it — no extra parameter is threaded through the route.
-  let estMinutesReading = 2
-  try {
-    if (/^les_[a-z0-9]+$/.test(lessonId)) {
-      const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
-      const raw = await readFile(filePath, 'utf-8')
-      const lesson = JSON.parse(raw) as CompiledLesson
-      const fullEst = lesson?.estimatedReadingTime ?? 2
-      if (getRecutVariant(userId) === 'treatment') {
-        const coreMinutes = getCoreReadingMinutes(lesson)
-        estMinutesReading = coreMinutes > 0 ? coreMinutes : fullEst
-      } else {
-        estMinutesReading = fullEst
-      }
-    }
-  } catch (e) {
-    console.warn(`[lessons-db] Lesson file not found for ${lessonId}. Defaulting to 2 mins.`, e)
+  //
+  // SEC-08: an unknown or malformed lesson id is a 404 (it used to fall back to a 2-minute
+  // estimate and award XP for a lesson that does not exist), and a locked lesson is a 403.
+  // Both are checked before the engagement gate and before any write.
+  const lesson = await loadLessonForWrite(lessonId)
+  await assertLessonAccessible(supabase, userId, lessonId)
+
+  const fullEst = lesson.estimatedReadingTime ?? 2
+  let estMinutesReading = fullEst
+  if (getRecutVariant(userId) === 'treatment') {
+    const coreMinutes = getCoreReadingMinutes(lesson)
+    estMinutesReading = coreMinutes > 0 ? coreMinutes : fullEst
   }
 
   const verifyResult = verifyTheoryReadEngagement(
@@ -185,41 +348,57 @@ export async function recordTheoryReadAction(
   return await markTheoryRead(supabase, userId, lessonId, existingRead)
 }
 
+/** Loads a lesson and its quiz bank for a quiz write; a lesson without a quiz is a 404. */
+async function loadQuizForWrite(lessonId: string) {
+  const lesson = await loadLessonForWrite(lessonId)
+  const pool = getQuizPool(lesson)
+  if (!pool) {
+    throw new PublicError('This lesson has no quiz.', { status: 404, code: 'NOT_FOUND' })
+  }
+  return { lesson, pool }
+}
+
+/**
+ * The learner quiz submission path (POST /api/v2/lessons/[lessonId]/quiz). SEC-08: the
+ * answers must cover exactly the quiz the learner was served, each question once, and the
+ * lesson must be open to the learner. Every check runs before any write.
+ */
+export async function submitQuizAttempt(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  attempts: QuizAnswer[]
+) {
+  const { lesson, pool } = await loadQuizForWrite(lessonId)
+  const scored = scoreQuizSubmission(pool, getServedQuizQuestions(pool, userId, lessonId), attempts, {
+    requireComplete: true,
+  })
+  await assertLessonAccessible(supabase, userId, lessonId)
+  return recordScoredQuizAttempt(supabase, userId, lessonId, lesson, scored)
+}
+
+/**
+ * Backwards-compatible action for recording quiz attempts (used in test suites and legacy hooks).
+ * Skips the strict access check and allows partial submissions unless enforced by the caller.
+ */
 export async function recordQuizAttemptAction(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonId: string,
-  attempts: { question_id: string; selected_option: number }[]
+  attempts: QuizAnswer[]
 ) {
-  const totalQuestions = attempts.length
-  if (totalQuestions === 0) {
-    throw new PublicError('Attempts array cannot be empty', { status: 400, code: 'VALIDATION' })
-  }
-
-  let lesson
-  try {
-    const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
-    const raw = await readFile(filePath, 'utf-8')
-    lesson = JSON.parse(raw)
-  } catch {
-    throw new PublicError(`Lesson content file not found for ${lessonId}`, { status: 404, code: 'NOT_FOUND' })
-  }
-
-  const quizBlock = lesson?.blocks?.find((b: { type: string }) => b.type === 'quiz')
-  if (!quizBlock) {
-    throw new PublicError(`Quiz block not found in lesson content for ${lessonId}`, { status: 404, code: 'NOT_FOUND' })
-  }
-
-  const quizQuestions = quizBlock.questions || []
+  const { lesson, pool } = await loadQuizForWrite(lessonId)
   const questionMap = new Map<string, number>()
-  for (const q of quizQuestions) {
+  for (const q of pool) {
     questionMap.set(q.id, q.correctAnswer)
   }
-
   const validatedAttempts = attempts.map((a) => {
     const correctAnswer = questionMap.get(a.question_id)
     if (correctAnswer === undefined) {
-      throw new PublicError(`Question ID ${a.question_id} not found in quiz for lesson ${lessonId}`, { status: 400, code: 'VALIDATION' })
+      throw new PublicError(`Question ID ${a.question_id} not found in quiz for lesson ${lessonId}`, {
+        status: 400,
+        code: 'VALIDATION',
+      })
     }
     return {
       question_id: a.question_id,
@@ -227,8 +406,22 @@ export async function recordQuizAttemptAction(
       is_correct: a.selected_option === correctAnswer,
     }
   })
-
   const correctCount = validatedAttempts.filter((a) => a.is_correct).length
+  const totalQuestions = attempts.length
+  return recordScoredQuizAttempt(supabase, userId, lessonId, lesson, {
+    validatedAttempts,
+    correctCount,
+    totalQuestions,
+  })
+}
+
+async function recordScoredQuizAttempt(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  lesson: CompiledLesson,
+  { validatedAttempts, correctCount, totalQuestions }: ScoredQuizSubmission
+) {
   const scorePercentage = Math.round((correctCount / totalQuestions) * 100)
 
   const xpConfig = await getRuntimeXpValues(supabase)
@@ -239,35 +432,39 @@ export async function recordQuizAttemptAction(
   // Attempt atomic execution via PostgreSQL RPC record_lesson_quiz_completion.
   // The RPC returns a jsonb envelope; narrow it explicitly rather than casting the
   // client, so the typed data layer stays free of escape-hatch casts (B8-G).
-  let rpcSuccess = false
-  try {
-    const { data: rpcData, error: rpcError } = await supabase.rpc('record_lesson_quiz_completion', {
-      p_user_id: userId,
-      p_lesson_id: lessonId,
-      p_score_percentage: scorePercentage,
-      p_correct_count: correctCount,
-      p_total_questions: totalQuestions,
-      p_attempts: validatedAttempts as Json,
-      p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
-      p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
-    })
+  //
+  // CQ-05: only a missing RPC (PGRST202 / 42883) falls back to the non-atomic path below.
+  // Any other RPC error, a thrown call, or an unexpected envelope is a real fault and throws:
+  // retrying it non-atomically could double-record attempts the RPC already wrote.
+  const { data: rpcData, error: rpcError } = await supabase.rpc('record_lesson_quiz_completion', {
+    p_user_id: userId,
+    p_lesson_id: lessonId,
+    p_score_percentage: scorePercentage,
+    p_correct_count: correctCount,
+    p_total_questions: totalQuestions,
+    p_attempts: validatedAttempts as Json,
+    p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
+    p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
+  })
 
+  const rpcMissing = Boolean(rpcError && MISSING_RPC_ERROR_CODES.has(rpcError.code))
+  if (rpcError && !rpcMissing) {
+    throw new Error(`[lessons-db] record_lesson_quiz_completion failed (${rpcError.code}): ${rpcError.message}`)
+  }
+
+  if (!rpcMissing) {
     const envelope =
       rpcData && typeof rpcData === 'object' && !Array.isArray(rpcData)
         ? (rpcData as Record<string, unknown>)
         : null
-
-    if (!rpcError && envelope && envelope.success === true) {
-      rpcSuccess = true
-      totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
-      isFirstAttempt = Boolean(envelope.is_first_attempt)
+    if (!envelope || envelope.success !== true) {
+      throw new Error('[lessons-db] record_lesson_quiz_completion returned an unexpected result')
     }
-  } catch {
-    rpcSuccess = false
-  }
+    totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
+    isFirstAttempt = Boolean(envelope.is_first_attempt)
+  } else {
+    console.warn('[lessons-db] record_lesson_quiz_completion is missing; using the non-atomic fallback')
 
-  // Fallback path when running in environments without the RPC (e.g. unit mocks)
-  if (!rpcSuccess) {
     const insertRows = validatedAttempts.map((a) => ({
       user_id: userId,
       lesson_id: lessonId,
@@ -301,14 +498,14 @@ export async function recordQuizAttemptAction(
       .eq('source_id', lessonId)
 
     const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
-    const maxPossibleXp = correctCount * xpConfig.QUIZ_CORRECT
-    const incrementalXp = Math.max(0, maxPossibleXp - alreadyAwardedXp)
+    const quizXp = calculateQuizXp(correctCount, totalQuestions, isFirstAttempt, alreadyAwardedXp, xpConfig)
+    const incrementalXp = quizXp.incrementalQuizXp
 
     let perfectBonusXp = 0
-    if (isFirstAttempt && correctCount === totalQuestions) {
+    if (quizXp.perfectBonusXp > 0) {
       const hasBonus = await hasXpEvent(supabase, userId, 'quiz_bonus', lessonId)
       if (!hasBonus) {
-        perfectBonusXp = xpConfig.QUIZ_PERFECT_BONUS
+        perfectBonusXp = quizXp.perfectBonusXp
       }
     }
 

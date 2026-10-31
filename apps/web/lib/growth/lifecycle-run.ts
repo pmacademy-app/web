@@ -14,6 +14,8 @@ import { loadProofStates } from '@/lib/growth/proof-state-db'
 import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { BRAND } from '@/lib/brand'
+import { getStreakStatusSummary } from '@/lib/streaks/streaks'
+import { findQueuedIdempotencyKeys, isInSendWindow, shiftLocalDate } from '@/lib/notifications/send-window'
 
 /** Keyset pagination batch size for lifecycle processing (mirrors T3 crons). */
 const BATCH_SIZE = 100
@@ -30,7 +32,7 @@ export interface LifecycleRunOptions {
   source: LifecycleRunSource
   /** Count who would be emailed or nudged, and write nothing at all. */
   dryRun: boolean
-  /** Bypass the per-user local-hour delivery gate. */
+  /** Bypass the per-user local send window. */
   force: boolean
   /** Clock for segment resolution, local-hour gating and nudges. Defaults to the current time. */
   now?: Date
@@ -45,6 +47,8 @@ export interface LifecycleRunResult {
   heldOut: number
   skippedTimezone: number
   skippedNoSegment: number
+  /** Due this run but already queued by an earlier run (same idempotency key). */
+  skippedAlreadyQueued: number
   /**
    * Pages of learners skipped entirely (no lifecycle email, no holdout, no nudge) because their
    * progress or preferences could not be read. Also counted in `proofNudges.pagesSkipped`, which
@@ -71,6 +75,7 @@ function emptyResult(dryRun: boolean, paused: boolean): LifecycleRunResult {
     heldOut: 0,
     skippedTimezone: 0,
     skippedNoSegment: 0,
+    skippedAlreadyQueued: 0,
     pagesSkipped: 0,
     proofNudges: {
       sent: { 'nudge.portfolio_ready': 0, 'nudge.fellow_eligible': 0 },
@@ -78,6 +83,29 @@ function emptyResult(dryRun: boolean, paused: boolean): LifecycleRunResult {
       pagesSkipped: 0,
     },
   }
+}
+
+/**
+ * Idempotency key for one lifecycle email (ENG-01).
+ *
+ * The send window is level-triggered (preferred local hour until 22:00), so a learner can be
+ * evaluated on two local dates inside one segment window: the D+1 and D+3 windows are 24 hours
+ * of signup age, which can span two local days. A per-local-date key would then send the same
+ * sequence twice, so D+1 and D+3 are keyed per learner (each can only happen once per account).
+ * Streak-broken qualifies on exactly one local date per lapse (quiet days are whole local
+ * days), so it keeps the per-local-date key and can recur for a later lapse.
+ */
+export function lifecycleIdempotencyKey(sequenceKey: LifecycleSequenceKey, userId: string, localDate: string): string {
+  return sequenceKey === 'lifecycle.streak_broken' ? `${sequenceKey}-${userId}-${localDate}` : `${sequenceKey}-${userId}`
+}
+
+/**
+ * Keys an earlier run may have used for the same email: the pre-ENG-01 per-local-date D+1/D+3
+ * keys for today and yesterday, so the key change cannot resend in the days it deploys.
+ */
+function legacyLifecycleKeys(sequenceKey: LifecycleSequenceKey, userId: string, localDate: string): string[] {
+  if (sequenceKey === 'lifecycle.streak_broken') return []
+  return [`${sequenceKey}-${userId}-${localDate}`, `${sequenceKey}-${userId}-${shiftLocalDate(localDate, -1)}`]
 }
 
 /**
@@ -92,7 +120,7 @@ function emptyResult(dryRun: boolean, paused: boolean): LifecycleRunResult {
  * Learners who get no lifecycle email this run are then evaluated for a proof nudge.
  *
  * With `dryRun` nothing is written: no email, no in-app, no holdout record. Counts cover
- * learners in their delivery hour (add `force` to count everyone).
+ * learners inside their send window (add `force` to count everyone).
  *
  * Never throws for a data failure: a query error or exception stops the run, is logged,
  * and the counts gathered so far are returned.
@@ -132,7 +160,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
 
       let queryBuilder = supabase
         .from('users')
-        .select('id, email, name, created_at, current_streak, longest_streak, last_streak_date, timezone')
+        .select('id, email, name, created_at, current_streak, longest_streak, streak_freezes_available, last_streak_date, timezone')
         .not('email', 'is', null)
 
       if (lastSeenId) {
@@ -145,7 +173,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
 
       if (queryErr) {
         const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
+        await logSystemError({
           severity: 'error',
           category: 'cron',
           operation: logOperation('query'),
@@ -161,6 +189,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         created_at: string
         current_streak?: number
         longest_streak?: number
+        streak_freezes_available?: number
         last_streak_date?: string | null
         timezone?: string | null
       }>
@@ -197,7 +226,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         result.proofNudges.pagesSkipped++
         const { logSystemError } = await import('@/lib/monitoring/logger')
         const reason = (progressRes.error as { message?: string }).message ?? String(progressRes.error)
-        void logSystemError({
+        await logSystemError({
           severity: 'error',
           category: 'cron',
           operation: logOperation('progress_query'),
@@ -215,7 +244,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         result.proofNudges.pagesSkipped++
         const { logSystemError } = await import('@/lib/monitoring/logger')
         const reason = prefRead.error instanceof Error ? prefRead.error.message : String(prefRead.error)
-        void logSystemError({
+        await logSystemError({
           severity: 'error',
           category: 'cron',
           operation: logOperation('preferences_query'),
@@ -254,16 +283,31 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         const userLocalTime = getUserLocalTime(timezone, nowUtc)
         const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
 
-        // Local-hour delivery gate (bypassed with force) — keeps lifecycle mail
-        // in the learner's morning window and makes the hourly cron send once/day.
-        if (!force && userLocalTime.localHour !== targetHour) {
+        // ENG-01: level-triggered window (bypassed with force). Due from the learner's
+        // preferred local hour until 22:00 local, so a missed hourly run is caught by the
+        // next one; lifecycleIdempotencyKey keeps it to one email per sequence episode.
+        if (!force && !isInSendWindow(userLocalTime, targetHour)) {
           result.skippedTimezone++
           continue
         }
 
+        // PROD-05: users.current_streak only resets on the learner's next activity, so a lapsed
+        // learner still stores their old streak and qualifiesStreakBroken (currentStreak === 0)
+        // could never fire. The snapshot carries the effective streak in their timezone instead.
+        const { effectiveCurrentStreak } = getStreakStatusSummary(
+          {
+            currentStreak: user.current_streak ?? 0,
+            longestStreak: user.longest_streak ?? 0,
+            streakFreezesAvailable: user.streak_freezes_available ?? 0,
+            lastActivityDate: user.last_streak_date ?? '',
+          },
+          timezone,
+          nowUtc
+        )
+
         const snapshot: LifecycleUserSnapshot = {
           createdAt: user.created_at,
-          currentStreak: user.current_streak ?? 0,
+          currentStreak: effectiveCurrentStreak,
           longestStreak: user.longest_streak ?? 0,
           lastStreakDate: user.last_streak_date ?? null,
           hasAnyProgress: hasAnyProgress.has(user.id),
@@ -285,7 +329,9 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         // split is queryable for D14 measurement.
         if (isLifecycleHoldout(user.id, sequenceKey)) {
           result.heldOut++
-          if (!dryRun) await recordHoldoutEvent(supabase, user.id, sequenceKey)
+          if (!dryRun) {
+            await recordHoldoutEvent(supabase, user.id, sequenceKey, lifecycleIdempotencyKey(sequenceKey, user.id, userLocalTime.localDate))
+          }
           nudgeCandidates.push(nudgeCandidate)
           continue
         }
@@ -300,14 +346,28 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
           ? await loadProofStates(supabase, lifecycleDue.map((d) => d.user.id)).catch(() => null)
           : null
 
+      // Learners whose email an earlier run already queued are dropped in one read. As before,
+      // a learner who got today's lifecycle email is not a nudge candidate either.
+      const alreadyQueued = await findQueuedIdempotencyKeys(
+        supabase,
+        lifecycleDue.flatMap((d) => [
+          lifecycleIdempotencyKey(d.sequenceKey, d.user.id, d.localDate),
+          ...legacyLifecycleKeys(d.sequenceKey, d.user.id, d.localDate),
+        ])
+      )
+
       for (const { user, sequenceKey, userPref, localDate, nudgeCandidate } of lifecycleDue) {
+        const idempotencyKey = lifecycleIdempotencyKey(sequenceKey, user.id, localDate)
+        if ([idempotencyKey, ...legacyLifecycleKeys(sequenceKey, user.id, localDate)].some((k) => alreadyQueued.has(k))) {
+          result.skippedAlreadyQueued++
+          continue
+        }
         if (dryRun) {
           // Counted as it would be sent; the learner is then not a nudge candidate either.
           result.lifecycleQueued++
           result.queuedBySequence[sequenceKey]++
           continue
         }
-        const idempotencyKey = `${sequenceKey}-${user.id}-${localDate}`
         const proofState = proofStates?.get(user.id)
         const nextStep = proofState ? selectProofNextStep(proofState) : null
         const hasStep = nextStep !== null && nextStep.kind !== 'none'
@@ -350,7 +410,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         if (nudges.skipped) result.proofNudges.pagesSkipped++
         if (nudges.failed > 0) {
           const { logSystemError } = await import('@/lib/monitoring/logger')
-          void logSystemError({
+          await logSystemError({
             severity: 'error',
             category: 'cron',
             operation: logOperation('proof_nudges'),
@@ -368,7 +428,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
   } catch (err) {
     console.error(`${logPrefix} Failed to process lifecycle sequences:`, err)
     const { logSystemError } = await import('@/lib/monitoring/logger')
-    void logSystemError({
+    await logSystemError({
       severity: 'error',
       category: 'cron',
       operation: logOperation('exception'),
@@ -383,17 +443,37 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
  * Records a holdout assignment as an auditable `notification_events` row so the
  * treatment/holdout split can be measured server-side without a separate platform.
  * Non-fatal: a logging failure never blocks the run.
+ *
+ * ENG-01: a held-out learner stays due on every hourly run of their send window, so the row
+ * carries the email's idempotency key and is written once per key. The admin readout counts
+ * these rows, and one per run would inflate the holdout arm. If the existence check itself
+ * fails, the row is written anyway (an extra audit row is better than a missing one).
  */
 async function recordHoldoutEvent(
   supabase: ReturnType<typeof createServiceRoleClient>,
   userId: string,
-  sequenceKey: LifecycleSequenceKey
+  sequenceKey: LifecycleSequenceKey,
+  idempotencyKey: string
 ): Promise<void> {
   try {
+    try {
+      let existing = supabase
+        .from('notification_events')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('skipped_reason', `lifecycle_holdout:${sequenceKey}`)
+      // D+1 and D+3 happen once per account, so any earlier row (including pre-ENG-01 rows
+      // without a key) already records this holdout. Streak-broken can recur per lapse.
+      if (sequenceKey === 'lifecycle.streak_broken') existing = existing.eq('payload->>idempotencyKey', idempotencyKey)
+      const { data, error } = await existing.limit(1)
+      if (!error && data && data.length > 0) return
+    } catch {
+      // Fall through to the insert.
+    }
     await supabase.from('notification_events').insert({
       event_type: sequenceKey,
       user_id: userId,
-      payload: { sequence: sequenceKey } as unknown as import('@/lib/supabase').Json,
+      payload: { sequence: sequenceKey, idempotencyKey } as unknown as import('@/lib/supabase').Json,
       channels_notified: [],
       skipped_reason: `lifecycle_holdout:${sequenceKey}`,
       created_at: new Date().toISOString(),

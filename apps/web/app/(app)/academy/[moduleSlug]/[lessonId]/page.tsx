@@ -24,6 +24,8 @@ import { getRecutVariant } from '@/lib/academy/experiment'
 import { withSampledQuiz } from '@/lib/academy/lesson-structure'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import { getModuleTitle } from '@/lib/curriculum/module-meta'
+import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import LessonPageContent from './lesson-content'
 
 interface PageProps {
@@ -31,18 +33,6 @@ interface PageProps {
 }
 
 const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih']
-
-const MODULE_LABEL: Record<string, string> = {
-  foundations: 'Product Thinking Foundations',
-  discovery: 'Discovery & User Research',
-  strategy: 'Product Strategy',
-  execution: 'Product Execution',
-  growth: 'Growth & Metrics',
-  leadership: 'PM Leadership',
-  technical: 'Technical Fundamentals for PMs',
-  design: 'Design Thinking & UX',
-  capstone: 'Capstone & Career Portfolio',
-}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lessonId } = await params
@@ -56,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
   const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
   const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
-  const description = `Lesson ${globalOrder}: ${lesson.title}, part of the ${MODULE_LABEL[lesson.module] ?? lesson.module} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
+  const description = `Lesson ${globalOrder}: ${lesson.title}, part of the ${getModuleTitle(lesson.module)} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
   const isSample = SAMPLE_LESSON_IDS.includes(lessonId)
 
   return {
@@ -102,7 +92,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const isSampleLesson = SAMPLE_LESSON_IDS.includes(lessonId)
 
   if (!user && !isSampleLesson) {
-    redirect('/login')
+    redirect(`/login?next=${encodeURIComponent(`/academy/${lesson.module}/${lesson.id}`)}`)
   }
 
   // 4. Sequential unlock check using stable IDs from global curriculum array
@@ -125,20 +115,9 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const prevGlobalIndex = prevMeta ? lessons.findIndex((l) => l.id === prevMeta.id) : -1
   const prevGlobalOrder = prevGlobalIndex >= 0 ? prevGlobalIndex + 1 : null
 
-  // Human-readable module name
-  const MODULE_NAMES: Record<string, string> = {
-    foundations: 'Foundations',
-    discovery: 'Discovery & User Research',
-    strategy: 'Product Strategy',
-    execution: 'Product Execution',
-    growth: 'Growth & Metrics',
-    leadership: 'PM Leadership',
-    technical: 'Technical Fundamentals',
-    design: 'Design Thinking',
-    capstone: 'Capstone Projects',
-  }
-  const moduleName = MODULE_NAMES[lesson.module] ?? lesson.module
-  const moduleNum = Math.ceil(globalOrder / 10)
+  // Display position (UX-05): "Module 3 · Lesson 2" with the module title from MODULE_META.
+  // The global index above stays for URLs, metadata and JSON-LD only.
+  const position = getLessonPosition(lesson, curriculum)
 
   let isLocked = false
 
@@ -235,6 +214,12 @@ export default async function AcademyLessonPage({ params }: PageProps) {
       firstIncompletePrereqGlobalOrder !== null &&
       lastPrereqGlobalOrder !== null &&
       firstIncompletePrereqGlobalOrder < lastPrereqGlobalOrder
+    // Learner-facing numbers use the module-local "Module N · Lesson M" scheme (UX-05).
+    const prereqLabel = firstIncompletePrereqMeta
+      ? getLessonPosition(firstIncompletePrereqMeta, curriculum).label
+      : null
+    const lastPrereqEntry = lastPrereqIndex >= 0 ? lessons[lastPrereqIndex] : null
+    const lastPrereqLabel = lastPrereqEntry ? getLessonPosition(lastPrereqEntry, curriculum).label : null
 
     return (
       <div className="container mx-auto px-4 py-16 max-w-xl text-center space-y-8 animate-fade-in">
@@ -247,32 +232,32 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         <div className="space-y-3">
           <h1 className="text-2xl font-bold font-serif text-foreground">Lesson Locked</h1>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-            {showRange ? (
-              // Range display: "Complete Lessons X–Y before unlocking Lesson N"
-              // This correctly shows "Lessons 1–10" for a brand-new user at Lesson 11
+            {showRange && prereqLabel && lastPrereqLabel ? (
+              // Range display: "Complete Module 1 · Lesson 1 through Module 1 · Lesson 10
+              // before unlocking Module 2 · Lesson 1: Title"
               <>
                 You must complete{' '}
                 <span className="font-semibold text-foreground">
-                  Lessons {firstIncompletePrereqGlobalOrder}–{lastPrereqGlobalOrder}
+                  {prereqLabel} through {lastPrereqLabel}
                 </span>{' '}
                 before you can unlock{' '}
                 <span className="font-semibold text-foreground">
-                  Lesson {globalOrder}: {lesson.title}
+                  {position.label}: {lesson.title}
                 </span>
                 .
               </>
             ) : (
-              // Single lesson display: "Complete Lesson X: Title before unlocking Lesson N"
+              // Single lesson display: "Complete Module 1 · Lesson 3: Title before unlocking ..."
               <>
                 You must complete{' '}
-                {firstIncompletePrereqMeta && firstIncompletePrereqGlobalOrder && (
+                {firstIncompletePrereqMeta && prereqLabel && (
                   <span className="font-semibold text-foreground">
-                    Lesson {firstIncompletePrereqGlobalOrder}: {firstIncompletePrereqMeta.title}
+                    {prereqLabel}: {firstIncompletePrereqMeta.title}
                   </span>
                 )}{' '}
                 before you can unlock{' '}
                 <span className="font-semibold text-foreground">
-                  Lesson {globalOrder}: {lesson.title}
+                  {position.label}: {lesson.title}
                 </span>
                 .
               </>
@@ -281,12 +266,12 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {firstIncompletePrereqUrl && firstIncompletePrereqMeta && firstIncompletePrereqGlobalOrder && (
+          {firstIncompletePrereqUrl && firstIncompletePrereqMeta && prereqLabel && (
             <Link
               href={firstIncompletePrereqUrl}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
             >
-              Start Lesson {firstIncompletePrereqGlobalOrder}: {firstIncompletePrereqMeta.title} →
+              Start {prereqLabel}: {firstIncompletePrereqMeta.title} →
             </Link>
           )}
           <Link
@@ -320,7 +305,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: lesson.title,
-    description: `Learn about ${lesson.title}, part of the free ${MODULE_LABEL[lesson.module] ?? lesson.module} curriculum.`,
+    description: `Learn about ${lesson.title}, part of the free ${getModuleTitle(lesson.module)} curriculum.`,
     url: lessonUrl,
     image: `${siteUrl}${BRAND.assets.ogImage}`,
     author: {
@@ -359,8 +344,9 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         nextLessonUrl={nextLessonUrl}
         nextLessonTitle={nextMeta?.title ?? null}
         globalOrder={globalOrder}
-        moduleNumber={moduleNum}
-        moduleName={moduleName}
+        moduleNumber={position.moduleNumber}
+        moduleLessonNumber={position.lessonNumber}
+        moduleName={position.moduleTitle}
         initialProgress={initialProgress}
         recutVariant={recutVariant}
       />

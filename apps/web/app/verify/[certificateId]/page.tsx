@@ -9,6 +9,8 @@ import { Award, AlertCircle, ArrowLeft, BookOpen, Layers, Zap, User } from 'luci
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import {
+  CERTIFICATE_REQUIREMENT_STATEMENT,
+  MODULE_CERTIFICATE_REQUIREMENT_STATEMENT,
   TEST_CERTIFICATE_EXPLANATION,
   TEST_CERTIFICATE_LABEL,
   getVerifyPageCopy,
@@ -224,10 +226,12 @@ export default async function CertificateVerificationPage({ params }: PageProps)
               </div>
               <div>
                 <h2 className="text-xl font-bold font-serif text-foreground">
-                  Credential Summary & Audit Trail
+                  Credential Summary
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  Verified learning achievements backing this certificate.
+                  {cert.type === 'module_completion' || cert.type === 'module'
+                    ? MODULE_CERTIFICATE_REQUIREMENT_STATEMENT
+                    : CERTIFICATE_REQUIREMENT_STATEMENT}
                 </p>
               </div>
             </div>
@@ -256,7 +260,6 @@ export default async function CertificateVerificationPage({ params }: PageProps)
                 <BookOpen className="w-3.5 h-3.5 text-primary" /> Lessons Completed
               </span>
               <div className="text-xl font-bold text-foreground">{cert.lessonsCompleted} / 90</div>
-              <span className="text-[10px] text-emerald-500 font-semibold">AST Verified</span>
             </div>
 
             <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
@@ -269,7 +272,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
 
             <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
               <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-primary" /> Verified Experience
+                <Zap className="w-3.5 h-3.5 text-primary" /> XP Earned
               </span>
               <div className="text-xl font-bold text-foreground">{cert.totalXp.toLocaleString()} XP</div>
               <span className="text-[10px] text-primary font-bold">{cert.levelInfo.title}</span>

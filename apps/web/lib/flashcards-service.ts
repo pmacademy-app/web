@@ -1,10 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase'
+import type { Database, Tables } from '@/lib/supabase'
 import {
   calculateSM2,
   SRSRating,
   FlashcardItem,
-  UserFlashcardSRSRow,
   ReviewStats,
   getDueCards,
   calculateReviewStats,
@@ -12,11 +11,57 @@ import {
 import { awardXp } from '@/lib/xp-service'
 import { getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
-import { getLocalDateString } from '@/lib/streaks'
 import { fetchCurriculumData, fetchCompiledLesson } from '@/lib/lesson-loader'
+import { startOfDay } from '@/lib/admin/dashboard-aggregation'
+import { lessonIdFromFlashcardId } from '@/lib/academy/lesson-ids'
+import { assertLessonAccessible } from '@/lib/academy/lessons-db'
+import { PublicError } from '@/lib/errors/public-error'
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
+type SrsRow = Tables<'user_flashcard_srs'>
+
+/**
+ * Wraps a failed read so callers get an Error that names the table, with the driver
+ * error kept as the cause. Reads no longer degrade silently: a failed
+ * `user_flashcard_srs` read used to make every card look new (CQ-07).
+ */
+function readFailed(table: string, error: { message: string }): Error {
+  return new Error(`[flashcards-service] ${table} read failed: ${error.message}`, { cause: error })
+}
+
+/**
+ * Start of the learner's current local calendar day as a UTC ISO instant, so "today"
+ * can be bounded in SQL. An unknown timezone falls back to UTC, as getLocalDateString does.
+ */
+function localDayStartUtcIso(timezone: string, now: Date): string {
+  try {
+    return startOfDay(now, timezone).toISOString()
+  } catch {
+    return startOfDay(now, 'UTC').toISOString()
+  }
+}
+
+/** Reads the learner's timezone, defaulting to UTC when the profile row has none. */
+async function readUserTimezone(supabase: SupabaseClient<Database>, userId: string): Promise<string> {
+  const { data, error } = await supabase.from('users').select('timezone').eq('id', userId).maybeSingle()
+  if (error) throw readFailed('users', error)
+  return data?.timezone || 'UTC'
+}
+
+/** Counts the flashcard XP events the learner earned since the start of their local day. */
+async function countTodayFlashcardReviews(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  timezone: string,
+  now: Date
+): Promise<number> {
+  const { count, error } = await supabase
+    .from('xp_events')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('source_type', 'flashcard')
+    .gte('created_at', localDayStartUtcIso(timezone, now))
+  if (error) throw readFailed('xp_events', error)
+  return count ?? 0
 }
 
 export interface ReviewQueueData {
@@ -33,43 +78,35 @@ export async function getReviewQueueData(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<ReviewQueueData> {
-  // 1. Fetch lesson progress, SRS records, user profile, today's XP events, and curriculum in parallel
-  const [
-    progressRes,
-    srsRes,
-    userProfileRes,
-    todayXpRes,
-    curriculum,
-  ] = await Promise.all([
-    (supabase.from('user_lesson_progress') as unknown as DBChain)
-      .select('lesson_id, status')
-      .eq('user_id', userId) as unknown as Promise<{ data: { lesson_id: string; status: string }[] | null }>,
-    (supabase.from('user_flashcard_srs') as unknown as DBChain)
-      .select('*')
-      .eq('user_id', userId) as unknown as Promise<{ data: UserFlashcardSRSRow[] | null }>,
-    (supabase.from('users') as unknown as DBChain)
-      .select('timezone')
-      .eq('id', userId)
-      .single() as unknown as Promise<{ data: { timezone: string } | null }>,
-    (supabase.from('xp_events') as unknown as DBChain)
-      .select('created_at')
-      .eq('user_id', userId)
-      .eq('source_type', 'flashcard') as unknown as Promise<{ data: { created_at: string }[] | null }>,
+  const now = new Date()
+
+  // 1. Fetch lesson progress, SRS records, the learner's timezone and the curriculum in
+  // parallel. Every read is checked: a failure throws instead of standing in as "no
+  // rows" (CQ-07).
+  const [progressRes, srsRes, timezone, curriculum] = await Promise.all([
+    supabase.from('user_lesson_progress').select('lesson_id, status').eq('user_id', userId),
+    supabase.from('user_flashcard_srs').select('*').eq('user_id', userId),
+    readUserTimezone(supabase, userId),
     fetchCurriculumData(),
   ])
 
-  const progressRows = progressRes?.data
-  const srsRows = srsRes?.data
-  const userProfile = userProfileRes?.data
-  const todayXpEvents = todayXpRes?.data
+  if (progressRes.error) throw readFailed('user_lesson_progress', progressRes.error)
+  if (srsRes.error) throw readFailed('user_flashcard_srs', srsRes.error)
 
-  const srsRecordsMap = new Map<string, UserFlashcardSRSRow>()
+  const progressRows = progressRes.data
+  const srsRows = srsRes.data
+
+  // Today's completed reviews, counted in SQL and bounded to the learner's local day.
+  // This used to fetch every flashcard XP event ever earned and filter in JS, which
+  // PostgREST truncates past 1,000 rows (CQ-07).
+  const todayCountPromise = countTodayFlashcardReviews(supabase, userId, timezone, now)
+
+  const srsRecordsMap = new Map<string, SrsRow>()
   const srsLessonIds = new Set<string>()
   for (const row of srsRows || []) {
     srsRecordsMap.set(row.flashcard_id, row)
-    const rowLessonId = (row as { lesson_id?: string }).lesson_id
-    if (rowLessonId) {
-      srsLessonIds.add(rowLessonId)
+    if (row.lesson_id) {
+      srsLessonIds.add(row.lesson_id)
     }
   }
 
@@ -91,8 +128,12 @@ export async function getReviewQueueData(
   const unlockedCards: FlashcardItem[] = []
   const cardIdsInUnlocked = new Set<string>()
 
-  // Batch load compiled lessons in parallel instead of sequential loop
-  const targetLessonDetails = await Promise.all(targetLessons.map((l) => fetchCompiledLesson(l.id)))
+  // Batch load compiled lessons in parallel instead of sequential loop. The today-count
+  // query is awaited alongside, so it cannot reject unobserved.
+  const [targetLessonDetails, completedTodayCount] = await Promise.all([
+    Promise.all(targetLessons.map((l) => fetchCompiledLesson(l.id))),
+    todayCountPromise,
+  ])
 
   for (let i = 0; i < targetLessons.length; i++) {
     const lessonSummary = targetLessons[i]
@@ -156,18 +197,7 @@ export async function getReviewQueueData(
     }
   }
 
-  // 4. Calculate today's completed reviews count from xp_events
-  const timezone = userProfile?.timezone || 'UTC'
-  const todayStr = getLocalDateString(timezone, new Date())
-
-  const completedTodayCount = (todayXpEvents || []).filter((e) => {
-    if (!e?.created_at) return false
-    const d = new Date(e.created_at)
-    return !isNaN(d.getTime()) && getLocalDateString(timezone, d) === todayStr
-  }).length
-
-  // 5. Evaluate due cards and aggregate stats
-  const now = new Date()
+  // 4. Evaluate due cards and aggregate stats
   const dueCards = getDueCards(unlockedCards, srsRecordsMap, now)
   const stats = calculateReviewStats(unlockedCards, srsRecordsMap, completedTodayCount, now)
 
@@ -176,6 +206,37 @@ export async function getReviewQueueData(
     allUnlockedCards: unlockedCards,
     stats,
   }
+}
+
+/**
+ * SEC-08: proves a flashcard id names a real card before anything is written for it, and
+ * returns the lesson that owns it. The id must be in the compiler's `fc-<lessonId>-<n>`
+ * format, its lesson must exist in content/dist, and the card must be in that lesson's
+ * flashcard deck. A caller-supplied lesson id has to agree with the card's own lesson.
+ */
+export async function resolveFlashcardLessonId(
+  flashcardId: string,
+  explicitLessonId?: string
+): Promise<string> {
+  const lessonId = lessonIdFromFlashcardId(flashcardId)
+  if (!lessonId) {
+    throw new PublicError('Flashcard not found.', { status: 404, code: 'NOT_FOUND' })
+  }
+  if (explicitLessonId !== undefined && explicitLessonId !== lessonId) {
+    throw new PublicError('lessonId does not match the flashcard.', { status: 400, code: 'VALIDATION' })
+  }
+
+  const lesson = await fetchCompiledLesson(lessonId)
+  const exists = (lesson?.blocks ?? []).some(
+    (b) =>
+      b.type === 'flashcardDeck' &&
+      Array.isArray((b as { cards?: { id: string }[] }).cards) &&
+      (b as { cards: { id: string }[] }).cards.some((card) => card.id === flashcardId)
+  )
+  if (!exists) {
+    throw new PublicError('Flashcard not found.', { status: 404, code: 'NOT_FOUND' })
+  }
+  return lessonId
 }
 
 /**
@@ -188,16 +249,21 @@ export async function recordFlashcardReview(
   flashcardId: string,
   rating: number,
   explicitLessonId?: string
-): Promise<{ nextReviewAt: Date; easeFactor: number }> {
+): Promise<{ nextReviewAt: Date; easeFactor: number; xpEarned: number }> {
+  // 0. Validate the card before any read or write keyed on its id (SEC-08), then require its
+  // lesson to be open to the learner, so a card from a locked lesson earns no XP (403).
+  const lessonId = await resolveFlashcardLessonId(flashcardId, explicitLessonId)
+  await assertLessonAccessible(supabase, userId, lessonId)
+
   // 1. Fetch current SM-2 state from database
-  const { data: srsData, error: srsFetchError } = (await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
+  const { data: srsData, error: srsFetchError } = await supabase
+    .from('user_flashcard_srs')
     .select('*')
     .eq('user_id', userId)
     .eq('flashcard_id', flashcardId)
-    .maybeSingle()) as unknown as { data: UserFlashcardSRSRow | null; error: unknown }
+    .maybeSingle()
 
-  if (srsFetchError) throw srsFetchError
+  if (srsFetchError) throw readFailed('user_flashcard_srs', srsFetchError)
 
   const prevState = srsData
     ? {
@@ -210,14 +276,7 @@ export async function recordFlashcardReview(
   // 2. Compute next spacing intervals using SM-2 Engine
   const nextState = calculateSM2(rating as SRSRating, prevState)
 
-  // 3. Resolve lessonId (from parameter, existing SRS record, or flashcard ID prefix)
-  let lessonId = explicitLessonId || (srsData as { lesson_id?: string })?.lesson_id || ''
-  if (!lessonId) {
-    const match = flashcardId.match(/^fc-(les_[a-z0-9]+)-/i)
-    if (match) {
-      lessonId = match[1]
-    }
-  }
+  // 3. lessonId was resolved from the card itself in step 0.
 
   // 4. Persist SRS review state with composite key (user_id, lesson_id, flashcard_id)
   const srsPayload = {
@@ -230,14 +289,14 @@ export async function recordFlashcardReview(
     next_review_at: nextState.nextReviewAt.toISOString(),
   }
 
-  const { error: upsertError } = await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
+  const { error: upsertError } = await supabase
+    .from('user_flashcard_srs')
     .upsert(srsPayload, { onConflict: 'user_id,lesson_id,flashcard_id' })
 
   if (upsertError) {
     // Fallback if database table has primary key constraint on (user_id, flashcard_id)
-    const { error: fallbackError } = await (supabase
-      .from('user_flashcard_srs') as unknown as DBChain)
+    const { error: fallbackError } = await supabase
+      .from('user_flashcard_srs')
       .upsert(srsPayload, { onConflict: 'user_id,flashcard_id' })
 
     if (fallbackError) {
@@ -246,31 +305,24 @@ export async function recordFlashcardReview(
     }
   }
 
-  // 4. Award daily flashcard review XP via canonical XP service (deduplicated)
+  // 4. Award daily flashcard review XP via canonical XP service (deduplicated).
+  // A failed read throws into the catch below, so XP is withheld rather than awarded
+  // twice: a failed read used to look like "not awarded today".
+  let xpEarned = 0
   try {
-    const { data: userProfile } = await (supabase
-      .from('users') as unknown as DBChain)
-      .select('timezone')
-      .eq('id', userId)
-      .single() as unknown as { data: { timezone: string } | null; error: unknown }
+    const timezone = await readUserTimezone(supabase, userId)
 
-    const timezone = userProfile?.timezone || 'UTC'
-    const todayStr = getLocalDateString(timezone, new Date())
-
-    const { data: existingEvents } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .select('created_at')
+    const { count: awardedTodayCount, error: xpReadError } = await supabase
+      .from('xp_events')
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('source_type', 'flashcard')
-      .eq('source_id', flashcardId) as unknown as { data: { created_at: string }[] | null; error: unknown }
+      .eq('source_id', flashcardId)
+      .gte('created_at', localDayStartUtcIso(timezone, new Date()))
 
-    const hasAwardedToday = existingEvents?.some((e) => {
-      if (!e?.created_at) return false
-      const d = new Date(e.created_at)
-      return !isNaN(d.getTime()) && getLocalDateString(timezone, d) === todayStr
-    }) ?? false
+    if (xpReadError) throw readFailed('xp_events', xpReadError)
 
-    if (!hasAwardedToday) {
+    if (!awardedTodayCount) {
       const xpConfig = await getRuntimeXpValues(supabase)
       await awardXp(
         supabase,
@@ -279,6 +331,7 @@ export async function recordFlashcardReview(
         xpConfig.FLASHCARD_REVIEW,
         flashcardId
       )
+      xpEarned = xpConfig.FLASHCARD_REVIEW
     }
   } catch (err) {
     console.error(`[flashcards-service] Error checking/awarding flashcard XP:`, err)
@@ -290,6 +343,7 @@ export async function recordFlashcardReview(
   return {
     nextReviewAt: nextState.nextReviewAt,
     easeFactor: nextState.easeFactor,
+    xpEarned,
   }
 }
 
@@ -303,11 +357,12 @@ export async function recordReviewSessionCompletion(
   xpEarned: number = 0
 ): Promise<{ success: boolean }> {
   try {
-    const { data: userRec } = await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: userRec, error: userReadError } = await supabase
+      .from('users')
       .select('email, name')
       .eq('id', userId)
-      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+      .maybeSingle()
+    if (userReadError) throw readFailed('users', userReadError)
 
     const { globalNotificationDispatcher } = await import('./notifications/dispatcher')
     const { initializeNotificationConnectors } = await import('./notifications/events/connectors')
@@ -368,15 +423,15 @@ export async function recordBatchFlashcardReviews(
   const cardIds = [...new Set(reviews.map((r) => r.flashcardId))]
 
   // 1. Batch fetch current SM-2 states from database for all cards in this batch
-  const { data: srsData, error: srsFetchError } = (await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
+  const { data: srsData, error: srsFetchError } = await supabase
+    .from('user_flashcard_srs')
     .select('*')
     .eq('user_id', userId)
-    .in('flashcard_id', cardIds)) as unknown as { data: UserFlashcardSRSRow[] | null; error: unknown }
+    .in('flashcard_id', cardIds)
 
-  if (srsFetchError) throw srsFetchError
+  if (srsFetchError) throw readFailed('user_flashcard_srs', srsFetchError)
 
-  const srsMap = new Map<string, UserFlashcardSRSRow>()
+  const srsMap = new Map<string, SrsRow>()
   for (const row of srsData || []) {
     srsMap.set(row.flashcard_id, row)
   }
@@ -405,7 +460,7 @@ export async function recordBatchFlashcardReviews(
 
     const nextState = calculateSM2(review.rating as SRSRating, prevState)
 
-    let lessonId = review.lessonId || (existing as { lesson_id?: string })?.lesson_id || ''
+    let lessonId = review.lessonId || existing?.lesson_id || ''
     if (!lessonId) {
       const match = review.flashcardId.match(/^fc-(les_[a-z0-9]+)-/i)
       if (match) {
@@ -432,13 +487,13 @@ export async function recordBatchFlashcardReviews(
 
   // 3. Batch upsert SRS review states
   if (payloads.length > 0) {
-    const { error: upsertError } = await (supabase
-      .from('user_flashcard_srs') as unknown as DBChain)
+    const { error: upsertError } = await supabase
+      .from('user_flashcard_srs')
       .upsert(payloads, { onConflict: 'user_id,lesson_id,flashcard_id' })
 
     if (upsertError) {
-      const { error: fallbackError } = await (supabase
-        .from('user_flashcard_srs') as unknown as DBChain)
+      const { error: fallbackError } = await supabase
+        .from('user_flashcard_srs')
         .upsert(payloads, { onConflict: 'user_id,flashcard_id' })
 
       if (fallbackError) {
@@ -448,31 +503,25 @@ export async function recordBatchFlashcardReviews(
     }
   }
 
-  // 4. Batch award daily review XP (deduplicated per card per local day)
+  // 4. Batch award daily review XP (deduplicated per card per local day). The read is
+  // bounded to today in SQL, and a failure throws into the catch so XP is withheld
+  // rather than awarded twice.
   try {
-    const { data: userProfile } = await (supabase
-      .from('users') as unknown as DBChain)
-      .select('timezone')
-      .eq('id', userId)
-      .single() as unknown as { data: { timezone: string } | null; error: unknown }
+    const timezone = await readUserTimezone(supabase, userId)
 
-    const timezone = userProfile?.timezone || 'UTC'
-    const todayStr = getLocalDateString(timezone, new Date())
-
-    const { data: existingEvents } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .select('source_id, created_at')
+    const { data: existingEvents, error: xpReadError } = await supabase
+      .from('xp_events')
+      .select('source_id')
       .eq('user_id', userId)
       .eq('source_type', 'flashcard')
-      .in('source_id', cardIds) as unknown as { data: { source_id: string; created_at: string }[] | null; error: unknown }
+      .in('source_id', cardIds)
+      .gte('created_at', localDayStartUtcIso(timezone, new Date()))
+
+    if (xpReadError) throw readFailed('xp_events', xpReadError)
 
     const awardedCardIds = new Set<string>()
     for (const event of existingEvents || []) {
-      if (!event.created_at) continue
-      const d = new Date(event.created_at)
-      if (!isNaN(d.getTime()) && getLocalDateString(timezone, d) === todayStr) {
-        awardedCardIds.add(event.source_id)
-      }
+      if (event.source_id) awardedCardIds.add(event.source_id)
     }
 
     const xpConfig = await getRuntimeXpValues(supabase)

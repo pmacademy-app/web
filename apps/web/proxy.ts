@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
+// PROD-09: the one open-redirect guard for `next`. Its only runtime dependency is
+// `node:crypto`, which the proxy's Node.js runtime provides.
+import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
 // Phase 6: pure, dependency-light access resolver (types only — safe in the edge proxy bundle).
 import { resolveLessonAccess } from '@/lib/curriculum-access'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
@@ -15,7 +18,7 @@ import { resolveLessonAccess } from '@/lib/curriculum-access'
 // Next's file tracer cannot tell which files are needed and conservatively ships the
 // whole compiled corpus with the proxy: 94 of the 191 traced entries were
 // `content/dist` — all 90 lesson bodies plus the curriculum, glossary and id
-// registry — for a branch that only runs on authenticated /lessons/* requests.
+// registry — for a branch that only runs on authenticated /lessons/... requests.
 //
 // Importing the curriculum index directly is the same data (it is the very file
 // `fetchCurriculumData()` reads) resolved at build time instead, so the tracer ships
@@ -32,6 +35,34 @@ const ADMIN_LOGIN_PAGE = '/admin/login'
 const ACCESS_DENIED_PAGE = '/admin/access-denied'
 // Google sign-ups who have not yet accepted the Terms and confirmed their age land here.
 const CONSENT_GATE_PAGE = '/signup/complete-consent'
+const LEARNER_LOGIN_PAGE = '/login'
+const ONBOARDING_PAGE = '/onboarding'
+
+/**
+ * The page the visitor asked for (path plus query), as a `next` value, or null when it
+ * is not a safe same-origin page path (UX-07 / PROD-09).
+ *
+ * Built from the request URL, so it cannot point off-origin today; it still goes
+ * through `sanitizeNextPath` so `/api` paths, over-long values and anything a future
+ * caller passes in are dropped rather than echoed into a redirect.
+ */
+function returnPathOf(request: NextRequest): string | null {
+  const safe = sanitizeNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`, '')
+  return safe === '' ? null : safe
+}
+
+/** True for /onboarding and anything under it, ignoring the query, hash and case. */
+function isOnboardingPath(value: string): boolean {
+  const pathname = value.split(/[?#]/, 1)[0].toLowerCase()
+  return pathname === ONBOARDING_PAGE || pathname.startsWith(`${ONBOARDING_PAGE}/`)
+}
+
+/** A redirect to `target`, carrying `next` when there is one. */
+function redirectWithNext(target: string, next: string | null, request: NextRequest): NextResponse {
+  const url = new URL(target, request.url)
+  if (next) url.searchParams.set('next', next)
+  return NextResponse.redirect(url)
+}
 
 /**
  * Attaches refreshed session cookies to a redirect/next response so a token
@@ -173,6 +204,13 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path === '/api/contact'
   const isProtectedLearnerApi = isApiRoute && !isExemptApi
 
+  // CQ-10: admin console APIs stay exempt from the learner gates above (maintenance mode,
+  // email verification, consent), but they still get their session refreshed here. Since
+  // CQ-10 the request-side auth helpers only read the access token, so without this an admin
+  // who stays on one console page past the one-hour token lifetime gets 401s from every
+  // console call. /api/auth routes keeps its fast path: those routes manage the session themselves.
+  const isAdminApi = path.startsWith('/api/admin/')
+
   // Maintenance page must always be reachable so learners see the correct message
   if (path === '/maintenance') {
     return withReferralCookie(passThrough(request, requestId), refParam)
@@ -203,7 +241,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     const accessToken = request.cookies.get('sb-access-token')?.value
     const refreshToken = request.cookies.get('sb-refresh-token')?.value
     if (accessToken || refreshToken) {
-      const slug = path.replace(/^\/lessons\//, '').replace(/\/.*$/, '')
+      const slug = path.replace(/^\/lessons\//, '').split('/')[0]
       const match = slug ? curriculum.lessons.find((l) => l.slug === slug) : null
       const academyUrl = match
         ? new URL(`/academy/${match.module}/${match.id}`, request.url)
@@ -277,7 +315,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   // Fast path for non-guarded public routes
-  if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
+  if (!isPublicPage && !isAppPage && !isProtectedLearnerApi && !isAdminApi) {
     return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
@@ -419,7 +457,9 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
   // ── Consent gate page: signed-in Google users without consent only ───────
   if (isConsentGatePage) {
-    if (!user) return withReferralCookie(NextResponse.redirect(new URL('/login', request.url)), refParam)
+    if (!user) {
+      return withReferralCookie(redirectWithNext(LEARNER_LOGIN_PAGE, returnPathOf(request), request), refParam)
+    }
 
     const response = (await needsConsent())
       ? passThrough(request, requestId)
@@ -471,6 +511,15 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
+  // ── Admin console APIs: session refresh only ────────────────────────────
+  // No gate and no redirect here. Each admin route authorizes the caller itself, and a
+  // request with no valid session passes through to answer its own 401. All this branch
+  // does is persist a refreshed token pair, which the route then reads through cookies().
+  if (isAdminApi) {
+    const response = passThrough(request, requestId)
+    return withReferralCookie(newSession ? withSessionCookies(response, newSession) : response, refParam)
+  }
+
   // ── Protected learner API routes (maintenance & email verification) ─────
   if (isProtectedLearnerApi) {
     const { SettingsService } = await import('@/lib/admin/settings-service')
@@ -519,8 +568,11 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   // ── Protected application routes ─────────────────────────────────────────
   if (isAppPage) {
     if (!user) {
-      const loginTarget = isAdminArea ? ADMIN_LOGIN_PAGE : '/login'
-      const response = NextResponse.redirect(new URL(loginTarget, request.url))
+      // Learners come back to the page they asked for after signing in. The admin login
+      // takes no `next`: it always lands on the console.
+      const response = isAdminArea
+        ? NextResponse.redirect(new URL(ADMIN_LOGIN_PAGE, request.url))
+        : redirectWithNext(LEARNER_LOGIN_PAGE, returnPathOf(request), request)
       response.cookies.delete('sb-access-token')
       response.cookies.delete('sb-refresh-token')
       return withReferralCookie(response, refParam)
@@ -563,18 +615,25 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
 
     const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
-    const isOnboardingPage = path === '/onboarding'
+    const isOnboardingPage = path === ONBOARDING_PAGE
 
     if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
-      // Force onboarding goal selection for learners (admins & override users are unaffected)
-      const response = NextResponse.redirect(new URL('/onboarding', request.url))
+      // Force onboarding goal selection for learners (admins & override users are unaffected).
+      // The page they asked for rides along as `next` so onboarding can finish there. The
+      // dashboard is onboarding's default anyway, and an /onboarding path as `next` would
+      // only send the learner back to onboarding, so neither is carried.
+      const next = path === AUTH_PAGE_TARGET_LEARNER || isOnboardingPath(path) ? null : returnPathOf(request)
+      const response = redirectWithNext(ONBOARDING_PAGE, next, request)
       const sessionRes = newSession ? withSessionCookies(response, newSession) : response
       return withReferralCookie(sessionRes, refParam)
     }
 
     if (isOnboardingComplete && isOnboardingPage) {
-      // Skip onboarding since it is already complete
-      const response = NextResponse.redirect(new URL('/dashboard', request.url))
+      // Skip onboarding since it is already complete, honouring a safe `next`. A `next`
+      // back into onboarding falls to the dashboard so this can never redirect to itself.
+      const requested = sanitizeNextPath(request.nextUrl.searchParams.get('next'), AUTH_PAGE_TARGET_LEARNER)
+      const target = isOnboardingPath(requested) ? AUTH_PAGE_TARGET_LEARNER : requested
+      const response = NextResponse.redirect(new URL(target, request.url))
       const sessionRes = newSession ? withSessionCookies(response, newSession) : response
       return withReferralCookie(sessionRes, refParam)
     }

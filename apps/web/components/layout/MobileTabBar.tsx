@@ -11,7 +11,7 @@ interface MobileTabBarProps {
 }
 
 const PRIMARY_TABS = [
-  { label: 'Home', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Curriculum', href: '/academy', icon: BookOpen },
   { label: 'Review', href: '/review', icon: RotateCw },
   { label: 'Badges', href: '/badges', icon: Trophy },

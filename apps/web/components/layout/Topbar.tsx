@@ -41,9 +41,11 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
   const defaultCrumbs = segments.map((seg, i) => {
     // Human-readable labels
     let label = seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    if (label.toLowerCase() === 'curriculum') label = 'Curriculum'
-    else if (label.toLowerCase() === 'review') label = 'Review Hub'
-    else if (label.toLowerCase() === 'leaderboard') label = 'Cohort Leaderboard'
+    // Route segments that differ from the sidebar label are renamed so the
+    // breadcrumb and the sidebar name each destination the same way.
+    if (seg === 'academy') label = 'Curriculum'
+    else if (seg === 'review') label = 'Review Hub'
+    else if (seg === 'leaderboard') label = 'Leaderboard'
 
     let href = '/' + segments.slice(0, i + 1).join('/')
     // Redirect standalone module slug breadcrumbs to /academy to prevent 404 dead links
@@ -54,6 +56,9 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
   })
 
   const breadcrumbs = contextCrumbs.length > 0 ? contextCrumbs : defaultCrumbs
+  // The root crumb links to the dashboard; skip it when the trail already
+  // starts there so the dashboard never reads "Dashboard > Dashboard".
+  const showRootCrumb = breadcrumbs[0]?.href !== '/dashboard'
 
   const handleSignOut = async () => {
     const result = await logout(router, { redirectTo: LEARNER_LOGIN_PATH })
@@ -120,17 +125,21 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
 
         {/* Breadcrumbs Navigation */}
         <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs font-medium min-w-0">
-          <Link
-            href="/dashboard"
-            className="text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded px-1"
-          >
-            Home
-          </Link>
+          {showRootCrumb && (
+            <Link
+              href="/dashboard"
+              className="text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded px-1"
+            >
+              Dashboard
+            </Link>
+          )}
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1
             return (
               <div key={`${crumb.label}-${idx}`} className="flex items-center gap-1.5">
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                {(showRootCrumb || idx > 0) && (
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                )}
                 {isLast ? (
                   <span className="text-foreground font-semibold px-1 truncate" aria-current="page">
                     {crumb.label}
@@ -166,7 +175,7 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
         >
           <Search className="w-4 h-4" />
         </button>
-        {/* Feedback Trigger — Pencil button */}
+        {/* Feedback Trigger: Pencil button */}
         <button
           type="button"
           id="feedback-trigger-btn"
@@ -247,7 +256,7 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
                   {userProfile.email}
                 </p>
                 <span className="inline-block text-[9px] uppercase tracking-wider font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded">
-                  Lvl {userProfile.level} — {levelTitle}
+                  Lvl {userProfile.level}: {levelTitle}
                 </span>
               </div>
 
@@ -283,7 +292,7 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
                   role="menuitem"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign Out
+                  Log out
                 </button>
               </div>
             </div>

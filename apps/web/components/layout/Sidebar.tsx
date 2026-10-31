@@ -10,6 +10,7 @@ import {
   RotateCw,
   BarChart3,
   Trophy,
+  Users,
   Settings,
   X,
   ChevronDown,
@@ -65,7 +66,7 @@ const SIDEBAR_LINKS = [
   { label: 'Badges', href: '/badges', icon: Trophy, quickStartTarget: 'badges' },
   { label: 'Review Hub', href: '/review', icon: RotateCw, quickStartTarget: 'review' },
   { label: 'Progress', href: '/progress', icon: BarChart3, quickStartTarget: undefined },
-  { label: 'Leaderboard', href: '/leaderboard', icon: Trophy, quickStartTarget: 'leaderboard' },
+  { label: 'Leaderboard', href: '/leaderboard', icon: Users, quickStartTarget: 'leaderboard' },
   { label: 'Settings', href: '/settings', icon: Settings, quickStartTarget: 'settings' },
 ]
 

@@ -10,10 +10,11 @@ interface PortfolioVerificationCardProps {
 }
 
 /**
- * Displays Automatic Portfolio Verification status. Unlike PM Fellow, there is
- * no request/approve action here — verification is computed live from the
- * same profile data as the readiness checklist above, and becomes active the
- * moment all criteria are met (or is set by an admin override).
+ * Displays the automatic "Profile complete" check (stored as portfolio
+ * verification). It only reflects profile completeness (photo, bio, links), not
+ * identity or skill, so the copy never says "Verified". Unlike PM Fellow there
+ * is no request/approve action: it is computed live from the same profile data
+ * as the readiness checklist above (or set by an admin override).
  */
 export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: PortfolioVerificationCardProps) {
   const { isVerified, source, linkCount } = verification
@@ -41,9 +42,9 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
             )}
           </span>
           <div>
-            <h3 className="text-sm font-bold font-serif text-foreground">Portfolio Verification</h3>
+            <h3 className="text-sm font-bold font-serif text-foreground">Profile Complete</h3>
             <p className="text-xs text-muted-foreground">
-              Automatic: no approval needed once your profile meets every requirement below.
+              Shown on your portfolio once your profile meets every requirement below. No approval needed.
             </p>
           </div>
         </div>
@@ -55,18 +56,18 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
               : 'bg-muted text-muted-foreground border-border'
           )}
         >
-          {isVerified ? 'Verified' : 'Not Verified'}
+          {isVerified ? 'Profile complete' : 'Incomplete'}
         </span>
       </div>
 
       {source === 'admin_rejected' && (
         <p className="text-[11px] text-muted-foreground bg-muted/40 border border-border rounded-lg p-2.5">
-          An admin has removed verification from this portfolio. It will not automatically re-verify until an admin restores it.
+          An admin has removed the profile complete check from this portfolio. It will not come back automatically until an admin restores it.
         </p>
       )}
       {source === 'admin_verified' && (
         <p className="text-[11px] text-muted-foreground bg-muted/40 border border-border rounded-lg p-2.5">
-          An admin has manually verified this portfolio.
+          An admin has manually marked this profile complete.
         </p>
       )}
 

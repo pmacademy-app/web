@@ -2,31 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { withRoute } from '@/lib/api/with-route'
 import { processEmailQueue } from '@/lib/notifications/queue/processor'
-
-async function recordSchedulerHeartbeat(
-  status: 'healthy' | 'failed',
-  details: Record<string, unknown>
-): Promise<void> {
-  try {
-    const { createServiceRoleClient } = await import('@/lib/supabase')
-    const supabase = createServiceRoleClient()
-    const nowIso = new Date().toISOString()
-    const payload = {
-      job: 'process-email-queue',
-      status,
-      last_run_at: nowIso,
-      ...(status === 'healthy' ? { last_success_at: nowIso } : {}),
-      ...details,
-    }
-    await supabase.from('system_settings').upsert({
-      key: 'cron_heartbeat:process-email-queue',
-      value: (payload as unknown as import('@/lib/supabase').Json),
-      updated_at: nowIso,
-    })
-  } catch (err) {
-    console.warn('[process-email-queue] Failed to record scheduler heartbeat:', err)
-  }
-}
+import { checkStaleHeartbeats, recordCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 
 /**
  * POST|GET /api/cron/process-email-queue
@@ -34,6 +10,9 @@ async function recordSchedulerHeartbeat(
  * Accepts the scheduler's `CRON_SECRET` bearer token or an authenticated admin
  * session. The unauthorized-attempt record is preserved through `onDenied`, and
  * the durable scheduler heartbeat is still written on both outcomes.
+ *
+ * ENG-01: this five-minute run is also the watchdog for every other cron job. After its own
+ * heartbeat it checks all of them and raises one out-of-band alert per stale episode.
  */
 export const POST = withRoute(
   {
@@ -59,10 +38,11 @@ export const POST = withRoute(
       const result = await processEmailQueue(50, { maxBatches: 5, maxExecutionMs: 45_000 })
       const durationMs = Date.now() - startTime
 
-      await recordSchedulerHeartbeat('healthy', {
+      await recordCronHeartbeat('process-email-queue', 'healthy', {
         last_duration_ms: durationMs,
         last_result: result,
       })
+      await checkStaleHeartbeats()
 
       return NextResponse.json({
         success: true,
@@ -77,10 +57,11 @@ export const POST = withRoute(
       // The heartbeat has to record the failure before the error leaves this
       // frame, otherwise a failed run is indistinguishable from one that never
       // started.
-      await recordSchedulerHeartbeat('failed', {
+      await recordCronHeartbeat('process-email-queue', 'failed', {
         last_duration_ms: durationMs,
         error: errorMsg,
       })
+      await checkStaleHeartbeats()
 
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({

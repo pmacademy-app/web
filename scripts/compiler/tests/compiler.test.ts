@@ -6,7 +6,7 @@ import { generateBlockId, getOrCreateLessonId } from '../registry';
 import { validateCompiledLesson } from '../validation';
 import { CompilerContext } from '../plugins/remark-plugins';
 import { extractQuizBlock, extractFlashcardBlock, mdastToBlocks } from '../plugins/extractors';
-import { compileLesson, compileAllContent } from '../compile';
+import { compileLesson, compileAllContent, parseResourceItem, resolveCompanyName } from '../compile';
 import { compileMermaidToSvg } from '../mermaid-svg';
 
 describe('PM Academy Content Compiler Test Suite', () => {
@@ -492,6 +492,80 @@ describe('PM Academy Content Compiler Test Suite', () => {
         totalBlockquotesFound >= 10,
         `Expected at least 10 blockquotes across the corpus, found ${totalBlockquotesFound}`
       );
+    });
+  });
+
+  describe('Resource items (SEO-13)', () => {
+    it('does not split on hyphens inside a URL', () => {
+      const raw = '[Product-Led Growth guide](https://example.com/product-led-growth-2024)';
+      const item = parseResourceItem(raw);
+      assert.strictEqual(item.citation, raw);
+      assert.strictEqual(item.note, undefined);
+    });
+
+    it('splits a URL item with a note on the spaced separator only', () => {
+      const item = parseResourceItem(
+        '[Self-Serve Onboarding](https://example.com/self-serve-onboarding) - a long-form, step-by-step guide'
+      );
+      assert.strictEqual(item.citation, '[Self-Serve Onboarding](https://example.com/self-serve-onboarding)');
+      assert.strictEqual(item.note, 'a long-form, step-by-step guide');
+    });
+
+    it('splits "Title - note" into citation and note', () => {
+      const item = parseResourceItem('Marty Cagan, *Inspired* - the widely referenced industry text');
+      assert.strictEqual(item.citation, 'Marty Cagan, *Inspired*');
+      assert.strictEqual(item.note, 'the widely referenced industry text');
+    });
+
+    it('splits only on the first separator and keeps later dashes verbatim', () => {
+      const item = parseResourceItem('Title - note one - note two');
+      assert.strictEqual(item.citation, 'Title');
+      assert.strictEqual(item.note, 'note one - note two');
+    });
+
+    it('treats an authored en dash or em dash separator the same way and never emits an em dash', () => {
+      const en = parseResourceItem('Title \u2013 note');
+      assert.deepStrictEqual(en, { citation: 'Title', note: 'note' });
+      const em = parseResourceItem('Title \u2014 note');
+      assert.deepStrictEqual(em, { citation: 'Title', note: 'note' });
+      assert.ok(!JSON.stringify(em).includes('\u2014'));
+    });
+
+    it('leaves hyphenated words and unspaced ranges intact', () => {
+      const raw = 'Wes Bush, *Product-Led Growth* (Lessons 61\u201362)';
+      assert.deepStrictEqual(parseResourceItem(raw), { citation: raw });
+    });
+  });
+
+  describe('Company example name (PROD-11)', () => {
+    it('returns an empty name, not a hard-coded company, when the lesson names none', () => {
+      const name = resolveCompanyName(
+        'Real Company Example',
+        "Shopify's evolution from an online storefront builder into a commerce platform"
+      );
+      assert.strictEqual(name, '');
+    });
+
+    it('returns an empty name when the section has no paragraph', () => {
+      assert.strictEqual(resolveCompanyName('Real Company Example'), '');
+    });
+
+    it('uses a bold lead in the first paragraph', () => {
+      assert.strictEqual(resolveCompanyName('Real Company Example', "**Airbnb**'s early history"), 'Airbnb');
+    });
+
+    it('uses a heading suffix when present', () => {
+      assert.strictEqual(resolveCompanyName('Real Company Example: Stripe', 'Some text'), 'Stripe');
+    });
+
+    it('compiles lesson-061 (no bold company lead) without a "Spotify" heading', async () => {
+      const rootDir = path.resolve(import.meta.dirname, '../../..');
+      const filePath = path.join(rootDir, 'content/lessons/lesson-061.md');
+      const { lesson } = await compileLesson(filePath, { [filePath]: 'les_061test' }, {});
+      const example = lesson.blocks.find((b: any) => b.type === 'companyExample');
+      assert.ok(example, 'lesson-061 must have a companyExample block');
+      assert.notStrictEqual(example.company, 'Spotify');
+      assert.strictEqual(typeof example.company, 'string');
     });
   });
 });

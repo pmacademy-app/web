@@ -1,7 +1,7 @@
 # Deployment & Infrastructure Guide — Prodily PM Academy
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Last Updated:** October 1, 2026
+**Last Updated:** October 28, 2026
 
 ---
 
@@ -39,17 +39,17 @@
 | `RESEND_FROM_EMAIL` | **Server Only** | Verified sender email (`welcome@prodily.app`) |
 | `RESEND_WEBHOOK_SECRET` | **Server Only** | Svix webhook secret (`whsec_...`) |
 | `SEND_EMAIL_HOOK_SECRET` | **Server Only** | Secret verifying Supabase Auth Send Email Hook calls |
-| `CRON_SECRET` | **Server Only** | Bearer secret authorizing GitHub Actions cron routes |
+| `CRON_SECRET` | **Server Only** | Bearer secret authorizing the `/api/cron/*` routes. Sent by GitHub Actions and, once applied, by Supabase pg_cron, which reads the same value from the Vault secret `cron_secret` (see §7). Rotate both together |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public (Client + Server) | Cloudflare Turnstile site key. **Required for a production build** — it is inlined into the client bundle at build time, so `next.config.ts` fails the build when it is absent (see [`SECURITY.md`](SECURITY.md)) |
 | `TURNSTILE_SECRET_KEY` | **Server Only** | Cloudflare Turnstile secret used for the server-side Siteverify call. Never prefix with `NEXT_PUBLIC_`; when missing in production the signup and resend-verification routes fail closed |
 | `DEV_TURNSTILE_BYPASS` | **Server Only** (local dev) | Optional. `true` skips Turnstile verification. Ignored whenever `NODE_ENV=production`, so it cannot weaken a deployed environment. Do **not** set it in Vercel |
 | `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Public (Client + Server) | Google sign-in flag. Only the exact string `true` enables it; default `false`. **Inlined at build time**, so a change needs a redeploy, not a restart. While off, the button is hidden and `/api/auth/google` returns 404. See §5 |
 | `OAUTH_STATE_SECRET` | **Server Only** | At least 32 random characters (`openssl rand -base64 48`). HMAC key for the signed Google intent cookie. Never prefix with `NEXT_PUBLIC_`. With the flag on and this missing or short, Google sign-in fails closed (`/login?error=oauth_unavailable`). See §5 |
-| `RECUT_EXPERIMENT_ENABLED` | **Server Only** | Phase 4 A/B flag (`lib/academy/experiment.ts`). **Defaults to control** when unset/`false`. Leave unset to keep OFF |
-| `RECUT_EXPERIMENT_TREATMENT_PCT` | **Server Only** | Optional split 0–100 (default 50). No effect while the flag is off |
-| `MODULE_ENTRY_UNLOCK_ENABLED` | **Server Only** | Phase 6 cohort flag (`lib/academy/module-entry-unlock.ts`). **Defaults to control** (global-sequential lock) when unset/`false`. Leave unset to keep OFF |
-| `MODULE_ENTRY_UNLOCK_TREATMENT_PCT` | **Server Only** | Optional treatment share within the cohort, 0–100 (default 100). No effect while off |
-| `MODULE_ENTRY_UNLOCK_COHORT_START` | **Server Only** | Optional ISO date; only learners created on/after are eligible. Unset = no cohort gate. Set before enabling |
+| `RECUT_EXPERIMENT_ENABLED` | **Server Only** | Phase 4 Core lesson recut kill switch (`lib/academy/experiment.ts`). **ON when unset** (owner decision D5, not an experiment). Set to `false` to turn it off for everyone |
+| `RECUT_EXPERIMENT_TREATMENT_PCT` | **Server Only** | Optional treatment share 0-100 (default 100, everyone). Leave unset; a value below 100 turns the recut back into a split |
+| `MODULE_ENTRY_UNLOCK_ENABLED` | **Server Only** | Phase 6 module-entry unlock kill switch (`lib/academy/module-entry-unlock.ts`). **ON when unset** (owner decision D5, not an experiment). Set to `false` to restore the global-sequential lock for everyone |
+| `MODULE_ENTRY_UNLOCK_TREATMENT_PCT` | **Server Only** | Optional treatment share 0-100 (default 100, everyone). Leave unset |
+| `MODULE_ENTRY_UNLOCK_COHORT_START` | **Server Only** | Optional ISO date; only learners created on/after it get the unlock. Leave unset so it applies to everyone |
 | `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` | **Server Only** | Phase 7 cohort flag (`lib/capstone-threshold-experiment.ts`), enforced server-side in `lib/capstones-db.ts`. **Defaults to control (8-of-10)** when unset/`false`. Enabling needs product sign-off (ADR-009). Leave unset to keep OFF |
 | `CAPSTONE_THRESHOLD_TREATMENT_PCT` | **Server Only** | Optional treatment share within the cohort, 0–100 (default 100). No effect while off |
 | `CAPSTONE_THRESHOLD_TREATMENT_LESSONS` | **Server Only** | Optional treatment gate, clamped 1–8 (default 4). A value above 8 is refused. No effect while off |
@@ -137,16 +137,16 @@ lower(email) = lower('<your email>');`) and make sure the account is genuinely y
 
 ## 4. Phase 6–8 deployment (activation programme)
 
-Phases 6, 7 and 8 are code-complete with all experiment flags **off by default** and **not yet deployed**. Full rationale in [`PHASE_HISTORY.md`](PHASE_HISTORY.md) and ADR-008/009/010.
+Phases 6, 7 and 8 are code-complete. The Phase 7 capstone-threshold experiment flag is **off by default**; the Phase 4 recut and Phase 6 module-entry unlock are **on by default** since owner decision D5 (2026-10-20). Full rationale in [`PHASE_HISTORY.md`](PHASE_HISTORY.md) and ADR-008/009/010.
 
 ### 4.1 What ships (verified in code)
 
 **Phase 6 — Make the path real**
 - Recommendation-based module routing (derived from onboarding goal; no column).
-- Module-entry unlock model (experiment): enter any module's first lesson; **intra-module lessons stay sequentially locked** until prerequisites complete.
+- Module-entry unlock model: enter any module's first lesson; **intra-module lessons stay sequentially locked** until prerequisites complete. ON for everyone since owner decision D5 (2026-10-20); `MODULE_ENTRY_UNLOCK_ENABLED=false` is the kill switch.
 - Existing-user access preservation (grandfathering): already-opened lessons stay open across flag changes.
 - Academy lock states + Search available/locked states; public sample-lesson behaviour unchanged.
-- Experiment: deterministic cohort assignment; **defaults to control** (global-sequential lock); grandfathering on rollback.
+- Deterministic assignment kept as machinery; **defaults to ON for everyone** (D5); grandfathering if the kill switch is used.
 - Measurement aggregator `lib/admin/module-entry-experiment.ts` (surfaced in 8.1).
 
 **Phase 7 — Make the payoff visible**
@@ -178,16 +178,17 @@ Phases 6, 7 and 8 are code-complete with all experiment flags **off by default**
 |---|---|---|---|
 | Core (Supabase, email, `CRON_SECRET`, Turnstile, `NEXT_PUBLIC_SITE_URL`) | **Yes** | Set (see §2) | App does not function / build without them |
 | Legal `NEXT_PUBLIC_LEGAL_*`, grievance | Recommended before public launch | Set to the confirmed operator identity | Legal pages otherwise show "not registered" wording |
-| `RECUT_EXPERIMENT_ENABLED` | No | **unset / `false`** | Keeps Phase 4 recut OFF (control) |
-| `MODULE_ENTRY_UNLOCK_ENABLED` | No | **unset / `false`** | Keeps Phase 6 unlock OFF (global-sequential lock) |
-| `MODULE_ENTRY_UNLOCK_COHORT_START` | No | unset | Only relevant when enabling |
+| `RECUT_EXPERIMENT_ENABLED` | No | **unset** (or `true`) | Phase 4 Core lesson recut ON for everyone (D5); `false` is the kill switch |
+| `RECUT_EXPERIMENT_TREATMENT_PCT` | No | **unset** | Default 100 (everyone). Remove any old `50` value, or half of learners stay on the full lesson |
+| `MODULE_ENTRY_UNLOCK_ENABLED` | No | **unset** (or `true`) | Phase 6 module-entry unlock ON for everyone (D5); `false` is the kill switch |
+| `MODULE_ENTRY_UNLOCK_TREATMENT_PCT` / `MODULE_ENTRY_UNLOCK_COHORT_START` | No | **unset** | Defaults give everyone the unlock |
 | `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` | No | **unset / `false`** | Keeps Phase 7 gate at 8-of-10 (control); enabling needs product sign-off |
 | `CAPSTONE_THRESHOLD_TREATMENT_LESSONS` | No | unset (default 4) | No effect while the flag is off |
 | `IN_APP_NOTIFICATIONS_ENABLED` (feature flag, not env) | n/a | **ON** (default) | Required for the `capstone.reviewed` notification to be written |
 | `RETENTION_DELETE_ENABLED` | No | **unset / `false`** | Retention cron stays dry-run |
 | `REDIS_URL` | No | **do not set** | Postgres-backed by design |
 
-> **Do not enable any experiment as part of deploying Phases 6–8.** Enabling is a separate, deliberate product decision.
+> **Do not enable the Phase 7 capstone-threshold experiment as part of a deploy.** Enabling it is a separate, deliberate product decision. The Phase 4 recut and Phase 6 module-entry unlock are no longer experiments: they are ON by default (owner decision D5) and the admin experiment readout shows "No experiment running" for them.
 
 ### 4.4 Manual QA before deployment
 
@@ -259,3 +260,69 @@ The code ships **off**. Nothing changes for users until the flag is turned on.
    - Settings > Security for a Google-only account shows "Managed by Google".
 5. **Then Production**, once the "Before Production" checks above are done: set the flag to `true` for Production and redeploy. Smoke-test one sign-in.
 6. **Rollback:** set the flag back to `false` and redeploy. Google-only users then cannot sign in until it is re-enabled, but they can set a password through the reset password page and use email login.
+
+---
+
+## 6. Function region (PR-09, ENG-02)
+
+Vercel runs functions in `iad1` (Washington DC) unless told otherwise. The audit saw `x-vercel-id: bom1::iad1::...` on production `/api/health` and 216 to 886 ms for a one-row query, which fits a transcontinental hop to the database on every Supabase call. Pinning the function region next to the database removes that hop. This is a dashboard setting, available on the Hobby plan as a single region; there is no code change.
+
+**Recorded values (owner to fill in):**
+
+| Item | Value |
+|---|---|
+| Supabase region (Project Settings > General) | `ap-south-1` (Mumbai) |
+| Vercel function region | `bom1` (pinned in `apps/web/vercel.json`) |
+| `/api/health` median before | `TO MEASURE` |
+| `/api/health` median after | `TO MEASURE` |
+| Date changed | `TO FILL` |
+
+Nearest Vercel region for common Supabase regions: `ap-south-1` > `bom1`, `ap-southeast-1` > `sin1`, `us-east-1` > `iad1`, `eu-central-1` > `fra1`, `eu-west-2` > `lhr1`.
+
+**Steps**
+
+1. Confirm the Supabase region in Project Settings > General and write it in the table.
+2. Measure before. From any shell (15 samples; the 8th sorted value is the median):
+   ```bash
+   for i in $(seq 1 15); do curl -s -o /dev/null -w '%{time_total}\n' https://prodily.app/api/health; done | sort -n | sed -n 8p
+   curl -sI https://prodily.app/api/health | grep -i x-vercel-id
+   ```
+   The JSON body also reports `services.database.latencyMs`, the database part alone.
+3. In Vercel: Project > Settings > Functions > Function Region, pick the region from the table, save, then redeploy production (the setting applies to new deployments).
+4. Measure after with the same commands. Done when `x-vercel-id` shows the new region in its second segment (for example `bom1::bom1::...`) and the median has dropped (expected about 150 to 200 ms less per database round trip; an estimate).
+5. Record the numbers in the table above.
+
+Rollback: set the region back to `iad1` and redeploy.
+
+---
+
+## 7. pg_cron scheduler (ENG-01)
+
+GitHub Actions scheduled runs arrive about 10 times a day instead of the 313 configured, so the email queue and the hourly reminder, recap and lifecycle jobs ran hours late. The fix moves the triggers into Supabase `pg_cron` + `pg_net` (both on the free tier), which call the same `/api/cron/*` endpoints with the same `Authorization: Bearer <CRON_SECRET>` header.
+
+The migration is **held, owner-applied**: [`supabase/migrations/pending-approval/20261024000003_schedule_cron_jobs_pg_cron.sql`](../supabase/migrations/pending-approval/20261024000003_schedule_cron_jobs_pg_cron.sql). It is run by hand in the SQL editor and is not moved into `supabase/migrations/`.
+
+| Job | Cadence (UTC) | Method | Endpoint |
+|---|---|---|---|
+| `prodily-process-email-queue` | `*/5 * * * *` | POST | `/api/cron/process-email-queue` |
+| `prodily-process-broadcasts` | `*/5 * * * *` | GET | `/api/cron/process-broadcasts` |
+| `prodily-daily-reminder` | `30 * * * *` | POST | `/api/cron/daily-reminder` |
+| `prodily-weekly-recap` | `30 * * * *` | POST | `/api/cron/weekly-recap` |
+| `prodily-lifecycle` | `30 * * * *` | POST | `/api/cron/lifecycle` |
+| `prodily-cleanup` | `30 20 * * *` (02:00 IST) | POST | `/api/cron/cleanup` |
+
+`/api/cron/retry-failed` is not scheduled; it stays a manual `workflow_dispatch` run. The table must stay in step with `CRON_JOB_DEFINITIONS` in `apps/web/lib/monitoring/cron-heartbeat.ts`.
+
+**Apply**
+
+1. Do the email capacity check first ([`EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md) §9). Working reminders send more mail.
+2. Supabase dashboard > Integrations > Vault: create the secret `cron_secret` with the same value as `CRON_SECRET` in Vercel Production, and `site_url` with `https://prodily.app` (no trailing slash or path). Use the Vault page rather than SQL so the value does not land in SQL editor history.
+3. SQL editor: paste and run the migration. It enables the extensions, creates `private.invoke_cron_endpoint` (SECURITY DEFINER, empty `search_path`, no EXECUTE for `anon`, `authenticated` or `service_role`), schedules the six jobs, then self-checks. If the self-check raises, nothing was applied; fix what it names and run it again (it is idempotent).
+4. Run query 1 of [`validation/20261024000003_schedule_cron_jobs_pg_cron_validation.sql`](../supabase/migrations/pending-approval/validation/20261024000003_schedule_cron_jobs_pg_cron_validation.sql). After 15 minutes run queries 2 to 4: runs `succeeded`, HTTP `200`, heartbeats fresh. A `401` means `cron_secret` does not match `CRON_SECRET`.
+5. Watch the admin System page heartbeats for 24 hours. Only then remove the `schedule:` block from `.github/workflows/notification-scheduler.yml` (a separate follow-up; keep `workflow_dispatch` for manual runs). Until then both schedulers fire; that is safe because every job dedupes on an idempotency key and the queue claim is row-locked.
+
+**Rotate `CRON_SECRET`:** update Vercel and the Vault `cron_secret` together (Vault page > edit). The jobs read the secret on every run, so nothing needs rescheduling.
+
+**Pause or undo:** `SELECT cron.alter_job(jobid, active := false) FROM cron.job WHERE jobname LIKE 'prodily-%';` pauses all six. To remove them, run [`rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`](../supabase/migrations/pending-approval/rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql), after making sure the GitHub `schedule:` block is still in place.
+
+**Housekeeping:** `cron.job_run_details` keeps one row per run (about 300 a day for these jobs). Clear old rows now and then on the free tier's 500 MB database: `DELETE FROM cron.job_run_details WHERE end_time < now() - interval '14 days';`. `pg_net` clears its own responses after about 6 hours.

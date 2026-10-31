@@ -1,8 +1,9 @@
 /**
- * Phase 6 — module-entry unlock experiment assignment.
+ * Phase 6 module-entry unlock assignment.
  *
- * Verifies the flag defaults to control, honours the cohort start date (new signups only),
- * is deterministic per user, and respects the treatment split.
+ * D5 (owner decision): module-entry unlock is ON permanently, not an experiment. Verifies the
+ * flag is on when unset (every learner treated), 'false' is the kill switch (everyone control),
+ * the optional cohort start date and split are still honoured, and assignment is deterministic.
  */
 
 import { describe, it, expect } from 'vitest'
@@ -18,11 +19,35 @@ const BEFORE = '2025-12-01T00:00:00Z' // before cohort start
 const COHORT_START = '2026-01-01T00:00:00Z'
 
 describe('getModuleEntryUnlockConfig', () => {
-  it('defaults to control (disabled) with no env', () => {
+  it('defaults to ON (enabled, 100%, no cohort gate) with no env', () => {
     const cfg = getModuleEntryUnlockConfig({} as NodeJS.ProcessEnv)
-    expect(cfg.enabled).toBe(false)
+    expect(cfg.enabled).toBe(true)
     expect(cfg.treatmentPercent).toBe(100)
     expect(cfg.cohortStartMs).toBeNull()
+  })
+
+  it("treats every user id when the env is unset", () => {
+    const cfg = getModuleEntryUnlockConfig({} as NodeJS.ProcessEnv)
+    for (let i = 0; i < 500; i++) {
+      expect(getModuleEntryUnlockVariant({ id: `user-${i}`, createdAt: BEFORE }, cfg)).toBe('treatment')
+    }
+  })
+
+  it("'false' is the kill switch: disabled and every user is control", () => {
+    const cfg = getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_ENABLED: 'false' } as unknown as NodeJS.ProcessEnv)
+    expect(cfg.enabled).toBe(false)
+    for (let i = 0; i < 200; i++) {
+      expect(getModuleEntryUnlockVariant({ id: `user-${i}`, createdAt: AFTER }, cfg)).toBe('control')
+    }
+  })
+
+  it('accepts the kill switch regardless of case or surrounding whitespace', () => {
+    expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_ENABLED: ' FALSE ' } as unknown as NodeJS.ProcessEnv).enabled).toBe(false)
+  })
+
+  it("stays on for any value other than 'false' (including an empty string)", () => {
+    expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv).enabled).toBe(true)
+    expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_ENABLED: '' } as unknown as NodeJS.ProcessEnv).enabled).toBe(true)
   })
 
   it('parses enabled, percent and cohort start', () => {
@@ -36,6 +61,11 @@ describe('getModuleEntryUnlockConfig', () => {
     expect(cfg.cohortStartMs).toBe(Date.parse(COHORT_START))
   })
 
+  it('treats a blank percent as unset (100%), not as 0%', () => {
+    expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_TREATMENT_PCT: '' } as unknown as NodeJS.ProcessEnv).treatmentPercent).toBe(100)
+    expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_TREATMENT_PCT: '  ' } as unknown as NodeJS.ProcessEnv).treatmentPercent).toBe(100)
+  })
+
   it('ignores an out-of-range or invalid percent', () => {
     expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_TREATMENT_PCT: '999' } as unknown as NodeJS.ProcessEnv).treatmentPercent).toBe(100)
     expect(getModuleEntryUnlockConfig({ MODULE_ENTRY_UNLOCK_TREATMENT_PCT: 'abc' } as unknown as NodeJS.ProcessEnv).treatmentPercent).toBe(100)
@@ -46,7 +76,7 @@ describe('getModuleEntryUnlockVariant', () => {
   const enabledAll = { enabled: true, treatmentPercent: 100, cohortStartMs: null }
   const enabledCohort = { enabled: true, treatmentPercent: 100, cohortStartMs: Date.parse(COHORT_START) }
 
-  it('is control when the flag is disabled (default)', () => {
+  it('is control when the kill switch is set (flag disabled)', () => {
     expect(getModuleEntryUnlockVariant({ id: 'u1', createdAt: AFTER }, { enabled: false, treatmentPercent: 100, cohortStartMs: null })).toBe('control')
   })
 

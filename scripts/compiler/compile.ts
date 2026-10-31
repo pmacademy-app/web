@@ -41,7 +41,7 @@ const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '15';
+const CACHE_VERSION = '16';
 
 interface CacheManifest {
   version: string;
@@ -69,6 +69,41 @@ export function getModuleSlugForLessonNumber(num: number): string {
   };
   const modNum = Math.ceil(num / 10);
   return moduleMap[modNum] || 'foundations';
+}
+
+/**
+ * Splits a "Further Reading" list item into its citation and optional note.
+ * Only the FIRST dash surrounded by whitespace (hyphen, en dash or em dash) acts
+ * as the separator, so hyphens inside words ("Product-Led") or URLs
+ * ("https://example.com/a-b") never split the item. The text is returned as
+ * authored; nothing is inserted when re-joining.
+ */
+export function parseResourceItem(rawText: string): { citation: string; note?: string } {
+  const text = rawText.trim();
+  const match = text.match(/^(.*?)\s+[-\u2013\u2014]\s+(.*)$/s);
+  if (!match) return { citation: text };
+  const citation = match[1].trim();
+  const note = match[2].trim();
+  if (citation.length === 0) return { citation: text };
+  return { citation, note: note.length > 0 ? note : undefined };
+}
+
+/**
+ * Resolves the company shown on a "Real Company Example" block. Sources, in order:
+ * a heading suffix ("Real Company Example: Stripe"), then a bold lead in the first
+ * paragraph ("**Stripe** ..."). Returns '' when neither names a company; the block
+ * must never fall back to a hard-coded company (PROD-11).
+ */
+export function resolveCompanyName(heading: string, firstParagraphMarkdown?: string): string {
+  const headingMatch = heading.match(/company example\s*:\s*(.+)$/i);
+  if (headingMatch && headingMatch[1].trim().length > 0) {
+    return headingMatch[1].trim();
+  }
+  const boldMatch = firstParagraphMarkdown?.match(/^\*\*([^*]+)\*\*/);
+  if (boldMatch && boldMatch[1].trim().length > 0) {
+    return boldMatch[1].trim();
+  }
+  return '';
 }
 
 export async function compileLesson(
@@ -295,17 +330,9 @@ export async function compileLesson(
       searchableTextParts.push(mmTitle);
       collectSearchableText(children, searchableTextParts);
     } else if (headingLower.includes('company example') || headingLower.includes('real company example')) {
-      // Find the first bold word in paragraphs to treat as company name, or heading text
-      let company = 'Spotify';
       const firstPara = segment.nodes.find((n) => n.type === 'paragraph');
-      if (firstPara) {
-        const textStr = toMarkdown(firstPara);
-        const boldMatch = textStr.match(/^\*\*([^*]+)\*\*/);
-        if (boldMatch) {
-          company = boldMatch[1].trim();
-        }
-      }
-      
+      const company = resolveCompanyName(segment.heading, firstPara ? toMarkdown(firstPara) : undefined);
+
       // Parse assumption flags
       const assumptionFlags: string[] = [];
       const nonAssumptionNodes = segment.nodes.filter((n) => {
@@ -452,16 +479,9 @@ export async function compileLesson(
       const listNode = segment.nodes.find((n) => n.type === 'list');
       if (listNode) {
         for (const item of listNode.children || []) {
-          const rawText = toMarkdown(item).trim();
-          // Resource link matches: - [Title](URL) - note
-          const parts = rawText.split(/\s*[-—]\s*/);
-          const citation = parts[0].trim();
-          const note = parts.slice(1).join(' - ').trim();
-          items.push({
-            citation,
-            note: note.length > 0 ? note : undefined,
-          });
-          searchableTextParts.push(citation, note);
+          const { citation, note } = parseResourceItem(toMarkdown(item));
+          items.push({ citation, note });
+          searchableTextParts.push(citation, note ?? '');
         }
       }
       const block: any = {

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Sparkles, Play, Flame, Zap, Clock, BookOpen } from 'lucide-react'
+import { Sparkles, Play, Flame, Clock, BookOpen } from 'lucide-react'
 import { trackFirstSessionStarted } from '@/lib/analytics'
 import type { NextLessonData } from './ContinueLearningCard'
 
@@ -16,8 +16,6 @@ export function FirstSessionKickoffCard({ nextLesson }: FirstSessionKickoffCardP
       module_slug: nextLesson.module,
     })
   }
-
-  const moduleName = nextLesson.module.replace(/-/g, ' ')
 
   return (
     <div
@@ -36,10 +34,6 @@ export function FirstSessionKickoffCard({ nextLesson }: FirstSessionKickoffCardP
               <Flame className="w-3 h-3" />
               Starts Day 1 Streak
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
-              <Zap className="w-3 h-3" />
-              +50 XP Preview
-            </span>
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold font-serif text-foreground leading-tight">
@@ -51,9 +45,9 @@ export function FirstSessionKickoffCard({ nextLesson }: FirstSessionKickoffCardP
           </p>
 
           <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1">
-            <span className="inline-flex items-center gap-1.5 font-medium text-foreground/90 capitalize">
+            <span className="inline-flex items-center gap-1.5 font-medium text-foreground/90">
               <BookOpen className="w-3.5 h-3.5 text-primary" />
-              Module: {moduleName}
+              Module: {nextLesson.moduleTitle}
             </span>
             <span>•</span>
             <span className="inline-flex items-center gap-1.5 font-medium text-foreground/90">
@@ -73,11 +67,8 @@ export function FirstSessionKickoffCard({ nextLesson }: FirstSessionKickoffCardP
             className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-primary px-7 py-4 text-sm font-bold text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Play className="w-4 h-4 fill-current" />
-            Start Lesson 1 →
+            Start {nextLesson.positionLabel} →
           </Link>
-          <span className="text-[11px] text-center text-muted-foreground">
-            Takes ~5 mins to complete
-          </span>
         </div>
       </div>
     </div>

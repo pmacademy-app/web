@@ -42,7 +42,7 @@ export default async function AuthenticatedLayout({
     profile = await ensureUserProfile(serviceSupabase, authUser)
     if (!profile) {
       const { logSystemError } = await import('@/lib/monitoring/logger')
-      void logSystemError({
+      await logSystemError({
         severity: 'critical',
         category: 'auth',
         operation: 'ensure_user_profile_failed',
