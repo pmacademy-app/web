@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { withRoute } from '@/lib/api/with-route'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 
 export const runtime = 'nodejs'
 
@@ -26,7 +27,7 @@ export const GET = withRoute(
     domain: 'cron',
     summary: 'Unexpected failure while processing scheduled broadcasts',
   },
-  async () => {
+  async () => withCronHeartbeat('process-broadcasts', async () => {
     const [emailResult, inAppResult] = await Promise.all([
       BroadcastService.processScheduledBroadcasts(),
       InAppManagerService.processScheduledInAppBroadcasts(),
@@ -44,5 +45,5 @@ export const GET = withRoute(
       },
       timestamp: new Date().toISOString(),
     })
-  }
+  })
 )

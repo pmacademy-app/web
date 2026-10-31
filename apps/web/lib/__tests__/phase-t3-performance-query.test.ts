@@ -505,6 +505,7 @@ describe('Phase T3 — Performance & Query Architecture Suite', () => {
 
           const qb = {
             select: vi.fn().mockReturnThis(),
+            gte: vi.fn().mockReturnThis(),
             eq: vi.fn().mockImplementation((f: string, v: unknown) => {
               filters[f] = v
               return qb
@@ -575,14 +576,14 @@ describe('Phase T3 — Performance & Query Architecture Suite', () => {
                 if (filters.flashcard_id_in && Array.isArray(filters.flashcard_id_in)) {
                   rows = rows.filter((r) => (filters.flashcard_id_in as string[]).includes(r.flashcard_id))
                 }
-                return resolve({ data: rows, error: null })
+                return resolve({ data: rows, count: rows.length, error: null })
               }
               if (currentTable === 'xp_events') {
                 let rows = mockStore.xpEvents.filter((r) => r.user_id === filters.user_id)
                 if (filters.source_id_in && Array.isArray(filters.source_id_in)) {
                   rows = rows.filter((r) => (filters.source_id_in as string[]).includes(r.source_id))
                 }
-                return resolve({ data: rows, error: null })
+                return resolve({ data: rows, count: rows.length, error: null })
               }
               return resolve({ data: [], error: null })
             }),

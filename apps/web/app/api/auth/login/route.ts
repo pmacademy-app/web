@@ -83,10 +83,17 @@ export const POST = withRoute(
       }
 
       const isRequired = await SettingsService.isEmailVerificationRequired()
+      // SEC-07: two service-role clients on purpose. A successful signInWithPassword
+      // stores the learner's session on the client it ran on, and supabase-js then
+      // sends that access token (not the service key) on every later PostgREST call,
+      // so its writes would run as `authenticated`. `authClient` only ever signs in;
+      // `supabase` never holds a session, so the lookups below and the
+      // public.users write in ensureUserProfile run as service_role.
+      const authClient = createServiceRoleClient()
       const supabase = createServiceRoleClient()
 
       // 1. Attempt password authentication with Supabase GoTrue
-      let { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      let { data: authData, error: authError } = await authClient.auth.signInWithPassword({
         email,
         password,
       })
@@ -154,7 +161,7 @@ export const POST = withRoute(
             await supabase.auth.admin.updateUserById(targetUserId, { email_confirm: true })
 
             // Re-attempt sign-in with verified credentials
-            const retryResult = await supabase.auth.signInWithPassword({ email, password })
+            const retryResult = await authClient.auth.signInWithPassword({ email, password })
             authData = retryResult.data
             authError = retryResult.error
           }

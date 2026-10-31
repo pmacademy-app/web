@@ -220,6 +220,7 @@ describe('overview page wiring', () => {
   it('wraps every block in its own Suspense, with the system snapshot last', () => {
     const blocks = [
       'OverviewAttention',
+      'OverviewNorthStarTile',
       'OverviewKpis',
       'OverviewCharts',
       'OverviewFunnel',

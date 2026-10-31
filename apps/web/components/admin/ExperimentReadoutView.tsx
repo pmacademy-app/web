@@ -2,7 +2,11 @@ import React from 'react'
 import { FlaskConical, Scissors, DoorOpen, Trophy } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminLoadWarning } from './AdminLoadWarning'
-import type { ExperimentReadout } from '@/lib/admin/experiment-readout-service'
+import {
+  NO_EXPERIMENT_RUNNING_LABEL,
+  type ExperimentReadout,
+  type ExperimentRunState,
+} from '@/lib/admin/experiment-readout-service'
 
 interface ExperimentReadoutViewProps {
   data: ExperimentReadout
@@ -35,7 +39,7 @@ interface ArmMeta {
 /**
  * Renders one experiment as a control-vs-treatment table. Deliberately descriptive only: it shows
  * each arm's n and metrics exactly as the aggregator produced them, with no significance test,
- * confidence interval or causal claim — the underlying aggregators compute none, so the UI asserts
+ * confidence interval or causal claim. The underlying aggregators compute none, so the UI asserts
  * none.
  */
 function ExperimentPanel<M extends ArmMeta>({
@@ -100,13 +104,41 @@ function ExperimentPanel<M extends ArmMeta>({
           </div>
           {(lowSample(control) || lowSample(treatment)) && (
             <p className="text-[11px] text-admin-warning">
-              One or more arms has fewer than {MIN_ARM_SAMPLE} learners — rates shown are directional
+              One or more arms has fewer than {MIN_ARM_SAMPLE} learners, so rates shown are directional
               only and not a conclusion.
             </p>
           )}
           {extraNote && <p className="text-[11px] text-admin-fg-muted">{extraNote}</p>}
         </>
       )}
+    </AdminSection>
+  )
+}
+
+/**
+ * Shown in place of the arm table when a flag has no live control-vs-treatment comparison. Per
+ * owner decision D5 this is the normal state for the recut and module-entry unlock: they are on
+ * for every learner behind a kill switch, so there is nothing to compare.
+ */
+function NotRunningPanel({
+  title,
+  icon,
+  state,
+  rolledOutText,
+  offText,
+}: {
+  title: string
+  icon: React.ElementType
+  state: ExperimentRunState
+  rolledOutText: string
+  offText: string
+}) {
+  return (
+    <AdminSection title={title} icon={icon} meta={state === 'off' ? 'Off' : 'On for everyone'}>
+      <div className="rounded-xl bg-admin-surface-raised border border-admin-border px-4 py-6 text-center">
+        <p className="text-sm font-semibold text-admin-fg">{NO_EXPERIMENT_RUNNING_LABEL}</p>
+        <p className="text-xs text-admin-fg-muted mt-1">{state === 'off' ? offText : rolledOutText}</p>
+      </div>
     </AdminSection>
   )
 }
@@ -130,7 +162,7 @@ function MetricRow<M extends ArmMeta>({
 }) {
   const render = (arm: M) => {
     const raw = metric.get(arm)
-    if (arm.n === 0) return <span className="text-admin-fg-muted">—</span>
+    if (arm.n === 0) return <span className="text-admin-fg-muted">No data</span>
     if (raw === null) return <span className="text-admin-fg-muted italic">n/a</span>
     return <span className="font-mono">{metric.format(raw)}</span>
   }
@@ -152,60 +184,85 @@ function MetricRow<M extends ArmMeta>({
 }
 
 /**
- * Phase 8.1 — the admin experiment readout surface.
+ * Phase 8.1: the admin experiment readout surface.
  *
- * Wires the three orphaned experiment aggregators (recut, module-entry unlock, capstone threshold)
- * into one admin-only page. All arithmetic lives in the aggregators; this component only presents it.
+ * Wires the three experiment aggregators (recut, module-entry unlock, capstone threshold) into one
+ * admin-only page. All arithmetic lives in the aggregators; this component only presents it. A flag
+ * with no live arm comparison (see `data.status`) renders "No experiment running" instead of arms.
  */
 export function ExperimentReadoutView({ data }: ExperimentReadoutViewProps) {
   return (
     <div className="space-y-6">
       {data.failed && (
-        <AdminLoadWarning message="The experiment readout could not be aggregated from the database. Showing an empty structure — retry shortly." />
+        <AdminLoadWarning message="The experiment readout could not be aggregated from the database. Showing an empty structure. Retry shortly." />
       )}
 
       <div className="rounded-xl bg-admin-surface-raised border border-admin-border px-4 py-3">
+        {!data.status.anyRunning && (
+          <p className="text-sm font-semibold text-admin-fg mb-1">{NO_EXPERIMENT_RUNNING_LABEL}</p>
+        )}
         <p className="text-xs text-admin-fg-muted">
-          Descriptive control-vs-treatment readouts for the three cohort experiments, assembled
-          server-side from tables the app already writes — no GA4, no persisted assignment. Every flag
-          currently defaults to <span className="font-semibold text-admin-fg">off</span>; arms are
-          reconstructed from each learner&apos;s deterministic variant so the comparison is readable
-          before rollout. These are raw rates only — no statistical-significance or causal claim is
-          made or implied.
+          The Core lesson recut and module-entry unlock are on for every learner (owner decision
+          D5). They are features behind a kill switch, not experiments, so they have no arm
+          comparison. The capstone-threshold arms are reconstructed from each learner&apos;s
+          deterministic variant, so they are readable even while its flag is off. Readouts are
+          assembled server-side from tables the app already writes (no GA4, no persisted
+          assignment) and show raw rates only: no statistical-significance or causal claim is made
+          or implied.
         </p>
       </div>
 
-      <ExperimentPanel
-        title="Phase 4 — Recut (unit of work)"
-        icon={Scissors}
-        description="Does splitting the lesson into a shorter Core path plus an optional Deep dive (and a trimmed quiz) increase throughput without hollowing out depth?"
-        control={data.recut.control}
-        treatment={data.recut.treatment}
-        metrics={[
-          { label: 'Mean lessons completed @ D30', get: (m) => m.meanLessonsCompletedD30, format: dec, primary: true, hint: 'Throughput within 30 days of signup' },
-          { label: 'Mean lessons completed (all-time)', get: (m) => m.meanLessonsCompleted, format: dec },
-          { label: 'Completed ≥1 lesson', get: (m) => m.firstLessonCompletionRate, format: pct, hint: 'Activation guardrail' },
-          { label: 'Opened a Deep dive', get: (m) => m.deepDiveOpenRate, format: pct, hint: 'Depth guardrail' },
-        ]}
-      />
+      {!data.status.recut.running ? (
+        <NotRunningPanel
+          title="Phase 4: Recut (unit of work)"
+          icon={Scissors}
+          state={data.status.recut.state}
+          rolledOutText="The Core lesson recut is on for every learner. Set RECUT_EXPERIMENT_ENABLED=false to turn it off."
+          offText="Turned off by the kill switch (RECUT_EXPERIMENT_ENABLED=false): every learner sees the full lesson and quiz."
+        />
+      ) : (
+        <ExperimentPanel
+          title="Phase 4: Recut (unit of work)"
+          icon={Scissors}
+          description="Does splitting the lesson into a shorter Core path plus an optional Deep dive (and a trimmed quiz) increase throughput without hollowing out depth?"
+          control={data.recut.control}
+          treatment={data.recut.treatment}
+          metrics={[
+            { label: 'Mean lessons completed @ D30', get: (m) => m.meanLessonsCompletedD30, format: dec, primary: true, hint: 'Throughput within 30 days of signup' },
+            { label: 'Mean lessons completed (all-time)', get: (m) => m.meanLessonsCompleted, format: dec },
+            { label: 'Completed ≥1 lesson', get: (m) => m.firstLessonCompletionRate, format: pct, hint: 'Activation guardrail' },
+            { label: 'Opened a Deep dive', get: (m) => m.deepDiveOpenRate, format: pct, hint: 'Depth guardrail' },
+          ]}
+        />
+      )}
+
+      {!data.status.moduleEntry.running ? (
+        <NotRunningPanel
+          title="Phase 6: Module-entry unlock"
+          icon={DoorOpen}
+          state={data.status.moduleEntry.state}
+          rolledOutText="Module-entry unlock is on for every learner. Set MODULE_ENTRY_UNLOCK_ENABLED=false to turn it off."
+          offText="Turned off by the kill switch (MODULE_ENTRY_UNLOCK_ENABLED=false): every learner has the global sequential lock."
+        />
+      ) : (
+        <ExperimentPanel
+          title="Phase 6: Module-entry unlock"
+          icon={DoorOpen}
+          description="Does letting learners enter any module (vs sequential gating) increase learning without scattering effort?"
+          control={data.moduleEntry.control}
+          treatment={data.moduleEntry.treatment}
+          metrics={[
+            { label: 'Mean lessons completed @ D30', get: (m) => m.meanLessonsCompletedD30, format: dec, primary: true, hint: 'Throughput within 30 days of signup' },
+            { label: 'Completed first lesson', get: (m) => m.firstLessonCompletionRate, format: pct, hint: 'Activation guardrail' },
+            { label: 'Completed all of Module 1', get: (m) => m.module1CompletionRate, format: pct, hint: 'Concentration guardrail' },
+            { label: 'Completed recommended module', get: (m) => m.recommendedModuleCompletionRate, format: pct, hint: 'Not derivable from progress rows, so shown as n/a' },
+            { label: 'Touched >1 module', get: (m) => m.moduleSwitchRate, format: pct, hint: 'Scattering signal' },
+          ]}
+        />
+      )}
 
       <ExperimentPanel
-        title="Phase 6 — Module-entry unlock"
-        icon={DoorOpen}
-        description="Does letting learners enter any module (vs sequential gating) increase learning without scattering effort?"
-        control={data.moduleEntry.control}
-        treatment={data.moduleEntry.treatment}
-        metrics={[
-          { label: 'Mean lessons completed @ D30', get: (m) => m.meanLessonsCompletedD30, format: dec, primary: true, hint: 'Throughput within 30 days of signup' },
-          { label: 'Completed first lesson', get: (m) => m.firstLessonCompletionRate, format: pct, hint: 'Activation guardrail' },
-          { label: 'Completed all of Module 1', get: (m) => m.module1CompletionRate, format: pct, hint: 'Concentration guardrail' },
-          { label: 'Completed recommended module', get: (m) => m.recommendedModuleCompletionRate, format: pct, hint: 'Not derivable from progress rows — shown as n/a' },
-          { label: 'Touched >1 module', get: (m) => m.moduleSwitchRate, format: pct, hint: 'Scattering signal' },
-        ]}
-      />
-
-      <ExperimentPanel
-        title="Phase 7 — Capstone threshold (8 → 4)"
+        title="Phase 7: Capstone threshold (8 → 4)"
         icon={Trophy}
         description="Does lowering the eligibility gate from 8 to 4 module lessons cause more learners to actually produce a capstone artifact, and stay engaged?"
         control={data.capstoneThreshold.control}
@@ -218,7 +275,7 @@ export function ExperimentReadoutView({ data }: ExperimentReadoutViewProps) {
           { label: 'Submitted any capstone', get: (m) => m.anyCapstoneSubmissionRate, format: pct },
           { label: 'Mean lessons completed @ D30', get: (m) => m.meanLessonsCompletedD30, format: dec, hint: 'Retention proxy' },
         ]}
-        extraNote={`Required lessons — control: ${data.capstoneThreshold.control.requiredLessons}, treatment: ${data.capstoneThreshold.treatment.requiredLessons}.`}
+        extraNote={`Required lessons. Control: ${data.capstoneThreshold.control.requiredLessons}, treatment: ${data.capstoneThreshold.treatment.requiredLessons}.`}
       />
 
       <p className="text-[11px] text-admin-fg-muted flex items-center gap-1.5">

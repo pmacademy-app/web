@@ -265,7 +265,7 @@ describe('P0-1 — consent records and existing users', () => {
 })
 
 describe('P0-2 — the signup form presents the acknowledgements', () => {
-  const signupSrc = read('app/(auth)/signup/page.tsx')
+  const signupSrc = `${read('app/(auth)/signup/page.tsx')}\n${read('app/(auth)/signup/SignupForm.tsx')}`
   // The checkbox markup lives in a shared component (also used by the Google consent
   // gate), so the markup assertions read the page and the component together. The
   // page must still render that component.

@@ -71,4 +71,41 @@ describe('Database Type Alignment Test Suite (Phase 0)', () => {
     expect(sampleInsert.email).toBe('test@example.com')
     expect(sampleUpdate.onboarding_preference).toBe('structured')
   })
+
+  it('types/database.ts contains product_events table definitions (20261024000001)', () => {
+    type ProductEventRow = Database['public']['Tables']['product_events']['Row']
+    type ProductEventInsert = Database['public']['Tables']['product_events']['Insert']
+
+    const sampleRow: ProductEventRow = {
+      id: 'evt-1',
+      user_id: null,
+      event_name: 'lesson_completed',
+      properties: { lessonId: 'les_001', score: 80 },
+      occurred_at: '2026-10-24T00:00:00Z',
+      created_at: '2026-10-24T00:00:00Z',
+    }
+
+    // Only event_name is required on insert; everything else has a DB default or is nullable.
+    const sampleInsert: ProductEventInsert = { event_name: 'signup' }
+
+    expect(sampleRow.event_name).toBe('lesson_completed')
+    expect(sampleInsert.event_name).toBe('signup')
+  })
+
+  it('types/database.ts contains the product_events measurement views (20261024000001)', () => {
+    type MasteringRow = Database['public']['Views']['weekly_mastering_learners']['Row']
+    type RetentionRow = Database['public']['Views']['weekly_cohort_retention']['Row']
+
+    const mastering: MasteringRow = { week_start: '2026-10-19', mastering_learners: 12 }
+    const retention: RetentionRow = {
+      cohort_week: '2026-10-12',
+      active_week: '2026-10-19',
+      week_offset: 1,
+      cohort_size: 40,
+      active_learners: 9,
+    }
+
+    expect(mastering.mastering_learners).toBe(12)
+    expect(retention.week_offset).toBe(1)
+  })
 })

@@ -14,10 +14,56 @@ next merge to `main`** — with no further human gate.
 For an additive migration that is fine. For a destructive one awaiting approval, it is
 not. This directory is where such a migration waits.
 
+## Companion files: `rollback/` and `validation/`
+
+A held migration keeps its rollback and validation scripts next to it, in the same layout the
+top level uses:
+
+- `pending-approval/<ts>_<name>.sql`: the migration
+- `pending-approval/rollback/<ts>_<name>.down.sql`: undoes it, safe to re-run
+- `pending-approval/validation/<ts>_<name>_validation.sql`: checks it after it is applied
+
+When a held migration is released into `supabase/migrations/`, move its two companions into
+`supabase/migrations/rollback/` and `supabase/migrations/validation/` in the same commit.
+Neither subfolder is read by the Supabase CLI, here or at the top level.
+
 ## Currently held
 
-**No migrations.** The directory stays in the repository so the next destructive migration
-has an obvious place to wait.
+Phase 2 (owner steps and their order: [`docs/ops/phase2-owner-runbook.md`](../../../docs/ops/phase2-owner-runbook.md)).
+
+### `20261024000003_schedule_cron_jobs_pg_cron.sql` (ENG-01, applied by hand, never moved)
+
+Schedules the six `/api/cron/*` jobs in Supabase `pg_cron` + `pg_net` (free tier), reading
+`CRON_SECRET` and the site URL from Supabase Vault at run time. The jobs and cadence match
+`CRON_JOB_DEFINITIONS` in `apps/web/lib/monitoring/cron-heartbeat.ts` and the GitHub workflow.
+`retry-failed` stays manual.
+
+This one is **owner-run in the SQL editor, not released through `db push`**: it needs two Vault
+secrets that only the owner can create, and its self-check refuses to finish without them.
+Leave the file here after applying it; the database, not the migration history, is the record.
+
+1. In the Supabase dashboard Vault page (Integrations > Vault), create `cron_secret` (same
+   value as `CRON_SECRET` in Vercel Production) and `site_url` (`https://prodily.app`, no path).
+2. Paste the migration into the SQL editor and run it. It ends with a self-check that raises,
+   and rolls everything back, if a job, the helper's privileges or a secret is wrong.
+3. Run query 1 of `validation/20261024000003_schedule_cron_jobs_pg_cron_validation.sql`, then
+   queries 2 to 4 after 15 minutes.
+4. Watch the admin System page heartbeats for 24 hours before the GitHub `schedule:` block is
+   removed (a separate follow-up). Both schedulers running at once is safe: each job dedupes on
+   an idempotency key.
+
+Undo: `rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`.
+
+### `20261027000001_users_username_check.sql` (CQ-24)
+
+Adds a CHECK constraint on `public.users.username`. Run its pre-check first: the constraint
+fails to apply if any existing username breaks the rule. Steps in the runbook, step (f).
+
+### `20261027000002_lock_public_users.sql` (Q1, SEC-07 part 2)
+
+Revokes learner writes to `public.users` through PostgREST. Apply only **after** the code that
+stops writing `public.users` with a learner session is deployed, then confirm a learner-token
+`PATCH /rest/v1/users` is refused. Steps in the runbook, step (g).
 
 ## Ops snippets (owner-run, never migrations)
 

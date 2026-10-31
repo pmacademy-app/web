@@ -222,7 +222,7 @@ export async function GET(request: Request, { params }: RouteProps) {
     const capstoneCount = publicCapstones.length
     const projectText = capstoneCount === 1 ? '1 Public Project' : `${capstoneCount} Public Projects`
 
-    // Evaluated Core Competencies (top clusters from Skill Radar)
+    // Topics studied (top clusters from Skill Radar, built from lesson completion)
     const topClusters: string[] = skillRadar?.breakdown && skillRadar.breakdown.length > 0
       ? skillRadar.breakdown.slice(0, 4).map((b) => b.label)
       : ['Discovery', 'Strategy', 'Execution', 'Growth']
@@ -467,7 +467,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               </div>
             </div>
 
-            {/* Core Competencies Card */}
+            {/* Topics Studied Card */}
             <div
               style={{
                 flex: 1.4,
@@ -505,7 +505,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                     textTransform: 'uppercase',
                   }}
                 >
-                  Evaluated PM Competencies
+                  Topics studied
                 </span>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {topClusters.map((clusterName: string, idx: number) => (

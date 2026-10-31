@@ -150,3 +150,87 @@ Starting September 2026, Prodily standardized a strict deliverability configurat
 - **Dual Synchronized Multipart Payload:** Every HTML email must be accompanied by an identical, unformatted `text/plain` alternative payload.
 - **Minimal Link Footprint:** Limit hyperlinks to the essential destination and a canonical, unstyled footer unsubscribe link (`Manage Preferences · Unsubscribe: https://prodily.app/settings?tab=notifications`).
 
+
+---
+
+## 9. Capacity and free-tier ceilings (ENG-10)
+
+Owner decisions: zero budget, free tiers only (D7), and the app quota stays at **100 per day** (Q3). This section is the capacity check that has to pass before the pg_cron scheduler (ENG-01, [`DEPLOYMENT.md`](DEPLOYMENT.md) §7) makes every hourly job actually run.
+
+### 9.1 The three ceilings
+
+| Ceiling | Free-tier limit | What counts against it |
+|---|---|---|
+| App quota (`email_daily_send_limit`, default and owner value **100**) | 100 per UTC day | Every queued email that is not critical auth: welcome, reminders, recaps, lifecycle, broadcasts, admin production sends |
+| Brevo (primary) | 300 per day | Everything sent through Brevo, including critical auth email that bypasses the app quota, admin test sends and the contact form |
+| Resend (failover only) | 100 per day (and 3,000 per month) | Only sends that failed over from Brevo (5xx, 402, 408, 429, no response) |
+
+The app quota is the binding one by design. Keeping it at 100 leaves about 200 Brevo sends a day for password resets, email-change confirmations, admin tests and the contact form, which never touch the quota. Resend is headroom for a Brevo outage, not extra daily capacity: the two providers together top out at 400 a day.
+
+### 9.2 Worst-case daily volume
+
+For one UTC day:
+
+```
+E = R + W_day + L + T
+```
+
+- **R, daily reminders.** Learners who get a reminder today. A learner qualifies when they have an email, are not on `email_suppressions`, have not turned off learning email, have at least one due flashcard, and were not active today. The reminder cadence (owner decision Q8) then limits it to the days since last activity: **daily for days 0 to 3, then day 7, day 14 and day 30, then stop.** Day 0 is in practice skipped, because a learner active today is not reminded. So R is the count of qualifying learners whose last activity was 1, 2, 3, 7, 14 or 30 days ago. Without the cadence, every lapsed learner would be mailed every day and R would grow with the whole lapsed base.
+- **W_day, weekly recaps.** W is the number of learners with XP or a completed lesson in the past 7 days (zero-activity recaps are suppressed). On average that is **W / 7** a day, but the default recap slot is Sunday 18:00 local, so for learners on the defaults the **Sunday peak is close to W**. Plan for the Sunday peak.
+- **L, lifecycle.** At most one lifecycle email per learner per day: D+1 never started, D+3 started but not finished, and streak broken then quiet for 3 to 4 days. A 30% holdout receives nothing. Roughly `0.7 x (signups in the D+1 and D+3 windows + newly quiet streak-breakers)`.
+- **T, queued transactional and admin.** One welcome email per signup, admin production sends, broadcasts (as `bulk`) and any other queued, non-critical template.
+
+**Rule of thumb:** while `R + W_day + L + T` stays under 100, everything sends on time. Above 100, the excess waits (next section). Above roughly 300 a day including auth email, Brevo itself refuses and the overflow fails over to Resend's 100.
+
+### 9.3 Measure the real numbers (read-only)
+
+Run this in the Supabase SQL editor (read-only, safe on production). It approximates "has a due card" with "has completed at least one lesson", which can only overcount, and measures days since last activity in UTC, which can be off by one day for a learner far from UTC.
+
+```sql
+WITH reachable AS (
+  SELECT u.id, u.last_streak_date::date AS last_active
+  FROM public.users u
+  LEFT JOIN public.user_notification_preferences p ON p.user_id = u.id
+  WHERE u.email IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM public.email_suppressions s
+      WHERE lower(s.email) = lower(u.email) AND (s.expires_at IS NULL OR s.expires_at > now())
+    )
+    AND coalesce(p.all_notifications, true)
+    AND coalesce(p.all_email, true)
+    AND coalesce(p.learning_email, true)
+),
+learners AS (
+  SELECT r.*, (current_date - r.last_active) AS days_since
+  FROM reachable r
+  WHERE EXISTS (
+    SELECT 1 FROM public.user_lesson_progress lp
+    WHERE lp.user_id = r.id AND lp.completed_at IS NOT NULL
+  )
+)
+SELECT
+  (SELECT count(*) FROM reachable)                                                AS reachable_with_email,
+  (SELECT count(*) FROM learners)                                                 AS learners_with_a_completed_lesson,
+  (SELECT count(*) FROM learners WHERE days_since IN (1, 2, 3, 7, 14, 30))        AS r_reminders_today_with_cadence,
+  (SELECT count(*) FROM learners WHERE days_since >= 1)                           AS r_reminders_today_without_cadence,
+  (SELECT count(DISTINCT x.user_id) FROM public.xp_events x
+     WHERE x.created_at > now() - interval '7 days')                               AS w_weekly_recap_upper_bound,
+  (SELECT round(count(*) / 14.0, 1) FROM public.users
+     WHERE created_at > now() - interval '14 days')                               AS signups_per_day_14d,
+  (SELECT round(count(*) / 14.0, 1) FROM public.email_queue
+     WHERE delivered_at > now() - interval '14 days')                             AS queued_delivered_per_day_14d,
+  (SELECT count(*) FROM public.email_queue
+     WHERE status = 'retrying' AND error_message = 'Daily email send quota reached') AS waiting_on_quota_now;
+```
+
+Plug the results in: `R = r_reminders_today_with_cadence`, `W_day` between `w_weekly_recap_upper_bound / 7` (average) and `w_weekly_recap_upper_bound` (Sunday), `L` about `0.7 x 2 x signups_per_day_14d` plus a few streak-breakers, `T` about `signups_per_day_14d` plus planned broadcasts. If the Sunday total is over 100, decide before switching the scheduler on: accept that reminders are deferred or dropped on peak days (the free option), or raise the quota toward Brevo's 300 while leaving room for auth email.
+
+### 9.4 What happens when the quota is hit
+
+- The quota is checked per item just before dispatch (`increment_daily_email_quota()`). It is first come, first served: nothing is reserved for higher-priority mail that arrives later in the day.
+- An item refused by the quota goes back to `retrying` with `next_retry_at` one hour later and `error_message = 'Daily email send quota reached'`. The counter resets at 00:00 UTC (05:30 IST).
+- When items are claimed, the queue orders them by `priority` (critical 1, high 2, medium 5, low 8, bulk 10), then by `scheduled_at`.
+
+**Policy: reminders are the lowest-priority automated email.** When the day's quota is gone, the daily reminder is the first thing to give up: welcome and transactional mail, then lifecycle and recaps, go first. A reminder that cannot go out on its local date has lost its point and should be dropped, not sent the next day.
+
+Current code does not fully match this yet. The daily reminder, weekly recap and lifecycle runs all enqueue at `medium`, so they compete equally, and a quota-deferred reminder is retried rather than dropped. Follow-ups (code, not done in this doc change): enqueue `learning.daily_reminder` at `low`, and skip a reminder whose local date has passed.

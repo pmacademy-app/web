@@ -109,6 +109,19 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
         ? badgeShareText(badgeName, BRAND.fullName)
         : portfolioShareText(displayName, BRAND.fullName)
 
+  const reportServerShare = (channel: string) => {
+    try {
+      fetch('/api/portfolio/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context, username, channel }),
+        keepalive: true,
+      }).catch(() => {})
+    } catch {
+      // Non-fatal
+    }
+  }
+
   const flashStatus = (status: CopyStatus) => {
     setCopyStatus(status)
     setAnnouncementId((id) => id + 1)
@@ -133,7 +146,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
     }
     if (!mounted.current) return
     if (ok) {
-      if (track) trackPortfolioShareClicked('copy')
+      if (track) { trackPortfolioShareClicked('copy'); reportServerShare('copy'); }
       setShowManualLink(false)
       flashStatus('copied')
     } else {
@@ -157,13 +170,13 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
         text: shareText,
         url: shareUrl,
       })
-      trackPortfolioShareClicked('native')
+      trackPortfolioShareClicked('native'); reportServerShare('native');
     } catch (error) {
       const reason = errorName(error)
       // A share is already in progress: this click is a duplicate, not a new intent.
       if (reason === 'InvalidStateError') return
       // The user opened the share sheet, so the intent counts even if they then cancelled.
-      trackPortfolioShareClicked('native')
+      trackPortfolioShareClicked('native'); reportServerShare('native');
       if (reason === 'AbortError') return
       // Any other failure (unsupported payload, permission) falls back to copying, untracked.
       await copyLink(false)
@@ -171,7 +184,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
   }
 
   const shareOnLinkedIn = () => {
-    trackPortfolioShareClicked('linkedin')
+    trackPortfolioShareClicked('linkedin'); reportServerShare('linkedin');
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
       '_blank',
@@ -180,7 +193,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
   }
 
   const shareOnX = () => {
-    trackPortfolioShareClicked('x')
+    trackPortfolioShareClicked('x'); reportServerShare('x');
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
       '_blank',

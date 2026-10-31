@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -167,16 +167,22 @@ export const POST = withRoute(
       )
     }
 
-    const supabase = createServiceRoleClient()
+    // SEC-07: two service-role clients on purpose, as in the login route. A successful
+    // signInWithPassword stores the learner's session on the client it ran on, and supabase-js
+    // then sends that access token (not the service key) on every later PostgREST call, so a
+    // lookup through it runs as `authenticated` under RLS and cannot see other learners' rows.
+    // `authClient` only re-verifies the password; `admin` never holds a session.
+    const authClient = createServiceRoleClient()
+    const admin = createServiceRoleClient()
 
     // 1. Re-authenticate with current password (defense against session hijacking).
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
+    const { error: verifyError } = await authClient.auth.signInWithPassword({
       email: userEmail,
       password: currentPassword,
     })
 
     if (verifyError) {
-      if (!(await accountHasPassword(supabase, userId))) {
+      if (!(await accountHasPassword(admin, userId))) {
         return passwordNotSetResponse()
       }
       return NextResponse.json({ success: false, error: 'Current password is incorrect.' }, { status: 400 })
@@ -193,7 +199,10 @@ export const POST = withRoute(
     // an exact match on the canonicalized value preserves the intended
     // case-insensitive comparison without passing user input through as a
     // pattern.
-    const { data: existing } = await supabase
+    //
+    // The lookup runs on `admin` (service role), never on `authClient`: as the signed-in
+    // learner, RLS would hide every other account's row and this 409 could never fire.
+    const { data: existing } = await admin
       .from('users')
       .select('id')
       .eq('email', newEmail)
@@ -240,12 +249,12 @@ export const POST = withRoute(
     )
 
     if (updateError) {
-      void logSystemError({
+      after(() => logSystemError({
         severity: 'warning',
         category: 'auth',
         operation: 'settings_email_change_failure',
         message: updateError.message,
-      })
+      }))
 
       const safeMessage = describeEmailUpdateError(updateError)
       if (safeMessage) {

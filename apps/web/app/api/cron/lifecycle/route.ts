@@ -3,9 +3,10 @@ import { z } from 'zod'
 
 import { withRoute } from '@/lib/api/with-route'
 import { runLifecycle } from '@/lib/growth/lifecycle-run'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 
 /**
- * `force=true` bypasses the per-user local-hour schedule window, matching the daily
+ * `force=true` bypasses the per-user local send window, matching the daily
  * reminder / weekly recap crons. Only the literal string 'true' has an effect.
  */
 const forceQuerySchema = z.object({
@@ -22,8 +23,9 @@ const forceQuerySchema = z.object({
  * logic lives in `runLifecycle` (lib/growth/lifecycle-run.ts), which the admin dry-run
  * preview shares.
  *
- * Runs hourly on the shared '30 * * * *' scheduler trigger; the per-user local-hour
- * gate plus a local-date idempotency key make delivery exactly-once per user per day.
+ * Runs hourly (pg_cron primary once approved, GitHub Actions '30 * * * *' fallback). Each
+ * learner is due from their preferred local hour until 22:00 local (ENG-01), so a missed run
+ * is caught by the next one; the idempotency keys keep it to one email per sequence episode.
  */
 export const POST = withRoute(
   {
@@ -42,7 +44,7 @@ export const POST = withRoute(
       })
     },
   },
-  async ({ query }) => {
+  async ({ query }) => withCronHeartbeat('lifecycle', async () => {
     // Growth R5 B6/B7: a dry run counts who would get a lifecycle email or a proof nudge, and
     // writes nothing at all. Counts cover learners in their delivery hour this run (add
     // force=true to count everyone; still nothing is written).
@@ -69,6 +71,7 @@ export const POST = withRoute(
       heldOut: run.heldOut,
       skippedTimezone: run.skippedTimezone,
       skippedNoSegment: run.skippedNoSegment,
+      skippedAlreadyQueued: run.skippedAlreadyQueued,
       pagesSkipped: run.pagesSkipped,
       dryRun: run.dryRun,
       proofNudges: {
@@ -78,7 +81,7 @@ export const POST = withRoute(
         pagesSkipped: run.proofNudges.pagesSkipped,
       },
     })
-  }
+  })
 )
 
 export const GET = POST

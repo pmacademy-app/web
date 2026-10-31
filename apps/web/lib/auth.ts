@@ -5,6 +5,7 @@ import { createAuthenticatedServerClient, createServiceRoleClient } from './supa
 import { globalNotificationDispatcher } from './notifications/dispatcher'
 import { initializeNotificationConnectors } from './notifications/events/connectors'
 import { consentFromAuthMetadata, type ConsentRecord } from './legal/consent'
+import { trackProductEvent } from './events/product-events'
 
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
@@ -77,6 +78,11 @@ export async function ensureUserProfile(
     return null
   }
 
+  // PROD-15: one `signup` per new profile row. Only reached when this call inserted the row
+  // (an existing row returns above; a lost insert race errors above), so a retry or a second
+  // concurrent bootstrap never double-counts. Never throws.
+  await trackProductEvent('signup', user.id, { provider })
+
   if (!extra?.skipWelcome) {
     await dispatchWelcomeEmailIfNeeded(supabase, user, name, timezone)
   }
@@ -142,32 +148,17 @@ import { cache } from 'react'
  */
 async function resolveServerUser(): Promise<User | null> {
   try {
+    // CQ-10: this resolver only reads. Session refresh is owned by proxy.ts (and
+    // /api/auth/refresh), which rotate the refresh token AND write the new pair back to the
+    // browser. Refreshing here would rotate the token and throw the new one away, leaving the
+    // browser holding a revoked refresh token. When the proxy has refreshed this request,
+    // Next merges the cookies it set into cookies(), so the fresh access token is read here.
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('sb-access-token')?.value
-    const refreshToken = cookieStore.get('sb-refresh-token')?.value
-    if (!accessToken && !refreshToken) return null
+    if (!accessToken) return null
 
-    if (accessToken) {
-      const authClient = createAuthenticatedServerClient(accessToken)
-      const user = await getAuthenticatedUser(authClient)
-      if (user) return user
-    }
-
-    // Refresh token fallback if access token is expired or missing
-    if (refreshToken) {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      if (supabaseUrl && supabaseAnonKey) {
-        const { createClient } = await import('@supabase/supabase-js')
-        const anonClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } })
-        const { data, error } = await anonClient.auth.refreshSession({ refresh_token: refreshToken })
-        if (!error && data.user) {
-          return data.user
-        }
-      }
-    }
-
-    return null
+    const authClient = createAuthenticatedServerClient(accessToken)
+    return await getAuthenticatedUser(authClient)
   } catch (err) {
     const error = err as Error & { digest?: string }
     if (error && (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('Dynamic server usage'))) {
@@ -231,12 +222,12 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
     token = authHeader.substring(7).trim()
   }
 
-  // Fallback: Check sb-access-token cookie
-  let refreshToken: string | null = null
+  // Fallback: the sb-access-token cookie. The raw request is read first; cookies() last,
+  // because it is the only source that sees cookies the proxy set on this same request.
+  let tokenFromRequest = false
   if (!token) {
     if ('cookies' in request && typeof (request as unknown as { cookies?: { get?: (k: string) => { value?: string } } }).cookies?.get === 'function') {
       token = (request as unknown as { cookies: { get: (k: string) => { value?: string } | undefined } }).cookies.get('sb-access-token')?.value || null
-      refreshToken = (request as unknown as { cookies: { get: (k: string) => { value?: string } | undefined } }).cookies.get('sb-refresh-token')?.value || null
     }
 
     if (!token && cookieHeader) {
@@ -244,48 +235,49 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
       if (matchAccess && matchAccess[1]) {
         token = decodeURIComponent(matchAccess[1].trim())
       }
-      const matchRefresh = cookieHeader.match(/sb-refresh-token=([^;]+)/)
-      if (matchRefresh && matchRefresh[1]) {
-        refreshToken = decodeURIComponent(matchRefresh[1].trim())
-      }
     }
 
+    tokenFromRequest = Boolean(token)
     if (!token) {
-      try {
-        const cookieStore = await cookies()
-        const sbToken = cookieStore.get('sb-access-token')?.value
-        const sbRefresh = cookieStore.get('sb-refresh-token')?.value
-        if (sbToken) token = sbToken
-        if (sbRefresh) refreshToken = sbRefresh
-      } catch {
-        // Ignored if cookies() context is unavailable
-      }
+      token = await readAccessTokenFromCookieStore()
     }
   }
 
   if (token) {
-    const authClient = createAuthenticatedServerClient(token)
-    const { data: { user }, error: userError } = await authClient.auth.getUser()
-    if (!userError && user) {
-      return user
-    }
+    const user = await verifyAccessToken(token)
+    if (user) return user
   }
 
-  // Refresh token fallback for API requests
-  if (refreshToken) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (supabaseUrl && supabaseAnonKey) {
-      const { createClient } = await import('@supabase/supabase-js')
-      const anonClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } })
-      const { data, error } = await anonClient.auth.refreshSession({ refresh_token: refreshToken })
-      if (!error && data.user) {
-        return data.user
-      }
+  // CQ-10: no token refresh here. The proxy owns refresh and cookie writes (for pages, learner
+  // APIs and /api/admin/*; /api/auth/* manages its own session): when it refreshes
+  // a request it sets the new pair on the response, and Next merges those cookies into
+  // cookies() for this same request. The raw request still carries the token the browser
+  // sent, so if that one was rejected, retry once with the proxy-refreshed token.
+  if (tokenFromRequest) {
+    const refreshed = await readAccessTokenFromCookieStore()
+    if (refreshed && refreshed !== token) {
+      return verifyAccessToken(refreshed)
     }
   }
 
   return null
+}
+
+async function verifyAccessToken(token: string): Promise<User | null> {
+  const authClient = createAuthenticatedServerClient(token)
+  const { data: { user }, error } = await authClient.auth.getUser()
+  return !error && user ? user : null
+}
+
+/** The access token from next/headers cookies(), or null outside a request scope. */
+async function readAccessTokenFromCookieStore(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies()
+    return cookieStore.get('sb-access-token')?.value || null
+  } catch {
+    // Ignored if cookies() context is unavailable
+    return null
+  }
 }
 
 /**

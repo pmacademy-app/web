@@ -29,6 +29,8 @@ import {
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+import { getModuleMeta } from '@/lib/curriculum/module-meta'
+import { formatLessonPosition, getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 import { AcademyNavigationRetention } from '@/components/curriculum/AcademyNavigationRetention'
 
@@ -99,7 +101,7 @@ export default async function AcademyPage() {
       treatment,
       override,
     })
-  // The learner's first actionable lesson globally — the safe fallback CTA when a module's
+  // The learner's first actionable lesson globally: the safe fallback CTA when a module's
   // target is not yet reachable (Lesson 1 for a brand-new learner).
   const globalFirstActionableIdx = getFirstActionableLessonIndex(
     completedSet,
@@ -121,6 +123,9 @@ export default async function AcademyPage() {
 
   // Find next actionable lesson for instant resume
   const nextIncompleteLesson = lessons.find((l) => !completedSet.has(l.id)) || lessons[0]
+
+  // UX-05: every learner-facing lesson number is "Module N · Lesson M"; global numbers stay in URLs.
+  const positionOf = (lesson: CurriculumEntry) => formatLessonPosition(lesson, curriculum)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -195,7 +200,7 @@ export default async function AcademyPage() {
               }
               title={
                 nextIncompleteLesson
-                  ? `Continue: Lesson ${nextIncompleteLesson.order} - ${nextIncompleteLesson.title}`
+                  ? `Continue: ${positionOf(nextIncompleteLesson)}, ${nextIncompleteLesson.title}`
                   : 'Curriculum Completed'
               }
               className="group relative rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs flex items-center gap-4.5 hover:border-primary/50 hover:bg-card/90 hover:shadow-md transition-all block focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
@@ -251,7 +256,7 @@ export default async function AcademyPage() {
                 </div>
                 {nextIncompleteLesson && (
                   <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-[160px]">
-                    Lesson {nextIncompleteLesson.order}: {nextIncompleteLesson.title}
+                    {positionOf(nextIncompleteLesson)}: {nextIncompleteLesson.title}
                   </div>
                 )}
                 <div className="text-[11px] text-muted-foreground font-mono">
@@ -269,7 +274,10 @@ export default async function AcademyPage() {
         <div className="space-y-4">
           {orderedModules.map(([moduleSlug, moduleLessons], idx) => {
             const meta = CURRICULUM_MODULE_META[moduleSlug]
-            const moduleNumber = idx + 1
+            const moduleNumber = moduleLessons[0]
+              ? getLessonPosition(moduleLessons[0], curriculum).moduleNumber
+              : idx + 1
+            const lessonCount = getModuleMeta(moduleSlug)?.lessonCount ?? moduleLessons.length
 
             // Phase 6: per-lesson access under the active model (treatment/control + grandfathering).
             const accessByLesson = new Map(moduleLessons.map((l) => [l.id, accessOf(l.id)]))
@@ -321,14 +329,14 @@ export default async function AcademyPage() {
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Module {String(moduleNumber).padStart(2, '0')}
+                          Module {moduleNumber}
                         </span>
-                        <span className="text-[11px] text-muted-foreground font-medium">• 10 Lessons</span>
+                        <span className="text-[11px] text-muted-foreground font-medium">• {lessonCount} Lessons</span>
 
                         {isModuleStarted && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
                             <Clock className="w-3 h-3" />
-                            {completedInModule}/10 Done ({modulePct}%)
+                            {completedInModule}/{lessonCount} Done ({modulePct}%)
                           </span>
                         )}
 
@@ -398,7 +406,7 @@ export default async function AcademyPage() {
                     </div>
                   )}
 
-                  {/* 10 Lessons Playlist Grid */}
+                  {/* Module lessons playlist grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                     {moduleLessons.map((lesson, lessonIdx) => {
                       const access = accessByLesson.get(lesson.id)!
@@ -413,9 +421,8 @@ export default async function AcademyPage() {
                       const prereq = isLocked && access.prerequisiteLessonId
                         ? lessons.find((l) => l.id === access.prerequisiteLessonId) ?? null
                         : null
-                      const prereqOrder = prereq
-                        ? lessons.findIndex((l) => l.id === prereq.id) + 1
-                        : null
+                      const prereqLabel = prereq ? positionOf(prereq) : null
+                      const lessonLabel = positionOf(lesson)
 
                       // A concise, screen-reader-friendly status that never relies on colour alone.
                       const statusLabel = isDone
@@ -423,11 +430,11 @@ export default async function AcademyPage() {
                         : isInProgress
                           ? 'In progress'
                           : isLocked
-                            ? prereqOrder
-                              ? `Locked — complete Lesson ${prereqOrder} first`
+                            ? prereqLabel
+                              ? `Locked, complete ${prereqLabel} first`
                               : 'Locked'
                             : isTargetLesson
-                              ? 'Available — start here'
+                              ? 'Available, start here'
                               : 'Available'
 
                       const rowClass = `flex items-center justify-between p-3.5 rounded-xl border transition-all text-xs md:text-sm group/item ${
@@ -452,7 +459,7 @@ export default async function AcademyPage() {
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
-                          {String(lessonIdx + 1).padStart(2, '0')}
+                          {lessonIdx + 1}
                         </div>
                       )
 
@@ -475,8 +482,8 @@ export default async function AcademyPage() {
                               {/* Visible (not colour-only) lock/prerequisite affordance */}
                               {isLocked && (
                                 <span className="block text-[10px] font-medium text-muted-foreground mt-0.5">
-                                  {prereqOrder
-                                    ? `Locked · complete Lesson ${prereqOrder} first`
+                                  {prereqLabel
+                                    ? `Locked · complete ${prereqLabel} first`
                                     : 'Locked'}
                                 </span>
                               )}
@@ -510,7 +517,7 @@ export default async function AcademyPage() {
                           className={`${rowClass} cursor-not-allowed`}
                         >
                           {/* Non-interactive: state is conveyed by the visible "Locked · complete
-                              Lesson N first" text (announced in reading order), not colour alone. */}
+                              Module N · Lesson M first" text (announced in reading order), not colour alone. */}
                           {innerBody}
                         </div>
                       ) : (
@@ -519,7 +526,7 @@ export default async function AcademyPage() {
                           href={`/academy/${lesson.module}/${lesson.id}`}
                           id={`lesson-link-${lesson.id}`}
                           data-locked="false"
-                          aria-label={`Lesson ${lessonIdx + 1}: ${lesson.title}. ${statusLabel}.`}
+                          aria-label={`${lessonLabel}: ${lesson.title}. ${statusLabel}.`}
                           className={rowClass}
                         >
                           {innerBody}
@@ -533,7 +540,7 @@ export default async function AcademyPage() {
                     <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                       {!targetAccessible && !isModuleFullyCompleted && globalFirstActionable && (
                         <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 leading-relaxed font-medium">
-                          Prerequisites needed: finish Lesson {globalFirstActionable.order} to keep progressing in order.
+                          Prerequisites needed: finish {positionOf(globalFirstActionable)} to keep progressing in order.
                         </div>
                       )}
 
@@ -551,10 +558,10 @@ export default async function AcademyPage() {
                           {isModuleFullyCompleted
                             ? `Review Module ${moduleNumber}`
                             : targetAccessible
-                              ? `Continue Module ${moduleNumber}: Lesson ${targetLesson.order}`
+                              ? `Continue ${positionOf(targetLesson)}`
                               : globalFirstActionable
-                                ? `Start from Lesson ${globalFirstActionable.order} first`
-                                : `Continue Module ${moduleNumber}: Lesson ${targetLesson.order}`}
+                                ? `Start from ${positionOf(globalFirstActionable)} first`
+                                : `Continue ${positionOf(targetLesson)}`}
                         </span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </Link>

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { withRoute } from '@/lib/api/with-route'
@@ -6,6 +6,10 @@ import { EmailAutomationsService } from '@/lib/notifications/automations/service
 import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { getDueCardsCount } from '@/lib/flashcards-service'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
+import { daysSinceLastActivity, shouldSendReminder } from '@/lib/notifications/reminder-cadence'
+import { findQueuedIdempotencyKeys, isInSendWindow } from '@/lib/notifications/send-window'
+import { getStreakStatusSummary } from '@/lib/streaks/streaks'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 /** Keyset pagination batch size for daily reminder processing */
@@ -39,7 +43,7 @@ export const POST = withRoute(
       })
     },
   },
-  async ({ query }) => {
+  async ({ query }) => withCronHeartbeat('daily-reminder', async () => {
     const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.daily_reminder')
     const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
     const schedules = await EmailAutomationsService.getDigestSchedules()
@@ -63,6 +67,8 @@ export const POST = withRoute(
     let remindersSkippedTimezone = 0
     let remindersSkippedActiveToday = 0
     let remindersSkippedNoDueCards = 0
+    let remindersSkippedAlreadyQueued = 0
+    let remindersSkippedCadence = 0
     let skippedPages = 0
 
     const startTime = Date.now()
@@ -84,7 +90,7 @@ export const POST = withRoute(
         // real activity/due-card data, preserving the T3 keyset pagination.
         let queryBuilder = supabase
           .from('users')
-          .select('id, email, name, current_streak, last_streak_date, timezone')
+          .select('id, email, name, created_at, current_streak, longest_streak, streak_freezes_available, last_streak_date, timezone')
           .not('email', 'is', null)
 
         if (lastSeenId) {
@@ -97,12 +103,12 @@ export const POST = withRoute(
 
         if (queryErr) {
           const { logSystemError } = await import('@/lib/monitoring/logger')
-          void logSystemError({
+          after(() => logSystemError({
             severity: 'error',
             category: 'cron',
             operation: 'cron_daily_reminder_query',
             message: `Database query failure in /api/cron/daily-reminder: ${queryErr.message}`,
-          })
+          }))
           break
         }
 
@@ -110,7 +116,10 @@ export const POST = withRoute(
           id: string
           email: string
           name?: string
+          created_at?: string | null
           current_streak?: number
+          longest_streak?: number
+          streak_freezes_available?: number
           last_streak_date?: string | null
           timezone?: string | null
         }>
@@ -126,37 +135,65 @@ export const POST = withRoute(
         } catch (prefErr) {
           skippedPages++
           const { logSystemError } = await import('@/lib/monitoring/logger')
-          void logSystemError({
+          after(() => logSystemError({
             severity: 'error',
             category: 'cron',
             operation: 'cron_daily_reminder_preferences',
             message: `Notification preferences read failed in /api/cron/daily-reminder; page skipped: ${prefErr instanceof Error ? prefErr.message : String(prefErr)}`,
-          })
+          }))
           lastSeenId = users[users.length - 1].id
           if (users.length < BATCH_SIZE) break
           continue
         }
 
         const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+        // One clock per page, so the send window, the cadence and the streak agree on "today".
+        const now = new Date()
 
+        // ENG-01: level-triggered window. A learner is due from their preferred local hour
+        // until 22:00 local (bypassed with force=true), so a missed hourly run is picked up
+        // by the next one. The per-local-date idempotency key keeps it to one reminder a
+        // day; learners whose key is already queued are skipped here in one read, before
+        // any per-learner work.
+        const dueThisRun = new Map<
+          string,
+          { timezone: string; localTime: ReturnType<typeof getUserLocalTime>; idempotencyKey: string }
+        >()
         for (const user of users) {
           if (!user.email) continue
-
           const userPref = prefMap.get(user.id)
           // Prefer the timezone stored on the preferences row; fall back to the
           // user's own profile timezone so no-preference-row learners are still
           // scheduled in their real local window rather than defaulting to UTC.
           const timezone = userPref?.timezone || user.timezone || 'UTC'
-          const userLocalTime = getUserLocalTime(timezone)
+          const userLocalTime = getUserLocalTime(timezone, now)
           const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
+          if (!isForced && !isInSendWindow(userLocalTime, targetHour)) continue
+          dueThisRun.set(user.id, {
+            timezone,
+            localTime: userLocalTime,
+            idempotencyKey: `daily-reminder-${user.id}-${userLocalTime.localDate}`,
+          })
+        }
+        const alreadyQueued = await findQueuedIdempotencyKeys(
+          supabase,
+          [...dueThisRun.values()].map((d) => d.idempotencyKey)
+        )
 
-          // Timezone-aware delivery window evaluation (preserved from T5):
-          // In production, when running periodically, only dispatch if current time
-          // matches the user's local preferred reminder hour (bypassed with force=true).
-          if (!isForced && userLocalTime.localHour !== targetHour) {
+        for (const user of users) {
+          if (!user.email) continue
+
+          const userPref = prefMap.get(user.id)
+          const due = dueThisRun.get(user.id)
+          if (!due) {
             remindersSkippedTimezone++
             continue
           }
+          if (alreadyQueued.has(due.idempotencyKey)) {
+            remindersSkippedAlreadyQueued++
+            continue
+          }
+          const userLocalTime = due.localTime
 
           // Phase 1.3 — a learner who already registered activity *today* (their
           // `last_streak_date`, stored in local-date terms by the streak engine,
@@ -164,6 +201,20 @@ export const POST = withRoute(
           // the reminder targeted at the lapsed/quiet audience.
           if (user.last_streak_date && user.last_streak_date === userLocalTime.localDate) {
             remindersSkippedActiveToday++
+            continue
+          }
+
+          // PROD-05 (Q8): back off with time since last activity (last_streak_date, else
+          // signup). Daily for days 0 to 3, then days 7, 14 and 30, then stop. Checked before
+          // the due-card read so a lapsed learner costs no query.
+          const quietDays = daysSinceLastActivity({
+            lastStreakDate: user.last_streak_date,
+            createdAt: user.created_at,
+            localDate: userLocalTime.localDate,
+            timezone: due.timezone,
+          })
+          if (!shouldSendReminder(quietDays)) {
+            remindersSkippedCadence++
             continue
           }
 
@@ -187,7 +238,21 @@ export const POST = withRoute(
             continue
           }
 
-          const idempotencyKey = `daily-reminder-${user.id}-${userLocalTime.localDate}`
+          // PROD-05: users.current_streak only resets on the learner's next activity, so a
+          // lapsed learner still stores their old streak. The email shows the effective
+          // streak in their timezone (0 once it has broken, freezes included).
+          const { effectiveCurrentStreak } = getStreakStatusSummary(
+            {
+              currentStreak: user.current_streak ?? 0,
+              longestStreak: user.longest_streak ?? 0,
+              streakFreezesAvailable: user.streak_freezes_available ?? 0,
+              lastActivityDate: user.last_streak_date ?? '',
+            },
+            due.timezone,
+            now
+          )
+
+          const idempotencyKey = due.idempotencyKey
           const result = await enqueueNotificationItem({
             userId: user.id,
             toEmail: user.email,
@@ -196,7 +261,8 @@ export const POST = withRoute(
             templateKey: 'learning.daily_reminder',
             templateVariables: {
               userName: user.name || user.email.split('@')[0],
-              currentStreak: user.current_streak || 0,
+              currentStreak: effectiveCurrentStreak,
+              longestStreak: user.longest_streak ?? 0,
               dueCount,
             },
             eventId: idempotencyKey,
@@ -217,12 +283,12 @@ export const POST = withRoute(
     } catch (err) {
       console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
       const { logSystemError } = await import('@/lib/monitoring/logger')
-      void logSystemError({
+      after(() => logSystemError({
         severity: 'error',
         category: 'cron',
         operation: 'cron_daily_reminder_exception',
         message: `Unhandled exception in /api/cron/daily-reminder: ${err instanceof Error ? err.message : String(err)}`,
-      })
+      }))
     }
 
     return NextResponse.json({
@@ -232,9 +298,11 @@ export const POST = withRoute(
       remindersSkippedTimezone,
       remindersSkippedActiveToday,
       remindersSkippedNoDueCards,
+      remindersSkippedAlreadyQueued,
+      remindersSkippedCadence,
       skippedPages,
     })
-  }
+  })
 )
 
 export const GET = POST

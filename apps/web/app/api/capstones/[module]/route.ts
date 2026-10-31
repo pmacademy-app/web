@@ -41,6 +41,8 @@ export const GET = withRoute(
 
     return NextResponse.json({
       success: true,
+      // The workspace keys its local draft backup on this (CQ-08). It is the caller's own id.
+      userId,
       definition: capstoneDef,
       submission: result.submission,
       reflection: result.reflection,

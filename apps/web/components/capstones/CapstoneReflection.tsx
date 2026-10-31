@@ -73,7 +73,7 @@ export function CapstoneReflection({
         />
 
         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>Reflections earn +15 XP when submitted.</span>
+          <span>Reflections earn XP when submitted.</span>
           {isPublic && (
             <span className="flex items-center gap-1 text-emerald-500 font-semibold">
               <Check className="w-3 h-3" /> Will be attached to public profile export

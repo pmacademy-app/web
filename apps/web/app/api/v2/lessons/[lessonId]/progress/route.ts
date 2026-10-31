@@ -6,15 +6,25 @@
  * Uses stable les_XXXXXX IDs and queries the `lesson_id` column
  * (renamed from lesson_slug in migration 20260802000001).
  *
- * This is the v2 counterpart to /api/lessons/[slug]/progress.
- * The [slug] routes remain active for the v1 lesson page (Phase 1.4 removes them).
+ * The v1 `[slug]` progress routes were removed (docs/API_CONTRACT.md); this is the only one.
+ *
+ * SEC-08 / CRIT1: any progress row makes the lesson count as "opened", which the access check
+ * then grandfathers in. So PATCH rejects a malformed id (400) and a locked lesson (403) before it
+ * writes, or it would unlock any lesson for the quiz and theory-read routes.
+ *
+ * CQ-11: every PATCH answers with the learner's progress row, and no write can move a completed
+ * lesson back to in_progress (the downgrade guard is part of the UPDATE, not a prior read).
  */
 
+import { after } from 'next/server'
 import { z } from 'zod'
 
+import { isLessonIdFormat } from '@/lib/academy/lesson-ids'
+import { assertLessonAccessible } from '@/lib/academy/lessons-db'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
-import { createServiceRoleClient } from '@/lib/supabase'
+import { trackProductEvent } from '@/lib/events/product-events'
+import { createServiceRoleClient, type Database } from '@/lib/supabase'
 
 // Two mutually-exclusive PATCH shapes: the existing "mark in progress", and the Phase 4
 // (§4.4) idempotent "deep dive opened" marker. Kept as a union so each call declares its
@@ -24,29 +34,65 @@ const patchSchema = z.union([
   z.object({ deep_dive_opened: z.literal(true) }),
 ])
 
-interface ProgressRow {
-  user_id: string
-  lesson_id: string
-  status: 'not_started' | 'in_progress' | 'completed'
-  theory_read_at: string | null
-  quiz_score: number | null
-  quiz_attempts: number
-  xp_earned: number
-  completed_at: string | null
-  deep_dive_opened_at: string | null
-}
-
-interface SupabaseTable {
-  upsert: (data: unknown, options?: unknown) => {
-    select: () => {
-      single: () => Promise<{ data: unknown; error: unknown }>
-    }
-  }
-}
+type ProgressTable = Database['public']['Tables']['user_lesson_progress']
+type ProgressRow = ProgressTable['Row']
+type ServiceClient = ReturnType<typeof createServiceRoleClient>
 
 /** The ad-hoc 401 probe these three v2 routes carried, preserved through the wrapper. */
 const warnUnauthorized = () => {
   console.warn('[auth-401-monitor] 401 Unauthorized in API v2')
+}
+
+/** The learner's progress row, or null when none exists. Database faults throw. */
+async function findProgress(
+  supabase: ServiceClient,
+  userId: string,
+  lessonId: string
+): Promise<ProgressRow | null> {
+  const { data, error } = await supabase
+    .from('user_lesson_progress')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('lesson_id', lessonId)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+/** The learner's progress row after a write that left it in place. */
+async function readProgress(supabase: ServiceClient, userId: string, lessonId: string): Promise<ProgressRow> {
+  const row = await findProgress(supabase, userId, lessonId)
+  if (!row) {
+    throw new Error(`[api/v2/lessons/progress] progress row for ${lessonId} missing after write`)
+  }
+  return row
+}
+
+/**
+ * Inserts the learner's progress row only when none exists (ON CONFLICT DO NOTHING).
+ * Returns the new row, or null when a row was already there. This is also the one reliable
+ * signal that the learner just started the lesson.
+ */
+async function insertProgressIfMissing(
+  supabase: ServiceClient,
+  userId: string,
+  lessonId: string,
+  fields: Omit<ProgressTable['Insert'], 'user_id' | 'lesson_id'>
+): Promise<ProgressRow | null> {
+  const { data, error } = await supabase
+    .from('user_lesson_progress')
+    .upsert(
+      { ...fields, user_id: userId, lesson_id: lessonId },
+      { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
+    )
+    .select()
+  if (error) throw error
+  return data?.[0] ?? null
+}
+
+/** PROD-15: recorded after the response; trackProductEvent never throws. */
+function recordLessonStarted(userId: string, lessonId: string): void {
+  after(() => trackProductEvent('lesson_started', userId, { lesson_id: lessonId }))
 }
 
 export const GET = withRoute(
@@ -61,17 +107,7 @@ export const GET = withRoute(
     const lessonId = params.lessonId
     const serviceSupabase = createServiceRoleClient()
 
-    const { data: progress, error } = (await serviceSupabase
-      .from('user_lesson_progress')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('lesson_id', lessonId)
-      .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
-
-    if (error) {
-      console.error(`[api/v2/lessons/${lessonId}/progress] Error fetching progress:`, error)
-      throw new RouteError(500, 'SERVER_ERROR', 'Database error')
-    }
+    const progress = await findProgress(serviceSupabase, userId, lessonId)
 
     if (!progress) {
       return Response.json({
@@ -83,7 +119,8 @@ export const GET = withRoute(
         quiz_attempts: 0,
         xp_earned: 0,
         completed_at: null,
-      })
+        deep_dive_opened_at: null,
+      } satisfies ProgressRow)
     }
 
     return Response.json(progress)
@@ -111,76 +148,73 @@ export const PATCH = withRoute(
     const userId = requireUserId(actor)
     const lessonId = params.lessonId
 
-    const body = await request.json()
-    const parsed = patchSchema.safeParse(body)
+    if (!isLessonIdFormat(lessonId)) {
+      throw new RouteError(400, 'VALIDATION', 'Invalid lesson id.')
+    }
+
+    // CQ-12: a malformed body is the caller's mistake (400), not an incident.
+    let raw: unknown
+    try {
+      raw = await request.json()
+    } catch {
+      throw new RouteError(400, 'VALIDATION', 'Invalid request body. JSON object expected.')
+    }
+    const parsed = patchSchema.safeParse(raw)
     if (!parsed.success) {
       throw new RouteError(400, 'VALIDATION', 'Body must be {status:"in_progress"} or {deep_dive_opened:true}.')
     }
 
     const serviceSupabase = createServiceRoleClient()
 
-    // Phase 4 (§4.4): first Deep-dive open. Idempotent — record the timestamp once and never
-    // overwrite it, so re-opening the section doesn't reset the marker. The upsert touches
-    // only this column, leaving status/theory/quiz state untouched.
+    // CRIT1: before any write. Unknown lesson -> 404, locked lesson -> 403 (PublicError).
+    await assertLessonAccessible(serviceSupabase, userId, lessonId)
+
+    // Phase 4 (§4.4): first Deep-dive open. Idempotent: the timestamp is set once and never
+    // overwritten, so re-opening the section does not reset the marker. Only this column is
+    // written, leaving status/theory/quiz state untouched.
     if ('deep_dive_opened' in parsed.data) {
-      const { data: existing } = (await serviceSupabase
+      const openedAt = new Date().toISOString()
+      const created = await insertProgressIfMissing(serviceSupabase, userId, lessonId, {
+        deep_dive_opened_at: openedAt,
+      })
+      if (created) {
+        recordLessonStarted(userId, lessonId)
+        return Response.json(created)
+      }
+
+      const { data: updated, error } = await serviceSupabase
         .from('user_lesson_progress')
-        .select('deep_dive_opened_at')
+        .update({ deep_dive_opened_at: openedAt })
         .eq('user_id', userId)
         .eq('lesson_id', lessonId)
-        .maybeSingle()) as unknown as { data: { deep_dive_opened_at: string | null } | null; error: unknown }
-
-      if (existing?.deep_dive_opened_at) {
-        return Response.json({ message: 'Deep dive already recorded.' })
-      }
-
-      const { data: updated, error } = (await (serviceSupabase
-        .from('user_lesson_progress') as unknown as SupabaseTable)
-        .upsert({
-          user_id: userId,
-          lesson_id: lessonId,
-          deep_dive_opened_at: new Date().toISOString(),
-        }, { onConflict: 'user_id,lesson_id' })
+        .is('deep_dive_opened_at', null)
         .select()
-        .single()) as unknown as { data: ProgressRow | null; error: unknown }
+        .maybeSingle()
+      if (error) throw error
 
-      if (error) {
-        console.error(`[api/v2/lessons/${lessonId}/progress] Error recording deep dive:`, error)
-        throw new RouteError(500, 'SERVER_ERROR', 'Database error')
-      }
-
-      return Response.json(updated)
+      return Response.json(updated ?? (await readProgress(serviceSupabase, userId, lessonId)))
     }
 
-    const { status } = parsed.data
+    const created = await insertProgressIfMissing(serviceSupabase, userId, lessonId, {
+      status: 'in_progress',
+    })
+    if (created) {
+      recordLessonStarted(userId, lessonId)
+      return Response.json(created)
+    }
 
-    // Query current status to prevent overriding a completed state with in_progress
-    const { data: existing } = (await serviceSupabase
+    // Never downgrade: the `neq` makes the guard atomic, so a quiz completing between two
+    // calls (or a second tab) cannot be overwritten. A completed row is returned unchanged.
+    const { data: updated, error } = await serviceSupabase
       .from('user_lesson_progress')
-      .select('status')
+      .update({ status: 'in_progress' })
       .eq('user_id', userId)
       .eq('lesson_id', lessonId)
-      .maybeSingle()) as unknown as { data: { status: string } | null; error: unknown }
-
-    if (existing?.status === 'completed' && status === 'in_progress') {
-      return Response.json({ message: 'Already completed, update ignored.' })
-    }
-
-    const { data: updated, error } = (await (serviceSupabase
-      .from('user_lesson_progress') as unknown as SupabaseTable)
-      .upsert({
-        user_id: userId,
-        lesson_id: lessonId,
-        status,
-      }, { onConflict: 'user_id,lesson_id' })
+      .neq('status', 'completed')
       .select()
-      .single()) as unknown as { data: ProgressRow | null; error: unknown }
+      .maybeSingle()
+    if (error) throw error
 
-    if (error) {
-      console.error(`[api/v2/lessons/${lessonId}/progress] Error upserting progress:`, error)
-      throw new RouteError(500, 'SERVER_ERROR', 'Database error')
-    }
-
-    return Response.json(updated)
+    return Response.json(updated ?? (await readProgress(serviceSupabase, userId, lessonId)))
   }
 )

@@ -123,7 +123,7 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
     it('recommends Product Strategy for experienced PMs focusing on career growth', () => {
       const rec = computeRecommendation('grow_career', 'experienced', ['strategy', 'prioritization'])
       expect(rec.slug).toBe('strategy')
-      expect(rec.name).toBe('Product Strategy')
+      expect(rec.name).toBe('Strategy, B2B & Competitive Moats')
     })
 
     it('recommends Users & Discovery when working in product with discovery focus', () => {
@@ -135,7 +135,7 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
     it('recommends Execution when user prioritizes PRDs and agile without specific goal match', () => {
       const rec = computeRecommendation(undefined, 'working', ['prds', 'agile'])
       expect(rec.slug).toBe('execution')
-      expect(rec.name).toBe('Product Execution')
+      expect(rec.name).toBe('Agile Execution & Roadmaps')
     })
   })
 

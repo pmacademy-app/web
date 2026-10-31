@@ -18,7 +18,8 @@ import { metadata as termsMetadata } from '../../app/(marketing)/terms/page'
 import robots from '../../app/robots'
 import sitemap from '../../app/sitemap'
 import { fetchCurriculumData, fetchCompiledLesson } from '../lesson-loader'
-import { FAQ_ITEMS, MODULES } from '@/config/content'
+import { FAQ_ITEMS } from '@/config/content'
+import { MODULE_META_LIST } from '@/lib/curriculum/module-meta'
 
 describe('Phase 2 Structured Data, GEO & AEO Unit Test Suite', () => {
   const expectedSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
@@ -87,11 +88,11 @@ describe('Phase 2 Structured Data, GEO & AEO Unit Test Suite', () => {
     expect(course.provider['@type']).toBe('EducationalOrganization')
     expect(course.provider.name).toBe(BRAND.fullName)
     expect(course.hasPart.length).toBe(9)
-    for (let i = 0; i < MODULES.length; i++) {
+    for (let i = 0; i < MODULE_META_LIST.length; i++) {
       const part = course.hasPart[i]
       expect(part['@type']).toBe('CourseUnit')
       expect(part.position).toBe(i + 1)
-      expect(part.name.includes(MODULES[i].title)).toBe(true)
+      expect(part.name).toBe(`Module ${i + 1}: ${MODULE_META_LIST[i].title}`)
     }
   })
 

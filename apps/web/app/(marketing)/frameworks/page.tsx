@@ -39,14 +39,26 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Sources for the well-known frameworks the lessons build on. Prodily teaches and adapts these;
+ * it did not invent them, so the page credits them instead of presenting them as its own.
+ */
+const FRAMEWORK_SOURCES: { idea: string; credit: string }[] = [
+  { idea: 'Desirability, feasibility and viability', credit: 'IDEO (design thinking)' },
+  { idea: 'Continuous discovery and opportunity solution trees', credit: 'Teresa Torres, Continuous Discovery Habits' },
+  { idea: 'RICE prioritization (Reach, Impact, Confidence, Effort)', credit: 'Sean McBride at Intercom' },
+  { idea: 'MoSCoW prioritization', credit: 'Dai Clegg, later adopted by DSDM' },
+  { idea: 'North Star Metric', credit: 'Popularized by Sean Ellis and the Amplitude North Star Framework' },
+]
+
 export default function FrameworksPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     '@id': `${siteUrl}/frameworks#termset`,
-    name: 'Prodily Original Frameworks & Mental Models',
+    name: 'Product Management Frameworks & Mental Models taught in Prodily',
     description:
-      'Proprietary Product Management frameworks and diagnostic models taught in the Prodily 90-lesson curriculum.',
+      'Product management frameworks and mental models taught in the Prodily 90-lesson curriculum. Well-known industry frameworks are credited to their original authors.',
     url: `${siteUrl}/frameworks`,
     hasDefinedTerm: FRAMEWORKS.map((fw) => ({
       '@type': 'DefinedTerm',
@@ -83,11 +95,30 @@ export default function FrameworksPage() {
 
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
             These aren&apos;t tips to memorize. They&apos;re tools to help you reason through product problems.
+            Some are Prodily&apos;s own teaching models; many build on well-known industry frameworks, credited below.
           </p>
         </header>
 
         {/* ── Interactive Frameworks Explorer ────────────────────────────── */}
         <FrameworksExplorer frameworks={FRAMEWORKS} />
+
+        {/* Credits for the established frameworks the lessons build on. */}
+        <section aria-labelledby="framework-sources-heading" className="max-w-3xl space-y-3">
+          <h2 id="framework-sources-heading" className="text-lg font-semibold text-foreground tracking-tight">
+            Where these ideas come from
+          </h2>
+          <p className="text-sm text-ink-muted leading-relaxed">
+            Several of these models adapt established work from across the product community. We teach and
+            apply them; we did not invent them.
+          </p>
+          <ul className="space-y-1.5 text-sm text-ink-muted leading-relaxed list-disc pl-5">
+            {FRAMEWORK_SOURCES.map((source) => (
+              <li key={source.idea}>
+                <span className="font-medium text-foreground">{source.idea}:</span> {source.credit}
+              </li>
+            ))}
+          </ul>
+        </section>
 
         {/* ── Bottom Capstone Callout ─────────────────────────────────────── */}
         <section className="rounded-2xl border border-border bg-surface p-8 sm:p-12 shadow-xs space-y-6">

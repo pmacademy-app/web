@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { Flame, Zap, Award, GraduationCap, Globe, BadgeCheck } from 'lucide-react'
+import { Flame, Zap, Award, GraduationCap, Globe, UserCheck } from 'lucide-react'
 import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
 import { ShareButton } from '@/components/portfolio/ShareButton'
 import { validateOptionalUrl } from '@/lib/portfolio'
@@ -95,8 +95,8 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
             <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground leading-tight truncate flex items-center gap-2">
               {name}
               {user.isPortfolioVerified && (
-                <span title="Verified Portfolio">
-                  <BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-primary shrink-0" />
+                <span title="Profile complete" role="img" aria-label="Profile complete">
+                  <UserCheck className="w-5 h-5 md:w-6 md:h-6 text-primary shrink-0" aria-hidden="true" />
                 </span>
               )}
             </h1>

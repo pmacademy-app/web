@@ -18,6 +18,9 @@ import {
   type CapstoneThresholdExperimentSummary,
   type CapstoneThresholdExperimentUserRow,
 } from './capstone-threshold-experiment'
+import { getRecutExperimentConfig } from '@/lib/academy/experiment'
+import { getModuleEntryUnlockConfig } from '@/lib/academy/module-entry-unlock'
+import { getCapstoneThresholdConfig } from '@/lib/capstone-threshold-experiment'
 
 /**
  * Phase 8.1 — experiment readout service (server-side, Phase 2 funnel layer).
@@ -33,8 +36,9 @@ import {
  * No GA4, no new event stream, no schema change: assignment for all three experiments is a
  * deterministic function of `users.id` (+ `created_at` for cohort-gated ones), so the arms are
  * reconstructed here without any persisted assignment. The aggregators segment the WHOLE population
- * by the variant each learner *would* receive, so the comparison is readable even while every flag
- * defaults to off.
+ * by the variant each learner *would* receive. Per owner decision D5 the recut and module-entry
+ * unlock are ON for everyone (features behind a kill switch, not experiments), so `status` tells
+ * the admin view which panels have a live arm comparison and which show "No experiment running".
  *
  * Cost: aggregate reads over `user_lesson_progress` can be sizeable, so the fetch+compute is wrapped
  * in `unstable_cache` (5-minute revalidate) — this is an admin dashboard, not a live meter. Access is
@@ -42,6 +46,64 @@ import {
  * `AdminConsoleLayout` gates before it runs. There is deliberately no API route, so no learner-facing
  * surface can reach this data.
  */
+
+/** Label the admin view shows for any experiment with no live arm comparison. */
+export const NO_EXPERIMENT_RUNNING_LABEL = 'No experiment running'
+
+/**
+ * Whether an experiment has a live control-vs-treatment comparison.
+ *
+ * - `running`: enabled with a split strictly between 0% and 100%, so both arms receive learners.
+ * - `rolled_out`: enabled at 100%, so every learner is treated. Per owner decision D5 this is the
+ *   permanent state of the Phase 4 recut and the Phase 6 module-entry unlock: they are features
+ *   behind a kill switch, not experiments.
+ * - `off`: kill switch set (or a 0% split), so every learner is control.
+ */
+export type ExperimentRunState = 'running' | 'rolled_out' | 'off'
+
+export interface ExperimentStatus {
+  running: boolean
+  state: ExperimentRunState
+}
+
+export interface ExperimentStatuses {
+  recut: ExperimentStatus
+  moduleEntry: ExperimentStatus
+  capstoneThreshold: ExperimentStatus
+  /** True when at least one of the three has a live arm comparison. */
+  anyRunning: boolean
+}
+
+/**
+ * Pure: classifies one flag config. A cohort start date at 100% still leaves a live comparison
+ * (learners created before it stay control), so it counts as running.
+ */
+export function getExperimentStatus(config: {
+  enabled: boolean
+  treatmentPercent: number
+  cohortStartMs?: number | null
+}): ExperimentStatus {
+  if (!config.enabled) return { running: false, state: 'off' }
+  const pct = Math.max(0, Math.min(100, config.treatmentPercent))
+  if (pct <= 0) return { running: false, state: 'off' }
+  if (pct >= 100 && (config.cohortStartMs ?? null) === null) {
+    return { running: false, state: 'rolled_out' }
+  }
+  return { running: true, state: 'running' }
+}
+
+/** Reads all three flag configs from the environment and classifies each. */
+export function getExperimentStatuses(env: NodeJS.ProcessEnv = process.env): ExperimentStatuses {
+  const recut = getExperimentStatus(getRecutExperimentConfig(env))
+  const moduleEntry = getExperimentStatus(getModuleEntryUnlockConfig(env))
+  const capstoneThreshold = getExperimentStatus(getCapstoneThresholdConfig(env))
+  return {
+    recut,
+    moduleEntry,
+    capstoneThreshold,
+    anyRunning: recut.running || moduleEntry.running || capstoneThreshold.running,
+  }
+}
 
 /** The primary ("module 1") module whose lessons gate capstone-1 eligibility. */
 const PRIMARY_MODULE_SLUG = 'foundations'
@@ -90,6 +152,8 @@ export interface ExperimentReadout {
   generatedAt: string
   /** Total learners the readout was assembled from (all arms, both experiments). */
   populationSize: number
+  /** Which experiments have a live arm comparison right now (from the env flags). */
+  status: ExperimentStatuses
   recut: RecutExperimentSummary
   moduleEntry: ModuleEntryExperimentSummary
   capstoneThreshold: CapstoneThresholdExperimentSummary
@@ -101,7 +165,15 @@ function emptySummaries(generatedAt: string, failed: boolean): ExperimentReadout
   const recut = computeRecutExperimentSummary([])
   const moduleEntry = computeModuleEntryExperimentSummary([])
   const capstoneThreshold = computeCapstoneThresholdExperimentSummary([])
-  return { generatedAt, populationSize: 0, recut, moduleEntry, capstoneThreshold, failed }
+  return {
+    generatedAt,
+    populationSize: 0,
+    status: getExperimentStatuses(),
+    recut,
+    moduleEntry,
+    capstoneThreshold,
+    failed,
+  }
 }
 
 /** Groups the flat fetch results into one `LearnerFacts` per known user. */
@@ -254,6 +326,7 @@ async function aggregateExperimentReadout(): Promise<ExperimentReadout> {
     return {
       generatedAt,
       populationSize: facts.length,
+      status: getExperimentStatuses(),
       recut: computeRecutExperimentSummary(toRecutRows(facts)),
       moduleEntry: computeModuleEntryExperimentSummary(toModuleEntryRows(facts)),
       capstoneThreshold: computeCapstoneThresholdExperimentSummary(toCapstoneThresholdRows(facts)),

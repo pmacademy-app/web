@@ -174,21 +174,7 @@ describe('Integrity Verification', () => {
   })
 
   // ===========================================================================
-  // 4. P2-B: Usage Time Tracker Canonical Hook
-  // ===========================================================================
-  describe('P2-B: Usage Time Tracker Canonical Hook Consolidation', () => {
-    it('both import paths resolve the canonical useUsageTimeTracker hook', async () => {
-      const hook1 = await import('../../hooks/useUsageTimeTracker')
-      const hook2 = await import('../../lib/hooks/useUsageTimeTracker')
-
-      expect(hook1.useUsageTimeTracker).toBeDefined()
-      expect(hook2.useUsageTimeTracker).toBeDefined()
-      expect(hook1.useUsageTimeTracker).toBe(hook2.useUsageTimeTracker)
-    })
-  })
-
-  // ===========================================================================
-  // 5. CURR: Generic Curriculum Prerequisite Invariant Across All 90 Lessons
+  // 4. CURR: Generic Curriculum Prerequisite Invariant Across All 90 Lessons
   // ===========================================================================
   describe('CURR: Generic Curriculum Prerequisite Invariant Across All 90 Lessons', () => {
     const canonicalIds = Array.from({ length: 90 }, (_, i) => `les_${String(i + 1).padStart(3, '0')}`)

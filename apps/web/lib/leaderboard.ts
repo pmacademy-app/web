@@ -9,7 +9,8 @@
  * Pure stateless functions with zero UI coupling.
  */
 
-export type LeaderboardTier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond' | 'Fellow'
+// The top tier is 'Elite', not 'Fellow', so it never reads as the PM Fellow designation.
+export type LeaderboardTier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond' | 'Elite'
 
 export interface RawLeaderboardUserMetric {
   userId: string
@@ -42,7 +43,7 @@ export function getLeaderboardTier(level: number, totalXp: number = 0): {
   badgeColor: string
 } {
   if (level >= 9 || totalXp >= 10000) {
-    return { tier: 'Fellow', badgeColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30' }
+    return { tier: 'Elite', badgeColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30' }
   }
   if (level >= 7 || totalXp >= 5000) {
     return { tier: 'Diamond', badgeColor: 'text-cyan-500 bg-cyan-500/10 border-cyan-500/30' }

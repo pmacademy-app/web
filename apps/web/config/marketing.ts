@@ -9,9 +9,11 @@
  */
 
 import { CAPSTONE_DEFINITIONS, type CapstoneDefinition } from '@/config/capstones'
-import { MODULES } from '@/config/content'
 
-/** A real, public learner portfolio used as the homepage's sample (owner decision). */
+/**
+ * A real, public learner portfolio used as the homepage's sample (owner decision).
+ * No homepage link points here yet: restore the link once the exemplar portfolio is finished.
+ */
 export const SAMPLE_PORTFOLIO_PATH = '/p/adityagangwani'
 
 /** One line under every illustrative mock on the homepage. */
@@ -38,23 +40,15 @@ export interface HomeCapstone {
   deliverableType: string
 }
 
-/**
- * Homepage display overrides, keyed by module number. Capstone 9's stored title says
- * "Interview-Ready", which reads as an interview-prep claim the product does not make.
- */
-const DISPLAY_TITLE_OVERRIDES: Partial<Record<number, string>> = {
-  9: 'End-to-End Product Case Study',
-}
-
 /** The nine real capstones, in module order, with homepage-safe titles. */
 export const HOME_CAPSTONES: readonly HomeCapstone[] = Object.values(CAPSTONE_DEFINITIONS)
   .map((def): HomeCapstone => {
-    const mod = MODULES.find((m) => m.number === def.moduleNumber)
+    // moduleNumber and moduleTitle come from MODULE_META via config/capstones.ts.
     return {
       number: def.moduleNumber,
       moduleSlug: def.moduleSlug,
-      moduleTitle: mod?.title ?? def.moduleTitle,
-      title: DISPLAY_TITLE_OVERRIDES[def.moduleNumber] ?? def.title,
+      moduleTitle: def.moduleTitle,
+      title: def.title,
       skill: def.competencyCluster,
       deliverableType: def.deliverableType,
     }

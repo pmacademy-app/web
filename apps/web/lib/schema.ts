@@ -1,5 +1,11 @@
 import { BRAND } from './brand'
-import { MODULES, FAQ_ITEMS } from '@/config/content'
+import { FAQ_ITEMS } from '@/config/content'
+import {
+  COURSE_WORKLOAD_HOURS,
+  MODULE_META_LIST,
+  formatModuleHours,
+  getModuleTitle,
+} from '@/lib/curriculum/module-meta'
 import type { CompiledLesson } from '@/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
@@ -73,12 +79,13 @@ export function getCourseSchema() {
     hasCourseInstance: {
       '@type': 'CourseInstance',
       courseMode: 'online',
-      courseWorkload: 'PT45H',
+      // Reading plus quizzes and reflections, summed from the compiled lessons.
+      courseWorkload: `PT${COURSE_WORKLOAD_HOURS}H`,
     },
-    hasPart: MODULES.map((mod) => ({
+    hasPart: MODULE_META_LIST.map((mod) => ({
       '@type': 'CourseUnit',
       name: `Module ${mod.number}: ${mod.title}`,
-      description: `Module ${mod.number} covers ${mod.skillLabels.join(', ')}. Outcome: ${mod.outcome}. (${mod.lessonCount} lessons, ${mod.estimatedTime}).`,
+      description: `${mod.description} Outcome: ${mod.outcome}. ${mod.lessonCount} lessons, about ${formatModuleHours(mod.estimatedMinutes)}.`,
       position: mod.number,
     })),
   }
@@ -93,12 +100,7 @@ export function getLessonSchema(
   slug: string
 ) {
   const lessonUrl = `${siteUrl}/lessons/${slug}`
-  const moduleInfo = MODULES.find(
-    (m) =>
-      m.title.toLowerCase().includes(lesson.module.toLowerCase()) ||
-      lesson.module.toLowerCase().includes(m.title.toLowerCase())
-  )
-  const moduleName = moduleInfo ? moduleInfo.title : lesson.module
+  const moduleName = getModuleTitle(lesson.module)
 
   const levelStr =
     lesson.difficulty === 1

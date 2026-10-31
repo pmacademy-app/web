@@ -50,7 +50,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleTitle: 'Product Thinking Foundations',
     summary: 'Separate the person using a product from the person making the buying decision.',
     definition:
-      'A framework refining Desirability by separating the person using the software from the decision-maker paying for it—crucial for B2B, enterprise, and multi-sided platforms.',
+      'A framework refining Desirability by separating the person using the software from the decision-maker paying for it. This is crucial for B2B, enterprise, and multi-sided platforms.',
     keyTakeaway:
       'Prevents misdiagnosing product failures caused by pleasing buyers while alienating actual end users (Lesson 5).',
   },

@@ -1,14 +1,21 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { after } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
+import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks-db'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
-import { CAPSTONE_DEFINITIONS, getCurriculumModuleForCapstone } from '@/config/capstones'
+import { getAllCapstoneDefinitions, getCurriculumModuleForCapstone } from '@/config/capstones'
+import {
+  getCapstoneThresholdConfig,
+  getCapstoneThresholdVariant,
+  getRequiredLessonsForVariant,
+} from '@/lib/capstone-threshold-experiment'
 import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
@@ -94,13 +101,15 @@ export default async function DashboardPage() {
     fetchCurriculumData(),
     // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
     getUserStreakStatus(supabase, authUser.id).catch((err) => {
-      void logSystemError({
-        severity: 'error',
-        category: 'db',
-        operation: 'dashboard_streak_read',
-        message: String(err),
-        userId: authUser.id,
-      })
+      after(() =>
+        logSystemError({
+          severity: 'error',
+          category: 'db',
+          operation: 'dashboard_streak_read',
+          message: String(err),
+          userId: authUser.id,
+        }),
+      )
       return notStartedStreakStatus()
     }),
     getReviewQueueData(supabase, authUser.id),
@@ -153,11 +162,14 @@ export default async function DashboardPage() {
     const activeNextIndex = curriculumLessons.findIndex((l) => !completedLessonIds.has(l.id))
     if (activeNextIndex !== -1) {
       const activeNext = curriculumLessons[activeNextIndex]
+      // Module-local numbering ("Module 2 · Lesson 3"), never the global 1..90 index (W1).
+      const position = getLessonPosition(activeNext, curriculum)
       nextLesson = {
         id: activeNext.id,
-        order: activeNextIndex + 1,
+        positionLabel: position.label,
         title: activeNext.title,
         module: activeNext.module,
+        moduleTitle: position.moduleTitle,
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
       }
     }
@@ -183,17 +195,28 @@ export default async function DashboardPage() {
     deliverableType: string
   } | null = null
 
-  const capstoneDefs = Object.values(CAPSTONE_DEFINITIONS)
+  // The prompt uses the same unlock rule the server enforces (lib/capstones-db.ts
+  // resolveCapstoneThreshold): N completed module lessons, where N comes from the Phase 7
+  // threshold experiment (8 by default). The profile row already carries users.created_at.
+  const thresholdConfig = getCapstoneThresholdConfig()
+  const requiredCapstoneLessons = getRequiredLessonsForVariant(
+    getCapstoneThresholdVariant({ id: authUser.id, createdAt: profile.created_at ?? null }, thresholdConfig),
+    thresholdConfig,
+  )
+
+  // Curriculum order (Module 1..9), so "first eligible" means the earliest module.
+  const capstoneDefs = getAllCapstoneDefinitions()
   for (const cap of capstoneDefs) {
     const status = capstoneStatusMap.get(cap.moduleSlug) || 'not_started'
     const isDone = status === 'submitted' || status === 'reviewed'
 
     if (!isDone) {
-      // Check if all lessons in this module are completed
-      const moduleLessons = curriculumLessons.filter((l) => l.module === getCurriculumModuleForCapstone(cap.moduleSlug))
-      const allModuleLessonsDone = moduleLessons.length > 0 && moduleLessons.every((l) => completedLessonIds.has(l.id))
+      const curriculumModule = getCurriculumModuleForCapstone(cap.moduleSlug)
+      const moduleLessons = curriculumLessons.filter((l) => l.module === curriculumModule)
+      const completedInModule = moduleLessons.filter((l) => completedLessonIds.has(l.id)).length
+      const isEligible = moduleLessons.length > 0 && completedInModule >= requiredCapstoneLessons
 
-      if (allModuleLessonsDone) {
+      if (isEligible) {
         nextCapstonePrompt = {
           moduleSlug: cap.moduleSlug,
           moduleNumber: cap.moduleNumber,

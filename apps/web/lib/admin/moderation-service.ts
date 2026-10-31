@@ -12,6 +12,7 @@
 
 import { createServiceRoleClient } from '../supabase'
 import { logAdminAction } from './guard'
+import { trackProductEvent } from '@/lib/events/product-events'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { MAX_OFFSET, MAX_PAGE_SIZE } from '@/lib/api/pagination'
 import { capstoneSharePath } from '@/lib/portfolio'
@@ -495,6 +496,14 @@ export class ModerationService {
       if (updatedRows.length === 0) {
         console.warn(`[ModerationService] reviewCapstone: no submission matched id "${submissionId}"`)
         return false
+      }
+
+            if (current.user_id) {
+        await trackProductEvent('capstone_reviewed', current.user_id, {
+          submission_id: submissionId,
+          action,
+          module_slug: current.module_slug,
+        })
       }
 
       await logAdminAction(adminUserId, adminEmail, `capstone_${action}`, 'capstone_submission', submissionId, {

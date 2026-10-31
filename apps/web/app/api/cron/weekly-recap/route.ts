@@ -11,6 +11,13 @@ import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
 import { BRAND } from '@/lib/brand'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
+import {
+  findQueuedIdempotencyKeys,
+  isInWeeklySendWindow,
+  localIsoWeekKey,
+  weeklyAnchorLocalDate,
+} from '@/lib/notifications/send-window'
 
 /** Keyset pagination batch size for weekly recap processing */
 const BATCH_SIZE = 100
@@ -43,7 +50,7 @@ export const POST = withRoute(
       })
     },
   },
-  async ({ query }) => {
+  async ({ query }) => withCronHeartbeat('weekly-recap', async () => {
     const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.weekly_recap')
     const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
     const schedules = await EmailAutomationsService.getDigestSchedules()
@@ -66,6 +73,7 @@ export const POST = withRoute(
     let recapsQueued = 0
     let recapsSkippedTimezone = 0
     let recapsSkippedNoActivity = 0
+    let recapsSkippedAlreadyQueued = 0
     let skippedPages = 0
 
     const startTime = Date.now()
@@ -180,7 +188,10 @@ export const POST = withRoute(
         const due: Array<{
           user: (typeof users)[number]
           userPref: ReturnType<typeof prefMap.get>
-          localDate: string
+          idempotencyKey: string
+          /** The pre-ENG-01 key (`weekly-recap-<user>-<preferred local date>`), checked so the
+           *  switch to per-week keys cannot send a second recap in the week it deploys. */
+          legacyKey: string
           xpEarnedThisWeek: number
           lessonsCompletedCount: number
         }> = []
@@ -193,9 +204,10 @@ export const POST = withRoute(
           const targetDay = userPref?.preferredRecapDay ?? weeklySched.dayOfWeek ?? 0
           const targetHour = userPref?.preferredRecapHour ?? weeklySched.hourUtc ?? 18
 
-          // Timezone-aware delivery window evaluation:
-          // Dispatches only when user's local day of week and local hour match the recap window (bypassed with force=true)
-          if (!isForced && (userLocalTime.localDayOfWeek !== targetDay || userLocalTime.localHour !== targetHour)) {
+          // ENG-01: level-triggered window. Due from the preferred local hour until 22:00 on the
+          // preferred day, or on a later day of the same local ISO week if every run that day
+          // was missed (bypassed with force=true). The per-ISO-week key keeps it to one recap.
+          if (!isForced && !isInWeeklySendWindow(userLocalTime, targetDay, targetHour)) {
             recapsSkippedTimezone++
             continue
           }
@@ -213,14 +225,32 @@ export const POST = withRoute(
             continue
           }
 
-          due.push({ user, userPref, localDate: userLocalTime.localDate, xpEarnedThisWeek, lessonsCompletedCount })
+          due.push({
+            user,
+            userPref,
+            idempotencyKey: `weekly-recap-${user.id}-${localIsoWeekKey(userLocalTime.localDate)}`,
+            legacyKey: `weekly-recap-${user.id}-${weeklyAnchorLocalDate(userLocalTime.localDate, userLocalTime.localDayOfWeek, targetDay)}`,
+            xpEarnedThisWeek,
+            lessonsCompletedCount,
+          })
         }
 
-        // Growth R5 B9: one proof next-step line per recap. A failed read only drops the line.
-        const proofStates = due.length > 0 ? await loadProofStates(supabase, due.map((d) => d.user.id)).catch(() => null) : null
+        // Learners already queued this week are dropped in one read, before the proof-state load
+        // and the per-learner enqueue (whose duplicate path would write a skipped-event row).
+        const alreadyQueued = await findQueuedIdempotencyKeys(
+          supabase,
+          due.flatMap((d) => [d.idempotencyKey, d.legacyKey])
+        )
+        const toSend = due.filter((d) => {
+          const queued = alreadyQueued.has(d.idempotencyKey) || alreadyQueued.has(d.legacyKey)
+          if (queued) recapsSkippedAlreadyQueued++
+          return !queued
+        })
 
-        for (const { user, userPref, localDate, xpEarnedThisWeek, lessonsCompletedCount } of due) {
-          const idempotencyKey = `weekly-recap-${user.id}-${localDate}`
+        // Growth R5 B9: one proof next-step line per recap. A failed read only drops the line.
+        const proofStates = toSend.length > 0 ? await loadProofStates(supabase, toSend.map((d) => d.user.id)).catch(() => null) : null
+
+        for (const { user, userPref, idempotencyKey, xpEarnedThisWeek, lessonsCompletedCount } of toSend) {
           const proofState = proofStates?.get(user.id)
           const nextStep = proofState ? selectProofNextStep(proofState) : null
 
@@ -274,9 +304,10 @@ export const POST = withRoute(
       recapsQueued,
       recapsSkippedTimezone,
       recapsSkippedNoActivity,
+      recapsSkippedAlreadyQueued,
       skippedPages,
     })
-  }
+  })
 )
 
 export const GET = POST

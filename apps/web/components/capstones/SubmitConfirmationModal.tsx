@@ -86,8 +86,7 @@ export function SubmitConfirmationModal({
               <span>Ready for Submission ({validation.wordCount} words)</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Submitting will record your proof-of-work deliverable and award{' '}
-              <strong className="text-foreground">+150 XP</strong>.
+              Submitting will record your proof-of-work deliverable and award capstone XP.
             </p>
           </div>
         )}
@@ -177,7 +176,7 @@ export function SubmitConfirmationModal({
                 Submitting...
               </>
             ) : (
-              'Confirm Submission (+150 XP)'
+              'Confirm Submission'
             )}
           </button>
         </div>

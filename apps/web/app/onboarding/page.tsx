@@ -2,13 +2,23 @@ import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { getServerUser } from '@/lib/auth'
+import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
 import OnboardingWizard from './OnboardingWizard'
 
-export default async function OnboardingPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>
+
+export default async function OnboardingPage({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams
+  const rawNext = Array.isArray(params.next) ? params.next[0] : params.next
+  // Where the learner was headed before onboarding interrupted them (for example the
+  // lesson whose public CTA they signed up from). Sanitized to a same-origin path;
+  // anything else is dropped and the wizard falls back to its recommendation.
+  const nextPath = sanitizeNextPath(rawNext?.trim(), '') || null
+
   const user = await getServerUser()
 
   if (!user) {
-    redirect('/login')
+    redirect(nextPath ? `/login?next=${encodeURIComponent(`/onboarding?next=${encodeURIComponent(nextPath)}`)}` : '/login')
   }
 
   // Fetch current profile to pre-fill and onboarding settings in parallel
@@ -31,6 +41,7 @@ export default async function OnboardingPage() {
           : null
       }
       onboardingSettings={onboardingSettings || undefined}
+      nextPath={nextPath}
     />
   )
 }

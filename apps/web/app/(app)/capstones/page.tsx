@@ -62,7 +62,7 @@ export default async function CapstonesOverviewPage() {
           {[
             { icon: Layers, label: '9 Applied Capstones' },
             { icon: BookOpen, label: 'Real Product Deliverables' },
-            { icon: Award, label: '150 XP Earned Per Submission' },
+            { icon: Award, label: 'XP for every submission' },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
               <Icon className="h-3.5 w-3.5 text-primary" />

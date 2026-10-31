@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { withRoute } from '@/lib/api/with-route'
 import { AvatarService, type StorageCleanupResult } from '@/lib/avatar/avatar-service'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 import { log } from '@/lib/monitoring/log'
 import { runRetentionSweep } from '@/lib/retention/sweep'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -56,7 +57,7 @@ export const POST = withRoute(
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/cleanup',
   },
-  async ({ request, requestId }) => {
+  async ({ request, requestId }) => withCronHeartbeat('cleanup', async () => {
     const requestedDryRun = await readRequestedDryRun(request)
     const deletionEnabled = deletionEnabledInEnvironment()
     const dryRun = requestedDryRun || !deletionEnabled
@@ -101,7 +102,7 @@ export const POST = withRoute(
       // Kept for the scheduler and any dashboard that read the old shape.
       cleanedRows: sweep.totalDeleted,
     })
-  }
+  })
 )
 
 /**

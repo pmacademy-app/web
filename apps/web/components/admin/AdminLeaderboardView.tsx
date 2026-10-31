@@ -26,7 +26,7 @@ interface AdminLeaderboardViewProps {
   initialData: AdminLeaderboardData
 }
 
-const TIERS = ['all', 'Fellow', 'Diamond', 'Gold', 'Silver', 'Bronze']
+const TIERS = ['all', 'Elite', 'Diamond', 'Gold', 'Silver', 'Bronze']
 
 export function AdminLeaderboardView({ initialData }: AdminLeaderboardViewProps) {
   const [data, setData] = useState<AdminLeaderboardData>(initialData)

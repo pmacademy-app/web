@@ -40,16 +40,22 @@ export function useUsageTimeTracker(
   const isUsage1hrDoneRef = useRef<boolean>(false)
   const pendingActiveSecondsRef = useRef<number>(0)
 
-  const handlePrompt = (promptKey: string) => {
-    if (!isMountedRef.current) return
-    if (typeof optionsOrCallback === 'function') {
-      optionsOrCallback(promptKey)
-    } else if (optionsOrCallback?.onPromptTriggered) {
-      optionsOrCallback.onPromptTriggered(promptKey)
-    }
-  }
+  // Latest-ref pattern (CQ-09): the tracking effect runs once, but it must call the
+  // caller's current callback, not the one captured on the first render.
+  const onPromptRef = useRef<(promptKey: string) => void>(() => {})
+  useEffect(() => {
+    onPromptRef.current =
+      typeof optionsOrCallback === 'function'
+        ? optionsOrCallback
+        : (promptKey: string) => optionsOrCallback?.onPromptTriggered?.(promptKey)
+  })
 
   useEffect(() => {
+    const handlePrompt = (promptKey: string) => {
+      if (!isMountedRef.current) return
+      onPromptRef.current(promptKey)
+    }
+
     isMountedRef.current = true
     isUsage1hrDoneRef.current = false
     pendingActiveSecondsRef.current = 0
@@ -216,8 +222,5 @@ export function useUsageTimeTracker(
         window.removeEventListener('learner:feedback:sync', handleCustomSync)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
-
-

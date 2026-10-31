@@ -46,6 +46,13 @@ interface OnboardingWizardProps {
   user: OnboardingUser
   profile: OnboardingProfile | null
   onboardingSettings?: OnboardingSettings
+  /**
+   * Sanitized same-origin path the learner was headed to before onboarding (for
+   * example the lesson they signed up from). When set, "Start Learning" goes there
+   * instead of the recommended lesson. A locked lesson is handled by the lesson's own
+   * gate, so no unlock check is needed here.
+   */
+  nextPath?: string | null
 }
 
 // Phase 4 (Collapse the Entrance): the draft key is bumped from _v2 so a learner who had a
@@ -105,7 +112,7 @@ interface PathDraft {
  */
 // Note: `user` is accepted for a stable prop contract (and future use) but the collapsed
 // single-screen flow needs no per-user client state, so it is intentionally not destructured.
-export default function OnboardingWizard({ profile, onboardingSettings }: OnboardingWizardProps) {
+export default function OnboardingWizard({ profile, onboardingSettings, nextPath = null }: OnboardingWizardProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -214,9 +221,12 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
       // still opens the full /academy list.
       const recommendedLessonPath =
         'recommendedLessonPath' in result ? result.recommendedLessonPath : null
+      // A `next` carried from signup (the lesson the learner came for) wins over the
+      // recommendation on the primary CTA.
+      const primaryTarget = nextPath ?? recommendedLessonPath
       const destination =
-        targetDestination === ONBOARDING_PRIMARY_DESTINATION && recommendedLessonPath
-          ? recommendedLessonPath
+        targetDestination === ONBOARDING_PRIMARY_DESTINATION && primaryTarget
+          ? primaryTarget
           : targetDestination
 
       router.push(destination)
@@ -242,10 +252,6 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
             Two quick choices and you&apos;re learning. You can add your profile and portfolio details
             anytime in Settings.
           </p>
-          {/* Growth R5 B12a: frame the outcome before the first lesson. */}
-          <p className="text-xs sm:text-sm font-semibold text-foreground max-w-md" data-testid="onboarding-portfolio-framing">
-            Every lesson and capstone you finish builds a public PM portfolio recruiters can see.
-          </p>
         </div>
 
         {/* Error Alert */}
@@ -266,7 +272,7 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
               What&apos;s your primary goal? <span className="text-primary" aria-hidden="true">*</span>
             </legend>
             <p className="text-[11px] text-muted-foreground">
-              This sets your recommended starting point and capstone path.
+              This sets your recommended starting module.
             </p>
             <div className="grid grid-cols-1 gap-2.5" role="radiogroup" aria-label="Primary learning goal" aria-required="true">
               {goalOptions.map((opt) => {
@@ -313,7 +319,7 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
               What&apos;s your experience level? <span className="text-primary" aria-hidden="true">*</span>
             </legend>
             <p className="text-[11px] text-muted-foreground">
-              Helps us calibrate examples and quiz difficulty to your background.
+              Helps us recommend where to start.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="radiogroup" aria-label="Experience level" aria-required="true">
               {experienceOptions.map((opt) => {
@@ -354,8 +360,24 @@ export default function OnboardingWizard({ profile, onboardingSettings }: Onboar
             </div>
           </fieldset>
 
+          {/* Arrived from a lesson (?next=): finishing returns there, so say that instead of
+              recommending a module the learner will not land on (W8). */}
+          {nextPath ? (
+            <div
+              data-testid="onboarding-continue-hint"
+              className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <p className="flex-1 min-w-0 self-center text-sm font-semibold text-foreground">
+                You&apos;ll continue with the lesson you were reading.
+              </p>
+            </div>
+          ) : null}
+
           {/* Non-blocking recommendation hint */}
-          {recommendedModule && (
+          {!nextPath && recommendedModule && (
             <div
               className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 animate-in fade-in duration-200"
               aria-live="polite"

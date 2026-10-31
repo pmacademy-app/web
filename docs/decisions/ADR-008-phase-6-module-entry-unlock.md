@@ -1,6 +1,7 @@
 # ADR-008 — Phase 6: Module-Entry Unlock & Recommendation Routing
 
 - **Status:** Accepted (experiment-gated; flag defaults to control)
+- **Status update (2026-10-24):** Owner decision D5 (2026-10-20) makes module-entry unlock ON permanently for every learner. It is no longer an experiment: `MODULE_ENTRY_UNLOCK_ENABLED` is now a kill switch that is on when unset, and only `false` restores the global-sequential lock. The default treatment share is 100% with no cohort gate. The rest of this ADR is kept as the historical record of the original decision.
 - **Date:** 2026-09-30
 - **Phase:** 6 — "Make the Path Real"
 - **Supersedes (in part):** the `lib/personalization/path-resolver.ts` invariant that personalization "NEVER skips, reorders, or bypasses any lesson" — see [Amended invariant](#amended-invariant).

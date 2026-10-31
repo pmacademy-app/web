@@ -96,6 +96,7 @@ export function ReviewHub({
   const handleRatingSelect = async (rating: SRSRating) => {
     if (!currentCard || isSubmitting) return
     setIsSubmitting(true)
+    let cardXp = 0
 
     try {
       // Submit review rating to server-side API endpoint
@@ -108,9 +109,16 @@ export function ReviewHub({
       if (!response.ok) {
         console.error('[ReviewHub] Failed to save flashcard review rating.')
       } else {
+        // Count only the XP the server reports for this review (it dedupes per card per day),
+        // never a client-side guess. Absent or malformed means no figure.
+        const data: unknown = await response.json().catch(() => null)
+        const reportedXp =
+          data && typeof data === 'object' ? (data as { xpEarned?: unknown }).xpEarned : undefined
+        cardXp = typeof reportedXp === 'number' && Number.isFinite(reportedXp) && reportedXp > 0 ? reportedXp : 0
+
         // Track session stats & immediate real-time stats update
         setReviewedCount((prev) => prev + 1)
-        setXpEarned((prev) => prev + 2) // 2 XP per card
+        setXpEarned((prev) => prev + cardXp)
         if (rating >= 3) {
           setPassedCount((prev) => prev + 1)
         }
@@ -133,7 +141,7 @@ export function ReviewHub({
         setCurrentIndex((prev) => prev + 1)
       } else {
         const finalReviewedCount = reviewedCount + 1
-        const finalXpEarned = xpEarned + 2
+        const finalXpEarned = xpEarned + cardXp
         fetch('/api/review/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -472,36 +472,43 @@ export async function GET(request: NextRequest) {
       // Recovery OTP must use the anon client so Supabase creates a proper
       // user-scoped session. The service role client bypasses session creation
       // which breaks the password reset flow entirely.
-      const supabase = type === 'recovery'
+      const authClient = type === 'recovery'
         ? createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             { auth: { persistSession: false } }
           )
         : createServiceRoleClient()
-      const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
+      const { data, error } = await authClient.auth.verifyOtp({ token_hash, type })
 
       if (!error && data.user) {
-        // Skip ensureUserProfile for recovery — the user already exists
+        // Recovery writes nothing to the database (the user already exists), so it
+        // never gets a service-role database client.
         if (type !== 'recovery') {
-          await ensureUserProfile(supabase, data.user)
+          // SEC-07: verifyOtp leaves the learner's session on `authClient`, and
+          // supabase-js then sends that access token on every later PostgREST call,
+          // so writes through it would run as `authenticated`. Every database write
+          // goes through this fresh service-role client instead, which never signs in.
+          const admin = createServiceRoleClient()
+
+          await ensureUserProfile(admin, data.user)
           // Verification is the registration milestone under Flow A, so this is where
           // a referral code supplied at signup is finally redeemed.
-          await redeemPendingReferral(supabase, data.user)
-        }
+          await redeemPendingReferral(admin, data.user)
 
-        // Supabase Auth's email_change confirmation updates `auth.users.email`
-        // directly, but there is no trigger syncing that to `public.users.email`
-        // (the app's own profile table). Keep them consistent here — this is
-        // the one place every email-change confirmation flows through.
-        if (type === 'email_change' && data.user.email) {
-          try {
-            await supabase
-              .from('users')
-              .update({ email: data.user.email })
-              .eq('id', data.user.id)
-          } catch (syncErr) {
-            log.exception('auth.callback.email_sync_failed', syncErr)
+          // Supabase Auth's email_change confirmation updates `auth.users.email`
+          // directly, but there is no trigger syncing that to `public.users.email`
+          // (the app's own profile table). Keep them consistent here: this is the
+          // one place every email-change confirmation flows through.
+          if (type === 'email_change' && data.user.email) {
+            try {
+              await admin
+                .from('users')
+                .update({ email: data.user.email })
+                .eq('id', data.user.id)
+            } catch (syncErr) {
+              log.exception('auth.callback.email_sync_failed', syncErr)
+            }
           }
         }
 

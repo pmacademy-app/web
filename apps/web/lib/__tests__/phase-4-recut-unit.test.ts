@@ -7,7 +7,7 @@
  *   4.3  Honest Core / Deep-dive / total reading estimates.
  *   Step 5  Theory gate recomputes against Core reading time, not full-lesson time.
  *   Step 7  XP behaviour with a 5-question quiz (proportional; no rescale).
- *   Experiment  Deterministic A/B assignment, default control.
+ *   Assignment  Deterministic; ON for everyone by default (D5), 'false' is the kill switch.
  *
  * These exercise the real shared module + the shipped lesson-shell helper, so the tests
  * track the code rather than a re-implementation.
@@ -35,6 +35,7 @@ import {
   validateLessonStructure,
 } from '@/lib/academy/lesson-structure'
 import {
+  DEFAULT_RECUT_TREATMENT_PERCENT,
   getRecutVariant,
   getRecutExperimentConfig,
   isRecutTreatment,
@@ -365,12 +366,41 @@ describe('Step 7 — XP economy with the sampled quiz (no rescale)', () => {
 
 // ─── Experiment assignment ────────────────────────────────────────────────────
 
-describe('Experiment — deterministic A/B, default control', () => {
-  it('is control for everyone when the flag is off (merge-to-main default)', () => {
+describe('Recut assignment: deterministic, ON by default (D5)', () => {
+  it('is enabled at 100% treatment when the env is unset', () => {
     const cfg = getRecutExperimentConfig({} as NodeJS.ProcessEnv)
+    expect(cfg.enabled).toBe(true)
+    expect(cfg.treatmentPercent).toBe(100)
+    expect(DEFAULT_RECUT_TREATMENT_PERCENT).toBe(100)
+  })
+
+  it('treats every user id when the env is unset', () => {
+    const cfg = getRecutExperimentConfig({} as NodeJS.ProcessEnv)
+    for (let i = 0; i < 500; i++) {
+      expect(getRecutVariant(`user-${i}`, cfg)).toBe('treatment')
+    }
+  })
+
+  it("'false' is the kill switch: every user is control", () => {
+    const cfg = getRecutExperimentConfig({ RECUT_EXPERIMENT_ENABLED: 'false' } as unknown as NodeJS.ProcessEnv)
     expect(cfg.enabled).toBe(false)
-    expect(getRecutVariant('user-1', cfg)).toBe('control')
-    expect(getRecutVariant('user-2', cfg)).toBe('control')
+    for (let i = 0; i < 200; i++) {
+      expect(getRecutVariant(`user-${i}`, cfg)).toBe('control')
+    }
+  })
+
+  it('accepts the kill switch regardless of case or surrounding whitespace', () => {
+    expect(getRecutExperimentConfig({ RECUT_EXPERIMENT_ENABLED: ' False ' } as unknown as NodeJS.ProcessEnv).enabled).toBe(false)
+  })
+
+  it('treats a blank RECUT_EXPERIMENT_TREATMENT_PCT as unset (100%), not as 0%', () => {
+    expect(getRecutExperimentConfig({ RECUT_EXPERIMENT_TREATMENT_PCT: '' } as unknown as NodeJS.ProcessEnv).treatmentPercent).toBe(100)
+  })
+
+  it('still honours an explicit RECUT_EXPERIMENT_TREATMENT_PCT', () => {
+    const cfg = getRecutExperimentConfig({ RECUT_EXPERIMENT_TREATMENT_PCT: '50' } as unknown as NodeJS.ProcessEnv)
+    expect(cfg.enabled).toBe(true)
+    expect(cfg.treatmentPercent).toBe(50)
   })
 
   it('is control for anonymous / sample-lesson viewers even when enabled', () => {

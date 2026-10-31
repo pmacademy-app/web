@@ -9,6 +9,7 @@ import { OverviewCharts } from '@/components/admin/overview/OverviewCharts'
 import { OverviewFunnel } from '@/components/admin/overview/OverviewFunnel'
 import { OverviewRecentActivity } from '@/components/admin/overview/OverviewRecentActivity'
 import { OverviewSystemSnapshot } from '@/components/admin/overview/OverviewSystemSnapshot'
+import { OverviewNorthStarTile, OverviewNorthStarTileSkeleton } from '@/components/admin/OverviewNorthStarTile'
 import {
   OverviewAttentionSkeleton,
   OverviewChartsSkeleton,
@@ -60,6 +61,11 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
 
       <Suspense key={`attention:${rangeKeyId}`} fallback={<OverviewAttentionSkeleton />}>
         <OverviewAttention {...range} />
+      </Suspense>
+
+      {/* Not range-scoped: always this week against last week. */}
+      <Suspense fallback={<OverviewNorthStarTileSkeleton />}>
+        <OverviewNorthStarTile />
       </Suspense>
 
       <Suspense key={`kpis:${rangeKeyId}`} fallback={<OverviewKpisSkeleton />}>

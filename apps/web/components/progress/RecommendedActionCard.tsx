@@ -21,14 +21,14 @@ export function RecommendedActionCard({ personalizedPath, milestone }: Recommend
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-emerald-500" />
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
-              Curriculum Mastered 👑
+              Curriculum Complete
             </span>
           </div>
           <h2 className="text-lg font-bold font-serif text-foreground">
             You have completed all 90 lessons!
           </h2>
           <p className="text-xs text-muted-foreground">
-            All 9 modules are mastered. Complete your capstones to showcase your applied proof of work.
+            You have finished all 9 modules. Complete your capstones to showcase your applied proof of work.
           </p>
         </div>
         <Link

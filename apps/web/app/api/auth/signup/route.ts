@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withRoute } from '@/lib/api/with-route'
 import { SettingsService } from '@/lib/admin/settings-service'
@@ -326,13 +326,13 @@ export const POST = withRoute(
           // constraint text). Keep it in the server-side log and return the classifier's
           // static copy, exactly as Flow A does. The classified response carries only our
           // own message and code, never the raw provider text.
-          void logSystemError({
+          after(() => logSystemError({
             severity: 'error',
             category: 'auth',
             operation: 'signup_create_user',
             message: createError.message || 'admin.createUser failed without a message',
             details: { flow: 'B', providerCode: createError.code ?? null },
-          })
+          }))
 
           return apiClassifiedAuthError({
             cause: createError,
@@ -368,8 +368,16 @@ export const POST = withRoute(
           }
         }
 
-        // 3. Generate genuine Supabase session via password login
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        // 3. Generate genuine Supabase session via password login.
+        //
+        // SEC-07: on its own client, as in the login route. A successful signInWithPassword
+        // stores the learner's session on the client it ran on, and supabase-js then sends that
+        // access token (not the service key) on every later PostgREST call through it. Keeping
+        // the sign-in off `supabase` means that client never holds a session, so the
+        // public.users and referral writes above (and any added after this point) always run
+        // as service_role.
+        const authClient = createServiceRoleClient()
+        const { data: authData, error: authError } = await authClient.auth.signInWithPassword({
           email,
           password,
         })

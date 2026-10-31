@@ -3,8 +3,7 @@
  *
  * 1. Portfolio page: a drawn page frame under the sample name with the PM Fellow badge
  *    state and three real capstones (module, title, deliverable type, skill). The skill
- *    radar and the "See a real portfolio" link each live in their own section, so they
- *    are not repeated here.
+ *    radar lives in its own section, so it is not repeated here.
  * 2. Certificate: the exported sample render, labelled as a sample. It deliberately
  *    has no verification link, because a sample has nothing to verify.
  * 3. PM Fellow: a distinction a person on the team grants on request. Not an
@@ -67,7 +66,7 @@ const PORTFOLIO_CAPSTONE_NUMBERS = [2, 5, 9]
 const DRAWN_PORTFOLIO_URL = `${BRAND.domain}/p/your-name`
 
 const FELLOW_POINTS = [
-  'No fee, no shortcut.',
+  'Free. Every requirement still applies.',
   'A person on our team decides.',
   'The badge sits on your public portfolio.',
 ] as const
@@ -246,7 +245,7 @@ function FellowCard() {
 
         <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-12">
           <div className="flex min-w-0 flex-col gap-3">
-            <h3 className={CARD_TITLE}>PM Fellow. Earned, then reviewed.</h3>
+            <h3 className={CARD_TITLE}>PM Fellow. Complete your portfolio, then an admin reviews it.</h3>
             <p className={CARD_BODY}>
               Complete every item on the portfolio checklist and request review.
             </p>

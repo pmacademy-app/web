@@ -28,7 +28,7 @@ declare global {
 }
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
-const TEST_LABEL = 'Test certificate — not a valid credential'
+const TEST_LABEL = 'Test certificate (not a valid credential)'
 const REAL_CODE = 'PMA-2026-ABCDEF12'
 const TEST_CODE = 'TEST-PMA-2026-ABCDEF12-9F3A1C'
 

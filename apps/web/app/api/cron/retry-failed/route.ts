@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { withRoute } from '@/lib/api/with-route'
+import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 import { processEmailQueue } from '@/lib/notifications/queue/processor'
 
 /**
@@ -27,7 +28,7 @@ export const POST = withRoute(
       })
     },
   },
-  async () => {
+  async () => withCronHeartbeat('retry-failed', async () => {
     try {
       // Deprecated: /api/cron/process-email-queue already drains both pending and retrying items.
       const result = await processEmailQueue(50)
@@ -50,7 +51,7 @@ export const POST = withRoute(
       // branch returned the raw exception message to the caller.
       throw err
     }
-  }
+  })
 )
 
 export const GET = POST

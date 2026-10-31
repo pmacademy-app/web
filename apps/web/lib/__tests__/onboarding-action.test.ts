@@ -357,7 +357,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
         username: 'a', // too short — rejected rather than silently persisted
       })
       expect(result).toEqual({
-        error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.',
+        error: 'Username must be between 3 and 30 characters.',
       })
       expect(mockDbUpdate).not.toHaveBeenCalled()
     })

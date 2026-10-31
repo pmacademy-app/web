@@ -12,6 +12,7 @@ import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { TEST_CERTIFICATE_PREFIX, generateCertificateCode, isTestCertificateCode } from '@/lib/certificates'
 import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
+import { trackProductEvent } from '@/lib/events/product-events'
 
 // Defined in the client-safe module so UI can ask without importing this data layer.
 export { TEST_CERTIFICATE_PREFIX, isTestCertificateCode }
@@ -305,6 +306,13 @@ export async function issueCertificateWithStatus(
     console.error('[certificates-db] Error inserting certificate:', insertError)
     throw new PublicError('Failed to issue certificate.', { status: 400, code: 'ISSUE_FAILED' })
   }
+
+  await trackProductEvent('certificate_issued', userId, {
+    certificate_id: inserted.id,
+    certificate_code: inserted.certificate_code,
+    type: inserted.type,
+    module_slug: inserted.module_slug,
+  })
 
   return { certificate: inserted, created: true }
 }
