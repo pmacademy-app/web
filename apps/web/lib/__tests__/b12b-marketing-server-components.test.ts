@@ -49,7 +49,6 @@ const LANDING_MODULES = [
   'components/marketing/sections/final-cta-link.tsx',
   'components/marketing/motion/reveal.tsx',
   'components/marketing/product-mockup/skill-radar.tsx',
-  'components/marketing/feature-card.tsx',
   'components/marketing/module-card.tsx',
   'hooks/use-reduced-motion.ts',
   // Rendered by the marketing layout on every landing view. Its mount fade was the

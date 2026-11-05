@@ -19,21 +19,6 @@ export type SkillCluster =
 /** A radar value map — 0 to 100 per cluster. */
 export type SkillValues = Record<SkillCluster, number>
 
-// ─── Marketing Content ────────────────────────────────────────────────────────
-
-export interface MarketingModule {
-  /** Display number, 1-indexed. e.g. 1 renders as "01" */
-  number: number
-  title: string
-  /** One or two primary skill clusters for this module */
-  skills: SkillCluster[]
-  estimatedTime: string
-  lessonCount: number
-  /** One-line portfolio or learning outcome */
-  outcome: string
-  /** Short skill labels shown as badges */
-  skillLabels: string[]
-}
 
 export interface JourneyStage {
   /** Display label on the roadmap node */
@@ -174,34 +159,6 @@ export interface LessonMeta {
   futureTopicsUnlocked: string
 }
 
-export interface ParsedLesson {
-  meta: LessonMeta
-  learningObjectives: string[]
-  theory: string
-  mistakes: string
-  mentalModel: {
-    title: string
-    content: string
-    diagramMermaid?: string
-  }
-  caseStudy: {
-    title: string
-    content: string
-  }
-  framework: {
-    title: string
-    content: string
-  }
-  realWorldPerspective: {
-    title: string
-    content: string
-  }
-  quiz: QuizQuestion[]
-  flashcards: FlashcardItem[]
-  reflectionPrompt: string
-  connections: string
-  rawMarkdownPath: string
-}
 
 
 // ─── v2 Compiled Lesson Types (from content/dist/lessons/*.json) ──────────────

@@ -170,35 +170,6 @@ export type Database = {
         }
         Relationships: []
       }
-      bookmarks: {
-        Row: {
-          created_at: string
-          id: string
-          lesson_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          lesson_id: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          lesson_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bookmarks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       capstone_submissions: {
         Row: {
           content: string
@@ -417,54 +388,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "contact_messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      email_dead_letter: {
-        Row: {
-          all_errors: Json
-          created_at: string
-          failure_reason: string | null
-          id: string
-          original_queue_id: string | null
-          template_key: string
-          template_variables: Json
-          user_id: string | null
-        }
-        Insert: {
-          all_errors?: Json
-          created_at?: string
-          failure_reason?: string | null
-          id?: string
-          original_queue_id?: string | null
-          template_key: string
-          template_variables?: Json
-          user_id?: string | null
-        }
-        Update: {
-          all_errors?: Json
-          created_at?: string
-          failure_reason?: string | null
-          id?: string
-          original_queue_id?: string | null
-          template_key?: string
-          template_variables?: Json
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "email_dead_letter_original_queue_id_fkey"
-            columns: ["original_queue_id"]
-            isOneToOne: false
-            referencedRelation: "email_queue"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_dead_letter_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1770,87 +1693,6 @@ export type Database = {
           },
         ]
       }
-      user_notification_timeline: {
-        Row: {
-          channel: string
-          clicked_at: string | null
-          created_at: string
-          delivered_at: string | null
-          error_details: string | null
-          event_id: string | null
-          failed_at: string | null
-          id: string
-          metadata: Json
-          opened_at: string | null
-          priority: number
-          queued_at: string
-          resend_id: string | null
-          sent_at: string | null
-          status: string
-          suppressed_at: string | null
-          template_key: string
-          template_version: number
-          user_id: string
-        }
-        Insert: {
-          channel: string
-          clicked_at?: string | null
-          created_at?: string
-          delivered_at?: string | null
-          error_details?: string | null
-          event_id?: string | null
-          failed_at?: string | null
-          id?: string
-          metadata?: Json
-          opened_at?: string | null
-          priority?: number
-          queued_at?: string
-          resend_id?: string | null
-          sent_at?: string | null
-          status: string
-          suppressed_at?: string | null
-          template_key: string
-          template_version?: number
-          user_id: string
-        }
-        Update: {
-          channel?: string
-          clicked_at?: string | null
-          created_at?: string
-          delivered_at?: string | null
-          error_details?: string | null
-          event_id?: string | null
-          failed_at?: string | null
-          id?: string
-          metadata?: Json
-          opened_at?: string | null
-          priority?: number
-          queued_at?: string
-          resend_id?: string | null
-          sent_at?: string | null
-          status?: string
-          suppressed_at?: string | null
-          template_key?: string
-          template_version?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_notification_timeline_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "notification_events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_notification_timeline_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           age_confirmed_at: string | null
@@ -2024,47 +1866,6 @@ export type Database = {
         }
         Relationships: []
       }
-      weekly_leaderboard_snapshots: {
-        Row: {
-          created_at: string
-          days_studied: number
-          id: string
-          lessons_completed: number
-          rank: number
-          user_id: string
-          week_start: string
-          xp_earned: number
-        }
-        Insert: {
-          created_at?: string
-          days_studied?: number
-          id?: string
-          lessons_completed?: number
-          rank?: number
-          user_id: string
-          week_start: string
-          xp_earned?: number
-        }
-        Update: {
-          created_at?: string
-          days_studied?: number
-          id?: string
-          lessons_completed?: number
-          rank?: number
-          user_id?: string
-          week_start?: string
-          xp_earned?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "weekly_leaderboard_snapshots_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       xp_events: {
         Row: {
           created_at: string
@@ -2208,10 +2009,6 @@ export type Database = {
           p_quiz_perfect_bonus_xp?: number
         }
         Returns: Json
-      }
-      sync_user_xp: {
-        Args: { p_user_id: string }
-        Returns: undefined
       }
     }
     Enums: {
