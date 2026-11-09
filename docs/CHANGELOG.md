@@ -2,6 +2,20 @@
 
 All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
 
+## [Phase 3 — Multi-Agent Dead Code Pruning & Technical Debt Cleanup] — 2026-10-31
+
+Executed full multi-agent dead code cleanup and technical debt elimination on branch `phase-3`.
+
+- **Multi-Agent Audit & Pruning**: Executed coordinated pipeline across frontend, backend/API, and database/systems domains.
+- **Frontend Cleanup**: Pruned verified unreferenced UI primitives and sections (`apps/web/components/marketing/feature-card.tsx`, `testimonial-card.tsx`, `sections/faq.tsx`, `badges/BadgeNotification.tsx`, `leaderboard/ProfileComparisonModal.tsx`, `progress/ProgressSectionDropdown.tsx`, `feedback/error-state.tsx`, `feedback/success-state.tsx`, `ui/accordion.tsx`, `ui/badge.tsx`, `ui/card.tsx`, `ui/select.tsx`, `ui/toast.tsx`, `hooks/useXpAnimation.ts`, `emails/components/ProgressBar.tsx`).
+- **False-Positive Protection**: Preserved `NotificationBell.tsx` and `NotificationToast.tsx` (actively mounted in `apps/web/components/layout/Topbar.tsx`) and `SkillRadarDemoData` (actively imported in `config/content.ts`).
+- **Backend & Route Decommissioning**: Pruned `/api/dev/send-test-email`, `/api/admin/system/storage-cleanup`, `/api/cron/retry-failed`, disabled campaign runner (`portfolio-activation-runner.ts`), legacy `search.ts`, `animation.ts`, admin barrel export, and duplicate email template key `'system.weekly_recap'`.
+- **Workflow Synchronization**: Cleaned deprecated manual dispatch job `retry-failed-emails` from `.github/workflows/notification-scheduler.yml`.
+- **Database Schema & Types**: Added DDL migration `20261031000001_phase3_drop_unused_tables.sql` dropping 4 unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and function `sync_user_xp`. Synchronized `apps/web/types/database.ts` and updated queue processor and admin service queries to eliminate runtime queries to dropped tables.
+- **Dependency & Lockfile Parity**: Pruned 7 unused NPM packages from `apps/web/package.json` and synchronized `apps/web/package-lock.json` to ensure `npm ci` compliance.
+- **Removed Obsolete Scripts**: Pruned 6 one-off and broken test scripts (`postgrest-data-export.ts`, `benchmark-concurrency.ts`, `compare-v1-v2.ts`, `test-all-shapes.ts`, `xp-duplicates.ts`, `send-jolly-recovery-email.ts`).
+- **Verification**: Verified with 100% pass on all 305 test files (4,566 unit tests) and zero TypeScript compiler errors (`tsc --noEmit`).
+
 ## [B8-E — XP Event Uniqueness] — 2026-09-13
 
 Migration `20260913000001_xp_event_uniqueness_b8e.sql` applied to production at 18:15:34Z.

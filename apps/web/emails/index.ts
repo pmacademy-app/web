@@ -88,10 +88,6 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     component: WeeklyRecap,
     subjectLine: `Your Week in ${BRAND.company}`,
   },
-  'system.weekly_recap': {
-    component: WeeklyRecap,
-    subjectLine: `Your Week in ${BRAND.company}`,
-  },
   'learning.daily_reminder': {
     component: DailyReminder,
     subjectLine: `Keep your learning streak alive on ${BRAND.shortName}!`,

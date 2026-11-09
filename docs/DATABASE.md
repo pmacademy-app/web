@@ -67,6 +67,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
 | `20260908000002_quota_key_utc.sql` | Pins `increment_daily_email_quota()` and `get_current_daily_email_count()` to the UTC day, matching the application side |
 | `20260923000001_signup_legal_consent.sql` | Signup consent columns on `public.users` (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum`) — all nullable, no backfill: NULL means the account predates consent capture and is **not** retroactively blocked |
+| `20261031000001_phase3_drop_unused_tables.sql` | Phase 3 dead code pruning: drops unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and unused RPC `sync_user_xp(uuid)`. |
 
 ---
 
@@ -81,7 +82,7 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.reflections`** — Qualitative learner reflections on lesson theory. (Previously mislabeled `user_reflections` in this doc.)
 - **`public.quiz_attempts`** — Individual quiz attempt records.
 - **`public.user_flashcard_srs`** — SM-2 spaced-repetition state per learner/flashcard.
-- **`public.bookmarks`** — Learner-saved lesson/framework bookmarks.
+- **`public.bookmarks`** — (Dropped in Phase 3 migration `20261031000001`)
 - **`public.badges`** — Badge catalog/definitions. **`public.user_badges`** — Per-user badge award rows.
 - **`public.capstone_submissions`** — Module capstone deliverables with moderation review status and per-submission `is_public` opt-out.
 
@@ -129,3 +130,17 @@ This section reflects the current `public` schema as generated in `apps/web/type
 
 ### Misc
 - **`public.waitlist`** — Pre-launch signup records.
+
+---
+
+## 4. Phase 3 Schema Cleanup Candidates (Dead Tables & Stored Procedures)
+
+A full multi-agent audit on branch `phase-3` cross-referenced every table and procedure in `supabase/migrations/` and `apps/web/types/database.ts` against application source code. The following objects have zero active callers, readers, or writers, and are scheduled for deprecation and removal in Phase 3 Batch 3-C (see [`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)):
+
+| Database Object | Type | Created In | Rationale for Removal |
+|---|---|---|---|
+| `public.weekly_leaderboard_snapshots` | Table | `20260805000006` | Never populated or queried; leaderboard aggregates user XP dynamically. |
+| `public.bookmarks` | Table | `20260728000002` | Unused legacy feature; superseded by progress tracking and flashcard queues. |
+| `public.email_dead_letter` | Table | `20260806000001` | Dead table; email errors are logged to `system_errors` and retained in `email_queue` with `status = 'failed'`. |
+| `public.user_notification_timeline` | Table | `20260806000001` | Redundant legacy timeline; in-app alerts are handled directly by `in_app_notifications`. |
+| `public.sync_user_xp(uuid)` | Stored Procedure / RPC | `20260805000001` | Unused function; trigger `update_user_xp_and_level()` handles automated XP summation. |

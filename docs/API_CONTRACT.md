@@ -197,6 +197,14 @@ every page — a defect that survives review because each page still looks right
 - **Cron routes** — no external caller, and their `errors` arrays are diagnostic output
   bounded by the size of the job.
 
+### Deprecated and Orphaned Routes (Phase 3 Pruning Candidates)
+
+The following routes were identified during the Phase 3 audit ([`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)) as dead or deprecated, marked for removal in Batch 3-B:
+- `POST /api/dev/send-test-email` — Orphaned dev duplicate; production testing uses `/api/admin/emails/test-send`.
+- `POST /api/cron/retry-failed` — Deprecated retry handler; retry processing was consolidated into `/api/cron/process-email-queue`.
+- `POST /api/waitlist` — Obsolete pre-launch endpoint; waitlist page redirects to `/signup`.
+- `POST /api/admin/system/storage-cleanup` — Uninvoked administrative route; cleanup is managed by scheduled cron executions.
+
 ---
 
 ## 4. Related

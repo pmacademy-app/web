@@ -96,12 +96,10 @@ const EXEMPT_COMPONENTS = [
   'admin/UsersWorkspace.tsx',
   'admin/admin-toast.tsx',
   'auth/ResendVerificationCard.tsx',
-  'badges/BadgeNotification.tsx',
   'capstones/RichEditor.tsx',
   'capstones/SubmitConfirmationModal.tsx',
   'feedback/ContextualFeedbackModal.tsx',
   'feedback/LessonFeedbackWidget.tsx',
-  'feedback/error-state.tsx',
   'layout/Sidebar.tsx',
   'layout/SystemAnnouncementBanner.tsx',
   'layout/Topbar.tsx',
@@ -112,7 +110,6 @@ const EXEMPT_COMPONENTS = [
   'leaderboard/LeaderboardPopoverModal.tsx',
   'leaderboard/LeaderboardScopeSwitcher.tsx',
   'leaderboard/LeaderboardTable.tsx',
-  'leaderboard/ProfileComparisonModal.tsx',
   'marketing/faq-explorer.tsx',
   'marketing/reviews-explorer.tsx',
   'marketing/sections/experience.tsx',
@@ -124,7 +121,6 @@ const EXEMPT_COMPONENTS = [
   'notifications/NotificationToast.tsx',
   'portfolio/FeaturedCapstoneCard.tsx',
   'portfolio/PortfolioCapstones.tsx',
-  'progress/ProgressSectionDropdown.tsx',
   'quick-start/QuickStartModal.tsx',
   'quiz/QuizOption.tsx',
   'review/QualitySelector.tsx',
@@ -138,7 +134,6 @@ const EXEMPT_COMPONENTS = [
   'settings/ReferralSettingsTab.tsx',
   'settings/SecuritySettingsTab.tsx',
   'settings/SettingsTabs.tsx',
-  'ui/accordion.tsx',
 ]
 
 function lint(code: string, filename: string, allow: string[] = EXEMPT_COMPONENTS) {

@@ -1055,28 +1055,4 @@ async function handlePermanentFailure(
   } catch {
     // Non-fatal logging fallback
   }
-
-  try {
-    await supabase.from('email_dead_letter').insert({
-      original_queue_id: queueId,
-      user_id: userId || null,
-      template_key: templateKey || 'unknown',
-      // Auth templates carry a live one-time credential in their variables
-      // (`verificationUrl` / `resetUrl` embed a `token_hash`). Dead letters are
-      // long-lived and admin-readable, so the variables are redacted before they are
-      // stored. Variable NAMES and non-sensitive values survive, which is what makes
-      // the record diagnosable; the token does not.
-      template_variables: (sanitizeStructuredPayload(templateVariables || {}) as unknown as import('@/lib/supabase').Json),
-      failure_reason: failureReason,
-      // Record every provider attempt, not just a single synthesized entry, so a
-      // dead letter says which providers were tried and how each one refused.
-      all_errors: ([
-        { attempt: attemptCount, error: failureReason, timestamp: now, provider: context?.provider ?? null },
-        ...attempts,
-      ] as unknown as import('@/lib/supabase').Json),
-      created_at: now,
-    })
-  } catch {
-    // Non-fatal dead letter insert fallback
-  }
 }
