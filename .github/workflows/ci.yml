@@ -334,7 +334,7 @@ jobs:
       - name: Push pending migrations
         run: |
           set -euo pipefail
-          npx supabase db push --password "${SUPABASE_DB_PASSWORD}"
+          npx supabase db push --include-all --linked --password "${SUPABASE_DB_PASSWORD}" --yes
 
       - name: Migration state AFTER push
         run: |
@@ -347,7 +347,7 @@ jobs:
       - name: Verify no migrations remain pending
         run: |
           set -euo pipefail
-          output="$(npx supabase db push --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
+          output="$(npx supabase db push --include-all --linked --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
           echo "${output}"
           # `upToDate` is a structured field in the CLI's JSON output and is the primary
           # signal; the prose forms are accepted as a fallback across CLI versions.
