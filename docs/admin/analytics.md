@@ -27,7 +27,7 @@ All metrics are computed live from PostgreSQL tables (`xp_events`, `user_lesson_
 
 ### A. Learners Tab
 - **Active User Velocity:** Real-time tracking of Daily Active Users (DAU), Weekly Active Users (WAU), and Monthly Active Users (MAU) with DAU/MAU stickiness ratios.
-- **Level & Tier Distribution:** Breakdown of learners across the 9 PM Academy levels (Level 1 "Associate PM Trainee" through Levels 7–9, all titled "Chief Product Officer").
+- **Level & Tier Distribution:** Breakdown of learners across the 9 Prodily levels (Level 1 "Associate PM Trainee" through Levels 7–9, all titled "Chief Product Officer").
 - **Streak Health:** Distribution of current student streaks and streak freeze utilization.
 
 ### B. Learning Tab

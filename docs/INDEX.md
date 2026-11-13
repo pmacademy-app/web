@@ -1,20 +1,19 @@
-# Canonical Documentation Index & Reading Map — Prodily PM Academy
+# Canonical Documentation Index and Reading Map: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.3.5 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 160 Test Files · 2180 Unit, Integration & Component Tests (100% Passing) · 17 Playwright E2E tests across 5 spec files  
-**Database Migrations:** 49 Migrations in `supabase/migrations/`  
-**Last Updated:** September 18, 2026  
+**Framework:** Next.js 16.4.3 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)
+**Test Suite:** 304 tracked Vitest files (`git ls-files 'apps/web/*.test.ts' 'apps/web/*.test.tsx'`) and 6 Playwright spec files under `apps/web/e2e/`
+**Database Migrations:** 70 top-level migrations in `supabase/migrations/` (plus `rollback/`, `validation/` and `pending-approval/`, which the Supabase CLI never reads)
+**Last Updated:** 2026-11-13
 
-> **Where the work stands.** [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) is the
-> authoritative record of implementation status; [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)
-> remains the locked specification. Where they disagree about *status*, the ledger
-> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete
-> and deployed. Phase 2 — B7-A…B7-H, B8-F/B8-G, B9-B…B9-D, B10-A…B10-D, B11-A…B11-C,
-> B12-A/B12-B, B13-A/B13-B and B14-A…B14-C — is complete in code on
-> `b10a-b14b/error-boundaries-logout-ci-security` (@ `208b5ec`, **not merged**) and awaits
-> merge plus production verification. B13-A needs a monitored deploy: it logs every
-> existing user out once.**
+> **Where the work stands.** `main` is at `41ce885` (PR #82). Plan Phases 1 and 2 of
+> [`../08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md) are merged (PR #64, PR #73), with
+> Phase 2 owner steps still to do per [`ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md).
+> The dead-code "Phase 3" from [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md) is merged (PR #79). The
+> follow-up cleanup on branch `chore/post-phase3-cleanup` is **not merged yet**. Plan Phase 3
+> (PR-14 to PR-20, platform safety) and Phases 4 and 5 are the remaining work: see
+> [`ROADMAP.md`](ROADMAP.md) for the order and [`../tasks/antigravity/README.md`](../tasks/antigravity/README.md)
+> for one brief per task. History is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
@@ -22,9 +21,9 @@
 
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
-3. **Database Migrations & Schema** (49 SQL DDL files in `supabase/migrations/`)
-4. **Automated Tests** (160 vitest files in `apps/web/lib/__tests__/` and `apps/web/components/__tests__/`; 17 Playwright tests across 5 spec files in `apps/web/e2e/`)
-5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
+3. **Database Migrations & Schema** (70 top-level SQL files in `supabase/migrations/`; held files in `pending-approval/` are not applied)
+4. **Automated Tests** (304 Vitest files in `apps/web/lib/__tests__/` and `apps/web/components/__tests__/`; 6 Playwright spec files in `apps/web/e2e/`)
+5. **Operating Manuals & Workspaces** (`docs/admin/*.md`, `docs/ops/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)
 
@@ -32,18 +31,29 @@
 
 ## 2. Documentation Structure & Map
 
+### Plans, Audit and Status
+
+| Category | Canonical Document | Purpose / Owning Topic | Status |
+|---|---|---|---|
+| **Remaining Work** | [`ROADMAP.md`](ROADMAP.md) | What is left after Phases 1, 2 and the dead-code Phase 3, in order: plan Phase 3 (PR-14 to PR-20), owner steps, Phases 4 and 5 | 🟢 Current |
+| **Task Briefs** | [`../tasks/antigravity/README.md`](../tasks/antigravity/README.md) | One brief per remaining task (AG-xx files), each with scope, files and verify commands | 🟢 Current |
+| **Implementation Plan** | [`../08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md) | The phased fix plan (PR-01 to PR-30) built from the 2026-10-17 audit, with the finding-ID coverage matrix. Read only | 🔒 Locked |
+| **Audit** | [`../audit/00-INDEX.md`](../audit/00-INDEX.md) | The 2026-10-17 seven-report audit (UI/UX, market, security, engineering, code quality, SEO/AEO, product) and the checked headline findings. Source of finding IDs. Read only | 🟡 Reference |
+| **Phase 2 Owner Steps** | [`ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md) | Dashboard settings, Vault secrets, held SQL and the order to run them in. Nothing in it has been applied yet | 🟠 Owner Action |
+| **Held Migrations** | [`../supabase/migrations/pending-approval/README.md`](../supabase/migrations/pending-approval/README.md) | Migrations kept out of the auto-apply path (pg_cron schedule, username CHECK, `lock_public_users`, waitlist drop, retired-flag cleanup, admin backfill) with their rollback and validation files | 🟠 Owner Action |
+| **Hardening Ledger** | [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) | Record of the B0 to B14 hardening batches (September 2026). Historical: current status lives in the roadmap and changelog | 🟡 Historical |
+| **Dead Code & Tech Debt** | [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md) | Dead-code inventory, the Phase 3 batches 3-A to 3-D, what landed in PR #79 and on `chore/post-phase3-cleanup`, and the candidates not acted on | 🟢 Done |
+| **Changelog History** | [`CHANGELOG.md`](CHANGELOG.md) | Chronological commit and release history | 🟢 Current |
+
+Removed docs: `FINAL_IMPLEMENTATION_PLAN.md`, `B12A_MARKETING_PERFORMANCE_BASELINE.md` and `docs/archive/` (including `PRODUCTION_BLUEPRINT.md`) were deleted in `1dbd2a4`; `docs/audits/` was retired in `76bc600`; `PHASE_HISTORY.md` was deleted in `f4343d3`. Read any of them with `git show <commit>^:<path>`, for example `git show f4343d3^:docs/PHASE_HISTORY.md`.
+
 ### Core Architecture & Technical Documentation (`docs/`)
 
 All primary architectural documentation lives directly under `docs/`:
 
 | Category | Canonical Document | Purpose / Owning Topic | Status |
 |---|---|---|---|
-| **Implementation Status** | [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) | **Authoritative execution state:** what is built, what the 2026-09-09 incident fix (`10a21a5`) already delivered, per-batch status B0–B14, open questions, and the next batch | 🟢 Current |
-| **Implementation Plan** | [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md) | **LOCKED** specification: locked decisions, P0 safety tasks, 16 initiatives, batch specifications, gates, rollout and signup-reopening criteria. Carries a status overlay pointing at the ledger — check the ledger before starting any batch | 🔒 Locked |
-| **Production Audits** | [`audits/`](audits/) | Stage 1–4 read-only audits (architecture, security, frontend/mobile, reliability/operations) and the two 2026-09 signup-abuse incident investigations. **Historical evidence** — findings are preserved as written and several are since fixed; each carries a status banner | 🟡 Historical |
-| **Architecture Baseline** | [`archive/PRODUCTION_BLUEPRINT.md`](archive/PRODUCTION_BLUEPRINT.md) | Target-architecture rationale behind the implementation plan. Superseded by `FINAL_IMPLEMENTATION_PLAN.md` for anything actionable | 🟡 Reference |
 | **Core Architecture** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | High-level system architecture, tech stack, directory boundaries, known debt | 🟢 Current |
-| **Dead Code & Tech Debt** | [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md) | Complete multi-agent dead code inventory, unused routes/services/tables, and Phase 3 cleanup blueprint | 🟡 Pending Execution |
 | **Product & Brand** | [`PRD.md`](PRD.md) | Product vision, target audience, brand rules, non-negotiable invariants | 🟢 Current |
 | **Engineering Rules** | [`RULES.md`](RULES.md) | Engineering guidelines, secret safety, verification standards, doc authority | 🟢 Current |
 | **Project Memory** | [`MEMORY.md`](MEMORY.md) | Core invariants, locked tech decisions, immutable data contracts | 🟢 Current |
@@ -53,23 +63,22 @@ All primary architectural documentation lives directly under `docs/`:
 | **Email Infrastructure**| [`EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md) | Auth Hook, email queue, queue processor, Resend delivery, broadcasts, templates | 🟢 Current |
 | **Authentication** | [`AUTHENTICATION.md`](AUTHENTICATION.md) | Supabase Auth, signup flow, 60s rate limit, the B13-A single session owner (httpOnly cookies only; the client bridge is deleted), platform settings | 🟢 Current |
 | **Error Monitoring** | [`ERROR_MONITORING.md`](ERROR_MONITORING.md) | `logSystemError()`, secret sanitization, 15m fingerprint dedup, alerts UI | 🟢 Current |
-| **Architecture Decisions** | [`decisions/`](decisions/) | ADRs for significant, expensive-to-reverse decisions (email failover, failure classification, config control plane, error taxonomy, redaction, API error contract; plus the activation-programme ADRs 007 collapse-entrance, 008 module-entry unlock, 009 payoff-visible, 010 close-the-loop) | 🟢 Current |
-| **Activation Programme (Phases 0–9)** | [`PHASE_HISTORY.md`](PHASE_HISTORY.md) | Durable ledger of the activation-improvement phases: what each phase changed, the three experiments (recut / module-entry unlock / capstone threshold, **all off by default**), the capstone review lifecycle, deferred Phase 9 OAuth, and product/access invariants. **Replaces the retired `IMPLEMENTATION_PLAN.md` / `PRODUCT_IMPROVEMENT_BLUEPRINT.md` / `PRODUCT_AUDIT_2026-09-24.md`** (removed 2026-10-01). Deployment specifics in [`DEPLOYMENT.md`](DEPLOYMENT.md) | 🟢 Current |
+| **Architecture Decisions** | [`decisions/`](decisions/) | ADRs for significant, expensive-to-reverse decisions (email failover, failure classification, config control plane, error taxonomy, redaction, API error contract; the activation-programme ADRs 007 collapse-entrance, 008 module-entry unlock, 009 payoff-visible, 010 close-the-loop; 011 Fellow LinkedIn credential). The activation phases and their experiments (all off by default) are recorded in ADR-007 to ADR-010 | 🟢 Current |
 | **Observability** | [`OBSERVABILITY.md`](OBSERVABILITY.md) | Resend usage vs application quota, queue/delivery metrics, telemetry sources | 🟢 Current |
-| **Database & Schema** | [`DATABASE.md`](DATABASE.md) | PostgreSQL schema, 49 migration files, table definitions, RLS policies, types | 🟢 Current |
+| **Database & Schema** | [`DATABASE.md`](DATABASE.md) | PostgreSQL schema, 70 top-level migration files, table definitions, RLS policies, types | 🟢 Current |
+| **Baseline Queries** | [`BASELINE_QUERIES.md`](BASELINE_QUERIES.md) | Read-only SQL behind the Phase 0.B activation baseline, run by `npm run baseline:report` | 🟢 Current |
 | **Security & RBAC** | [`SECURITY.md`](SECURITY.md) | Threat model, RBAC authorization, webhook HMAC signatures, secret safety | 🟢 Current |
 | **Cron & Scheduling** | [`CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md) | GitHub Actions workflows (`notification-scheduler.yml`), `CRON_SECRET` endpoints | 🟢 Current |
 | **Design System** | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Prodily palette, typography, glassmorphism, responsive viewports, header feedback | 🟢 Current |
-| **Marketing Performance** | [`B12A_MARKETING_PERFORMANCE_BASELINE.md`](B12A_MARKETING_PERFORMANCE_BASELINE.md) | B12-A measured baseline for `/`: per-route bundle payloads, Lighthouse mobile/desktop, `/about` control, and the gate decision that unlocked B12-B | 🟢 Current |
-| **API Contract** | [`API_CONTRACT.md`](API_CONTRACT.md) | B13-B: the list pagination contract (`limit`/`offset`, envelope, server-side caps as an abuse control) and the API versioning policy — why `/api/v2` is not a version boundary and why versioning defers to D-04/D-01 | 🟢 Current |
-| **Content Pipeline** | [`CONTENT_SYSTEM.md`](CONTENT_SYSTEM.md) | Markdown source, Compiler v2, build-time Mermaid SVGs, FlexSearch | 🟢 Current |
+| **API Contract** | [`API_CONTRACT.md`](API_CONTRACT.md) | B13-B: the list pagination contract (`limit`/`offset`, envelope, server-side caps as an abuse control) and the API versioning policy: why `/api/v2` is not a version boundary and why versioning defers to D-04/D-01 | 🟢 Current |
+| **Content Pipeline** | [`CONTENT_SYSTEM.md`](CONTENT_SYSTEM.md) | Markdown source, Compiler v2, build-time Mermaid SVGs, and the compiler-built JSON search index served by `/api/search-index` | 🟢 Current |
 | **User Progress & XP** | [`USER_SYSTEM.md`](USER_SYSTEM.md) | Progress tracking, SM-2 flashcards, XP ledger, streaks, badges, referrals | 🟢 Current |
 | **Portfolio & Certs** | [`PORTFOLIO.md`](PORTFOLIO.md) | Public portfolio (`/p/[username]`), Automatic Portfolio Verification, dynamic OG card, certificates | 🟢 Current |
 | **Leaderboard & Social** | [`LEADERBOARD.md`](LEADERBOARD.md) | Global/Cohort/Friends ranking modes, cohorts, Friend Accountability | 🟢 Current |
+| **Marketing Email History** | [`MARKETING_EMAIL_HISTORY.md`](MARKETING_EMAIL_HISTORY.md) | Record of past marketing and campaign email sends | 🟡 Historical |
 | **External Services** | [`INTEGRATIONS.md`](INTEGRATIONS.md) | External service matrix (Supabase, Resend, GitHub Actions), test mocks | 🟢 Current |
 | **Deployment & Hosting**| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Vercel deployment, Next.js build config, environment variable reference | 🟢 Current |
-| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration/component suites (160 files, 2180 tests), Playwright E2E (17 tests, 5 spec files), CI gates | 🟢 Current |
-| **Changelog History** | [`CHANGELOG.md`](CHANGELOG.md) | Chronological commit and release history | 🟢 Current |
+| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration/component suites (304 files), Playwright E2E (6 spec files), CI gates | 🟢 Current |
 
 ---
 

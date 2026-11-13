@@ -1,7 +1,7 @@
-# Authentication Infrastructure & User State Sync — Prodily PM Academy
+# Authentication Infrastructure & User State Sync: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 (Turbopack) / Supabase Auth / PostgreSQL  
+**Framework:** Next.js 16.4.3 (Turbopack) / Supabase Auth / PostgreSQL  
 **Last Updated:** September 6, 2026  
 
 ---

@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD) — Prodily PM Academy
+# Prodily Product Requirements Document (PRD)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026  
@@ -7,10 +7,10 @@
 
 ## 1. Product Vision & Brand Architecture
 
-**Prodily** is the parent technology brand. **PM Academy** is the flagship product. The full formal name is **Prodily PM Academy**.
+**Prodily** is the product and the brand. The earlier "PM Academy" product name was dropped from titles, legal text and site name (commits 283cfe9 and 4decabe).
 
 - **Mission**: Provide a 100% free, structured, gamified Product Management curriculum empowering aspiring and practicing PMs globally.
-- **Brand Positioning**: Sleek, modern, glassmorphic design system (green `#019E75` + navy `#011229`), eliminating corporate bloat and paywalls.
+- **Brand Positioning**: Sleek, modern design system (primary green `#1F6B4E`, background `#FBFAF6`, foreground `#171A17`, accent `#D98B24`, all from `theme/tokens.ts`), eliminating corporate bloat and paywalls.
 - **Value Proposition**: 90 bite-sized lessons, interactive SM-2 flashcard review, capstone portfolio projects, shareable certificates, and streak tracking.
 
 ---

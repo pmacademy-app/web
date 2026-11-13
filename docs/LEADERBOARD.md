@@ -1,4 +1,4 @@
-# Leaderboard, Cohorts & Friend Accountability — Prodily PM Academy
+# Leaderboard, Cohorts & Friend Accountability (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026
@@ -52,7 +52,7 @@ A single in-memory `Map` keyed by week-start, 45-second TTL, shared across all t
 - In practice this behaves like a one-way "follow for comparison," not mutual friending. If you're designing new UI copy around this feature, don't describe it as "friend requests" — describe it as "add for accountability."
 - Add-by-username lookup: `addFriend()` accepts either a UUID or a `username` string, resolving via a regex check on which column to query (fixed in this session — see `docs/ISSUES_KNOWN.md` ISSUE-15 for the root cause of the bug this replaced).
 
-**UI:** `FriendAccountabilitySection.tsx` (add by `@username`, remove), `LeaderboardScopeSwitcher.tsx` (Global/Cohort/Friends tabs), `CohortsSection.tsx` (join/leave), `ProfileComparisonModal.tsx`.
+**UI:** `FriendAccountabilitySection.tsx` (add by `@username`, remove), `LeaderboardScopeSwitcher.tsx` (Global/Cohort/Friends tabs), `CohortsSection.tsx` (join/leave), `LeaderboardHeader.tsx` (with `LeaderboardPopoverModal.tsx` info popovers), `LeaderboardTable.tsx`. `ProfileComparisonModal.tsx` was deleted in commit 6876fb7; `LeaderboardTable` still accepts an optional `onCompare` prop, but no caller passes it, so no Compare button renders today.
 
 ---
 

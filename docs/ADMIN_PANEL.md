@@ -1,4 +1,4 @@
-# Admin Panel Architecture & Technical Reference — Prodily PM Academy
+# Admin Panel Architecture & Technical Reference (Prodily)
 
 **Status:** 🟢 Production Ready  
 **Scope:** Admin Console Workspaces, APIs, Navigation, RBAC, Services, and State Architecture  
@@ -8,7 +8,7 @@
 
 ## 1. Admin Panel Overview
 
-The Admin Panel (`/admin`) is the centralized operational control center for Prodily PM Academy administrators.
+The Admin Panel (`/admin`) is the centralized operational control center for Prodily administrators.
 
 It is structured around three core operational pillars:
 1. **Attention & Action:** Immediate visibility into items requiring human intervention — the Attention Center currently surfaces exactly 4 items: failed email deliveries, new contact messages, pending testimonials, and active system alerts. (There is no portfolio/Fellow-request attention item today, despite earlier versions of this doc claiming one.)
@@ -176,7 +176,7 @@ Note: `is_fellow` (Fellow designation) is granted via **either** the `portfolios
 
 ## 5. Verification & Quality Metrics
 
-- **Vitest Unit & Integration Tests:** 100 test suites, 1029 tests passing.
+- **Vitest Unit & Integration Tests:** the admin suites run in CI with the full Vitest suite; locally, use the focused `npm run test:admin` and `npm run test:admin-settings` scripts. See [`TESTING.md`](TESTING.md).
 - **TypeScript Typecheck:** 0 errors (`tsc --noEmit`).
 - **ESLint:** 0 errors, 0 warnings.
-- **Next.js Production Build:** compiles successfully under Next.js 16.2.12 Turbopack.
+- **Next.js Production Build:** built by CI under Next.js 16.4.3 Turbopack.

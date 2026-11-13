@@ -1,13 +1,13 @@
-# Prodily PM Academy — Web Application (`apps/web`)
+# Prodily Web Application (`apps/web`)
 
-This directory contains the Next.js 16 web application for **Prodily PM Academy**, the flagship interactive learning platform for product managers.
+This directory contains the Next.js 16 web application for **Prodily**, the interactive learning platform for product managers.
 
 ---
 
 ## 1. Overview & Architecture
 
 Built with a static-first curriculum architecture and a lightweight Supabase PostgreSQL state engine:
-- **Next.js 16.2.12 App Router**: Server Components for zero-bundle-size data fetching and Route Handlers for backend APIs.
+- **Next.js 16.4.3 App Router**: Server Components for zero-bundle-size data fetching and Route Handlers for backend APIs.
 - **Turbopack Build Engine**: Fast compile times and optimized static page generation.
 - **Design Tokens**: Glassmorphic design system configured in `theme/tokens.ts` and `lib/brand.ts`.
 - **Database Model**: PostgreSQL persistence for user state, XP events, streaks, badges, certificates, notification queues, and system error telemetry.
@@ -27,8 +27,9 @@ apps/web/
 │   │   ├── leaderboard/        #   Global/Cohort/Friends leaderboard rankings
 │   │   ├── notifications/      #   Redirect stub → /dashboard (no real page here —
 │   │   │                       #     the notification UI is the header bell/drawer)
-│   │   ├── progress/           #   "How am I doing" summary (skill radar, badges,
-│   │   │                       #     capstones, certificates)
+│   │   ├── progress/           #   "How am I doing": index redirects to /progress/radar;
+│   │   │                       #     subpages radar, badges, capstones, certificates,
+│   │   │                       #     metrics, milestones
 │   │   ├── review/             #   SM-2 flashcard review queue
 │   │   └── settings/           #   Profile, portfolio, security, notification prefs
 │   ├── (auth)/                 # Public auth pages (login, signup, reset-password,
@@ -43,12 +44,12 @@ apps/web/
 │   └── verify/[id]/            # Public certificate authenticity verification
 ├── blocks/                     # Custom lesson block components
 ├── components/                 # React UI primitives, Admin, Layout, Auth, and Feedback
-├── contexts/                   # React Contexts (auth session, breadcrumbs)
-├── e2e/                        # Playwright E2E browser tests (`e2e/auth/`, 3 specs)
+├── contexts/                   # React Contexts (breadcrumbs, lesson)
+├── e2e/                        # Playwright E2E browser tests (6 specs in auth/, flows/, root)
 ├── emails/                     # React Email templates & rendering components
 ├── hooks/                      # Custom client hooks
 ├── lib/                        # Core backend services, DB client, aggregations
-│   └── __tests__/              # Vitest unit and integration test suites (100 files)
+│   └── __tests__/              # Vitest unit and integration test suites (273 files, 2026-11-12)
 ├── theme/                      # Design system tokens (`theme/tokens.ts`)
 ├── types/                      # TypeScript definitions & auto-generated `database.ts`
 ├── proxy.ts                    # Next.js 16 request interceptor & auth proxy
@@ -71,13 +72,16 @@ npm run dev                 # Start Turbopack dev server at http://localhost:300
 npm run content:compile     # Compile Markdown lessons & Mermaid diagrams to static JSON
 npm run content:validate    # Validate lesson integrity, IDs, and quiz structure
 
-# Testing & Quality
-npm test                    # Run all Vitest unit and integration test suites
-npm run test:watch          # Run Vitest in interactive watch mode
-npx playwright test         # Run Playwright E2E browser tests
+# Testing & Quality (focused runs locally)
+npx vitest run lib/__tests__/<file>.test.ts   # Run one Vitest file
+npm run test:rls            # Focused domain script (see the other test:* scripts in package.json)
+npx vitest                  # Interactive watch mode (there is no test:watch script)
+npm run typecheck           # TypeScript check (tsc --noEmit)
 npm run lint                # Run ESLint checks
+npm run test:e2e            # Run Playwright E2E browser tests
 
-# Production Build
+# Full suite and production build: CI runs these; they tend to time out locally
+npm test                    # Run all Vitest unit and integration test suites
 npm run build               # Compile content and build Next.js production bundle
 npm run start               # Start production server locally
 ```
@@ -95,7 +99,7 @@ Create `.env.local` in `apps/web/` using `.env.example` as a template. See [`../
 For full architectural and engineering documentation, refer to the [`docs/`](../../docs/) directory:
 - [`docs/INDEX.md`](../../docs/INDEX.md) — Documentation index and reading map
 - [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) — System architecture & technical debt
-- [`docs/DATABASE.md`](../../docs/DATABASE.md) — Database schema & 30 migrations
+- [`docs/DATABASE.md`](../../docs/DATABASE.md): Database schema & migrations
 - [`docs/TESTING.md`](../../docs/TESTING.md) — Testing strategy & suite inventory
 - [`docs/ADMIN_PANEL.md`](../../docs/ADMIN_PANEL.md) — Admin Console reference
 - [`docs/AUTHENTICATION.md`](../../docs/AUTHENTICATION.md) — Auth flow & session bridge

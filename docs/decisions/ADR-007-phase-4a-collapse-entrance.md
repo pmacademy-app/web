@@ -87,7 +87,7 @@ funnel data exists.
 ### 4.4 — Google OAuth: reviewed and deferred
 
 Google OAuth is **not implemented in Phase 4A.** It is now the deferred **Phase 9** (see
-[`../PHASE_HISTORY.md`](../PHASE_HISTORY.md)), explicitly **conditional**, and none of its three
+`docs/PHASE_HISTORY.md`, deleted in `f4343d3`), explicitly **conditional**, and none of its three
 entry-gate conditions are met:
 
 1. Phase 2's server-side funnel is not yet providing a measured signup→verified drop rate (>25% is the

@@ -1,4 +1,4 @@
-# Known Issues & Production Verification Tracker — Prodily PM Academy
+# Known Issues & Production Verification Tracker: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Current Branch:** `main`  
@@ -25,7 +25,7 @@
 
 #### ISSUE-23: Signup Abuse Cleanup Pending Approval
 - **Status**: 🟠 Mitigated — **state changed since this entry was written; re-verify**
-- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)).
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see `docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`, deleted in `1dbd2a4`; read it with `git show 1dbd2a4^:docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`).
 - **State observed 2026-10-17 (read-only check of production)**: `product_settings.allowSignups` is **`true`** and `requireEmailVerification` is `false`, so signups are open again. The flagged accounts are **no longer present**: `public.users` held 490 rows and `auth.users` 496 (6 unconfirmed signups with no profile row), with no cluster of zero-engagement accounts on 2026-09-06/07. The approval/removal decision is not recorded in this file.
 - **Required Action**: record who reopened signups and how the 1,233 accounts were removed; confirm the Turnstile CAPTCHA is enforced on signup in production; decide whether `requireEmailVerification` should stay off.
 - **Note**: the root-cause fixes (signup rate limiting, pre-dispatch daily quota enforcement, provider failover) are implemented and test-passing. Deployment requires migrations `20260907000001` and `20260908000001`.
@@ -159,7 +159,8 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 #### D-04 — Two UI error-token families · **DEFER**
 
 - **Current state**: `destructive` (shadcn) is used by 22 files including every auth surface and the shared `AuthErrorNotice`. `danger` / `success` (semantic tokens in `globals.css`) are used only by `components/feedback/error-state.tsx` and `success-state.tsx`.
-- **Evidence**: those two components are consumed by `components/forms/waitlist-form.tsx` and `components/marketing/product-mockup/lesson-card-preview.tsx`.
+- **Evidence (2026-09-08)**: those two components were consumed by `components/forms/waitlist-form.tsx` and `components/marketing/product-mockup/lesson-card-preview.tsx`.
+- **Update 2026-11-12, largely resolved by deletion**: both `feedback/*` components and both consumers are gone. `waitlist-form.tsx` was removed in `76bc600`, `success-state.tsx` in `35dfe84`, `error-state.tsx` in `6876fb7`, and `lesson-card-preview.tsx` on `chore/post-phase3-cleanup`. The `--color-danger*` tokens are still defined in `app/globals.css` and used by `components/marketing/frameworks-explorer.tsx`; retiring them is the only step left.
 - **Real inconsistency?** Marginal today. The families never appear on the same screen — `destructive` covers auth and app surfaces, `danger` covers one marketing form. The visible difference is a slightly different red and a `rounded-md` versus `rounded-lg` corner.
 - **Maintenance risk**: the real cost is decision friction. A new component has two plausible "error" tokens and no rule for choosing. That is how the P13 success-notice decision arose — moving auth success onto `--color-success` would have split the error/success pair across families.
 - **Decision**: defer; no design-system refactor in this task.
@@ -170,7 +171,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 #### D-05 — Dead settings types · **RETAIN**
 
 - **Current state**: fields whose controls were removed in P10 still exist on `ProductSettings`, `LearningSettings`, `EmailSettings` and `NotificationSettings`, with defaults in `settings-service.ts`.
-- **Evidence**: each dead field resolves to exactly two files — `lib/admin/types.ts` and `lib/admin/settings-service.ts`. Grep hits in `app/layout.tsx` and `lib/campaigns/portfolio-activation-runner.ts` are unrelated local identifiers that happen to be named `siteName` and `replyToEmail`, not these settings. No runtime code reads any of them.
+- **Evidence**: each dead field resolves to exactly two files: `lib/admin/types.ts` and `lib/admin/settings-service.ts`. Grep hits in `app/layout.tsx` and `lib/campaigns/portfolio-activation-runner.ts` (the whole `lib/campaigns/` folder has since been removed, in `6876fb7`) were unrelated local identifiers that happen to be named `siteName` and `replyToEmail`, not these settings. No runtime code reads any of them.
 - **Migration needed to remove?** No schema migration. `system_settings` stores each section as a single JSONB blob, so dropping fields is a TypeScript-only change that leaves stale keys inside existing blobs.
 - **Misleading or unsafe?** No. Nothing renders them and nothing reads them; the persisted values are inert. The genuinely misleading part — controls implying enforcement — was removed in P10.
 - **Decision**: retain. Removal is cosmetic, and because `upsertSettings` merges over current values, trimming the types would silently drop keys from stored blobs on the next save for no benefit.
@@ -180,6 +181,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 
 #### D-06 — `retry-failed` and `cleanup` cron routes · **PARTIALLY FIXED + FOLLOW-UP**
 
+- **Update 2026-11-12**: superseded. `/api/cron/cleanup` is now the B9-D retention sweep (`lib/retention/`), report-only unless `RETENTION_DELETE_ENABLED=true` and the caller posts `{"dryRun": false}`. `/api/cron/retry-failed` is no longer scheduled; the workflow runs it only on manual dispatch (`job_to_run: retry`). It is kept because the cron heartbeat and the admin System page still reference it. The entry below records the state on 2026-09-08.
 - **Invoked in production?** Yes, both. `.github/workflows/notification-scheduler.yml` calls `/api/cron/retry-failed` hourly and `/api/cron/cleanup` daily.
 - **`/api/cron/retry-failed`**: the body is `processEmailQueue(50)`, identical in effect to `/api/cron/process-email-queue`, which already runs every five minutes. It performs no dead-letter recovery and does not clear `next_retry_at`. It is a duplicate rather than a no-op — it does real work, just work the five-minute job already does — and it reported that work under a `retried` field, which reads as "failed items recovered" when it means "items a normal queue run processed".
 - **`/api/cron/cleanup`**: returned `{ success: true, cleanedRows: 0 }` and deleted nothing. This one did report success while doing nothing (ISSUE-21).
@@ -204,7 +206,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 #### D-08 — Two email transports · **DEFER**
 
 - **Current state**: `lib/email.ts` implements its own Brevo and Resend `fetch` calls; `lib/notifications/providers/*` implements them again behind the registry.
-- **Who uses each**: `lib/email.ts` serves 15 callers — the Supabase Auth hook, `/api/contact`, `/api/waitlist`, admin test-send, the webhook bounce alert, `lib/campaigns/*` and the local campaign scripts. The registry serves `processEmailQueue()` and the template test-send.
+- **Who uses each**: `lib/email.ts` served 15 callers on 2026-09-08: the Supabase Auth hook, `/api/contact`, `/api/waitlist`, admin test-send, the webhook bounce alert, `lib/campaigns/*` and the local campaign scripts. `/api/waitlist` (removed 2026-11-12) and `lib/campaigns/` (removed in `6876fb7`) are gone; the rest remain. The registry serves `processEmailQueue()` and the template test-send.
 - **Do they behave differently?** Not on the axes that matter. Both resolve the primary through `resolvePrimaryProvider()` and classify failures through `classifyProviderFailure()`, so failover eligibility is identical, and both report through the error taxonomy. The remaining differences are intentional: the queue path records `provider` / `provider_attempts` on the row and is subject to the daily quota gate; the direct path has no row to annotate and is deliberately not quota-gated, because critical auth and contact mail must not be blocked by an optional-email cap.
 - **Actual risk**: low. The dangerous divergences — different primary, different failover policy, silent auth failures — are closed. What remains is duplicated HTTP-call code, a maintenance cost: a future provider change must be made twice.
 - **Why still separate**: the provider classes build the sender from `BRAND`, while `sendEmail()` accepts per-call `fromEmail` and `replyTo` that the marketing campaign scripts depend on. Unifying without addressing that would change sender identity for those campaigns.
@@ -330,7 +332,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 - **Impact**: The Analytics workspace's XP-by-source breakdown chart is non-functional as shipped.
 
 #### ISSUE-21: `/api/cron/cleanup` Is a No-Op Placeholder
-- **Status**: ⚪ Known Architectural Debt
+- **Status**: 🟢 Resolved in code (B9-D). The route now runs the retention sweep in `lib/retention/` plus orphaned-avatar cleanup. It is report-only by default and deletes only when `RETENTION_DELETE_ENABLED=true` and the caller posts `{"dryRun": false}`; the scheduled job sends no body. Follow-up: the `user_notification_timeline` rule in `lib/retention/policy.ts` still targets a table dropped by `20261031000001`, so that one rule reports an error on every run until it is removed.
 - **Description**: The route always returns `{ cleanedRows: 0 }` and performs no actual deletion, despite being scheduled hourly-equivalent in `notification-scheduler.yml` and despite prior documentation describing it as purging old delivery logs and expired tokens.
 - **Impact**: No automatic cleanup of old records currently happens; not urgent, but the scheduled job is currently dead weight.
 

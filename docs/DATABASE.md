@@ -1,9 +1,9 @@
-# Database Schema & Migration Specification — Prodily PM Academy
+# Database Schema & Migration Specification: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Database:** PostgreSQL (Supabase)
-**Migrations:** 41 Versioned SQL DDL Files in `supabase/migrations/`
-**Last Updated:** September 6, 2026
+**Migrations:** 70 top-level SQL files in `supabase/migrations/` (counted 2026-11-12)
+**Last Updated:** November 12, 2026 (Phase 3 cleanup reconciled; the per-table detail below dates from September 2026)
 
 ---
 
@@ -11,19 +11,21 @@
 
 All database schema definitions are managed through versioned SQL DDL migration files in `supabase/migrations/`.
 
-- **Total Versioned Migrations:** 41 SQL files (`20260728000001` → `20260906000001`).
+- **Versioned Migrations:** 70 top-level SQL files as of 2026-11-12 (`20260728000001` → `20261031000001`). Count them with `ls supabase/migrations/*.sql | wc -l`. The `rollback/`, `validation/` and `pending-approval/` subfolders are never read by the Supabase CLI; files there are applied by hand only.
 - **Row Level Security (RLS):** Enabled on every user-owned table (spot-checked across the initial schema, security-hardening, leaderboard/cohort, referral, and fellow-request migrations — not independently re-verified table-by-table for all 42 tables).
 - **Service-Role Isolation:** Admin and background API routes use `createServiceRoleClient()` to interact with system tables with elevated permissions.
 - **TypeScript Type Safety:** Auto-generated TypeScript definitions live in `apps/web/types/database.ts` (the authoritative current schema reference) and are re-exported by `apps/web/lib/supabase.ts`.
 
 ---
 
-## 2. Complete PostgreSQL Migration History (41 Files)
+## 2. PostgreSQL Migration History (Selected Files)
+
+Not every migration is listed here. `ls supabase/migrations/*.sql` is the authoritative list.
 
 | Timestamp Migration File | Target Schema / Modification |
 |---|---|
 | `20260728000001_create_waitlist.sql` | `public.waitlist` pre-launch table |
-| `20260728000002_create_user_state.sql` | `public.users`, `user_lesson_progress`, `reflections`, `xp_events`, `badges`, `user_badges`, `bookmarks`, `quiz_attempts`, `capstone_submissions`, `cohorts`, `cohort_members` |
+| `20260728000002_create_user_state.sql` | `public.users`, `user_lesson_progress`, `reflections`, `xp_events`, `badges`, `user_badges`, `bookmarks` (dropped by `20261031000001`), `quiz_attempts`, `capstone_submissions`, `cohorts`, `cohort_members` |
 | `20260728000003_alter_waitlist_column.sql` | Waitlist column adjustments |
 | `20260728000004_db_security_fixes.sql` | RLS policies on tables the initial migration missed (`badges`, `cohorts`) |
 | `20260728164000_supabase_security_hardening.sql` | Search path security hardening |
@@ -33,7 +35,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260805000003_add_portfolio_columns.sql` | `is_portfolio_public` & `bio` columns on `users` |
 | `20260805000004_create_certificates.sql` | `public.certificates` credential registry |
 | `20260805000005_seed_badges.sql` | Initial badge definitions |
-| `20260805000006_create_leaderboards_and_cohorts.sql` | `user_leaderboard_settings`, `weekly_leaderboard_snapshots`, `user_friends` (seeds `cohorts`: `foundations-2026`, `career-switchers`) |
+| `20260805000006_create_leaderboards_and_cohorts.sql` | `user_leaderboard_settings`, `weekly_leaderboard_snapshots` (dropped by `20261031000001`), `user_friends` (seeds `cohorts`: `foundations-2026`, `career-switchers`) |
 | `20260806000001_notification_platform_foundation.sql` | `in_app_notifications`, `email_queue`, and notification delivery/audit tables |
 | `20260809000000_create_testimonials_table.sql` | `public.testimonials` |
 | `20260809000001_security_hardening_rls.sql` | Notification table RLS policies |
@@ -67,13 +69,13 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
 | `20260908000002_quota_key_utc.sql` | Pins `increment_daily_email_quota()` and `get_current_daily_email_count()` to the UTC day, matching the application side |
 | `20260923000001_signup_legal_consent.sql` | Signup consent columns on `public.users` (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum`) — all nullable, no backfill: NULL means the account predates consent capture and is **not** retroactively blocked |
-| `20261031000001_phase3_drop_unused_tables.sql` | Phase 3 dead code pruning: drops unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and unused RPC `sync_user_xp(uuid)`. |
+| `20261031000001_phase3_drop_unused_tables.sql` | Phase 3 dead code pruning: drops unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and unused RPC `sync_user_xp(uuid)`. Structural rollback (no rows): `rollback/20261031000001_phase3_drop_unused_tables.down.sql`. |
 
 ---
 
 ## 3. Database Table Categories & Schema Summary
 
-This section reflects the current `public` schema as generated in `apps/web/types/database.ts` (42 tables + 2 functions). Where an earlier version of this document used a different table name, the correction is noted.
+This section reflects the current `public` schema as generated in `apps/web/types/database.ts` (39 tables as of 2026-11-12). Where an earlier version of this document used a different table name, the correction is noted.
 
 ### Core User & Learning Tables
 - **`public.users`** — Main profile entity: `id`, `name`, `username`, `email`, `avatar_url`, `bio`, `total_xp`, `level`, `is_admin`, `is_fellow`, `is_portfolio_public`, `portfolio_layout`, `featured_capstone_id`, `portfolio_view_count`, `curriculum_access_override`, streak columns (`current_streak`, `longest_streak`, `last_streak_date`, `streak_freezes_available`), `portfolio_verification_override`, and signup-consent columns (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum` — nullable; populated only for accounts created from 2026-09-23 onward).
@@ -82,7 +84,7 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.reflections`** — Qualitative learner reflections on lesson theory. (Previously mislabeled `user_reflections` in this doc.)
 - **`public.quiz_attempts`** — Individual quiz attempt records.
 - **`public.user_flashcard_srs`** — SM-2 spaced-repetition state per learner/flashcard.
-- **`public.bookmarks`** — (Dropped in Phase 3 migration `20261031000001`)
+- **`public.bookmarks`**: dropped by `20261031000001_phase3_drop_unused_tables.sql`; structural rollback (empty table, no rows) in `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql`.
 - **`public.badges`** — Badge catalog/definitions. **`public.user_badges`** — Per-user badge award rows.
 - **`public.capstone_submissions`** — Module capstone deliverables with moderation review status and per-submission `is_public` opt-out.
 
@@ -91,7 +93,7 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.cohort_members`** — Learner ↔ cohort join table (users freely join/leave).
 - **`public.user_friends`** — One-way "add for accountability" connections. (Previously mislabeled `friendships`.) See [`LEADERBOARD.md`](LEADERBOARD.md) for the exact semantics — there is currently no request/accept/reject step.
 - **`public.user_leaderboard_settings`** — Per-user opt-in/opt-out of leaderboard visibility.
-- **`public.weekly_leaderboard_snapshots`** — Cached/historical weekly ranking snapshots.
+- **`public.weekly_leaderboard_snapshots`**: dropped by `20261031000001_phase3_drop_unused_tables.sql`; structural rollback (empty table, no rows) in `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql`. The leaderboard aggregates XP live.
 
 ### PM Fellow & Portfolio Verification
 - **`public.fellow_requests`** — Learner-submitted PM Fellow requests (`pending` / `approved` / `rejected`), reviewed by admins. See [`docs/admin/fellow-designation.md`](admin/fellow-designation.md).
@@ -104,15 +106,15 @@ This section reflects the current `public` schema as generated in `apps/web/type
 ### Communication & Broadcasts
 - **`public.email_queue`** — Asynchronous transactional email queue. Carries `provider` (which provider produced the outcome) and `provider_attempts` (every attempt with status code and error, at most two — primary plus one failover), added by `20260907000001_email_provider_failover.sql`.
 - **`public.email_broadcasts`** — Targeted email campaigns (`id`, `title`, `audience_filter`, `status`, `sent_count`).
-- **`public.email_dead_letter`** — Permanently-failed email records after exhausting retries. Retains `user_id`, `template_key` and template variables so an operator can tell who was affected; the variables are redacted before storage, so a dead-lettered auth email cannot be replayed with its original one-time token.
+- **`public.email_dead_letter`**: dropped by `20261031000001_phase3_drop_unused_tables.sql`; structural rollback (empty table, no rows) in `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql`. A permanently failed email now stays in `email_queue` with `status = 'dead_letter'` (plus `error_message`, `failed_at`, `provider_attempts`), and the failure is logged to `system_errors`.
 - **`public.email_suppressions`** — Addresses excluded from future sends. Written on `email.complained` (`spam_complaint`) and on `email.bounced` (`hard_bounce`); the bounce case is what stops admin retry actions from re-sending to an address that already hard-bounced.
 - **`public.email_delivery_events`** / **`public.notification_events`** — Delivery/audit event logs (not a single `notification_delivery_events` table as previously documented — these are two distinct tables).
 - **`public.in_app_broadcasts`** — Targeted in-app notification campaigns.
 - **`public.in_app_notifications`** — In-app notification inbox. (Previously mislabeled `notifications`.)
 - **`public.user_notification_preferences`** — Per-user notification channel preferences. (Previously mislabeled `notification_preferences`.)
-- **`public.user_notification_timeline`** — Per-user notification history/timeline.
+- **`public.user_notification_timeline`**: dropped by `20261031000001_phase3_drop_unused_tables.sql`; structural rollback (empty table, no rows) in `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql`. In-app history lives in `in_app_notifications`.
 - **`public.notification_templates`** / **`public.notification_template_versions`** — Draft/publish versioned email template content (each save creates a new version row; publishing archives the prior version). Not previously documented.
-- **`public.notification_feature_flags`** — Per-automation enable/pause flags.
+- **`public.notification_feature_flags`**: legacy per-automation flag table, not read by the app. The live flag store is the `system_settings` row with `key = 'feature_flags'` (a jsonb map of flag key to boolean), read and written by `FeatureFlagService`. The retired `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED` keys are removed from both by the held `pending-approval/20261112000002_remove_retired_notification_flags.sql`.
 - **`public.system_announcements`** — Platform-wide banner announcements. **`public.user_announcement_dismissals`** — per-user dismissal state.
 
 ### Moderation & Achievement Tables
@@ -129,18 +131,19 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.rate_limits`** — Persistent rate limiting records.
 
 ### Misc
-- **`public.waitlist`** — Pre-launch signup records.
+- **`public.waitlist`**: pre-launch signup records. Still present, but nothing writes to it since `/api/waitlist` was removed. The drop is held in `supabase/migrations/pending-approval/20261112000001_drop_waitlist_table.sql`; the owner must export the rows first (they are personal data).
 
 ---
 
-## 4. Phase 3 Schema Cleanup Candidates (Dead Tables & Stored Procedures)
+## 4. Dropped and Held Schema Objects
 
-A full multi-agent audit on branch `phase-3` cross-referenced every table and procedure in `supabase/migrations/` and `apps/web/types/database.ts` against application source code. The following objects have zero active callers, readers, or writers, and are scheduled for deprecation and removal in Phase 3 Batch 3-C (see [`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)):
+The Phase 3 dead-code audit (see [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)) found these objects had no callers, readers or writers. The first five were dropped in Batch 3-C by `20261031000001_phase3_drop_unused_tables.sql` (PR #79); `rollback/20261031000001_phase3_drop_unused_tables.down.sql` re-creates their structure but not their rows. The last one is held for the owner.
 
-| Database Object | Type | Created In | Rationale for Removal |
-|---|---|---|---|
-| `public.weekly_leaderboard_snapshots` | Table | `20260805000006` | Never populated or queried; leaderboard aggregates user XP dynamically. |
-| `public.bookmarks` | Table | `20260728000002` | Unused legacy feature; superseded by progress tracking and flashcard queues. |
-| `public.email_dead_letter` | Table | `20260806000001` | Dead table; email errors are logged to `system_errors` and retained in `email_queue` with `status = 'failed'`. |
-| `public.user_notification_timeline` | Table | `20260806000001` | Redundant legacy timeline; in-app alerts are handled directly by `in_app_notifications`. |
-| `public.sync_user_xp(uuid)` | Stored Procedure / RPC | `20260805000001` | Unused function; trigger `update_user_xp_and_level()` handles automated XP summation. |
+| Database Object | Type | Created In | Status | Rationale |
+|---|---|---|---|---|
+| `public.weekly_leaderboard_snapshots` | Table | `20260805000006` | Dropped (`20261031000001`) | Never populated or queried; leaderboard aggregates user XP dynamically. |
+| `public.bookmarks` | Table | `20260728000002` | Dropped (`20261031000001`) | Unused legacy feature; superseded by progress tracking and flashcard queues. |
+| `public.email_dead_letter` | Table | `20260806000001` | Dropped (`20261031000001`) | Dead table; email errors are logged to `system_errors` and retained in `email_queue` with `status = 'dead_letter'`. |
+| `public.user_notification_timeline` | Table | `20260806000001` | Dropped (`20261031000001`) | Redundant legacy timeline; in-app alerts are handled directly by `in_app_notifications`. |
+| `public.sync_user_xp(uuid)` | Stored Procedure / RPC | `20260805000001` | Dropped (`20261031000001`) | Unused function; trigger `update_user_xp_and_level()` handles automated XP summation. |
+| `public.waitlist` | Table | `20260728000001` | **Held**: `pending-approval/20261112000001_drop_waitlist_table.sql` | Pre-launch waitlist is closed and `/api/waitlist` is removed. The owner exports the rows (personal data) before applying the drop by hand; the rollback re-creates an empty table only. |

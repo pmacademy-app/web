@@ -1,4 +1,4 @@
-# Deployment & Infrastructure Guide — Prodily PM Academy
+# Deployment & Infrastructure Guide: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** October 28, 2026
@@ -8,14 +8,14 @@
 ## 1. Production Hosting & Build Configuration
 
 - **Hosting Platform**: Vercel Serverless Platform.
-- **Framework & Runtime**: Next.js 16.2.12 App Router (Node.js runtime for API Route Handlers).
+- **Framework & Runtime**: Next.js 16.4.3 App Router (Node.js runtime for API Route Handlers).
 - **Build Engine**: Next.js Turbopack compiler engine.
 - **Vercel Root Directory**: `apps/web` (configured in Vercel Dashboard).
 - **Vercel Config**: Single `apps/web/vercel.json` (`{ "framework": "nextjs" }`). No root-level `vercel.json`.
 - **Build Pipeline (`npm run build`)**:
   1. Compiles 90 Markdown lessons (`npm run content:compile`).
   2. Compiles embedded Mermaid diagrams to static SVGs via Node.js + JSDOM.
-  3. Pre-builds FlexSearch index (`content/dist/search-index.json`).
+  3. Writes the search index as plain JSON (`content/dist/search-index.json`, from `scripts/compiler/compile.ts`). There is no search library; `GET /api/search-index` serves the file and caches it for an hour.
   4. Runs TypeScript type checking across all App Router routes and components.
   5. Renders static App Router pages.
 - **CI Pipeline (`.github/workflows/ci.yml`)**, distinct from the pipeline above — runs on every PR and push to `main`: content compile → lint → typecheck → unit/integration tests → `next build` → Playwright install → E2E tests → (push to `main` only) Supabase migration deploy job.
@@ -137,7 +137,7 @@ lower(email) = lower('<your email>');`) and make sure the account is genuinely y
 
 ## 4. Phase 6–8 deployment (activation programme)
 
-Phases 6, 7 and 8 are code-complete. The Phase 7 capstone-threshold experiment flag is **off by default**; the Phase 4 recut and Phase 6 module-entry unlock are **on by default** since owner decision D5 (2026-10-20). Full rationale in [`PHASE_HISTORY.md`](PHASE_HISTORY.md) and ADR-008/009/010.
+Phases 6, 7 and 8 are code-complete. The Phase 7 capstone-threshold experiment flag is **off by default**; the Phase 4 recut and Phase 6 module-entry unlock are **on by default** since owner decision D5 (2026-10-20). Full rationale in ADR-008/009/010 (`docs/decisions/`) and in `docs/PHASE_HISTORY.md`, which was deleted in `f4343d3` (read it with `git show f4343d3^:docs/PHASE_HISTORY.md`).
 
 ### 4.1 What ships (verified in code)
 

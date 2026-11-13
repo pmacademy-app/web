@@ -1,4 +1,4 @@
-# Application Error Monitoring & Alerting — Prodily PM Academy
+# Application Error Monitoring & Alerting (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 8, 2026  

@@ -18,7 +18,7 @@ Since Growth R1, the code has followed a hard rule: the Fellow experience never 
 | Option | What it is | Status |
 |---|---|---|
 | A. LinkedIn "Add to profile" certification for Fellow | Reuse `buildLinkedInCertificationUrl` with a Fellow name and issuer | **Blocked.** It claims a credential. It needs a written issuer policy (what Fellow certifies, who verifies it, revocation, a public verification page) from product and legal. |
-| B. LinkedIn **feed share** of the learner's portfolio, with Fellow wording where we control the text | `ShareButton context="fellow"` | **Accepted.** No credential claim. LinkedIn's share-offsite intent takes only a URL, so the post card comes from the portfolio page's OG tags, which already show the Fellow badge. The X and native-share text reads "I was selected as a PM Fellow at Prodily PM Academy. Here is my Product Management portfolio:". |
+| B. LinkedIn **feed share** of the learner's portfolio, with Fellow wording where we control the text | `ShareButton context="fellow"` | **Accepted.** No credential claim. LinkedIn's share-offsite intent takes only a URL, so the post card comes from the portfolio page's OG tags, which already show the Fellow badge. The X and native-share text reads "I was selected as a PM Fellow at Prodily. Here is my Product Management portfolio:". |
 | C. Downloadable Fellow badge image for manual posting | A static or generated asset | Deferred. It needs design work and has low expected reach. |
 
 ## Decision
