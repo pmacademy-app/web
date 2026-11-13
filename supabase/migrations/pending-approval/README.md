@@ -65,6 +65,36 @@ Revokes learner writes to `public.users` through PostgREST. Apply only **after**
 stops writing `public.users` with a learner session is deployed, then confirm a learner-token
 `PATCH /rest/v1/users` is refused. Steps in the runbook, step (g).
 
+### `20261030000001_cron_heartbeat_deadman.sql` (ENG-01, audit W3, applied by hand, never moved)
+
+Adds an in-database dead-man check for the cron heartbeats. The app's own stale check runs inside
+the five-minute `process-email-queue` route, so it goes quiet when the scheduler or Vercel stops.
+This job, `prodily-deadman-cron-heartbeats`, runs `private.check_cron_heartbeats_deadman()` every
+15 minutes, reads the same `cron_heartbeat:<job>` rows and posts one alert per outage to a webhook.
+It stores its alert markers under `cron_deadman_alert:<job>` in `public.system_settings`. The job
+intervals in the SQL repeat `CRON_JOB_DEFINITIONS`; `apps/web/lib/__tests__/eng01-deadman-sql-drift.test.ts`
+fails if they drift. It does not cover pg_cron or the database itself stopping (see the header).
+
+Prerequisites:
+
+- `20261024000003_schedule_cron_jobs_pg_cron.sql` is applied and its validation passes.
+- The Vault secret `cron_alert_webhook_url` exists: an https webhook URL whose only power is
+  posting to one alert channel (for example the same value as `ALERT_WEBHOOK_URL` in Vercel).
+
+Run:
+
+1. In the Supabase dashboard Vault page (Integrations > Vault), create `cron_alert_webhook_url`.
+2. Paste the migration into the SQL editor and run it. It ends with a self-check that raises, and
+   rolls everything back, if the job, the function, its privileges or the secret is wrong.
+3. Run query 1 of `validation/20261030000001_cron_heartbeat_deadman_validation.sql`, then queries
+   2 and 4. Run query 3 after 30 minutes, when the job has run at least twice.
+
+Leave the file here after applying it, like 20261024000003.
+
+Undo: `rollback/20261030000001_cron_heartbeat_deadman.down.sql` unschedules the job, drops the
+function and deletes the `cron_deadman_alert:*` markers (bookkeeping only, no export needed). It
+keeps pg_cron, pg_net, the `private` schema and the Vault secret, which other jobs use.
+
 Post-Phase 3 cleanup (branch `chore/post-phase3-cleanup`). Both are owner-run in the SQL editor,
 in this order, and only after that branch is deployed. They are independent, so either can be
 skipped or delayed.
