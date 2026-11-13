@@ -15,6 +15,10 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # SEC-20: wait 3 days after a release before proposing it, so a compromised
+    # publish has time to be caught and pulled. Security updates are not delayed.
+    cooldown:
+      default-days: 3
     labels:
       - "dependencies"
     # Patch and minor noise is grouped into one PR per week; majors stay separate so
@@ -77,6 +81,10 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    # SEC-20: wait 3 days after a release before proposing it, so a compromised
+    # publish has time to be caught and pulled. Security updates are not delayed.
+    cooldown:
+      default-days: 3
     labels:
       - "dependencies"
     commit-message:
@@ -88,6 +96,10 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    # SEC-20: wait 3 days after a release before proposing it, so a compromised
+    # publish has time to be caught and pulled. Security updates are not delayed.
+    cooldown:
+      default-days: 3
     labels:
       - "ci"
     commit-message:

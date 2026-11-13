@@ -20,13 +20,20 @@ jobs:
     defaults:
       run:
         working-directory: ./apps/web
+    # Job-level env reaches every step, including third-party install scripts, so
+    # only public values live here. SEC-10: no step in this job gets the Supabase
+    # service-role key, the Resend key, the cron secret or the email hook secret.
+    #   - Unit tests: vitest.setup.ts forces mock Supabase values and a test cron
+    #     secret, and suites that need the email secrets set their own.
+    #   - next build: a CI build is never served. The build-time readers of the
+    #     service-role key (app/sitemap.ts, FeedbackAdminService) fall back to an
+    #     empty list when it is absent, and the email and cron secrets are only read
+    #     by request handlers at runtime.
+    # The two NEXT_PUBLIC_ Supabase values are inlined into the client bundle, so
+    # they are public by design and stay here for the build.
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      SEND_EMAIL_HOOK_SECRET: ${{ secrets.SEND_EMAIL_HOOK_SECRET }}
       # Turnstile. NEXT_PUBLIC_TURNSTILE_SITE_KEY is inlined into the client bundle at
       # build time, so `next.config.ts` refuses to produce a production build without
       # it — a bundle with no site key ships a signup page whose challenge never
@@ -50,17 +57,27 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/web/package-lock.json
 
+      # SEC-20: no install script runs during the install. Only the packages in the
+      # lockfile that declare one (`hasInstallScript`) are rebuilt, by name:
+      # esbuild and unrs-resolver (both `postinstall`). fsevents also declares one
+      # but is a macOS-only optional dependency that is never installed here.
+      # Re-check this list when the lockfile gains a new `hasInstallScript` entry.
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --ignore-scripts
+          npm rebuild esbuild unrs-resolver
 
+      # The step gets a true/false flag, never the key itself.
       - name: Verify Environment Presence (Safe Check)
+        env:
+          HAS_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
         run: |
           if [ -n "$NEXT_PUBLIC_SUPABASE_URL" ]; then
             echo "✓ NEXT_PUBLIC_SUPABASE_URL is configured in CI environment"
           else
             echo "::warning::NEXT_PUBLIC_SUPABASE_URL is not set in CI environment"
           fi
-          if [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+          if [ "$HAS_SERVICE_ROLE_KEY" = "true" ]; then
             echo "✓ SUPABASE_SERVICE_ROLE_KEY is configured in CI environment"
           else
             echo "::warning::SUPABASE_SERVICE_ROLE_KEY is not set in CI environment"
@@ -130,13 +147,11 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+    # Public values only at job level (SEC-10). The one sensitive secret this job
+    # needs is set on the step that starts the server; see "Run critical-path E2E".
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      SEND_EMAIL_HOOK_SECRET: ${{ secrets.SEND_EMAIL_HOOK_SECRET }}
       # The same published always-pass Turnstile dummies the build job documents. The
       # signup spec depends on them: without a solvable challenge the form never submits.
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
@@ -189,7 +204,11 @@ jobs:
       - name: Install dependencies
         if: steps.decide.outputs.run == 'true'
         working-directory: ./apps/web
-        run: npm ci
+        # Same install policy as build-and-validate: no install scripts, then
+        # rebuild only the packages that declare one.
+        run: |
+          npm ci --ignore-scripts
+          npm rebuild esbuild unrs-resolver
 
       - name: Parse & validate content pipeline
         if: steps.decide.outputs.run == 'true'
@@ -208,9 +227,16 @@ jobs:
         working-directory: ./apps/web
         run: npm run build
 
+      # Playwright's webServer starts `next start` inside this step, so the server's
+      # runtime secrets belong here and nowhere else in the job. It needs the
+      # service-role key for its API routes. It does not get the Resend key (email
+      # falls back to a console log), the cron secret (no spec calls a cron route)
+      # or the email hook secret (Supabase never calls this CI server's hook).
       - name: Run critical-path E2E
         if: steps.decide.outputs.run == 'true'
         working-directory: ./apps/web
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run test:e2e
 
       - name: Upload Playwright report on failure
@@ -298,10 +324,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # setup-cli v3 installs the CLI from npm and needs Node.js 20 or newer.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      # SEC-20: the CLI that writes to production is pinned, not fetched from npm
+      # at whatever version is newest on the day. The action is pinned to a commit
+      # SHA. The flags below (`--linked` plus `--yes`, commit 777c36a) were adapted
+      # to CLI v3, and 3.1.0 is the npm `latest` the old unpinned call resolved to
+      # when this pin was set, so the deploy behaves as before. Bump `version:` on
+      # purpose, after reading the CLI release notes, never by drift.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: '3.1.0'
 
       # Fail loudly rather than skipping. A migration job that silently does nothing is
       # worse than one that fails: the schema the application expects is simply absent,
@@ -322,24 +360,24 @@ jobs:
       - name: Link Supabase project
         run: |
           set -euo pipefail
-          npx supabase link --project-ref "${SUPABASE_PROJECT_ID}" --password "${SUPABASE_DB_PASSWORD}" --yes
+          supabase link --project-ref "${SUPABASE_PROJECT_ID}" --password "${SUPABASE_DB_PASSWORD}" --yes
 
       # Recorded before and after so a run's log answers "what did this change?" without
       # anyone needing production access.
       - name: Migration state BEFORE push
         run: |
           set -euo pipefail
-          npx supabase migration list --linked
+          supabase migration list --linked
 
       - name: Push pending migrations
         run: |
           set -euo pipefail
-          npx supabase db push --include-all --linked --password "${SUPABASE_DB_PASSWORD}" --yes
+          supabase db push --include-all --linked --password "${SUPABASE_DB_PASSWORD}" --yes
 
       - name: Migration state AFTER push
         run: |
           set -euo pipefail
-          npx supabase migration list --linked
+          supabase migration list --linked
 
       # The push above exits non-zero on failure, but a partial or no-op apply would
       # still pass. A dry run is the CLI's own answer to "is anything still pending?",
@@ -347,7 +385,7 @@ jobs:
       - name: Verify no migrations remain pending
         run: |
           set -euo pipefail
-          output="$(npx supabase db push --include-all --linked --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
+          output="$(supabase db push --include-all --linked --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
           echo "${output}"
           # `upToDate` is a structured field in the CLI's JSON output and is the primary
           # signal; the prose forms are accepted as a fallback across CLI versions.

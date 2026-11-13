@@ -230,3 +230,32 @@ into a commit is exactly the accident this scan exists to catch.
 minor updates are grouped; majors stay separate so each gets its own review and
 regression run. Dependabot is what keeps the audit allowlist converging rather
 than only growing.
+
+Every ecosystem sets `cooldown: { default-days: 3 }`: a new release is not
+proposed until it is 3 days old, which gives a compromised publish time to be
+caught and pulled first. Cooldown applies to version updates only, so security
+updates still arrive as soon as an advisory is published.
+
+### 5.4 CI secrets and install scripts
+
+Added 2026-11-13 (SEC-10, SEC-20). What changed in
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml):
+
+- **No sensitive secret at job level.** Job-level `env` reaches every step,
+  including third-party install scripts. `build-and-validate` and `e2e` now keep
+  only public values there: the two `NEXT_PUBLIC_SUPABASE_*` values (inlined into
+  the client bundle anyway) and the published Turnstile test keys.
+- **Secrets go only to the step that needs them.** In `build-and-validate`, no
+  step gets `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `CRON_SECRET` or
+  `SEND_EMAIL_HOOK_SECRET`: unit tests use the mocks in `vitest.setup.ts`, and a CI
+  build is never served (its build-time readers of the service-role key fall back
+  to an empty list). The environment check gets a true/false flag, not the key.
+  In `e2e`, only the step that starts the server gets `SUPABASE_SERVICE_ROLE_KEY`.
+- **Installs run no scripts.** Both jobs run `npm ci --ignore-scripts`, then
+  `npm rebuild esbuild unrs-resolver`, the only lockfile packages that declare an
+  install script on Linux. Re-check that list when the lockfile gains a new
+  `hasInstallScript` entry.
+- **The deploy CLI is pinned.** `deploy-supabase` installs the Supabase CLI with
+  `supabase/setup-cli`, pinned to a commit SHA, at a fixed `version:`, instead of
+  `npx supabase` resolving whatever is newest on the day. Bump the version on
+  purpose after reading the CLI release notes.
