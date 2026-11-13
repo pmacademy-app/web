@@ -1,7 +1,7 @@
-# Learner Progress, Gamification, Flashcards & Referrals — Prodily PM Academy
+# Learner Progress, Gamification, Flashcards & Referrals (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 (Turbopack) / PostgreSQL / React 19  
+**Framework:** Next.js 16.4.3 (Turbopack) / PostgreSQL / React 19  
 **Last Updated:** September 6, 2026  
 
 For Leaderboard, Cohorts, and Friend Accountability — a large enough system to warrant its own document — see [`docs/LEADERBOARD.md`](LEADERBOARD.md).
@@ -76,7 +76,7 @@ A learner can self-request PM Fellow designation from Settings — a different t
 Two distinct authenticated pages, both under `app/(app)/`:
 
 - **`/dashboard`** — action-oriented: "what should I do right now." Personalized goal banner, "Continue Learning" CTA (next incomplete lesson), a 3-card action grid (flashcard review, next capstone, streak), and a small recent-XP ticker.
-- **`/progress`** — summary/reflective: "how am I doing overall, and what have I earned." Skill Radar competency visualization, Level/Streak/Progress-ring cards, full Badge Showcase, Capstones Overview, and a Certificates section (including auto-issuance of a `full_curriculum` certificate once all 90 lessons are complete). Deliberately reuses already-fetched rows across its sub-sections to avoid duplicate queries.
+- **`/progress`**: summary/reflective, "how am I doing overall, and what have I earned." The index redirects to `/progress/radar`; the section is split into subpages `radar` (Skill Radar), `badges`, `capstones`, `certificates` (including auto-issuance of a `full_curriculum` certificate once all 90 lessons are complete), `metrics` and `milestones`. The old single-page `BadgeShowcaseCard` and `CapstonesOverviewCard` components were deleted.
 
 ---
 

@@ -3,7 +3,7 @@
 - **Status:** Accepted (implemented on `prodily-phase-8-close-the-loop`; not deployed)
 - **Date:** 2026-10-01
 - **Phase:** 8 — "Read the results, close the loop"
-- **Builds on:** [ADR-008](ADR-008-phase-6-module-entry-unlock.md) (Phase 6 module-entry unlock), [ADR-009](ADR-009-phase-7-make-payoff-visible.md) (Phase 7 payoff visibility + capstone-threshold experiment). Source spec: [`docs/PHASE_8_PROPOSAL.md`](../PHASE_8_PROPOSAL.md).
+- **Builds on:** [ADR-008](ADR-008-phase-6-module-entry-unlock.md) (Phase 6 module-entry unlock), [ADR-009](ADR-009-phase-7-make-payoff-visible.md) (Phase 7 payoff visibility + capstone-threshold experiment). Source spec: `docs/PHASE_8_PROPOSAL.md` (deleted in `f4343d3`; read it with `git show f4343d3^:docs/PHASE_8_PROPOSAL.md`).
 
 ## Context
 

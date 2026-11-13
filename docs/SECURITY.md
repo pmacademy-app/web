@@ -1,4 +1,4 @@
-# Security Threat Model & Access Control — Prodily PM Academy
+# Security Threat Model & Access Control: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026  
@@ -51,7 +51,7 @@ An Origin/Referer header check exists today on exactly **two** routes: `POST /ap
 
 ## 3a. Signup Abuse Controls (added 2026-09-07)
 
-`POST /api/auth/signup` previously had **no rate limiting of any kind**, which allowed ~1,233 automated accounts to be created in ~25 hours (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). It now enforces, via the persistent cross-instance rate limiter (`lib/rate-limit.ts`):
+`POST /api/auth/signup` previously had **no rate limiting of any kind**, which allowed ~1,233 automated accounts to be created in ~25 hours (see `docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`, deleted in `1dbd2a4`; read it with `git show 1dbd2a4^:docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`). It now enforces, via the persistent cross-instance rate limiter (`lib/rate-limit.ts`):
 - **5 signups / 15 minutes** per client IP (`x-forwarded-for` / `x-real-ip`).
 - **3 signups / 24 hours** per canonicalized email — Gmail `local+tag@gmail.com` addresses collapse to `local@gmail.com` before the check, closing the specific alias-abuse pattern seen in the incident.
 
@@ -80,7 +80,7 @@ Google sign-in is behind `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` (off by default; `GET
 
 - **Server-Only Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `SEND_EMAIL_HOOK_SECRET`, `CRON_SECRET`, `BREVO_API_KEY`, `BREVO_WEBHOOK_SECRET`, `RESEND_API_KEY`, and `RESEND_WEBHOOK_SECRET` are strictly server-side.
 - **Client Expose Prevention**: Never import service-role client into client components (`'use client'`).
-- **Secret Sanitization**: `lib/monitoring/redaction.ts` is the single redaction implementation, applied to logged messages, to `details` payloads recursively, to queue template variables before they reach `email_dead_letter` / `notification_events`, and to the outgoing message of `apiError()`. It redacts by value shape (provider keys `xkeysib-`/`xsmtpsib-`/`re_`, `whsec_` and Svix signatures, JWTs, database connection credentials, `Authorization` and cookie headers, session tokens, one-time auth tokens in URLs, passwords) **and** by key name for structured payloads. Email addresses are masked rather than dropped so the recipient domain stays diagnosable. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). Admin API responses use `adminErrorMessage()`, which sanitizes rather than genericizes: the operator keeps the diagnostic text, credentials and connection strings do not survive.
+- **Secret Sanitization**: `lib/monitoring/redaction.ts` is the single redaction implementation, applied to logged messages, to `details` payloads recursively, to queue template variables before they reach `notification_events` (the `email_dead_letter` table was dropped by `20261031000001`), and to the outgoing message of `apiError()`. It redacts by value shape (provider keys `xkeysib-`/`xsmtpsib-`/`re_`, `whsec_` and Svix signatures, JWTs, database connection credentials, `Authorization` and cookie headers, session tokens, one-time auth tokens in URLs, passwords) **and** by key name for structured payloads. Email addresses are masked rather than dropped so the recipient domain stays diagnosable. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). Admin API responses use `adminErrorMessage()`, which sanitizes rather than genericizes: the operator keeps the diagnostic text, credentials and connection strings do not survive.
 
 ---
 

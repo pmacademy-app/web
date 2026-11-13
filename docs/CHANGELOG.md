@@ -1,20 +1,68 @@
-# Repository Changelog — Prodily PM Academy
+# Prodily Repository Changelog
 
-All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
+All notable changes to **Prodily** (`prodily-monorepo`) are documented in this file, newest first. Hashes are short SHAs on `main` unless an entry says otherwise. Plan IDs (PR-01, SEC-07 and so on) refer to [`../08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md) and the audit in [`../audit/00-INDEX.md`](../audit/00-INDEX.md). Remaining work is in [`ROADMAP.md`](ROADMAP.md).
 
-## [Phase 3 — Multi-Agent Dead Code Pruning & Technical Debt Cleanup] — 2026-10-31
+## [Unreleased: post-Phase 3 cleanup] (branch `chore/post-phase3-cleanup`)
 
-Executed full multi-agent dead code cleanup and technical debt elimination on branch `phase-3`.
+Not merged yet. Follows the dead-code "Phase 3" (PR #79) with the removals it deferred, a `knip` sweep and a documentation refresh.
 
-- **Multi-Agent Audit & Pruning**: Executed coordinated pipeline across frontend, backend/API, and database/systems domains.
-- **Frontend Cleanup**: Pruned verified unreferenced UI primitives and sections (`apps/web/components/marketing/feature-card.tsx`, `testimonial-card.tsx`, `sections/faq.tsx`, `badges/BadgeNotification.tsx`, `leaderboard/ProfileComparisonModal.tsx`, `progress/ProgressSectionDropdown.tsx`, `feedback/error-state.tsx`, `feedback/success-state.tsx`, `ui/accordion.tsx`, `ui/badge.tsx`, `ui/card.tsx`, `ui/select.tsx`, `ui/toast.tsx`, `hooks/useXpAnimation.ts`, `emails/components/ProgressBar.tsx`).
-- **False-Positive Protection**: Preserved `NotificationBell.tsx` and `NotificationToast.tsx` (actively mounted in `apps/web/components/layout/Topbar.tsx`) and `SkillRadarDemoData` (actively imported in `config/content.ts`).
-- **Backend & Route Decommissioning**: Pruned `/api/dev/send-test-email`, `/api/admin/system/storage-cleanup`, `/api/cron/retry-failed`, disabled campaign runner (`portfolio-activation-runner.ts`), legacy `search.ts`, `animation.ts`, admin barrel export, and duplicate email template key `'system.weekly_recap'`.
-- **Workflow Synchronization**: Cleaned deprecated manual dispatch job `retry-failed-emails` from `.github/workflows/notification-scheduler.yml`.
-- **Database Schema & Types**: Added DDL migration `20261031000001_phase3_drop_unused_tables.sql` dropping 4 unused tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and function `sync_user_xp`. Synchronized `apps/web/types/database.ts` and updated queue processor and admin service queries to eliminate runtime queries to dropped tables.
-- **Dependency & Lockfile Parity**: Pruned 7 unused NPM packages from `apps/web/package.json` and synchronized `apps/web/package-lock.json` to ensure `npm ci` compliance.
-- **Removed Obsolete Scripts**: Pruned 6 one-off and broken test scripts (`postgrest-data-export.ts`, `benchmark-concurrency.ts`, `compare-v1-v2.ts`, `test-all-shapes.ts`, `xp-duplicates.ts`, `send-jolly-recovery-email.ts`).
-- **Verification**: Verified with 100% pass on all 305 test files (4,566 unit tests) and zero TypeScript compiler errors (`tsc --noEmit`).
+### Removed
+- **Waitlist**: the `/api/waitlist` route and its `proxy.ts` entries, the `waitlist_signup` analytics event and `trackWaitlistSignup()`, `buildWaitlistConfirmationEmail()` in `lib/email.ts`, and the waitlist types (`ROLE_OPTIONS`, `RoleOption`, `WaitlistFormValues`, `WaitlistPayload`). No UI posted to the route. The `public.waitlist` table is **not** dropped yet: the drop is held in `supabase/migrations/pending-approval/20261112000001_drop_waitlist_table.sql` (with rollback and validation) until the owner exports the rows.
+- **Retired flags** `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED`: defaults, types and admin toggles. Nothing read them at runtime. The stored values are cleaned by the held `pending-approval/20261112000002_remove_retired_notification_flags.sql`, which removes them from the `system_settings` `feature_flags` jsonb and from `notification_feature_flags`. Run it only after this code is deployed.
+- **Unused components**: `DashboardNotificationsWidget`, `BadgeShowcaseCard`, `CapstonesOverviewCard`, the marketing product-mockup previews (`lesson-card-preview`, `module-card-preview`, `xp-row-preview`) and the marketing sections `community` and `testimonials`. Tests and allowlists updated.
+- `lib/xp/duplicate-analysis.ts` and its test (the B8-D/B8-E work it supported is finished).
+- **knip sweep**: dead types in `types/index.ts` (`ApiSuccess`, `ApiError`, `QuizQuestion`, `FlashcardItem`, `LessonMeta`, `FeatureItem`, `TestimonialItem`; `CompiledLessonRef`, `CompiledFlashcard` and `CompiledGlossaryEntry` are now module-private); `EXPERIENCE_FEATURES`, `COMMUNITY_FEATURES`, `TESTIMONIALS` and `PORTFOLIO_ARTIFACTS` in `config/content.ts`; `LEVEL_TITLES` and `getTitleForXp` in `lib/xp/xp.ts`; the `BrandMarkProdigy` alias; unused imports in 7 production files; the dead `onCompare` prop and Compare button in `LeaderboardTable`, with the stale `ProfileComparisonModal` ESLint entry. Test allowlists tightened to match.
+- The retention rule for the dropped `user_notification_timeline` table, and the account-deletion entries for the dropped `bookmarks` and `user_notification_timeline` tables.
+
+### Added
+- `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql`: structure-only rollback for the Phase 3 drop. Rows are not restored, and `sync_user_xp` comes back `service_role`-only. Notes added to the `rollback/20261018000001_*` files, which still reference the dropped `sync_user_xp`.
+- [`ROADMAP.md`](ROADMAP.md) (remaining work), `tasks/antigravity/` (task files for that work), `.agents/` (rules and a verify skill), and a rewritten root `AGENTS.md` (it pointed at a `.tokencap/` folder that does not exist).
+
+### Changed
+- `@types/qrcode` moved to `devDependencies`. The lockfile also dropped a stale `optional` flag on `@emnapi/wasi-threads`.
+- Docs refreshed across `docs/`: Next.js 16.4.3, 70 top-level migrations, 304 tracked test files, FlexSearch claims replaced (search is a compiler-built JSON index served by `/api/search-index`), "Prodily PM Academy" renamed to "Prodily", and links into the deleted `docs/archive/` now cite the deleting commit. README quickstart is `npm ci --prefix apps/web`. `tasks/google-oauth-plan.md` marked implemented (flag off).
+
+## [PR #82: Supabase deploy fix] (2026-11-09)
+
+Commit `777c36a`, merged as `41ce885`.
+
+- `deploy-supabase` CI job: `supabase db push` now runs with `--include-all --linked --yes`, and the dry-run check with `--include-all --linked`.
+- `supabase/config.toml`: `[auth.email]` and `[auth.sms]` use `enabled` in place of the deprecated `enable_signup` key.
+
+## [Phase 3: dead-code pruning] (PR #79, merged 2026-11-09)
+
+Commits `f44293f` (audit doc), `35dfe84`, `306853e`, `ce95199`, `710c174`, `6876fb7` and `18e0e0b`; merged as `0b04fd0`. "Phase 3" here means the dead-code batches 3-A to 3-D in [`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md), not plan Phase 3 (PR-14 to PR-20, platform safety), which is mostly not started.
+
+- **Components** (`35dfe84`, `6876fb7`): removed `marketing/feature-card.tsx`, `marketing/testimonial-card.tsx`, `marketing/sections/faq.tsx`, `badges/BadgeNotification.tsx`, `leaderboard/ProfileComparisonModal.tsx`, `progress/ProgressSectionDropdown.tsx`, `feedback/error-state.tsx`, `feedback/success-state.tsx`, `ui/accordion.tsx`, `ui/badge.tsx`, `ui/card.tsx`, `ui/select.tsx`, `ui/toast.tsx`, `hooks/useXpAnimation.ts` and `emails/components/ProgressBar.tsx`. `NotificationBell.tsx` and `NotificationToast.tsx` were kept: they are mounted in `components/layout/Topbar.tsx`.
+- **Backend** (`306853e`, `6876fb7`): removed `/api/dev/send-test-email`, `/api/admin/system/storage-cleanup`, `lib/search.ts`, `lib/animation.ts`, the `lib/admin/index.ts` barrel, the disabled `lib/campaigns/portfolio-activation-runner.ts` (shrunk in `306853e`, deleted in `6876fb7`), and the duplicate `'system.weekly_recap'` email template key.
+- **Correction:** `/api/cron/retry-failed` was **kept**, and so was the manual `retry-failed-emails` job in `.github/workflows/notification-scheduler.yml`. The route is used by the cron heartbeat (`lib/monitoring/cron-heartbeat.ts`), the admin system service (`lib/admin/system-service.ts`) and that workflow job. An earlier version of this entry said both were removed. `/api/waitlist` was also kept in this PR; it was removed later on `chore/post-phase3-cleanup`.
+- **Database** (`ce95199`, `6876fb7`): migration `20261031000001_phase3_drop_unused_tables.sql` drops `weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline` and `sync_user_xp`. `types/database.ts`, the queue processor and the notifications admin service no longer touch them; permanent email failures stay in `email_queue` with status `'dead_letter'`. The migration shipped without a rollback file; one was added on `chore/post-phase3-cleanup`.
+- **Dependencies** (`710c174`, `18e0e0b`): **5** packages removed net (`bail`, `hermes-parser`, `lightningcss`, `mdn-data`, `@types/mdast`). `710c174` also removed `@emnapi/core` and `@emnapi/runtime`, but CI needs them, and `18e0e0b` restored both to `devDependencies`. An earlier version of this entry said 7.
+- **Scripts** (`710c174`): removed 5 tracked scripts (`scripts/backup/postgrest-data-export.ts`, `scripts/benchmark-concurrency.ts`, `scripts/compiler/tests/compare-v1-v2.ts`, `scripts/compiler/tests/test-all-shapes.ts`, `scripts/diagnostics/xp-duplicates.ts`) and the `test:parity` and `benchmark` npm scripts. `apps/web/scripts/send-jolly-recovery-email.ts` is gitignored and was never tracked, so no commit removes it.
+- **Types** (`6876fb7`): removed `MarketingModule` and `ParsedLesson` from `types/index.ts`.
+- Reported at the time: 305 test files and 4,566 tests passing, and a clean `tsc --noEmit`.
+
+## [Phase 2: trust and correctness] (PR #73, merged 2026-10-31)
+
+Commit `002fb0f` (plan PR-05 to PR-13), with CI follow-ups `df7cc94` and `20cd137`; merged as `a893dbf`.
+
+- Measurement foundation (PR-05): `quiz_submitted` and `lesson_completed` product events sent via `after()`, plus share, moderation, certificate and referral events, and `POST /api/portfolio/share`.
+- Server-side trust (SEC-07, SEC-08): client writes on `users` and capstones locked, session-free server paths, quiz attempts validated against lesson content and access. Atomic quiz-completion RPC (CQ-05).
+- Function region pinned to `bom1`, next to Supabase `ap-south-1` (PR-09).
+- Scheduled email (PR-11, ENG-01): cron heartbeats, ISO send-window logic, out-of-band alerts, and a pg_cron schedule held for the owner.
+- Scoped capstone draft autosave and fresh callbacks in the usage-time tracker (CQ-08, CQ-09).
+- The commit title covers PR-05 to PR-13; the message details only the items above, so PR-07, PR-08, PR-10 and PR-12 are judged done from the code, not from the commit message.
+- **Owner steps not done yet.** [`ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md) lists them in order: region check, Vault secrets, and the held SQL in [`supabase/migrations/pending-approval/`](../supabase/migrations/pending-approval/README.md) (`20261024000003` pg_cron schedule, `20261027000001` username CHECK, `20261027000002` lock `public.users`, `20261030000001` cron dead-man check, `admin_backfill_from_admin_emails.sql`).
+
+## [Phase 1: stop the bleeding] (PR #64, merged 2026-10-21)
+
+Commit `01d5915` (plan PR-01 to PR-04), with `af5bea5`, `ea3bb33` and the docs removal `f4343d3`; merged as `bd8981c`.
+
+- Database permissions locked down (PR-01; SEC-01, -02, -03, -05, -06, -22): migration `20261018000001` revokes the quiz-completion and `sync_user_xp` RPCs from `anon` and `authenticated`, drops the `public_profiles` view, removes the open `email_broadcasts` and `fellow_requests` policies and the learner testimonial insert policy, and pins `search_path`. Ships rollback, validation and read-only forensics scripts.
+- Admin access comes only from `users.is_admin` (SEC-04, SEC-17); `ADMIN_EMAILS` is no longer read. The console refuses self-demotion, demoting the last admin and deleting an admin. The owner backfill by UUID is held in `pending-approval/`.
+- Correctness (CQ-01, -02, -03, -31): the weekly summary covers only the 7-day window; suppression and preference read failures block non-critical sends; the portfolio-activation campaign is refused.
+- UX and SEO (UX-01, -02, SEO-02, -04): avatar falls back to the learner's initial, quiz and flashcard keyboard handling scoped, `robots.txt` fixed, `/glossary` redirects to `/frameworks`.
+- Google sign-in shipped behind `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED`, **off** by default (`af5bea5`).
 
 ## [B8-E — XP Event Uniqueness] — 2026-09-13
 
@@ -33,7 +81,7 @@ Migration `20260913000001_xp_event_uniqueness_b8e.sql` applied to production at 
 - Executed **direct-to-production by explicit approval, without a staging project**.
   Pre-migration backup: data-only PostgREST export (not a `pg_dump`).
 
-Execution record: [`archive/B8E_XP_UNIQUENESS_EXECUTION.md`](archive/B8E_XP_UNIQUENESS_EXECUTION.md).
+Execution record: `docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`, deleted in `1dbd2a4`. Read it with `git show 1dbd2a4^:docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`.
 
 ## [Repository Cleanup] — 2026-09-13
 
@@ -45,9 +93,10 @@ Deployed as `76bc600`. Housekeeping only — no application behaviour changed.
 - Renamed 11 test files from historical phase/batch labels to the behaviour they
   protect. No test was deleted; all 1536 still pass.
 - Retired `docs/audits/`. Thirteen completed audits, incident investigations and batch
-  records moved to [`archive/`](archive/) — retained as traceability, not guidance. The
-  B8-E investigation was promoted to [`PENDING_B8E_MIGRATION.md`](archive/B8E_XP_UNIQUENESS_EXECUTION.md)
-  because it documents a pending operation rather than history.
+  records moved to `docs/archive/`, kept as traceability, not guidance. `docs/archive/`
+  was later deleted in `1dbd2a4`; list it with `git show 1dbd2a4^:docs/archive/`. The
+  B8-E investigation was promoted to `PENDING_B8E_MIGRATION.md` (later
+  `docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`) because it documented a pending operation rather than history.
 - Corrected three dead-code claims that were wrong: `MarkdownRenderer` and `QuizOption`
   are live, and `lib/hooks/useUsageTimeTracker.ts` is a tested re-export shim.
 - **B8-E was held** in `supabase/migrations/pending-approval/` and not applied by this change. It was applied later the same day — see the B8-E entry above.
@@ -84,7 +133,7 @@ Architecture decisions: [`docs/decisions/`](decisions/). Requires migrations `20
 
 ## [Signup Abuse Incident Response] — 2026-09-07
 
-Full incident writeup: [`docs/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md).
+Full incident writeup: `docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`, deleted in `1dbd2a4`. Read it with `git show 1dbd2a4^:docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`.
 
 ### Fixed
 - **Signup rate limiting**: `/api/auth/signup` had zero throttling of any kind. Added persistent, cross-instance IP (5/15min) and canonical-email (3/24h, collapsing Gmail `+tag` aliases) rate limits.

@@ -10,7 +10,7 @@ Accepted
 
 Outbound email ran through two independent stacks that each decided which provider to use:
 
-- `apps/web/lib/email.ts` — direct transport used by the Supabase Auth hook, `/api/contact`, `/api/waitlist`, admin test send, and the local campaign scripts.
+- `apps/web/lib/email.ts`: direct transport used by the Supabase Auth hook, `/api/contact`, admin test send, and the local campaign scripts (also `/api/waitlist` until that route was removed on 2026-11-12).
 - `apps/web/lib/notifications/providers/` — a `ProviderRegistry` used by `processEmailQueue()`.
 
 Two defects followed from that split:

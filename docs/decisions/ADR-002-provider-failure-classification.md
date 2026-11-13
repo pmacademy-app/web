@@ -7,7 +7,7 @@ Accepted
 2026-09-07
 
 ## Supersedes
-The failover policy added on 2026-09-07 during the signup-abuse remediation, which is described in [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](../archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md).
+The failover policy added on 2026-09-07 during the signup-abuse remediation, which is described in `docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md` (deleted in `1dbd2a4`; read it with `git show 1dbd2a4^:docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`).
 
 ## Context
 

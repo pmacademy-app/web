@@ -1,6 +1,6 @@
-# Prodily PM Academy — Developer Handbook
+# Prodily Developer Handbook
 
-Welcome to the **Prodily PM Academy** workspace (**Prodily** is the brand, **PM Academy** is the flagship product). This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, testing, and deployment workflows.
+Welcome to the **Prodily** workspace. This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, testing, and deployment workflows.
 
 Built by [Aditya Gangwani](https://adityagangwani.me/hire)
 
@@ -8,11 +8,11 @@ Built by [Aditya Gangwani](https://adityagangwani.me/hire)
 
 ## 1. Project Overview & Scope
 
-**Prodily PM Academy** is a 100% free, interactive, gamified learning platform for product managers. It features a curated **90-lesson curriculum** divided into **9 modules × 10 lessons each**, interactive quizzes, spaced repetition (SM-2) flashcards, capstone projects, verified certificates, and public learner portfolios.
+**Prodily** is a 100% free, interactive, gamified learning platform for product managers. It features a curated **90-lesson curriculum** divided into **9 modules × 10 lessons each**, interactive quizzes, spaced repetition (SM-2) flashcards, capstone projects, verified certificates, and public learner portfolios.
 
 ### Branding Architecture
-The platform ships under the **Prodily** brand with **PM Academy** as the product name (`Prodily PM Academy` formally).
-- **Brand System**: Primary green (`#019E75`) and dark navy (`#011229`), defined in `apps/web/lib/brand.ts` and `apps/web/theme/tokens.ts`.
+The platform ships under the single name **Prodily**. The earlier "PM Academy" product name was dropped from titles, legal text and site name (commits 283cfe9 and 4decabe).
+- **Brand System**: Primary green (`#1F6B4E`), background (`#FBFAF6`), foreground (`#171A17`) and accent (`#D98B24`), defined in `apps/web/theme/tokens.ts` and re-exported by `apps/web/lib/brand.ts`. CI fails the build if these hex values are hardcoded elsewhere.
 - **Logo Hierarchy**: `BrandLogo.tsx` provides `animated-full` (hero marketing), `full` (headers/certificates), and `icon` (collapsed/mobile).
 - **Design Tokens**: Glassmorphic theme system with zero hardcoded ad-hoc styles.
 
@@ -41,10 +41,10 @@ prodily-monorepo/
 │       │   └── verify/[id]/    # Public certificate verification
 │       ├── blocks/             # Custom lesson block components
 │       ├── components/         # Reusable UI components (Admin, Layout, Feedback, Auth)
-│       ├── e2e/                # Playwright E2E browser tests (auth lifecycle)
+│       ├── e2e/                # Playwright E2E browser tests (6 specs: auth, flows)
 │       ├── emails/             # React Email templates & rendering components
 │       ├── lib/                # Core business services, Supabase client, aggregations
-│       │   └── __tests__/      # Vitest unit and integration test files (118 test suites)
+│       │   └── __tests__/      # Vitest unit and integration test files (273 files, 2026-11-12)
 │       ├── theme/              # Central design tokens (theme/tokens.ts)
 │       ├── types/              # TypeScript types & database.ts (auto-generated schema)
 │       ├── proxy.ts            # Next.js 16 request interceptor / auth routing proxy
@@ -56,7 +56,7 @@ prodily-monorepo/
 ├── docs/                       # Canonical system documentation
 │   ├── INDEX.md                # Documentation reading map & index
 │   ├── ARCHITECTURE.md         # System architecture & known debt
-│   ├── DATABASE.md             # PostgreSQL schema & 46 versioned migrations
+│   ├── DATABASE.md             # PostgreSQL schema & versioned migrations
 │   ├── TESTING.md              # Testing framework & suite inventory
 │   ├── LEADERBOARD.md          # Leaderboard, cohorts, friend accountability
 │   └── ...                     # Subsystem-specific specifications
@@ -64,7 +64,8 @@ prodily-monorepo/
 │   ├── brand/                  # Brand asset generation scripts
 │   └── compiler/               # Markdown table parser, Mermaid SVG compiler, search builder
 └── supabase/
-    └── migrations/             # 46 timestamped PostgreSQL SQL migrations
+    └── migrations/             # 70 top-level SQL migrations (2026-11-12), auto-applied on merge
+                                #   to main; rollback/, validation/, pending-approval/ are not
 ```
 
 ---
@@ -73,17 +74,17 @@ prodily-monorepo/
 
 | Layer | Technology | Version / Notes |
 |---|---|---|
-| **Framework** | Next.js App Router | `16.2.12` (Turbopack engine) |
+| **Framework** | Next.js App Router | `16.4.3` (Turbopack engine) |
 | **Language** | TypeScript | `^5.x` (Strict mode) |
 | **UI Library** | React | `19.2.4` |
 | **Styling** | Tailwind CSS v4 + CSS design tokens | Centralized design system, light/dark theming |
 | **Charts (Admin)**| Recharts | `^3.x` (MIT, free) |
-| **Database** | Supabase PostgreSQL | 46 versioned migrations |
+| **Database** | Supabase PostgreSQL | 70 top-level versioned migrations (2026-11-12) |
 | **Authentication** | Supabase Auth | Email/password + PKCE, custom cookie session bridge |
 | **Transactional Email**| Brevo (primary) + Resend (fallback), via Supabase Auth Hook | Both called via raw `fetch`, no SDK dependency |
-| **Search Engine** | FlexSearch | Pre-indexed JSON at build time |
-| **Unit Testing** | Vitest | 118 test files in `apps/web/lib/__tests__/` (1256 tests) |
-| **E2E Testing** | Playwright | 3 auth-lifecycle specs in `apps/web/e2e/auth/` |
+| **Search** | Compiler-built JSON index (no search library) | `content/dist/search-index.json`, served by `/api/search-index` and scored client-side |
+| **Unit Testing** | Vitest | 304 tracked test files (273 in `apps/web/lib/__tests__/`, 31 in `apps/web/components/__tests__/`) |
+| **E2E Testing** | Playwright | 6 specs in `apps/web/e2e/` |
 | **Hosting** | Vercel Serverless | Configured at `apps/web/` root |
 
 ---
@@ -161,9 +162,10 @@ The Admin Console has 19 route folders; several are thin redirects into a unifie
 ## 6. Local Setup & Quickstart
 
 ### Step 1: Install Dependencies
-From the repository root:
+The root `package.json` has no dependencies; its scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `content:build`) only proxy into `apps/web` with `npm --prefix apps/web`. Install the app's dependencies from the repository root:
 ```bash
-npm install
+npm ci --prefix apps/web
+# or: cd apps/web && npm ci
 ```
 
 ### Step 2: Configure Environment
@@ -203,37 +205,41 @@ The content compiler (`scripts/compiler/compile.ts`) runs at build time:
 All automated tests are executed from `apps/web/`:
 
 ```bash
-# Run all 100 unit and integration test suites via Vitest
-npm test                    # alias: npx vitest run
+# Run one focused Vitest file (preferred locally)
+npx vitest run lib/__tests__/<file>.test.ts
 
-# Run tests in watch mode
-npm run test:watch
-
-# Run Playwright E2E browser tests
-npx playwright test
-
-# Run ESLint linting
-npm run lint
+# Run a focused domain script (test:rls, test:admin, test:auth, test:a11y, and the other test:* scripts)
+npm run test:rls
 
 # Run TypeScript type check
 npm run typecheck
 
-# Run full production build (content compilation + Next.js build)
+# Run ESLint linting
+npm run lint
+
+# Run Playwright E2E browser tests
+npm run test:e2e
+
+# Full Vitest suite and full production build (content:build + next build).
+# Both tend to time out locally; CI runs them on every PR to main.
+npm test
 npm run build
 ```
+
+There is no `test:watch` script; use `npx vitest` for watch mode.
 
 ---
 
 ## 9. Schedulers & Background Jobs
 
 Background jobs and queue processing are managed by GitHub Actions:
-- **`ci.yml`**: Runs lint, type check, unit tests, content compile, Next.js build, Playwright E2E, and (on push to `main`) a Supabase migration deploy job.
+- **`ci.yml`**: Runs content build, lint, type check, unit tests, the a11y gate, the brand check, Next.js build, gated Playwright E2E (always on `main`, on PRs only when auth-relevant paths change), a dependency audit and gitleaks scan, and (on push to `main`) a Supabase migration deploy job. See [`docs/TESTING.md`](docs/TESTING.md).
 - **`notification-scheduler.yml`**: Scheduled runner for:
   - Email queue processing (`/api/cron/process-email-queue`, every 5 min) & scheduled broadcast execution (`/api/cron/process-broadcasts`, every 5 min)
   - Failed email retries (`/api/cron/retry-failed`, hourly)
   - Daily reminder emails (`/api/cron/daily-reminder`)
   - Weekly recap distribution (`/api/cron/weekly-recap`)
-  - `/api/cron/cleanup` is scheduled but currently a no-op placeholder (returns `{ cleanedRows: 0 }`, performs no cleanup)
+  - Retention cleanup (`/api/cron/cleanup`): report-only by default; it deletes only when the caller sends `dryRun: false` and the environment sets `RETENTION_DELETE_ENABLED=true`
 
 ---
 
@@ -247,8 +253,8 @@ All system documentation lives directly under `docs/`:
 | [`docs/HARDENING_LEDGER.md`](docs/HARDENING_LEDGER.md) | Production-hardening implementation status: what is built, what remains, next batch |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | High-level system architecture & technical invariants |
 | [`docs/ADMIN_PANEL.md`](docs/ADMIN_PANEL.md) | Comprehensive Admin Console guide (workspaces, APIs, security) |
-| [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL schema, 46 migration files, table definitions |
-| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory (118 files, 1256 tests) & Playwright E2E |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL schema, migrations, table definitions |
+| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory, CI gates & Playwright E2E |
 | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | Auth flows, session bridge, signup + email-change verification lifecycle |
 | [`docs/EMAIL_SYSTEM.md`](docs/EMAIL_SYSTEM.md) | Supabase Auth Send Email Hook, email queue, dual Brevo/Resend delivery |
 | [`docs/CRON_AND_SCHEDULING.md`](docs/CRON_AND_SCHEDULING.md) | GitHub Actions workflows & cron endpoints |

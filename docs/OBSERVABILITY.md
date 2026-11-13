@@ -1,4 +1,4 @@
-# Observability & Metric Telemetry Specification — Prodily PM Academy
+# Observability & Metric Telemetry Specification (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 8, 2026  

@@ -454,17 +454,17 @@ describe('Incident 2026-09-09 — governed email gateway', () => {
     expect(sends).toHaveLength(1)
   })
 
-  it('the global non-critical pause DOES block a waitlist confirmation', async () => {
+  it('the global non-critical pause DOES block a contact acknowledgement', async () => {
     const { sends } = setupGateway({ globalPause: true })
     const { sendGovernedEmail } = await import('../email-governance')
 
     const result = await sendGovernedEmail({
-      purpose: 'waitlist.confirmation',
+      purpose: 'contact.acknowledgement',
       to: 'someone@example.com',
-      subject: 'w',
-      html: '<p>w</p>',
-      text: 'w',
-      idempotencyKey: 'waitlist:someone@example.com',
+      subject: 'c',
+      html: '<p>c</p>',
+      text: 'c',
+      idempotencyKey: 'contact:someone@example.com',
     })
 
     expect(result.sent).toBe(false)
@@ -642,12 +642,12 @@ describe('Incident 2026-09-09 — governed email gateway', () => {
       const { sends } = setupGateway({ suppressed: true })
       const { sendGovernedEmail } = await import('../email-governance')
       const result = await sendGovernedEmail({
-        purpose: 'waitlist.confirmation',
+        purpose: 'contact.acknowledgement',
         to: 'bounced@example.com',
-        subject: 'w',
-        html: '<p>w</p>',
-        text: 'w',
-        idempotencyKey: 'waitlist:bounced@example.com',
+        subject: 'c',
+        html: '<p>c</p>',
+        text: 'c',
+        idempotencyKey: 'contact:bounced@example.com',
       })
       expect(result.blocked).toBe('suppressed')
       expect(sends).toHaveLength(0)

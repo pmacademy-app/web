@@ -65,6 +65,43 @@ Revokes learner writes to `public.users` through PostgREST. Apply only **after**
 stops writing `public.users` with a learner session is deployed, then confirm a learner-token
 `PATCH /rest/v1/users` is refused. Steps in the runbook, step (g).
 
+Post-Phase 3 cleanup (branch `chore/post-phase3-cleanup`). Both are owner-run in the SQL editor,
+in this order, and only after that branch is deployed. They are independent, so either can be
+skipped or delayed.
+
+### 1. `20261112000001_drop_waitlist_table.sql`
+
+Drops `public.waitlist`. The `/api/waitlist` route was removed on the branch and no UI posted to
+it. **Destructive: export the rows first.** They are personal data (names and emails), so keep the
+export outside the repository and never commit it.
+
+1. Deploy the branch, so nothing can insert any more.
+2. Export: `SELECT * FROM public.waitlist ORDER BY created_at;` and download the result as CSV.
+   Note `SELECT count(*) FROM public.waitlist;` to check the export against it. Do not paste the
+   exported rows into chat, tickets or AI agents. The CSV lands on local disk: delete it when
+   done (it is the only copy of the rows, so keep it until you are sure no rollback is needed).
+3. Run the migration in the SQL editor.
+4. Run `validation/20261112000001_drop_waitlist_table_validation.sql` (read-only).
+
+Undo: `rollback/20261112000001_drop_waitlist_table.down.sql` re-creates the empty table with its
+RLS policies and comment. It does not restore rows; re-import the CSV for that.
+
+### 2. `20261112000002_remove_retired_notification_flags.sql`
+
+Removes `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED`, which nothing read at run time,
+from the live flag store (the `feature_flags` row of `public.system_settings`) and from the unused
+`public.notification_feature_flags` table. Apply only after the branch is deployed: older code
+writes both keys back whenever an admin toggles any flag.
+
+1. Optional: note the current values (query in the migration header). They are not kept.
+2. Run the migration in the SQL editor.
+3. Run `validation/20261112000002_remove_retired_notification_flags_validation.sql` (read-only).
+4. After applying, redeploy (or restart) all instances, then re-run the validation after the next
+   admin flag toggle.
+
+Undo: `rollback/20261112000002_remove_retired_notification_flags.down.sql` puts both keys back as
+`true`. The previous values cannot be recovered.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are
@@ -111,8 +148,10 @@ admin access from the admin console (`/admin/users`, role toggle).
 approved and **applied to production on 2026-09-13 at 18:15:34Z**. It now lives in
 `supabase/migrations/` as part of the applied history.
 
-Execution record, including preflight numbers and the full post-migration
-reconciliation: [`docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`](../../../docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md).
+Its execution record (preflight numbers and the full post-migration reconciliation) was
+`docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`. That file was removed from the repository in
+commit `1dbd2a4` (2026-09-18). Read it from history with
+`git show 1dbd2a4^:docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`.
 
 ## Holding a migration
 

@@ -180,9 +180,20 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       expect(res.status).not.toBe(503)
     })
 
-    it('8. Exempt APIs (/api/auth/login, /api/waitlist) bypass maintenance mode', async () => {
+    it('8. Exempt auth API (/api/auth/login) bypasses maintenance mode', async () => {
       mockSettings.maintenanceMode = true
-      const req = new NextRequest('https://prodily.app/api/waitlist', { method: 'POST' })
+      const req = new NextRequest('https://prodily.app/api/auth/login', { method: 'POST' })
+      const res = await proxy(req)
+      expect(res.status).not.toBe(503)
+    })
+
+    it('8b. Exempt contact API (/api/contact, exact match) bypasses maintenance mode', async () => {
+      mockSettings.maintenanceMode = true
+      const req = new NextRequest('https://prodily.app/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: 'Jane', email: 'jane@example.com', message: 'Hello' }),
+      })
       const res = await proxy(req)
       expect(res.status).not.toBe(503)
     })

@@ -1,4 +1,4 @@
-# Design System & Visual Identity — Prodily PM Academy
+# Design System & Visual Identity (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026  

@@ -5,7 +5,7 @@ import { MODULE_META_LIST, formatModuleHours } from '@/lib/curriculum/module-met
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getCourseSchema } from '@/lib/schema'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
-import { ArrowRight, BookOpen, Clock, Layers, Sparkles } from 'lucide-react'
+import { ArrowRight, BookOpen, Clock, Layers } from 'lucide-react'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl

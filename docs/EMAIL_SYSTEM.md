@@ -1,7 +1,7 @@
-# Email Infrastructure & Delivery Pipeline — Prodily PM Academy
+# Email Infrastructure & Delivery Pipeline: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 / React Email / dual Brevo+Resend delivery  
+**Framework:** Next.js 16.4.3 / React Email / dual Brevo+Resend delivery  
 **Last Updated:** September 8, 2026  
 
 ---
@@ -66,7 +66,7 @@ There is **no hourly enforcement** anywhere in the pipeline. The `hourlySendLimi
 
 ### Dead Letters & Bounce Suppression
 
-- Items that exhaust `max_attempts` move to `dead_letter` and are copied into `email_dead_letter` **with** their `user_id`, `template_key` and template variables, so an operator can tell who was affected. Those variables are redacted before storage — see [ADR-005](decisions/ADR-005-sensitive-data-redaction.md).
+- Items that exhaust `max_attempts`, or fail permanently, stay in `email_queue` with `status = 'dead_letter'`, plus `error_message`, `failed_at`, `provider` and `provider_attempts` (`handlePermanentFailure()` in `lib/notifications/queue/processor.ts`). The row keeps its `user_id`, `template_key` and `template_variables`, so an operator can tell who was affected and requeue it from the admin email queue. A `queue.dead_letter` incident is logged to `system_errors` with redacted details; see [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). The separate `email_dead_letter` table was dropped by `20261031000001_phase3_drop_unused_tables.sql`. The retention policy keeps dead-letter queue rows for 90 days (`lib/retention/policy.ts`); `/api/cron/cleanup` only deletes them once `RETENTION_DELETE_ENABLED=true`.
 - `email.bounced` webhooks now add the recipient to `email_suppressions` with reason `hard_bounce`, alongside the existing `spam_complaint` suppression on `email.complained`. This is what stops the admin retry actions from re-sending to an address that already hard-bounced.
 - Admin retry actions (`retry-all`, `retry-selected`, single retry) clear `next_retry_at` and `processing_at` when requeueing. Without that the row stayed unclaimable by `claim_email_queue_items()` for the remainder of its backoff while the UI reported it as requeued.
 

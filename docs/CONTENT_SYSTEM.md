@@ -1,7 +1,7 @@
-# Content Compilation & Rendering Pipeline — Prodily PM Academy
+# Content Compilation & Rendering Pipeline (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Last Updated:** September 6, 2026  
+**Last Updated:** November 12, 2026  
 
 ---
 
@@ -26,7 +26,7 @@ The compiler script (`scripts/compiler/compile.ts`) executes at build time:
    - Replaces Mermaid code blocks in Markdown with static inline SVG elements.
 3. **Cross-Lesson Validations**: Verifies stable `lessonId` uniqueness, quiz answer option counts (4 per quiz), and link references.
 4. **Curriculum Index Aggregation**: Emits `content/dist/curriculum.json` containing total counts, module structures, and lesson sequences.
-5. **FlexSearch Search Index Generation**: Pre-builds FlexSearch index JSON at `content/dist/search-index.json` for client-side search.
+5. **Search Index Generation**: Writes a plain JSON array of search documents (lessons, glossary terms, quiz questions, flashcards) to `content/dist/search-index.json`. No search library is involved: `GET /api/search-index` serves the file (cached for an hour) and `components/search/SearchOverlay.tsx` scores matches client-side. The FlexSearch package was removed in September 2026.
 
 ---
 
@@ -38,7 +38,7 @@ The compiler script (`scripts/compiler/compile.ts`) executes at build time:
 | **Compiler Engine** | `scripts/compiler/compile.ts` | 🟢 Verified in Production |
 | **Build-Time Mermaid SVG Engine** | `scripts/compiler/mermaid-svg.ts` | 🟢 Verified in Production |
 | **Static JSON Output** | `content/dist/lessons/` | 🟢 Verified in Production |
-| **FlexSearch Pre-Indexed Search** | `content/dist/search-index.json` | 🟢 Verified in Production |
+| **Compiled JSON Search Index** | `content/dist/search-index.json`, served by `/api/search-index` | 🟢 Verified in Production |
 
 ---
 

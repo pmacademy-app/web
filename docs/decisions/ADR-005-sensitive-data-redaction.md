@@ -25,9 +25,11 @@ One implementation in `apps/web/lib/monitoring/redaction.ts`, applying **two ind
 
 2. **By key name** — for structured payloads. A token in an unanticipated format (an opaque string with no recognisable prefix) survives the regexes but is caught because of where it sits in the object. An explicit allowlist protects the fields operators triage by (`templateKey`, `authAction`, `statusCode`, `errorId`, `queueId`, `maskedEmail`), which a naive `/key/i` deny-list would have stripped.
 
-Applied at three boundaries: `logErrorReport()` / `logSystemError()` message and details; the `email_dead_letter` and `notification_events` writes in the queue processor; and `apiError()`'s outgoing user-facing message.
+Applied at three boundaries: `logErrorReport()` / `logSystemError()` message and details; the `notification_events` writes in the queue processor (and, until the table was dropped, the `email_dead_letter` write); and `apiError()`'s outgoing user-facing message.
 
 **Emails are masked, not dropped.** `j***e@corp-mail.co.uk` keeps the recipient domain, which is what identifies a failing destination.
+
+**Update 2026-11-12.** The `email_dead_letter` table was dropped by `20261031000001_phase3_drop_unused_tables.sql` (dead-code Batch 3-C), so `handlePermanentFailure()` no longer copies template variables anywhere. A permanently failed email now stays in `email_queue` with `status = 'dead_letter'`, and the `queue.dead_letter` incident in `system_errors` carries redacted details only. The queue row itself keeps the `template_variables` it was enqueued with, unredacted, because a requeue needs them; for a dead-lettered auth email that includes the one-time link until the retention sweep removes the row: 90 days for dead letters (`lib/retention/policy.ts`), and only once deletion is switched on with `RETENTION_DELETE_ENABLED=true`, since `/api/cron/cleanup` is report-only by default. The Context above describes the state on 2026-09-08.
 
 ## Alternatives Considered
 

@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-The Moderation Workspace is the centralized review center for all learner-submitted content across Prodily PM Academy: student testimonials, product feedback, module capstone deliverables, and public portfolio verifications.
+The Moderation Workspace is the centralized review center for all learner-submitted content across Prodily: student testimonials, product feedback, module capstone deliverables, and public portfolio verifications.
 
 ---
 
@@ -51,7 +51,7 @@ A second, newer path to the same `is_fellow` designation: learners who reach ful
 
 ## 4. System Effects
 
-- **Marketing Page Sync:** Publishing a testimonial automatically updates the landing page testimonials carousel.
+- **Marketing Page Sync:** Published testimonials feed the homepage `PublishedTestimonialsSection` (`components/marketing/sections/published-testimonials.tsx`) and `/reviews`. The homepage section renders only once at least three approved rows exist, and it refreshes on the page cache window (hourly at most), not instantly. The older `testimonials.tsx` carousel section was deleted.
 - **Portfolio Showcase:** Marking a capstone as public permits the learner to pin it as a featured case study on their public portfolio.
 - **Fellow Requests:** Approving/rejecting a request also sends the learner an in-app notification (the legacy Portfolio Verification queue does not).
 - **Audit Logging:** All moderation decisions (approve, publish, reject, toggle) are permanently recorded in `public.admin_audit_logs`.

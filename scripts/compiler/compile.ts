@@ -861,7 +861,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
   fs.writeFileSync(path.join(DIST_DIR, 'glossary-index.json'), JSON.stringify(glossaryIndex, null, 2), 'utf-8');
 
   // 4. Generate search-index.json
-  console.log('🔎 Generating FlexSearch-friendly search index...');
+  console.log('🔎 Generating search index JSON...');
   const searchDocs: any[] = [];
   
   compiledLessons.forEach((l) => {

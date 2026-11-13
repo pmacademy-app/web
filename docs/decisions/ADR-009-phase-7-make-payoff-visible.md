@@ -11,7 +11,7 @@ Capstones are Prodily's strongest differentiator against free PM content — nin
 
 ### Source-document divergence (important)
 
-The two source docs disagreed on Phase 7's scope, and this ADR records how it was resolved. (Both source files — the implementation plan and the product-improvement blueprint — were retired on 2026-10-01; their durable content now lives in [`../PHASE_HISTORY.md`](../PHASE_HISTORY.md). The quotes below are preserved verbatim as the record of the divergence.)
+The two source docs disagreed on Phase 7's scope, and this ADR records how it was resolved. (Both source files, the implementation plan and the product-improvement blueprint, were retired on 2026-10-01. Their durable content moved to `docs/PHASE_HISTORY.md`, which was itself deleted in `f4343d3`; read it with `git show f4343d3^:docs/PHASE_HISTORY.md`. The quotes below are preserved verbatim as the record of the divergence.)
 
 - **The implementation plan (authoritative), Phase 7** listed: 7.1 surface the capstone, 7.2 **review SLA**, 7.3 removals (`dueCount`, dead nav), 7.4 fix the feedback instrument. Its Definition-of-Done said *"submission gating unchanged (still 8 of 10)."* It contained **no** threshold experiment.
 - **The blueprint, §7.2 ("Reconsider the 8-of-10 threshold")** explicitly called for an experiment: *"Test a lower threshold (e.g. 4 lessons) for one module with a cohort."*

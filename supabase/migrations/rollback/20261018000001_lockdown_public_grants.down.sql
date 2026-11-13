@@ -22,6 +22,11 @@
 -- The search_path pins on sync_user_xp, update_user_xp_and_level and
 -- sync_user_xp_and_level_on_update are kept: they are safe on their own.
 --
+-- Later change: 20261031000001_phase3_drop_unused_tables.sql dropped public.sync_user_xp(uuid).
+-- Every mention of it in this file and in rollback/20261018000001_reopen_holes.down.sql applies
+-- only if rollback/20261031000001_phase3_drop_unused_tables.down.sql has run first to re-create
+-- it. The statements below do not reference sync_user_xp, so this file runs either way.
+--
 -- No data is touched. Re-runnable.
 
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT EXECUTE ON FUNCTIONS TO PUBLIC;

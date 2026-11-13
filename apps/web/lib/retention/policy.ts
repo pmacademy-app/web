@@ -130,15 +130,6 @@ export const RETENTION_RULES: readonly RetentionRule[] = [
     supportsHold: true,
   },
   {
-    id: 'user_notification_timeline',
-    table: 'user_notification_timeline',
-    timestampColumn: 'created_at',
-    idColumn: 'id',
-    days: 30,
-    reason: 'L-11: operational telemetry 30d',
-    supportsHold: true,
-  },
-  {
     id: 'rate_limits',
     table: 'rate_limits',
     timestampColumn: 'last_requested_at',

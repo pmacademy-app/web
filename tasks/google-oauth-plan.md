@@ -1,7 +1,7 @@
 # Google sign-in / sign-up: plan
 
 Branch: `fix/phase1-stop-the-bleeding` (implement here, in a separate session).
-Status: PLAN ONLY, nothing implemented.
+Status: Implemented, flag off (NEXT_PUBLIC_GOOGLE_AUTH_ENABLED). Landed in commit af5bea5; the flag check lives in `apps/web/lib/auth/google-auth.ts`. The plan below is kept as the design record.
 
 ## Owner decisions (2026-10-20)
 - Same verified email across password and Google: **merge** into one account (Supabase default auto-link).

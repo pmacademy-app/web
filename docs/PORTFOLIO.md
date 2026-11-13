@@ -1,7 +1,7 @@
-# Learner Portfolio, Verification & Credibility Architecture — Prodily PM Academy
+# Learner Portfolio, Verification & Credibility Architecture (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 App Router / React 19 / Supabase PostgreSQL  
+**Framework:** Next.js 16.4.3 App Router / React 19 / Supabase PostgreSQL  
 **Last Updated:** September 6, 2026  
 
 > This document covers two genuinely separate credibility signals that happen to share similar names: **PM Fellow** (`is_fellow`, manually admin-granted — see §4 and [`docs/admin/fellow-designation.md`](admin/fellow-designation.md)) and **Automatic Portfolio Verification** (`isPortfolioVerified`, criteria-based and admin-overridable — see §4a and [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md)). A portfolio can have either, both, or neither.
