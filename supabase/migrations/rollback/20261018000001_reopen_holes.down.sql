@@ -24,6 +24,8 @@
 -- 20260826000003:62-66; 20260905000001:47-51; 20260809000000:20-23.
 
 -- SEC-01: RPCs callable by learners
+-- NOTE: 20261031000001_phase3_drop_unused_tables.sql dropped public.sync_user_xp(uuid). The next
+-- line only works if rollback/20261031000001_phase3_drop_unused_tables.down.sql has run first.
 -- GRANT EXECUTE ON FUNCTION public.sync_user_xp(uuid) TO authenticated;
 -- GRANT EXECUTE ON FUNCTION public.record_lesson_quiz_completion(uuid, text, int, int, int, jsonb, int, int) TO authenticated;
 
