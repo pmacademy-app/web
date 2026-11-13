@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { reportClientError } from '@/lib/monitoring/client-error-beacon'
+
 /**
  * Root segment error boundary. It renders *inside* the root layout, so it must
  * not emit its own document shell — a nested html/body pair breaks
@@ -20,6 +22,7 @@ export default function RootSegmentError({
 }) {
   useEffect(() => {
     console.error('[RootSegmentError Boundary] Logged:', error)
+    reportClientError(error, 'root')
   }, [error])
 
   return (

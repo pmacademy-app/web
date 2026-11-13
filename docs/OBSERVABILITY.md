@@ -76,7 +76,32 @@ A key observability distinction exists between upstream provider usage and inter
 
 ---
 
-## 4. Related Decisions
+## 4. Request errors, client crashes and route timing (ENG-11)
+
+Three signals, all free and all in logs or tables you already have. Nothing here needs a paid service.
+
+### Server errors outside `withRoute`
+- **Source:** `apps/web/instrumentation.ts`, `onRequestError`. Next.js calls it for errors in Server Components, Server Actions, route handlers and the proxy. Errors inside `withRoute` are already recorded by the wrapper and answered with a 500, so they do not arrive here twice.
+- **Recorded:** one `system_errors` row via `logErrorReport` (domain `api`, kind `unexpected`, operation `next.<routeType>`, summary `Unhandled <routeType> error in <routePath>`). `details` holds the method, the path without its query string, the route file pattern, the route type, the digest, the error name, the redacted message (first 500 characters) and the request id when the caller sent a well-formed `x-request-id`.
+- **Never recorded:** request bodies, the query string, cookies, the Authorization header or any other header.
+- **Skipped:** `redirect()`, `notFound()` and other Next.js control-flow errors.
+- **Where to look:** admin console, System errors, filtered by operation `next.render`, `next.action`, `next.route` or `next.proxy`. Match a learner's "Error ID" (the digest) against `details.digest`.
+
+### Client-side crashes
+- **Source:** `apps/web/lib/monitoring/client-error-beacon.ts`, called from the four error boundaries (`app/error.tsx`, `app/global-error.tsx`, `app/(app)/error.tsx`, `app/admin/(console)/error.tsx`). It posts `{ message, digest, path, boundary }` with `navigator.sendBeacon`, or `fetch` with `keepalive` as a fallback. The message is cut to 500 characters, the path loses its query and hash, and one page load sends at most 5 reports.
+- **Endpoint:** `POST /api/client-errors` (`apps/web/app/api/client-errors/route.ts`). Anonymous, on `withRoute`, 10 reports per IP per minute, body capped at 2048 bytes (413 above it), strict zod schema (400 on anything else), 204 on success. The proxy skips session checks for it so the maintenance and consent gates cannot drop reports.
+- **Recorded:** one `system_errors` row via `logSystemError` at `warning` severity, operation `client.error_boundary`, with the boundary, path, digest and message in `details`. Warnings do not page admins.
+- **Where to look:** admin console, System errors, operation `client.error_boundary`.
+
+### Route timing
+- **Source:** `withRoute` in `apps/web/lib/api/with-route.ts`.
+- **Recorded:** one structured log line per API request, event `route.timing`, with `operation`, `method`, `status`, `ms` and `requestId`. Refusals (401, 400, 429) are timed too. Requests at or above 3000 ms log at `warn` with `slow: true`; the rest log at `info`. `health.check` is not timed, so uptime probes do not flood the log.
+- **Not persisted:** these lines go to the platform log only (`lib/monitoring/log.ts`), never to a table.
+- **Where to look:** Vercel project, Logs. Search `route.timing` and filter on `operation`, or `"slow":true` for the slow ones.
+
+---
+
+## 5. Related Decisions
 
 - [ADR-004: Structured error taxonomy with derived severity](decisions/ADR-004-structured-error-taxonomy.md)
 - [ADR-003: Database-backed feature-flag control plane](decisions/ADR-003-db-backed-configuration-control-plane.md)

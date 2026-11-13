@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 
+import { reportClientError } from '@/lib/monitoring/client-error-beacon'
+
 /**
  * Admin console error boundary. Uses `unstable_retry` (Next.js 16.2) to
  * re-fetch and re-render the failed segment.
@@ -17,8 +19,8 @@ export default function AdminConsoleError({
   unstable_retry?: () => void
 }) {
   useEffect(() => {
-    // Log to the configured error reporting service.
     console.error(error)
+    reportClientError(error, 'admin')
   }, [error])
 
   const handleRetry = () => {

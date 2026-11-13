@@ -200,7 +200,11 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path.startsWith('/api/admin/') ||
     path.startsWith('/api/cron/') ||
     path.startsWith('/api/email/') ||
-    path === '/api/contact'
+    path === '/api/contact' ||
+    // ENG-11: the error-boundary beacon. It reads no session, so verifying one here
+    // would cost an auth call per crash report, and the maintenance and consent gates
+    // would drop the very reports that explain an outage.
+    path === '/api/client-errors'
   const isProtectedLearnerApi = isApiRoute && !isExemptApi
 
   // CQ-10: admin console APIs stay exempt from the learner gates above (maintenance mode,

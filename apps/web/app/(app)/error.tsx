@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, RotateCcw, Home } from 'lucide-react'
 
+import { reportClientError } from '@/lib/monitoring/client-error-beacon'
+
 export default function AppError({
   error,
   reset,
@@ -12,8 +14,8 @@ export default function AppError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to an analytics or reporting service
     console.error('[AppError Boundary] Logged:', error)
+    reportClientError(error, 'app')
   }, [error])
 
   return (

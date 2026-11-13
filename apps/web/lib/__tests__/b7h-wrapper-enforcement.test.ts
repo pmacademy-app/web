@@ -204,9 +204,10 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // (The 135 above was never applied to the assertion: Phase 3 pruning removed two
   // routes in PR #79, which kept the count at 133.)
   // 132 since the post-Phase 3 cleanup removed `waitlist/route.ts` (it was on `withRoute`).
-  it('accounts for all 132 routes', () => {
-    expect(files).toHaveLength(132)
-    expect(migrated).toHaveLength(129)
+  // 133 since ENG-11 added `client-errors/route.ts` (the error-boundary beacon, on `withRoute`).
+  it('accounts for all 133 routes', () => {
+    expect(files).toHaveLength(133)
+    expect(migrated).toHaveLength(130)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {

@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { apiError, apiInternalError } from '@/lib/errors/api-response'
 import { PublicError } from '@/lib/errors/public-error'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
+import { log } from '@/lib/monitoring/log'
 import { runWithRequestContext } from '@/lib/monitoring/request-context'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
@@ -24,6 +25,7 @@ import { resolveActor, type Actor, type ActorDenial, type ActorPolicy } from './
  *   3. rate limiting     — declarative rules, non-enumerating refusal
  *   4. the error envelope — ADR-006, with unexpected exceptions never reaching
  *                           the client
+ *   5. request timing:   one structured `route.timing` line per request (ENG-11)
  *
  * What it deliberately does not own: business logic, authorization decisions
  * beyond the actor kind, and response shaping for the success path. A handler
@@ -175,6 +177,38 @@ async function resolveParams(context?: NextRouteContext): Promise<Record<string,
 }
 
 /**
+ * Operations that get no timing line. An uptime probe hits the health check every
+ * minute or so, and a line per probe would bury the requests worth reading.
+ */
+const UNTIMED_OPERATIONS: ReadonlySet<string> = new Set(['health.check'])
+
+/** A request at or above this duration is logged at `warn` so a slow path stands out. */
+export const SLOW_ROUTE_MS = 3000
+
+/**
+ * One structured line per request (ENG-11): operation, method, status and elapsed
+ * milliseconds. Goes through `log`, so it is redacted, carries the request id, and
+ * is silent under test unless a test opts in. Never throws.
+ */
+function logRouteTiming(
+  operation: string,
+  method: string,
+  status: number,
+  startedAt: number,
+  requestId: string
+): void {
+  if (UNTIMED_OPERATIONS.has(operation)) return
+  try {
+    const ms = Math.round(performance.now() - startedAt)
+    const fields = { operation, method, status, ms, requestId }
+    if (ms >= SLOW_ROUTE_MS) log.warn('route.timing', { ...fields, slow: true })
+    else log.info('route.timing', fields)
+  } catch {
+    // Timing is diagnostic only and must never change the response.
+  }
+}
+
+/**
  * Evaluates every declared rule and refuses if any of them is exhausted.
  *
  * All rules are evaluated rather than short-circuiting on the first refusal, so
@@ -232,11 +266,12 @@ export function withRoute<
     // match (cron, the webhooks, health) still get an id here, which is the reason
     // this cannot live in the proxy alone.
     const requestId = resolveRequestId(request)
+    const startedAt = performance.now()
 
     // B9-C: publish the id as ambient context for the duration of the request, so
     // structured logs raised deep in a call chain (the queue processor, four calls
     // below a cron handler) carry it without every signature having to pass it.
-    return runWithRequestContext({ requestId }, async () => {
+    const response = await runWithRequestContext({ requestId }, async () => {
     try {
       // 1. Who is calling?
       const resolution = await resolveActor(request, config.actor)
@@ -376,5 +411,10 @@ export function withRoute<
       })
     }
     })
+
+    // ENG-11: measured around everything above, refusals included, so a slow actor
+    // lookup or limiter shows up as well as a slow handler.
+    logRouteTiming(config.operation, request.method, response.status, startedAt, requestId)
+    return response
   }
 }

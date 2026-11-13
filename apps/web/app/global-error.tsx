@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { reportClientError } from '@/lib/monitoring/client-error-beacon'
+
 // `global-error.tsx` replaces the root layout when it renders, so the stylesheet
 // the layout imports is not applied here. Importing it directly is what keeps the
 // last-resort error page from rendering unstyled.
@@ -25,6 +27,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error('[GlobalError Boundary] Root layout render failed:', error)
+    reportClientError(error, 'global')
   }, [error])
 
   return (
