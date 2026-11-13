@@ -6,19 +6,15 @@ import {
   Trophy,
   Search,
   Zap,
-  Flame,
   AlertTriangle,
   ExternalLink,
-  Shield,
   Eye,
   EyeOff,
   Filter,
-  CheckCircle2,
 } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminPageHeader } from './AdminPageHeader'
-import { AdminStatusBadge } from './AdminStatusBadge'
-import { type AdminLeaderboardData, type AdminLeaderboardUser } from '@/lib/admin/leaderboard-admin-service'
+import { type AdminLeaderboardData } from '@/lib/admin/leaderboard-admin-service'
 import { getLeaderboardTier } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
 
@@ -29,7 +25,7 @@ interface AdminLeaderboardViewProps {
 const TIERS = ['all', 'Elite', 'Diamond', 'Gold', 'Silver', 'Bronze']
 
 export function AdminLeaderboardView({ initialData }: AdminLeaderboardViewProps) {
-  const [data, setData] = useState<AdminLeaderboardData>(initialData)
+  const data = initialData
   const [search, setSearch] = useState('')
   const [tierFilter, setTierFilter] = useState('all')
   const [showAnomaliesOnly, setShowAnomaliesOnly] = useState(false)

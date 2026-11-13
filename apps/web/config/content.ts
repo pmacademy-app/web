@@ -3,15 +3,11 @@
  *
  * All copy is verbatim from Sprint 3: Content & Communication System.
  * Do NOT rewrite, paraphrase, or invent alternatives.
- *
- * Testimonials marked // PLACEHOLDER — replace with real quotes before launch.
  */
 
 import type {
   JourneyStage,
-  FeatureItem,
   FAQItem,
-  TestimonialItem,
   SkillRadarDemoData,
 } from '@/types'
 import {
@@ -62,65 +58,6 @@ export const JOURNEY_STAGES: JourneyStage[] = [
     cluster: 'growth',
   },
 ]
-
-// ─── Learning Experience Features (Sprint 2 §12) ──────────────────────────────
-
-export const EXPERIENCE_FEATURES: FeatureItem[] = [
-  {
-    icon: 'BookOpen',
-    title: 'Interactive Lessons',
-    description: 'Structured lessons that build on each other, with reading, reflection, and immediate application.',
-  },
-  {
-    icon: 'Layers',
-    title: 'Flashcards',
-    description: 'Spaced repetition keeps key PM concepts fresh and ready for application.',
-  },
-  {
-    icon: 'CheckSquare',
-    title: 'Quizzes',
-    description: 'Immediate, specific feedback on every question so you know exactly what to revisit.',
-  },
-  {
-    icon: 'PenLine',
-    title: 'Assignments',
-    description: 'Practical PM tasks that produce real artifacts, not exercises you discard.',
-  },
-  {
-    icon: 'FileSearch',
-    title: 'Case Studies',
-    description: 'Real product decisions analysed through PM frameworks and structured thinking.',
-  },
-  {
-    icon: 'BriefcaseBusiness',
-    title: 'Portfolio Projects',
-    description: 'Capstones that become interview-ready artifacts showing how you think, not just that you finished.',
-  },
-]
-
-// ─── Community Features (Sprint 2 §16) ────────────────────────────────────────
-
-export const COMMUNITY_FEATURES: FeatureItem[] = [
-  {
-    icon: 'MessagesSquare',
-    title: 'Discussion',
-    description: 'Structured conversations around lessons, frameworks, and product decisions.',
-  },
-  {
-    icon: 'Users',
-    title: 'Peer Review',
-    description: 'Give and receive feedback on assignments, PRDs, and capstone work.',
-  },
-  {
-    icon: 'BarChart3',
-    title: 'Consistency Leaderboards',
-    description: 'Opt-in, cohort-based rankings focused on study consistency, not raw completion.',
-  },
-]
-
-// ─── Testimonials (Sprint 2 §17, Sprint 3 §3) ────────────────────────────────
-
-export const TESTIMONIALS: TestimonialItem[] = []
 
 // ─── FAQ (Sprint 3 §3) ────────────────────────────────────────────────────────
 
@@ -199,12 +136,3 @@ export const SKILL_RADAR_DEMO: SkillRadarDemoData = {
     technical:  40,
   },
 }
-
-// ─── Portfolio Artifacts ──────────────────────────────────────────────────────
-
-export const PORTFOLIO_ARTIFACTS = [
-  { title: 'Improving onboarding activation', type: 'PRD', icon: 'FileText' },
-  { title: 'Q3 Growth bets', type: 'Roadmap', icon: 'Map' },
-  { title: 'Reducing checkout drop-off', type: 'Case Study', icon: 'FileSearch' },
-  { title: 'Market entry memo', type: 'Strategy Doc', icon: 'Briefcase' },
-] as const

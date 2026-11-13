@@ -150,9 +150,6 @@ export function BrandMarkProdily(props: Omit<BrandLogoProps, 'variant'>) {
   return <BrandLogo variant="mark-prodily" {...props} />
 }
 
-/** @deprecated Use BrandMarkProdily */
-export const BrandMarkProdigy = BrandMarkProdily
-
 export function BrandIcon(props: Omit<BrandLogoProps, 'variant'>) {
   return <BrandLogo variant="icon" {...props} />
 }

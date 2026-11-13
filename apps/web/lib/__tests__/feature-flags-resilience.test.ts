@@ -6,6 +6,8 @@ vi.mock('@/lib/monitoring/logger', () => ({ logErrorReport }))
 
 // A controllable fake for the single read the service performs.
 let maybeSingleImpl: () => Promise<{ data: unknown; error: unknown }>
+// Captures every write so a test can assert exactly which keys were persisted.
+const upsert = vi.fn<(row: unknown) => Promise<{ error: unknown }>>(async () => ({ error: null }))
 const createServiceRoleClient = vi.fn(() => ({
   from: () => ({
     select: () => ({
@@ -13,6 +15,7 @@ const createServiceRoleClient = vi.fn(() => ({
         maybeSingle: () => maybeSingleImpl(),
       }),
     }),
+    upsert,
   }),
 }))
 vi.mock('@/lib/supabase', () => ({ createServiceRoleClient }))
@@ -93,5 +96,39 @@ describe('FeatureFlagService — resilience', () => {
     maybeSingleImpl = async () => ({ data: { value: { EMAIL_ENABLED: false } }, error: null })
     await svc.ensureHydrated(true)
     expect(svc.isEnabled('EMAIL_ENABLED')).toBe(false)
+  })
+
+  it('does not write a retired key back after the database row drops it', async () => {
+    // A warm instance hydrates while the row still carries a retired flag.
+    maybeSingleImpl = async () => ({
+      data: { value: { EMAIL_ENABLED: true, ACHIEVEMENT_EMAIL_ENABLED: true } },
+      error: null,
+    })
+    const svc = new FeatureFlagService()
+    await svc.ensureHydrated(true)
+    expect(svc.getAll().map((f) => f.key)).toContain('ACHIEVEMENT_EMAIL_ENABLED')
+
+    // A migration removes the key from the row. The next admin toggle force-hydrates
+    // and then persists the cache: the retired key must not come back.
+    maybeSingleImpl = async () => ({ data: { value: { EMAIL_ENABLED: true } }, error: null })
+    await svc.setFlag('MARKETING_EMAILS_ENABLED', true)
+
+    expect(upsert).toHaveBeenCalledTimes(1)
+    const written = (upsert.mock.calls[0][0] as { value: Record<string, boolean> }).value
+    expect(written).not.toHaveProperty('ACHIEVEMENT_EMAIL_ENABLED')
+    expect(written.MARKETING_EMAILS_ENABLED).toBe(true)
+    expect(written.EMAIL_ENABLED).toBe(true)
+    expect(svc.getAll().map((f) => f.key)).not.toContain('ACHIEVEMENT_EMAIL_ENABLED')
+  })
+
+  it('reverts a removed override to the compiled default on rehydration', async () => {
+    maybeSingleImpl = async () => ({ data: { value: { EMAIL_ENABLED: false } }, error: null })
+    const svc = new FeatureFlagService()
+    await svc.ensureHydrated(true)
+    expect(svc.isEnabled('EMAIL_ENABLED')).toBe(false)
+
+    maybeSingleImpl = async () => ({ data: null, error: null })
+    await svc.ensureHydrated(true)
+    expect(svc.isEnabled('EMAIL_ENABLED')).toBe(true)
   })
 })

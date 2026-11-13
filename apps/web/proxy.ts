@@ -130,8 +130,8 @@ function passThrough(request: NextRequest, requestId: string): NextResponse {
  *
  * The id is resolved here *and* independently in `withRoute`, which is deliberate
  * rather than duplicated: the proxy's matcher excludes `api/cron`, `api/health`,
- * `api/email/webhooks`, `api/email/unsubscribe`, `api/auth/callback`, `api/og` and
- * `api/waitlist`, so a proxy-only implementation would leave exactly the scheduled
+ * `api/email/webhooks`, `api/email/unsubscribe`, `api/auth/callback` and `api/og`,
+ * so a proxy-only implementation would leave exactly the scheduled
  * and webhook traffic untraceable. Both sides call the same resolver, so when the
  * proxy does run it stamps the header and the handler adopts that value instead of
  * minting a second one.
@@ -200,7 +200,6 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path.startsWith('/api/admin/') ||
     path.startsWith('/api/cron/') ||
     path.startsWith('/api/email/') ||
-    path === '/api/waitlist' ||
     path === '/api/contact'
   const isProtectedLearnerApi = isApiRoute && !isExemptApi
 
@@ -690,6 +689,6 @@ export const config = {
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|[^/]*\\.[^/]*$).*)',
   ],
 }

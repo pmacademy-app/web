@@ -26,8 +26,6 @@ const FLAG_CATEGORIES: Record<string, FlagCategory> = {
     color: 'text-admin-warning',
     description: 'One-time celebration modal for a new certificate, published capstone, Fellow grant or completed module',
   },
-  ACHIEVEMENT_EMAIL_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
-  PORTFOLIO_EMAILS_ENABLED: { label: 'Communication', icon: Mail, color: 'text-admin-info' },
   WEEKLY_RECAP_ENABLED: { label: 'Scheduled', icon: Calendar, color: 'text-admin-accent' },
   MARKETING_EMAILS_ENABLED: { label: 'Marketing', icon: Globe, color: 'text-admin-purple' },
   QUEUE_PROCESSING_ENABLED: { label: 'Infrastructure', icon: Zap, color: 'text-admin-success' },

@@ -3,7 +3,6 @@ import { calculateLevel } from '../xp'
 import {
   calculateWeekStart,
   calculateRankings,
-  getLeaderboardTier,
   type LeaderboardEntry,
   type RawLeaderboardUserMetric,
 } from '../leaderboard'

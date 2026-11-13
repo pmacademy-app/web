@@ -258,15 +258,6 @@ describe('B7-E / N-4 — the unlimited authenticated writes now have ceilings', 
 })
 
 describe('B7-E — the pre-existing abuse controls came through unchanged', () => {
-  it('waitlist keeps its fail-closed trusted-IP bucket', () => {
-    const source = routeSource('waitlist/route.ts')
-
-    expect(source).toContain('failClosed: true')
-    expect(source).toContain('getClientIpBucket(request)')
-    // Not the caller-supplied header.
-    expect(source).not.toContain('x-forwarded-for')
-  })
-
   it('contact keeps its fail-closed bucket keyed on the learner or the trusted IP', () => {
     const source = routeSource('contact/route.ts')
 
@@ -293,7 +284,6 @@ describe('B7-E — the pre-existing abuse controls came through unchanged', () =
     // schema would move validation in front of the limiter, so none of them may
     // have one.
     for (const relative of [
-      'waitlist/route.ts',
       'contact/route.ts',
       'feedback/route.ts',
       'testimonials/route.ts',
@@ -324,7 +314,7 @@ describe('B7-E — migration scope', () => {
     'badges', 'capstones', 'certificates', 'cohorts', 'feedback', 'flashcards',
     'friends', 'leaderboard', 'notifications', 'referrals', 'reflections', 'review',
     'skill-radar', 'streaks', 'v2', 'xp', 'user', 'announcements', 'contact',
-    'fellow-requests', 'health', 'search-index', 'testimonials', 'waitlist',
+    'fellow-requests', 'health', 'search-index', 'testimonials',
   ]
 
   it('leaves no learner-facing route resolving the actor itself', () => {
@@ -354,7 +344,6 @@ describe('B7-E — migration scope', () => {
       'search-index/route.ts',
       'testimonials/route.ts',
       'v2/lessons/[lessonId]/feedback/route.ts',
-      'waitlist/route.ts',
     ]
 
     for (const file of routeFiles()) {

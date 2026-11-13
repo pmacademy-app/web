@@ -82,7 +82,6 @@ export type AchievementCelebrationCtaAction =
   | 'continue_learning'
 
 type EventMap = {
-  waitlist_signup:          Record<string, never>
   hero_cta_click:           { location: HeroCTALocation }
   curriculum_view:          Record<string, never>
   faq_expand:               { question_index: number }
@@ -186,13 +185,8 @@ function trackEvent<K extends keyof EventMap>(
 
 // ─── Named event functions ────────────────────────────────────────────────────
 
-/** Fired after a successful 201 response from POST /api/waitlist. */
-export function trackWaitlistSignup() {
-  trackEvent('waitlist_signup')
-}
-
 /**
- * Fired when any "Join Waitlist" CTA button is clicked.
+ * Fired when a primary marketing CTA (nav, hero, or a homepage section) is clicked.
  * @param location - Which section the CTA was in
  */
 export function trackHeroCTAClick(location: HeroCTALocation) {

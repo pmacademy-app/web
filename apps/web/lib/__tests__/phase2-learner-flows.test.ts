@@ -6,7 +6,6 @@ import { deriveProofState, type ProofStateInput } from '@/lib/growth/proof-state
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { MODULE_SLUGS } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
-import { CapstonesOverviewCard } from '@/components/progress/CapstonesOverviewCard'
 import {
   ContinueLearningCard,
   FirstSessionKickoffCard,
@@ -33,12 +32,6 @@ describe('W3 capstones follow curriculum order', () => {
 
   it('the record key order is not curriculum order (the regression being guarded)', () => {
     expect(Object.values(CAPSTONE_DEFINITIONS).map((c) => c.moduleNumber)).not.toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
-  })
-
-  it('CapstonesOverviewCard lists Module 1..9 in order', () => {
-    const markup = html(React.createElement(CapstonesOverviewCard, { capstoneStatusByModule: new Map() }))
-    const numbers = [...markup.matchAll(/>Module (\d)</g)].map((m) => Number(m[1]))
-    expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
   })
 
   it('deriveProofState picks the earliest eligible module, not the first record key', () => {

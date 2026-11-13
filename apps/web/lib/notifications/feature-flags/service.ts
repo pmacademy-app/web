@@ -22,11 +22,6 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
   // published capstone). Off = nothing is claimed; the notifications stay in the bell.
   ACHIEVEMENT_CELEBRATIONS_ENABLED: true,
 
-  // Email scope: Only major achievement milestones (module completed, certificate, portfolio)
-  // Per-lesson/badge/XP events are In-App only
-  ACHIEVEMENT_EMAIL_ENABLED: true,
-  PORTFOLIO_EMAILS_ENABLED: true,
-
   // Scheduled emails
   WEEKLY_RECAP_ENABLED: true,     // Only scheduled learner email — max once/week if meaningful activity
 
@@ -99,6 +94,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class FeatureFlagService {
   private inMemoryCache: Map<string, FeatureFlagRecord> = new Map()
+  /**
+   * The compiled baseline this instance was built with (constructor flags, or
+   * DEFAULT_FEATURE_FLAGS). A successful hydration rebuilds the cache from this
+   * baseline overlaid with the persisted row, so it is the floor every snapshot
+   * starts from.
+   */
+  private readonly baseFlags: Record<string, boolean>
   /** Epoch ms of the last successful DB hydration; 0 means never hydrated. */
   private hydratedAt = 0
   /**
@@ -113,8 +115,8 @@ export class FeatureFlagService {
   private hydrationPromise: Promise<void> | null = null
 
   constructor(initialFlags?: Record<string, boolean>) {
-    const flagsToSet = initialFlags || DEFAULT_FEATURE_FLAGS
-    for (const [key, enabled] of Object.entries(flagsToSet)) {
+    this.baseFlags = { ...(initialFlags || DEFAULT_FEATURE_FLAGS) }
+    for (const [key, enabled] of Object.entries(this.baseFlags)) {
       this.inMemoryCache.set(key, {
         key,
         enabled,
@@ -185,19 +187,13 @@ export class FeatureFlagService {
         if (error) throw error
 
         const value = (data as { value?: unknown } | null)?.value
-        if (value && typeof value === 'object') {
-          const updatedAt = new Date().toISOString()
-          for (const [key, enabled] of Object.entries(value as Record<string, unknown>)) {
-            this.inMemoryCache.set(key, {
-              key,
-              description: this.inMemoryCache.get(key)?.description,
-              enabled: Boolean(enabled),
-              updatedAt,
-            })
-          }
-        }
+        const persisted =
+          value && typeof value === 'object' && !Array.isArray(value)
+            ? (value as Record<string, unknown>)
+            : {}
+        this.rebuildCache(persisted)
         // A row that is absent or empty is a legitimate "no overrides" answer, so the
-        // defaults stand and the snapshot still counts as fresh. Clear any backoff.
+        // baseline stands and the snapshot still counts as fresh. Clear any backoff.
         const now = Date.now()
         this.hydratedAt = now
         this.lastGoodHydrationAt = now
@@ -222,6 +218,36 @@ export class FeatureFlagService {
       staleForMs: this.lastGoodHydrationAt > 0 ? Date.now() - this.lastGoodHydrationAt : null,
       servingCompiledDefaults: this.lastGoodHydrationAt === 0,
     })
+  }
+
+  /**
+   * Replaces the cache with the baseline overlaid by the persisted row.
+   *
+   * Hydration is authoritative rather than a merge. A merge never evicted anything,
+   * so a warm instance that had read a key before it was removed from the row (for
+   * example a retired flag dropped by a migration) kept it in memory, and the next
+   * admin toggle wrote the whole cache back through `persistToDatabase`, restoring
+   * the removed key. Rebuilding means the cache, and therefore every later write,
+   * only ever holds baseline keys plus keys the database currently has.
+   */
+  private rebuildCache(persisted: Record<string, unknown>): void {
+    const previous = this.inMemoryCache
+    const updatedAt = new Date().toISOString()
+    const next = new Map<string, FeatureFlagRecord>()
+    const merged: Record<string, boolean> = { ...this.baseFlags }
+    for (const [key, enabled] of Object.entries(persisted)) {
+      merged[key] = Boolean(enabled)
+    }
+    for (const [key, enabled] of Object.entries(merged)) {
+      const prior = previous.get(key)
+      next.set(key, {
+        key,
+        description: prior?.description,
+        enabled,
+        updatedAt: prior && prior.enabled === enabled ? prior.updatedAt : updatedAt,
+      })
+    }
+    this.inMemoryCache = next
   }
 
   /**

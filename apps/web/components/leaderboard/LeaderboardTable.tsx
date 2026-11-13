@@ -2,16 +2,15 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Trophy, Flame, Zap, ArrowUp, ArrowDown, ExternalLink, Shield } from 'lucide-react'
+import { Trophy, Flame, Zap, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react'
 import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[]
-  onCompare?: (entry: LeaderboardEntry) => void
 }
 
-export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) {
+export function LeaderboardTable({ entries }: LeaderboardTableProps) {
   if (entries.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-card p-12 text-center space-y-3">
@@ -213,16 +212,6 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                   {/* Actions */}
                   <td className="py-3 px-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {onCompare && !entry.isCurrentUser && (
-                        <button
-                          type="button"
-                          onClick={() => onCompare(entry)}
-                          className="px-2.5 py-1 rounded-md border border-border bg-background hover:bg-secondary text-[11px] font-semibold text-foreground transition-colors"
-                        >
-                          Compare
-                        </button>
-                      )}
-
                       {entry.username && (
                         <Link
                           href={`/p/${entry.username}`}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Trophy, Calendar, BookOpen, Eye, EyeOff, Zap, Award, Users, Shield, ChevronDown } from 'lucide-react'
+import { Trophy, Calendar, BookOpen, Eye, EyeOff, Users, Shield, ChevronDown } from 'lucide-react'
 import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import type { CohortItemPayload } from '@/lib/leaderboard-db'
 import { cn } from '@/lib/utils'

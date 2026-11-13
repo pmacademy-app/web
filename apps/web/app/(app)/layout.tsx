@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
