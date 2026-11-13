@@ -44,7 +44,7 @@ export default function MarketingLayout({
           keep it from affecting interaction or text contrast. Not animated. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-20 bg-grain opacity-[0.035] dark:opacity-[0.05]"
+        className="pointer-events-none fixed inset-0 z-20 bg-grain opacity-[0.035]"
       />
     </div>
   )

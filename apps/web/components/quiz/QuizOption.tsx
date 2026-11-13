@@ -29,8 +29,8 @@ export default function QuizOption({
     textClasses = 'text-primary'
     badgeClasses = 'bg-primary text-primary-foreground border-primary'
   } else if (state === 'correct') {
-    borderClasses = 'border-emerald-500 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 font-semibold'
-    textClasses = 'text-emerald-800 dark:text-emerald-300'
+    borderClasses = 'border-emerald-500 bg-emerald-500/5 text-emerald-700 font-semibold'
+    textClasses = 'text-emerald-800'
     badgeClasses = 'bg-emerald-500 text-white border-emerald-500'
   } else if (state === 'incorrect') {
     borderClasses = 'border-destructive bg-destructive/5 text-destructive'

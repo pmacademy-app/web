@@ -29,12 +29,12 @@ export function AuthSuccessNotice({ children, className }: AuthSuccessNoticeProp
       aria-live="polite"
       className={cn(
         'flex items-start gap-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3',
-        'text-xs font-medium text-emerald-700 dark:text-emerald-300',
+        'text-xs font-medium text-emerald-700',
         className
       )}
     >
       <CheckCircle2
-        className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+        className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
         aria-hidden="true"
       />
       <span className="min-w-0 flex-1 break-words">{children}</span>

@@ -117,7 +117,7 @@ export function DangerZoneTab() {
             <button
               type="button"
               onClick={() => setActiveDialog('reset-progress')}
-              className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+              className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-500/20 transition-colors"
             >
               Reset Progress
             </button>
@@ -153,7 +153,7 @@ export function DangerZoneTab() {
           <button
             type="button"
             onClick={() => setActiveDialog('reset-xp')}
-            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors shrink-0"
+            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-500/20 transition-colors shrink-0"
           >
             Reset XP
           </button>
@@ -173,7 +173,7 @@ export function DangerZoneTab() {
           <button
             type="button"
             onClick={() => setActiveDialog('reset-flashcards')}
-            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors shrink-0"
+            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-500/20 transition-colors shrink-0"
           >
             Reset Flashcards
           </button>
@@ -193,7 +193,7 @@ export function DangerZoneTab() {
           <button
             type="button"
             onClick={() => setActiveDialog('reset-streak')}
-            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors shrink-0"
+            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-500/20 transition-colors shrink-0"
           >
             Reset Streak
           </button>
@@ -213,7 +213,7 @@ export function DangerZoneTab() {
           <button
             type="button"
             onClick={() => setActiveDialog('reset-skill-radar')}
-            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-colors shrink-0"
+            className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-500/20 transition-colors shrink-0"
           >
             Reset Skill Radar
           </button>

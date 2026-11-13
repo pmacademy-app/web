@@ -499,7 +499,7 @@ export default function QuizBlock({ block }: BlockProps) {
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                       <Check className="h-3 w-3" />
                     </span>
-                    <span className="text-emerald-600 dark:text-emerald-400">Correct!</span>
+                    <span className="text-emerald-600">Correct!</span>
                   </>
                 ) : (
                   <>

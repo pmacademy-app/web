@@ -49,7 +49,7 @@ function EmailVerifiedContent() {
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 animate-fade-in">
       <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 md:p-10 shadow-lg text-center space-y-6">
         <div className="flex justify-center">
-          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 animate-scale-in">
+          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 animate-scale-in">
             <CheckCircle2 className="h-10 w-10" />
           </div>
         </div>

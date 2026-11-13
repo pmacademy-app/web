@@ -81,7 +81,7 @@ export default function FlashcardDeckBlock({ block, previewMode }: BlockProps) {
     return (
       <div className="max-w-md mx-auto text-center py-10 space-y-8 animate-fade-in my-6">
         <div className="flex justify-center">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
             <Award className="h-8 w-8" />
           </div>
         </div>

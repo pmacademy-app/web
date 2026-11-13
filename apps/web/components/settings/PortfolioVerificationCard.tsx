@@ -52,7 +52,7 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
           className={cn(
             'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border shrink-0',
             isVerified
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
               : 'bg-muted text-muted-foreground border-border'
           )}
         >

@@ -69,7 +69,7 @@ export function SubmitConfirmationModal({
         {/* Validation Check Summary */}
         {!validation.isValid ? (
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4 text-xs space-y-2 text-amber-500">
-            <div className="flex items-center gap-2 font-bold text-amber-600 dark:text-amber-400">
+            <div className="flex items-center gap-2 font-bold text-amber-600">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>Requirements Not Met</span>
             </div>
@@ -81,7 +81,7 @@ export function SubmitConfirmationModal({
           </div>
         ) : (
           <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-4 text-xs space-y-2">
-            <div className="flex items-center gap-2 font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-2 font-bold text-emerald-600">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>Ready for Submission ({validation.wordCount} words)</span>
             </div>
@@ -101,8 +101,8 @@ export function SubmitConfirmationModal({
               <span
                 className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                   userProfile?.isPortfolioPublic !== false
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                 }`}
               >
                 {userProfile?.isPortfolioPublic !== false ? (

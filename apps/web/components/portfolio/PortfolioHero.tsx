@@ -84,7 +84,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
                 Product Management Portfolio
               </span>
               {user.isFellow && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/25">
                   <GraduationCap className="w-3 h-3" />
                   Product Management Fellow
                 </span>
@@ -102,7 +102,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
             </h1>
 
             {user.isFellow && (
-              <p className="text-xs md:text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <p className="text-xs md:text-sm font-semibold text-emerald-600 flex items-center gap-1.5">
                 <GraduationCap className="w-4 h-4 shrink-0" />
                 Product Management Fellow at Prodily
               </p>
@@ -134,7 +134,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-4 text-xs font-semibold">
         {/* Metric Badges */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold">
             <Flame className="w-4 h-4 text-amber-500" />
             <span>{currentStreak} Day Streak</span>
           </div>

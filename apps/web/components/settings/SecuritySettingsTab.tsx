@@ -241,7 +241,7 @@ function ChangeEmailCard() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-border">
         <div className="flex-1">
           {emailSuccessMsg && (
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+            <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
               <CheckCircle2 className="w-4 h-4 shrink-0" /> {emailSuccessMsg}
             </span>
           )}
@@ -474,7 +474,7 @@ export function SecuritySettingsTab() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-border">
           <div className="flex-1">
             {successMessage && (
-              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
                 <CheckCircle2 className="w-4 h-4 shrink-0" /> Password updated successfully!
               </span>
             )}
@@ -484,7 +484,7 @@ export function SecuritySettingsTab() {
               </span>
             )}
             {!successMessage && !errorMessage && isPasswordDirty && (
-              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+              <span className="text-[11px] font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
                 Unsaved changes
               </span>
             )}

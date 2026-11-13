@@ -48,9 +48,9 @@ export function PortfolioReadinessCard({
             <span
               className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                 isReadyToShare
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
                   : statusLabel === 'Needs Attention'
-                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
+                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/25'
                   : 'bg-muted text-muted-foreground border-border'
               }`}
             >
@@ -110,7 +110,7 @@ export function PortfolioReadinessCard({
                       {item.label}
                     </span>
                     {item.importance === 'essential' && !item.isComplete && (
-                      <span className="text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                      <span className="text-[9px] uppercase font-bold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
                         Required
                       </span>
                     )}

@@ -105,7 +105,7 @@ export function NotificationItemCard({
             </span>
 
             {isUrgent && (
-              <span className="text-[11px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
+              <span className="text-[11px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 px-1.5 py-0.5 rounded border border-rose-500/20">
                 Urgent
               </span>
             )}
@@ -284,53 +284,53 @@ function getCategoryBadge(category?: string): { label: string; className: string
     case 'announcements':
       return {
         label: 'Announcement',
-        className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+        className: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
       }
     case 'achievements':
     case 'achievement':
       return {
         label: 'Achievement',
-        className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        className: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
       }
     case 'certificates':
     case 'certificate':
       return {
         label: 'Certificate',
-        className: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+        className: 'bg-teal-500/10 text-teal-600 border-teal-500/20',
       }
     case 'learning':
     case 'curriculum':
       return {
         label: 'Learning',
-        className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
       }
     case 'portfolio':
       return {
         label: 'Portfolio',
-        className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        className: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
       }
     case 'capstones':
     case 'capstone':
       return {
         label: 'Capstone',
-        className: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+        className: 'bg-sky-500/10 text-sky-600 border-sky-500/20',
       }
     case 'security':
     case 'account':
       return {
         label: 'Security',
-        className: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+        className: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
       }
     case 'product_updates':
     case 'update':
       return {
         label: 'Update',
-        className: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+        className: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
       }
     case 'marketing':
       return {
         label: 'Community',
-        className: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+        className: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
       }
     default:
       return {

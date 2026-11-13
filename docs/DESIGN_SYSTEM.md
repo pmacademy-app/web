@@ -16,11 +16,9 @@
 - **Accent**: `#D98B24` (amber/orange — used for the Fellow badge)
 - **Border**: `#DED8CB`
 
-### Main App Palette (`TOKENS.colors.dark` — dark theme)
-- **Background**: `#0E1110`
-- **Foreground**: `#F4F1E8`
-- **Primary**: `#66D6A3`
-- **Border**: `#343A34`
+### Dark mode: not supported
+- There is no dark theme (owner decision D9). `theme/tokens.ts` has no dark palette, `app/globals.css` has no `.dark` tokens or `dark` variant, and components use no `dark:` classes.
+- `apps/web/lib/__tests__/ux20-no-dark-mode.test.ts` keeps it that way.
 
 ### Admin Console Palette (`TOKENS.colors.admin` — scoped to `.admin-console`, a distinct dark UI theme)
 - **Background**: `#050B14`

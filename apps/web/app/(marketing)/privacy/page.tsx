@@ -49,7 +49,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Main Content */}
-      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm text-ink-muted leading-relaxed">
+      <div className="prose prose-neutral max-w-none space-y-8 text-sm text-ink-muted leading-relaxed">
         <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 text-foreground space-y-2">
           <p className="font-semibold text-sm">
             Core Privacy Principle

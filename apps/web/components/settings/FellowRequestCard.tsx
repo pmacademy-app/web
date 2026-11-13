@@ -63,7 +63,7 @@ export function FellowRequestCard() {
   if (!data) {
     return (
       <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-6 space-y-3">
-        <div className="flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400">
+        <div className="flex items-center gap-2 text-xs text-rose-600">
           <AlertCircle className="w-4 h-4" />
           <span>{error?.message || 'Failed to load Fellow status.'}</span>
         </div>
@@ -95,7 +95,7 @@ export function FellowRequestCard() {
       </div>
 
       {(submitError || error) && (
-        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-2">
+        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-600 flex items-center gap-2">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{submitError || error?.message}</span>
         </div>
@@ -105,7 +105,7 @@ export function FellowRequestCard() {
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
           <div>
-            <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">You are a PM Fellow</p>
+            <p className="text-xs font-bold text-emerald-600">You are a PM Fellow</p>
             <p className="text-[11px] text-muted-foreground">Your Fellow badge is live on your public portfolio.</p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export function FellowRequestCard() {
         <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-3">
           <Clock className="w-5 h-5 text-amber-500 shrink-0" />
           <div>
-            <p className="text-xs font-bold text-amber-600 dark:text-amber-400">Request Submitted</p>
+            <p className="text-xs font-bold text-amber-600">Request Submitted</p>
             <p className="text-[11px] text-muted-foreground">
               {data.latestRequest?.requestedAt
                 ? `Submitted ${new Date(data.latestRequest.requestedAt).toLocaleDateString()}. `
@@ -160,7 +160,7 @@ export function FellowRequestCard() {
       {data.state === 'eligible' && (
         <div className="space-y-3">
           {justSubmitted ? (
-            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               Fellow request submitted successfully.
             </div>

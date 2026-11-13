@@ -284,7 +284,7 @@ export function RichEditor({
       {/* Editor Body */}
       {isPreview || isLocked ? (
         <div
-          className="p-6 min-h-[400px] prose dark:prose-invert max-w-none text-foreground leading-relaxed overflow-y-auto focus:outline-none"
+          className="p-6 min-h-[400px] prose max-w-none text-foreground leading-relaxed overflow-y-auto focus:outline-none"
           dangerouslySetInnerHTML={{ __html: renderedHtml }}
         />
       ) : (

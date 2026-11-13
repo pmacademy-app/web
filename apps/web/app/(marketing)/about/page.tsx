@@ -128,7 +128,7 @@ export default function AboutPage() {
               href={BRAND.social.buyMeACoffee}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-xs hover:bg-amber-500/20 transition-all flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 font-bold text-xs hover:bg-amber-500/20 transition-all flex items-center gap-1.5"
             >
               <span>☕ Support on Buy Me a Coffee</span>
             </Link>

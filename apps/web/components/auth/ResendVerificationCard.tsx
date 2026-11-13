@@ -151,7 +151,7 @@ export function ResendVerificationCard({
             <div
               className={`mt-3 p-3 rounded-lg text-xs flex items-center gap-2 ${
                 statusMessage.type === 'success'
-                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+                  ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20'
                   : 'bg-destructive/10 text-destructive border border-destructive/20'
               }`}
             >

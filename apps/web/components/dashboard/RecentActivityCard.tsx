@@ -66,7 +66,7 @@ export function RecentActivityCard({ activities }: RecentActivityCardProps) {
 
               <div className="flex flex-col items-end shrink-0">
                 {item.xpAmount ? (
-                  <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                  <span className="text-xs font-mono font-bold text-amber-600">
                     +{item.xpAmount} XP
                   </span>
                 ) : null}

@@ -185,7 +185,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
       </div>
 
       {/* Theory preview blocks rendered via v2 BlockTreeRenderer */}
-      <div className="prose dark:prose-invert max-w-none">
+      <div className="prose max-w-none">
         <BlockTreeRenderer blocks={previewBlocks} lessonId={lesson.id} />
         <div className="h-24 bg-gradient-to-t from-background to-transparent pointer-events-none -mt-24 relative z-10" />
       </div>

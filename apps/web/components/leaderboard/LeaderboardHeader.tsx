@@ -154,13 +154,13 @@ export function LeaderboardHeader({
             className={cn(
               'inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer select-none',
               isOptedIn
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20'
                 : 'bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary'
             )}
           >
             {isOptedIn ? (
               <>
-                <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Public</span>
               </>
             ) : (

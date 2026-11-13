@@ -144,7 +144,7 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
             <div className="flex items-center gap-2">
               <span className="font-semibold text-admin-fg truncate text-xs">{p.learnerName}</span>
               {p.isFellow && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/25">
                   <GraduationCap className="w-3 h-3" /> Fellow
                 </span>
               )}
@@ -179,12 +179,12 @@ export function PortfoliosView({ initialPortfolios, counts, status, q, onParamsC
       header: 'Verification Status',
       cell: (p) => (
         p.isFellow ? (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/25">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Verified Fellow
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-500/10 text-amber-600 border border-amber-500/25">
             <Clock className="w-3.5 h-3.5" />
             Pending Review
           </span>

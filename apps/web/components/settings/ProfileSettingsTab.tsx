@@ -247,7 +247,7 @@ function ProfileFormContent({
               </span>
             )}
             {!successMessage && !errorMessage && isDirty && (
-              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+              <span className="text-[11px] font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
                 Unsaved changes
               </span>
             )}

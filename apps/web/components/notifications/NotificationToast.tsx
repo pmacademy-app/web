@@ -72,7 +72,7 @@ export function NotificationToast() {
         <h4 className="text-xs font-bold text-foreground flex items-center justify-between">
           <span>{toast.title}</span>
           {toast.xpEarned && (
-            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
+            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
               +{toast.xpEarned} XP
             </span>
           )}

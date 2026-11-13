@@ -47,7 +47,7 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
 
   return (
     <div
-      className={`prose prose-neutral dark:prose-invert max-w-none prose-p:text-foreground/85 prose-strong:text-foreground prose-em:text-foreground/80 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-headings:font-serif prose-headings:text-foreground prose-li:text-foreground/85 prose-li:leading-relaxed ${className}`}
+      className={`prose prose-neutral max-w-none prose-p:text-foreground/85 prose-strong:text-foreground prose-em:text-foreground/80 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-headings:font-serif prose-headings:text-foreground prose-li:text-foreground/85 prose-li:leading-relaxed ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   )

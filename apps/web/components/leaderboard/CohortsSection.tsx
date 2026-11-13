@@ -71,7 +71,7 @@ export function CohortsSection({ initialCohorts, className, hideHeader }: Cohort
       )}
 
       {errorMsg && (
-        <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs">
+        <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 text-xs">
           {errorMsg}
         </div>
       )}
@@ -92,7 +92,7 @@ export function CohortsSection({ initialCohorts, className, hideHeader }: Cohort
                       {cohort.name}
                     </h3>
                     {cohort.isMember && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center gap-1">
                         <Check className="w-3 h-3" /> Joined
                       </span>
                     )}

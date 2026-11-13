@@ -5,8 +5,7 @@
  * In Tailwind v4, all theme configuration lives here via @theme.
  * Raw hex values live ONLY in this file — never in component classes.
  *
- * Dark mode tokens are defined but NOT activated in Sprint 4.
- * The .dark {} block is ready for a future sprint.
+ * There is no dark mode (owner decision D9). Do not add dark tokens or variants.
  */
 
 @import "tailwindcss";
@@ -14,7 +13,6 @@
 @import "shadcn/tailwind.css";
 /*---break---
  */
-@custom-variant dark (&:is(.dark *));
 
 /* ─── Fonts ──────────────────────────────────────────────────────────────────
    Loaded via next/font in app/layout.tsx and injected as CSS variables.
@@ -118,82 +116,6 @@
   --sidebar-accent-foreground:        oklch(0.205 0 0);
   --sidebar-border:        oklch(0.922 0 0);
   --sidebar-ring:        oklch(0.708 0 0);
-}
-
-/* ─── Dark Mode Tokens (Sprint 1 §14) ───────────────────────────────────────
-   DEFINED but NOT ACTIVATED in Sprint 4.
-   Activate by adding `next-themes` ThemeProvider and wiring .dark class.
-   Do not delete — these are ready for the dark mode sprint.
----------------------------------------------------------------------------- */
-
-.dark {
-  /* Core Palette — Dark */
-  --color-background:        #0E1110;
-  --color-foreground:        #F4F1E8;
-  --color-surface:           #161A18;
-  --color-surface-muted:     #202520;
-  --color-border:            #343A34;
-  --color-border-strong:     #4A5249;
-  --color-primary:           #66D6A3;
-  --color-primary-foreground:#07110C;
-  --color-accent:            #FFB454;
-  --color-accent-foreground: #1C1003;
-  --color-focus:             #7AB2FF;
-
-  /* Semantic — Dark */
-  --color-success:           #4ADE80;
-  --color-success-bg:        #13261A;
-  --color-warning:           #FACC15;
-  --color-warning-bg:        #30250B;
-  --color-danger:            #FB7185;
-  --color-danger-bg:         #321A16;
-  --color-info:              #93C5FD;
-  --color-info-bg:           #13213A;
-  --color-locked:            #8A9289;
-  --color-ai:                #C4B5FD;
-  --color-ink-muted:         #AEB4AC;
-  --color-primary-hover:     #85E0B6;
-  --color-primary-soft:      #13261D;
-
-  /* Competency — Dark (increased lightness for contrast) */
-  --color-skill-discovery:   #2DD4BF;
-  --color-skill-strategy:    #60A5FA;
-  --color-skill-design:      #F472B6;
-  --color-skill-execution:   #A78BFA;
-  --color-skill-growth:      #4ADE80;
-  --color-skill-leadership:  #FBD038;
-  --color-skill-technical:   #94A3B8;
-  --background:        oklch(0.145 0 0);
-  --foreground:        oklch(0.985 0 0);
-  --card:        oklch(0.205 0 0);
-  --card-foreground:        oklch(0.985 0 0);
-  --popover:        oklch(0.205 0 0);
-  --popover-foreground:        oklch(0.985 0 0);
-  --primary:        oklch(0.922 0 0);
-  --primary-foreground:        oklch(0.205 0 0);
-  --secondary:        oklch(0.269 0 0);
-  --secondary-foreground:        oklch(0.985 0 0);
-  --muted:        oklch(0.269 0 0);
-  --muted-foreground:        oklch(0.708 0 0);
-  --accent:        oklch(0.269 0 0);
-  --accent-foreground:        oklch(0.985 0 0);
-  --destructive:        oklch(0.704 0.191 22.216);
-  --border:        oklch(1 0 0 / 10%);
-  --input:        oklch(1 0 0 / 15%);
-  --ring:        oklch(0.556 0 0);
-  --chart-1:        oklch(0.87 0 0);
-  --chart-2:        oklch(0.556 0 0);
-  --chart-3:        oklch(0.439 0 0);
-  --chart-4:        oklch(0.371 0 0);
-  --chart-5:        oklch(0.269 0 0);
-  --sidebar:        oklch(0.205 0 0);
-  --sidebar-foreground:        oklch(0.985 0 0);
-  --sidebar-primary:        oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground:        oklch(0.985 0 0);
-  --sidebar-accent:        oklch(0.269 0 0);
-  --sidebar-accent-foreground:        oklch(0.985 0 0);
-  --sidebar-border:        oklch(1 0 0 / 10%);
-  --sidebar-ring:        oklch(0.556 0 0);
 }
 
 /* ─── Admin Panel Brand Tokens ───────────────────────────────────────────────
@@ -654,9 +576,7 @@ body {
      Do not put two effects that share a pseudo-element on the same element.
 ---------------------------------------------------------------------------- */
 
-/* Tinted elevation. Light mode: soft green-tinted layers, never black.
-   Dark mode: a primary tint would read as a glow, so shadows sink toward a
-   green-black instead. */
+/* Tinted elevation: soft green-tinted layers, never black. */
 :root {
   --shadow-tinted:
     0 1px 2px color-mix(in oklch, var(--color-primary) 8%, transparent),
@@ -665,16 +585,6 @@ body {
     0 1px 2px color-mix(in oklch, var(--color-primary) 8%, transparent),
     0 16px 40px -16px color-mix(in oklch, var(--color-primary) 20%, transparent),
     0 40px 80px -32px color-mix(in oklch, var(--color-primary) 22%, transparent);
-}
-
-.dark {
-  --shadow-tinted:
-    0 1px 2px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 60%, transparent),
-    0 10px 28px -12px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 70%, transparent);
-  --shadow-tinted-lg:
-    0 1px 2px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 60%, transparent),
-    0 16px 40px -16px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 75%, transparent),
-    0 40px 80px -32px color-mix(in oklch, color-mix(in oklch, var(--color-primary-soft) 30%, black) 80%, transparent);
 }
 
 /* Static film grain: greyscale SVG feTurbulence tile, fully URL-encoded (the
@@ -751,10 +661,6 @@ body {
   position: relative;
   overflow: hidden;
   --glare-tint: color-mix(in oklch, white 38%, transparent);
-
-  &:where(.dark *) {
-    --glare-tint: color-mix(in oklch, white 9%, transparent);
-  }
 
   &::after {
     content: '';
@@ -860,12 +766,10 @@ body {
   }
 }
 
-/* Deep closing band. Light: primary green with primary-foreground text.
-   Dark: the dark primary is a light mint, so the band re-points --color-primary
-   to a deep green and --color-primary-foreground to the cream foreground.
-   Because the colour utilities read these variables, text-primary-foreground,
-   bg-primary-foreground, text-primary, text-ink-muted, border-border and the
-   focus ring inside the band all stay legible in both modes.
+/* Deep closing band: primary green with primary-foreground text. The band
+   re-points --color-ink-muted, --color-border and --color-focus to tints of
+   the foreground, so text-ink-muted, border-border and the focus ring inside
+   the band stay legible on the green.
    A static grain layer sits on ::after, under the content. */
 @utility band-deep {
   position: relative;
@@ -875,11 +779,6 @@ body {
   --color-ink-muted: color-mix(in oklch, var(--color-primary-foreground) 86%, transparent);
   --color-border: color-mix(in oklch, var(--color-primary-foreground) 24%, transparent);
   --color-focus: var(--color-primary-foreground);
-
-  &:where(.dark *) {
-    --color-primary: color-mix(in oklch, var(--color-primary-soft) 80%, var(--color-primary-hover));
-    --color-primary-foreground: var(--color-foreground);
-  }
 
   &::after {
     content: '';

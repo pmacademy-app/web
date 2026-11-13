@@ -178,7 +178,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
         {copy.isTest ? (
           <div
             role="alert"
-            className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-center justify-between gap-4 text-amber-700 dark:text-amber-400"
+            className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-center justify-between gap-4 text-amber-700"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-amber-500/20 shrink-0">

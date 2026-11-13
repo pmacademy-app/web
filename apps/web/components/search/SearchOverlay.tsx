@@ -371,7 +371,7 @@ export function SearchOverlay() {
     >
       {/* High-grade ambient backdrop with subtle blur */}
       <div
-        className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs transition-opacity duration-200"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
         onClick={closeSearch}
         aria-hidden="true"
       />
@@ -585,7 +585,7 @@ export function SearchOverlay() {
                             {positionLabel} · {moduleChipLabel(entry.moduleName)}
                           </span>
                           {isCompleted && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                               Completed
                             </span>
                           )}
@@ -595,7 +595,7 @@ export function SearchOverlay() {
                             </span>
                           )}
                           {isLocked && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">
                               <Lock className="w-2.5 h-2.5" />
                               {prereqLabel ? `Locked · complete ${prereqLabel}` : 'Locked'}
                             </span>
