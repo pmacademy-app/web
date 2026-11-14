@@ -60,7 +60,7 @@ jobs:
           RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
           SITE_URL="${RAW_URL:-https://prodily.app}"
           SITE_URL="${SITE_URL%/}"
-          curl --fail-with-body -s -S -X GET "${SITE_URL}/api/cron/process-broadcasts" \
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/process-broadcasts" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 

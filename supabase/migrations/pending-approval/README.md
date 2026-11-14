@@ -52,6 +52,8 @@ Leave the file here after applying it; the database, not the migration history, 
    removed (a separate follow-up). Both schedulers running at once is safe: each job dedupes on
    an idempotency key.
 
+If applied before AG-14, re-run it once so process-broadcasts uses POST.
+
 Undo: `rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`.
 
 ### `20261027000001_users_username_check.sql` (CQ-24)

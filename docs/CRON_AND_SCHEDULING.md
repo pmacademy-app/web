@@ -21,7 +21,7 @@ Background jobs, queue processing, broadcasts, and periodic maintenance are exec
 | Cron Endpoint | HTTP Method | GitHub Job | Schedule (UTC) | Cadence | Purpose |
 |---|:---:|---|:---:|:---:|---|
 | `/api/cron/process-email-queue` | `POST` | `process-email-queue` | `*/5 * * * *` | Every 5 minutes | Processes pending and retrying items in `email_queue`, with exponential backoff and lease reclamation |
-| `/api/cron/process-broadcasts` | `GET` | `process-broadcasts` | `*/5 * * * *` | Every 5 minutes | Executes scheduled email and in-app broadcasts |
+| `/api/cron/process-broadcasts` | `POST` | `process-broadcasts` | `*/5 * * * *` | Every 5 minutes | Executes scheduled email and in-app broadcasts |
 | `/api/cron/daily-reminder` | `POST` | `daily-reminder` | `30 * * * *` | Hourly | Enqueues SRS reminders and streak alerts for users whose local preferred hour has arrived; a local-date idempotency key makes it once per day |
 | `/api/cron/weekly-recap` | `POST` | `weekly-recap` | `30 * * * *` | Hourly | Enqueues the weekly recap for users at their local recap day and hour (Sunday 18:00 by default), deduplicated per user per local date |
 | `/api/cron/lifecycle` | `POST` | `lifecycle-sequences` | `30 * * * *` | Hourly | Enqueues lifecycle reactivation emails at the user's local hour, at most one per user per day, with a 30% deterministic holdout per sequence |
@@ -39,4 +39,4 @@ The table must stay in step with `CRON_JOB_DEFINITIONS` in `apps/web/lib/monitor
 - All 7 endpoints reject unauthenticated public requests with HTTP `401 Unauthorized`.
 - Bearer token must match `process.env.CRON_SECRET`.
 - Authenticated admin sessions are accepted as a second caller (`actor: { allow: ['cron', 'admin'] }` in `withRoute`) for manual admin console triggers (`Run Now`).
-- Every route except `process-broadcasts` exports `GET = POST`, so a GET reaches the same handler. `process-broadcasts` is GET-only because the scheduler calls it with GET.
+- Every route exports `POST`. Each also exports `GET = POST` as a legacy alias that will be removed in AG-15.

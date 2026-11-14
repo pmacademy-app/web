@@ -44,7 +44,7 @@ const CRON_SECRET = 'b7c-cron-secret-under-test'
 
 const { POST: cleanup } = await import('../../app/api/cron/cleanup/route')
 const { POST: dailyReminder } = await import('../../app/api/cron/daily-reminder/route')
-const { GET: processBroadcasts } = await import('../../app/api/cron/process-broadcasts/route')
+const { GET: processBroadcastsGet, POST: processBroadcasts } = await import('../../app/api/cron/process-broadcasts/route')
 const { POST: processEmailQueue } = await import('../../app/api/cron/process-email-queue/route')
 const { POST: retryFailed } = await import('../../app/api/cron/retry-failed/route')
 const { POST: weeklyRecap } = await import('../../app/api/cron/weekly-recap/route')
@@ -252,6 +252,11 @@ describe('B7-C — success response shapes are unchanged', () => {
 
     expect(body.emailBroadcasts).toEqual({ processed: 1, errors: 0 })
     expect(body.inAppBroadcasts).toEqual({ processed: 2, errors: 0 })
+  })
+
+  it('process-broadcasts exports both POST and the legacy GET alias', () => {
+    expect(typeof processBroadcasts).toBe('function')
+    expect(typeof processBroadcastsGet).toBe('function')
   })
 
   it('the digest routes still short-circuit when their automation is disabled', async () => {
