@@ -129,4 +129,15 @@ GitHub Actions (`.github/workflows/ci.yml`) runs these gates on every pull reque
 6. **Next.js Production Build:** `npm run build`.
 7. **Playwright E2E (separate `e2e` job, gated):** always runs on `main`. On a pull request it runs only when the diff touches auth-relevant paths (`app/(auth)/`, `app/api/auth/`, `app/api/user/`, `lib/auth/`, `lib/api/actor`, `proxy.ts`, `e2e/`, `playwright.config.ts`, `package-lock.json`); otherwise the job reports that it skipped. The write-heavy flows (signup to XP, session lifecycle) self-skip unless `E2E_ALLOW_WRITES` and staging credentials are set, and `e2e/support/env.ts` refuses to run against the production host.
 8. **Security:** dependency audit gate (`scripts/ci/audit-gate.ts`) and a gitleaks secret scan.
-9. **On push to `main` only:** the Supabase migration deploy job, which applies every top-level file in `supabase/migrations/`.
+9. **Local Database Replay and Grant Checks (`db-local` job, AG-04):** starts a local Postgres instance via `supabase start`, replays all top-level migrations with `supabase db reset`, applies safe held migrations from `supabase/tests/held-migrations.txt` via `scripts/ci/apply-held-migrations.sh`, runs the grant allowlist SQL test (`supabase/tests/grant_allowlist.sql`), and checks database types drift (`scripts/ci/check-db-types-drift.sh`).
+10. **On push to `main` only:** the Supabase migration deploy job, which applies every top-level file in `supabase/migrations/`.
+
+---
+
+## 5. Local Database Testing and Grant Allowlist (AG-04)
+
+### Adding a Held Migration to Local DB Replay
+When a task adds a new held migration in `supabase/migrations/pending-approval/` that requires no external Vault secrets or pg_cron, append its filename to `supabase/tests/held-migrations.txt`. The `scripts/ci/apply-held-migrations.sh` script applies it during CI replay and executes its companion validation file if safe on an empty database.
+
+### Updating the Grant Allowlist
+If a migration grants access on schema `public` objects (tables, views, columns, routines, sequences) to `anon` or `authenticated`, document the grant and its RLS justification in `supabase/tests/grant_allowlist.sql`. Any unallowlisted grant causes the `db-local` job to fail.

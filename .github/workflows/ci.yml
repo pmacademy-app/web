@@ -298,6 +298,48 @@ jobs:
           set -euo pipefail
           gitleaks dir . --config .gitleaks.toml --redact --no-banner --verbose --exit-code 1
 
+  # Replays migrations against a local Postgres instance, applies safe held
+  # migrations, runs the grant allowlist test, and verifies database types. (AG-04)
+  db-local:
+    name: Local Database Replay and Security Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: '3.1.0'
+
+      - name: Start local Supabase
+        run: |
+          supabase start
+
+      - name: Reset local database
+        run: |
+          supabase db reset
+
+      - name: Apply held migrations
+        run: |
+          bash scripts/ci/apply-held-migrations.sh
+
+      - name: Run grant allowlist test
+        run: |
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/tests/grant_allowlist.sql
+
+      - name: Check database types drift
+        run: |
+          bash scripts/ci/check-db-types-drift.sh
+
   # Applies pending migrations in supabase/migrations/ to the linked project.
   #
   # This job previously guarded its only step with
@@ -307,7 +349,7 @@ jobs:
   # F-REL-7 / B14-A. Credential presence is now asserted in its own step that FAILS,
   # and the applied state is verified after the push rather than assumed.
   deploy-supabase:
-    needs: build-and-validate
+    needs: [build-and-validate, db-local]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 15
