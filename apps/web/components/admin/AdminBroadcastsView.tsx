@@ -36,7 +36,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function ProgressBar({ sent, total }: { sent: number; total: number | null }) {
-  if (!total) return <span className="text-admin-fg-subtle text-xs">—</span>
+  if (!total) return <span className="text-admin-fg-subtle text-xs">-</span>
   const pct = Math.min(100, Math.round((sent / total) * 100))
   return (
     <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsV
   const [cancelling, setCancelling] = useState<string | null>(null)
   const [actionMsg, setActionMsg] = useState<{ id: string; msg: string; type: 'success' | 'error' } | null>(null)
 
-  const { data, mutate: revalidateBroadcasts } = useApiQuery<AdminBroadcastsResponse>(
+  const { data, error, mutate: revalidateBroadcasts } = useApiQuery<AdminBroadcastsResponse>(
     '/api/admin/emails/broadcasts',
     {
       fallbackData: initialData ? { success: true, data: initialData } : undefined,
@@ -138,7 +138,20 @@ export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsV
       </div>
 
       {/* Broadcast List */}
-      {broadcasts.length === 0 ? (
+      {error && !data ? (
+        <div className="flex flex-col items-center justify-center py-16 rounded-xl border border-admin-danger/25 bg-admin-danger-soft/40 text-center space-y-3">
+          <AlertTriangle className="w-8 h-8 text-admin-danger" />
+          <p className="text-sm font-semibold text-admin-fg">Failed to load broadcasts</p>
+          <p className="text-xs text-admin-fg-muted">There was an error loading the broadcast list. Please try again.</p>
+          <button
+            type="button"
+            onClick={refresh}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-admin-border bg-admin-surface text-admin-fg text-xs font-bold hover:bg-admin-surface-raised transition-colors cursor-pointer"
+          >
+            Retry
+          </button>
+        </div>
+      ) : broadcasts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 rounded-xl border border-dashed border-admin-border text-center space-y-3">
           <Send className="w-8 h-8 text-admin-fg-subtle" />
           <p className="text-sm font-semibold text-admin-fg">No broadcasts yet</p>
@@ -188,7 +201,7 @@ export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsV
                       )}
                     </td>
                     <td className="px-4 py-3 text-admin-fg-muted font-mono">
-                      {b.scheduled_at ? new Date(b.scheduled_at).toLocaleString() : '—'}
+                      {b.scheduled_at ? new Date(b.scheduled_at).toLocaleString() : '-'}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">

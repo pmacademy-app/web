@@ -1,6 +1,5 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
 import type { AdminUserFilters } from '@/lib/admin/types'
 
@@ -19,28 +18,28 @@ export const POST = withRoute(
     summary: 'Unexpected failure in POST /api/admin/emails/broadcasts/recipient-sample',
   },
   async ({ request }) => {
+    let body: { filters?: AdminUserFilters; limit?: string }
+    // Targeted parse: bad JSON is a client validation error, not a server fault.
     try {
-      const body = await request.json()
-      const filters = (body.filters ?? {}) as AdminUserFilters
-      const limit = Math.min(100, Math.max(1, parseInt(body.limit || '50', 10)))
-
-      const sample = await BroadcastService.previewRecipientSample(filters, limit)
-
-      // Only return safe fields — no sensitive data
-      const safeSample = sample.map((u) => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        career_role: u.career_role,
-        onboarding_completed: u.onboarding_completed,
-      }))
-
-      return NextResponse.json({ success: true, sample: safeSample, count: safeSample.length })
-    } catch (err) {
-      return NextResponse.json(
-        { error: adminErrorMessage(err, 'Internal server error') },
-        { status: 500 }
-      )
+      body = (await request.json()) as { filters?: AdminUserFilters; limit?: string }
+    } catch {
+      throw new RouteError(400, 'VALIDATION', 'Invalid JSON body')
     }
+
+    const filters = (body.filters ?? {}) as AdminUserFilters
+    const limit = Math.min(100, Math.max(1, parseInt(body.limit || '50', 10)))
+
+    const sample = await BroadcastService.previewRecipientSample(filters, limit)
+
+    // Only return safe fields: no sensitive data
+    const safeSample = sample.map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      career_role: u.career_role,
+      onboarding_completed: u.onboarding_completed,
+    }))
+
+    return NextResponse.json({ success: true, sample: safeSample, count: safeSample.length })
   }
 )
