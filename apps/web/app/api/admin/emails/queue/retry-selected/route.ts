@@ -6,6 +6,10 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { revalidateAdminShell } from '@/lib/admin/cache-tags'
+import {
+  AUTH_EMAIL_EXPIRED_RETRY_MESSAGE,
+  isExpiredAuthQueueRow,
+} from '@/lib/notifications/queue/helpers'
 
 export const runtime = 'nodejs'
 
@@ -35,7 +39,7 @@ export const POST = withRoute(
       // 1. Fetch eligible items (not delivered or active processing)
       const { data: rawItems, error: fetchErr } = await supabase
         .from('email_queue')
-        .select('id, to_email, template_key, status, processing_at')
+        .select('id, to_email, template_key, template_variables, status, processing_at')
         .in('id', safeIds)
         .or(`status.in.(failed,dead_letter,retrying,skipped,suppressed),and(status.eq.processing,processing_at.lte.${staleThresholdIso})`)
 
@@ -43,7 +47,13 @@ export const POST = withRoute(
         return NextResponse.json({ error: sanitizeErrorMessage(fetchErr.message) }, { status: 500 })
       }
 
-      const items = (rawItems || []) as Array<{ id: string; to_email: string; template_key: string; status: string }>
+      const items = (rawItems || []) as Array<{
+        id: string
+        to_email: string
+        template_key: string
+        template_variables: unknown
+        status: string
+      }>
       if (items.length === 0) {
         return NextResponse.json({
           success: true,
@@ -65,14 +75,35 @@ export const POST = withRoute(
 
       const eligibleIds: string[] = []
       const suppressedIds: string[] = []
+      // ADR-005: auth emails whose variables were scrubbed at dead-letter time. Requeueing
+      // them would send a broken link, so they are left as they are and reported.
+      const expiredAuthIds: string[] = []
 
       for (const item of items) {
+        if (isExpiredAuthQueueRow(item.template_key, item.template_variables)) {
+          expiredAuthIds.push(item.id)
+          continue
+        }
         const isCritical = item.template_key === 'auth.verify_email' || item.template_key === 'auth.password_reset'
         if (!isCritical && suppressedSet.has(item.to_email.toLowerCase())) {
           suppressedIds.push(item.id)
         } else {
           eligibleIds.push(item.id)
         }
+      }
+
+      // Every match was an expired auth email: nothing to requeue, so say why.
+      if (expiredAuthIds.length > 0 && eligibleIds.length === 0 && suppressedIds.length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            requested: safeIds.length,
+            retried: 0,
+            expired: expiredAuthIds.length,
+            error: AUTH_EMAIL_EXPIRED_RETRY_MESSAGE,
+          },
+          { status: 409 }
+        )
       }
 
       const now = new Date().toISOString()
@@ -131,6 +162,7 @@ export const POST = withRoute(
           requestedCount: safeIds.length,
           retriedCount,
           suppressedCount: suppressedIds.length,
+          expiredAuthCount: expiredAuthIds.length,
         }
       )
 
@@ -140,7 +172,8 @@ export const POST = withRoute(
         requested: safeIds.length,
         retried: retriedCount,
         skipped: safeIds.length - retriedCount,
-        message: `Successfully requeued ${retriedCount} email(s) for delivery.`,
+        expired: expiredAuthIds.length,
+        message: `Successfully requeued ${retriedCount} email(s) for delivery.${expiredAuthNote(expiredAuthIds.length)}`,
       })
     } catch (err) {
       const message = adminErrorMessage(err, 'Batch retry failed')
@@ -148,3 +181,10 @@ export const POST = withRoute(
     }
   }
 )
+
+/** Tells the admin how many selected auth emails were left alone because they expired. */
+function expiredAuthNote(count: number): string {
+  return count > 0
+    ? ` ${count} sign-in email(s) expired and were not requeued. Ask the learner to request a new one.`
+    : ''
+}

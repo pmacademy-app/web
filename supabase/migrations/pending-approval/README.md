@@ -132,6 +132,31 @@ writes both keys back whenever an admin toggles any flag.
 Undo: `rollback/20261112000002_remove_retired_notification_flags.down.sql` puts both keys back as
 `true`. The previous values cannot be recovered.
 
+### `20261113000001_scrub_dead_letter_auth_links.sql` (ADR-005 gap, SEC-17, AG-02, one-off)
+
+Replaces `template_variables` with the marker `{"_scrubbed": "dead_letter"}` on every
+`email_queue` row with status `dead_letter` or `failed` and a `template_key` starting with
+`auth.`. Those rows still hold one-time verification and password-reset links that admins can
+read. The AG-02 app change already scrubs new dead letters
+(`apps/web/lib/notifications/queue/processor.ts`); this cleans up the rows written before it.
+The column is `NOT NULL`, so the marker is written instead of `NULL`. `updated_at` is left alone so
+the retention clock does not restart. Rows that can still be sent (pending, retrying, processing)
+are not touched.
+
+1. Deploy the AG-02 change first, so nothing writes unscrubbed dead letters any more and admin
+   retry refuses scrubbed auth rows.
+2. Optional: run the count query in the migration header to see how many rows will change.
+3. Run the migration in the SQL editor. Its self-check raises if any matching row still carries a
+   variable.
+4. Run `validation/20261113000001_scrub_dead_letter_auth_links_validation.sql` (read-only, expects 0).
+
+No export step: the only data removed is the expired links, and exporting them would copy the
+secret this removes. Leave the file here after applying it.
+
+Undo: `rollback/20261113000001_scrub_dead_letter_auth_links.down.sql` is a documented no-op. The
+scrubbed links cannot be restored, and they had expired anyway. A learner who still needs the
+email requests a new one.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are

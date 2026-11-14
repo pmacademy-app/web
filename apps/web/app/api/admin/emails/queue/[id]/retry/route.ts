@@ -6,6 +6,10 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { revalidateAdminShell } from '@/lib/admin/cache-tags'
+import {
+  AUTH_EMAIL_EXPIRED_RETRY_MESSAGE,
+  isExpiredAuthQueueRow,
+} from '@/lib/notifications/queue/helpers'
 
 export const runtime = 'nodejs'
 
@@ -26,7 +30,7 @@ export const POST = withRoute(
       // 1. Fetch current queue item
       const { data: item, error: fetchErr } = await supabase
         .from('email_queue')
-        .select('id, to_email, template_key, status, attempt_count, processing_at')
+        .select('id, to_email, template_key, template_variables, status, attempt_count, processing_at')
         .eq('id', id)
         .maybeSingle()
 
@@ -55,6 +59,15 @@ export const POST = withRoute(
         return NextResponse.json(
           { error: 'Cannot retry queue item currently being processed by an active worker.' },
           { status: 400 }
+        )
+      }
+
+      // ADR-005: a dead-lettered auth email has its variables (and its one-time link)
+      // scrubbed. Requeueing it would send a broken link, and the original had expired.
+      if (isExpiredAuthQueueRow(item.template_key, item.template_variables)) {
+        return NextResponse.json(
+          { success: false, error: AUTH_EMAIL_EXPIRED_RETRY_MESSAGE },
+          { status: 409 }
         )
       }
 
