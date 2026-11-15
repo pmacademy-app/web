@@ -362,3 +362,24 @@ To prevent new code from running against an unmigrated schema, production deploy
    - If an application deployment needs to be rolled back immediately, open the Vercel dashboard > Deployments, find the previous known-good deployment, and promote it to production.
    - If a database migration must also be rolled back, execute the corresponding `.down.sql` script in `supabase/migrations/pending-approval/rollback/` via the Supabase SQL Editor.
 
+---
+
+## 9. Nightly Database Backups and Restore Drills (ENG-07 / AG-08)
+
+Because the free Supabase tier does not provide automated downloadable daily backups, database resilience is maintained through a zero-cost scheduled backup workflow:
+
+1. **Workflow (`.github/workflows/db-backup.yml`):**
+   - **Schedule**: Nightly at 21:30 UTC (03:00 IST, off-peak hours in India), plus on-demand `workflow_dispatch`.
+   - **Dumps**: Dumps roles, schema, and table data using the pinned Supabase CLI.
+   - **Encryption**: Packages the SQL dumps and encrypts them with AES256 symmetric encryption via GnuPG using the `BACKUP_ENCRYPTION_KEY` secret. Unencrypted SQL files are scrubbed before upload.
+   - **Retention**: Uploads the encrypted archive (`prodily_db_backup_<timestamp>.tar.gz.gpg`) to GitHub Actions Artifacts with a 30-day retention period.
+
+2. **Required Repository Secrets:**
+   - `BACKUP_ENCRYPTION_KEY`: Symmetric key held only by the owner in a secure password manager.
+   - `SUPABASE_DB_PASSWORD`: Production database user password.
+   - `SUPABASE_PROJECT_ID`: Supabase project reference ID.
+
+3. **Restore Drill Runbook:**
+   - Full instructions for downloading, decrypting, and test-restoring an archive into a local Supabase instance are detailed in [`docs/ops/restore-drill.md`](ops/restore-drill.md).
+
+
