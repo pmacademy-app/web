@@ -326,3 +326,39 @@ The migration is **held, owner-applied**: [`supabase/migrations/pending-approval
 **Pause or undo:** `SELECT cron.alter_job(jobid, active := false) FROM cron.job WHERE jobname LIKE 'prodily-%';` pauses all six. To remove them, run [`rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`](../supabase/migrations/pending-approval/rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql), after making sure the GitHub `schedule:` block is still in place.
 
 **Housekeeping:** `cron.job_run_details` keeps one row per run (about 300 a day for these jobs). Clear old rows now and then on the free tier's 500 MB database: `DELETE FROM cron.job_run_details WHERE end_time < now() - interval '14 days';`. `pg_net` clears its own responses after about 6 hours.
+
+---
+
+## 8. Release Order: Database Migrations Before Application Deployment (ENG-06 / AG-07)
+
+To prevent new code from running against an unmigrated schema, production deployments follow a strict, coordinated order:
+
+1. **GitHub Actions on `main`:**
+   - Job `deploy-supabase` runs first and applies all pending migrations in `supabase/migrations/` to the production database via the pinned Supabase CLI.
+   - Job `deploy-vercel` runs only after `deploy-supabase` completes successfully (`needs: [deploy-supabase]`).
+   - The Vercel CLI pulls environment configuration, prebuilds production artifacts (`vercel build --prod`), and deploys prebuilt assets (`vercel deploy --prebuilt --prod`).
+   - The job verifies deployment health by curling `https://prodily.app/api/health`.
+
+2. **Vercel Git Integration (`apps/web/vercel.json`):**
+   - Automatic Git-triggered production deployment for `main` is disabled:
+     ```json
+     "git": {
+       "deploymentEnabled": {
+         "main": false
+       }
+     }
+     ```
+   - Pull request preview deployments remain enabled.
+
+3. **Owner Setup (Required before merging):**
+   - Vercel dashboard > Account Settings > Tokens: create a personal access token.
+   - Obtain `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` from project settings or `.vercel/project.json`.
+   - GitHub repository > Settings > Secrets and variables > Actions: add the three secrets:
+     - `VERCEL_TOKEN`
+     - `VERCEL_ORG_ID`
+     - `VERCEL_PROJECT_ID`
+
+4. **Rollback Procedure:**
+   - If an application deployment needs to be rolled back immediately, open the Vercel dashboard > Deployments, find the previous known-good deployment, and promote it to production.
+   - If a database migration must also be rolled back, execute the corresponding `.down.sql` script in `supabase/migrations/pending-approval/rollback/` via the Supabase SQL Editor.
+

@@ -445,3 +445,68 @@ jobs:
           fi
           echo "::error title=Migrations still pending after push::supabase db push --dry-run did not report the remote database as up to date. The deploy may be partial. Review the migration state output above before treating this deploy as complete."
           exit 1
+
+  # Deploys prebuilt Next.js application to Vercel production after database migrations
+  # have applied cleanly. (ENG-06 / AG-07)
+  deploy-vercel:
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [deploy-supabase]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Assert Vercel deployment credentials are present
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          missing=""
+          [ -n "${VERCEL_TOKEN:-}" ]      || missing="${missing} VERCEL_TOKEN"
+          [ -n "${VERCEL_ORG_ID:-}" ]    || missing="${missing} VERCEL_ORG_ID"
+          [ -n "${VERCEL_PROJECT_ID:-}" ] || missing="${missing} VERCEL_PROJECT_ID"
+          if [ -n "${missing}" ]; then
+            echo "::error title=Vercel production deploy cannot run::Missing repository secret(s):${missing}. Production was NOT deployed. Configure these secrets, then re-run this workflow."
+            exit 1
+          fi
+          echo "✓ All three Vercel deployment secrets are present."
+
+      - name: Pull Vercel Environment Information
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 pull --yes --environment=production --token="${VERCEL_TOKEN}"
+
+      - name: Build Project Artifacts
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 build --prod --token="${VERCEL_TOKEN}"
+
+      - name: Deploy Prebuilt Artifacts to Production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
+
+      - name: Verify Deployment Health
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --retry 5 --retry-delay 5 https://prodily.app/api/health
