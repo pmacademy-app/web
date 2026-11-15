@@ -41,8 +41,7 @@ export function CookieConsentBanner() {
 
   return (
     <div
-      role="dialog"
-      aria-modal="false"
+      role="region"
       aria-label="Cookie preferences"
       className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"
     >

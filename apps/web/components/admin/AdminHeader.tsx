@@ -21,6 +21,7 @@ import {
 import { getAdminSectionLabel } from '@/lib/admin/navigation'
 import { signOutAdmin } from '@/lib/admin/session'
 import { apiGet } from '@/lib/api/client'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import type { AdminConsoleUser } from './AdminConsoleShell'
 import type { AdminSearchResponse } from '@/lib/api/contracts/admin'
 
@@ -366,20 +367,14 @@ export function AdminHeader({
       </header>
 
       {/* Global Search Dialog Modal */}
-      {searchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4">
-          <div
-            className="fixed inset-0 bg-black/50 transition-opacity"
-            onClick={handleCloseSearch}
-            aria-hidden="true"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Admin Global Search"
-            className="relative w-full max-w-2xl rounded-2xl bg-admin-surface border border-admin-border shadow-2xl p-4 sm:p-5 space-y-4 animate-in fade-in-0 zoom-in-95"
-          >
-            {/* Search Input Bar */}
+      <Dialog open={searchOpen} onOpenChange={(open) => !open && handleCloseSearch()}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100%-2rem)] sm:w-full max-w-2xl rounded-2xl bg-admin-surface border border-admin-border shadow-2xl p-4 sm:p-5 space-y-4"
+        >
+          <DialogTitle className="sr-only">Admin Global Search</DialogTitle>
+          <DialogDescription className="sr-only">Search learners, curriculum lessons, certificates, or communications</DialogDescription>
+          {/* Search Input Bar */}
             <div className="flex items-center gap-3 border-b border-admin-border pb-3">
               <Search className="w-5 h-5 text-admin-accent shrink-0" />
               <input
@@ -553,9 +548,8 @@ export function AdminHeader({
                 </div>
               ) : null}
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { AlertTriangle, Eye, EyeOff, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 export interface ConfirmDestructiveActionProps {
   isOpen: boolean
@@ -82,12 +83,10 @@ export function ConfirmDestructiveAction({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 animate-in fade-in-0">
-      <div
-        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-destructive/30 bg-card p-4 sm:p-6 shadow-2xl space-y-5 sm:space-y-6"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="destructive-dialog-title"
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent
+        showCloseButton={false}
+        className="block relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-destructive/30 bg-card p-4 sm:p-6 shadow-2xl space-y-5 sm:space-y-6"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
@@ -96,10 +95,10 @@ export function ConfirmDestructiveAction({
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
-              <h3 id="destructive-dialog-title" className="text-lg font-bold text-foreground">
+              <DialogTitle className="text-lg font-bold text-foreground">
                 {title}
-              </h3>
-              <p className="text-xs text-muted-foreground">{description}</p>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">{description}</DialogDescription>
             </div>
           </div>
           <Button
@@ -218,7 +217,7 @@ export function ConfirmDestructiveAction({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

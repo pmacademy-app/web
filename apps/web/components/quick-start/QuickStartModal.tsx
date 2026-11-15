@@ -435,7 +435,6 @@ export function QuickStartModal() {
         ref={cardRef}
         tabIndex={-1}
         role="dialog"
-        aria-modal="true"
         aria-labelledby="quickstart-title"
         aria-describedby="quickstart-description"
         className={[

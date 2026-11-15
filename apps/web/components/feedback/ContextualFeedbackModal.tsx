@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { MessageSquare, Star, X, Send, CheckCircle2, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { apiPost } from '@/lib/api/client'
 
 interface ContextualFeedbackModalProps {
@@ -120,13 +121,11 @@ export function ContextualFeedbackModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="feedback-modal-title"
-    >
-      <div className="w-full max-w-lg bg-background border border-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
+      <DialogContent
+        showCloseButton={false}
+        className="block w-full max-w-lg bg-background border border-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative"
+      >
         <Button
           type="button"
           variant="ghost"
@@ -157,10 +156,10 @@ export function ContextualFeedbackModal({
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div>
-                <h3 id="feedback-modal-title" className="text-base font-bold text-foreground font-serif">
+                <DialogTitle id="feedback-modal-title" className="text-base font-bold text-foreground font-serif">
                   {title}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground leading-snug">{description}</DialogDescription>
               </div>
             </div>
 
@@ -320,7 +319,7 @@ export function ContextualFeedbackModal({
             </div>
           </form>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

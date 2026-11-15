@@ -7,6 +7,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, LogOut, PanelsTop
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { signOutAdmin } from '@/lib/admin/session'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import type { AdminConsoleUser } from './AdminConsoleShell'
 import {
   ADMIN_NAV_BUILT,
@@ -245,32 +246,26 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: Adm
       </aside>
 
       {/* Mobile Drawer Overlay */}
-      {mobileOpen && (
-        <div className="no-print fixed inset-0 z-50 md:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/60 transition-opacity"
+      <Dialog open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
+        <DialogContent
+          side="left"
+          showCloseButton={false}
+          className="no-print md:hidden relative flex flex-col h-full p-0 gap-0 border-r border-admin-border bg-admin-surface"
+        >
+          <DialogTitle className="sr-only">Admin navigation</DialogTitle>
+          <DialogDescription className="sr-only">Admin console navigation menu</DialogDescription>
+          <button
+            ref={closeButtonRef}
+            type="button"
             onClick={onMobileClose}
-            aria-hidden="true"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Admin navigation"
-            className="relative flex flex-col h-full animate-in slide-in-from-left duration-200"
+            aria-label="Close admin navigation menu"
+            className="absolute top-2 right-2 z-10 size-10 inline-flex items-center justify-center rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg transition-colors"
           >
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={onMobileClose}
-              aria-label="Close admin navigation menu"
-              className="absolute top-2 right-2 z-10 size-10 inline-flex items-center justify-center rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            {content}
-          </div>
-        </div>
-      )}
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          {content}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

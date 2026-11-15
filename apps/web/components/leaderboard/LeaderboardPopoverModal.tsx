@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 interface LeaderboardPopoverModalProps {
   isOpen: boolean
@@ -25,41 +26,13 @@ export function LeaderboardPopoverModal({
   badgeText,
   children,
 }: LeaderboardPopoverModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!isOpen) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
-
-  if (!isOpen) return null
-
   return (
-    <>
-      {/* Click-outside backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/40 animate-in fade-in duration-150"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Floating Popover Modal */}
-      <div
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        showCloseButton={false}
         className={cn(
-          'fixed top-20 left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2.5',
-          'w-auto sm:w-[480px] max-h-[82vh] sm:max-h-[75vh]',
-          'z-50 bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden',
-          'animate-in fade-in zoom-in-95 duration-150'
+          'w-[calc(100%-2rem)] sm:w-[480px] max-h-[82vh] sm:max-h-[75vh]',
+          'bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden p-0 gap-0'
         )}
       >
         {/* Modal Header */}
@@ -75,14 +48,14 @@ export function LeaderboardPopoverModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold font-serif text-foreground">{title}</h3>
+                <DialogTitle className="text-sm font-bold font-serif text-foreground">{title}</DialogTitle>
                 {badgeText && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-semibold">
                     {badgeText}
                   </span>
                 )}
               </div>
-              {subtitle && <p className="text-[11px] text-muted-foreground">{subtitle}</p>}
+              {subtitle && <DialogDescription className="text-[11px] text-muted-foreground">{subtitle}</DialogDescription>}
             </div>
           </div>
 
@@ -100,7 +73,7 @@ export function LeaderboardPopoverModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {children}
         </div>
-      </div>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

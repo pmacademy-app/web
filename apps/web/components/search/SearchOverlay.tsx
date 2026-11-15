@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react'
 import { useSearch } from './SearchOverlayProvider'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import {
   buildCurriculumModuleIndex,
   resolveLessonAccess,
@@ -364,22 +365,16 @@ export function SearchOverlay() {
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 pt-16 sm:pt-4"
-      aria-modal="true"
-      role="dialog"
-      aria-label="Search curriculum"
-    >
-      {/* High-grade ambient backdrop with subtle blur */}
-      <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
-        onClick={closeSearch}
-        aria-hidden="true"
-      />
-
-      {/* Modern Command Palette Panel */}
-      <div className="relative w-full max-w-2xl bg-card border border-border shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
-        {/* Seamless Search Input Bar */}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && closeSearch()}>
+      <DialogContent
+        showCloseButton={false}
+        className="block w-full max-w-2xl bg-card border border-border shadow-2xl rounded-2xl overflow-hidden p-0 gap-0 max-h-[85vh] flex flex-col"
+      >
+        <DialogTitle className="sr-only">Search curriculum</DialogTitle>
+        <DialogDescription className="sr-only">Search curriculum lessons and modules</DialogDescription>
+        {/* Modern Command Palette Panel */}
+        <div className="relative w-full bg-card flex flex-col flex-1 min-h-0">
+          {/* Seamless Search Input Bar */}
         <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5 border-b border-border bg-card">
           <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <Search className="w-4 h-4" />
@@ -626,6 +621,7 @@ export function SearchOverlay() {
           )}
         </div>
       </div>
-    </div>
+    </DialogContent>
+  </Dialog>
   )
 }
