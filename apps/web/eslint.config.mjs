@@ -122,12 +122,10 @@ const RAW_BUTTON_ALLOWLIST = [
   "admin/UsersWorkspace.tsx",
   "admin/admin-toast.tsx",
   "auth/ResendVerificationCard.tsx",
-  "badges/BadgeNotification.tsx",
   "capstones/RichEditor.tsx",
   "capstones/SubmitConfirmationModal.tsx",
   "feedback/ContextualFeedbackModal.tsx",
   "feedback/LessonFeedbackWidget.tsx",
-  "feedback/error-state.tsx",
   "layout/Sidebar.tsx",
   "layout/SystemAnnouncementBanner.tsx",
   "layout/Topbar.tsx",
@@ -147,7 +145,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "notifications/NotificationToast.tsx",
   "portfolio/FeaturedCapstoneCard.tsx",
   "portfolio/PortfolioCapstones.tsx",
-  "progress/ProgressSectionDropdown.tsx",
   "quick-start/QuickStartModal.tsx",
   "quiz/QuizOption.tsx",
   "review/QualitySelector.tsx",
@@ -161,7 +158,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "settings/ReferralSettingsTab.tsx",
   "settings/SecuritySettingsTab.tsx",
   "settings/SettingsTabs.tsx",
-  "ui/accordion.tsx",
 ];
 
 const eslintConfig = [
