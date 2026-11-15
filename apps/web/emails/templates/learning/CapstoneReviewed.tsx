@@ -40,7 +40,7 @@ export const CapstoneReviewedEmail: React.FC<CapstoneReviewedEmailProps> = ({
         Hello {userName}, your submission for <strong>{moduleName}</strong> has been reviewed.
       </p>
       {feedback && (
-        <div style={{ backgroundColor: '#F9F8F6', borderLeft: '4px solid #10B981', padding: '12px 16px', margin: '16px 0', fontSize: '14px', color: '#171A17' }}>
+        <div style={{ backgroundColor: '#F9F8F6', borderLeft: '4px solid #15803D', padding: '12px 16px', margin: '16px 0', fontSize: '14px', color: '#171A17' }}>
           <p style={{ margin: 0, fontStyle: 'italic' }}>&quot;{feedback}&quot;</p>
         </div>
       )}

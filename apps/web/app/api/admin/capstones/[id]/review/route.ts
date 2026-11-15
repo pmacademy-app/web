@@ -28,7 +28,7 @@ export const POST = withRoute(
       .maybeSingle()
 
     if (readError) {
-      throw new RouteError(500, 'DATABASE_ERROR', 'Failed to read capstone submission.')
+      throw new Error('Failed to read capstone submission.')
     }
     if (!current) {
       throw new RouteError(404, 'NOT_FOUND', 'Capstone submission not found.')

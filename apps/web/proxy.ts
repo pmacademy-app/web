@@ -350,19 +350,32 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     if (accessToken) {
       try {
-        const { data, error } = await supabase.auth.getClaims(accessToken)
-        if (!error && data?.claims?.sub) {
-          const claims = data.claims
-          user = {
-            id: claims.sub,
-            email: (claims.email as string) || '',
-            app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
-            user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
-            email_confirmed_at: (claims.email_confirmed_at as string | undefined) ?? (claims.email ? 'confirmed' : undefined),
+        if (typeof (supabase.auth as any).getClaims === 'function') {
+          const { data, error } = await (supabase.auth as any).getClaims(accessToken)
+          if (!error && data?.claims?.sub) {
+            const claims = data.claims
+            user = {
+              id: claims.sub,
+              email: (claims.email as string) || '',
+              app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
+              user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
+              email_confirmed_at: (claims.email_confirmed_at as string | undefined) ?? (claims.email ? 'confirmed' : undefined),
+            }
+          }
+        } else {
+          const { data, error } = await supabase.auth.getUser(accessToken)
+          if (!error && data?.user) {
+            user = {
+              id: data.user.id,
+              email: data.user.email || '',
+              app_metadata: data.user.app_metadata || {},
+              user_metadata: data.user.user_metadata || {},
+              email_confirmed_at: data.user.email_confirmed_at,
+            }
           }
         }
       } catch (err) {
-        console.error('[proxy] getClaims error:', err)
+        console.error('[proxy] auth verification error:', err)
       }
     }
 
@@ -640,6 +653,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     const profileData = await loadUserProfileData()
     const isOnboardingComplete = Boolean(
       user.app_metadata?.onboarding_complete === true ||
+      user.app_metadata?.onboarding_completed === true ||
       profileData?.onboarding_completed ||
       profileData?.goal != null ||
       profileData?.curriculum_access_override
