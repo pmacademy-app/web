@@ -333,6 +333,24 @@ export const LessonJSONSchema = z.object({
   estimatedReadingTime: z.number(),
   estimatedCompletionTime: z.number(),
   prerequisites: z.array(z.string()), // list of stable lessonId strings
+  seoTitle: z.string().max(60, 'seoTitle must be up to 60 characters').optional(),
+  seoDescription: z
+    .string()
+    .min(120, 'seoDescription must be at least 120 characters')
+    .max(160, 'seoDescription must be at most 160 characters')
+    .optional(),
+  inShort: z
+    .string()
+    .refine(
+      (val: string) => {
+        const words = val.trim().split(/\s+/).filter(Boolean).length;
+        return words >= 40 && words <= 80;
+      },
+      {
+        message: 'inShort must be between 40 and 80 words',
+      }
+    )
+    .optional(),
   sourceFile: z.string(),
   blocks: z.array(BlockSchema),
   assets: z.array(

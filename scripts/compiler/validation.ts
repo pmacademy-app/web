@@ -421,6 +421,50 @@ const validationRules: ValidationRule[] = [
       return issues;
     },
   },
+
+  // 10. SEO fields validation (AG-23)
+  {
+    id: 'seo-fields-validation',
+    severity: 'error',
+    check(lesson, ctx) {
+      const issues: ValidationIssue[] = [];
+      if (lesson.seoTitle !== undefined) {
+        if (typeof lesson.seoTitle !== 'string' || lesson.seoTitle.length > 60) {
+          issues.push({
+            id: 'seo-fields-validation',
+            severity: 'error',
+            message: `seoTitle must be up to 60 characters (got ${lesson.seoTitle?.length ?? 0}): "${lesson.seoTitle}"`,
+            filePath: ctx.filePath,
+          });
+        }
+      }
+      if (lesson.seoDescription !== undefined) {
+        const len = typeof lesson.seoDescription === 'string' ? lesson.seoDescription.length : 0;
+        if (len < 120 || len > 160) {
+          issues.push({
+            id: 'seo-fields-validation',
+            severity: 'error',
+            message: `seoDescription must be between 120 and 160 characters (got ${len}): "${lesson.seoDescription}"`,
+            filePath: ctx.filePath,
+          });
+        }
+      }
+      if (lesson.inShort !== undefined) {
+        const words = typeof lesson.inShort === 'string'
+          ? lesson.inShort.trim().split(/\s+/).filter(Boolean).length
+          : 0;
+        if (words < 40 || words > 80) {
+          issues.push({
+            id: 'seo-fields-validation',
+            severity: 'error',
+            message: `inShort must be between 40 and 80 words (got ${words}): "${lesson.inShort}"`,
+            filePath: ctx.filePath,
+          });
+        }
+      }
+      return issues;
+    },
+  },
 ];
 
 export function validateCompiledLesson(

@@ -1,3 +1,9 @@
+---
+seoTitle: "Product Surveys: Designing Effective Quantitative Research"
+seoDescription: "Design unbiased surveys that generate reliable quantitative user data. Learn optimal question structures, sampling techniques, and rating scales."
+inShort: "Surveys are quantitative research tools designed to measure patterns, validate qualitative findings, and gather feedback across large representative user samples. Effective surveys use precise, neutral questions, avoid leading phrasing or double-barreled prompts, and employ balanced Likert scales. They verify whether pain points observed in customer interviews represent widespread problems across the broader market."
+---
+
 # Lesson 13: Surveys
 
 ## Why This Lesson Matters

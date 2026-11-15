@@ -1,3 +1,9 @@
+---
+seoTitle: "Users vs Customers: Navigating Divergent Stakeholders"
+seoDescription: "Learn the critical distinction between users and customers in product management. Align competing buyer priorities with daily user workflows effectively."
+inShort: "Users are the individuals who interact directly with a product day to day, while customers are the economic buyers who hold purchasing authority. In consumer apps they are often identical, but in enterprise software they frequently have conflicting priorities, requiring product managers to balance enterprise purchasing criteria against daily end-user workflow satisfaction."
+---
+
 # Lesson 5: Users vs. Customers
 
 ## Why This Lesson Matters

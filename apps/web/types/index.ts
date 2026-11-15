@@ -157,6 +157,9 @@ export interface CompiledLesson {
   estimatedReadingTime: number  // minutes
   estimatedCompletionTime: number // minutes
   prerequisites: string[]       // array of les_XXXXXX IDs
+  seoTitle?: string
+  seoDescription?: string
+  inShort?: string
   sourceFile: string
   blocks: CompiledBlock[]
   assets?: unknown[]
@@ -185,6 +188,9 @@ export interface CurriculumEntry {
   estimatedReadingTime: number
   estimatedCompletionTime: number
   prerequisites: string[]
+  seoTitle?: string
+  seoDescription?: string
+  inShort?: string
   updatedAt?: string
 }
 

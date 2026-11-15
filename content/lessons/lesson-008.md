@@ -1,3 +1,9 @@
+---
+seoTitle: "Product Discovery: Validate Value, Usability & Viability"
+seoDescription: "Master continuous product discovery to reduce risk before building. Learn how discovery and delivery run in parallel to validate assumptions rapidly."
+inShort: "Product discovery is the continuous process of identifying and validating what to build before committing engineering resources to development. Working in parallel with delivery, discovery systematically mitigates four primary risks: value risk (will customers buy?), usability risk (can users figure it out?), feasibility risk (can engineers build it?), and business viability risk (does it work for the business?)."
+---
+
 # Lesson 8: Product Discovery
 
 ## Why This Lesson Matters

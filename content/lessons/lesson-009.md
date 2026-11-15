@@ -1,3 +1,9 @@
+---
+seoTitle: "Product Vision: Defining Long-Term Purpose and Direction"
+seoDescription: "Define an inspiring, enduring product vision that aligns teams. Distinguish stable long-term vision from adaptable strategies and tactical roadmaps."
+inShort: "A product vision describes the future state an organization strives to create for customers over a three to five year horizon. Unlike flexible roadmaps and tactical backlogs that shift frequently, a strong product vision remains stable, acting as a north star that inspires cross-functional teams and guides coherent strategic decision-making over time."
+---
+
 # Lesson 9: Product Vision
 
 ## Why This Lesson Matters

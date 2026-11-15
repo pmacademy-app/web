@@ -6,7 +6,7 @@ import { generateBlockId, getOrCreateLessonId } from '../registry';
 import { validateCompiledLesson } from '../validation';
 import { CompilerContext } from '../plugins/remark-plugins';
 import { extractQuizBlock, extractFlashcardBlock, mdastToBlocks } from '../plugins/extractors';
-import { compileLesson, compileAllContent, parseResourceItem, resolveCompanyName } from '../compile';
+import { compileLesson, compileAllContent, parseResourceItem, resolveCompanyName, extractFrontmatterAndMetadata } from '../compile';
 import { compileMermaidToSvg } from '../mermaid-svg';
 
 describe('PM Academy Content Compiler Test Suite', () => {
@@ -566,6 +566,134 @@ describe('PM Academy Content Compiler Test Suite', () => {
       assert.ok(example, 'lesson-061 must have a companyExample block');
       assert.notStrictEqual(example.company, 'Spotify');
       assert.strictEqual(typeof example.company, 'string');
+    });
+  });
+
+  describe('SEO Fields & In Short (AG-23)', () => {
+    it('extracts valid frontmatter fields and separates markdown body', () => {
+      const source = `---
+seoTitle: "What is Product Management? Role, Scope & Impact"
+seoDescription: "Product Management is the discipline of deciding what problem to solve with evidence. Learn the core definition, scope, and accountability triangle."
+inShort: "Product Management is the discipline of deciding, with evidence, what problem is worth solving and ensuring the resulting solution creates customer and business value. Rather than writing code or designing interfaces directly, a PM achieves outcomes through cross-functional influence, balancing desirability, feasibility, and viability."
+---
+
+# Lesson 1: What is Product Management?
+## Theory
+Body content here.`;
+
+      const result = extractFrontmatterAndMetadata(source);
+      assert.strictEqual(result.seoTitle, 'What is Product Management? Role, Scope & Impact');
+      assert.strictEqual(
+        result.seoDescription,
+        'Product Management is the discipline of deciding what problem to solve with evidence. Learn the core definition, scope, and accountability triangle.'
+      );
+      assert.ok(result.inShort?.startsWith('Product Management is the discipline'));
+      assert.ok(!result.markdownBody.includes('seoTitle'));
+      assert.ok(result.markdownBody.includes('# Lesson 1: What is Product Management?'));
+    });
+
+    it('allows missing SEO fields', () => {
+      const source = `# Lesson 1: What is Product Management?
+## Theory
+Body content here.`;
+      const result = extractFrontmatterAndMetadata(source);
+      assert.strictEqual(result.seoTitle, undefined);
+      assert.strictEqual(result.seoDescription, undefined);
+      assert.strictEqual(result.inShort, undefined);
+      assert.strictEqual(result.markdownBody, source);
+    });
+
+    it('validation catches seoTitle exceeding 60 characters', () => {
+      const mockLesson: any = {
+        schemaVersion: 2,
+        id: 'les_test01',
+        title: 'Test',
+        slug: 'lesson-001',
+        module: 'foundations',
+        order: 1,
+        totalInModule: 10,
+        difficulty: 1,
+        estimatedReadingTime: 20,
+        estimatedCompletionTime: 30,
+        prerequisites: [],
+        sourceFile: 'content/lessons/lesson-001.md',
+        blocks: [
+          { type: 'learningObjectives', blockId: 'b1', objectives: ['Obj'] },
+          { type: 'theory', blockId: 'b2', children: [] },
+          { type: 'quiz', blockId: 'b3', questions: Array(15).fill({ question: 'Q', options: ['A', 'B', 'C', 'D'], correctAnswer: 0, explanation: 'Exp' }) },
+          { type: 'flashcardDeck', blockId: 'b4', cards: [{ front: 'F', back: 'B' }] },
+          { type: 'connections', blockId: 'b5', previous: null, current: { id: 'les_test01', title: 'Test' }, next: null, unlocks: [] },
+        ],
+        searchable: { plainText: '', headings: [] },
+        seoTitle: 'This is an excessively long SEO title that goes way beyond sixty characters in length',
+      };
+      const ctx: any = { filePath: 'test.md', lessonId: 'les_test01', issues: [] };
+      const issues = validateCompiledLesson(mockLesson, ctx);
+      const seoErrors = issues.filter((i) => i.id === 'seo-fields-validation');
+      assert.ok(seoErrors.length > 0, 'expected seo-fields-validation error');
+      assert.ok(seoErrors[0].message.includes('up to 60 characters'));
+    });
+
+    it('validation catches seoDescription outside 120-160 characters', () => {
+      const mockLesson: any = {
+        schemaVersion: 2,
+        id: 'les_test02',
+        title: 'Test',
+        slug: 'lesson-001',
+        module: 'foundations',
+        order: 1,
+        totalInModule: 10,
+        difficulty: 1,
+        estimatedReadingTime: 20,
+        estimatedCompletionTime: 30,
+        prerequisites: [],
+        sourceFile: 'content/lessons/lesson-001.md',
+        blocks: [
+          { type: 'learningObjectives', blockId: 'b1', objectives: ['Obj'] },
+          { type: 'theory', blockId: 'b2', children: [] },
+          { type: 'quiz', blockId: 'b3', questions: Array(15).fill({ question: 'Q', options: ['A', 'B', 'C', 'D'], correctAnswer: 0, explanation: 'Exp' }) },
+          { type: 'flashcardDeck', blockId: 'b4', cards: [{ front: 'F', back: 'B' }] },
+          { type: 'connections', blockId: 'b5', previous: null, current: { id: 'les_test02', title: 'Test' }, next: null, unlocks: [] },
+        ],
+        searchable: { plainText: '', headings: [] },
+        seoDescription: 'Too short description.',
+      };
+      const ctx: any = { filePath: 'test.md', lessonId: 'les_test02', issues: [] };
+      const issues = validateCompiledLesson(mockLesson, ctx);
+      const seoErrors = issues.filter((i) => i.id === 'seo-fields-validation');
+      assert.ok(seoErrors.length > 0, 'expected seo-fields-validation error for short description');
+      assert.ok(seoErrors[0].message.includes('between 120 and 160 characters'));
+    });
+
+    it('validation catches inShort outside 40-80 words', () => {
+      const mockLesson: any = {
+        schemaVersion: 2,
+        id: 'les_test03',
+        title: 'Test',
+        slug: 'lesson-001',
+        module: 'foundations',
+        order: 1,
+        totalInModule: 10,
+        difficulty: 1,
+        estimatedReadingTime: 20,
+        estimatedCompletionTime: 30,
+        prerequisites: [],
+        sourceFile: 'content/lessons/lesson-001.md',
+        blocks: [
+          { type: 'learningObjectives', blockId: 'b1', objectives: ['Obj'] },
+          { type: 'theory', blockId: 'b2', children: [] },
+          { type: 'quiz', blockId: 'b3', questions: Array(15).fill({ question: 'Q', options: ['A', 'B', 'C', 'D'], correctAnswer: 0, explanation: 'Exp' }) },
+          { type: 'flashcardDeck', blockId: 'b4', cards: [{ front: 'F', back: 'B' }] },
+          { type: 'connections', blockId: 'b5', previous: null, current: { id: 'les_test03', title: 'Test' }, next: null, unlocks: [] },
+        ],
+        searchable: { plainText: '', headings: [] },
+        inShort: 'This summary has only six words.',
+      };
+      const ctx: any = { filePath: 'test.md', lessonId: 'les_test03', issues: [] };
+      const issues = validateCompiledLesson(mockLesson, ctx);
+      const seoErrors = issues.filter((i) => i.id === 'seo-fields-validation');
+      assert.ok(seoErrors.length > 0, 'expected seo-fields-validation error for short inShort');
+      assert.ok(seoErrors[0].message.includes('between 40 and 80 words'));
     });
   });
 });

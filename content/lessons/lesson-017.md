@@ -1,3 +1,9 @@
+---
+seoTitle: "Problem Statements: How to Frame Problems Without Solutions"
+seoDescription: "Write crisp, solution-free problem statements that focus engineering teams. Learn how to define affected users, root causes, and measurable impacts."
+inShort: "A problem statement is a concise description of an issue that needs to be addressed, framed entirely from the user perspective without prematurely prescribing a solution. Well-crafted problem statements specify who experiences the problem, in what context it occurs, what the measurable negative impact is, and why solving it aligns with strategic business goals."
+---
+
 # Lesson 17: Problem Statements
 
 ## Why This Lesson Matters

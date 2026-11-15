@@ -1,3 +1,9 @@
+---
+seoTitle: "Customer Segmentation: Group Users by Behavior and Needs"
+seoDescription: "Segment target markets by behavior, needs, and workflows instead of superficial demographics. Discover how actionable segments guide product strategy."
+inShort: "Customer segmentation divides a broad user base into distinct subgroups based on shared characteristics, behaviors, needs, or economic value. Effective product segmentation focuses on behavioral signals and operational context rather than superficial demographics alone, enabling teams to build focused feature sets, target go-to-market motions accurately, and prioritize roadmap investments for maximum retention and growth."
+---
+
 # Lesson 18: Customer Segmentation
 
 ## Why This Lesson Matters

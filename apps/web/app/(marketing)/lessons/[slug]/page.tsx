@@ -32,18 +32,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const [lesson, curriculum] = await Promise.all([
-    getLessonBySlug(slug),
-    fetchCurriculumData(),
-  ])
+  const lesson = await getLessonBySlug(slug)
   if (!lesson) return { title: 'Lesson Not Found' }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
-  const globalIdx = curriculum?.lessons.findIndex((l) => l.slug === slug || l.id === lesson.id) ?? -1
-  const globalOrder = globalIdx >= 0 ? globalIdx + 1 : (parseInt(slug.replace(/^lesson-/, ''), 10) || lesson.order)
   const canonicalUrl = `${siteUrl}/lessons/${slug}`
-  const pageTitle = `Lesson ${globalOrder}: ${lesson.title}`
-  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${getModuleTitle(lesson.module)}).`
+  const pageTitle = lesson.seoTitle || lesson.title
+  const description = lesson.seoDescription || `Read ${lesson.title} on ${BRAND.product}. (Module: ${getModuleTitle(lesson.module)}).`
 
   return {
     title: pageTitle,
@@ -53,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     openGraph: {
       title: `${pageTitle} | ${BRAND.fullName}`,
-      description: `Free Product Management lesson: ${lesson.title}`,
+      description: lesson.seoDescription || `Free Product Management lesson: ${lesson.title}`,
       url: canonicalUrl,
       type: 'article',
       images: [{
@@ -118,6 +113,17 @@ export default async function PublicLessonPage({ params }: PageProps) {
   const previewBlocks = lesson.blocks
     .filter((b) => !['quiz', 'flashcardDeck', 'reflection', 'connections'].includes(b.type))
     .slice(0, 8)
+
+  const publicReferenceBlocks = lesson.blocks
+    .filter((b) => ['glossary', 'cheatSheet', 'interviewPerspective'].includes(b.type))
+    .filter((b) => !previewBlocks.some((p) => p.blockId === b.blockId))
+
+  const prereqLessons = (lesson.prerequisites || [])
+    .map((prereqId) => curriculum?.lessons.find((l) => l.id === prereqId))
+    .filter((l): l is NonNullable<typeof l> => Boolean(l))
+
+  const buildsTowardLessons = (curriculum?.lessons || [])
+    .filter((l) => l.prerequisites?.includes(lesson.id))
 
   return (
     <article className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-4xl space-y-8">
@@ -184,6 +190,21 @@ export default async function PublicLessonPage({ params }: PageProps) {
         </h1>
       </div>
 
+      {/* In short answer box */}
+      {lesson.inShort && (
+        <aside
+          aria-label="In short"
+          className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-2 text-foreground"
+        >
+          <h2 className="text-xs font-bold uppercase tracking-wider text-primary">
+            In short
+          </h2>
+          <p className="text-base sm:text-lg leading-relaxed text-foreground/90 font-sans">
+            {lesson.inShort}
+          </p>
+        </aside>
+      )}
+
       {/* Theory preview blocks rendered via v2 BlockTreeRenderer */}
       <div className="prose max-w-none">
         <BlockTreeRenderer blocks={previewBlocks} lessonId={lesson.id} />
@@ -208,6 +229,61 @@ export default async function PublicLessonPage({ params }: PageProps) {
           </Link>
         </div>
       </div>
+
+      {publicReferenceBlocks.length > 0 && (
+        <section aria-label="Reference material" className="prose max-w-none pt-4 space-y-6">
+          <BlockTreeRenderer blocks={publicReferenceBlocks} lessonId={lesson.id} />
+        </section>
+      )}
+
+      {/* Prerequisites & Builds Toward */}
+      <section
+        aria-label="Prerequisites and progression"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-border/60"
+      >
+        <div className="rounded-xl border border-border bg-card/50 p-5 space-y-3">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+            Before this
+          </h2>
+          {prereqLessons.length > 0 ? (
+            <ul className="space-y-2">
+              {prereqLessons.map((prereq) => (
+                <li key={prereq.id}>
+                  <Link
+                    href={`/lessons/${prereq.slug}`}
+                    className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1.5"
+                  >
+                    <span>{prereq.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-ink-muted">None (foundational lesson)</p>
+          )}
+        </div>
+        <div className="rounded-xl border border-border bg-card/50 p-5 space-y-3">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+            Builds toward
+          </h2>
+          {buildsTowardLessons.length > 0 ? (
+            <ul className="space-y-2">
+              {buildsTowardLessons.map((target) => (
+                <li key={target.id}>
+                  <Link
+                    href={`/lessons/${target.slug}`}
+                    className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1.5"
+                  >
+                    <span>{target.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-ink-muted">Advanced synthesis</p>
+          )}
+        </div>
+      </section>
 
       {/* Lesson Navigation Footer */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center pt-8 border-t border-border/60 text-xs">

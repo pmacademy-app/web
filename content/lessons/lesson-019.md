@@ -1,3 +1,9 @@
+---
+seoTitle: "Opportunity Identification: Finding High-Impact Product Bets"
+seoDescription: "Identify and size product opportunities systematically. Use Opportunity Solution Trees to connect customer problems directly to measurable business outcomes."
+inShort: "Opportunity identification is the practice of recognizing unmet customer needs, underserved workflows, or emerging market gaps that can be converted into measurable business value. By visualizing candidate opportunities on an Opportunity Solution Tree, product teams connect target business outcomes to verified user pain points, sizing potential impact before committing development effort to specific technical solutions."
+---
+
 # Lesson 19: Opportunity Identification
 
 ## Why This Lesson Matters

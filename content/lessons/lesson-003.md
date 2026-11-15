@@ -1,3 +1,9 @@
+---
+seoTitle: "What is Product Thinking? Move from Features to Value"
+seoDescription: "Master product thinking to uncover root user problems. Discover how to move beyond surface-level feature requests using the Five Whys technique."
+inShort: "Product thinking is the cognitive discipline of focusing on root user problems and business objectives before jumping to feature solutions. Instead of treating every stakeholder request as an engineering backlog item, product thinkers investigate the underlying user job, test critical assumptions, and validate that proposed solutions deliver measurable strategic impact."
+---
+
 # Lesson 3: Product Thinking
 
 ## Why This Lesson Matters

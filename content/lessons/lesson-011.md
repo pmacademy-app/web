@@ -1,3 +1,9 @@
+---
+seoTitle: "User Research for PMs: Methods, Biases & Best Practices"
+seoDescription: "Learn foundational user research methodologies for product managers. Combine qualitative insights and quantitative data while avoiding cognitive bias."
+inShort: "User research is the systematic investigation of user needs, behaviors, and motivations through qualitative and quantitative methods. Qualitative research reveals why people behave in certain ways, while quantitative research establishes what is happening at scale. Rigorous research counteracts team assumptions and protects product decisions against confirmation bias and stakeholder wishful thinking."
+---
+
 # Lesson 11: User Research
 
 ## Why This Lesson Matters

@@ -1,3 +1,9 @@
+---
+seoTitle: "Product Lifecycle Stages: From Introduction to Decline"
+seoDescription: "Explore the four product lifecycle stages: introduction, growth, maturity, and decline. Learn how strategic priorities and metrics shift at each phase."
+inShort: "The product lifecycle traces how a product progresses through introduction, growth, maturity, and decline. Each phase demands distinct strategic priorities, risk management tactics, and success metrics. Transitioning successfully requires validating problem-solution fit early, securing product-market fit to scale during growth, optimizing margins in maturity, and managing transitions during decline."
+---
+
 # Lesson 4: Product Lifecycle
 
 ## Why This Lesson Matters

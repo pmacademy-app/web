@@ -1,3 +1,9 @@
+---
+seoTitle: "User Personas: Building Behavior-Based Customer Models"
+seoDescription: "Build practical, research-backed user personas for product decisions. Focus on behaviors, context, and goals rather than superficial demographics."
+inShort: "A user persona is a composite archetype representing a distinct group of users who share similar goals, workflows, and behavioral patterns. Rather than cataloging arbitrary demographic trivia like fictional hobbies, actionable product personas synthesize verified user research into clear summaries of customer context, pain points, technical capabilities, and decision criteria to guide trade-offs."
+---
+
 # Lesson 14: Personas
 
 ## Why This Lesson Matters
