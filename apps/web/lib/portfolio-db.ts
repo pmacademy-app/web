@@ -635,14 +635,20 @@ export async function updatePortfolioSettings(
   }
 }
 
+export interface PublicCapstoneSitemapEntry {
+  moduleSlug: string
+  submittedAt: string
+}
+
 export interface PublicPortfolioSitemapEntry {
   username: string
   updatedAt?: string | null
   createdAt?: string | null
+  capstones?: PublicCapstoneSitemapEntry[]
 }
 
 /**
- * Queries all publicly indexable portfolio users for XML sitemap generation.
+ * Queries all publicly indexable portfolio users and their public capstones for XML sitemap generation.
  * Strictly filters for is_portfolio_public = true and valid, non-empty usernames.
  * Private, unconfigured, or invalid username accounts are excluded.
  */
@@ -652,7 +658,7 @@ export async function getPublicPortfolioSitemapEntries(
   try {
     const { data: users, error } = await supabase
       .from('users')
-      .select('username, created_at')
+      .select('id, username, created_at')
       .eq('is_portfolio_public', true)
       .not('username', 'is', null)
       .neq('username', '')
@@ -661,12 +667,45 @@ export async function getPublicPortfolioSitemapEntries(
       return []
     }
 
-    return users
-      .filter((u) => u.username && validateUsername(u.username).isValid)
-      .map((u) => ({
-        username: u.username,
-        createdAt: u.created_at ?? null,
-      }))
+    const validUsers = users.filter((u) => u.username && validateUsername(u.username).isValid)
+    if (validUsers.length === 0) {
+      return []
+    }
+
+    const userCapstonesMap = new Map<string, PublicCapstoneSitemapEntry[]>()
+    try {
+      const userIds = validUsers.map((u) => u.id).filter(Boolean)
+      if (userIds.length > 0) {
+        const { data: submissions } = await supabase
+          .from('capstone_submissions')
+          .select('user_id, module_slug, submitted_at, is_public, status')
+          .in('user_id', userIds)
+          .in('status', ['submitted', 'reviewed'])
+          .neq('is_public', false)
+
+        if (submissions) {
+          for (const sub of submissions) {
+            if (sub.user_id && sub.module_slug && sub.submitted_at) {
+              if (!userCapstonesMap.has(sub.user_id)) {
+                userCapstonesMap.set(sub.user_id, [])
+              }
+              userCapstonesMap.get(sub.user_id)!.push({
+                moduleSlug: sub.module_slug,
+                submittedAt: sub.submitted_at,
+              })
+            }
+          }
+        }
+      }
+    } catch {
+      // Capstone queries are best-effort if table or mock does not support it
+    }
+
+    return validUsers.map((u) => ({
+      username: u.username!,
+      createdAt: u.created_at ?? null,
+      capstones: userCapstonesMap.get(u.id) || [],
+    }))
   } catch (err) {
     console.error('[portfolio-db] Error fetching public portfolio sitemap entries:', err)
     return []

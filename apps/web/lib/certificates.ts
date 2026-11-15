@@ -52,11 +52,11 @@ export function generateCertificateCode(
  */
 export function generateCredentialJsonLd({
   certificateCode,
-  learnerName,
+  learnerName: _learnerName,
   careerTitle,
   issuedAt,
   verificationUrl,
-  portfolioUrl,
+  portfolioUrl: _portfolioUrl,
 }: CredentialJsonLdOptions): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
@@ -71,11 +71,6 @@ export function generateCredentialJsonLd({
       '@type': 'Organization',
       name: BRAND.fullName,
       url: BRAND.siteUrl,
-    },
-    grantee: {
-      '@type': 'Person',
-      name: learnerName,
-      sameAs: portfolioUrl,
     },
   }
 }

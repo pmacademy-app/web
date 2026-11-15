@@ -185,6 +185,7 @@ export interface CurriculumEntry {
   estimatedReadingTime: number
   estimatedCompletionTime: number
   prerequisites: string[]
+  updatedAt?: string
 }
 
 /** Full curriculum.json shape from content/dist/ */

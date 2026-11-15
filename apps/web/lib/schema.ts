@@ -83,7 +83,7 @@ export function getCourseSchema() {
       courseWorkload: `PT${COURSE_WORKLOAD_HOURS}H`,
     },
     hasPart: MODULE_META_LIST.map((mod) => ({
-      '@type': 'CourseUnit',
+      '@type': 'Course',
       name: `Module ${mod.number}: ${mod.title}`,
       description: `${mod.description} Outcome: ${mod.outcome}. ${mod.lessonCount} lessons, about ${formatModuleHours(mod.estimatedMinutes)}.`,
       position: mod.number,
@@ -103,11 +103,15 @@ export function getLessonSchema(
   const moduleName = getModuleTitle(lesson.module)
 
   const levelStr =
-    lesson.difficulty === 1
+    lesson.difficulty <= 3
       ? 'Beginner'
-      : lesson.difficulty === 2
+      : lesson.difficulty <= 6
       ? 'Intermediate'
       : 'Advanced'
+
+  const modifiedDate = lesson.updatedAt
+    ? new Date(lesson.updatedAt).toISOString().split('T')[0]
+    : '2026-10-31'
 
   return {
     '@context': 'https://schema.org',
@@ -118,6 +122,8 @@ export function getLessonSchema(
     description: `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${moduleName}).`,
     learningResourceType: 'Lesson',
     educationalLevel: levelStr,
+    datePublished: '2026-10-31',
+    dateModified: modifiedDate,
     timeRequired: `PT${lesson.estimatedReadingTime || 20}M`,
     url: lessonUrl,
     mainEntityOfPage: lessonUrl,

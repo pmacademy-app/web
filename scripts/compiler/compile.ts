@@ -39,9 +39,21 @@ const SOURCE_DIR = path.join(ROOT_DIR, 'content/lessons');
 const DIST_DIR = path.join(ROOT_DIR, 'content/dist');
 const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
+const DATES_PATH = path.join(ROOT_DIR, 'content/lesson-dates.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '16';
+const CACHE_VERSION = '17';
+
+export function loadLessonDates(): Record<string, string> {
+  if (!fs.existsSync(DATES_PATH)) {
+    throw new Error(`Content build failed: missing lesson dates file at ${DATES_PATH}`);
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DATES_PATH, 'utf-8'));
+  } catch (err) {
+    throw new Error(`Content build failed: could not parse ${DATES_PATH}: ${err}`);
+  }
+}
 
 interface CacheManifest {
   version: string;
@@ -109,10 +121,17 @@ export function resolveCompanyName(heading: string, firstParagraphMarkdown?: str
 export async function compileLesson(
   filePath: string,
   registry: Record<string, string>,
-  numToId: Record<number, string>
+  numToId: Record<number, string>,
+  lessonDates?: Record<string, string>
 ): Promise<{ lesson: any; context: CompilerContext }> {
   const sourceContent = fs.readFileSync(filePath, 'utf-8');
   const lessonId = getOrCreateLessonId(filePath);
+
+  const dates = lessonDates || (fs.existsSync(DATES_PATH) ? loadLessonDates() : {});
+  const lessonDate = dates[lessonId];
+  if (!lessonDate && fs.existsSync(DATES_PATH)) {
+    throw new Error(`Content build failed: lesson ${lessonId} (${filePath}) has no date in content/lesson-dates.json`);
+  }
 
   const ctx: CompilerContext = {
     filePath,
@@ -590,8 +609,8 @@ export async function compileLesson(
       headings: headingList,
     },
     glossaryTermsIntroduced: ctx.glossaryTerms.map((t) => t.term),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: lessonDate ? `${lessonDate}T00:00:00.000Z` : '2026-10-31T00:00:00.000Z',
+    updatedAt: lessonDate ? `${lessonDate}T00:00:00.000Z` : '2026-10-31T00:00:00.000Z',
   };
 
   lessonObj.contentHash = computeHash(JSON.stringify(lessonObj.blocks));
@@ -660,6 +679,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
 
   // Load registry and build backfill indices
   const registryMap = loadRegistry();
+  const lessonDates = loadLessonDates();
   const numToId: Record<number, string> = {};
   for (const [filePath, lessonId] of Object.entries(registryMap)) {
     const fileName = path.basename(filePath);
@@ -709,7 +729,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
 
     // Compile
     try {
-      const { lesson, context } = await compileLesson(file, registryMap, numToId);
+      const { lesson, context } = await compileLesson(file, registryMap, numToId, lessonDates);
       
       // Validate
       const issues = validateCompiledLesson(lesson, context);
@@ -807,6 +827,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
       estimatedReadingTime: l.estimatedReadingTime,
       estimatedCompletionTime: l.estimatedCompletionTime,
       prerequisites: l.prerequisites,
+      updatedAt: l.updatedAt || '2026-10-31T00:00:00.000Z',
     });
 
     if (!moduleLessons[l.module]) {

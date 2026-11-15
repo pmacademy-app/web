@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { ArrowLeft, Award, Calendar, FileText, MessageSquare } from 'lucide-react'
 import { getDedupedPublicPortfolioData } from '@/lib/portfolio-db'
 import { formatCapstoneShareUrl, formatPortfolioShareUrl } from '@/lib/portfolio'
@@ -26,7 +26,8 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 async function load(params: PageProps['params']) {
   const { username, moduleSlug } = await params
-  const portfolio = await getDedupedPublicPortfolioData(username)
+  const cleanUsername = username.toLowerCase()
+  const portfolio = await getDedupedPublicPortfolioData(cleanUsername)
   const capstone = findPublicCapstone(portfolio, moduleSlug)
   return capstone && portfolio ? { portfolio, capstone } : null
 }
@@ -61,13 +62,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PublicCapstonePage({ params }: PageProps) {
+  const { username, moduleSlug } = await params
+  if (username !== username.toLowerCase()) {
+    redirect(`/p/${username.toLowerCase()}/capstones/${moduleSlug}`)
+  }
   const found = await load(params)
   if (!found) notFound()
 
   const { portfolio, capstone } = found
-  const { username, name } = portfolio.user
-  const portfolioUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
-  const pageUrl = formatCapstoneShareUrl(SITE_ORIGIN, username, capstone.moduleSlug)
+  const { name } = portfolio.user
+  const portfolioUrl = formatPortfolioShareUrl(SITE_ORIGIN, username.toLowerCase())
+  const pageUrl = formatCapstoneShareUrl(SITE_ORIGIN, username.toLowerCase(), capstone.moduleSlug)
   const jsonLd = buildCapstoneJsonLd({
     capstone,
     authorName: name,

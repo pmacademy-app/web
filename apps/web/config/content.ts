@@ -16,6 +16,19 @@ import {
   COURSE_WORKLOAD_HOURS,
 } from '@/lib/curriculum/module-meta'
 
+/** Committed last-modified dates for static marketing pages (used in sitemap.xml) */
+export const STATIC_PAGE_DATES: Record<string, string> = {
+  home: '2026-11-12',
+  curriculum: '2026-11-12',
+  frameworks: '2026-11-12',
+  faq: '2026-11-15',
+  reviews: '2026-11-12',
+  about: '2026-11-12',
+  contact: '2026-11-12',
+  privacy: '2026-10-31',
+  terms: '2026-10-31',
+}
+
 // Module titles, order and study time live in lib/curriculum/module-meta.ts (MODULE_META).
 
 // ─── Journey Stages (Sprint 2 §10) ───────────────────────────────────────────

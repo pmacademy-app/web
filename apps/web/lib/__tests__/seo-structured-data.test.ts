@@ -90,7 +90,7 @@ describe('Phase 2 Structured Data, GEO & AEO Unit Test Suite', () => {
     expect(course.hasPart.length).toBe(9)
     for (let i = 0; i < MODULE_META_LIST.length; i++) {
       const part = course.hasPart[i]
-      expect(part['@type']).toBe('CourseUnit')
+      expect(part['@type']).toBe('Course')
       expect(part.position).toBe(i + 1)
       expect(part.name).toBe(`Module ${i + 1}: ${MODULE_META_LIST[i].title}`)
     }

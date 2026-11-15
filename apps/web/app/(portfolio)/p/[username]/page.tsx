@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import {
   getDedupedPublicPortfolioData,
@@ -27,7 +28,8 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
-  const portfolio = await getDedupedPublicPortfolioData(username)
+  const cleanUsername = username.toLowerCase()
+  const portfolio = await getDedupedPublicPortfolioData(cleanUsername)
 
   if (!portfolio || !portfolio.user.isPortfolioPublic) {
     return {
@@ -38,8 +40,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { name, bio, isFellow } = portfolio.user
-  const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
-  const ogImageUrl = `${SITE_ORIGIN}${portfolioOgCardPath(username)}`
+  const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, cleanUsername)
+  const ogImageUrl = `${SITE_ORIGIN}${portfolioOgCardPath(cleanUsername)}`
 
   const metaTitle = isFellow
     ? `${name} | Product Management Fellow at Prodily | Portfolio`
@@ -88,7 +90,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
   const { username } = await params
-  const portfolio = await getDedupedPublicPortfolioData(username)
+  if (username !== username.toLowerCase()) {
+    redirect(`/p/${username.toLowerCase()}`)
+  }
+  const portfolio = await getDedupedPublicPortfolioData(username.toLowerCase())
 
   // Counted here and ONLY here. It used to live inside the data fetch, which both
   // `generateMetadata()` and this component call — so every view was counted twice.
