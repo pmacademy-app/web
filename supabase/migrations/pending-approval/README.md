@@ -225,6 +225,19 @@ Run:
 Undo:
 Run `rollback/20261113000005_lesson_mastery.down.sql` in the SQL editor.
 
+### `20261113000006_weekly_goal.sql` (PROD-06, PROD-13a, AG-29, weekly goal and session minutes)
+
+Adds `weekly_goal_lessons smallint` (1 to 7) and `session_minutes smallint` (10, 15, 20, 30, 45, 60) columns to `public.users` with check constraints. Used by learner settings, onboarding, weekly recap reports, and in-app milestone nudges.
+
+Privileges: Writes remain restricted to service role only.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000006_weekly_goal.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000006_weekly_goal_validation.sql`.
+
+Undo:
+Run `rollback/20261113000006_weekly_goal.down.sql` in the SQL editor.
+
 ### `20261113000007_leaderboard_weekly_rpc.sql` (ENG-08, ENG-10, AG-31, weekly leaderboard RPC and DB size telemetry)
 
 Adds `public.get_weekly_leaderboard(p_week_start timestamptz, p_limit int, p_offset int)` returning the ranked weekly leaderboard aggregated in the database engine instead of loading all users, lessons, and XP rows into server memory. Also provides `public.get_database_size_bytes()` returning `bigint` for monitoring database size against the Supabase 500 MB free tier limit.

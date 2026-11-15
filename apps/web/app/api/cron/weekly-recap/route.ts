@@ -95,7 +95,7 @@ export const POST = withRoute(
 
         let queryBuilder = supabase
           .from('users')
-          .select('id, email, name, total_xp, current_streak')
+          .select('id, email, name, total_xp, current_streak, weekly_goal_lessons, session_minutes')
           .not('email', 'is', null)
 
         if (lastSeenId) {
@@ -265,6 +265,8 @@ export const POST = withRoute(
               lessonsCompletedThisWeek: lessonsCompletedCount,
               xpEarnedThisWeek,
               currentStreak: user.current_streak || 0,
+              weeklyGoalLessons: (user as Record<string, unknown>).weekly_goal_lessons ?? null,
+              sessionMinutes: (user as Record<string, unknown>).session_minutes ?? null,
               // A rolling 7x24h window can touch 8 calendar dates.
               daysStudiedThisWeek: Math.min(7, studyDays.get(user.id)?.size ?? 0),
               weekNumber,

@@ -1741,6 +1741,7 @@ export type Database = {
           portfolio_verification_override: string | null
           portfolio_view_count: number
           privacy_version: string | null
+          session_minutes: number | null
           streak_freezes_available: number
           terms_accepted_at: string | null
           terms_version: string | null
@@ -1749,6 +1750,7 @@ export type Database = {
           total_xp: number
           username: string | null
           website_url: string | null
+          weekly_goal_lessons: number | null
         }
         Insert: {
           age_confirmed_at?: string | null
@@ -1782,6 +1784,7 @@ export type Database = {
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
           privacy_version?: string | null
+          session_minutes?: number | null
           streak_freezes_available?: number
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1790,6 +1793,7 @@ export type Database = {
           total_xp?: number
           username?: string | null
           website_url?: string | null
+          weekly_goal_lessons?: number | null
         }
         Update: {
           age_confirmed_at?: string | null
@@ -1823,6 +1827,7 @@ export type Database = {
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
           privacy_version?: string | null
+          session_minutes?: number | null
           streak_freezes_available?: number
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1831,6 +1836,7 @@ export type Database = {
           total_xp?: number
           username?: string | null
           website_url?: string | null
+          weekly_goal_lessons?: number | null
         }
         Relationships: [
           {

@@ -8,7 +8,8 @@ import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
 import { showClientToast } from '@/lib/events/client-event-bus'
-import type { ProfileGetResponse, ProfileUpdateResponse } from '@/lib/api/contracts/settings'
+import { ProfileUpdateResponse, ProfileGetResponse } from '@/lib/api/contracts/settings'
+import { WeeklyGoalCard } from '@/components/settings/WeeklyGoalCard'
 
 function buildProfileData(profile?: ProfileGetResponse['profile']) {
   return {
@@ -290,10 +291,13 @@ export function ProfileSettingsTab() {
   }
 
   return (
-    <ProfileFormContent
-      key={data?.profile?.name ?? 'empty'}
-      profile={data?.profile}
-      onSaveSuccess={() => void mutate()}
-    />
+    <div className="space-y-4">
+      <WeeklyGoalCard />
+      <ProfileFormContent
+        key={data?.profile?.name ?? 'empty'}
+        profile={data?.profile}
+        onSaveSuccess={() => void mutate()}
+      />
+    </div>
   )
 }

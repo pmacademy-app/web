@@ -26,6 +26,19 @@ export const profileUpdateSchema = z.object({
   website_url: urlField('Website URL'),
 })
 
+export const goalUpdateSchema = z.object({
+  weekly_goal_lessons: z.number().int().min(1).max(7).nullable().optional(),
+  session_minutes: z.union([z.literal(10), z.literal(15), z.literal(20), z.literal(30), z.literal(45), z.literal(60)]).nullable().optional(),
+})
+
+export type GoalUpdateInput = z.infer<typeof goalUpdateSchema>
+
+export interface GoalGetResponse {
+  success: boolean
+  weekly_goal_lessons: number | null
+  session_minutes: number | null
+}
+
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>
 
 export interface LearnerProfileData {

@@ -5,5 +5,6 @@
 20261113000001_scrub_dead_letter_auth_links.sql
 20261113000004_capstone_review_feedback.sql
 20261113000005_lesson_mastery.sql
+20261113000006_weekly_goal.sql
 20261113000007_leaderboard_weekly_rpc.sql
 20261113000008_drop_duplicate_indexes.sql
