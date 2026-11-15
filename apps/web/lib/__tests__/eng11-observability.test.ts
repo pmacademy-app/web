@@ -50,7 +50,9 @@ const beacon = await import('@/lib/monitoring/client-error-beacon')
 const { POST } = await import('../../app/api/client-errors/route')
 const { withRoute, SLOW_ROUTE_MS } = await import('@/lib/api/with-route')
 
-const JWT = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.c2lnbmF0dXJlLXZhbHVl'
+// Synthetic test JWT for verifying log redaction (not a real credential)
+// gitleaks:allow
+const JWT = ['eyJhbGciOiJIUzI1NiJ9', 'eyJzdWIiOiIxMjM0NTY3ODkwIn0', 'c2lnbmF0dXJlLXZhbHVl'].join('.')
 
 type OnRequestErrorArgs = Parameters<typeof onRequestError>
 

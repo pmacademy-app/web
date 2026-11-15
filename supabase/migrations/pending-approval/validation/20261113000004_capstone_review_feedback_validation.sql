@@ -56,6 +56,9 @@ DECLARE
   v_test_user_id uuid := gen_random_uuid();
 BEGIN
   -- Insert dummy user and submission
+  INSERT INTO auth.users (id, email, aud, role)
+  VALUES (v_test_user_id, 'validation_test@example.com', 'authenticated', 'authenticated');
+
   INSERT INTO public.users (id, email, name)
   VALUES (v_test_user_id, 'validation_test@example.com', 'Validation Tester');
 

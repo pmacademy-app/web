@@ -33,6 +33,9 @@ DECLARE
   v_test_user_id uuid := gen_random_uuid();
 BEGIN
   -- Insert user with valid goals
+  INSERT INTO auth.users (id, email, aud, role)
+  VALUES (v_test_user_id, 'goal_val_test@example.com', 'authenticated', 'authenticated');
+
   INSERT INTO public.users (id, email, name, weekly_goal_lessons, session_minutes)
   VALUES (v_test_user_id, 'goal_val_test@example.com', 'Goal Tester', 3, 20);
 

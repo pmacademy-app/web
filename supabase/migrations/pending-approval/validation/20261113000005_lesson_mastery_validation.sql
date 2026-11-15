@@ -44,6 +44,9 @@ DECLARE
   v_best smallint;
 BEGIN
   -- Insert dummy user
+  INSERT INTO auth.users (id, email, aud, role)
+  VALUES (v_test_user_id, 'mastery_val_test@example.com', 'authenticated', 'authenticated');
+
   INSERT INTO public.users (id, email, name)
   VALUES (v_test_user_id, 'mastery_val_test@example.com', 'Mastery Tester');
 

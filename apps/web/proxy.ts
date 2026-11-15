@@ -350,16 +350,28 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     if (accessToken) {
       try {
-        if (typeof (supabase.auth as any).getClaims === 'function') {
-          const { data, error } = await (supabase.auth as any).getClaims(accessToken)
-          if (!error && data?.claims?.sub) {
-            const claims = data.claims
+        type AuthWithGetClaims = {
+          getClaims?: (token: string) => Promise<{
+            data: { claims?: Record<string, unknown> } | null
+            error: unknown
+          }>
+        }
+        const authWithClaims = supabase.auth as unknown as AuthWithGetClaims
+        if (typeof authWithClaims.getClaims === 'function') {
+          const { data, error } = await authWithClaims.getClaims(accessToken)
+          const claims = data?.claims
+          if (!error && claims?.sub && typeof claims.sub === 'string') {
             user = {
               id: claims.sub,
-              email: (claims.email as string) || '',
+              email: typeof claims.email === 'string' ? claims.email : '',
               app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
               user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
-              email_confirmed_at: (claims.email_confirmed_at as string | undefined) ?? (claims.email ? 'confirmed' : undefined),
+              email_confirmed_at:
+                typeof claims.email_confirmed_at === 'string'
+                  ? claims.email_confirmed_at
+                  : claims.email
+                    ? 'confirmed'
+                    : undefined,
             }
           }
         } else {
