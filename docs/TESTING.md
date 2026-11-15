@@ -129,12 +129,46 @@ GitHub Actions (`.github/workflows/ci.yml`) runs these gates on every pull reque
 6. **Next.js Production Build:** `npm run build`.
 7. **Playwright E2E (separate `e2e` job, gated):** always runs on `main`. On a pull request it runs only when the diff touches auth-relevant paths (`app/(auth)/`, `app/api/auth/`, `app/api/user/`, `lib/auth/`, `lib/api/actor`, `proxy.ts`, `e2e/`, `playwright.config.ts`, `package-lock.json`); otherwise the job reports that it skipped. The write-heavy flows (signup to XP, session lifecycle) self-skip unless `E2E_ALLOW_WRITES` and staging credentials are set, and `e2e/support/env.ts` refuses to run against the production host.
 8. **Security:** dependency audit gate (`scripts/ci/audit-gate.ts`) and a gitleaks secret scan.
-9. **Local Database Replay and Grant Checks (`db-local` job, AG-04):** starts a local Postgres instance via `supabase start`, replays all top-level migrations with `supabase db reset`, applies safe held migrations from `supabase/tests/held-migrations.txt` via `scripts/ci/apply-held-migrations.sh`, runs the grant allowlist SQL test (`supabase/tests/grant_allowlist.sql`), and checks database types drift (`scripts/ci/check-db-types-drift.sh`).
+9. **Local Database Replay, Grant Checks, and pgTAP (`db-local` job, AG-04, AG-05):** starts a local Postgres instance via `supabase start`, replays all top-level migrations with `supabase db reset`, applies safe held migrations from `supabase/tests/held-migrations.txt` via `scripts/ci/apply-held-migrations.sh`, runs the grant allowlist SQL test (`supabase/tests/grant_allowlist.sql`), runs pgTAP database test suites (`supabase test db`), and checks database types drift (`scripts/ci/check-db-types-drift.sh`).
 10. **On push to `main` only:** the Supabase migration deploy job, which applies every top-level file in `supabase/migrations/`.
 
 ---
 
-## 5. Local Database Testing and Grant Allowlist (AG-04)
+## 5. Local Database Testing, Grant Allowlist, and pgTAP Suites (AG-04, AG-05)
+
+### Database Unit Testing with pgTAP
+Local database behavior tests are written in SQL using pgTAP and executed during CI in the `db-local` job via `supabase test db`. These tests verify Row Level Security policies, RPC access grants, and triggers against a real Postgres container.
+
+Test files are located in `supabase/tests/*.test.sql`:
+- `rpc_grants.test.sql`: asserts that anon and authenticated cannot execute SECURITY DEFINER functions in schema public, and that service_role holds execute on designated RPCs.
+- `users_rls.test.sql`: asserts learner own-row reads, blocks reading another learner's private profile, verifies revoked writes for public.users, and tests column guard triggers.
+- `capstone_rls.test.sql`: asserts learner reads own capstone submissions, blocks reading other learners' private submissions, and verifies write revocation.
+- `notifications_rls.test.sql`: asserts learner reads own in-app notifications, blocks reading or mutating another user's inbox, and enforces column privileges on updates.
+- `quiz_rpc.test.sql`: asserts that `record_lesson_quiz_completion` awards XP on initial completion and awards 0 incremental XP on duplicate invocations.
+
+### How to Add a pgTAP Test
+1. Create a new test file under `supabase/tests/<area>.test.sql`.
+2. Wrap the test in a transaction block with rollback to maintain test isolation:
+   ```sql
+   BEGIN;
+   CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
+   SELECT extensions.plan(2);
+
+   -- Test assertions here
+   SELECT extensions.ok(true, 'first assertion passes');
+   SELECT extensions.is(1, 1, 'second assertion passes');
+
+   SELECT * FROM extensions.finish();
+   ROLLBACK;
+   ```
+3. To test policies under specific user roles, simulate the JWT claims and session role:
+   ```sql
+   SET LOCAL ROLE authenticated;
+   SELECT set_config('request.jwt.claims', json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text, true);
+   -- Run assertions as authenticated user
+   RESET ROLE;
+   ```
+4. Never use real user emails or personal data in test seeds; use synthetic IDs and example.com addresses.
 
 ### Adding a Held Migration to Local DB Replay
 When a task adds a new held migration in `supabase/migrations/pending-approval/` that requires no external Vault secrets or pg_cron, append its filename to `supabase/tests/held-migrations.txt`. The `scripts/ci/apply-held-migrations.sh` script applies it during CI replay and executes its companion validation file if safe on an empty database.

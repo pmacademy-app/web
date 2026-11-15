@@ -10,6 +10,10 @@
 
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
+
+SELECT extensions.plan(1);
+
 DO $$
 DECLARE
   v_unexpected text[] := ARRAY[]::text[];
@@ -171,6 +175,10 @@ BEGIN
 
   RAISE NOTICE 'Grant allowlist check PASSED: all schema public privileges for anon and authenticated match the allowlist';
 END $$;
+
+SELECT extensions.pass('Schema public grant allowlist matches declared privileges');
+
+SELECT * FROM extensions.finish();
 
 ROLLBACK;
 
