@@ -112,6 +112,75 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Founder & Author Credentials */}
+        <div className="border-t border-border pt-8 space-y-4">
+          <h2 className="text-2xl font-bold font-serif text-foreground">
+            Founder & Author Credentials
+          </h2>
+          <div className="space-y-3 text-sm md:text-base text-foreground/90 leading-relaxed">
+            <p>
+              Prodily was founded and authored by{' '}
+              <a
+                href="https://adityagangwani.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:text-primary underline underline-offset-4 transition-colors"
+              >
+                Aditya Gangwani
+              </a>
+              . Aditya is a product practitioner who created Prodily to bridge the gap between abstract PM concepts and actual job-ready execution.
+            </p>
+            <p className="text-sm text-ink-muted">
+              Every lesson, rubric, and case study across the 90-lesson curriculum reflects firsthand experience shipping products, conducting user research, prioritizing roadmaps, and evaluating business tradeoffs. You can explore his background, writing, and work on his{' '}
+              <a
+                href="https://adityagangwani.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium"
+              >
+                personal website
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+
+        {/* Editorial Process */}
+        <div className="border-t border-border pt-8 space-y-4">
+          <h2 className="text-2xl font-bold font-serif text-foreground">
+            Our Editorial Process
+          </h2>
+          <p className="text-sm md:text-base text-foreground/90 leading-relaxed">
+            We hold our curriculum to strict standards of practical utility, accuracy, and clarity. Here is how each lesson is developed and maintained:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div className="p-4 rounded-xl border border-border bg-card/60 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-primary">
+                1. Practical Research
+              </h3>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Concepts originate from proven product frameworks and real tech environments, never ungrounded theory or AI regurgitation.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl border border-border bg-card/60 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-primary">
+                2. Applied Practice
+              </h3>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Every lesson couples mental models with interactive questions, realistic scenarios, and actionable takeaways learners can apply immediately.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl border border-border bg-card/60 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-primary">
+                3. Continuous Maintenance
+              </h3>
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Lessons display their latest update date. Content is periodically audited against emerging product methodologies, AI workflows, and learner feedback.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Creator & Support Box */}
         <div className="pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1">

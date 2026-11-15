@@ -91,6 +91,16 @@ export default async function PublicLessonPage({ params }: PageProps) {
   const prevLesson = globalIdx > 0 ? curriculum?.lessons[globalIdx - 1] : null
   const nextLesson = globalIdx >= 0 && globalIdx < (curriculum?.lessons.length ?? 0) - 1 ? curriculum?.lessons[globalIdx + 1] : null
 
+  const formattedDate = (() => {
+    if (!lesson.updatedAt) return 'October 2026'
+    const parsed = new Date(lesson.updatedAt)
+    if (isNaN(parsed.getTime())) return lesson.updatedAt
+    return parsed.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    })
+  })()
+
   // Structured Data (LearningResource & BreadcrumbList)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
   const moduleTitle = getModuleTitle(lesson.module)
@@ -188,6 +198,21 @@ export default async function PublicLessonPage({ params }: PageProps) {
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground leading-tight">
           {lesson.title}
         </h1>
+        <div className="flex flex-wrap items-center gap-3 pt-1 text-sm text-ink-muted">
+          <span>
+            Written by{' '}
+            <a
+              href="https://adityagangwani.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground hover:text-primary font-medium underline underline-offset-4 transition-colors"
+            >
+              Aditya Gangwani
+            </a>
+          </span>
+          <span aria-hidden="true">•</span>
+          <span>Updated {formattedDate}</span>
+        </div>
       </div>
 
       {/* In short answer box */}

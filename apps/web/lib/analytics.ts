@@ -479,9 +479,53 @@ export function trackAchievementCelebrationCtaClicked(
   trackEvent('achievement_celebration_cta_clicked', { kind, action })
 }
 
+// ─── AI Referrer Classification (AEO-03, AG-25) ─────────────────────────────
 
+export interface ReferrerClassification {
+  isAiReferral: boolean
+  source?: string
+}
 
+const AI_REFERRER_DOMAINS: Readonly<Record<string, string>> = {
+  'chatgpt.com': 'chatgpt',
+  'chat.openai.com': 'chatgpt',
+  'perplexity.ai': 'perplexity',
+  'gemini.google.com': 'gemini',
+  'copilot.microsoft.com': 'copilot',
+  'claude.ai': 'claude',
+}
 
+/**
+ * Classifies an incoming referrer URL to identify known AI answer engines.
+ * Strips all query strings, paths, and fragments immediately to avoid PII leaks.
+ */
+export function classifyReferrer(referrerUrl?: string | null): ReferrerClassification {
+  if (!referrerUrl || typeof referrerUrl !== 'string') {
+    return { isAiReferral: false }
+  }
 
+  const trimmed = referrerUrl.trim()
+  if (!trimmed) {
+    return { isAiReferral: false }
+  }
 
+  try {
+    const hasProtocol = trimmed.startsWith('http://') || trimmed.startsWith('https://')
+    const parsed = new URL(hasProtocol ? trimmed : `https://${trimmed}`)
+    const hostname = parsed.hostname.toLowerCase()
+
+    for (const [domain, source] of Object.entries(AI_REFERRER_DOMAINS)) {
+      if (hostname === domain || hostname.endsWith(`.${domain}`)) {
+        return {
+          isAiReferral: true,
+          source,
+        }
+      }
+    }
+
+    return { isAiReferral: false }
+  } catch {
+    return { isAiReferral: false }
+  }
+}
 
