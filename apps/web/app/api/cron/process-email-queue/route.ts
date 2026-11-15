@@ -76,5 +76,3 @@ export const POST = withRoute(
     }
   }
 )
-
-export const GET = POST

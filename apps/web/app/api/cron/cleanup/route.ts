@@ -113,11 +113,4 @@ export const POST = withRoute(
   })
 )
 
-/**
- * The scheduler calls POST; GET is kept for manual admin inspection.
- *
- * A GET has no body, so `readRequestedDryRun` returns true and the route is always
- * report-only over GET. That is the intended behaviour: browsing to this endpoint
- * must never delete anything.
- */
-export const GET = POST
+
