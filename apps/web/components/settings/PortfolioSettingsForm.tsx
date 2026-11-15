@@ -264,11 +264,14 @@ function PortfolioSettingsFormContent({
             <input
               id="setting-visibility-toggle"
               type="checkbox"
+              role="switch"
+              aria-checked={formData.isPortfolioPublic}
+              aria-label="Toggle portfolio public visibility"
               checked={formData.isPortfolioPublic}
               onChange={(e) => handleChange('isPortfolioPublic', e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
+            <div className="w-11 h-6 bg-secondary peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
           </label>
         </div>
       </div>
@@ -292,6 +295,7 @@ function PortfolioSettingsFormContent({
               <input
                 id="setting-username"
                 type="text"
+                autoComplete="username"
                 value={formData.username}
                 onChange={(e) => handleChange('username', e.target.value)}
                 placeholder="johndoe"
@@ -310,6 +314,7 @@ function PortfolioSettingsFormContent({
             <input
               id="setting-name"
               type="text"
+              autoComplete="name"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="John Doe"
@@ -362,6 +367,7 @@ function PortfolioSettingsFormContent({
             <input
               id="setting-linkedin"
               type="url"
+              autoComplete="url"
               value={formData.linkedinUrl}
               onChange={(e) => handleChange('linkedinUrl', e.target.value)}
               placeholder="https://linkedin.com/in/username"
@@ -377,6 +383,7 @@ function PortfolioSettingsFormContent({
             <input
               id="setting-github"
               type="url"
+              autoComplete="url"
               value={formData.githubUrl}
               onChange={(e) => handleChange('githubUrl', e.target.value)}
               placeholder="https://github.com/username"
@@ -392,6 +399,7 @@ function PortfolioSettingsFormContent({
             <input
               id="setting-website"
               type="url"
+              autoComplete="url"
               value={formData.websiteUrl}
               onChange={(e) => handleChange('websiteUrl', e.target.value)}
               placeholder="https://yourwebsite.com"

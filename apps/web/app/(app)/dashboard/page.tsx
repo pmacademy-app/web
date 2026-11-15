@@ -267,6 +267,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      <h1 className="sr-only">Dashboard</h1>
+
       {/* 0. Personalized Goal Header (Phase 3) */}
       <PersonalizedGoalBanner
         path={personalizedPath}

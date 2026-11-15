@@ -108,14 +108,16 @@ export function ReferralSettingsTab() {
         {/* Copy Link Input Bar */}
         <div className="space-y-2 pt-2 border-t border-border/60">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-foreground">Your Personal Referral Link</label>
+            <label htmlFor="setting-referral-link-input" className="text-xs font-semibold text-foreground">Your Personal Referral Link</label>
             <span className="text-[11px] text-muted-foreground font-mono">Code: {referralCode}</span>
           </div>
 
           <div className="flex items-center gap-2 p-2 rounded-xl border border-border bg-secondary/40">
             <input
+              id="setting-referral-link-input"
               type="text"
               readOnly
+              aria-label="Your personal referral link"
               value={referralLink}
               className="flex-1 min-w-0 bg-transparent text-base sm:text-xs font-mono text-foreground focus:outline-hidden px-2 select-all overflow-hidden text-ellipsis"
             />

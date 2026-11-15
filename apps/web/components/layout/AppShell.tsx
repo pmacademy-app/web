@@ -70,6 +70,14 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
   return (
     <SearchOverlayProvider>
       <div className="flex min-h-dvh bg-background">
+        {/* Skip link: must be the first focusable element */}
+        <a
+          href="#main-content"
+          className="fixed top-4 left-4 z-[100] px-4 py-2 bg-surface text-foreground text-body-sm font-medium border border-border rounded-md shadow-sm -translate-y-20 focus:translate-y-0 transition-transform duration-[120ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        >
+          Skip to main content
+        </a>
+
         {/* Navigation Sidebar */}
         <Sidebar
           isOpen={isSidebarOpen}
@@ -94,7 +102,7 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
           />
 
           {/* Content viewport with safe bottom padding on mobile for MobileTabBar */}
-          <main className="flex-1 overflow-y-auto px-3.5 py-4 sm:px-5 md:px-6 lg:px-8 pb-24 lg:pb-8 outline-none">
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto px-3.5 py-4 sm:px-5 md:px-6 lg:px-8 pb-24 lg:pb-8 outline-none">
             {children}
           </main>
         </div>

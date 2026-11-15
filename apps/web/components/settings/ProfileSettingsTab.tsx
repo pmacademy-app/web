@@ -136,29 +136,32 @@ function ProfileFormContent({
 
         {/* Full Name */}
         <div className="space-y-1">
-          <label className="block text-xs font-semibold text-foreground">
+          <label htmlFor="profile-settings-name" className="block text-xs font-semibold text-foreground">
             Full Name
           </label>
           <input
+            id="profile-settings-name"
             type="text"
+            autoComplete="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g. Alex Morgan"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-base md:text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
         {/* Bio */}
         <div className="space-y-1">
-          <label className="block text-xs font-semibold text-foreground">
+          <label htmlFor="profile-settings-bio" className="block text-xs font-semibold text-foreground">
             Headline / Bio
           </label>
           <textarea
+            id="profile-settings-bio"
             rows={2}
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             placeholder="Product Manager passionate about AI platforms and user experience..."
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-base md:text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
           />
         </div>
 
@@ -170,41 +173,47 @@ function ProfileFormContent({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <label htmlFor="profile-settings-linkedin" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                 <LinkedInIcon className="w-3.5 h-3.5 text-sky-600" /> LinkedIn URL
               </label>
               <input
+                id="profile-settings-linkedin"
                 type="url"
+                autoComplete="url"
                 value={formData.linkedinUrl}
                 onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
                 placeholder="https://linkedin.com/in/username"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-base md:text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <label htmlFor="profile-settings-github" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                 <GitHubIcon className="w-3.5 h-3.5 text-foreground" /> GitHub URL
               </label>
               <input
+                id="profile-settings-github"
                 type="url"
+                autoComplete="url"
                 value={formData.githubUrl}
                 onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
                 placeholder="https://github.com/username"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-base md:text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <label htmlFor="profile-settings-website" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5 text-success" /> Website URL
               </label>
               <input
+                id="profile-settings-website"
                 type="url"
+                autoComplete="url"
                 value={formData.websiteUrl}
                 onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
                 placeholder="https://yourwebsite.com"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-base md:text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
           </div>

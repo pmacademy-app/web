@@ -180,6 +180,8 @@ function ResetPasswordFormContent() {
             <Input
               id="reset-email"
               type="email"
+              autoComplete="email"
+              inputMode="email"
               required
               disabled={isLoading}
               error={!!requestForm.formState.errors.email}
@@ -213,6 +215,7 @@ function ResetPasswordFormContent() {
               <Input
                 id="new-password"
                 type={showNewPassword ? 'text' : 'password'}
+                autoComplete="new-password"
                 required
                 disabled={isLoading || isSuccess}
                 error={!!updateForm.formState.errors.newPassword}
@@ -248,6 +251,7 @@ function ResetPasswordFormContent() {
               <Input
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
                 required
                 disabled={isLoading || isSuccess}
                 error={!!updateForm.formState.errors.confirmPassword}

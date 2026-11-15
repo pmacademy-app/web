@@ -208,6 +208,7 @@ function ChangeEmailCard() {
             <Input
               id="settings-email-password"
               type={showEmailPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               required
               disabled={submittingEmail}
               value={emailPassword}
@@ -233,6 +234,8 @@ function ChangeEmailCard() {
           <Input
             id="settings-new-email"
             type="email"
+            autoComplete="email"
+            inputMode="email"
             required
             disabled={submittingEmail}
             value={newEmail}
@@ -398,6 +401,7 @@ export function SecuritySettingsTab() {
               <Input
                 id="settings-current-password"
                 type={showCurrentPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 required
                 disabled={saving}
                 value={currentPassword}
@@ -426,6 +430,7 @@ export function SecuritySettingsTab() {
                 <Input
                   id="settings-new-password"
                   type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   disabled={saving}
                   value={newPassword}
@@ -456,6 +461,7 @@ export function SecuritySettingsTab() {
                 <Input
                   id="settings-confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   disabled={saving}
                   value={confirmPassword}
