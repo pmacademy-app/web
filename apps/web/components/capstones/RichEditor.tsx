@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { calculateCapstoneWordCount } from '@/lib/capstones'
 import { marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify'
 import { cn } from '@/lib/utils'
 
 interface RichEditorProps {
@@ -43,10 +44,11 @@ export function RichEditor({
   const { wordCount, characterCount } = calculateCapstoneWordCount(value)
   const isWordCountMet = wordCount >= minWordCount
 
-  // Parse markdown to HTML for preview/read-only mode via useMemo (pure render computation)
+  // Parse markdown to HTML for preview/read-only mode via useMemo (pure render computation, sanitized via DOMPurify)
   const renderedHtml = useMemo(() => {
     try {
-      return marked.parse(value || '*No content written yet.*') as string
+      const parsed = marked.parse(value || '*No content written yet.*') as string
+      return DOMPurify.sanitize(parsed, { ALLOW_UNKNOWN_PROTOCOLS: false })
     } catch {
       return value || '*No content written yet.*'
     }

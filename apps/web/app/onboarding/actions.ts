@@ -12,6 +12,7 @@ import {
   academyLessonPath,
 } from '@/lib/personalization/path-resolver'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
+import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
 import { validateUsername } from '@/lib/portfolio'
 import { trackProductEvent } from '@/lib/events/product-events'
 
@@ -293,7 +294,12 @@ export async function submitOnboarding(data: OnboardingData) {
     }
     if (name) updatePayload.name = name
     if (username) updatePayload.username = username
-    if (data.avatar_url?.trim()) updatePayload.avatar_url = data.avatar_url.trim()
+    if (data.avatar_url?.trim()) {
+      if (!isValidAvatarUrl(data.avatar_url)) {
+        return { success: false, error: "Avatar URL must be hosted on Prodily's secure avatar storage." }
+      }
+      updatePayload.avatar_url = data.avatar_url.trim()
+    }
     if (data.bio?.trim()) updatePayload.bio = data.bio.trim()
     if (compositeLearningPurpose) updatePayload.learning_purpose = compositeLearningPurpose
     if (Array.isArray(data.topics) && data.topics.length > 0) updatePayload.onboarding_topics = data.topics

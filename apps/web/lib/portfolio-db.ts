@@ -28,6 +28,7 @@ import {
   type PortfolioVerificationOverride,
   portfolioFallbackUsername as portfolioFallbackUsernameFor,
 } from '@/lib/portfolio-readiness'
+import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -521,6 +522,11 @@ export async function updatePortfolioSettings(
 
   if (existingUsers && existingUsers.length > 0) {
     throw new PortfolioValidationError('This username is already taken by another user.')
+  }
+
+  // SEC-13: Validate avatar URL against allowed Supabase Storage avatars bucket
+  if (settings.avatarUrl && !isValidAvatarUrl(settings.avatarUrl)) {
+    throw new PortfolioValidationError("Avatar URL must be hosted on Prodily's secure avatar storage.")
   }
 
   // 4. Update user record

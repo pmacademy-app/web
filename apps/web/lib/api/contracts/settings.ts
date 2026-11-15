@@ -20,6 +20,7 @@ const urlField = (label: string) =>
 
 export const profileUpdateSchema = z.object({
   name: z.string().max(100, 'Name must be 100 characters or fewer.').optional().nullable(),
+  avatar_url: z.string().max(1000).optional().nullable(),
   bio: z.string().max(500, 'Bio must be 500 characters or fewer.').optional().nullable(),
   linkedin_url: urlField('LinkedIn URL'),
   github_url: urlField('GitHub URL'),
