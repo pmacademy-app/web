@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '../../app/api/settings/security/route'
 import * as authLib from '../auth'
 import * as supabaseLib from '../supabase'
+import { SupabaseFake } from './helpers/supabase-fake'
 
 const { mockEvaluatePersistentRateLimit } = vi.hoisted(() => ({
   mockEvaluatePersistentRateLimit: vi.fn(),
@@ -45,16 +46,14 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     vi.mocked(authLib.getAuthenticatedUserFromRequest).mockResolvedValue(
       mockUser as unknown as import('@supabase/supabase-js').User
     )
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignInWithPassword,
-        admin: {
-          updateUserById: mockUpdateUserById,
-          signOut: mockAdminSignOut,
-          getUserById: mockGetUserById,
-        },
-      },
-    } as unknown as ReturnType<typeof supabaseLib.createServiceRoleClient>)
+    const fake = new SupabaseFake()
+    fake.auth.signInWithPassword = mockSignInWithPassword
+    fake.auth.admin.updateUserById = mockUpdateUserById
+    fake.auth.admin.signOut = mockAdminSignOut
+    fake.auth.admin.getUserById = mockGetUserById
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(
+      fake as unknown as ReturnType<typeof supabaseLib.createServiceRoleClient>
+    )
   })
 
   it('0. Rejects non-JSON Content-Type with 415', async () => {

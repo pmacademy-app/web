@@ -93,11 +93,11 @@ beforeEach(() => {
 })
 
 describe('CQ-05: record_lesson_quiz_completion error handling', () => {
-  it.each(['PGRST202', '42883'])('falls back to the non-atomic path when the RPC is missing (%s)', async (code) => {
+  it.each(['PGRST202', '42883'])('throws when the RPC is missing (%s) without running any fallback', async (code) => {
     client.rpc.mockResolvedValueOnce({ data: null, error: { code, message: 'function not found' } })
 
-    await expect(run()).rejects.toThrow(FALLBACK_SENTINEL)
-    expect(fallbackRan()).toBe(true)
+    await expect(run()).rejects.toThrow(`record_lesson_quiz_completion failed (${code})`)
+    expect(fallbackRan()).toBe(false)
   })
 
   it.each([

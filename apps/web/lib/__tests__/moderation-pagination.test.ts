@@ -17,7 +17,7 @@ type QueryResult = { data: unknown; error: unknown; count?: number | null }
 let queries: RecordedQuery[] = []
 let resolver: (q: RecordedQuery) => QueryResult = () => ({ data: [], error: null, count: 0 })
 
-const CHAIN_METHODS = ['select', 'eq', 'neq', 'is', 'not', 'or', 'in', 'order', 'range', 'limit', 'ilike']
+const CHAIN_METHODS = ['select', 'eq', 'neq', 'is', 'not', 'or', 'in', 'order', 'range', 'limit', 'ilike', 'like', 'insert', 'update', 'upsert', 'delete']
 
 function createChain(table: string) {
   const record: RecordedQuery = { table, ops: [] }

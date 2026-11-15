@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
+import { SupabaseFake } from './helpers/supabase-fake'
 import {
   resolveRange,
   eachDay,
@@ -15,90 +16,47 @@ import {
 
 const TZ = 'UTC'
 
-const createMockChain = (table: string) => {
-  const chain: any = {
-    select: vi.fn(() => chain),
-    eq: vi.fn(() => chain),
-    in: vi.fn(() => chain),
-    gte: vi.fn(() => chain),
-    lte: vi.fn(() => chain),
-    lt: vi.fn(() => chain),
-    not: vi.fn(() => chain),
-    order: vi.fn(() => chain),
-    limit: vi.fn(() => chain),
-    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
-    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-    then: (resolve: any) => {
-      if (table === 'users') {
-        resolve({
-          data: [
-            { id: 'user-1', name: 'Alice PM', email: 'alice@example.com', total_xp: 150, created_at: new Date().toISOString() },
-            { id: 'user-2', name: 'Bob PM', email: 'bob@example.com', total_xp: 200, created_at: new Date().toISOString() },
-          ],
-          count: 2,
-          error: null,
-        })
-      } else if (table === 'xp_events') {
-        resolve({
-          data: [
-            { user_id: 'user-1', xp_amount: 50, created_at: new Date().toISOString() },
-          ],
-          count: 1,
-          error: null,
-        })
-      } else if (table === 'user_lesson_progress') {
-        resolve({
-          data: [
-            { user_id: 'user-1', lesson_id: 'les_foundations_01', completed_at: new Date().toISOString() },
-          ],
-          count: 1,
-          error: null,
-        })
-      } else if (table === 'quiz_attempts') {
-        resolve({
-          data: [{ id: 'q-1', user_id: 'user-1', attempted_at: new Date().toISOString() }],
-          count: 1,
-          error: null,
-        })
-      } else if (table === 'capstone_submissions') {
-        resolve({
-          data: [{ id: 'c-1', user_id: 'user-1', module_slug: 'foundations', submitted_at: new Date().toISOString() }],
-          count: 1,
-          error: null,
-        })
-      } else if (table === 'certificates') {
-        resolve({
-          data: [{ id: 'cert-1', user_id: 'user-1', learner_name: 'Alice', issued_at: new Date().toISOString(), certificate_code: 'CERT-001' }],
-          count: 1,
-          error: null,
-        })
-      } else {
-        resolve({ data: [], count: 0, error: null })
-      }
-    },
-  }
-  return chain
-}
+const fake = new SupabaseFake()
+fake.seed('users', [
+  { id: 'user-1', name: 'Alice PM', email: 'alice@example.com', total_xp: 150, created_at: new Date().toISOString(), goal: 'transition', is_portfolio_public: true },
+  { id: 'user-2', name: 'Bob PM', email: 'bob@example.com', total_xp: 200, created_at: new Date().toISOString(), goal: 'upskill', is_portfolio_public: false },
+])
+fake.seed('xp_events', [
+  { id: 'xp-1', user_id: 'user-1', xp_amount: 50, created_at: new Date().toISOString() },
+])
+fake.seed('user_lesson_progress', [
+  { id: 'p-1', user_id: 'user-1', lesson_id: 'les_foundations_01', completed_at: new Date().toISOString() },
+])
+fake.seed('quiz_attempts', [
+  { id: 'q-1', user_id: 'user-1', attempted_at: new Date().toISOString() },
+])
+fake.seed('capstone_submissions', [
+  { id: 'c-1', user_id: 'user-1', module_slug: 'foundations', submitted_at: new Date().toISOString() },
+])
+fake.seed('certificates', [
+  { id: 'cert-1', user_id: 'user-1', learner_name: 'Alice', issued_at: new Date().toISOString(), certificate_code: 'CERT-001', created_at: new Date().toISOString() },
+])
+fake.seed('badges', [
+  { id: 'badge-1', key: 'cpo_completion' },
+])
+fake.seed('user_badges', [
+  { user_id: 'user-1', badge_id: 'badge-1' },
+])
+fake.seed('email_queue', [
+  { id: 'eq-1', status: 'sent', failed_at: null },
+])
+fake.seed('contact_messages', [
+  { id: 'cm-1', status: 'resolved' },
+])
+fake.seed('testimonials', [
+  { id: 't-1', status: 'published' },
+])
+fake.seed('system_errors', [
+  { id: 'se-1', status: 'resolved' },
+])
 
 vi.mock('../supabase', () => ({
-  createServiceRoleClient: vi.fn(() => ({
-    from: vi.fn((table: string) => createMockChain(table)),
-    rpc: vi.fn(() => Promise.resolve({ data: null, error: { message: 'RPC not found' } })),
-    auth: {
-      admin: {
-        listUsers: vi.fn(() =>
-          Promise.resolve({
-            data: {
-              users: [
-                { id: 'user-1', email: 'alice@example.com', email_confirmed_at: new Date().toISOString() },
-              ],
-            },
-            error: null,
-          })
-        ),
-      },
-    },
-  })),
+  createServiceRoleClient: vi.fn(() => fake),
   createBrowserSupabaseClient: vi.fn(),
   createAuthenticatedServerClient: vi.fn(),
 }))
@@ -284,9 +242,37 @@ describe('Dashboard Aggregation Unit Test Suite', () => {
     })
 
     it('DashboardService.getDashboardData returns full KPI and series structure', async () => {
-      const { DashboardService } = await import('../admin/dashboard-service')
+      const {
+        DashboardService,
+        loadDashboardKpis,
+        loadDashboardSeries,
+        loadDashboardFunnel,
+        loadDashboardAttention,
+        loadDashboardRecentActivity,
+        loadDashboardSystemSnapshot,
+      } = await import('../admin/dashboard-service')
+
+      const kpisSlice = await loadDashboardKpis('30d')
+      expect(kpisSlice.failed).toBe(false)
+
+      const seriesSlice = await loadDashboardSeries('30d')
+      expect(seriesSlice.failed).toBe(false)
+
+      const funnelSlice = await loadDashboardFunnel()
+      expect(funnelSlice.failed).toBe(false)
+
+      const attentionSlice = await loadDashboardAttention('30d')
+      expect(attentionSlice.failed).toBe(false)
+
+      const recentSlice = await loadDashboardRecentActivity()
+      expect(recentSlice.failed).toBe(false)
+
+      const snapshotSlice = await loadDashboardSystemSnapshot()
+      expect(snapshotSlice.failed).toBe(false)
+
       const data = await DashboardService.getDashboardData('30d', null, null)
       expect(data).toBeDefined()
+      expect((data as any).failed).toBeUndefined()
       expect(data.kpis).toBeDefined()
       expect(typeof data.kpis.totalUsers).toBe('number')
       expect(typeof data.kpis.activeLearners).toBe('number')

@@ -30,6 +30,7 @@ vi.mock('@/lib/flashcards-service', () => ({
 }))
 
 import * as supabaseModule from '@/lib/supabase'
+import { SupabaseFake } from './helpers/supabase-fake'
 import { getDueCardsCount } from '@/lib/flashcards-service'
 import {
   createDefaultNotificationPreferences,
@@ -68,24 +69,6 @@ const CRON_HEADERS = { Authorization: `Bearer ${TEST_CRON_SECRET}` }
 beforeEach(() => {
   process.env.CRON_SECRET = TEST_CRON_SECRET
 })
-
-/** Keyset-aware `users` query builder mock: supports select().not().[gt(id)].order().limit(). */
-function usersBuilder(usersArr: Array<Record<string, unknown>>) {
-  let cursor: string | null = null
-  const b: Record<string, unknown> = {}
-  b.select = () => b
-  b.not = () => b
-  b.gt = (col: string, val: string) => {
-    if (col === 'id') cursor = val
-    return b
-  }
-  b.order = () => b
-  b.limit = async (n: number) => {
-    const filtered = cursor ? usersArr.filter((u) => String(u.id) > cursor!) : usersArr
-    return { data: filtered.slice(0, n), error: null }
-  }
-  return b
-}
 
 // ── 1.1 / 1.2 — Preference resolution & defaults ─────────────────────────────
 describe('Phase 1.1/1.2 — stored preference resolution & new email defaults', () => {
@@ -217,23 +200,28 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
     prefRows?: Array<Record<string, unknown>>
     inserts: Array<Record<string, unknown>>
   }) {
-    return {
-      from: (table: string) => {
-        if (table === 'users') return usersBuilder(users)
-        if (table === 'user_notification_preferences') return { select: () => ({ in: async () => ({ data: prefRows, error: null }) }) }
-        if (table === 'email_suppressions') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-        if (table === 'email_queue') {
-          return {
-            insert: (obj: Record<string, unknown>) => {
-              inserts.push(obj)
-              return { select: () => ({ single: async () => ({ data: { id: `q-${inserts.length}` }, error: null }) }) }
-            },
-          }
+    const fake = new SupabaseFake()
+    fake.seed('users', users)
+    fake.seed('user_notification_preferences', prefRows)
+    fake.seed('email_suppressions', [])
+    fake.seed('cron_heartbeats', [])
+    fake.seed('notification_events', [])
+    fake.seed('email_queue', [])
+
+    const origFrom = fake.from.bind(fake)
+    fake.from = (table: string) => {
+      const builder = origFrom(table)
+      if (table === 'email_queue') {
+        const origInsert = builder.insert.bind(builder)
+        builder.insert = (values: Record<string, unknown> | Array<Record<string, unknown>>) => {
+          if (Array.isArray(values)) inserts.push(...values)
+          else if (values) inserts.push(values)
+          return origInsert(values)
         }
-        if (table === 'notification_events') return { insert: async () => ({ data: null, error: null }) }
-        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-      },
+      }
+      return builder
     }
+    return fake
   }
 
   it('selects a lapsed user (streak broken) with due cards and passes the REAL due count', async () => {
@@ -316,20 +304,30 @@ describe('Phase 1.4 — weekly recap suppresses zero-activity users', () => {
     lessonRows?: Array<Record<string, unknown>>
     inserts: Array<Record<string, unknown>>
   }) {
-    return {
-      from: (table: string) => {
-        if (table === 'users') return usersBuilder(users)
-        if (table === 'xp_events') return { select: () => ({ in: () => ({ gte: () => ({ order: () => ({ range: async () => ({ data: xpRows, error: null }) }) }) }) }) }
-        if (table === 'user_lesson_progress') return { select: () => ({ in: () => ({ eq: () => ({ gte: async () => ({ data: lessonRows, error: null }) }) }) }) }
-        if (table === 'user_notification_preferences') return { select: () => ({ in: async () => ({ data: [], error: null }) }) }
-        if (table === 'email_suppressions') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-        if (table === 'email_queue') {
-          return { insert: (obj: Record<string, unknown>) => { inserts.push(obj); return { select: () => ({ single: async () => ({ data: { id: `q-${inserts.length}` }, error: null }) }) } } }
+    const fake = new SupabaseFake()
+    fake.seed('users', users)
+    fake.seed('xp_events', xpRows)
+    fake.seed('user_lesson_progress', lessonRows)
+    fake.seed('user_notification_preferences', [])
+    fake.seed('email_suppressions', [])
+    fake.seed('cron_heartbeats', [])
+    fake.seed('notification_events', [])
+    fake.seed('email_queue', [])
+
+    const origFrom = fake.from.bind(fake)
+    fake.from = (table: string) => {
+      const builder = origFrom(table)
+      if (table === 'email_queue') {
+        const origInsert = builder.insert.bind(builder)
+        builder.insert = (values: Record<string, unknown> | Array<Record<string, unknown>>) => {
+          if (Array.isArray(values)) inserts.push(...values)
+          else if (values) inserts.push(values)
+          return origInsert(values)
         }
-        if (table === 'notification_events') return { insert: async () => ({ data: null, error: null }) }
-        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-      },
+      }
+      return builder
     }
+    return fake
   }
 
   it('an active user with recap data receives the recap; a zero-activity user does not', async () => {
@@ -340,8 +338,8 @@ describe('Phase 1.4 — weekly recap suppresses zero-activity users', () => {
           { id: 'u-0001', email: 'active@example.com', name: 'Active', total_xp: 500, current_streak: 3 },
           { id: 'u-0002', email: 'idle@example.com', name: 'Idle', total_xp: 0, current_streak: 0 },
         ],
-        xpRows: [{ user_id: 'u-0001', xp_amount: 120 }],
-        lessonRows: [{ user_id: 'u-0001' }],
+        xpRows: [{ user_id: 'u-0001', xp_amount: 120, created_at: new Date().toISOString() }],
+        lessonRows: [{ user_id: 'u-0001', status: 'completed', completed_at: new Date().toISOString() }],
         inserts,
       }) as never
     )
@@ -470,36 +468,44 @@ describe('Phase 1.5 — lifecycle cron treats ~70% and holds out ~30%, no duplic
     inserts: Array<Record<string, unknown>>
     holdoutEvents: Array<Record<string, unknown>>
   }) {
-    return {
-      from: (table: string) => {
-        if (table === 'users') return usersBuilder(users)
-        // The lifecycle run pages this read: select().in().order().order().range().
-        if (table === 'user_lesson_progress') {
-          const b: Record<string, unknown> = {}
-          b.select = () => b
-          b.in = () => b
-          b.order = () => b
-          b.range = async (from: number, to: number) => ({ data: progressRows.slice(from, to + 1), error: null })
-          return b
+    const fake = new SupabaseFake()
+    fake.seed('users', users)
+    fake.seed('user_lesson_progress', progressRows)
+    fake.seed('user_notification_preferences', [])
+    fake.seed('email_suppressions', [])
+    fake.seed('cron_heartbeats', [])
+    fake.seed('capstone_submissions', [])
+    fake.seed('fellow_requests', [])
+    fake.seed('certificates', [])
+    fake.seed('notification_events', [])
+    fake.seed('email_queue', [])
+
+    const origFrom = fake.from.bind(fake)
+    fake.from = (table: string) => {
+      const builder = origFrom(table)
+      if (table === 'email_queue') {
+        const origInsert = builder.insert.bind(builder)
+        builder.insert = (values: Record<string, unknown> | Array<Record<string, unknown>>) => {
+          if (Array.isArray(values)) inserts.push(...values)
+          else if (values) inserts.push(values)
+          return origInsert(values)
         }
-        if (table === 'user_notification_preferences') return { select: () => ({ in: async () => ({ data: [], error: null }) }) }
-        if (table === 'email_suppressions') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-        if (table === 'email_queue') {
-          return { insert: (obj: Record<string, unknown>) => { inserts.push(obj); return { select: () => ({ single: async () => ({ data: { id: `q-${inserts.length}` }, error: null }) }) } } }
-        }
-        if (table === 'notification_events') {
-          return {
-            insert: async (obj: Record<string, unknown>) => {
-              if (typeof obj?.skipped_reason === 'string' && obj.skipped_reason.startsWith('lifecycle_holdout')) {
-                holdoutEvents.push(obj)
-              }
-              return { data: null, error: null }
-            },
+      }
+      if (table === 'notification_events') {
+        const origInsert = builder.insert.bind(builder)
+        builder.insert = (values: Record<string, unknown> | Array<Record<string, unknown>>) => {
+          const arr = Array.isArray(values) ? values : [values]
+          for (const obj of arr) {
+            if (typeof obj?.skipped_reason === 'string' && obj.skipped_reason.startsWith('lifecycle_holdout')) {
+              holdoutEvents.push(obj)
+            }
           }
+          return origInsert(values)
         }
-        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
-      },
+      }
+      return builder
     }
+    return fake
   }
 
   it('D+1 never-started cohort: ~70% queued, ~30% held out, all classified, no dup', async () => {

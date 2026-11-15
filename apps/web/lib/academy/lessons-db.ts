@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
-import { verifyTheoryReadEngagement, getRuntimeXpValues, calculateQuizXp } from '../xp'
+import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
 import { getCoreReadingMinutes, sampleQuizQuestions } from './lesson-structure'
 import { getRecutVariant } from './experiment'
 import { isModuleEntryUnlockTreatment } from './module-entry-unlock'
@@ -11,7 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
-import { completeLesson, resolveLessonAccessForUser } from '../lessons-completion-service'
+import { resolveLessonAccessForUser } from '../lessons-completion-service'
 import { fetchCurriculumData } from '../lesson-loader'
 import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
 import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
@@ -244,9 +244,6 @@ export function scoreQuizSubmission(
   }
 }
 
-/** PostgREST "function not found" and Postgres undefined_function. */
-const MISSING_RPC_ERROR_CODES = new Set(['PGRST202', '42883'])
-
 /**
  * Marks theory content as read and unlocks the quiz for this lesson.
  * Awards theory_read XP idempotently via the XP event ledger.
@@ -432,10 +429,6 @@ async function recordScoredQuizAttempt(
   // Attempt atomic execution via PostgreSQL RPC record_lesson_quiz_completion.
   // The RPC returns a jsonb envelope; narrow it explicitly rather than casting the
   // client, so the typed data layer stays free of escape-hatch casts (B8-G).
-  //
-  // CQ-05: only a missing RPC (PGRST202 / 42883) falls back to the non-atomic path below.
-  // Any other RPC error, a thrown call, or an unexpected envelope is a real fault and throws:
-  // retrying it non-atomically could double-record attempts the RPC already wrote.
   const { data: rpcData, error: rpcError } = await supabase.rpc('record_lesson_quiz_completion', {
     p_user_id: userId,
     p_lesson_id: lessonId,
@@ -447,98 +440,19 @@ async function recordScoredQuizAttempt(
     p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
   })
 
-  const rpcMissing = Boolean(rpcError && MISSING_RPC_ERROR_CODES.has(rpcError.code))
-  if (rpcError && !rpcMissing) {
+  if (rpcError) {
     throw new Error(`[lessons-db] record_lesson_quiz_completion failed (${rpcError.code}): ${rpcError.message}`)
   }
 
-  if (!rpcMissing) {
-    const envelope =
-      rpcData && typeof rpcData === 'object' && !Array.isArray(rpcData)
-        ? (rpcData as Record<string, unknown>)
-        : null
-    if (!envelope || envelope.success !== true) {
-      throw new Error('[lessons-db] record_lesson_quiz_completion returned an unexpected result')
-    }
-    totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
-    isFirstAttempt = Boolean(envelope.is_first_attempt)
-  } else {
-    console.warn('[lessons-db] record_lesson_quiz_completion is missing; using the non-atomic fallback')
-
-    const insertRows = validatedAttempts.map((a) => ({
-      user_id: userId,
-      lesson_id: lessonId,
-      question_id: a.question_id,
-      selected_option: a.selected_option,
-      is_correct: a.is_correct,
-    }))
-
-    const { error: attemptsInsertError } = await supabase
-      .from('quiz_attempts')
-      .insert(insertRows)
-
-    if (attemptsInsertError) throw attemptsInsertError
-
-    const { data: progress, error: progressFetchError } = await supabase
-      .from('user_lesson_progress')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('lesson_id', lessonId)
-      .maybeSingle()
-
-    if (progressFetchError) throw progressFetchError
-
-    isFirstAttempt = !progress || progress.quiz_attempts === 0
-
-    const { data: existingQuizEvents } = await supabase
-      .from('xp_events')
-      .select('xp_amount')
-      .eq('user_id', userId)
-      .eq('source_type', 'quiz_correct')
-      .eq('source_id', lessonId)
-
-    const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
-    const quizXp = calculateQuizXp(correctCount, totalQuestions, isFirstAttempt, alreadyAwardedXp, xpConfig)
-    const incrementalXp = quizXp.incrementalQuizXp
-
-    let perfectBonusXp = 0
-    if (quizXp.perfectBonusXp > 0) {
-      const hasBonus = await hasXpEvent(supabase, userId, 'quiz_bonus', lessonId)
-      if (!hasBonus) {
-        perfectBonusXp = quizXp.perfectBonusXp
-      }
-    }
-
-    totalXpToAward = incrementalXp + perfectBonusXp
-
-    await completeLesson(
-      supabase,
-      userId,
-      lessonId,
-      scorePercentage,
-      totalXpToAward
-    )
-
-    if (incrementalXp > 0) {
-      await awardXp(
-        supabase,
-        userId,
-        'quiz_correct',
-        incrementalXp,
-        lessonId
-      )
-    }
-
-    if (perfectBonusXp > 0) {
-      await awardXp(
-        supabase,
-        userId,
-        'quiz_bonus',
-        perfectBonusXp,
-        lessonId
-      )
-    }
+  const envelope =
+    rpcData && typeof rpcData === 'object' && !Array.isArray(rpcData)
+      ? (rpcData as Record<string, unknown>)
+      : null
+  if (!envelope || envelope.success !== true) {
+    throw new Error('[lessons-db] record_lesson_quiz_completion returned an unexpected result')
   }
+  totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
+  isFirstAttempt = Boolean(envelope.is_first_attempt)
 
   await updateUserStreak(supabase, userId)
 

@@ -1,4 +1,30 @@
-import { vi, afterEach } from 'vitest'
+import { vi, afterEach, expect } from 'vitest'
+import {
+  isConsoleGuardAllowlisted,
+  isConsoleErrorsAllowed,
+  resetConsoleErrorsAllowed,
+} from './lib/__tests__/helpers/console-guard-allowlist'
+
+// Console guard for unhandled "is not a function" errors in code under test (AG-06 / CQ-32)
+const trappedFunctionErrors: string[] = []
+const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
+
+console.error = (...args: unknown[]) => {
+  const msg = args.map((a) => (a instanceof Error ? `${a.message}\n${a.stack}` : String(a))).join(' ')
+  if (msg.includes('is not a function')) {
+    trappedFunctionErrors.push(msg)
+  }
+  originalConsoleError(...args)
+}
+
+console.warn = (...args: unknown[]) => {
+  const msg = args.map((a) => (a instanceof Error ? `${a.message}\n${a.stack}` : String(a))).join(' ')
+  if (msg.includes('is not a function')) {
+    trappedFunctionErrors.push(msg)
+  }
+  originalConsoleWarn(...args)
+}
 
 // Set deterministic test environment variables (isolate from local .env.local)
 if (process.env.ALLOW_LIVE_DB_TESTS !== 'true') {
@@ -183,6 +209,22 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(),
 }))
 
-afterEach(() => {
+afterEach((context) => {
+  const testPath = (context?.task?.file?.name as string | undefined) || expect.getState().testPath || ''
+  const trapped = [...trappedFunctionErrors]
+  trappedFunctionErrors.length = 0
+
+  const optedOut = isConsoleErrorsAllowed()
+  resetConsoleErrorsAllowed()
+
+  if (trapped.length > 0) {
+    if (!optedOut && !isConsoleGuardAllowlisted(testPath)) {
+      throw new Error(
+        `[console-guard] Unhandled "is not a function" error logged during test in ${testPath}:\n${trapped.join('\n')}\n` +
+          'Either migrate the mock to SupabaseFake, opt out via allowConsoleErrors(), or add to console-guard-allowlist.ts.'
+      )
+    }
+  }
+
   vi.clearAllMocks()
 })
