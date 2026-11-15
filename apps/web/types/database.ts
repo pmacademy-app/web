@@ -1580,6 +1580,7 @@ export type Database = {
       }
       user_lesson_progress: {
         Row: {
+          best_score: number | null
           completed_at: string | null
           deep_dive_opened_at: string | null
           lesson_id: string
@@ -1591,6 +1592,7 @@ export type Database = {
           xp_earned: number
         }
         Insert: {
+          best_score?: number | null
           completed_at?: string | null
           deep_dive_opened_at?: string | null
           lesson_id: string
@@ -1602,6 +1604,7 @@ export type Database = {
           xp_earned?: number
         }
         Update: {
+          best_score?: number | null
           completed_at?: string | null
           deep_dive_opened_at?: string | null
           lesson_id?: string

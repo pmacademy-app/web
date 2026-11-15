@@ -75,7 +75,6 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
             : `Capstone rejected and kept private.`
         toast(msg, 'success')
         setConfirmAction(null)
-        setConfirmReject(false)
         onClose()
         router.refresh()
       } else {

@@ -412,6 +412,61 @@ export async function recordQuizAttemptAction(
   })
 }
 
+async function enqueueWrongAnswerFlashcards(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  wrongQuestionIds: string[],
+  lesson?: CompiledLesson
+) {
+  if (!wrongQuestionIds.length) return
+
+  // Maps question id q-les_xxx-N to flashcard id fc-les_xxx-N
+  const flashcardIds = new Set<string>()
+  for (const qid of wrongQuestionIds) {
+    if (qid.startsWith('q-')) {
+      flashcardIds.add(qid.replace(/^q-/, 'fc-'))
+    } else {
+      flashcardIds.add(`fc-${lessonId}-${qid}`)
+    }
+  }
+
+  const deckBlock = lesson?.blocks?.find((b) => b.type === 'flashcardDeck') as
+    | { cards?: { id: string }[] }
+    | undefined
+  const deckCardIds = deckBlock?.cards?.map((c) => c.id)
+
+  const targetIds: string[] = []
+  for (const fcId of flashcardIds) {
+    if (!deckCardIds || deckCardIds.length === 0 || deckCardIds.includes(fcId)) {
+      targetIds.push(fcId)
+    }
+  }
+
+  if (!targetIds.length) return
+
+  const nowIso = new Date().toISOString()
+  const rows = targetIds.map((flashcardId) => ({
+    user_id: userId,
+    lesson_id: lessonId,
+    flashcard_id: flashcardId,
+    ease_factor: 2.5,
+    interval_days: 0,
+    repetitions: 0,
+    next_review_at: nowIso,
+  }))
+
+  const { error: upsertError } = await supabase
+    .from('user_flashcard_srs')
+    .upsert(rows, { onConflict: 'user_id,lesson_id,flashcard_id', ignoreDuplicates: true })
+
+  if (upsertError) {
+    await supabase
+      .from('user_flashcard_srs')
+      .upsert(rows, { onConflict: 'user_id,flashcard_id', ignoreDuplicates: true })
+  }
+}
+
 async function recordScoredQuizAttempt(
   supabase: SupabaseClient<Database>,
   userId: string,
@@ -454,6 +509,36 @@ async function recordScoredQuizAttempt(
   totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
   isFirstAttempt = Boolean(envelope.is_first_attempt)
 
+  // AG-28 Mastery: 70 percent threshold to pass/complete.
+  const isPassed =
+    typeof envelope.is_passed === 'boolean'
+      ? envelope.is_passed
+      : scorePercentage >= 70 || envelope.status === 'completed'
+  const isNewlyCompleted =
+    typeof envelope.is_newly_completed === 'boolean'
+      ? envelope.is_newly_completed
+      : isFirstAttempt
+  const bestScore =
+    typeof envelope.best_score === 'number'
+      ? envelope.best_score
+      : Math.max(scorePercentage, 0)
+
+  // Enqueue flashcards for wrong answers
+  const wrongAttempts = validatedAttempts.filter((a) => !a.is_correct)
+  if (wrongAttempts.length > 0) {
+    try {
+      await enqueueWrongAnswerFlashcards(
+        supabase,
+        userId,
+        lessonId,
+        wrongAttempts.map((a) => a.question_id),
+        lesson
+      )
+    } catch (fcErr) {
+      console.warn('[lessons-db] Flashcard enqueue warning:', fcErr)
+    }
+  }
+
   await updateUserStreak(supabase, userId)
 
   let totalCompletedLessons = 0
@@ -469,7 +554,7 @@ async function recordScoredQuizAttempt(
     const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
     initializeNotificationConnectors()
 
-    // Dispatch quiz.completed
+    // Dispatch quiz.completed on every attempt
     await globalNotificationDispatcher.dispatch({
       id: `quiz-complete-${userId}-${lessonId}-${Date.now()}`,
       event: 'quiz.completed',
@@ -488,24 +573,26 @@ async function recordScoredQuizAttempt(
       },
     })
 
-    // Dispatch lesson.completed
-    await globalNotificationDispatcher.dispatch({
-      id: `lesson-complete-${userId}-${lessonId}`,
-      event: 'lesson.completed',
-      userId,
-      userEmail: userRec?.email || '',
-      userName: userRec?.name || 'Learner',
-      userTimezone: 'UTC',
-      priority: 'medium',
-      category: 'learning',
-      occurredAt: new Date().toISOString(),
-      payload: {
+    // Dispatch lesson.completed only when the lesson was newly completed
+    if (isNewlyCompleted) {
+      await globalNotificationDispatcher.dispatch({
+        id: `lesson-complete-${userId}-${lessonId}`,
+        event: 'lesson.completed',
         userId,
-        lessonId,
-        lessonTitle: lesson?.title || lessonId,
-        xpEarned: totalXpToAward,
-      },
-    })
+        userEmail: userRec?.email || '',
+        userName: userRec?.name || 'Learner',
+        userTimezone: 'UTC',
+        priority: 'medium',
+        category: 'learning',
+        occurredAt: new Date().toISOString(),
+        payload: {
+          userId,
+          lessonId,
+          lessonTitle: lesson?.title || lessonId,
+          xpEarned: totalXpToAward,
+        },
+      })
+    }
 
     const { data: userProgress, error: progressError } = await supabase
       .from('user_lesson_progress')
@@ -521,11 +608,8 @@ async function recordScoredQuizAttempt(
     )
     totalCompletedLessons = completedLessonIds.size
 
-    // Phase 7: activate the referral reward once the learner has a completed lesson. Checked on
-    // every completion, not only the first: an activation that failed (settings read, XP insert,
-    // status update) leaves the referral `signed_up`, and this is its retry. With nothing pending
-    // the check is one read on the unique referrals(referred_user_id) index and returns.
-    if (totalCompletedLessons >= 1) {
+    // Phase 7: activate the referral reward once the learner has a completed lesson.
+    if (totalCompletedLessons >= 1 && isNewlyCompleted) {
       try {
         const { onFirstLessonCompletedReferralCheck } = await import('../referral/referral-service')
         await onFirstLessonCompletedReferralCheck(supabase, userId)
@@ -535,11 +619,8 @@ async function recordScoredQuizAttempt(
     }
 
     // Growth R4: a module is complete when its last open lesson is completed, in any order.
-    // Only a first attempt can newly complete a lesson (every attempt upserts status 'completed'
-    // and quiz_attempts starts at 0), so later attempts skip the check. The
-    // dispatcher does not dedupe by event id; a replay (or a race between two tabs) is harmless
-    // because the stable id feeds the in-app and email idempotency keys, which do.
-    const completedModule = isFirstAttempt ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
+    // Checks when a lesson newly completes.
+    const completedModule = isNewlyCompleted ? findNewlyCompletedModule(lessonId, completedLessonIds) : null
     if (completedModule) {
       await globalNotificationDispatcher.dispatch({
         id: moduleCompletedEventId(userId, completedModule.slug),
@@ -561,14 +642,8 @@ async function recordScoredQuizAttempt(
       })
     }
 
-    // Growth R1: issue (and announce once) the full-curriculum certificate as soon as
-    // the learner completes every lesson. Gated on `isFirstAttempt`: the first quiz
-    // attempt is the one that marks a lesson completed (later attempts cannot change the
-    // completed count), so post-90 resubmissions skip the extra queries. Learners who
-    // finished before this hook existed, or whose issuance failed here, are repaired by
-    // the certificates page. The helper is idempotent and only dispatches when it
-    // created the row; isolated so a failure never breaks quiz submission.
-    if (isFirstAttempt && totalCompletedLessons >= CURRICULUM_LESSON_COUNT) {
+    // Growth R1: issue full-curriculum certificate as soon as the learner completes every lesson.
+    if (isNewlyCompleted && totalCompletedLessons >= CURRICULUM_LESSON_COUNT) {
       try {
         const { issueFullCurriculumCertificateIfEligible } = await import('../certificates/issue-flow')
         await issueFullCurriculumCertificateIfEligible(supabase, userId, {
@@ -585,7 +660,10 @@ async function recordScoredQuizAttempt(
 
   return {
     success: true,
-    isCompleted: true,
+    isCompleted: typeof envelope.status === 'string' ? envelope.status === 'completed' : isPassed,
+    isPassed,
+    isNewlyCompleted,
+    bestScore,
     isFirstLesson: totalCompletedLessons === 1,
     totalCompletedLessons,
     correctCount,

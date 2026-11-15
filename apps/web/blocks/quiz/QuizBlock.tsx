@@ -269,6 +269,7 @@ export default function QuizBlock({ block }: BlockProps) {
   if (quizFinished) {
     const percentage = Math.round((correctCount / totalQuestions) * 100);
     const isPerfect = correctCount === totalQuestions;
+    const isPassed = percentage >= 70;
 
     return (
       <div className="max-w-xl mx-auto text-center py-8 space-y-8 animate-fade-in my-6">
@@ -296,11 +297,20 @@ export default function QuizBlock({ block }: BlockProps) {
             aria-describedby={summaryScoreId}
             className="text-2xl md:text-3xl font-bold font-serif text-foreground rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            {isPerfect ? 'Flawless Victory!' : 'Quiz Completed!'}
+            {isPerfect ? 'Flawless Victory!' : isPassed ? 'Quiz Completed!' : 'Keep Practicing!'}
           </h2>
           <p id={summaryScoreId} role="status" className="text-muted-foreground text-sm">
-            You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
-            <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
+            {isPassed ? (
+              <>
+                You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
+                <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
+              </>
+            ) : (
+              <>
+                Attempted, {percentage}%. You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
+                <span className="font-semibold">{totalQuestions}</span> correct answers. Retake to complete (70% required).
+              </>
+            )}
           </p>
         </div>
 

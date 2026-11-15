@@ -146,9 +146,12 @@ export function isTabUnlocked(tab: TabType, prog: LessonProgressV2 | null | unde
  * optional reflection.
  */
 export function lessonCompletedFromQuiz(
-  res: { isCompleted?: boolean; success?: boolean } | null | undefined
+  res: { isCompleted?: boolean; success?: boolean; isPassed?: boolean } | null | undefined
 ): boolean {
-  return !!res && (res.isCompleted === true || res.success === true)
+  if (!res) return false
+  if (res.isPassed === false) return false
+  if (res.isCompleted === false && !res.isPassed) return false
+  return res.isPassed === true || res.isCompleted === true || res.success === true
 }
 
 /**

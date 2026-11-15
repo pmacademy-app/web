@@ -209,6 +209,22 @@ Run:
 Undo:
 Run `rollback/20261113000004_capstone_review_feedback.down.sql` in the SQL editor.
 
+### `20261113000005_lesson_mastery.sql` (PROD-02, AG-28, lesson mastery threshold at 70 percent)
+
+Adds `best_score smallint` to `public.user_lesson_progress` and updates `public.record_lesson_quiz_completion` RPC to enforce a 70 percent passing threshold. Scores below 70 percent mark progress as `in_progress`. Existing `completed` rows are grandfathered and never downgraded by subsequent retakes.
+
+Privileges: Executable only by `service_role`. Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Fixed `search_path = public, pg_temp`.
+
+Prerequisites:
+- Deploy alongside or before AG-28 code change.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000005_lesson_mastery.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000005_lesson_mastery_validation.sql`.
+
+Undo:
+Run `rollback/20261113000005_lesson_mastery.down.sql` in the SQL editor.
+
 ### `20261113000007_leaderboard_weekly_rpc.sql` (ENG-08, ENG-10, AG-31, weekly leaderboard RPC and DB size telemetry)
 
 Adds `public.get_weekly_leaderboard(p_week_start timestamptz, p_limit int, p_offset int)` returning the ranked weekly leaderboard aggregated in the database engine instead of loading all users, lessons, and XP rows into server memory. Also provides `public.get_database_size_bytes()` returning `bigint` for monitoring database size against the Supabase 500 MB free tier limit.
