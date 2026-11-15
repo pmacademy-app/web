@@ -193,6 +193,22 @@ Run:
 Undo:
 `rollback/20261113000003_backfill_onboarding_completed.down.sql`.
 
+### `20261113000004_capstone_review_feedback.sql` (PROD-03, AG-26, capstone review feedback and resubmission)
+
+Adds nullable `review_scores jsonb`, `review_feedback text`, `revision_count int not null default 0`, and `review_history jsonb` to `public.capstone_submissions`. Adds check constraints on feedback length (maximum 4000 characters) and revision count (non-negative).
+
+Privileges: Writes remain restricted to service role only. Learners read their own rows through existing SELECT RLS policies.
+
+Prerequisites:
+- Apply this migration before or alongside deploying the AG-26 code change.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000004_capstone_review_feedback.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000004_capstone_review_feedback_validation.sql` (schema verification and privilege checks).
+
+Undo:
+Run `rollback/20261113000004_capstone_review_feedback.down.sql` in the SQL editor.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are

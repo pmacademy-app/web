@@ -176,8 +176,12 @@ export type Database = {
           id: string
           is_public: boolean
           module_slug: string
+          review_feedback: string | null
+          review_history: Json | null
+          review_scores: Json | null
           reviewed_at: string | null
           reviewed_by: string | null
+          revision_count: number
           status: string
           submitted_at: string
           user_id: string | null
@@ -187,8 +191,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug: string
+          review_feedback?: string | null
+          review_history?: Json | null
+          review_scores?: Json | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          revision_count?: number
           status?: string
           submitted_at?: string
           user_id?: string | null
@@ -198,8 +206,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug?: string
+          review_feedback?: string | null
+          review_history?: Json | null
+          review_scores?: Json | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          revision_count?: number
           status?: string
           submitted_at?: string
           user_id?: string | null

@@ -11,6 +11,7 @@ import type { Database } from '@/lib/supabase'
 import { getAllCapstoneDefinitions, getCapstoneDefinition, getCurriculumModuleForCapstone } from '@/config/capstones'
 import {
   deriveCapstoneStatus,
+  getLatestReviewAction,
   validateCapstoneSubmission,
   validateCapstoneTransition,
   type CapstoneStatus,
@@ -466,7 +467,8 @@ export async function submitCapstoneAction(
   }
 
   // 6. Validate transition
-  const transition = validateCapstoneTransition(existing?.status, 'submitted', 'learner')
+  const lastAction = existing ? getLatestReviewAction(existing) : null
+  const transition = validateCapstoneTransition(existing?.status, 'submitted', 'learner', lastAction)
   if (!transition.allowed) {
     throw new PublicError(transition.reason || 'Cannot submit capstone in current state.', { status: 409, code: 'INVALID_STATE' })
   }
@@ -475,14 +477,43 @@ export async function submitCapstoneAction(
   let result: CapstoneSubmissionRow
 
   if (existing) {
+    const isResubmission = existing.status === 'reviewed'
+    const nextRevisionCount = isResubmission
+      ? (existing.revision_count ?? 0) + 1
+      : (existing.revision_count ?? 0)
+
+    const updatePayload: Database['public']['Tables']['capstone_submissions']['Update'] = {
+      content,
+      status: 'submitted',
+      is_public: effectiveIsPublic,
+      submitted_at: now,
+      revision_count: nextRevisionCount,
+    }
+
+    if (isResubmission) {
+      const history = Array.isArray(existing.review_history) ? [...existing.review_history] : []
+      const alreadyInHistory = history.some(
+        (h) => (h as Record<string, unknown>)?.reviewed_at === existing.reviewed_at
+      )
+      if (!alreadyInHistory && existing.reviewed_at) {
+        history.push({
+          action: lastAction,
+          scores: existing.review_scores,
+          feedback: existing.review_feedback,
+          reviewed_at: existing.reviewed_at,
+          reviewed_by: existing.reviewed_by,
+          submitted_at: existing.submitted_at,
+          revision_count: existing.revision_count ?? 0,
+        })
+      }
+      updatePayload.review_history = history as unknown as Database['public']['Tables']['capstone_submissions']['Update']['review_history']
+      updatePayload.review_scores = null
+      updatePayload.review_feedback = null
+    }
+
     const { data: updated, error: updateError } = await supabase
       .from('capstone_submissions')
-      .update({
-        content,
-        status: 'submitted',
-        is_public: effectiveIsPublic,
-        submitted_at: now,
-      })
+      .update(updatePayload)
       .eq('id', existing.id)
       .select()
       .single()

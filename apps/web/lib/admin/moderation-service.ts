@@ -430,16 +430,37 @@ export class ModerationService {
     adminUserId: string,
     adminEmail: string,
     submissionId: string,
-    action: 'approve' | 'reject',
+    action: 'approve' | 'reject' | 'request_changes',
+    reviewDataOrClient?:
+      | {
+          scores?: Record<string, number>
+          feedback?: string
+        }
+      | unknown,
     supabaseClient?: unknown
   ): Promise<boolean> {
-    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
+    let reviewData: { scores?: Record<string, number>; feedback?: string } | undefined
+    let clientToUse: unknown
+
+    if (
+      reviewDataOrClient &&
+      typeof reviewDataOrClient === 'object' &&
+      !('from' in reviewDataOrClient) &&
+      !('auth' in reviewDataOrClient)
+    ) {
+      reviewData = reviewDataOrClient as { scores?: Record<string, number>; feedback?: string }
+      clientToUse = supabaseClient
+    } else {
+      clientToUse = reviewDataOrClient
+    }
+
+    const supabase = (clientToUse as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
     try {
-      // 1. Read the current row so we can (a) detect whether this is the FIRST review — which drives
-      //    both the timestamp write and the single notification — and (b) resolve the recipient.
+      // 1. Read the current row so we can (a) detect whether this is the FIRST review, which drives
+      //    both the timestamp write and the single notification, and (b) resolve the recipient.
       const { data: current, error: readError } = (await (supabase
         .from('capstone_submissions') as unknown as DBChain)
-        .select('id, user_id, module_slug, status, is_public, reviewed_at')
+        .select('id, user_id, module_slug, status, is_public, reviewed_at, revision_count, review_history, review_scores, review_feedback')
         .eq('id', submissionId)
         .maybeSingle()) as unknown as {
         data:
@@ -450,6 +471,10 @@ export class ModerationService {
               status: string
               is_public: boolean | null
               reviewed_at: string | null
+              revision_count?: number | null
+              review_history?: unknown[] | null
+              review_scores?: Record<string, number> | null
+              review_feedback?: string | null
             }
           | null
         error: unknown
@@ -470,11 +495,23 @@ export class ModerationService {
       const publishedNow = action === 'approve' && !(current.status === 'reviewed' && current.is_public === true)
       const reviewedAtIso = new Date().toISOString()
 
+      const history = Array.isArray(current.review_history) ? [...current.review_history] : []
+      history.push({
+        action,
+        scores: reviewData?.scores ?? null,
+        feedback: reviewData?.feedback ?? null,
+        reviewed_at: reviewedAtIso,
+        reviewed_by: adminUserId,
+      })
+
       // 2. Always set status + visibility. Stamp reviewed_at/reviewed_by only on the first review so
-      //    the turnaround clock is not reset by a later approve↔reject change.
+      //    the turnaround clock is not reset by a later approve or reject change.
       const updatePayload: Record<string, unknown> = {
         status: 'reviewed',
         is_public: action === 'approve',
+        review_scores: reviewData?.scores ?? current.review_scores ?? null,
+        review_feedback: reviewData?.feedback ?? current.review_feedback ?? null,
+        review_history: history,
       }
       if (!alreadyReviewed) {
         updatePayload.reviewed_at = reviewedAtIso

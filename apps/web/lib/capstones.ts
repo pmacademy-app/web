@@ -142,18 +142,58 @@ export interface CapstoneTransitionResult {
   reason?: string
 }
 
+export type CapstoneReviewAction = 'approve' | 'reject' | 'request_changes'
+
+export interface CapstoneTransitionOptions {
+  lastReviewAction?: CapstoneReviewAction | null
+  reviewAction?: CapstoneReviewAction | null
+}
+
+/**
+ * Resolves the most recent review action from review_history or legacy visibility flag.
+ */
+export function getLatestReviewAction(submission: {
+  review_history?: unknown | null
+  is_public?: boolean | null
+}): CapstoneReviewAction | null {
+  if (Array.isArray(submission.review_history) && submission.review_history.length > 0) {
+    const last = submission.review_history[submission.review_history.length - 1] as Record<string, unknown> | null
+    if (last && typeof last.action === 'string') {
+      if (last.action === 'approve' || last.action === 'reject' || last.action === 'request_changes') {
+        return last.action
+      }
+    }
+  }
+  if (submission.is_public === true) {
+    return 'approve'
+  }
+  if (submission.is_public === false) {
+    return 'reject'
+  }
+  return null
+}
+
 /**
  * Validates whether a capstone status transition is permitted for a given actor.
  * Prevents illegal state transitions such as reverting submitted capstones to draft
  * or non-admins marking submissions as reviewed.
+ *
+ * PROD-03 / AG-26: Allows resubmission from 'reviewed' to 'submitted' when the review
+ * action was 'request_changes' or 'reject'. Approved submissions remain final.
  */
 export function validateCapstoneTransition(
   currentStatus: string | null | undefined,
   targetStatus: string,
-  actor: 'learner' | 'admin'
+  actor: 'learner' | 'admin',
+  options?: CapstoneTransitionOptions | CapstoneReviewAction | null
 ): CapstoneTransitionResult {
   const normCurrent = currentStatus ? currentStatus.toLowerCase().trim() : 'unlocked'
   const normTarget = targetStatus.toLowerCase().trim()
+
+  const reviewAction: CapstoneReviewAction | null =
+    typeof options === 'string'
+      ? options
+      : options?.lastReviewAction ?? options?.reviewAction ?? null
 
   if (actor === 'learner') {
     // Learners can only move to 'draft' or 'submitted'
@@ -169,9 +209,15 @@ export function validateCapstoneTransition(
 
     if (normTarget === 'submitted') {
       if (normCurrent === 'reviewed') {
+        if (reviewAction === 'request_changes' || reviewAction === 'reject') {
+          return { allowed: true }
+        }
         return {
           allowed: false,
-          reason: 'Cannot resubmit an already reviewed capstone.',
+          reason:
+            reviewAction === 'approve'
+              ? 'Cannot resubmit an approved capstone.'
+              : 'Cannot resubmit an already reviewed capstone.',
         }
       }
       return { allowed: true }
