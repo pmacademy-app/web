@@ -175,3 +175,32 @@ When a task adds a new held migration in `supabase/migrations/pending-approval/`
 
 ### Updating the Grant Allowlist
 If a migration grants access on schema `public` objects (tables, views, columns, routines, sequences) to `anon` or `authenticated`, document the grant and its RLS justification in `supabase/tests/grant_allowlist.sql`. Any unallowlisted grant causes the `db-local` job to fail.
+
+---
+
+## 6. Real-Page Accessibility Audits with Playwright and Axe (AG-21)
+
+In addition to component-level JSDOM accessibility checks (`npm run test:a11y`), Prodily runs end-to-end accessibility testing against real rendered layouts using Playwright and `@axe-core/playwright`.
+
+### Test Suites (`apps/web/e2e/a11y/`)
+- `e2e/a11y/public-pages.spec.ts`:
+  - Audits public marketing and authentication routes: `/`, `/curriculum`, `/frameworks`, `/faq`, `/about`, `/reviews`, `/lessons/lesson-001`, `/login`, `/signup`.
+  - Enforces WCAG 2.0 Level A, AA, and WCAG 2.1 Level AA rules (`wcag2a`, `wcag2aa`, `wcag21aa`).
+  - Fails on violations with severity `serious` or `critical`.
+  - Verifies keyboard skip-link functionality on `/` and `/login` (first Tab focuses skip link, activating moves focus to `<main id="main-content">`).
+- `e2e/a11y/app-pages.spec.ts`:
+  - Audits authenticated learner pages: `/dashboard`, `/academy`, lesson pages, `/progress`, `/settings`, and modal dialogs.
+  - Skips automatically when staging credentials (`E2E_USER_EMAIL`, `E2E_USER_PASSWORD`) are not provided.
+  - Refuses to run against production hosts (`assertNotProduction()`).
+
+### Listing and Running Accessibility Specs
+```bash
+# From apps/web/
+
+# List the public a11y tests without starting a web server
+npx playwright test e2e/a11y/public-pages.spec.ts --list
+
+# Run accessibility specs against local dev server or staging URL
+# (Requires built app or running webServer; executed automatically in CI on main)
+npm run test:e2e -- e2e/a11y/
+```
