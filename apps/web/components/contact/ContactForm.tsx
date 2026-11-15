@@ -77,7 +77,7 @@ export function ContactForm() {
       </p>
 
       {success && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-start gap-3 text-xs font-semibold">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-success flex items-start gap-3 text-xs font-semibold">
           <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-sm">Message Sent Successfully!</p>

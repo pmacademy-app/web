@@ -48,9 +48,9 @@ export function PortfolioReadinessCard({
             <span
               className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                 isReadyToShare
-                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
+                  ? 'bg-emerald-500/10 text-success border-emerald-500/25'
                   : statusLabel === 'Needs Attention'
-                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/25'
+                  ? 'bg-amber-500/10 text-warning border-amber-500/25'
                   : 'bg-muted text-muted-foreground border-border'
               }`}
             >
@@ -96,11 +96,11 @@ export function PortfolioReadinessCard({
             >
               <div className="flex items-start gap-2.5 min-w-0">
                 {item.isComplete ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
                 ) : (
                   <AlertCircle
                     className={`w-4 h-4 shrink-0 mt-0.5 ${
-                      item.importance === 'essential' ? 'text-amber-500' : 'text-muted-foreground'
+                      item.importance === 'essential' ? 'text-warning' : 'text-muted-foreground'
                     }`}
                   />
                 )}
@@ -110,7 +110,7 @@ export function PortfolioReadinessCard({
                       {item.label}
                     </span>
                     {item.importance === 'essential' && !item.isComplete && (
-                      <span className="text-[9px] uppercase font-bold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                      <span className="text-[9px] uppercase font-bold text-warning bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
                         Required
                       </span>
                     )}

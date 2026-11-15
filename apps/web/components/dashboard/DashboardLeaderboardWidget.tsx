@@ -95,7 +95,7 @@ export function DashboardLeaderboardWidget(props: DashboardLeaderboardWidgetProp
         <div className={STAT_ROW}>
           <dt className={STAT_LABEL}>Days Studied</dt>
           <dd className="ml-auto leading-8">
-            <span className="text-2xl font-extrabold font-mono text-emerald-600">{days}</span>
+            <span className="text-2xl font-extrabold font-mono text-success">{days}</span>
             <span aria-hidden="true" className="text-xs font-medium text-muted-foreground">{` / ${DAYS_IN_WEEK}`}</span>
             <span className="sr-only">{` of ${DAYS_IN_WEEK}`}</span>
           </dd>

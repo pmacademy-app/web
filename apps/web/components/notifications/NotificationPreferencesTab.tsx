@@ -237,7 +237,7 @@ function NotificationPreferencesForm({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
         <div className="flex-1">
           {savedSuccess ? (
-            <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+            <span className="text-xs font-semibold text-success flex items-center gap-1.5 animate-in fade-in-0" role="status">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               Preferences saved successfully!
             </span>
@@ -247,7 +247,7 @@ function NotificationPreferencesForm({
               {errorMessage}
             </span>
           ) : isDirty ? (
-            <span className="text-[11px] font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+            <span className="text-[11px] font-medium text-warning bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
               Unsaved changes
             </span>
           ) : (

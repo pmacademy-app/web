@@ -218,7 +218,7 @@ function PortfolioSettingsFormContent({
       )}
 
       {successMsg && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-500 flex items-center gap-2 font-bold">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-success flex items-center gap-2 font-bold">
           <Check className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -247,9 +247,9 @@ function PortfolioSettingsFormContent({
           <div className="space-y-0.5">
             <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
               {formData.isPortfolioPublic ? (
-                <Globe className="w-4 h-4 text-emerald-500" />
+                <Globe className="w-4 h-4 text-success" />
               ) : (
-                <Lock className="w-4 h-4 text-amber-500" />
+                <Lock className="w-4 h-4 text-warning" />
               )}
               <span>Portfolio Visibility</span>
             </h3>
@@ -357,7 +357,7 @@ function PortfolioSettingsFormContent({
           {/* LinkedIn */}
           <div className="space-y-1.5">
             <label htmlFor="setting-linkedin" className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <LinkedInIcon className="w-3.5 h-3.5 text-blue-500" /> LinkedIn Profile URL
+              <LinkedInIcon className="w-3.5 h-3.5 text-info" /> LinkedIn Profile URL
             </label>
             <input
               id="setting-linkedin"
@@ -405,7 +405,7 @@ function PortfolioSettingsFormContent({
       <div id="featured-capstone-section" tabIndex={-1} className="rounded-2xl border border-border bg-card p-6 space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/40">
         <div className="border-b border-border pb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" /> Featured Deliverable Spotlight
+            <Sparkles className="w-4 h-4 text-warning" /> Featured Deliverable Spotlight
           </h3>
           <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
             Proof-of-Work Pinning
@@ -514,7 +514,7 @@ function PortfolioSettingsFormContent({
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <div className="border-b border-border pb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
-            <Eye className="w-4 h-4 text-emerald-500" /> Visitor Engagement &amp; Social Sharing
+            <Eye className="w-4 h-4 text-success" /> Visitor Engagement &amp; Social Sharing
           </h3>
           <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
             Public Metrics
@@ -579,7 +579,7 @@ function PortfolioSettingsFormContent({
           )}
           <a
             href="/progress"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-warning hover:underline"
           >
             <span>View Progress &amp; Certificates</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -588,7 +588,7 @@ function PortfolioSettingsFormContent({
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {successMsg && (
-            <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in-0" role="status">
+            <span className="text-xs font-bold text-success flex items-center gap-1 animate-in fade-in-0" role="status">
               <Check className="w-4 h-4 shrink-0" />
               <span>Saved successfully!</span>
             </span>
@@ -600,7 +600,7 @@ function PortfolioSettingsFormContent({
             </span>
           )}
           {!successMsg && !errorMsg && isDirty && (
-            <span className="text-[11px] font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md text-center">
+            <span className="text-[11px] font-medium text-warning bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md text-center">
               Unsaved changes
             </span>
           )}

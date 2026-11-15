@@ -209,7 +209,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
         : 'Copy Link'
 
   const primaryIcon = copied ? (
-    <Check aria-hidden="true" className="text-emerald-300" />
+    <Check aria-hidden="true" className="text-success" />
   ) : failed ? (
     <CircleAlert aria-hidden="true" />
   ) : canNativeShare ? (
@@ -274,7 +274,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
             title={failed ? shareUrl : 'Copy link'}
           >
             {copied ? (
-              <Check aria-hidden="true" className="text-emerald-500" />
+              <Check aria-hidden="true" className="text-success" />
             ) : failed ? (
               <CircleAlert aria-hidden="true" className="text-destructive" />
             ) : (

@@ -155,7 +155,7 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealt
               </div>
               <div className="p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border">
                 <p className="text-[11px] font-semibold text-admin-fg-muted">Network Errors (24h)</p>
-                <p className={`text-xl font-extrabold mt-1 ${authHealth.networkFailures24h > 5 ? 'text-amber-500' : 'text-admin-fg'}`}>
+                <p className={`text-xl font-extrabold mt-1 ${authHealth.networkFailures24h > 5 ? 'text-warning' : 'text-admin-fg'}`}>
                   {authHealth.networkFailures24h}
                 </p>
               </div>
@@ -175,7 +175,7 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealt
               </div>
             ) : (
               <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border flex items-center gap-2 text-xs text-admin-fg-muted">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                 <span>Zero authentication anomalies recorded in the last 24 hours.</span>
               </div>
             )}

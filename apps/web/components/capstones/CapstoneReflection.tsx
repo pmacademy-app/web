@@ -43,7 +43,7 @@ export function CapstoneReflection({
             className="flex items-center gap-2 text-xs font-medium cursor-pointer select-none text-muted-foreground hover:text-foreground"
           >
             {isPublic ? (
-              <Globe className="w-3.5 h-3.5 text-emerald-500" />
+              <Globe className="w-3.5 h-3.5 text-success" />
             ) : (
               <Lock className="w-3.5 h-3.5 text-muted-foreground" />
             )}
@@ -75,7 +75,7 @@ export function CapstoneReflection({
         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
           <span>Reflections earn XP when submitted.</span>
           {isPublic && (
-            <span className="flex items-center gap-1 text-emerald-500 font-semibold">
+            <span className="flex items-center gap-1 text-success font-semibold">
               <Check className="w-3 h-3" /> Will be attached to public profile export
             </span>
           )}

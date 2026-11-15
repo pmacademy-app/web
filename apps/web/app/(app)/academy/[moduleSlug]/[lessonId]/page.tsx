@@ -224,7 +224,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     return (
       <div className="container mx-auto px-4 py-16 max-w-xl text-center space-y-8 animate-fade-in">
         <div className="flex justify-center">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 text-warning border border-amber-500/20">
             <Lock className="h-8 w-8" />
           </div>
         </div>

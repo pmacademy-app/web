@@ -144,7 +144,7 @@ function LessonFeedbackFormContent({
           <h3 className="text-xs md:text-sm font-bold font-serif text-foreground flex items-center gap-2">
             <span>How clear was this lesson?</span>
             {submitted && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-success bg-emerald-500/10 px-2 py-0.5 rounded-full">
                 <CheckCircle className="w-3 h-3" /> Feedback Recorded
               </span>
             )}
@@ -182,7 +182,7 @@ function LessonFeedbackFormContent({
                 <Star
                   className={`w-5 h-5 transition-transform ${
                     active
-                      ? 'fill-amber-400 text-amber-400 scale-110'
+                      ? 'fill-amber-400 text-warning scale-110'
                       : 'text-muted-foreground/40 hover:text-muted-foreground'
                   }`}
                 />
@@ -217,8 +217,8 @@ function LessonFeedbackFormContent({
                     className={`text-xs px-2.5 py-1 rounded-lg font-medium border transition-all ${
                       isSelected
                         ? tag.category === 'positive'
-                          ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                          : 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+                          ? 'bg-emerald-500/15 border-emerald-500/40 text-success'
+                          : 'bg-amber-500/15 border-amber-500/40 text-warning'
                         : 'bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground'
                     }`}
                   >
@@ -249,8 +249,8 @@ function LessonFeedbackFormContent({
                     className={`text-xs px-2.5 py-1 rounded-lg font-medium border transition-all ${
                       isSelected
                         ? opt.value === 'yes'
-                          ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
-                          : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                          ? 'bg-amber-500/15 border-amber-500/40 text-warning'
+                          : 'bg-emerald-500/15 border-emerald-500/40 text-success'
                         : 'bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground'
                     }`}
                   >
@@ -292,7 +292,7 @@ function LessonFeedbackFormContent({
           {/* Submit Action */}
           <div className="flex items-center justify-between pt-1">
             {errorMsg ? (
-              <div className="text-xs text-red-500 flex items-center gap-1">
+              <div className="text-xs text-danger flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{errorMsg}</span>
               </div>

@@ -108,12 +108,12 @@ export function AdminLessonDetailView({
       value:
         lesson.clarityScore !== null && lesson.clarityScore !== undefined ? (
           <div className="flex items-center gap-2">
-            <span className="text-amber-400 font-bold">★ {lesson.clarityScore.toFixed(1)}</span>
+            <span className="text-warning font-bold">★ {lesson.clarityScore.toFixed(1)}</span>
             {lesson.clarityPct !== null && (
               <span className="text-admin-fg-subtle text-xs">({lesson.clarityPct}% clear)</span>
             )}
             {lesson.needsReview && (
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-amber-400">
+              <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-warning">
                 Needs Review
               </span>
             )}
@@ -213,8 +213,8 @@ export function AdminLessonDetailView({
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400 font-bold text-xs flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span className="text-warning font-bold text-xs flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-warning" />
                       {item.rating}/5
                     </span>
                     {item.tags.length > 0 && (

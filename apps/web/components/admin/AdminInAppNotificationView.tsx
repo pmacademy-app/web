@@ -238,11 +238,11 @@ export function AdminInAppNotificationView({
         const p = item.priority
         const color =
           p === 'urgent'
-            ? 'text-red-400 border-red-500/25 bg-red-500/10'
+            ? 'text-danger border-red-500/25 bg-red-500/10'
             : p === 'high'
-            ? 'text-amber-400 border-amber-500/25 bg-amber-500/10'
+            ? 'text-warning border-amber-500/25 bg-amber-500/10'
             : p === 'medium'
-            ? 'text-blue-400 border-blue-500/25 bg-blue-500/10'
+            ? 'text-info border-blue-500/25 bg-blue-500/10'
             : 'text-slate-400 border-slate-500/25 bg-slate-500/10'
 
         return (
@@ -351,7 +351,7 @@ export function AdminInAppNotificationView({
                 type="button"
                 disabled={isLoading}
                 onClick={() => handlePause(item.id)}
-                className="p-1 rounded text-amber-400 hover:bg-amber-400/10 transition-colors cursor-pointer"
+                className="p-1 rounded text-warning hover:bg-amber-400/10 transition-colors cursor-pointer"
                 title="Pause Schedule"
               >
                 <Pause className="w-3.5 h-3.5" />
@@ -375,7 +375,7 @@ export function AdminInAppNotificationView({
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleCancel(item.id)}
-                className="p-1 rounded text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                className="p-1 rounded text-danger hover:bg-red-400/10 transition-colors cursor-pointer"
                 title="Cancel Notification"
               >
                 <Clock className="w-3.5 h-3.5" />
@@ -387,7 +387,7 @@ export function AdminInAppNotificationView({
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleDelete(item.id)}
-                className="p-1 rounded text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                className="p-1 rounded text-danger hover:bg-red-400/10 transition-colors cursor-pointer"
                 title="Delete"
               >
                 <Trash2 className="w-3.5 h-3.5" />

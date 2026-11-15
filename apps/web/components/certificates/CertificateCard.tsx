@@ -80,7 +80,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
               <AlertCircle className="w-3.5 h-3.5" /> {statusLabel}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[11px] font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-success border border-emerald-500/20 text-[11px] font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" /> {statusLabel}
             </span>
           )}
@@ -174,7 +174,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
                 <AlertCircle className="w-3.5 h-3.5" /> Test only
               </div>
             ) : (
-              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+              <div className="flex items-center gap-1 text-[11px] font-bold text-success">
                 <ShieldCheck className="w-3.5 h-3.5" /> Scan to Verify
               </div>
             )}

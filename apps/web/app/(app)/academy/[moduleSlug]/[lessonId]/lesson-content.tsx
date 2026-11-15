@@ -283,7 +283,7 @@ function ReflectionForm({
 
       {xpEarned !== null ? (
         <div className="text-center py-8 space-y-3 animate-fade-in">
-          <p className="text-emerald-600 font-bold text-lg">
+          <p className="text-success font-bold text-lg">
             Reflection saved! +{xpEarned} XP earned.
           </p>
         </div>
@@ -391,7 +391,7 @@ function TheoryReadButton({
   if (theoryReadAt) {
     return (
       <div className="mt-8 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
+        <div className="flex items-center gap-2 text-success font-bold text-sm">
           <Award className="h-5 w-5" />
           Theory section completed. Quiz is now unlocked!
         </div>
@@ -678,7 +678,7 @@ export default function LessonPageContent({
   if (error || !progress) {
     return (
       <div className="text-center py-20 space-y-4">
-        <p className="text-red-500 font-bold">Failed to load lesson progress. Please reload.</p>
+        <p className="text-danger font-bold">Failed to load lesson progress. Please reload.</p>
         <Link href="/academy" className="text-primary hover:underline text-sm font-semibold">
           Return to Curriculum
         </Link>
@@ -728,13 +728,13 @@ export default function LessonPageContent({
       return (
         <div className="max-w-lg mx-auto text-center py-12 space-y-8 animate-scale-up">
           <div className="flex justify-center">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 shadow-sm">
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-warning shadow-sm">
               <Trophy className="h-10 w-10" />
             </div>
           </div>
 
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 text-xs font-semibold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-warning text-xs font-semibold uppercase tracking-wider">
               Module Achievement Unlocked
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
@@ -820,7 +820,7 @@ export default function LessonPageContent({
             You completed <strong>{lesson.title}</strong>. Your skill radar has been updated.
           </p>
           {sessionQuizScore !== null && (
-            <p className="text-xs font-semibold text-emerald-600">
+            <p className="text-xs font-semibold text-success">
               You scored {sessionQuizScore}% on the practice quiz.
             </p>
           )}

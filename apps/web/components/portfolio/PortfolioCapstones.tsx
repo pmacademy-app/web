@@ -112,7 +112,7 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
 
                 <div className="flex items-center gap-3 self-start sm:self-auto">
                   {cap.status === 'reviewed' ? (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-[11px] font-semibold text-emerald-500 border border-emerald-500/20">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-[11px] font-semibold text-success border border-emerald-500/20">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Reviewed by Prodily</span>
                     </div>
@@ -132,8 +132,8 @@ export function PortfolioCapstones({ capstones, username }: PortfolioCapstonesPr
                   >
                     {isCopied ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-emerald-500 font-bold hidden sm:inline">Copied!</span>
+                        <Check className="w-3.5 h-3.5 text-success" />
+                        <span className="text-success font-bold hidden sm:inline">Copied!</span>
                       </>
                     ) : (
                       <>

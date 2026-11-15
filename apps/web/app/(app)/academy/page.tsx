@@ -446,7 +446,7 @@ export default async function AcademyPage() {
                       }`
 
                       const iconEl = isDone ? (
-                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-success border border-emerald-500/20 flex items-center justify-center shrink-0">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       ) : isLocked ? (
@@ -539,7 +539,7 @@ export default async function AcademyPage() {
                   {targetLesson && (
                     <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                       {!targetAccessible && !isModuleFullyCompleted && globalFirstActionable && (
-                        <div className="text-xs text-amber-600 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 leading-relaxed font-medium">
+                        <div className="text-xs text-warning bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 leading-relaxed font-medium">
                           Prerequisites needed: finish {positionOf(globalFirstActionable)} to keep progressing in order.
                         </div>
                       )}

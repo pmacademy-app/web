@@ -112,7 +112,7 @@ function KeyTakeawaysSection({ block, children }: BlockProps) {
     return (
       <SectionCard
         badgeText="Key Takeaways"
-        badgeColor="bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+        badgeColor="bg-emerald-500/10 text-success border-emerald-500/20"
         borderColor="border-l-emerald-500"
         title={String(block.title || block.name || '')}
       >
@@ -124,13 +124,13 @@ function KeyTakeawaysSection({ block, children }: BlockProps) {
   return (
     <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-emerald-500/15">
-        <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+        <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
         <h3 className="text-lg font-bold font-serif text-foreground">Key Takeaways</h3>
       </div>
       <ul className="space-y-3">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-3">
-            <span className="shrink-0 mt-1 text-emerald-600">
+            <span className="shrink-0 mt-1 text-success">
               <CheckCircle2 className="h-4 w-4" />
             </span>
             <MarkdownRenderer
@@ -154,7 +154,7 @@ function CheatSheetSection({ block, children }: BlockProps) {
     return (
       <SectionCard
         badgeText="Cheat Sheet"
-        badgeColor="bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+        badgeColor="bg-yellow-500/10 text-warning border-yellow-500/20"
         borderColor="border-l-yellow-500"
         title={String(block.title || block.name || '')}
       >
@@ -166,13 +166,13 @@ function CheatSheetSection({ block, children }: BlockProps) {
   return (
     <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-yellow-500/15">
-        <Zap className="h-5 w-5 text-yellow-600 shrink-0" />
+        <Zap className="h-5 w-5 text-warning shrink-0" />
         <h3 className="text-lg font-bold font-serif text-foreground">Quick Reference Cheat Sheet</h3>
       </div>
       <ul className="space-y-2">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2.5 py-2 border-b border-yellow-500/10 last:border-0">
-            <ChevronRight className="h-4 w-4 shrink-0 mt-0.5 text-yellow-600" />
+            <ChevronRight className="h-4 w-4 shrink-0 mt-0.5 text-warning" />
             <MarkdownRenderer
               content={item}
               className="text-sm text-foreground/80 leading-relaxed flex-1 [&>p]:m-0"
@@ -304,7 +304,7 @@ function RealWorldPerspectiveSection({ block, children }: BlockProps) {
     return (
       <SectionCard
         badgeText="Real-World Perspective"
-        badgeColor="bg-amber-500/10 text-amber-600 border-amber-500/20"
+        badgeColor="bg-amber-500/10 text-warning border-amber-500/20"
         borderColor="border-l-amber-500"
         title={String(block.title || block.name || '')}
       >
@@ -316,7 +316,7 @@ function RealWorldPerspectiveSection({ block, children }: BlockProps) {
   return (
     <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-5 pb-3 border-b border-amber-500/15">
-        <Users className="h-5 w-5 text-amber-600 shrink-0" />
+        <Users className="h-5 w-5 text-warning shrink-0" />
         <h3 className="text-lg font-bold font-serif text-foreground">Real-World Perspective</h3>
       </div>
       <div className="space-y-5">
@@ -385,7 +385,7 @@ function MentalModelSection({ block, children }: BlockProps) {
   return (
     <div className="rounded-xl border-l-4 border-l-emerald-500 border border-emerald-500/20 bg-emerald-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-1">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-success border border-emerald-500/20">
           Mental Model
         </span>
       </div>
@@ -435,7 +435,7 @@ function FrameworkSection({ block, children }: BlockProps) {
   return (
     <div className="rounded-xl border-l-4 border-l-blue-500 border border-blue-500/20 bg-blue-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-1">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 border border-blue-500/20">
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-info border border-blue-500/20">
           Framework &amp; Tools
         </span>
       </div>

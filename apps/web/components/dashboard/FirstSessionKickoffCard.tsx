@@ -30,7 +30,7 @@ export function FirstSessionKickoffCard({ nextLesson }: FirstSessionKickoffCardP
               <Sparkles className="w-3.5 h-3.5" />
               First-Session Kickoff
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-warning text-xs font-semibold">
               <Flame className="w-3 h-3" />
               Starts Day 1 Streak
             </span>

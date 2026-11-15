@@ -40,7 +40,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
                   className={cn(
                     'w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs shrink-0',
                     isTop3
-                      ? ['text-amber-500 bg-amber-500/10 border-amber-500/30', 'text-slate-400 bg-slate-400/10 border-slate-400/30', 'text-amber-700 bg-amber-700/10 border-amber-700/30'][entry.rank - 1]
+                      ? ['text-warning bg-amber-500/10 border-amber-500/30', 'text-slate-400 bg-slate-400/10 border-slate-400/30', 'text-amber-700 bg-amber-700/10 border-amber-700/30'][entry.rank - 1]
                       : 'text-muted-foreground border-border font-mono'
                   )}
                 >
@@ -78,7 +78,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-muted/40 py-1.5">
                   <div className="text-[9px] text-muted-foreground uppercase font-semibold">Days</div>
-                  <div className="text-xs font-bold font-mono text-emerald-500">{entry.daysStudied}/7</div>
+                  <div className="text-xs font-bold font-mono text-success">{entry.daysStudied}/7</div>
                 </div>
                 <div className="rounded-lg bg-muted/40 py-1.5">
                   <div className="text-[9px] text-muted-foreground uppercase font-semibold">XP</div>
@@ -86,7 +86,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
                 </div>
                 <div className="rounded-lg bg-muted/40 py-1.5">
                   <div className="text-[9px] text-muted-foreground uppercase font-semibold">Streak</div>
-                  <div className="text-xs font-bold font-mono text-amber-500">{entry.currentStreak}d</div>
+                  <div className="text-xs font-bold font-mono text-warning">{entry.currentStreak}d</div>
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
             {entries.map((entry) => {
               const isTop3 = entry.rank <= 3
               const medalColors = [
-                'text-amber-500 bg-amber-500/10 border-amber-500/30', // 1st Gold
+                'text-warning bg-amber-500/10 border-amber-500/30', // 1st Gold
                 'text-slate-400 bg-slate-400/10 border-slate-400/30', // 2nd Silver
                 'text-amber-700 bg-amber-700/10 border-amber-700/30', // 3rd Bronze
               ]
@@ -144,7 +144,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
 
                       {/* Rank Change Arrow (only show on positive/negative movement) */}
                       {entry.positionChange > 0 && (
-                        <span className="text-[10px] text-emerald-500 font-bold flex items-center" title={`Up ${entry.positionChange} ranks`}>
+                        <span className="text-[10px] text-success font-bold flex items-center" title={`Up ${entry.positionChange} ranks`}>
                           <ArrowUp className="w-3 h-3" />
                         </span>
                       )}
@@ -185,7 +185,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
 
                   {/* Days Studied */}
                   <td className="py-3 px-4 text-center">
-                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-semibold font-mono text-xs">
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-success border border-emerald-500/20 font-semibold font-mono text-xs">
                       <span>{entry.daysStudied} / 7 Days</span>
                     </div>
                   </td>
@@ -204,7 +204,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
 
                   {/* Streak */}
                   <td className="py-3 px-4 text-center">
-                    <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-500">
+                    <span className="inline-flex items-center gap-1 font-mono font-bold text-warning">
                       <Flame className="w-3.5 h-3.5" /> {entry.currentStreak}d
                     </span>
                   </td>

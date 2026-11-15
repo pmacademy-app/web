@@ -126,7 +126,7 @@ export function ReferralSettingsTab() {
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <Check className="w-3.5 h-3.5 text-success" />
                   Copied!
                 </>
               ) : (
@@ -172,7 +172,7 @@ export function ReferralSettingsTab() {
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-info flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -184,7 +184,7 @@ export function ReferralSettingsTab() {
         </div>
 
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-success flex items-center justify-center shrink-0">
             <Award className="w-5 h-5" />
           </div>
           <div>
@@ -196,7 +196,7 @@ export function ReferralSettingsTab() {
         </div>
 
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-warning flex items-center justify-center shrink-0">
             <Zap className="w-5 h-5" />
           </div>
           <div>
@@ -256,7 +256,7 @@ export function ReferralSettingsTab() {
 
                 <div>
                   {item.status === 'rewarded' || item.status === 'activated' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-success border border-emerald-500/20">
                       <Check className="w-3 h-3" />
                       Activated
                     </span>

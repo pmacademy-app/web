@@ -54,14 +54,14 @@ export default async function BadgesGalleryPage() {
           <div className="text-2xl font-bold text-foreground font-serif">
             {totalEarned} / {totalAvailable}
           </div>
-          <p className="text-[11px] text-emerald-500 font-semibold">
+          <p className="text-[11px] text-success font-semibold">
             {completionPercentage}% Completion
           </p>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-5 space-y-1 shadow-xs">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Award className="w-3.5 h-3.5 text-amber-500" /> Milestone Completion
+            <Award className="w-3.5 h-3.5 text-warning" /> Milestone Completion
           </span>
           <div className="w-full bg-secondary h-2.5 rounded-full overflow-hidden mt-2">
             <div

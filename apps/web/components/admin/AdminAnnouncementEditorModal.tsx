@@ -167,10 +167,10 @@ export function AdminAnnouncementEditorModal({
                 >
                   <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      {type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
-                      {type === 'critical' && <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />}
-                      {type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-                      {type === 'info' && <Info className="w-4 h-4 text-blue-400 shrink-0" />}
+                      {type === 'warning' && <AlertTriangle className="w-4 h-4 text-warning shrink-0" />}
+                      {type === 'critical' && <ShieldAlert className="w-4 h-4 text-danger shrink-0" />}
+                      {type === 'success' && <CheckCircle2 className="w-4 h-4 text-success shrink-0" />}
+                      {type === 'info' && <Info className="w-4 h-4 text-info shrink-0" />}
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 text-xs">
                         <span className="font-bold tracking-tight">{title || 'Sample Title'}</span>
                         <span className="opacity-90">{content || 'Announcement content preview will appear here.'}</span>

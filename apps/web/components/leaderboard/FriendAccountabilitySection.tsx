@@ -110,7 +110,7 @@ export function FriendAccountabilitySection({
       {!hideHeader && (
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2 text-foreground font-bold font-serif text-base">
-            <Shield className="w-5 h-5 text-emerald-500" /> Friend Accountability
+            <Shield className="w-5 h-5 text-success" /> Friend Accountability
           </div>
           <span className="text-xs text-muted-foreground font-mono">
             {friends.length} Friends
@@ -152,7 +152,7 @@ export function FriendAccountabilitySection({
           <div
             className={`flex items-center gap-1.5 text-xs p-2 rounded-lg ${
               feedback.type === 'success'
-                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                ? 'bg-emerald-500/10 text-success border border-emerald-500/20'
                 : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
             }`}
           >
@@ -197,7 +197,7 @@ export function FriendAccountabilitySection({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-mono text-emerald-500 font-bold">
+                  <span className="font-mono text-success font-bold">
                     {f.daysStudied} / 7 Days
                   </span>
 

@@ -85,7 +85,7 @@ export default function ContactPage() {
         {/* Support Creator Box */}
         <div className="p-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-4 shadow-xs flex flex-col justify-between">
           <div className="space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-warning flex items-center justify-center">
               <Heart className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold font-serif text-foreground">

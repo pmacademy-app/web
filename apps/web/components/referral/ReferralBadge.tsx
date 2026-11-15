@@ -62,7 +62,7 @@ export function ReferralBadge({ refCode }: { refCode?: string | null }) {
           Join free today to get full access to 90 lessons, interactive quizzes, and capstones.
         </p>
       </div>
-      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+      <CheckCircle className="w-4 h-4 text-success shrink-0" />
     </div>
   )
 }

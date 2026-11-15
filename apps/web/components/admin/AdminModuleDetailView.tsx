@@ -74,7 +74,7 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-admin-fg flex items-center gap-1">
-                <span className="text-amber-400">★</span> {lesson.clarityScore.toFixed(1)}
+                <span className="text-warning">★</span> {lesson.clarityScore.toFixed(1)}
               </span>
               {lesson.clarityPct !== null && (
                 <span className="text-[10px] text-admin-fg-muted font-mono">
@@ -83,7 +83,7 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
               )}
             </div>
             {lesson.needsReview && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-amber-500 w-fit">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-warning w-fit">
                 Needs Review
               </span>
             )}
@@ -176,13 +176,13 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
           onClick={() => setFilterNeedsReview(true)}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer flex items-center gap-1.5 ${
             filterNeedsReview
-              ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+              ? 'bg-amber-500/15 border-amber-500/40 text-warning'
               : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <span>Needs Review</span>
           {needsReviewCount > 0 && (
-            <span className="px-1.5 py-0.2 text-[10px] font-mono rounded-full bg-amber-500/20 text-amber-400">
+            <span className="px-1.5 py-0.2 text-[10px] font-mono rounded-full bg-amber-500/20 text-warning">
               {needsReviewCount}
             </span>
           )}

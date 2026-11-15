@@ -81,7 +81,7 @@ export default function FlashcardDeckBlock({ block, previewMode }: BlockProps) {
     return (
       <div className="max-w-md mx-auto text-center py-10 space-y-8 animate-fade-in my-6">
         <div className="flex justify-center">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-success border border-emerald-500/20">
             <Award className="h-8 w-8" />
           </div>
         </div>
@@ -166,12 +166,12 @@ function FlashcardItemCard({ card, onReview, isSubmitting }: { card: Flashcard; 
   }, [isFlipped, handleFlip]);
 
   const ratingOptions = [
-    { value: 0, label: 'Blackout', color: 'bg-red-500/10 text-red-600 border-red-500/20' },
+    { value: 0, label: 'Blackout', color: 'bg-red-500/10 text-danger border-red-500/20' },
     { value: 1, label: 'Wrong', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
-    { value: 2, label: 'Hard', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-    { value: 3, label: 'Pass', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
+    { value: 2, label: 'Hard', color: 'bg-amber-500/10 text-warning border-amber-500/20' },
+    { value: 3, label: 'Pass', color: 'bg-blue-500/10 text-info border-blue-500/20' },
     { value: 4, label: 'Good', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' },
-    { value: 5, label: 'Perfect', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
+    { value: 5, label: 'Perfect', color: 'bg-emerald-500/10 text-success border-emerald-500/20' },
   ];
 
   return (

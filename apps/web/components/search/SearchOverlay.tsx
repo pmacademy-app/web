@@ -567,13 +567,13 @@ export function SearchOverlay() {
                         {isLocked ? (
                           <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                         ) : isCompleted ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <Check className="w-3.5 h-3.5 text-success" />
                         ) : entry.type === 'lesson' ? (
                           <BookOpen className="w-3.5 h-3.5 text-primary" />
                         ) : entry.type === 'glossary' ? (
-                          <FileText className="w-3.5 h-3.5 text-blue-500" />
+                          <FileText className="w-3.5 h-3.5 text-info" />
                         ) : (
-                          <Layers className="w-3.5 h-3.5 text-amber-500" />
+                          <Layers className="w-3.5 h-3.5 text-warning" />
                         )}
                       </div>
 
@@ -586,7 +586,7 @@ export function SearchOverlay() {
                             {positionLabel} · {moduleChipLabel(entry.moduleName)}
                           </span>
                           {isCompleted && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-success border border-emerald-500/20">
                               Completed
                             </span>
                           )}
@@ -596,7 +596,7 @@ export function SearchOverlay() {
                             </span>
                           )}
                           {isLocked && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-warning border border-amber-500/20">
                               <Lock className="w-2.5 h-2.5" />
                               {prereqLabel ? `Locked · complete ${prereqLabel}` : 'Locked'}
                             </span>

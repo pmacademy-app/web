@@ -49,8 +49,8 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
       {/* Header Badges */}
       <div className="flex flex-wrap items-center justify-between gap-3 relative z-10">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-600 border border-amber-500/25 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-warning border border-amber-500/25 text-xs font-semibold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-warning" />
             Featured Artifact
           </span>
 
@@ -80,8 +80,8 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-emerald-500 font-bold hidden sm:inline">Copied!</span>
+                <Check className="w-3.5 h-3.5 text-success" />
+                <span className="text-success font-bold hidden sm:inline">Copied!</span>
               </>
             ) : (
               <>
@@ -110,7 +110,7 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
           </span>
           <span>•</span>
           {capstone.status === 'reviewed' ? (
-            <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
+            <span className="inline-flex items-center gap-1 text-success font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" />
               Reviewed by Prodily
             </span>

@@ -77,7 +77,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
       {unlocks && unlocks.length > 0 && (
         <div className="rounded-xl border border-border bg-card p-5 space-y-4">
           <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-            <Key className="h-4 w-4 text-amber-500" />
+            <Key className="h-4 w-4 text-warning" />
             <span>Future Concepts Unlocked</span>
           </div>
           <ul className="space-y-3">

@@ -30,7 +30,7 @@ export function ReviewStats({ stats }: ReviewStatsProps) {
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Completed Today
           </span>
-          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          <CheckCircle2 className="w-4 h-4 text-success" />
         </div>
         <div className="mt-2">
           <span className="text-2xl font-extrabold text-foreground font-mono">
@@ -62,7 +62,7 @@ export function ReviewStats({ stats }: ReviewStatsProps) {
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Total Unlocked
           </span>
-          <Award className="w-4 h-4 text-amber-500" />
+          <Award className="w-4 h-4 text-warning" />
         </div>
         <div className="mt-2">
           <span className="text-2xl font-extrabold text-foreground font-mono">

@@ -13,10 +13,10 @@ interface QualityOption {
 const QUALITY_OPTIONS: QualityOption[] = [
   { rating: 0, label: 'Blackout', shortcut: '0', color: 'bg-rose-500/10 text-rose-600 border-rose-500/30 hover:bg-rose-500/20' },
   { rating: 1, label: 'Incorrect', shortcut: '1', color: 'bg-rose-500/10 text-rose-600 border-rose-500/30 hover:bg-rose-500/20' },
-  { rating: 2, label: 'Difficult', shortcut: '2', color: 'bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20' },
+  { rating: 2, label: 'Difficult', shortcut: '2', color: 'bg-amber-500/10 text-warning border-amber-500/30 hover:bg-amber-500/20' },
   { rating: 3, label: 'Pass', shortcut: '3', color: 'bg-sky-500/10 text-sky-600 border-sky-500/30 hover:bg-sky-500/20' },
-  { rating: 4, label: 'Good', shortcut: '4', color: 'bg-blue-500/10 text-blue-600 border-blue-500/30 hover:bg-blue-500/20' },
-  { rating: 5, label: 'Perfect', shortcut: '5', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20' },
+  { rating: 4, label: 'Good', shortcut: '4', color: 'bg-blue-500/10 text-info border-blue-500/30 hover:bg-blue-500/20' },
+  { rating: 5, label: 'Perfect', shortcut: '5', color: 'bg-emerald-500/10 text-success border-emerald-500/30 hover:bg-emerald-500/20' },
 ]
 
 interface QualitySelectorProps {

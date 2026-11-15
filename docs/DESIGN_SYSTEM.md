@@ -79,3 +79,22 @@ Right-hand controls follow the strict visual hierarchy:
    - **Private Feedback**: Posts to `/api/feedback` (persisted in `public.user_feedback`).
    - **Public Review**: Posts to `/api/testimonials` (persisted in `public.testimonials` for admin moderation).
 5. **Authentication Context**: Automatically inherits logged-in Supabase session headers without requiring manual user ID entry.
+
+---
+
+## 5. Semantic Color Tokens and WCAG Contrast (AG-18)
+
+Raw palette classes (`text-emerald-*`, `text-amber-*`, `text-blue-*`, `text-purple-*`) are banned by the ESLint rule `prodily/no-raw-palette-text`. All typography and status text must use semantic design tokens defined in `apps/web/app/globals.css`.
+
+Every token achieves at least 4.5:1 contrast against both the page background (`#F8F6F0`) and card surface (`#FFFFFF`), satisfying WCAG AA requirements for body text.
+
+| Semantic Token | Utility Class | Hex Value | Contrast on Canvas (#F8F6F0) | Contrast on Surface (#FFFFFF) | WCAG AA Status | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `success` | `text-success` | `#15803D` | 4.64:1 | 5.02:1 | Pass | Completed lessons, saved drafts, verified badges |
+| `warning` | `text-warning` | `#B45309` | 4.65:1 | 5.02:1 | Pass | Pending submissions, streaks, warning notices |
+| `info` | `text-info` | `#2563EB` | 4.78:1 | 5.17:1 | Pass | Informational hints, links, platform milestones |
+| `ai` | `text-ai` | `#7C3AED` | 5.27:1 | 5.70:1 | Pass | AI suggestions, intelligent feedback prompts |
+| `danger` | `text-danger` / `text-destructive` | `#C2410C` | 4.79:1 | 5.18:1 | Pass | Errors, destructive actions, failed evaluations |
+| `ink-muted` | `text-ink-muted` | `#625A4E` | 6.28:1 | 6.79:1 | Pass | Secondary copy, subtle explanations, muted body |
+| `foreground` | `text-foreground` | `#171A17` | 16.24:1 | 17.55:1 | Pass | Primary body text, headers, active navigation |
+

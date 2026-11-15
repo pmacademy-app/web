@@ -34,7 +34,7 @@ export function AuthSuccessNotice({ children, className }: AuthSuccessNoticeProp
       )}
     >
       <CheckCircle2
-        className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+        className="mt-0.5 h-4 w-4 shrink-0 text-success"
         aria-hidden="true"
       />
       <span className="min-w-0 flex-1 break-words">{children}</span>

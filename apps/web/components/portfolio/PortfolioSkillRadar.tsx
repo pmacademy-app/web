@@ -63,9 +63,9 @@ export function PortfolioSkillRadar({ skillRadar }: PortfolioSkillRadarProps) {
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                     isMaster
-                      ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                      ? 'bg-amber-500/10 text-warning border border-amber-500/20'
                       : isAdvanced
-                      ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                      ? 'bg-emerald-500/10 text-success border border-emerald-500/20'
                       : 'bg-secondary text-muted-foreground'
                   }`}
                 >

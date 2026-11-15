@@ -113,7 +113,7 @@ export function BadgeCard({ badge, portfolio }: BadgeCardProps) {
             className={cn(
               'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md border',
               isEarned
-                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                ? 'bg-emerald-500/10 text-success border-emerald-500/20'
                 : 'bg-secondary text-muted-foreground border-border'
             )}
           >
@@ -134,7 +134,7 @@ export function BadgeCard({ badge, portfolio }: BadgeCardProps) {
       <div className="pt-2 border-t border-border/50">
         {isEarned ? (
           <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-            <span className="font-semibold text-emerald-500 flex items-center gap-1">
+            <span className="font-semibold text-success flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" /> Milestone Earned
             </span>
             {formattedDate && <span className="font-mono">{formattedDate}</span>}

@@ -57,7 +57,7 @@ export function AdminErrorDetailDrawer({ group, open, onOpenChange, onStatusChan
       {group ? (
         <div className="space-y-5">
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-danger text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -96,7 +96,7 @@ export function AdminErrorDetailDrawer({ group, open, onOpenChange, onStatusChan
                 type="button"
                 disabled={updating !== null}
                 onClick={() => void handleUpdateStatus('acknowledged')}
-                className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-warning transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {updating === 'acknowledged' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                 <span>Acknowledge</span>
@@ -107,7 +107,7 @@ export function AdminErrorDetailDrawer({ group, open, onOpenChange, onStatusChan
                 type="button"
                 disabled={updating !== null}
                 onClick={() => void handleUpdateStatus('resolved')}
-                className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-success transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {updating === 'resolved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                 <span>Resolve</span>

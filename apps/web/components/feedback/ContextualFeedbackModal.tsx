@@ -140,7 +140,7 @@ export function ContextualFeedbackModal({
 
         {success ? (
           <div className="py-8 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-success flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground">Thank You!</h3>
@@ -206,7 +206,7 @@ export function ContextualFeedbackModal({
                   >
                     <Star
                       className={`w-5 h-5 transition-colors ${
-                        star <= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/40'
+                        star <= rating ? 'fill-amber-400 text-warning' : 'text-muted-foreground/40'
                       }`}
                     />
                   </button>

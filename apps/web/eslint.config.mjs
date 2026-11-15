@@ -4,12 +4,14 @@ import nextTs from "eslint-config-next/typescript";
 import requireWithRoute from "./eslint-rules/require-with-route.mjs";
 import noRawButton from "./eslint-rules/no-raw-button.mjs";
 import noRawApiFetch from "./eslint-rules/no-raw-api-fetch.mjs";
+import noRawPaletteText from "./eslint-rules/no-raw-palette-text.mjs";
 
 const prodily = {
   rules: {
     "require-with-route": requireWithRoute.rules["require-with-route"],
     "no-raw-button": noRawButton.rules["no-raw-button"],
     "no-raw-api-fetch": noRawApiFetch.rules["no-raw-api-fetch"],
+    "no-raw-palette-text": noRawPaletteText.rules["no-raw-palette-text"],
   },
 };
 
@@ -205,6 +207,19 @@ const eslintConfig = [
     plugins: { prodily },
     rules: {
       "prodily/no-raw-api-fetch": "error",
+    },
+  },
+  {
+    // UX-04 / AG-18: ban raw palette text colors in favor of semantic tokens.
+    files: [
+      "app/**/*.{ts,tsx,js,jsx}",
+      "components/**/*.{ts,tsx,js,jsx}",
+      "blocks/**/*.{ts,tsx,js,jsx}",
+      "renderer/**/*.{ts,tsx,js,jsx}",
+    ],
+    plugins: { prodily },
+    rules: {
+      "prodily/no-raw-palette-text": "error",
     },
   },
   {

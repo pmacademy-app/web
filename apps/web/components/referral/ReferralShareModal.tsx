@@ -119,7 +119,7 @@ export function ReferralShareModal({
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-success" />
                   Copied!
                 </>
               ) : (

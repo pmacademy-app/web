@@ -238,7 +238,7 @@ export function RichEditor({
         ) : (
           <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
             {isLocked ? (
-              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-mono text-[11px]">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-success font-mono text-[11px]">
                 LOCKED / SUBMITTED MODE
               </span>
             ) : (
@@ -271,7 +271,7 @@ export function RichEditor({
             <span
               className={cn(
                 'font-bold',
-                isWordCountMet ? 'text-emerald-500' : 'text-amber-500 font-semibold'
+                isWordCountMet ? 'text-success' : 'text-warning font-semibold'
               )}
             >
               {wordCount} / {minWordCount} words

@@ -197,7 +197,7 @@ function ProfileFormContent({
 
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-emerald-600" /> Website URL
+                <Globe className="w-3.5 h-3.5 text-success" /> Website URL
               </label>
               <input
                 type="url"
@@ -237,7 +237,7 @@ function ProfileFormContent({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-border/60">
           <div className="flex-1">
             {successMessage && (
-              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+              <span className="text-xs font-semibold text-success flex items-center gap-1.5 animate-in fade-in-0" role="status">
                 <CheckCircle2 className="w-4 h-4 shrink-0" /> Profile updated successfully!
               </span>
             )}
@@ -247,7 +247,7 @@ function ProfileFormContent({
               </span>
             )}
             {!successMessage && !errorMessage && isDirty && (
-              <span className="text-[11px] font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+              <span className="text-[11px] font-medium text-warning bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
                 Unsaved changes
               </span>
             )}

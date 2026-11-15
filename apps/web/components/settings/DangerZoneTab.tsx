@@ -86,8 +86,8 @@ export function DangerZoneTab() {
     <div className="space-y-6">
       {/* Toast Notification */}
       {successToast && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-600 font-semibold flex items-center gap-2 animate-in fade-in-0 shadow-sm">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-success font-semibold flex items-center gap-2 animate-in fade-in-0 shadow-sm">
+          <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
@@ -111,7 +111,7 @@ export function DangerZoneTab() {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-amber-600" />
+                <RotateCcw className="w-4 h-4 text-warning" />
                 Reset Lesson Progress
               </h3>
               <p className="text-xs text-muted-foreground">
@@ -147,7 +147,7 @@ export function DangerZoneTab() {
         <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <Zap className="w-4 h-4 text-amber-600" />
+              <Zap className="w-4 h-4 text-warning" />
               Reset XP Total
             </h3>
             <p className="text-xs text-muted-foreground">
@@ -167,7 +167,7 @@ export function DangerZoneTab() {
         <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-600" />
+              <Award className="w-4 h-4 text-warning" />
               Reset Flashcard SRS Queue
             </h3>
             <p className="text-xs text-muted-foreground">
@@ -187,7 +187,7 @@ export function DangerZoneTab() {
         <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-600" />
+              <Flame className="w-4 h-4 text-warning" />
               Reset Daily Streak
             </h3>
             <p className="text-xs text-muted-foreground">
@@ -207,7 +207,7 @@ export function DangerZoneTab() {
         <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <Compass className="w-4 h-4 text-amber-600" />
+              <Compass className="w-4 h-4 text-warning" />
               Reset Skill Radar Scores
             </h3>
             <p className="text-xs text-muted-foreground">

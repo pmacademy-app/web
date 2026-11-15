@@ -106,7 +106,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center space-y-4 shadow-sm">
-          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500 w-fit mx-auto">
+          <div className="p-3 rounded-2xl bg-amber-500/10 text-warning w-fit mx-auto">
             <Lock className="w-8 h-8" />
           </div>
           <h1 className="text-xl font-bold font-serif text-foreground">

@@ -103,9 +103,9 @@ export function FellowRequestCard() {
 
       {data.state === 'approved' && (
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
           <div>
-            <p className="text-xs font-bold text-emerald-600">You are a PM Fellow</p>
+            <p className="text-xs font-bold text-success">You are a PM Fellow</p>
             <p className="text-[11px] text-muted-foreground">Your Fellow badge is live on your public portfolio.</p>
           </div>
         </div>
@@ -113,9 +113,9 @@ export function FellowRequestCard() {
 
       {data.state === 'pending' && (
         <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-3">
-          <Clock className="w-5 h-5 text-amber-500 shrink-0" />
+          <Clock className="w-5 h-5 text-warning shrink-0" />
           <div>
-            <p className="text-xs font-bold text-amber-600">Request Submitted</p>
+            <p className="text-xs font-bold text-warning">Request Submitted</p>
             <p className="text-[11px] text-muted-foreground">
               {data.latestRequest?.requestedAt
                 ? `Submitted ${new Date(data.latestRequest.requestedAt).toLocaleDateString()}. `
@@ -160,7 +160,7 @@ export function FellowRequestCard() {
       {data.state === 'eligible' && (
         <div className="space-y-3">
           {justSubmitted ? (
-            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-success flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               Fellow request submitted successfully.
             </div>

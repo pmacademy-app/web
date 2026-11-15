@@ -124,8 +124,8 @@ export function CertificateActions({
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="text-emerald-500 font-bold">Link Copied!</span>
+              <Check className="w-3.5 h-3.5 text-success" />
+              <span className="text-success font-bold">Link Copied!</span>
             </>
           ) : (
             <>

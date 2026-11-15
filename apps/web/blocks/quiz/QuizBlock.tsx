@@ -276,7 +276,7 @@ export default function QuizBlock({ block }: BlockProps) {
           {isPerfect ? (
             <div className="relative">
               <div className="absolute -inset-1 rounded-full bg-amber-500 blur opacity-40 animate-pulse" />
-              <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 text-warning border border-amber-500/20">
                 <Trophy className="h-10 w-10 animate-bounce" />
               </div>
             </div>
@@ -499,7 +499,7 @@ export default function QuizBlock({ block }: BlockProps) {
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                       <Check className="h-3 w-3" />
                     </span>
-                    <span className="text-emerald-600">Correct!</span>
+                    <span className="text-success">Correct!</span>
                   </>
                 ) : (
                   <>

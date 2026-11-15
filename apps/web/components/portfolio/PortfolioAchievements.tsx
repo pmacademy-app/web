@@ -87,18 +87,18 @@ export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: Po
 
         <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5 text-amber-500" /> Current Streak
+            <Flame className="w-3.5 h-3.5 text-warning" /> Current Streak
           </span>
           <div className="text-xl font-bold text-foreground">{currentStreak} Days</div>
-          <span className="text-[10px] text-amber-500 font-semibold">Active Habit</span>
+          <span className="text-[10px] text-warning font-semibold">Active Habit</span>
         </div>
 
         <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5 text-emerald-500" /> Longest Streak
+            <Trophy className="w-3.5 h-3.5 text-success" /> Longest Streak
           </span>
           <div className="text-xl font-bold text-foreground">{longestStreak} Days</div>
-          <span className="text-[10px] text-emerald-500 font-semibold">Personal Record</span>
+          <span className="text-[10px] text-success font-semibold">Personal Record</span>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: Po
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs font-bold block truncate">{b.name}</span>
-                  <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+                  <span className="text-[10px] text-success font-semibold flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> {b.category}
                   </span>
                 </div>

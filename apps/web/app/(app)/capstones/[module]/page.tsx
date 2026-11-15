@@ -361,26 +361,26 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
               {autosaveStatus === 'saving' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                  <span className="text-amber-500 font-semibold">Saving...</span>
+                  <span className="text-warning font-semibold">Saving...</span>
                 </>
               )}
               {autosaveStatus === 'saved' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-500 font-semibold">Draft Saved</span>
+                  <span className="text-success font-semibold">Draft Saved</span>
                 </>
               )}
               {autosaveStatus === 'error' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="text-red-500 font-semibold">Saved Locally</span>
+                  <span className="text-danger font-semibold">Saved Locally</span>
                 </>
               )}
             </div>
           )}
 
           {isLocked ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-success text-xs font-bold border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4" />
               <span>Submitted{formattedSubmittedDate ? ` on ${formattedSubmittedDate}` : ''}</span>
             </div>
@@ -402,7 +402,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-background p-6 md:p-7 shadow-xs space-y-4 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3.5">
-              <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-500 shrink-0">
+              <div className="p-3 rounded-xl bg-emerald-500/15 text-success shrink-0">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div className="space-y-0.5">
@@ -411,7 +411,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
                     Your capstone is now part of your portfolio!
                   </h2>
                   {awardedXp !== null && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-success border border-emerald-500/30">
                       +{awardedXp} XP Awarded
                     </span>
                   )}
@@ -468,7 +468,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
 
       {/* Success Notification Alert Banner (Temporary feedback if freshly submitted) */}
       {submitSuccessMsg && (
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between text-xs text-emerald-500 animate-in fade-in duration-300">
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between text-xs text-success animate-in fade-in duration-300">
           <div className="flex items-center gap-2.5 font-bold">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{submitSuccessMsg}</span>
@@ -568,7 +568,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             <span className="text-foreground flex items-center gap-1.5">
               <Award className="w-4 h-4 text-primary" /> Deliverable Readiness
             </span>
-            <span className={validation.isValid ? 'text-emerald-500 font-bold' : 'text-muted-foreground'}>
+            <span className={validation.isValid ? 'text-success font-bold' : 'text-muted-foreground'}>
               {validation.wordCount} / {capstoneDef.minWordCount} words {validation.isValid ? '(Ready to Submit ✓)' : `(${Math.max(0, capstoneDef.minWordCount - validation.wordCount)} words remaining)`}
             </span>
           </div>
