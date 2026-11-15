@@ -142,11 +142,6 @@ function FlashcardItemCard({ card, onReview, isSubmitting }: { card: Flashcard; 
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsFlipped(false);
-  }, [card.id]);
-
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;

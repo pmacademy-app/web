@@ -39,7 +39,7 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
   const [feedback, setFeedback] = useState<string>('')
 
   const capstoneDef = capstone?.moduleSlug ? getCapstoneDefinition(capstone.moduleSlug) : null
-  const requirements = capstoneDef?.requirements || []
+  const requirements = useMemo(() => capstoneDef?.requirements || [], [capstoneDef])
 
   // Check if all rubric requirements have been assigned a score (0..3)
   const allScoresAssigned = useMemo(() => {

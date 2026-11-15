@@ -14,15 +14,16 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: AvatarUploadProps) {
+  const [prevPropUrl, setPrevPropUrl] = useState(currentAvatarUrl)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(currentAvatarUrl || null)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (currentAvatarUrl !== prevPropUrl) {
+    setPrevPropUrl(currentAvatarUrl)
     setAvatarUrl(currentAvatarUrl || null)
-  }, [currentAvatarUrl])
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {

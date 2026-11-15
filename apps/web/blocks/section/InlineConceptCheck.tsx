@@ -23,7 +23,7 @@ export function InlineConceptCheck({
           </div>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
-              Quick Reflection Checkpoint
+              {conceptTitle}
             </span>
             <p className="text-xs text-foreground font-medium leading-snug mt-0.5">
               {prompt}

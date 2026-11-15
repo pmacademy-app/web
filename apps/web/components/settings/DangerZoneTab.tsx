@@ -79,7 +79,7 @@ export function DangerZoneTab() {
     const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/delete-account', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to delete account.' : res.error.message)
     // Redirect to home on full account deletion
-    window.location.href = '/'
+    router.push('/')
   }
 
   return (

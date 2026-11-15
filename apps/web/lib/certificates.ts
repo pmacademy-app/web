@@ -50,14 +50,8 @@ export function generateCertificateCode(
 /**
  * Generates schema.org EducationalOccupationalCredential JSON-LD for verification page SEO.
  */
-export function generateCredentialJsonLd({
-  certificateCode,
-  learnerName: _learnerName,
-  careerTitle,
-  issuedAt,
-  verificationUrl,
-  portfolioUrl: _portfolioUrl,
-}: CredentialJsonLdOptions): Record<string, unknown> {
+export function generateCredentialJsonLd(options: CredentialJsonLdOptions): Record<string, unknown> {
+  const { certificateCode, careerTitle, issuedAt, verificationUrl } = options
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOccupationalCredential',

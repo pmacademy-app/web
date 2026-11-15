@@ -29,7 +29,6 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
   currentStreak = 0,
   daysStudiedThisWeek = 0,
   weeklyGoalLessons = null,
-  sessionMinutes = null,
   proofStepText = null,
   proofStepUrl = null,
   referralRewardXp = null,
