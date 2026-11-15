@@ -95,6 +95,10 @@ Off unless `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` at build time. Security contro
 5. **Errors** shown on `/login`: `oauth_cancelled`, `oauth_failed`, `oauth_rate_limited`, `oauth_unavailable`, `signups_closed`, `signup_limited`, `consent_declined`.
 6. **Settings.** `GET /api/settings/security/change-email` returns `hasPassword`. When it is `false`, Settings > Security shows "Managed by Google" on both cards and explains how to add a password with the reset email. The change-password and change-email routes answer 400 `PASSWORD_NOT_SET` for these accounts.
 
+### E. Trusted Claims and Onboarding Gate (SEC-21)
+
+Onboarding completion is recorded in `app_metadata.onboarding_complete` (written by the service role) and in `public.users.onboarding_completed`. The proxy and application layout evaluate access decisions using `app_metadata` and database columns (`onboarding_completed`, `goal`, `curriculum_access_override`). Client-writable `user_metadata` is never used for access authorization decisions.
+
 ---
 
 ## 3. Platform Settings & Access Controls

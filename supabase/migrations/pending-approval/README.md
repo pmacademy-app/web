@@ -178,6 +178,21 @@ Undo:
 1. In Supabase Dashboard: Auth > Hooks: remove the Before User Created hook assignment.
 2. Run `rollback/20261113000002_before_user_created_allow_signups.down.sql` in the SQL editor to drop the function.
 
+### `20261113000003_backfill_onboarding_completed.sql` (SEC-21, AG-13, onboarding backfill)
+
+Backfills `public.users.onboarding_completed = true` for learners whose onboarding was recorded only in `auth.users.raw_user_meta_data->>'onboarding_complete'` prior to the switch to `app_metadata` and database-backed flags. Touches only rows where `public.users.onboarding_completed` is not true, `goal` is null, and `curriculum_access_override` is not true. Safe no-op if count is zero.
+
+Prerequisites:
+- Apply this migration before or immediately alongside deploying the AG-13 code change, so legacy users who completed onboarding are not redirected to /onboarding.
+
+Run:
+1. Optional pre-check: run `validation/20261113000003_backfill_onboarding_completed_validation.sql` to check how many rows will be updated.
+2. Paste `supabase/migrations/pending-approval/20261113000003_backfill_onboarding_completed.sql` into the Supabase SQL editor and run it.
+3. Re-run `validation/20261113000003_backfill_onboarding_completed_validation.sql` (expects count = 0).
+
+Undo:
+`rollback/20261113000003_backfill_onboarding_completed.down.sql`.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are

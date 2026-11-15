@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
+import { isAllowedApiOrigin } from '@/lib/security/origin-check'
 // PROD-09: the one open-redirect guard for `next`. Its only runtime dependency is
 // `node:crypto`, which the proxy's Node.js runtime provides.
 import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
@@ -207,6 +208,19 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path === '/api/client-errors'
   const isProtectedLearnerApi = isApiRoute && !isExemptApi
 
+  // SEC-12: Enforce same-origin writes for cookie-authenticated API requests
+  if (isApiRoute && !isAllowedApiOrigin(request, path)) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Cross-origin request forbidden.',
+        code: 'FORBIDDEN',
+        requestId,
+      },
+      { status: 403, headers: { [REQUEST_ID_HEADER]: requestId } }
+    )
+  }
+
   // CQ-10: admin console APIs stay exempt from the learner gates above (maintenance mode,
   // email verification, consent), but they still get their session refreshed here. Since
   // CQ-10 the request-side auth helpers only read the access token, so without this an admin
@@ -376,6 +390,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     curriculum_access_override?: boolean
     auth_provider?: string
     terms_accepted_at?: string | null
+    onboarding_completed?: boolean
+    goal?: string | null
   }
   let cachedUserData: ProfileData | null = null
   async function loadUserProfileData() {
@@ -392,7 +408,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
       const { data } = await authorizedClient
         .from('users')
-        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at')
+        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at, onboarding_completed, goal')
         .eq('id', user.id)
         .maybeSingle()
       cachedUserData = (data || {}) as ProfileData
@@ -424,7 +440,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
   async function hasCurriculumAccessOverride(): Promise<boolean> {
     if (!user) return false
-    if (user.app_metadata?.curriculum_access_override || user.user_metadata?.curriculum_access_override) return true
+    // SEC-21: Trusted claim in app_metadata only (user_metadata is client-writable)
+    if (user.app_metadata?.curriculum_access_override === true) return true
 
     const profileData = await loadUserProfileData()
     return Boolean(profileData?.curriculum_access_override)
@@ -617,7 +634,15 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       }
     }
 
-    const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
+    // SEC-21: Trusted claim in app_metadata OR database public.users columns.
+    // Stop reading user_metadata for access decisions.
+    const profileData = await loadUserProfileData()
+    const isOnboardingComplete = Boolean(
+      user.app_metadata?.onboarding_complete === true ||
+      profileData?.onboarding_completed ||
+      profileData?.goal != null ||
+      profileData?.curriculum_access_override
+    )
     const isOnboardingPage = path === ONBOARDING_PAGE
 
     if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {

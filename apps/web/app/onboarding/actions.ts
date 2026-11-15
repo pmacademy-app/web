@@ -311,10 +311,13 @@ export async function submitOnboarding(data: OnboardingData) {
       return { error: 'Failed to save profile information. Please try again.' }
     }
 
-    // 2. Update auth metadata so middleware and the JWT reflect onboarding_complete and the
-    //    chosen path. Only the required fields are always written; deferred identity fields are
-    //    included only when supplied, mirroring the DB update above.
+    // 2. Update auth metadata so middleware and the JWT reflect onboarding_complete in app_metadata
+    //    and the chosen path in user_metadata. Only the required fields are always written; deferred
+    //    identity fields are included only when supplied, mirroring the DB update above.
     const { error: metaError } = await dbSupabase.auth.admin.updateUserById(userId, {
+      app_metadata: {
+        onboarding_complete: true,
+      },
       user_metadata: {
         ...(name ? { full_name: name } : {}),
         ...(username ? { username } : {}),

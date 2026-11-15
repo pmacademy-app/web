@@ -33,19 +33,20 @@ All user-owned database tables enforce strict RLS policies:
 ## 3. Webhook & API Authentication Security
 
 1. **Supabase Auth Hook (`/api/auth/send-email-hook`)**:
-   - Verifies requests using `SEND_EMAIL_HOOK_SECRET`.
-   - Supports Bearer token, custom headers (`x-supabase-auth-secret`), query string, and Svix HMAC-SHA256 signatures.
+   - Verifies requests using Standard Webhooks (Svix) HMAC-SHA256 signatures (`webhook-signature` or `svix-signature`) over `${webhook-id}.${webhook-timestamp}.${body}` using `SEND_EMAIL_HOOK_SECRET`.
+   - Enforces a 5-minute (300 second) maximum timestamp drift to prevent replay attacks.
+   - Bearer token and custom header bypasses have been removed (SEC-16).
 2. **Email provider webhooks (`/api/email/webhooks`)** — this single route handles **two** distinct providers with two distinct verification mechanisms:
    - **Resend**: Svix HMAC-SHA256 signature verification via `RESEND_WEBHOOK_SECRET` (`verifySvixSignature()`).
-   - **Brevo**: a plain shared-secret header compare (`x-brevo-webhook-secret` / `x-webhook-secret`) against `BREVO_WEBHOOK_SECRET` — not HMAC-based.
+   - **Brevo**: a plain shared-secret header compare (`x-brevo-webhook-secret` / `x-webhook-secret`) against `BREVO_WEBHOOK_SECRET`: not HMAC-based.
    - Both reject unsigned/mismatched payloads with HTTP 401.
 3. **Cron Endpoints (`/api/cron/*`)**:
    - Enforces Bearer token authentication matching `CRON_SECRET`.
    - Rejects unauthorized calls with HTTP 401 and logs a warning with `logSystemError()`.
 
-### CSRF / Origin-Referer Scope
+### CSRF / Same-Origin Write Check (SEC-12)
 
-An Origin/Referer header check exists today on exactly **two** routes: `POST /api/auth/update-password` and `POST /api/auth/complete-consent` (the Google consent gate, which can delete a fresh account). It is not a platform-wide CSRF policy. Signup, login, and change-email do not currently enforce it.
+Cookie-authenticated mutating endpoints (POST, PUT, PATCH, DELETE) across `/api/*` enforce same-origin verification in `apps/web/proxy.ts` (SEC-12). Requests carrying session cookies must supply `Sec-Fetch-Site: same-origin` or a valid `Origin` header matching `BRAND.siteUrl` or the request host. Non-matching cross-origin requests are rejected with HTTP 403 Forbidden. Server-to-server endpoints (`api/auth/send-email-hook`, `api/email/webhooks`, `api/email/unsubscribe`, `api/cron/*`) are exempt.
 
 ---
 
