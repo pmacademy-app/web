@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Gift, CheckCircle } from 'lucide-react'
+import { apiGet } from '@/lib/api/client'
 
 interface ReferrerData {
   id: string
@@ -21,9 +22,11 @@ export function ReferralBadge({ refCode }: { refCode?: string | null }) {
     let isMounted = true
     async function fetchReferrer() {
       try {
-        const res = await fetch(`/api/referrals/resolve?code=${encodeURIComponent(refCode || '')}`)
+        const res = await apiGet<{ valid?: boolean; referrer?: ReferrerData }>(
+          `/api/referrals/resolve?code=${encodeURIComponent(refCode || '')}`
+        )
         if (!res.ok) return
-        const data = await res.json()
+        const data = res.data
         if (data?.valid && data.referrer && isMounted) {
           setReferrer(data.referrer)
         }

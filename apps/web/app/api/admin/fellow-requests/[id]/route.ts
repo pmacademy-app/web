@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
 import { requireAdmin } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { revalidateAdminShell } from '@/lib/admin/cache-tags'
 
@@ -22,7 +22,7 @@ export const PATCH = withRoute(
       const { decision, rejectionReason } = body ?? {}
 
       if (decision !== 'approved' && decision !== 'rejected') {
-        return NextResponse.json({ error: 'decision must be "approved" or "rejected".' }, { status: 400 })
+        throw new RouteError(400, 'BAD_REQUEST', 'decision must be "approved" or "rejected".')
       }
 
       const result = await FellowRequestAdminService.reviewRequest(
@@ -34,7 +34,7 @@ export const PATCH = withRoute(
       )
 
       if (!result.success) {
-        return NextResponse.json({ error: result.error || 'Failed to review Fellow request.' }, { status: 400 })
+        throw new RouteError(400, 'BAD_REQUEST', result.error || 'Failed to review Fellow request.')
       }
 
       // The Fellow Requests queue lives inside the Moderation workspace (a tab,
@@ -46,9 +46,9 @@ export const PATCH = withRoute(
 
       return NextResponse.json({ success: true })
     } catch (error: unknown) {
+      if (error instanceof RouteError) throw error
       const message = adminErrorMessage(error, 'Failed to review Fellow request.')
-      console.error('[API PATCH /api/admin/fellow-requests/[id]] Error:', error)
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'ADMIN_FELLOW_REQUEST_FAILED', message)
     }
   }
 )

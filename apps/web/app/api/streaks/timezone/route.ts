@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -38,7 +39,14 @@ export const POST = withRoute(
       .eq('id', requireUserId(actor))
 
     if (updateError) {
-      console.error('[API /api/streaks/timezone] Error:', updateError)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'streaks.timezone.update',
+        message: `Failed to update timezone: ${updateError instanceof Error ? updateError.message : String(updateError)}`,
+        userId: requireUserId(actor),
+        details: { timezone, error: String(updateError) },
+      })
       throw new RouteError(500, 'SERVER_ERROR', 'Failed to update timezone.')
     }
 

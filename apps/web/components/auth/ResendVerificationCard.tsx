@@ -5,6 +5,7 @@ import { Mail, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { classifyAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/TurnstileWidget'
+import { apiPost } from '@/lib/api/client'
 
 interface ResendVerificationCardProps {
   email?: string
@@ -64,26 +65,33 @@ export function ResendVerificationCard({
     setStatusMessage(null)
 
     try {
-      const res = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetEmail, turnstileToken }),
-      })
-
-      const data = await res.json()
+      const result = await apiPost<{
+        success?: boolean
+        message?: string
+        error?: string
+        code?: string
+        resetInMs?: number
+      }>('/api/auth/resend-verification', { email: targetEmail, turnstileToken })
 
       // The token is single-use, so it is spent either way. Clear it and re-issue a
       // fresh challenge so a retry never replays a token Cloudflare has already seen.
       setTurnstileToken('')
       turnstileRef.current?.reset()
 
-      if (res.ok && data.success) {
-        setStatusMessage({ type: 'success', text: data.message || 'Verification email sent successfully!' })
+      if (result.ok && result.data.success) {
+        setStatusMessage({ type: 'success', text: result.data.message || 'Verification email sent successfully!' })
         setCooldown(60)
         onSuccess?.()
       } else {
-        const isRateLimited = res.status === 429 || data.code === 'AUTH_RATE_LIMITED'
-        const errorText = data.error || 'Failed to send verification email.'
+        const status = result.ok ? 200 : result.error.status
+        const code = result.ok ? result.data.code : result.error.code
+        const errorText = result.ok
+          ? result.data.error || 'Failed to send verification email.'
+          : result.error.message || 'Failed to send verification email.'
+        const resetInMs = result.ok
+          ? result.data.resetInMs
+          : (result.error.extra?.resetInMs as number | undefined)
+        const isRateLimited = status === 429 || code === 'AUTH_RATE_LIMITED'
         const classified = isRateLimited
           ? {
               code: 'AUTH_RATE_LIMITED' as const,
@@ -100,8 +108,8 @@ export function ResendVerificationCard({
         }
 
         setStatusMessage({ type: 'error', text: classified.message })
-        if (data.resetInMs) {
-          setCooldown(Math.ceil(data.resetInMs / 1000))
+        if (resetInMs) {
+          setCooldown(Math.ceil(resetInMs / 1000))
         } else if (isRateLimited) {
           setCooldown(60)
         }

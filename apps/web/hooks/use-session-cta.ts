@@ -14,16 +14,14 @@
  */
 
 import { useEffect, useState } from 'react'
+import { apiGet } from '@/lib/api/client'
 
 let pending: Promise<boolean> | null = null
 
 function fetchAuthenticated(): Promise<boolean> {
   if (!pending) {
-    pending = fetch('/api/auth/session', { credentials: 'same-origin', cache: 'no-store' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: unknown) =>
-        Boolean(data && typeof data === 'object' && (data as { authenticated?: unknown }).authenticated === true),
-      )
+    pending = apiGet<{ authenticated?: boolean }>('/api/auth/session', { cache: 'no-store' })
+      .then((res) => Boolean(res.ok && res.data?.authenticated === true))
       .catch(() => false)
       .finally(() => {
         // Share only the in-flight request. A later mount (after a client-side

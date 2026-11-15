@@ -3,6 +3,7 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sendGovernedEmail } from '@/lib/email-governance'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 function escapeHtml(unsafe: string): string {
   return unsafe
@@ -85,7 +86,13 @@ export const POST = withRoute(
 
     // If Database insert fails, NEVER return false success
     if (error || !data) {
-      console.error('[contact/route] Error inserting contact message into Database:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'contact.insert_message',
+        message: `Failed to insert contact message: ${error?.message || 'unknown'}`,
+        details: { error: error?.message },
+      })
       throw new RouteError(500, 'SERVER_ERROR', 'Failed to record contact message. Please try again.')
     }
 
@@ -116,7 +123,7 @@ export const POST = withRoute(
         </head>
         <body>
           <div class="card">
-            <div class="header">New Contact Inquiry — Prodily</div>
+            <div class="header">New Contact Inquiry: Prodily</div>
             <table class="meta-table">
               <tr><td class="meta-label">From:</td><td><strong>${safeName}</strong> (&lt;<a href="mailto:${safeEmail}">${safeEmail}</a>&gt;)</td></tr>
               <tr><td class="meta-label">Subject:</td><td>${safeSubject}</td></tr>
@@ -135,7 +142,7 @@ export const POST = withRoute(
       </html>
     `
 
-    const textContent = `New Contact Inquiry — Prodily\n\nFrom: ${cleanName} (${cleanEmail})\nSubject: ${cleanSubject}\nCategory: ${cleanCategory}\nSubmitter: ${userTypeText}\nMessage ID: ${data.id}\n\nMessage:\n${cleanMessage}`
+    const textContent = `New Contact Inquiry: Prodily\n\nFrom: ${cleanName} (${cleanEmail})\nSubject: ${cleanSubject}\nCategory: ${cleanCategory}\nSubmitter: ${userTypeText}\nMessage ID: ${data.id}\n\nMessage:\n${cleanMessage}`
 
     let emailSent = false
     try {
@@ -153,14 +160,22 @@ export const POST = withRoute(
       if (emailResult.sent) {
         emailSent = true
       } else {
-        console.error(
-          '[contact/route] Support alert dispatch failed for message ID:',
-          data.id,
-          emailResult.blocked ? `blocked: ${emailResult.blocked}` : emailResult.error
-        )
+        void logSystemError({
+          severity: 'warning',
+          category: 'email',
+          operation: 'contact.dispatch_alert',
+          message: `Support alert dispatch failed for message ID ${data.id}: ${emailResult.blocked ? `blocked: ${emailResult.blocked}` : emailResult.error}`,
+          details: { messageId: data.id, blocked: emailResult.blocked, error: emailResult.error },
+        })
       }
     } catch (emailErr) {
-      console.error('[contact/route] Exception sending alert email for message ID:', data.id, emailErr)
+      void logSystemError({
+        severity: 'error',
+        category: 'email',
+        operation: 'contact.dispatch_alert_exception',
+        message: `Exception sending alert email for message ID ${data.id}: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`,
+        details: { messageId: data.id, error: String(emailErr) },
+      })
     }
 
     // Return successful response since message is stored in DB. Indicate email delivery status.

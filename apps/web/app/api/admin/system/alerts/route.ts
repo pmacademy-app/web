@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 import { clampPagination, paginated, toRange } from '@/lib/api/pagination'
@@ -53,7 +53,6 @@ export const GET = withRoute(
       // empty success made a broken monitoring pipeline indistinguishable from a
       // healthy system — the console showed a green all-clear while the query that
       // feeds it was erroring.
-      console.error('[AdminSystemAlerts] DB query error:', sanitizeErrorMessage(queryErr.message))
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
         void logErrorReport({
@@ -68,15 +67,10 @@ export const GET = withRoute(
       } catch {
         // Non-fatal logger fallback
       }
-      return NextResponse.json(
-        {
-          success: false,
-          code: 'ALERTS_QUERY_FAILED',
-          // Admins keep the database error text — it is the diagnostic — but any
-          // connection string or credential inside it is redacted first.
-          error: `Unable to load system alerts: ${sanitizeErrorMessage(queryErr.message)}`,
-        },
-        { status: 500 }
+      throw new RouteError(
+        500,
+        'ALERTS_QUERY_FAILED',
+        `Unable to load system alerts: ${sanitizeErrorMessage(queryErr.message)}`
       )
     }
 
@@ -96,8 +90,8 @@ export const GET = withRoute(
       unacknowledgedCriticalCount: unackCritical || 0,
     })
   } catch (err) {
-    console.error('[AdminSystemAlerts] Exception fetching system alerts:', err)
-    return NextResponse.json({ error: 'Internal server error while fetching alerts.' }, { status: 500 })
+    if (err instanceof RouteError) throw err
+    throw err
   }
   }
 )
@@ -116,7 +110,7 @@ export const PATCH = withRoute(
     const { alertId, fingerprint, newStatus } = body
 
     if ((!alertId && !fingerprint) || !['new', 'acknowledged', 'resolved'].includes(newStatus)) {
-      return NextResponse.json({ error: 'Valid alertId or fingerprint and newStatus are required.' }, { status: 400 })
+      throw new RouteError(400, 'INVALID_INPUT', 'Valid alertId or fingerprint and newStatus are required.')
     }
 
     const supabase = createServiceRoleClient()
@@ -132,7 +126,7 @@ export const PATCH = withRoute(
     const { error: updateErr } = await query
 
     if (updateErr) {
-      return NextResponse.json({ error: sanitizeErrorMessage(updateErr.message) }, { status: 400 })
+      throw new RouteError(400, 'ALERT_UPDATE_FAILED', sanitizeErrorMessage(updateErr.message))
     }
 
     const targetId = alertId || fingerprint || 'group'
@@ -140,8 +134,8 @@ export const PATCH = withRoute(
 
     return NextResponse.json({ success: true, message: `Alert status updated to ${newStatus}` })
   } catch (err) {
-    console.error('[AdminSystemAlerts] Exception updating alert status:', err)
-    return NextResponse.json({ error: 'Internal server error while updating alert.' }, { status: 500 })
+    if (err instanceof RouteError) throw err
+    throw err
   }
   }
 )

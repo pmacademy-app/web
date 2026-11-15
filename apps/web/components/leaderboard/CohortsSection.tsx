@@ -5,6 +5,7 @@ import { Users, Loader2, LogIn, LogOut, Check } from 'lucide-react'
 import type { CohortItemPayload } from '@/lib/leaderboard-db'
 
 import { cn } from '@/lib/utils'
+import { apiPost } from '@/lib/api/client'
 
 interface CohortsSectionProps {
   initialCohorts: CohortItemPayload[]
@@ -24,23 +25,25 @@ export function CohortsSection({ initialCohorts, className, hideHeader }: Cohort
     const action = currentIsMember ? 'leave' : 'join'
 
     try {
-      const res = await fetch('/api/cohorts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cohortSlug, action }),
+      const res = await apiPost<{ success?: boolean; error?: string; isMember?: boolean }>('/api/cohorts', {
+        cohortSlug,
+        action,
       })
 
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        setErrorMsg(data.error || `Failed to ${action} cohort.`)
+      if (!res.ok || !res.data.success) {
+        const message = res.ok
+          ? res.data.error || `Failed to ${action} cohort.`
+          : res.error.message || `Failed to ${action} cohort.`
+        setErrorMsg(message)
         return
       }
+
+      const data = res.data
 
       setCohorts((prev) =>
         prev.map((c) => {
           if (c.slug === cohortSlug) {
-            const newMember = data.isMember
+            const newMember = data.isMember ?? !currentIsMember
             return {
               ...c,
               isMember: newMember,

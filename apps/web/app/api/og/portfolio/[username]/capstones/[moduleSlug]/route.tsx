@@ -5,6 +5,7 @@ import { findPublicCapstone } from '@/lib/portfolio-capstone-page'
 import { BRAND } from '@/lib/brand'
 import { OG, ProdilyLogoMark } from '@/lib/og/brand'
 import { capstoneOgCardPath, needsCanonicalOgRedirect, redirectToOgCardPath } from '@/lib/og/card-paths'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 /**
  * OG image for one public capstone page (Growth R5 / B13b).
@@ -108,7 +109,13 @@ export async function GET(request: Request, { params }: RouteProps) {
       { ...SIZE, headers: { 'Cache-Control': 'public, max-age=60, s-maxage=3600, stale-while-revalidate=600' } },
     )
   } catch (err) {
-    console.error('[og/capstone] render failed:', err instanceof Error ? err.message : err)
+    void logSystemError({
+      severity: 'error',
+      category: 'api',
+      operation: 'og.capstone.render',
+      message: `Failed to generate capstone OG image: ${err instanceof Error ? err.message : String(err)}`,
+      details: { error: String(err) },
+    })
     return new Response('Failed to generate image', { status: 500 })
   }
 }

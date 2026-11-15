@@ -281,7 +281,6 @@ export const POST = withRoute(
 
       await EmailAutomationsService.recordDigestRun('dailyReminder')
     } catch (err) {
-      console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
       const { logSystemError } = await import('@/lib/monitoring/logger')
       after(() => logSystemError({
         severity: 'error',

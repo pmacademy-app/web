@@ -26,6 +26,7 @@ import {
 } from '@/lib/curriculum-access'
 import { getModuleMeta, getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
+import { apiGet } from '@/lib/api/client'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,9 +98,9 @@ function loadSearchIndex(): Promise<SearchEntry[]> {
     _indexCallbacks.push(resolve)
     if (_indexLoading) return
     _indexLoading = true
-    fetch('/api/search-index')
-      .then((r) => r.json())
-      .then((data: SearchEntry[]) => {
+    apiGet<SearchEntry[]>('/api/search-index')
+      .then((res) => {
+        const data = res.ok && Array.isArray(res.data) ? res.data : []
         _indexCache = data
         _indexCallbacks.forEach((cb) => cb(data))
         _indexCallbacks = []
@@ -135,18 +136,18 @@ let _accessLoaded = false
 async function loadCurriculumAccess(): Promise<AccessData | null> {
   if (_accessLoaded) return _accessCache
   try {
-    const res = await fetch('/api/user/curriculum-access')
+    const res = await apiGet<{
+      completedIds?: string[]
+      openedIds?: string[]
+      treatment?: boolean
+      override?: boolean
+    }>('/api/user/curriculum-access')
     if (!res.ok) {
       _accessLoaded = true
       _accessCache = null
       return null
     }
-    const data = (await res.json()) as {
-      completedIds: string[]
-      openedIds: string[]
-      treatment: boolean
-      override: boolean
-    }
+    const data = res.data
     _accessCache = {
       completedIds: new Set(data.completedIds ?? []),
       openedIds: new Set(data.openedIds ?? []),

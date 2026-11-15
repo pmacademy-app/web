@@ -4,8 +4,9 @@ import { NextResponse } from 'next/server'
 import { logAdminAction } from '@/lib/admin/guard'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { requireAdmin } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
+import { logSystemError } from '@/lib/monitoring/logger'
 import { deleteAccount, resetProgress } from '@/lib/settings/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 
@@ -22,13 +23,14 @@ export const GET = withRoute(
       const userDetail = await AdminConsoleService.getUserDetailData(id)
 
       if (!userDetail) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        throw new RouteError(404, 'NOT_FOUND', 'User not found')
       }
 
       return NextResponse.json({ user: userDetail })
     } catch (error: unknown) {
+      if (error instanceof RouteError) throw error
       const message = adminErrorMessage(error, 'Failed to fetch user details.')
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'USER_DETAIL_FETCH_FAILED', message)
     }
   }
 )
@@ -62,15 +64,16 @@ export const DELETE = withRoute(
         .maybeSingle()
 
       if (targetErr || !targetUser) {
-        return NextResponse.json({ error: 'User not found.' }, { status: 404 })
+        throw new RouteError(404, 'NOT_FOUND', 'User not found.')
       }
 
       // 3. Admin protection: no administrator account can be deleted through the API.
       // An admin must be demoted (users.is_admin = false) before the account can be removed.
       if (targetUser.is_admin === true) {
-        return NextResponse.json(
-          { error: 'Administrators cannot be deleted. Remove their admin access first.' },
-          { status: 403 }
+        throw new RouteError(
+          403,
+          'FORBIDDEN',
+          'Administrators cannot be deleted. Remove their admin access first.'
         )
       }
 
@@ -80,7 +83,14 @@ export const DELETE = withRoute(
       // 5. Permanently delete GoTrue auth user to prevent zombie accounts
       const { error: authDeleteError } = await supabase.auth.admin.deleteUser(id)
       if (authDeleteError) {
-        console.error(`[admin.users.id.delete] Auth user deletion failed for ${id}:`, authDeleteError)
+        void logSystemError({
+          severity: 'error',
+          category: 'auth',
+          operation: 'admin.users.delete_auth_user',
+          message: `Auth user deletion failed for ${id}: ${authDeleteError.message}`,
+          userId: id,
+          details: { error: authDeleteError.message },
+        })
       }
 
       await logAdminAction(admin.userId, admin.email, 'admin_user_deleted', 'user', id, {
@@ -98,8 +108,9 @@ export const DELETE = withRoute(
         authDeleted: !authDeleteError,
       })
     } catch (error: unknown) {
+      if (error instanceof RouteError) throw error
       const message = adminErrorMessage(error, 'Failed to delete user account.')
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'DELETE_USER_FAILED', message)
     }
   }
 )
@@ -136,7 +147,7 @@ export const POST = withRoute(
       if (action === 'reset_module') {
         const moduleSlug = body.moduleSlug || body.module
         if (!moduleSlug) {
-          return NextResponse.json({ error: 'moduleSlug is required for reset_module action.' }, { status: 400 })
+          throw new RouteError(400, 'INVALID_INPUT', 'moduleSlug is required for reset_module action.')
         }
 
         await resetProgress(supabase, id, moduleSlug)
@@ -155,7 +166,7 @@ export const POST = withRoute(
         const isFellow = typeof body.isFellow === 'boolean' ? body.isFellow : Boolean(body.makeFellow)
         const success = await AdminConsoleService.toggleUserFellowStatus(id, isFellow)
         if (!success) {
-          return NextResponse.json({ error: 'Failed to update fellow status.' }, { status: 500 })
+          throw new RouteError(500, 'UPDATE_FELLOW_STATUS_FAILED', 'Failed to update fellow status.')
         }
 
         await logAdminAction(
@@ -171,10 +182,11 @@ export const POST = withRoute(
         return NextResponse.json({ success: true, targetUserId: id, isFellow })
       }
 
-      return NextResponse.json({ error: 'Invalid admin action' }, { status: 400 })
+      throw new RouteError(400, 'INVALID_INPUT', 'Invalid admin action')
     } catch (error: unknown) {
+      if (error instanceof RouteError) throw error
       const message = adminErrorMessage(error, 'Failed to execute admin action.')
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'EXECUTE_ADMIN_ACTION_FAILED', message)
     }
   }
 )

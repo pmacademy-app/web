@@ -13,6 +13,7 @@ import {
   portfolioShareText,
 } from '@/lib/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
+import { apiPost } from '@/lib/api/client'
 
 interface ShareButtonProps {
   username: string
@@ -111,12 +112,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
 
   const reportServerShare = (channel: string) => {
     try {
-      fetch('/api/portfolio/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, username, channel }),
-        keepalive: true,
-      }).catch(() => {})
+      void apiPost('/api/portfolio/share', { context, username, channel }, { keepalive: true }).catch(() => {})
     } catch {
       // Non-fatal
     }

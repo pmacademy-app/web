@@ -1,4 +1,4 @@
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { SystemService } from '@/lib/admin/system-service'
 
 export const runtime = 'nodejs'
@@ -14,9 +14,8 @@ export const GET = withRoute(
     try {
       const data = await SystemService.getAuthHealthTelemetry()
       return Response.json({ success: true, data }, { status: 200 })
-    } catch (err) {
-      console.error('[AdminSystemAuthHealth] Failed to fetch auth health:', err)
-      return Response.json({ success: false, error: 'Failed to fetch authentication health' }, { status: 500 })
+    } catch {
+      throw new RouteError(500, 'AUTH_HEALTH_FETCH_FAILED', 'Failed to fetch authentication health')
     }
   }
 )

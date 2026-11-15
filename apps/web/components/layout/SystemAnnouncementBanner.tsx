@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Info, AlertTriangle, ShieldAlert, CheckCircle2, X, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SystemAnnouncementItem } from '@/lib/admin/announcements-service'
+import { apiGet, apiPost } from '@/lib/api/client'
 
 interface SystemAnnouncementBannerProps {
   initialAnnouncements?: SystemAnnouncementItem[]
@@ -65,10 +66,11 @@ export function SystemAnnouncementBanner({
         if (userId) params.set('userId', userId)
         if (cohortId) params.set('cohortId', cohortId)
 
-        const res = await fetch(`/api/announcements/active?${params.toString()}`)
-        const json = await res.json()
-        if (isMounted && json.success && Array.isArray(json.announcements)) {
-          setAnnouncements(json.announcements)
+        const res = await apiGet<{ success?: boolean; announcements?: SystemAnnouncementItem[] }>(
+          `/api/announcements/active?${params.toString()}`
+        )
+        if (isMounted && res.ok && res.data.success && Array.isArray(res.data.announcements)) {
+          setAnnouncements(res.data.announcements)
         }
       } catch (err) {
         console.warn('[SystemAnnouncementBanner] Failed to fetch announcements:', err)
@@ -89,11 +91,7 @@ export function SystemAnnouncementBanner({
     try {
       localStorage.setItem('prodily_dismissed_announcements', JSON.stringify(Array.from(nextDismissed)))
       if (userId) {
-        await fetch(`/api/announcements/${id}/dismiss`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        })
+        await apiPost(`/api/announcements/${id}/dismiss`, { userId })
       }
     } catch (err) {
       console.warn('[SystemAnnouncementBanner] Dismiss sync error:', err)

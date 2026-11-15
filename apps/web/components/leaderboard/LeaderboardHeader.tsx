@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { LeaderboardPopoverModal } from './LeaderboardPopoverModal'
 import { CohortsSection } from './CohortsSection'
 import { FriendAccountabilitySection } from './FriendAccountabilitySection'
+import { apiPost } from '@/lib/api/client'
 
 interface LeaderboardHeaderProps {
   personalEntry: LeaderboardEntry | null
@@ -40,11 +41,7 @@ export function LeaderboardHeader({
     setLoading(true)
 
     try {
-      const res = await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isOptedIn: nextState }),
-      })
+      const res = await apiPost<{ success?: boolean }>('/api/leaderboard', { isOptedIn: nextState })
       if (res.ok && onOptInToggle) {
         onOptInToggle(nextState)
       }

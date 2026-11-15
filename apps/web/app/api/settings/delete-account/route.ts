@@ -4,6 +4,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { deleteAccount } from '@/lib/settings/settings-service'
 import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 export const POST = withRoute(
   {
@@ -36,7 +37,14 @@ export const POST = withRoute(
     //    prevents the user from logging in again. Requires service_role key.
     const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId)
     if (authDeleteError) {
-      console.error('[API POST /api/settings/delete-account] Auth user deletion failed:', authDeleteError)
+      void logSystemError({
+        severity: 'error',
+        category: 'auth',
+        operation: 'settings.delete_account_auth_user',
+        message: `Auth user deletion failed for ${userId}: ${authDeleteError.message}`,
+        userId,
+        details: { error: authDeleteError.message },
+      })
     }
 
     // 3. Clear session cookies from the response so the browser is immediately logged out

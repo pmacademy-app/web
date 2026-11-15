@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Shield, UserPlus, Trash2, Loader2, Check, AlertCircle } from 'lucide-react'
 import type { LeaderboardEntry } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
+import { apiGet, apiPost, apiDelete } from '@/lib/api/client'
 
 interface FriendAccountabilitySectionProps {
   initialFriends: LeaderboardEntry[]
@@ -33,33 +34,31 @@ export function FriendAccountabilitySection({
     setFeedback(null)
 
     try {
-      const res = await fetch('/api/friends', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: cleanUsername }),
+      const res = await apiPost<{ success?: boolean; message?: string; error?: string }>('/api/friends', {
+        username: cleanUsername,
       })
 
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
+      if (!res.ok || !res.data.success) {
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to add friend. Please check the username.'
+          : res.error.message || 'Failed to add friend. Please check the username.'
         setFeedback({
           type: 'error',
-          message: data.error || 'Failed to add friend. Please check the username.',
+          message: errorMsg,
         })
         return
       }
 
       setFeedback({
         type: 'success',
-        message: data.message || `Added @${cleanUsername} to your study friends!`,
+        message: res.data.message || `Added @${cleanUsername} to your study friends!`,
       })
       setUsernameInput('')
 
       // Refresh friends list
-      const listRes = await fetch('/api/friends')
-      const listData = await listRes.json()
-      if (listData.success && Array.isArray(listData.friendsEntries)) {
-        setFriends(listData.friendsEntries)
+      const listRes = await apiGet<{ success?: boolean; friendsEntries?: LeaderboardEntry[] }>('/api/friends')
+      if (listRes.ok && listRes.data.success && Array.isArray(listRes.data.friendsEntries)) {
+        setFriends(listRes.data.friendsEntries)
       }
     } catch {
       setFeedback({
@@ -76,16 +75,17 @@ export function FriendAccountabilitySection({
     setFeedback(null)
 
     try {
-      const res = await fetch(`/api/friends?friendId=${encodeURIComponent(friendId)}`, {
-        method: 'DELETE',
-      })
+      const res = await apiDelete<{ success?: boolean; error?: string }>(
+        `/api/friends?friendId=${encodeURIComponent(friendId)}`
+      )
 
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
+      if (!res.ok || !res.data.success) {
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to remove friend.'
+          : res.error.message || 'Failed to remove friend.'
         setFeedback({
           type: 'error',
-          message: data.error || 'Failed to remove friend.',
+          message: errorMsg,
         })
         return
       }

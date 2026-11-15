@@ -6,6 +6,7 @@ import { X, Bell, RefreshCw, Layers, Settings } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
+import { apiGet, apiPatch } from '@/lib/api/client'
 
 interface NotificationCenterDrawerProps {
   isOpen: boolean
@@ -63,10 +64,9 @@ export function NotificationCenterDrawer({
     const ids = unreadItems.map((i) => i.id)
 
     try {
-      const res = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'mark_read', notificationIds: ids }),
+      const res = await apiPatch<{ success?: boolean }>('/api/notifications', {
+        action: 'mark_read',
+        notificationIds: ids,
       })
       if (!res.ok) {
         console.warn('[NotificationCenterDrawer] Non-fatal: failed to persist batch read state in DB')
@@ -81,11 +81,20 @@ export function NotificationCenterDrawer({
     if (isOpen) {
       const load = async () => {
         try {
-          const res = await fetch('/api/notifications')
-          const data = await res.json()
+          const res = await apiGet<{
+            success?: boolean
+            items?: NotificationItem[]
+            grouped?: {
+              today: NotificationItem[]
+              yesterday: NotificationItem[]
+              thisWeek: NotificationItem[]
+              earlier: NotificationItem[]
+            }
+          }>('/api/notifications')
           if (!mounted) return
 
-          if (data.success) {
+          if (res.ok && res.data.success) {
+            const data = res.data
             const rawItems: NotificationItem[] = data.items || []
             const unreadItems = rawItems.filter((i) => !i.isRead)
 
@@ -113,7 +122,10 @@ export function NotificationCenterDrawer({
               void markDisplayedAsRead(unreadItems)
             }
           } else {
-            setError(data.error || 'Failed to fetch notifications.')
+            const errorMsg = res.ok
+              ? 'Failed to fetch notifications.'
+              : res.error.message || 'Failed to fetch notifications.'
+            setError(errorMsg)
           }
         } catch (err) {
           console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
@@ -133,9 +145,19 @@ export function NotificationCenterDrawer({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/notifications')
-      const data = await res.json()
-      if (data.success) {
+      const res = await apiGet<{
+        success?: boolean
+        error?: string
+        items?: NotificationItem[]
+        grouped?: {
+          today: NotificationItem[]
+          yesterday: NotificationItem[]
+          thisWeek: NotificationItem[]
+          earlier: NotificationItem[]
+        }
+      }>('/api/notifications')
+      if (res.ok && res.data.success) {
+        const data = res.data
         const rawItems: NotificationItem[] = data.items || []
         const unreadItems = rawItems.filter((i) => !i.isRead)
 
@@ -160,7 +182,10 @@ export function NotificationCenterDrawer({
           void markDisplayedAsRead(unreadItems)
         }
       } else {
-        setError(data.error || 'Failed to fetch notifications.')
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to fetch notifications.'
+          : res.error.message || 'Failed to fetch notifications.'
+        setError(errorMsg)
       }
     } catch (err) {
       console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
@@ -198,10 +223,9 @@ export function NotificationCenterDrawer({
 
     // 2. Persist read state in DB with rollback on failure
     try {
-      const res = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'mark_read', notificationId: id }),
+      const res = await apiPatch<{ success?: boolean }>('/api/notifications', {
+        action: 'mark_read',
+        notificationId: id,
       })
       if (!res.ok) {
         console.warn('[NotificationCenterDrawer] Server failed to persist read state, resyncing')

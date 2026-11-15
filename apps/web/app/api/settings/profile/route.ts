@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { profileUpdateSchema } from '@/lib/api/contracts/settings'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 export { profileUpdateSchema }
 
@@ -56,7 +57,14 @@ export const POST = withRoute(
       // N-3: the driver error is logged, never returned. Before B7-F the outer
       // catch on this route sent `error.message` straight to an authenticated
       // learner, which can carry a connection string.
-      console.error('[API POST /api/settings/profile] Error updating profile:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'settings.profile.update',
+        message: `Failed to update profile settings: ${error.message}`,
+        userId: actor.kind === 'learner' ? actor.userId : undefined,
+        details: { error: error.message },
+      })
       throw new RouteError(400, 'SERVER_ERROR', 'Failed to update profile settings.')
     }
 

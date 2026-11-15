@@ -3,11 +3,13 @@ import nextTs from "eslint-config-next/typescript";
 
 import requireWithRoute from "./eslint-rules/require-with-route.mjs";
 import noRawButton from "./eslint-rules/no-raw-button.mjs";
+import noRawApiFetch from "./eslint-rules/no-raw-api-fetch.mjs";
 
 const prodily = {
   rules: {
     "require-with-route": requireWithRoute.rules["require-with-route"],
     "no-raw-button": noRawButton.rules["no-raw-button"],
+    "no-raw-api-fetch": noRawApiFetch.rules["no-raw-api-fetch"],
   },
 };
 
@@ -190,6 +192,19 @@ const eslintConfig = [
     plugins: { prodily },
     rules: {
       "prodily/no-raw-button": ["error", { allow: RAW_BUTTON_ALLOWLIST }],
+    },
+  },
+  {
+    // CQ-30: ban raw fetch('/api/...') in favor of the typed API client.
+    files: [
+      "app/**/*.{ts,tsx,js,jsx}",
+      "components/**/*.{ts,tsx,js,jsx}",
+      "hooks/**/*.{ts,tsx,js,jsx}",
+      "lib/**/*.{ts,tsx,js,jsx}",
+    ],
+    plugins: { prodily },
+    rules: {
+      "prodily/no-raw-api-fetch": "error",
     },
   },
   {

@@ -288,7 +288,6 @@ export const POST = withRoute(
 
       await EmailAutomationsService.recordDigestRun('weeklyRecap')
     } catch (err) {
-      console.error('[cron/weekly-recap] Failed to process weekly recaps:', err)
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
         severity: 'error',

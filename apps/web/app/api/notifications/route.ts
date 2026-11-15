@@ -7,6 +7,7 @@ import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
 import { isSafeNotificationLink, parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
 import { clampPagination, paginated, toRange, DEFAULT_PAGE_SIZE } from '@/lib/api/pagination'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -151,7 +152,13 @@ export const PATCH = withRoute(
         .eq('is_read', false)
 
       if (error) {
-        console.error('[API:notifications] Error marking all read:', error)
+        void logSystemError({
+          severity: 'error',
+          category: 'db',
+          operation: 'notifications.mark_all_read',
+          message: `Error marking all read: ${error instanceof Error ? error.message : String(error)}`,
+          userId,
+        })
       }
 
       return NextResponse.json({ success: true, message: 'All notifications marked as read' })
@@ -169,7 +176,13 @@ export const PATCH = withRoute(
           .eq('is_read', false)
 
         if (error) {
-          console.error('[API:notifications] Error marking batch read:', error)
+          void logSystemError({
+            severity: 'error',
+            category: 'db',
+            operation: 'notifications.mark_batch_read',
+            message: `Error marking batch read: ${error instanceof Error ? error.message : String(error)}`,
+            userId,
+          })
         }
 
         return NextResponse.json({ success: true, markedIds: idsToMark, count: idsToMark.length })
@@ -190,7 +203,13 @@ export const PATCH = withRoute(
       .eq('user_id', userId)
 
     if (error) {
-      console.error('[API:notifications] Error updating read state:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'notifications.update_read_state',
+        message: `Error updating read state: ${error instanceof Error ? error.message : String(error)}`,
+        userId,
+      })
     }
 
     return NextResponse.json({ success: true, notificationId, isRead })

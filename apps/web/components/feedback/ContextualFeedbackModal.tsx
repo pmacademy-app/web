@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { MessageSquare, Star, X, Send, CheckCircle2, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { apiPost } from '@/lib/api/client'
 
 interface ContextualFeedbackModalProps {
   isOpen: boolean
@@ -35,11 +36,7 @@ export function ContextualFeedbackModal({
 
   const handleDismiss = async () => {
     try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'dismiss', promptKey }),
-      })
+      await apiPost('/api/feedback', { action: 'dismiss', promptKey })
     } catch {
       // Ignored
     }
@@ -78,45 +75,41 @@ export function ContextualFeedbackModal({
           return
         }
 
-        const res = await fetch('/api/testimonials', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            authorName: authorName.trim(),
-            content,
-            rating,
-            headline,
-            authorRole: authorRole || 'Prodily Learner',
-            allowPublicFeature,
-          }),
+        const res = await apiPost<{ success?: boolean; error?: string }>('/api/testimonials', {
+          authorName: authorName.trim(),
+          content,
+          rating,
+          headline,
+          authorRole: authorRole || 'Prodily Learner',
+          allowPublicFeature,
         })
 
-        const data = await res.json()
-        if (res.ok && data.success) {
+        if (res.ok && res.data.success) {
           setSuccess(true)
           setTimeout(() => onClose(), 1800)
         } else {
-          setError(data.error || 'Failed to submit review.')
+          const errorMsg = res.ok
+            ? res.data.error || 'Failed to submit review.'
+            : res.error.message || 'Failed to submit review.'
+          setError(errorMsg)
         }
       } else {
-        const res = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content,
-            category: 'curriculum',
-            sourceEvent,
-            rating,
-            promptKey,
-          }),
+        const res = await apiPost<{ success?: boolean; error?: string }>('/api/feedback', {
+          content,
+          category: 'curriculum',
+          sourceEvent,
+          rating,
+          promptKey,
         })
 
-        const data = await res.json()
-        if (res.ok && data.success) {
+        if (res.ok && res.data.success) {
           setSuccess(true)
           setTimeout(() => onClose(), 1800)
         } else {
-          setError(data.error || 'Failed to submit feedback.')
+          const errorMsg = res.ok
+            ? res.data.error || 'Failed to submit feedback.'
+            : res.error.message || 'Failed to submit feedback.'
+          setError(errorMsg)
         }
       }
     } catch {

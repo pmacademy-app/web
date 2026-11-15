@@ -6,6 +6,7 @@ import { LeaderboardTable } from './LeaderboardTable'
 import type { LeaderboardEntry } from '@/lib/leaderboard'
 import type { CohortItemPayload } from '@/lib/leaderboard-db'
 import { cn } from '@/lib/utils'
+import { apiGet } from '@/lib/api/client'
 
 type Scope = 'global' | 'cohort' | 'friends'
 
@@ -40,11 +41,21 @@ export function LeaderboardScopeSwitcher({
     setLoadingCohortId(cohortId)
     setCohortError(null)
     try {
-      const res = await fetch(`/api/leaderboard?scope=cohort&cohortId=${encodeURIComponent(cohortId)}`)
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to load cohort rankings.')
+      const res = await apiGet<{
+        success?: boolean
+        error?: string
+        entries: LeaderboardEntry[]
+        personalEntry: LeaderboardEntry | null
+        cohortName: string | null
+      }>(`/api/leaderboard?scope=cohort&cohortId=${encodeURIComponent(cohortId)}`)
+
+      if (!res.ok || !res.data.success) {
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to load cohort rankings.'
+          : res.error.message || 'Failed to load cohort rankings.'
+        throw new Error(errorMsg)
       }
+      const data = res.data
       setCohortCache((prev) => ({
         ...prev,
         [cohortId]: {

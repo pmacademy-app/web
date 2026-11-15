@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { apiGet, apiPost } from '@/lib/api/client'
 
 export interface UseUsageTimeTrackerOptions {
   onPromptTriggered?: (key: string) => void
@@ -88,10 +89,11 @@ export function useUsageTimeTracker(
       }
 
       try {
-        const res = await fetch('/api/feedback/eligibility', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payload,
+        const res = await apiPost<{
+          success?: boolean
+          completedPrompts?: string[]
+          eligiblePrompts?: string[]
+        }>('/api/feedback/eligibility', JSON.parse(payload), {
           keepalive: isUnload,
         })
 
@@ -101,7 +103,7 @@ export function useUsageTimeTracker(
           return
         }
 
-        const data = await res.json()
+        const data = res.data
         if (!data.success) return
 
         if (Array.isArray(data.completedPrompts) && data.completedPrompts.includes('usage_1hr')) {
@@ -126,8 +128,12 @@ export function useUsageTimeTracker(
 
       try {
         if (!globalInitialCheckPromise) {
-          globalInitialCheckPromise = fetch('/api/feedback/eligibility')
-            .then((r) => (r.ok ? r.json() : null))
+          globalInitialCheckPromise = apiGet<{
+            success?: boolean
+            completedPrompts?: string[]
+            eligiblePrompts?: string[]
+          }>('/api/feedback/eligibility')
+            .then((r) => (r.ok ? r.data : null))
             .catch(() => null)
             .finally(() => {
               // Clear promise after resolution so subsequent sessions fetch fresh

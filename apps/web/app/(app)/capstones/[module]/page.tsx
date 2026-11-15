@@ -28,6 +28,7 @@ import { useCapstoneAutosave } from '@/hooks/useCapstoneAutosave'
 import { RichEditor } from '@/components/capstones/RichEditor'
 import { CapstoneReflection } from '@/components/capstones/CapstoneReflection'
 import { SubmitConfirmationModal } from '@/components/capstones/SubmitConfirmationModal'
+import { apiGet, apiPost } from '@/lib/api/client'
 import {
   trackCapstoneSubmitted,
   trackPortfolioArtifactCreated,
@@ -78,9 +79,18 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch(`/api/capstones/${moduleSlug}`)
+        const res = await apiGet<{
+          userId?: string
+          status?: CapstoneStatus
+          submission?: { content?: string; submitted_at?: string }
+          reflection?: { content?: string; is_public?: boolean }
+          userProfile?: Record<string, unknown> | null
+          lessonsCompleted?: number
+          totalLessons?: number
+          requiredLessons?: number
+        }>(`/api/capstones/${moduleSlug}`)
         if (res.ok) {
-          const data = await res.json()
+          const data = res.data
           if (typeof data.userId === 'string' && data.userId) {
             setUserId(data.userId)
           }
@@ -139,21 +149,23 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
       setIsSubmitting(true)
       await saveNow()
 
-      const res = await fetch(`/api/capstones/${moduleSlug}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          reflectionContent,
-          reflectionIsPublic,
-          isPublic,
-        }),
+      const res = await apiPost<{
+        submission?: { submitted_at?: string }
+        xpEarned?: number
+        message?: string
+        error?: string
+      }>(`/api/capstones/${moduleSlug}/submit`, {
+        content,
+        reflectionContent,
+        reflectionIsPublic,
+        isPublic,
       })
 
-      const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Submission failed.')
+        throw new Error(res.error.message || 'Submission failed.')
       }
+
+      const data = res.data
 
       // The draft is now a submission; drop the local backup so it cannot resurface.
       clearLocalDraft()
