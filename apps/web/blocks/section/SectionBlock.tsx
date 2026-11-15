@@ -250,8 +250,8 @@ function InterviewPerspectiveSection({ block, children }: BlockProps) {
     return (
       <SectionCard
         badgeText="Interview Perspective"
-        badgeColor="bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
-        borderColor="border-l-indigo-500"
+        badgeColor="bg-primary/10 text-primary border-primary/20"
+        borderColor="border-l-primary"
         title={String(block.title || block.name || '')}
       >
         {children}
@@ -260,17 +260,17 @@ function InterviewPerspectiveSection({ block, children }: BlockProps) {
   }
 
   return (
-    <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6 shadow-sm my-6">
-      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-indigo-500/15">
-        <MessageSquare className="h-5 w-5 text-indigo-600 shrink-0" />
+    <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 shadow-sm my-6">
+      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-primary/15">
+        <MessageSquare className="h-5 w-5 text-primary shrink-0" />
         <h3 className="text-lg font-bold font-serif text-foreground">Interview Perspective</h3>
       </div>
       <div className="space-y-4">
         {questions.map((q, i) => (
           <div key={i} className="space-y-2 font-sans text-sm">
             {q.question && (
-              <div className="rounded-lg border border-indigo-500/15 bg-indigo-500/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1.5">
+              <div className="rounded-lg border border-primary/15 bg-primary/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary mb-1.5">
                   Sample Question
                 </p>
                 <p className="text-sm font-semibold text-foreground leading-snug">{q.question}</p>
@@ -350,11 +350,11 @@ function CompanyExampleSection({ block, children }: BlockProps) {
   if (!hasRenderableChildren(children) && !company) return null;
 
   return (
-    <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-6 shadow-sm my-6">
-      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-sky-500/15">
-        <Building2 className="h-5 w-5 text-sky-600 shrink-0" />
+    <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 shadow-sm my-6">
+      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-primary/15">
+        <Building2 className="h-5 w-5 text-primary shrink-0" />
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
             Company Example
           </span>
           <h3 className="text-lg font-bold font-serif text-foreground leading-snug">{company}</h3>
@@ -364,7 +364,7 @@ function CompanyExampleSection({ block, children }: BlockProps) {
         {children}
       </div>
       {assumptionFlags.length > 0 && (
-        <div className="mt-5 pt-4 border-t border-sky-500/15">
+        <div className="mt-5 pt-4 border-t border-primary/15">
           {assumptionFlags.map((flag, i) => (
             <p key={i} className="text-[11px] text-muted-foreground/70 leading-relaxed italic">
               ⚠️ Note: {flag}
@@ -410,9 +410,9 @@ function CaseStudySection({ block, children }: BlockProps) {
   if (!hasRenderableChildren(children) && !title) return null;
 
   return (
-    <div className="rounded-xl border-l-4 border-l-violet-500 border border-violet-500/20 bg-violet-500/5 p-6 shadow-sm my-6">
+    <div className="rounded-xl border-l-4 border-l-primary border border-primary/20 bg-primary/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-1">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-600 border border-violet-500/20">
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
           Case Study
         </span>
       </div>
@@ -433,9 +433,9 @@ function FrameworkSection({ block, children }: BlockProps) {
   if (!hasRenderableChildren(children) && !name) return null;
 
   return (
-    <div className="rounded-xl border-l-4 border-l-blue-500 border border-blue-500/20 bg-blue-500/5 p-6 shadow-sm my-6">
+    <div className="rounded-xl border-l-4 border-l-primary border border-primary/20 bg-primary/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-1">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-info border border-blue-500/20">
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
           Framework &amp; Tools
         </span>
       </div>
@@ -459,9 +459,9 @@ function SummarySection({ children }: BlockProps) {
   if (!hasRenderableChildren(children)) return null;
 
   return (
-    <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-6 shadow-sm my-6">
-      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-teal-500/15">
-        <Lightbulb className="h-5 w-5 text-teal-600 shrink-0" />
+    <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 shadow-sm my-6">
+      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-primary/15">
+        <Lightbulb className="h-5 w-5 text-primary shrink-0" />
         <h3 className="text-lg font-bold font-serif text-foreground">Lesson Summary</h3>
       </div>
       <div className="text-sm text-foreground/80 leading-relaxed space-y-3">

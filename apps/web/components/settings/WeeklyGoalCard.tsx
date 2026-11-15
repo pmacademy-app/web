@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Target, Clock, Save, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
@@ -20,19 +21,22 @@ const LESSON_GOAL_OPTIONS = [
 
 const SESSION_MINUTE_OPTIONS = [
   { value: '', label: 'No preference' },
-  { value: '10', label: '10 minutes per session' },
-  { value: '15', label: '15 minutes per session' },
-  { value: '20', label: '20 minutes per session' },
-  { value: '30', label: '30 minutes per session' },
-  { value: '45', label: '45 minutes per session' },
-  { value: '60', label: '60 minutes per session' },
+  { value: '10', label: '10 minutes' },
+  { value: '15', label: '15 minutes' },
+  { value: '20', label: '20 minutes' },
+  { value: '30', label: '30 minutes' },
+  { value: '45', label: '45 minutes' },
+  { value: '60', label: '60 minutes' },
 ]
 
-export function WeeklyGoalCard() {
-  const { data, isLoading, mutate } = useApiQuery<GoalGetResponse>('/api/settings/goal')
+interface WeeklyGoalFormContentProps {
+  goalData?: GoalGetResponse | null
+  onSaveSuccess: () => void
+}
 
-  const initialWeeklyGoal = data?.weekly_goal_lessons ? String(data.weekly_goal_lessons) : ''
-  const initialSessionMinutes = data?.session_minutes ? String(data.session_minutes) : ''
+function WeeklyGoalFormContent({ goalData, onSaveSuccess }: WeeklyGoalFormContentProps) {
+  const initialWeeklyGoal = goalData?.weekly_goal_lessons ? String(goalData.weekly_goal_lessons) : ''
+  const initialSessionMinutes = goalData?.session_minutes ? String(goalData.session_minutes) : ''
 
   const [persistedData, setPersistedData] = useState({
     weeklyGoal: initialWeeklyGoal,
@@ -43,15 +47,6 @@ export function WeeklyGoalCard() {
     weeklyGoal: initialWeeklyGoal,
     sessionMinutes: initialSessionMinutes,
   })
-
-  useEffect(() => {
-    if (data) {
-      const g = data.weekly_goal_lessons ? String(data.weekly_goal_lessons) : ''
-      const m = data.session_minutes ? String(data.session_minutes) : ''
-      setPersistedData({ weeklyGoal: g, sessionMinutes: m })
-      setFormData({ weeklyGoal: g, sessionMinutes: m })
-    }
-  }, [data])
 
   const [saving, setSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState(false)
@@ -77,7 +72,7 @@ export function WeeklyGoalCard() {
       if (res.ok && res.data.success) {
         setPersistedData({ ...formData })
         setSuccessMessage(true)
-        void mutate()
+        onSaveSuccess()
         setTimeout(() => setSuccessMessage(false), 3000)
       } else {
         const errorText = !res.ok ? res.error.message : (res.data.error || 'Failed to update weekly goal.')
@@ -88,15 +83,6 @@ export function WeeklyGoalCard() {
     } finally {
       setSaving(false)
     }
-  }
-
-  if (isLoading && !data) {
-    return (
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-center text-muted-foreground text-xs py-6">
-        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-        <span>Loading goal settings...</span>
-      </div>
-    )
   }
 
   return (
@@ -170,16 +156,39 @@ export function WeeklyGoalCard() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={saving || !isDirty}
-          aria-disabled={saving || !isDirty}
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+          size="sm"
+          className="flex items-center gap-2 font-semibold shadow-2xs shrink-0"
         >
           {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
           Save Goal
-        </button>
+        </Button>
       </div>
     </form>
+  )
+}
+
+export function WeeklyGoalCard() {
+  const { data, isLoading, mutate } = useApiQuery<GoalGetResponse>('/api/settings/goal')
+
+  if (isLoading && !data) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-center text-muted-foreground text-xs py-6">
+        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+        <span>Loading goal settings...</span>
+      </div>
+    )
+  }
+
+  const key = data ? `${data.weekly_goal_lessons ?? 'none'}-${data.session_minutes ?? 'none'}` : 'empty'
+
+  return (
+    <WeeklyGoalFormContent
+      key={key}
+      goalData={data}
+      onSaveSuccess={() => void mutate()}
+    />
   )
 }

@@ -21,7 +21,7 @@ import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { LessonContextProvider } from '@/contexts/lesson-context'
-import { dispatchClientNotificationEvent } from '@/lib/events/client-event-bus'
+import { dispatchClientNotificationEvent, showClientToast } from '@/lib/events/client-event-bus'
 import type { CompiledLesson, CompiledBlock } from '@/types'
 import {
   BookOpen,
@@ -396,7 +396,7 @@ function TheoryReadButton({
       <div className="mt-8 flex flex-col items-center gap-4">
         <div className="flex items-center gap-2 text-success font-bold text-sm">
           <Award className="h-5 w-5" />
-          Theory section completed. Quiz is now unlocked!
+          Lesson read. Quiz is now unlocked!
         </div>
         <Button onClick={onComplete} variant="outline" size="lg" className="font-semibold">
           Proceed to Quiz →
@@ -795,8 +795,11 @@ export default function LessonPageContent({
                       url: window.location.href,
                     }).catch(() => {})
                   } else {
-                    navigator.clipboard.writeText(window.location.href)
-                    alert('Achievement link copied to clipboard!')
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                      showClientToast('Link Copied', 'Achievement link copied to clipboard.', 'success')
+                    }).catch(() => {
+                      showClientToast('Copy Failed', 'Unable to copy link to clipboard.', 'error')
+                    })
                   }
                 }}
                 className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
@@ -864,10 +867,10 @@ export default function LessonPageContent({
 
   // ── Tab definitions ──────────────────────────────────────────────────────
   const tabs = [
-    { id: 'theory' as const, label: 'Theory', icon: BookOpen, unlocked: true },
-    { id: 'quiz' as const, label: 'Practice Quiz', icon: CheckSquare, unlocked: isQuizUnlocked },
-    { id: 'flashcards' as const, label: 'Flashcards', icon: Layers, unlocked: isFlashcardsUnlocked },
-    { id: 'reflection' as const, label: 'Reflection', icon: Edit3, unlocked: isReflectionUnlocked },
+    { id: 'theory' as const, label: 'Theory', icon: BookOpen, unlocked: true, lockHint: '' },
+    { id: 'quiz' as const, label: 'Practice Quiz', icon: CheckSquare, unlocked: isQuizUnlocked, lockHint: 'Read the lesson to unlock the quiz.' },
+    { id: 'flashcards' as const, label: 'Flashcards', icon: Layers, unlocked: isFlashcardsUnlocked, lockHint: 'Read the lesson to unlock flashcards.' },
+    { id: 'reflection' as const, label: 'Reflection', icon: Edit3, unlocked: isReflectionUnlocked, lockHint: 'Pass the quiz to unlock the reflection.' },
   ]
 
 
@@ -897,6 +900,8 @@ export default function LessonPageContent({
                 aria-selected={isActive}
                 aria-controls={`panel-${tab.id}`}
                 disabled={!tab.unlocked}
+                title={!tab.unlocked ? tab.lockHint : undefined}
+                aria-label={!tab.unlocked ? `${tab.label} (${tab.lockHint})` : tab.label}
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                   isActive
@@ -946,8 +951,13 @@ export default function LessonPageContent({
       <div className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
         {/* Theory Panel */}
         {activeTab === 'theory' && (
-          <div id="panel-theory" role="tabpanel" aria-labelledby="tab-theory">
-            {/* Phase 4 (revised, Step 7): quiet Core progress affordance — lowers perceived
+          <div
+            id="panel-theory"
+            role="tabpanel"
+            aria-labelledby="tab-theory"
+            className="max-w-[68ch] mx-auto text-base leading-relaxed"
+          >
+            {/* Phase 4 (revised, Step 7): quiet Core progress affordance: lowers perceived
                 effort for a fuller Core without gamification. Treatment only. */}
             {isTreatment && (
               <CoreReadingProgress estimatedMinutes={coreReadingMinutes} />
