@@ -209,6 +209,30 @@ Run:
 Undo:
 Run `rollback/20261113000004_capstone_review_feedback.down.sql` in the SQL editor.
 
+### `20261113000007_leaderboard_weekly_rpc.sql` (ENG-08, ENG-10, AG-31, weekly leaderboard RPC and DB size telemetry)
+
+Adds `public.get_weekly_leaderboard(p_week_start timestamptz, p_limit int, p_offset int)` returning the ranked weekly leaderboard aggregated in the database engine instead of loading all users, lessons, and XP rows into server memory. Also provides `public.get_database_size_bytes()` returning `bigint` for monitoring database size against the Supabase 500 MB free tier limit.
+
+Privileges: Executable only by `service_role`. Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Fixed `search_path = public, pg_temp`.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000007_leaderboard_weekly_rpc.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000007_leaderboard_weekly_rpc_validation.sql` (read-only verification of functions and covering indexes).
+
+Undo:
+Run `rollback/20261113000007_leaderboard_weekly_rpc.down.sql` in the SQL editor.
+
+### `20261113000008_drop_duplicate_indexes.sql` (ENG-08, AG-31, drop redundant duplicate indexes)
+
+Drops duplicate or redundant indexes to save database storage on the free tier. Contains detection query in header and conditionally drops duplicate indexes if present.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000008_drop_duplicate_indexes.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000008_drop_duplicate_indexes_validation.sql`.
+
+Undo:
+Run `rollback/20261113000008_drop_duplicate_indexes.down.sql` in the SQL editor.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are

@@ -1935,6 +1935,30 @@ export type Database = {
     }
     Functions: {
       calculate_user_level:{ Args: { p_xp: number }; Returns: number }
+      get_database_size_bytes: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_weekly_leaderboard: {
+        Args: {
+          p_week_start: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          user_id: string
+          username: string | null
+          name: string | null
+          avatar_url: string | null
+          level: number
+          total_xp: number
+          current_streak: number
+          days_studied: number
+          lessons_completed: number
+          xp_earned: number
+          rank: number
+        }[]
+      }
       claim_email_queue_items: {
         Args: { p_batch_size: number }
         Returns: {
