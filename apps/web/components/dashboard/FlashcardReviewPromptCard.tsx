@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Link from 'next/link'
 import { Brain, ArrowRight, CheckCircle2 } from 'lucide-react'

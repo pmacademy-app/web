@@ -127,6 +127,13 @@ jobs:
       - name: Next.js Production Build
         run: npm run build
 
+      - name: Upload Next.js build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: apps/web/.next
+          retention-days: 1
+
   # Critical-path E2E (B14-C). A separate job from build-and-validate for two reasons.
   #
   # Cost: E2E installs a browser and boots the production server, and the roadmap is
@@ -143,6 +150,7 @@ jobs:
   # `e2e/support/env.ts` refuses outright to run against the production host. The
   # remaining specs need no account and run here on every triggered build.
   e2e:
+    needs: [build-and-validate]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -222,10 +230,13 @@ jobs:
 
       # Only built when no external base URL is supplied; with one, the specs run
       # against that deployment and Playwright's webServer is not used.
-      - name: Next.js Production Build
+      # Download prebuilt Next.js artifact from build-and-validate to eliminate redundant build
+      - name: Download Next.js build artifact
         if: steps.decide.outputs.run == 'true' && env.PLAYWRIGHT_TEST_BASE_URL == ''
-        working-directory: ./apps/web
-        run: npm run build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: apps/web/.next
 
       # Playwright's webServer starts `next start` inside this step, so the server's
       # runtime secrets belong here and nowhere else in the job. It needs the

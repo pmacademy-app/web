@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { fetchCompiledLesson, fetchCurriculumData, resolveSlugToId } from '@/lib/lesson-loader'
 import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
-import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
+import { BlockTreeServerRenderer } from '@/renderer/block-tree-server'
 import { BRAND } from '@/lib/brand'
 import { getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
@@ -230,9 +230,9 @@ export default async function PublicLessonPage({ params }: PageProps) {
         </aside>
       )}
 
-      {/* Theory preview blocks rendered via v2 BlockTreeRenderer */}
+      {/* Theory preview blocks rendered via Server Component renderer */}
       <div className="prose max-w-none">
-        <BlockTreeRenderer blocks={previewBlocks} lessonId={lesson.id} />
+        <BlockTreeServerRenderer blocks={previewBlocks} lessonId={lesson.id} />
         <div className="h-24 bg-gradient-to-t from-background to-transparent pointer-events-none -mt-24 relative z-10" />
       </div>
 
@@ -257,7 +257,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
 
       {publicReferenceBlocks.length > 0 && (
         <section aria-label="Reference material" className="prose max-w-none pt-4 space-y-6">
-          <BlockTreeRenderer blocks={publicReferenceBlocks} lessonId={lesson.id} />
+          <BlockTreeServerRenderer blocks={publicReferenceBlocks} lessonId={lesson.id} />
         </section>
       )}
 

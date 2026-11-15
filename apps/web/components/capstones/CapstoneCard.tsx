@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Link from 'next/link'
 import { Award, Lock, CheckCircle, Clock, ChevronRight, Edit3 } from 'lucide-react'

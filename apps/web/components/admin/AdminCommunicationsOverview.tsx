@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Link from 'next/link'
 import { Mail, Clock, AlertTriangle, MessageSquare, Star, Activity, ArrowRight, PauseCircle, CheckCircle2 } from 'lucide-react'
