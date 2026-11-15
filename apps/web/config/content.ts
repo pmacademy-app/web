@@ -21,6 +21,7 @@ export const STATIC_PAGE_DATES: Record<string, string> = {
   home: '2026-11-12',
   curriculum: '2026-11-12',
   frameworks: '2026-11-12',
+  glossary: '2026-11-15',
   faq: '2026-11-15',
   reviews: '2026-11-12',
   about: '2026-11-12',

@@ -43,12 +43,12 @@ export const metadata: Metadata = {
  * Sources for the well-known frameworks the lessons build on. Prodily teaches and adapts these;
  * it did not invent them, so the page credits them instead of presenting them as its own.
  */
-const FRAMEWORK_SOURCES: { idea: string; credit: string }[] = [
-  { idea: 'Desirability, feasibility and viability', credit: 'IDEO (design thinking)' },
-  { idea: 'Continuous discovery and opportunity solution trees', credit: 'Teresa Torres, Continuous Discovery Habits' },
-  { idea: 'RICE prioritization (Reach, Impact, Confidence, Effort)', credit: 'Sean McBride at Intercom' },
-  { idea: 'MoSCoW prioritization', credit: 'Dai Clegg, later adopted by DSDM' },
-  { idea: 'North Star Metric', credit: 'Popularized by Sean Ellis and the Amplitude North Star Framework' },
+const FRAMEWORK_SOURCES: { idea: string; credit: string; slug?: string }[] = [
+  { idea: 'Desirability, feasibility and viability', credit: 'IDEO (design thinking)', slug: 'desirability-feasibility-viability' },
+  { idea: 'Continuous discovery and opportunity solution trees', credit: 'Teresa Torres, Continuous Discovery Habits', slug: 'opportunity-solution-tree' },
+  { idea: 'RICE prioritization (Reach, Impact, Confidence, Effort)', credit: 'Sean McBride at Intercom', slug: 'rice' },
+  { idea: 'MoSCoW prioritization', credit: 'Dai Clegg, later adopted by DSDM', slug: 'moscow' },
+  { idea: 'North Star Metric', credit: 'Popularized by Sean Ellis and the Amplitude North Star Framework', slug: 'north-star-metric' },
 ]
 
 export default function FrameworksPage() {
@@ -96,6 +96,11 @@ export default function FrameworksPage() {
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
             These aren&apos;t tips to memorize. They&apos;re tools to help you reason through product problems.
             Some are Prodily&apos;s own teaching models; many build on well-known industry frameworks, credited below.
+            Looking for quick definitions of individual terms? Browse the full{' '}
+            <Link href="/glossary" className="text-primary font-medium hover:underline inline-flex items-center gap-0.5">
+              <span>Product Management Glossary</span>
+              <ArrowRight size={13} aria-hidden="true" />
+            </Link>.
           </p>
         </header>
 
@@ -114,10 +119,23 @@ export default function FrameworksPage() {
           <ul className="space-y-1.5 text-sm text-ink-muted leading-relaxed list-disc pl-5">
             {FRAMEWORK_SOURCES.map((source) => (
               <li key={source.idea}>
-                <span className="font-medium text-foreground">{source.idea}:</span> {source.credit}
+                {source.slug ? (
+                  <Link href={`/frameworks/${source.slug}`} className="font-medium text-foreground hover:text-primary hover:underline">
+                    {source.idea}:
+                  </Link>
+                ) : (
+                  <span className="font-medium text-foreground">{source.idea}:</span>
+                )}{' '}
+                {source.credit}
               </li>
             ))}
           </ul>
+          <p className="text-xs text-ink-muted pt-1">
+            Want to look up a specific term or metric? See the{' '}
+            <Link href="/glossary" className="text-primary font-medium hover:underline">
+              full A to Z glossary
+            </Link>.
+          </p>
         </section>
 
         {/* ── Bottom Capstone Callout ─────────────────────────────────────── */}

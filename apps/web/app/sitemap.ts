@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { BRAND } from '@/lib/brand'
 import { STATIC_PAGE_DATES } from '@/config/content'
+import { FRAMEWORK_DETAILS } from '@/config/frameworks'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getPublicPortfolioSitemapEntries } from '@/lib/portfolio-db'
@@ -12,13 +13,14 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl).replace(/\/$
  *
  * Includes:
  *  - All public marketing pages with committed lastModified dates
+ *  - All 10 detailed framework pages (/frameworks/[slug])
+ *  - The comprehensive product management glossary hub (/glossary)
  *  - All 90 public lesson preview pages (/lessons/lesson-001 ... /lessons/lesson-090) with real updatedAt
  *  - All publicly accessible user portfolios (/p/[username]) and public capstone case studies (/p/[username]/capstones/[moduleSlug])
  *
  * Excludes:
  *  - All private/unconfigured user portfolios (is_portfolio_public: false)
  *  - All authenticated/admin app routes (/dashboard, /settings, /admin, /academy, etc.)
- *  - Redirect routes (/glossary)
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const marketingRoutes: MetadataRoute.Sitemap = [
@@ -38,6 +40,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/frameworks`,
       lastModified: new Date(STATIC_PAGE_DATES.frameworks),
       changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/glossary`,
+      lastModified: new Date(STATIC_PAGE_DATES.glossary),
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
@@ -78,6 +86,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  const frameworkRoutes: MetadataRoute.Sitemap = FRAMEWORK_DETAILS.map((fw) => ({
+    url: `${siteUrl}/frameworks/${fw.slug}`,
+    lastModified: new Date(fw.updatedAt),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
   const curriculum = await fetchCurriculumData()
   const lessonRoutes: MetadataRoute.Sitemap = (curriculum?.lessons ?? []).map((lesson) => ({
     url: `${siteUrl}/lessons/${lesson.slug}`,
@@ -117,6 +132,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap] Error generating public portfolio routes:', portfolioErr)
   }
 
-  return [...marketingRoutes, ...lessonRoutes, ...portfolioRoutes]
+  return [...marketingRoutes, ...frameworkRoutes, ...lessonRoutes, ...portfolioRoutes]
 }
 

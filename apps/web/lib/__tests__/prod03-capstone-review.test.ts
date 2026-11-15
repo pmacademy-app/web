@@ -302,7 +302,7 @@ describe('PROD-03 / AG-26 Capstone Review and Resubmission', () => {
 
       expect(success).toBe(true)
       expect(updatedPayload).not.toBeNull()
-      const payload = updatedPayload as Record<string, unknown>
+      const payload = updatedPayload as unknown as Record<string, unknown>
       expect(payload.status).toBe('reviewed')
       expect(payload.is_public).toBe(false)
       expect(payload.review_scores).toEqual(scores)
