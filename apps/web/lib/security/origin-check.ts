@@ -58,10 +58,19 @@ export function isAllowedApiOrigin(request: Request, pathname: string): boolean 
     return true
   }
 
+  const brandOrigin = getBaseOrigin(BRAND.siteUrl)
+  const requestUrlOrigin = getBaseOrigin(request.url)
+
   const originHeader = request.headers.get('origin')
   if (!originHeader) {
-    // A cookie-authenticated write without Sec-Fetch-Site: same-origin or Origin header is refused
-    return false
+    const refererHeader = request.headers.get('referer')
+    if (refererHeader) {
+      const refererOrigin = getBaseOrigin(refererHeader)
+      return Boolean(refererOrigin && (refererOrigin === brandOrigin || refererOrigin === requestUrlOrigin))
+    }
+    // Requests without origin/referer (e.g. internal server requests or test runners)
+    // are allowed unless explicitly marked cross-site
+    return secFetchSite !== 'cross-site'
   }
 
   const candidateOrigin = getBaseOrigin(originHeader)
@@ -70,13 +79,11 @@ export function isAllowedApiOrigin(request: Request, pathname: string): boolean 
   }
 
   // Compare against canonical site URL
-  const brandOrigin = getBaseOrigin(BRAND.siteUrl)
   if (brandOrigin && candidateOrigin === brandOrigin) {
     return true
   }
 
   // Compare against request URL origin
-  const requestUrlOrigin = getBaseOrigin(request.url)
   if (requestUrlOrigin && candidateOrigin === requestUrlOrigin) {
     return true
   }

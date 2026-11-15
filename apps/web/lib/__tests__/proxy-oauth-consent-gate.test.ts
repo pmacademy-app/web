@@ -72,9 +72,9 @@ beforeEach(() => {
   state.profileError = null
   state.profileThrows = false
   state.users = {
-    google: { app_metadata: { provider: 'google', providers: ['google'] }, user_metadata: onboarded },
-    password: { app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: onboarded },
-    merged: { app_metadata: { provider: 'email', providers: ['email', 'google'] }, user_metadata: onboarded },
+    google: { app_metadata: { provider: 'google', providers: ['google'], onboarding_complete: true }, user_metadata: onboarded },
+    password: { app_metadata: { provider: 'email', providers: ['email'], onboarding_complete: true }, user_metadata: onboarded },
+    merged: { app_metadata: { provider: 'email', providers: ['email', 'google'], onboarding_complete: true }, user_metadata: onboarded },
   }
 })
 

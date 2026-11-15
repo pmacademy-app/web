@@ -662,14 +662,18 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     // SEC-21: Trusted claim in app_metadata OR database public.users columns.
     // Stop reading user_metadata for access decisions.
-    const profileData = await loadUserProfileData()
-    const isOnboardingComplete = Boolean(
+    let isOnboardingComplete = Boolean(
       user.app_metadata?.onboarding_complete === true ||
-      user.app_metadata?.onboarding_completed === true ||
-      profileData?.onboarding_completed ||
-      profileData?.goal != null ||
-      profileData?.curriculum_access_override
+      user.app_metadata?.onboarding_completed === true
     )
+    if (!isOnboardingComplete) {
+      const profileData = await loadUserProfileData()
+      isOnboardingComplete = Boolean(
+        profileData?.onboarding_completed ||
+        profileData?.goal != null ||
+        profileData?.curriculum_access_override
+      )
+    }
     const isOnboardingPage = path === ONBOARDING_PAGE
 
     if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {

@@ -84,6 +84,7 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
       const token = createMockJwt({
         sub: 'usr_learner_123',
         email: 'learner@example.com',
+        app_metadata: { onboarding_complete: true },
         user_metadata: { onboarding_complete: true },
         email_confirmed_at: '2026-01-01T00:00:00Z',
         exp: futureExp,
@@ -157,6 +158,7 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
       const token = createMockJwt({
         sub: 'usr_unverified_123',
         email: 'unverified@example.com',
+        app_metadata: { onboarding_complete: true },
         user_metadata: { onboarding_complete: true },
         exp: futureExp,
       })
@@ -256,6 +258,7 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
       const token = createMockJwt({
         sub: 'usr_override_learner',
         email: 'override@gmail.com',
+        app_metadata: { curriculum_access_override: true },
         user_metadata: { onboarding_complete: false, curriculum_access_override: true },
         email_confirmed_at: '2026-01-01T00:00:00Z',
         exp: futureExp,

@@ -111,7 +111,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
   const validOnboardingData: OnboardingData = {
     name: 'Alex Rivera',
     username: 'alex_pm',
-    avatar_url: 'https://example.com/avatar.png',
+    avatar_url: 'https://mock.supabase.co/storage/v1/object/public/avatars/usr_123/avatar.png',
     bio: 'Aspiring PM',
     career_role: 'beginner',
     goal: 'become_pm',
@@ -144,6 +144,9 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     const refreshedAccessToken = createMockJwt({
       sub: 'usr_123',
       email: 'alex@example.com',
+      app_metadata: {
+        onboarding_complete: true,
+      },
       user_metadata: {
         full_name: 'Alex Rivera',
         username: 'alex_pm',
@@ -219,6 +222,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     const refreshedAccessToken = createMockJwt({
       sub: 'usr_456',
       email: 'learner@example.com',
+      app_metadata: { onboarding_complete: true },
       user_metadata: { onboarding_complete: true },
       exp: Math.floor(Date.now() / 1000) + 3600,
     })
@@ -258,6 +262,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     const refreshedAccessToken = createMockJwt({
       sub: 'usr_recovered',
       email: 'recovered@example.com',
+      app_metadata: { onboarding_complete: true },
       user_metadata: { onboarding_complete: true },
       exp: Math.floor(Date.now() / 1000) + 3600,
     })

@@ -38,7 +38,7 @@ BEGIN;
 DO $$
 DECLARE
   v_test_user_id uuid := gen_random_uuid();
-  v_test_lesson_id text := 'validation-lesson-test';
+  v_test_lesson_id text := 'les_val_test';
   v_res jsonb;
   v_status text;
   v_best smallint;
