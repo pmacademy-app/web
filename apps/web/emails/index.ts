@@ -3,6 +3,7 @@ import { WelcomeEmail } from './templates/auth/Welcome'
 import { VerifyEmail } from './templates/auth/VerifyEmail'
 import { PasswordReset } from './templates/auth/PasswordReset'
 import { ModuleCompletedEmail } from './templates/learning/ModuleCompleted'
+import { CapstoneReviewedEmail } from './templates/learning/CapstoneReviewed'
 import { WeeklyRecap } from './templates/learning/WeeklyRecap'
 import { DailyReminder } from './templates/learning/DailyReminder'
 import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
@@ -48,6 +49,10 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'learning.module_complete': {
     component: ModuleCompletedEmail,
     subjectLine: 'Module Complete: {{moduleName}}!',
+  },
+  'learning.capstone_reviewed': {
+    component: CapstoneReviewedEmail as unknown as React.ComponentType<Record<string, unknown>>,
+    subjectLine: 'Your capstone review for {{moduleName}} is ready',
   },
   'achievement.badge_earned': {
     component: BadgeEarnedEmail,

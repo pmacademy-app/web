@@ -556,6 +556,9 @@ export class ModerationService {
           moduleSlug: current.module_slug,
           isPublished: action === 'approve',
           reviewedAt: reviewedAtIso,
+          action,
+          feedback: reviewData?.feedback,
+          revisionCount: current.revision_count ?? 0,
           // The first review keeps the plain event id. A later review that publishes gets its own,
           // or its in-app notice would be dropped as a duplicate of the first review's.
           publishedOnReReview: alreadyReviewed,
@@ -620,6 +623,9 @@ export class ModerationService {
       moduleSlug: string
       isPublished: boolean
       reviewedAt: string
+      action?: 'approve' | 'reject' | 'request_changes'
+      feedback?: string
+      revisionCount?: number
       /** A re-review that publishes a capstone the first review left unpublished. */
       publishedOnReReview?: boolean
     }
@@ -667,6 +673,9 @@ export class ModerationService {
           moduleTitle: definition?.moduleTitle || input.moduleSlug,
           isPublished: input.isPublished,
           reviewedAt: input.reviewedAt,
+          action: input.action,
+          feedback: input.feedback,
+          revisionCount: input.revisionCount,
           username,
           isPortfolioPublic: learner?.is_portfolio_public === true,
         },

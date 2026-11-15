@@ -51,6 +51,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [submitSuccessMsg, setSubmitSuccessMsg] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [reviewScores, setReviewScores] = useState<Record<string, number> | null>(null)
+  const [reviewFeedback, setReviewFeedback] = useState<string | null>(null)
+  const [isPublicSubmission, setIsPublicSubmission] = useState<boolean>(false)
+  const [isEditingResubmission, setIsEditingResubmission] = useState<boolean>(false)
   // XP the server actually awarded for this submission (from the submit response). Null when
   // the page was loaded after an earlier submission, so no figure is invented.
   const [awardedXp, setAwardedXp] = useState<number | null>(null)
@@ -82,7 +87,13 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         const res = await apiGet<{
           userId?: string
           status?: CapstoneStatus
-          submission?: { content?: string; submitted_at?: string }
+          submission?: {
+            content?: string
+            submitted_at?: string
+            review_scores?: Record<string, number> | null
+            review_feedback?: string | null
+            is_public?: boolean | null
+          }
           reflection?: { content?: string; is_public?: boolean }
           userProfile?: { username: string; isPortfolioPublic: boolean } | null
           lessonsCompleted?: number
@@ -98,6 +109,15 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             setServerInitialContent(data.submission.content || '')
             setSubmissionStatus(data.status || 'unlocked')
             setSubmittedAt(data.submission.submitted_at || null)
+            if (data.submission.review_scores) {
+              setReviewScores(data.submission.review_scores)
+            }
+            if (data.submission.review_feedback) {
+              setReviewFeedback(data.submission.review_feedback)
+            }
+            if (typeof data.submission.is_public === 'boolean') {
+              setIsPublicSubmission(data.submission.is_public)
+            }
           } else {
             setServerInitialContent(capstoneDef?.starterTemplate || '')
             setSubmissionStatus(data.status || 'locked')
@@ -124,7 +144,8 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
     }
   }, [moduleSlug, capstoneDef])
 
-  const isLocked = submissionStatus === 'submitted' || submissionStatus === 'reviewed'
+  const isLocked =
+    (submissionStatus === 'submitted' || submissionStatus === 'reviewed') && !isEditingResubmission
 
   // Debounced Autosave Hook
   const {
@@ -191,9 +212,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
       } catch (analyticsErr) {
         console.warn('Analytics tracking error:', analyticsErr)
       }
+      setIsEditingResubmission(false)
+      setSubmitError(null)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to submit capstone.'
-      alert(msg)
+      setSubmitError(msg)
     } finally {
       setIsSubmitting(false)
     }
@@ -396,6 +419,86 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
           )}
         </div>
       </div>
+
+      {/* Submit Error Banner (replaces alert) */}
+      {submitError && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs font-medium text-destructive flex items-center justify-between gap-3">
+          <span>{submitError}</span>
+          <button
+            type="button"
+            onClick={() => setSubmitError(null)}
+            className="text-xs underline hover:no-underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Reviewer Feedback & Rubric Scores (AG-27) */}
+      {(reviewScores || reviewFeedback) && (
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+            <div>
+              <h2 className="text-base font-bold font-serif text-foreground flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary" /> Review & Rubric Evaluation
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isPublicSubmission
+                  ? 'Your capstone was approved and is published on your public portfolio.'
+                  : 'Review feedback and detailed rubric scores from the reviewer.'}
+              </p>
+            </div>
+            {!isPublicSubmission && !isEditingResubmission && (
+              <button
+                type="button"
+                onClick={() => setIsEditingResubmission(true)}
+                className="px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors cursor-pointer self-start sm:self-auto"
+              >
+                Edit and resubmit
+              </button>
+            )}
+          </div>
+
+          {reviewFeedback && (
+            <div className="p-4 rounded-xl bg-secondary/60 border border-border space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Reviewer Feedback</p>
+              <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{reviewFeedback}</p>
+            </div>
+          )}
+
+          {reviewScores && capstoneDef && capstoneDef.requirements.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Rubric Scores</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {capstoneDef.requirements.map((req) => {
+                  const score = reviewScores[req.id]
+                  const scoreLabel =
+                    score === 3
+                      ? 'Exemplary (3/3)'
+                      : score === 2
+                      ? 'Proficient (2/3)'
+                      : score === 1
+                      ? 'Developing (1/3)'
+                      : score === 0
+                      ? 'Missing (0/3)'
+                      : 'Not scored'
+                  return (
+                    <div key={req.id} className="p-3 rounded-lg border border-border bg-background space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-foreground text-xs">{req.label}</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                          {scoreLabel}
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground text-[11px] leading-tight">{req.description}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Post-Submission Portfolio Showcase Card (Phase 4 Direct-to-Portfolio) */}
       {isLocked && (

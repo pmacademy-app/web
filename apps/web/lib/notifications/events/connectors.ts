@@ -296,4 +296,34 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       idempotencyKey: `capstone-published-email-${submissionId}`,
     })
   })
+
+  // AG-27: capstone.reviewed -> learning.capstone_reviewed transactional notification
+  d.registerHandler('capstone.reviewed', 'connector.learning.capstone_reviewed', async (event: EventEnvelope<Record<string, unknown>>) => {
+    if (!event.userEmail) return
+    const submissionId = typeof event.payload.submissionId === 'string' ? event.payload.submissionId : ''
+    if (!submissionId) return
+    const moduleSlug = typeof event.payload.moduleSlug === 'string' ? event.payload.moduleSlug : ''
+    const action = typeof event.payload.action === 'string' ? event.payload.action : (event.payload.isPublished ? 'approve' : 'reject')
+    const feedback = typeof event.payload.feedback === 'string' ? event.payload.feedback : ''
+
+    await enqueueNotificationItem({
+      userId: event.userId,
+      toEmail: event.userEmail,
+      toName: event.userName,
+      channel: 'email',
+      templateKey: 'learning.capstone_reviewed',
+      templateVariables: {
+        userName: event.userName || 'Learner',
+        moduleName: event.payload.moduleTitle || (moduleSlug && getCapstoneDefinition(moduleSlug)?.moduleTitle) || 'Product Management Capstone',
+        moduleSlug,
+        action,
+        feedback,
+      },
+      eventId: event.id,
+      eventType: event.event,
+      category: 'learning',
+      priorityLevel: 'medium',
+      idempotencyKey: `capstone-reviewed-email-${submissionId}-${event.payload.revisionCount || 0}`,
+    })
+  })
 }
