@@ -19,6 +19,7 @@ import { NextRequest } from 'next/server'
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     auth: {
+      getClaims: async () => ({ data: null, error: new Error('no session') }),
       getUser: async () => ({ data: { user: null }, error: new Error('no session') }),
       refreshSession: async () => ({ data: { session: null, user: null }, error: new Error('no session') }),
     },

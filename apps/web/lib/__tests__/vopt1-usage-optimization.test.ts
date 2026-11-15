@@ -68,6 +68,13 @@ describe('V-OPT-1: session proxy matcher', () => {
     }
   )
 
+  it.each(['/about', '/contact', '/faq', '/frameworks', '/glossary', '/privacy', '/reviews', '/terms', '/waitlist'])(
+    'excludes public marketing page %s from entering the proxy (ENG-04 / AG-16)',
+    (path) => {
+      expect(entersProxy(path)).toBe(false)
+    }
+  )
+
   it('still excludes static assets and build output', () => {
     for (const p of ['/_next/static/chunk.js', '/_next/image', '/favicon.ico', '/robots.txt', '/sitemap.xml', '/logo.svg']) {
       expect(entersProxy(p)).toBe(false)

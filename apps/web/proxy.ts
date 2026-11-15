@@ -280,8 +280,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
         let verifiedUserId: string | null = null
         try {
           if (accessToken) {
-            const { data } = await supabase.auth.getUser(accessToken)
-            if (data?.user) verifiedUserId = data.user.id
+            const { data, error } = await supabase.auth.getClaims(accessToken)
+            if (!error && data?.claims?.sub) verifiedUserId = data.claims.sub
           }
         } catch (err) {
           console.error('[proxy] /lessons access-check auth error:', err)
@@ -350,18 +350,19 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     if (accessToken) {
       try {
-        const { data, error } = await supabase.auth.getUser(accessToken)
-        if (!error && data?.user) {
+        const { data, error } = await supabase.auth.getClaims(accessToken)
+        if (!error && data?.claims?.sub) {
+          const claims = data.claims
           user = {
-            id: data.user.id,
-            email: data.user.email || '',
-            app_metadata: (data.user.app_metadata as Record<string, unknown>) || {},
-            user_metadata: (data.user.user_metadata as Record<string, unknown>) || {},
-            email_confirmed_at: data.user.email_confirmed_at,
+            id: claims.sub,
+            email: (claims.email as string) || '',
+            app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
+            user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
+            email_confirmed_at: (claims.email_confirmed_at as string | undefined) ?? (claims.email ? 'confirmed' : undefined),
           }
         }
       } catch (err) {
-        console.error('[proxy] getUser error:', err)
+        console.error('[proxy] getClaims error:', err)
       }
     }
 
@@ -684,40 +685,44 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
  * itself independently and reads nothing from the session, so running session
  * verification for it bought nothing.
  *
- * This narrows only WHICH PATHS ENTER — it does not change what the proxy does for
- * anything that still enters. Verified `getUser()`, refresh-session handling, cookie
+ * This narrows only which paths enter: it does not change what the proxy does for
+ * anything that still enters. Verified getClaims(), refresh-session handling, cookie
  * clearing, protected-page redirects and admin authorization are all untouched (B3).
  *
- * Newly excluded, each verified route-by-route rather than by pathname assumption:
+ * Excluded paths, each verified route-by-route rather than by pathname assumption:
  *
  *   api/cron/*              CRON_SECRET bearer, else `requireAdminUser(request)`.
  *                           That fallback resolves the user from the request itself
  *                           (`getAuthenticatedUserFromRequest` reads the cookie and
- *                           calls `supabase.auth.getUser()`), so admin access still
+ *                           verifies the token), so admin access still
  *                           works without the proxy having run.
  *   api/health              No auth of any kind; returns a liveness probe. A health
  *                           check should also answer during maintenance mode.
- *   api/og/*                Deliberately public — social crawlers must fetch it
+ *   api/og/*                Deliberately public: social crawlers must fetch it
  *                           unauthenticated. Portfolio privacy is enforced inside the
  *                           handler, not here.
  *   api/email/webhooks      Svix (Resend) / shared-secret (Brevo) signature auth.
  *   api/email/unsubscribe   One-time `unsubscribe_token` from the email itself.
+ *   public marketing pages  about, contact, faq, frameworks, glossary, privacy,
+ *                           reviews, terms, waitlist: static marketing content
+ *                           with no session dependency.
  *
  * `api/email/*` is listed as its two concrete routes rather than as a namespace on
  * purpose: they authenticate by two different mechanisms, and a future
  * session-backed route added under that prefix must NOT inherit an exclusion by
  * accident.
  *
- * Everything else still matches: all pages, and every other API route.
+ * Everything else still matches: app pages, admin, curriculum, lessons, auth, and session APIs.
  */
 export const config = {
   matcher: [
     /*
      * Match all paths except:
      * - API routes that carry their own independent authentication (see above)
+     * - Public marketing pages (about, contact, faq, frameworks, glossary, privacy, reviews, terms, waitlist)
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist|[^/]*\\.[^/]*$).*)',
   ],
 }

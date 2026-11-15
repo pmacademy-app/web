@@ -281,3 +281,14 @@ See [ADR-006](decisions/ADR-006-api-error-response-contract.md).
 ## Auth Email Delivery Failures
 
 Delivery failures on `/api/auth/send-email-hook` and in `lib/email.ts` are recorded as structured incidents (`domain: auth` / `domain: email`) with the masked recipient, `email_action_type`, provider and status code. Until September 2026 this path emitted only `console.error`, so signup verification and password reset could fail with no admin-visible signal. See [`ERROR_MONITORING.md`](ERROR_MONITORING.md).
+
+---
+
+## Asymmetric JWT Signing Keys & Local Verification (ENG-03, ENG-04)
+
+With asymmetric signing keys (RS256/ES256), `supabase.auth.getClaims(jwt)` verifies JWTs locally using WebCrypto `crypto.subtle.verify` and cached JWKS keys, avoiding network round-trips to GoTrue. When symmetric signing keys (HS256) are used, `getClaims()` automatically falls back to `getUser()` over the network.
+
+The session proxy (`apps/web/proxy.ts`) and API auth resolver (`lib/auth.ts`) use `getClaims()` to verify identity and claims locally. Each layer verifies the token independently: headers asserting identity from clients or upstream are never trusted.
+
+The proxy matcher excludes public marketing pages (`/about`, `/contact`, `/faq`, `/frameworks`, `/glossary`, `/privacy`, `/reviews`, `/terms`, `/waitlist`) and static assets that do not need session verification.
+

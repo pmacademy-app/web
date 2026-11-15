@@ -84,7 +84,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
           status?: CapstoneStatus
           submission?: { content?: string; submitted_at?: string }
           reflection?: { content?: string; is_public?: boolean }
-          userProfile?: Record<string, unknown> | null
+          userProfile?: { username: string; isPortfolioPublic: boolean } | null
           lessonsCompleted?: number
           totalLessons?: number
           requiredLessons?: number

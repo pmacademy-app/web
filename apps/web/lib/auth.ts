@@ -130,9 +130,11 @@ export async function dispatchWelcomeEmailIfNeeded(
 
 /**
  * Server-side helper to verify auth session in API routes and server actions.
- * Never trust user_id from client request body — always use this function.
+ * Never trust user_id from client request body: always use this function.
  */
 export async function getAuthenticatedUser(supabase: SupabaseClient<Database>): Promise<User | null> {
+  // Kept: callers passing an explicit client to getAuthenticatedUser(supabase) require
+  // the fresh, complete User record directly from GoTrue (e.g. account settings and profile email display).
   const { data: { user }, error } = await supabase.auth.getUser()
   if (error || !user) {
     return null
@@ -265,8 +267,25 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
 
 async function verifyAccessToken(token: string): Promise<User | null> {
   const authClient = createAuthenticatedServerClient(token)
-  const { data: { user }, error } = await authClient.auth.getUser()
-  return !error && user ? user : null
+  // ENG-03 / AG-16: fast path with getClaims()
+  if (typeof authClient.auth.getClaims === 'function') {
+    const { data, error } = await authClient.auth.getClaims(token)
+    if (!error && data?.claims?.sub) {
+      const claims = data.claims
+      return {
+        id: claims.sub,
+        app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
+        user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
+        aud: (claims.aud as string) || 'authenticated',
+        created_at: new Date(claims.iat ? claims.iat * 1000 : Date.now()).toISOString(),
+        email: (claims.email as string) || undefined,
+        role: (claims.role as string) || 'authenticated',
+        is_anonymous: Boolean(claims.is_anonymous),
+      } as User
+    }
+    return null
+  }
+  return null
 }
 
 /** The access token from next/headers cookies(), or null outside a request scope. */

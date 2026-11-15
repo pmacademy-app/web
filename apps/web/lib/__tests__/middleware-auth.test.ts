@@ -7,6 +7,22 @@ vi.mock('@supabase/supabase-js', () => {
   return {
     createClient: () => ({
       auth: {
+        getClaims: vi.fn(async (token?: string) => {
+          if (token === 'mock-user-token') {
+            return {
+              data: {
+                claims: {
+                  sub: 'mock-user-id',
+                  email: 'user@example.com',
+                  user_metadata: { is_admin: true },
+                  app_metadata: {},
+                },
+              },
+              error: null,
+            }
+          }
+          return { data: null, error: new Error('Invalid token') }
+        }),
         getUser: vi.fn(async (token: string) => {
           if (token === 'mock-user-token') {
             return {
