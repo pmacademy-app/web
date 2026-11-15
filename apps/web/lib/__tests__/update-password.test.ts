@@ -43,7 +43,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(json.error).toBe('Forbidden: Untrusted Origin')
   })
 
-  it('Rejects short password (< 6 chars) with 400', async () => {
+  it('Rejects short password (< 10 chars) with 400', async () => {
     const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -53,7 +53,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.success).toBe(false)
-    expect(json.error).toBe('Password must be at least 6 characters.')
+    expect(json.error).toBe('Password must be at least 10 characters.')
   })
 
   it('Rejects request with neither sb-access-token nor sb-refresh-token with 401 and clears cookies', async () => {

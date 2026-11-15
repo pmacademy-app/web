@@ -10,6 +10,7 @@ import { apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/
 import { isNetworkFailure } from '@/lib/auth/errors'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE } from '@/lib/auth/password-policy'
 
 export const runtime = 'nodejs'
 
@@ -187,8 +188,8 @@ export const POST = withRoute(
       }
 
       const { newPassword } = body
-      if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
-        return NextResponse.json({ success: false, error: 'Password must be at least 6 characters.' }, { status: 400 })
+      if (!newPassword || typeof newPassword !== 'string' || newPassword.length < MIN_PASSWORD_LENGTH) {
+        return NextResponse.json({ success: false, error: PASSWORD_MIN_LENGTH_MESSAGE }, { status: 400 })
       }
 
       const cookieStore = await cookies()

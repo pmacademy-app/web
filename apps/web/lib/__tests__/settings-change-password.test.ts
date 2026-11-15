@@ -93,7 +93,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(json.code).toBe('UNAUTHORIZED')
   })
 
-  it('2. Rejects short new password (< 6 chars) with 400', async () => {
+  it('2. Rejects short new password (< 10 chars) with 400', async () => {
     const req = new Request('https://prodily.app/api/settings/security', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -108,7 +108,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.success).toBe(false)
-    expect(json.error).toContain('at least 6 characters')
+    expect(json.error).toContain('at least 10 characters')
   })
 
   it('3. Rejects mismatched new passwords with 400', async () => {

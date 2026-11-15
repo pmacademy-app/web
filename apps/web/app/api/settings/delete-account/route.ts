@@ -3,6 +3,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { deleteAccount } from '@/lib/settings/settings-service'
+import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
 
 export const POST = withRoute(
   {
@@ -11,8 +12,19 @@ export const POST = withRoute(
     domain: 'api',
     summary: 'Unexpected failure while deleting a learner account',
   },
-  async ({ actor }) => {
+  async ({ request, actor }) => {
     const userId = requireUserId(actor)
+    const body = await request.json().catch(() => ({}))
+
+    const reauth = await verifyDestructiveReauth({
+      actor,
+      body,
+      expectedPhrase: 'DELETE',
+    })
+
+    if (!reauth.ok) {
+      return reauth.response
+    }
 
     // Use service-role client for admin operations (bypasses RLS, has auth.admin access)
     const supabase = createServiceRoleClient()
@@ -20,13 +32,10 @@ export const POST = withRoute(
     // 1. Delete all application-owned data rows (cascades through all user tables)
     await deleteAccount(supabase, userId)
 
-    // 2. Permanently delete the Supabase Auth user — this is the critical step that
+    // 2. Permanently delete the Supabase Auth user: this is the critical step that
     //    prevents the user from logging in again. Requires service_role key.
     const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId)
     if (authDeleteError) {
-      // If auth deletion fails, log the error but still return success since data
-      // is already cleaned. The user can no longer access any application data.
-      // A manual cleanup in Supabase dashboard may be needed.
       console.error('[API POST /api/settings/delete-account] Auth user deletion failed:', authDeleteError)
     }
 

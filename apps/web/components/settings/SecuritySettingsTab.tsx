@@ -10,6 +10,11 @@ import { apiPost } from '@/lib/api/client'
 import { useDirtyFormGuard } from '@/hooks/use-dirty-form-guard'
 import { showClientToast } from '@/lib/events/client-event-bus'
 import { logout } from '@/lib/auth/logout'
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_NEW_MIN_LENGTH_MESSAGE,
+  PASSWORD_MIN_LENGTH_HINT,
+} from '@/lib/auth/password-policy'
 import type {
   ChangeEmailGetResponse,
   ChangeEmailPostResponse,
@@ -293,8 +298,8 @@ export function SecuritySettingsTab() {
       return
     }
 
-    if (newPassword.length < 6) {
-      const msg = 'New password must be at least 6 characters long.'
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      const msg = PASSWORD_NEW_MIN_LENGTH_MESSAGE
       setErrorMessage(msg)
       showClientToast('Password Update Failed', msg, 'error')
       return
@@ -425,7 +430,7 @@ export function SecuritySettingsTab() {
                   disabled={saving}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 6 characters"
+                  placeholder={`Minimum ${MIN_PASSWORD_LENGTH} characters`}
                   className="rounded-xl pr-10"
                 />
                 <button
@@ -438,7 +443,7 @@ export function SecuritySettingsTab() {
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Must be at least 6 characters long.
+                {PASSWORD_MIN_LENGTH_HINT}
               </p>
             </div>
 

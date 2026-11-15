@@ -16,6 +16,12 @@ import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
 import { AuthSuccessNotice } from '@/components/auth/AuthSuccessNotice'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { updatePasswordAction } from './actions'
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_MIN_LENGTH_MESSAGE,
+  PASSWORD_PLACEHOLDER,
+  PASSWORD_MIN_LENGTH_HINT,
+} from '@/lib/auth/password-policy'
 
 const requestSchema = z.object({
   email: z
@@ -31,7 +37,7 @@ const updateSchema = z
     newPassword: z
       .string()
       .min(1, 'New password is required.')
-      .min(6, 'Password must be at least 6 characters.'),
+      .min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
     confirmPassword: z
       .string()
       .min(1, 'Please confirm your new password.'),
@@ -211,7 +217,7 @@ function ResetPasswordFormContent() {
                 disabled={isLoading || isSuccess}
                 error={!!updateForm.formState.errors.newPassword}
                 aria-describedby={updateForm.formState.errors.newPassword ? 'password-error' : 'password-hint'}
-                placeholder="Min. 6 characters"
+                placeholder={PASSWORD_PLACEHOLDER}
                 className="pr-10"
                 {...updateForm.register('newPassword')}
               />
@@ -225,7 +231,7 @@ function ResetPasswordFormContent() {
               </button>
             </div>
             <p id="password-hint" className="mt-1 text-[11px] text-muted-foreground">
-              Must be at least 6 characters long.
+              {PASSWORD_MIN_LENGTH_HINT}
             </p>
             {updateForm.formState.errors.newPassword && (
               <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">

@@ -6,6 +6,8 @@
  * Designed to be reusable by Phase 6 Auth Telemetry.
  */
 
+import { PASSWORD_WEAK_REQUIREMENTS_MESSAGE } from './password-policy'
+
 export type AuthErrorCode =
   | 'AUTH_INVALID_CREDENTIALS'
   | 'AUTH_EMAIL_NOT_CONFIRMED'
@@ -240,7 +242,7 @@ export function classifyAuthError(
   ) {
     return {
       code: 'AUTH_PASSWORD_TOO_WEAK',
-      message: 'Password does not meet security requirements. Please choose a password with at least 6 characters.',
+      message: PASSWORD_WEAK_REQUIREMENTS_MESSAGE,
       retryable: false,
       isNetworkError: false,
       rawCode: rawCode || 'weak_password',

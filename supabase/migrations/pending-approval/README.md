@@ -159,6 +159,25 @@ Undo: `rollback/20261113000001_scrub_dead_letter_auth_links.down.sql` is a docum
 scrubbed links cannot be restored, and they had expired anyway. A learner who still needs the
 email requests a new one.
 
+### `20261113000002_before_user_created_allow_signups.sql` (SEC-09, AG-12, database signup gate)
+
+Adds `public.hook_before_user_created(event jsonb)` returning `jsonb` to enforce the platform signup toggle directly in the database. When `public.system_settings` `product_settings.allowSignups` is `false`, the hook blocks the registration with HTTP 403: "New learner registrations are currently closed. Please check back later."
+
+Privileges: execute granted only to `supabase_auth_admin`; revoked from `PUBLIC`, `anon`, and `authenticated`. Runs as `SECURITY DEFINER` with fixed `search_path = public, pg_temp`.
+
+Prerequisites:
+- Verify that Supabase Auth Hooks are available on the active plan.
+- The AG-12 app change is deployed.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000002_before_user_created_allow_signups.sql` into the Supabase SQL editor and run it.
+2. In Supabase Dashboard: Auth > Hooks > Before User Created: select `public.hook_before_user_created`.
+3. Run `validation/20261113000002_before_user_created_allow_signups_validation.sql` (transaction rollback check).
+
+Undo:
+1. In Supabase Dashboard: Auth > Hooks: remove the Before User Created hook assignment.
+2. Run `rollback/20261113000002_before_user_created_allow_signups.down.sql` in the SQL editor to drop the function.
+
 ## Ops snippets (owner-run, never migrations)
 
 These files also live here because this folder is invisible to `supabase db push`. They are

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, RotateCcw, Zap, Flame, Compass, Award, UserX, CheckCircle2 } from 'lucide-react'
 import { apiPost } from '@/lib/api/client'
-import { mutate } from '@/lib/api/hooks'
+import { mutate, useApiQuery } from '@/lib/api/hooks'
 import { ConfirmDestructiveAction } from '@/components/settings/ConfirmDestructiveAction'
 
 const MODULE_OPTIONS = [
@@ -26,15 +26,19 @@ export function DangerZoneTab() {
   const [activeDialog, setActiveDialog] = useState<string | null>(null)
   const [successToast, setSuccessToast] = useState<string | null>(null)
 
+  const { data: securityEmailData } = useApiQuery<{ hasPassword?: boolean }>('/api/settings/security/change-email')
+  const hasPassword = securityEmailData?.hasPassword !== false
+
   const showSuccess = (msg: string) => {
     setSuccessToast(msg)
     setTimeout(() => setSuccessToast(null), 4000)
   }
 
   // Action handlers calling API routes
-  const handleResetProgress = async () => {
+  const handleResetProgress = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
     const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/progress', {
       module_slug: selectedModule,
+      ...auth,
     })
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset progress.' : res.error.message)
     void mutate((key) => typeof key === 'string' && key.includes('/api/'), undefined, { revalidate: true })
@@ -46,33 +50,33 @@ export function DangerZoneTab() {
     )
   }
 
-  const handleResetXp = async () => {
-    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/xp')
+  const handleResetXp = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/xp', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset XP.' : res.error.message)
     void mutate('/api/xp')
     showSuccess('XP total reset to 0 (ledger audit entry recorded).')
   }
 
-  const handleResetFlashcards = async () => {
-    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/flashcards')
+  const handleResetFlashcards = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/flashcards', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset flashcards.' : res.error.message)
     showSuccess('Flashcard SRS history reset successfully.')
   }
 
-  const handleResetStreak = async () => {
-    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/streak')
+  const handleResetStreak = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/streak', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset streak.' : res.error.message)
     showSuccess('Streak reset to 0 days.')
   }
 
-  const handleResetSkillRadar = async () => {
-    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/skill-radar')
+  const handleResetSkillRadar = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/skill-radar', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset Skill Radar.' : res.error.message)
     showSuccess('Skill Radar competency state reset successfully.')
   }
 
-  const handleDeleteAccount = async () => {
-    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/delete-account')
+  const handleDeleteAccount = async (auth: { currentPassword?: string; confirmationPhrase?: string }) => {
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/delete-account', auth)
     if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to delete account.' : res.error.message)
     // Redirect to home on full account deletion
     window.location.href = '/'
@@ -254,6 +258,7 @@ export function DangerZoneTab() {
         }
         confirmationKeyword="RESET"
         confirmButtonText="Confirm Progress Reset"
+        hasPassword={hasPassword}
         onConfirm={handleResetProgress}
         onClose={() => setActiveDialog(null)}
       />
@@ -265,6 +270,7 @@ export function DangerZoneTab() {
         plainLanguageLossSummary="This will record an auditing negative XP entry in the ledger to bring your total XP balance to 0. Your historical XP event logs, lesson completions, and streak remain intact."
         confirmationKeyword="RESET"
         confirmButtonText="Confirm XP Reset"
+        hasPassword={hasPassword}
         onConfirm={handleResetXp}
         onClose={() => setActiveDialog(null)}
       />
@@ -276,6 +282,7 @@ export function DangerZoneTab() {
         plainLanguageLossSummary="This will clear your SM-2 flashcard intervals and review count history. All flashcards will be scheduled as new unreviewed cards."
         confirmationKeyword="RESET"
         confirmButtonText="Confirm Flashcard Reset"
+        hasPassword={hasPassword}
         onConfirm={handleResetFlashcards}
         onClose={() => setActiveDialog(null)}
       />
@@ -287,6 +294,7 @@ export function DangerZoneTab() {
         plainLanguageLossSummary="This will set your current active streak to 0 days. Your longest streak record, XP, and lesson completions remain unchanged."
         confirmationKeyword="RESET"
         confirmButtonText="Confirm Streak Reset"
+        hasPassword={hasPassword}
         onConfirm={handleResetStreak}
         onClose={() => setActiveDialog(null)}
       />
@@ -298,6 +306,7 @@ export function DangerZoneTab() {
         plainLanguageLossSummary="This will clear calculated scores across all 7 Skill Radar clusters. Completing new lessons or quizzes will re-populate competency scores."
         confirmationKeyword="RESET"
         confirmButtonText="Confirm Skill Radar Reset"
+        hasPassword={hasPassword}
         onConfirm={handleResetSkillRadar}
         onClose={() => setActiveDialog(null)}
       />
@@ -309,6 +318,7 @@ export function DangerZoneTab() {
         plainLanguageLossSummary="This will delete your account across all user data tables. Your public portfolio handle will be revoked, issued certificates will be delinked from your profile, queued notifications will be dropped, and your session will terminate."
         confirmationKeyword="DELETE"
         confirmButtonText="Permanently Delete Account"
+        hasPassword={hasPassword}
         onConfirm={handleDeleteAccount}
         onClose={() => setActiveDialog(null)}
         isDestructive={true}

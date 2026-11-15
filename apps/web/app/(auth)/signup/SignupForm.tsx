@@ -17,6 +17,7 @@ import { MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 import { LegalConsentFields } from '@/components/auth/LegalConsentFields'
 import { GoogleButton } from '@/components/auth/GoogleButton'
 import { buildGoogleStartHref, isGoogleAuthEnabled } from '@/lib/auth/google-auth'
+import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE, PASSWORD_PLACEHOLDER } from '@/lib/auth/password-policy'
 
 // Build-time inlined flag, so this is constant for the life of the bundle.
 const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
@@ -37,7 +38,7 @@ const signupSchema = z.object({
   password: z
     .string()
     .min(1, 'Password is required.')
-    .min(6, 'Password must be at least 6 characters.'),
+    .min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
   // Mirrors the server schema in app/api/auth/signup/route.ts. The client copy is
   // for the inline error; the server's is the one that actually blocks the account.
   acceptedTerms: z.literal(true, {
@@ -340,7 +341,7 @@ export default function SignupForm({ refCode = null, next = null }: SignupFormPr
             disabled={isLoading}
             error={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
-            placeholder="Min. 6 characters"
+            placeholder={PASSWORD_PLACEHOLDER}
             {...register('password')}
           />
           {errors.password && (
