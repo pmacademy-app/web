@@ -134,7 +134,7 @@ export async function apiInternalError(options: {
   return apiError({
     status: options.status ?? 500,
     code: options.code ?? 'SERVER_ERROR',
-    message: options.message ?? GENERIC_SERVER_ERROR_MESSAGE,
+    message: options.message ?? (options.domain === 'admin' ? adminErrorMessage(options.cause, GENERIC_SERVER_ERROR_MESSAGE) : GENERIC_SERVER_ERROR_MESSAGE),
     errorId,
     requestId: options.requestId,
     extra: options.extra,

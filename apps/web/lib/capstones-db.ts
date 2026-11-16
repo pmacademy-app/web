@@ -7,7 +7,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase'
+import type { Database, Json } from '@/lib/supabase'
 import { getAllCapstoneDefinitions, getCapstoneDefinition, getCurriculumModuleForCapstone } from '@/config/capstones'
 import {
   deriveCapstoneStatus,
@@ -491,7 +491,7 @@ export async function submitCapstoneAction(
     }
 
     if (isResubmission) {
-      const history = Array.isArray(existing.review_history) ? [...existing.review_history] : []
+      const history: Json[] = Array.isArray(existing.review_history) ? [...existing.review_history] : []
       const alreadyInHistory = history.some(
         (h) => (h as Record<string, unknown>)?.reviewed_at === existing.reviewed_at
       )
@@ -506,7 +506,7 @@ export async function submitCapstoneAction(
           revision_count: existing.revision_count ?? 0,
         })
       }
-      updatePayload.review_history = history as unknown as Database['public']['Tables']['capstone_submissions']['Update']['review_history']
+      updatePayload.review_history = history
       updatePayload.review_scores = null
       updatePayload.review_feedback = null
     }

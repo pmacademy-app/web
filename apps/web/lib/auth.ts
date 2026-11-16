@@ -270,6 +270,7 @@ async function verifyAccessToken(token: string): Promise<User | null> {
   // ENG-03 / AG-16: fast path with getClaims()
   const authWithClaims = authClient.auth as unknown as {
     getClaims?: (token: string) => Promise<{ data: { claims?: Record<string, unknown> } | null; error: unknown }>
+    getUser?: (token: string) => Promise<{ data: { user?: User | null } | null; error: unknown }>
   }
   if (typeof authWithClaims.getClaims === 'function') {
     const { data, error } = await authWithClaims.getClaims(token)
@@ -286,12 +287,15 @@ async function verifyAccessToken(token: string): Promise<User | null> {
         is_anonymous: Boolean(claims.is_anonymous),
       } as User
     }
+    return null
   }
 
-  // Fallback to getUser(token)
-  const { data, error } = await authClient.auth.getUser(token)
-  if (!error && data?.user) {
-    return data.user
+  // Fallback to getUser(token) when getClaims is unavailable in legacy client or mock environments
+  if (typeof authWithClaims.getUser === 'function') {
+    const { data, error } = await authClient.auth.getUser(token)
+    if (!error && data?.user) {
+      return data.user
+    }
   }
 
   return null

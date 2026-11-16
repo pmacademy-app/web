@@ -101,10 +101,14 @@ export async function logout(
       })
 
       if (!result.ok) {
-        failures.push({
-          step: 'session_cookie_clear',
-          reason: `server responded ${result.error.status}`,
-        })
+        if (result.error.kind === 'parse' && result.error.status >= 200 && result.error.status < 300) {
+          // An unreadable 2xx sign-out body is treated as success rather than inventing a failure
+        } else {
+          failures.push({
+            step: 'session_cookie_clear',
+            reason: result.error.kind === 'network' ? 'Failed to fetch' : `server responded ${result.error.status}`,
+          })
+        }
       } else if (result.data?.revocation === 'failed') {
         failures.push({ step: 'provider_sign_out', reason: 'provider revocation failed' })
       }

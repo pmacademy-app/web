@@ -14,9 +14,9 @@ INSERT INTO auth.users (id, email, aud, role)
 VALUES ('77777777-7777-7777-7777-777777777777'::uuid, 'learner_quiz@example.com', 'authenticated', 'authenticated')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.users (id, email, name, xp, level)
+INSERT INTO public.users (id, email, name, total_xp, level)
 VALUES ('77777777-7777-7777-7777-777777777777'::uuid, 'learner_quiz@example.com', 'Learner Quiz', 0, 1)
-ON CONFLICT (id) DO UPDATE SET xp = 0, level = 1;
+ON CONFLICT (id) DO UPDATE SET total_xp = 0, level = 1;
 
 -- Act as service_role (the authorized caller of the quiz RPC)
 SET LOCAL ROLE service_role;
@@ -26,14 +26,14 @@ SELECT extensions.is(
   (
     SELECT (public.record_lesson_quiz_completion(
       '77777777-7777-7777-7777-777777777777'::uuid,
-      'test-lesson-ag05',
+      'les_test_ag05',
       100,
       5,
       5,
       '[]'::jsonb,
       10,
       20
-    )->>'xp_awarded')::int
+    )->>'total_xp_awarded')::int
   ),
   70,
   'First quiz completion awards 70 XP (50 correct + 20 perfect bonus)'
@@ -41,7 +41,7 @@ SELECT extensions.is(
 
 -- 2. User total XP is updated to 70
 SELECT extensions.is(
-  (SELECT xp FROM public.users WHERE id = '77777777-7777-7777-7777-777777777777'::uuid),
+  (SELECT total_xp FROM public.users WHERE id = '77777777-7777-7777-7777-777777777777'::uuid),
   70,
   'User XP in public.users is updated to 70 after first quiz completion'
 );
@@ -51,14 +51,14 @@ SELECT extensions.is(
   (
     SELECT (public.record_lesson_quiz_completion(
       '77777777-7777-7777-7777-777777777777'::uuid,
-      'test-lesson-ag05',
+      'les_test_ag05',
       100,
       5,
       5,
       '[]'::jsonb,
       10,
       20
-    )->>'xp_awarded')::int
+    )->>'total_xp_awarded')::int
   ),
   0,
   'Second quiz completion with identical input awards 0 incremental XP'
@@ -66,7 +66,7 @@ SELECT extensions.is(
 
 -- 4. User total XP remains 70 (no double-awarded XP)
 SELECT extensions.is(
-  (SELECT xp FROM public.users WHERE id = '77777777-7777-7777-7777-777777777777'::uuid),
+  (SELECT total_xp FROM public.users WHERE id = '77777777-7777-7777-7777-777777777777'::uuid),
   70,
   'User XP in public.users remains 70 (not double-awarded)'
 );

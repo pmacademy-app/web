@@ -42,6 +42,7 @@ export const POST = withRoute(
       revalidateAdminTag(body.tag)
       return NextResponse.json<AdminCacheRevalidateResponse>({ success: true, tag: body.tag })
     } catch (error: unknown) {
+      console.error('[API POST /api/admin/cache/revalidate] Error:', error)
       const message = adminErrorMessage(error, 'Failed to refresh the admin cache.')
       throw new RouteError(500, 'ADMIN_CACHE_REVALIDATE_FAILED', message)
     }

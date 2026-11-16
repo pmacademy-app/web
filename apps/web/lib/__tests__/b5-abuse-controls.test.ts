@@ -310,7 +310,7 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
       // User A blocked
       const resA = await updatePasswordPOST(createRequest(
         'https://prodily.app/api/auth/update-password',
-        { newPassword: 'pwd123456' },
+        { newPassword: 'validPassword123' },
         { Authorization: `Bearer ${userAToken}` }
       ))
       expect(resA.status).toBe(429)
@@ -318,7 +318,7 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
       // User B succeeds
       const resB = await updatePasswordPOST(createRequest(
         'https://prodily.app/api/auth/update-password',
-        { newPassword: 'pwd123456' },
+        { newPassword: 'validPassword123' },
         { Authorization: `Bearer ${userBToken}` }
       ))
       expect(resB.status).toBe(200)

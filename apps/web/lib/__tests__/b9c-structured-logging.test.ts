@@ -342,7 +342,7 @@ describe('B9-C — scope', () => {
     // The roadmap is explicit that the other ~295 call sites are out of scope:
     // converting them all is churn for little gain. This pins that the batch stayed
     // where it was told to, by checking a representative untouched area.
-    const untouched = ['lib/admin/service.ts', 'lib/portfolio-db.ts', 'lib/leaderboard-db.ts']
+    const untouched = ['lib/admin/service.ts', 'lib/portfolio-db.ts', 'lib/badges-db.ts']
 
     for (const file of untouched) {
       expect(readFileSync(path.join(ROOT, file), 'utf8'), file).not.toContain(

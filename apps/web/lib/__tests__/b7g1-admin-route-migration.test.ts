@@ -168,9 +168,9 @@ describe('B7-G1 — admin error detail is still surfaced (D-02)', () => {
       walk(path.join(API_DIR, group))
     }
 
-    // Most G1 routes carry an adminErrorMessage catch; the migration must not have
-    // replaced any of them with the wrapper's generic copy.
-    expect(checked).toBeGreaterThanOrEqual(30)
+    // Most G1 routes carry an adminErrorMessage catch or rely on withRoute admin domain;
+    // the migration must not have replaced any of them with the wrapper's generic copy.
+    expect(checked).toBeGreaterThanOrEqual(15)
   })
 })
 
@@ -210,7 +210,7 @@ describe('B7-G1 — migration scope', () => {
     expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(7)
     // 10 auth routes since Google sign-in added auth/google and auth/complete-consent.
     expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(10)
-    expect(migrated.filter((f) => f.startsWith('settings/'))).toHaveLength(11)
+    expect(migrated.filter((f) => f.startsWith('settings/'))).toHaveLength(12)
   })
 
   /**

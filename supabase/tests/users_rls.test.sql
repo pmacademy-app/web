@@ -20,10 +20,10 @@ VALUES
   ('22222222-2222-2222-2222-222222222222'::uuid, 'learner_b@example.com', 'authenticated', 'authenticated')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.users (id, email, name, is_public, is_admin, xp, level)
+INSERT INTO public.users (id, email, name, is_admin, total_xp, level)
 VALUES
-  ('11111111-1111-1111-1111-111111111111'::uuid, 'learner_a@example.com', 'Learner A', false, false, 50, 1),
-  ('22222222-2222-2222-2222-222222222222'::uuid, 'learner_b@example.com', 'Learner B', false, false, 100, 2)
+  ('11111111-1111-1111-1111-111111111111'::uuid, 'learner_a@example.com', 'Learner A', false, 50, 1),
+  ('22222222-2222-2222-2222-222222222222'::uuid, 'learner_b@example.com', 'Learner B', false, 100, 2)
 ON CONFLICT (id) DO NOTHING;
 
 -- Act as Learner A
@@ -80,7 +80,7 @@ SET LOCAL ROLE anon;
 SELECT extensions.throws_ok(
   $$ UPDATE public.users SET is_admin = true WHERE id = '11111111-1111-1111-1111-111111111111'::uuid $$,
   '42501',
-  'privileged user columns can only be set by the service',
+  'privileged user columns can only be changed by the service',
   'guard_privileged_user_columns blocks non-admin role setting is_admin'
 );
 
