@@ -73,8 +73,12 @@ RESET ROLE;
 SELECT set_config('request.jwt.claims', '', true);
 
 -- 6. Trigger guard_privileged_user_columns blocks setting is_admin by unauthorized roles
--- Grant UPDATE and a temporary test policy to anon in this transaction to verify trigger execution
-GRANT UPDATE ON public.users TO anon;
+-- Grant UPDATE and SELECT with temporary test policies to anon so the row is visible
+-- under RLS and the trigger actually fires. Without a SELECT policy the WHERE clause
+-- matches nothing (auth.uid() is NULL for anon), the update touches 0 rows, and no
+-- exception is raised.
+GRANT SELECT, UPDATE ON public.users TO anon;
+CREATE POLICY test_anon_select ON public.users FOR SELECT TO anon USING (true);
 CREATE POLICY test_anon_update ON public.users FOR UPDATE TO anon USING (true) WITH CHECK (true);
 SET LOCAL ROLE anon;
 
@@ -87,7 +91,8 @@ SELECT extensions.throws_ok(
 
 RESET ROLE;
 DROP POLICY IF EXISTS test_anon_update ON public.users;
-REVOKE UPDATE ON public.users FROM anon;
+DROP POLICY IF EXISTS test_anon_select ON public.users;
+REVOKE SELECT, UPDATE ON public.users FROM anon;
 
 SELECT * FROM extensions.finish();
 
