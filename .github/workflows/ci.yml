@@ -132,6 +132,7 @@ jobs:
         with:
           name: next-build
           path: apps/web/.next
+          include-hidden-files: true
           retention-days: 1
 
   # Critical-path E2E (B14-C). A separate job from build-and-validate for two reasons.
