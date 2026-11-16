@@ -234,7 +234,7 @@ jobs:
       # Download prebuilt Next.js artifact from build-and-validate to eliminate redundant build
       - name: Download Next.js build artifact
         if: steps.decide.outputs.run == 'true' && env.PLAYWRIGHT_TEST_BASE_URL == ''
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: next-build
           path: apps/web/.next
