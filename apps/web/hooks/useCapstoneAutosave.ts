@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { apiPost } from '@/lib/api/client'
 
 export type AutosaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -122,15 +123,14 @@ export function useCapstoneAutosave({
         options.keepalive === true && new TextEncoder().encode(body).length <= KEEPALIVE_BODY_LIMIT_BYTES
 
       try {
-        const res = await fetch(`/api/capstones/${moduleSlug}/draft`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body,
-          keepalive,
-        })
+        const res = await apiPost<{ success?: boolean }>(
+          `/api/capstones/${moduleSlug}/draft`,
+          { content: textToSave },
+          { keepalive }
+        )
 
         if (!res.ok) {
-          throw new Error(`Server status ${res.status}`)
+          throw new Error(`Server status ${res.error.status}`)
         }
 
         // A newer save (or newer typing) supersedes this response: do not let it mark the

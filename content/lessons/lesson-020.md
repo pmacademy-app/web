@@ -1,3 +1,9 @@
+---
+seoTitle: "Continuous Product Discovery: Habits for Product Teams"
+seoDescription: "Establish a continuous discovery cadence in your product team. Connect weekly customer touchpoints to rapid prototyping and assumption testing habits."
+inShort: "The product discovery process is a repeatable, continuous operational rhythm where teams conduct weekly customer research, map candidate opportunities, and run rapid assumption tests. Rather than treating discovery as a one-off phase before engineering, continuous discovery ensures product decisions remain grounded in current customer evidence, dramatically reducing the risk of building features that fail in the market."
+---
+
 # Lesson 20: Product Discovery Process
 
 ## Why This Lesson Matters

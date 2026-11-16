@@ -6,6 +6,8 @@ import { X, Bell, RefreshCw, Layers, Settings } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
+import { apiGet, apiPatch } from '@/lib/api/client'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 interface NotificationCenterDrawerProps {
   isOpen: boolean
@@ -63,10 +65,9 @@ export function NotificationCenterDrawer({
     const ids = unreadItems.map((i) => i.id)
 
     try {
-      const res = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'mark_read', notificationIds: ids }),
+      const res = await apiPatch<{ success?: boolean }>('/api/notifications', {
+        action: 'mark_read',
+        notificationIds: ids,
       })
       if (!res.ok) {
         console.warn('[NotificationCenterDrawer] Non-fatal: failed to persist batch read state in DB')
@@ -81,11 +82,20 @@ export function NotificationCenterDrawer({
     if (isOpen) {
       const load = async () => {
         try {
-          const res = await fetch('/api/notifications')
-          const data = await res.json()
+          const res = await apiGet<{
+            success?: boolean
+            items?: NotificationItem[]
+            grouped?: {
+              today: NotificationItem[]
+              yesterday: NotificationItem[]
+              thisWeek: NotificationItem[]
+              earlier: NotificationItem[]
+            }
+          }>('/api/notifications')
           if (!mounted) return
 
-          if (data.success) {
+          if (res.ok && res.data.success) {
+            const data = res.data
             const rawItems: NotificationItem[] = data.items || []
             const unreadItems = rawItems.filter((i) => !i.isRead)
 
@@ -113,7 +123,10 @@ export function NotificationCenterDrawer({
               void markDisplayedAsRead(unreadItems)
             }
           } else {
-            setError(data.error || 'Failed to fetch notifications.')
+            const errorMsg = res.ok
+              ? 'Failed to fetch notifications.'
+              : res.error.message || 'Failed to fetch notifications.'
+            setError(errorMsg)
           }
         } catch (err) {
           console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
@@ -133,9 +146,19 @@ export function NotificationCenterDrawer({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/notifications')
-      const data = await res.json()
-      if (data.success) {
+      const res = await apiGet<{
+        success?: boolean
+        error?: string
+        items?: NotificationItem[]
+        grouped?: {
+          today: NotificationItem[]
+          yesterday: NotificationItem[]
+          thisWeek: NotificationItem[]
+          earlier: NotificationItem[]
+        }
+      }>('/api/notifications')
+      if (res.ok && res.data.success) {
+        const data = res.data
         const rawItems: NotificationItem[] = data.items || []
         const unreadItems = rawItems.filter((i) => !i.isRead)
 
@@ -160,7 +183,10 @@ export function NotificationCenterDrawer({
           void markDisplayedAsRead(unreadItems)
         }
       } else {
-        setError(data.error || 'Failed to fetch notifications.')
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to fetch notifications.'
+          : res.error.message || 'Failed to fetch notifications.'
+        setError(errorMsg)
       }
     } catch (err) {
       console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
@@ -198,10 +224,9 @@ export function NotificationCenterDrawer({
 
     // 2. Persist read state in DB with rollback on failure
     try {
-      const res = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'mark_read', notificationId: id }),
+      const res = await apiPatch<{ success?: boolean }>('/api/notifications', {
+        action: 'mark_read',
+        notificationId: id,
       })
       if (!res.ok) {
         console.warn('[NotificationCenterDrawer] Server failed to persist read state, resyncing')
@@ -214,27 +239,26 @@ export function NotificationCenterDrawer({
   if (!isOpen) return null
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Notifications"
-      className="fixed top-16 left-4 right-4 max-w-[calc(100vw-32px)] max-h-[calc(100dvh-4rem-5.5rem-env(safe-area-inset-bottom))] sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2.5 sm:w-96 sm:max-w-sm lg:max-h-[85vh] z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col focus:outline-none overflow-hidden animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none"
-    >
-      {/* Clean Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-            <Bell className="w-4 h-4" />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        className="w-[calc(100vw-32px)] sm:w-96 max-h-[85vh] bg-background border border-border rounded-2xl shadow-2xl flex flex-col p-0 gap-0 overflow-hidden"
+      >
+        {/* Clean Header */}
+        <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+              <Bell className="w-4 h-4" />
+            </div>
+            <div>
+              <DialogTitle className="text-sm font-bold text-foreground">Notifications</DialogTitle>
+              <DialogDescription className="text-[11px] text-muted-foreground">
+                {unreadCount > 0
+                  ? `${unreadCount} unread update${unreadCount === 1 ? '' : 's'}`
+                  : 'All caught up'}
+              </DialogDescription>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-bold text-foreground">Notifications</h3>
-            <p className="text-[11px] text-muted-foreground">
-              {unreadCount > 0
-                ? `${unreadCount} unread update${unreadCount === 1 ? '' : 's'}`
-                : 'All caught up'}
-            </p>
-          </div>
-        </div>
 
         <div className="flex items-center gap-1 shrink-0 -mr-1.5 -my-1.5 sm:m-0">
           <Link
@@ -386,6 +410,7 @@ export function NotificationCenterDrawer({
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
-    </div>
+    </DialogContent>
+  </Dialog>
   )
 }

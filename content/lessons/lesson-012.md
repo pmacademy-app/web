@@ -1,3 +1,9 @@
+---
+seoTitle: "Customer Interviews: How to Ask Non-Leading Questions"
+seoDescription: "Master the art of customer interviews. Learn to investigate past behaviors, uncover switch forces, and avoid misleading hypothetical answers."
+inShort: "Customer interviews are structured conversations focused on understanding genuine user behavior and past experiences rather than opinions or hypothetical promises. By examining concrete actions, emotional triggers, and historical purchasing moments through switch interview techniques, product managers uncover authentic motivations while avoiding the false positives that leading questions and future-oriented speculation inevitably produce."
+---
+
 # Lesson 12: Customer Interviews
 
 ## Why This Lesson Matters

@@ -7,6 +7,7 @@
  */
 
 import type { AuthErrorCode, ClassifiedAuthError } from './errors'
+import { apiPost } from '@/lib/api/client'
 
 export type AuthTelemetryAction =
   | 'login'
@@ -77,17 +78,12 @@ export function recordAuthTelemetry(
       }
     }
 
-    // 2. Fallback to fetch with keepalive: true
-    if (typeof fetch === 'function') {
-      fetch('/api/auth/telemetry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: jsonString,
-        keepalive: true,
-      }).catch(() => {
-        // Telemetry failure is completely silent and non-fatal
-      })
-    }
+    // 2. Fallback to typed API client with keepalive: true
+    void apiPost('/api/auth/telemetry', JSON.parse(jsonString), {
+      keepalive: true,
+    }).catch(() => {
+      // Telemetry failure is completely silent and non-fatal
+    })
   } catch {
     // Top-level catch ensures telemetry can NEVER cause an auth failure
   }

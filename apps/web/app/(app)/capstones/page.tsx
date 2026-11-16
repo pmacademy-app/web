@@ -45,12 +45,12 @@ export default async function CapstonesOverviewPage() {
 
           {/* Quick Metrics */}
           <div className="flex items-center gap-3 bg-card border border-border p-3 rounded-xl shadow-xs self-start md:self-auto">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-bold">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-success text-xs font-bold">
               <CheckCircle className="w-4 h-4" />
               <span>{submittedCount} / {totalCount} Submitted</span>
             </div>
             {draftCount > 0 && (
-              <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold">
+              <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-warning text-xs font-bold">
                 {draftCount} Drafts in Progress
               </div>
             )}

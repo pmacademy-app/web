@@ -27,7 +27,12 @@ import { derivePortfolioState } from '@/lib/dashboard/proof-card'
 import { loadProofExtras } from '@/lib/dashboard/proof-extras-db'
 import { ProofExtrasSkeleton } from '@/components/dashboard/ProofExtrasRow'
 import { ProofExtrasSlot } from './ProofExtrasSlot'
-import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
+import {
+  resolvePersonalizedPath,
+  resolveNextRecommendedMilestone,
+  resolveStartLearningTarget,
+} from '@/lib/personalization/path-resolver'
+import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
 import { LeaderboardWidgetSlot } from './LeaderboardWidgetSlot'
@@ -156,9 +161,41 @@ export default async function DashboardPage() {
   // A failed or empty certificate lookup reads as "not earned yet".
   const hasCertificate = hasFullCurriculumCertificate(certificateResult)
 
-  // 3. Determine Next Lesson CTA
+  // 3. Resolve Goal-Driven Personalization & Next Lesson CTA
+  // Uses the identical resolver onboarding uses (resolveStartLearningTarget)
+  const personalizedPath = resolvePersonalizedPath(profile)
+  const recommendedMilestone = resolveNextRecommendedMilestone(
+    personalizedPath,
+    completedLessonIds,
+    curriculumLessons
+  )
+
+  const accessContext = {
+    completedIds: completedLessonIds,
+    treatment: isModuleEntryUnlockTreatment({
+      id: authUser.id,
+      createdAt: profile.created_at ?? null,
+    }),
+  }
+  const startLearningTarget = resolveStartLearningTarget(
+    personalizedPath,
+    curriculumLessons,
+    accessContext
+  )
+
   let nextLesson: NextLessonData | null = null
-  if (curriculumLessons.length > 0) {
+  if (startLearningTarget) {
+    const activeNext = startLearningTarget.lesson
+    const position = getLessonPosition(activeNext, curriculum)
+    nextLesson = {
+      id: activeNext.id,
+      positionLabel: position.label,
+      title: activeNext.title,
+      module: activeNext.module,
+      moduleTitle: position.moduleTitle,
+      estimatedTime: `${activeNext.estimatedReadingTime} min`,
+    }
+  } else if (curriculumLessons.length > 0) {
     const activeNextIndex = curriculumLessons.findIndex((l) => !completedLessonIds.has(l.id))
     if (activeNextIndex !== -1) {
       const activeNext = curriculumLessons[activeNextIndex]
@@ -257,16 +294,10 @@ export default async function DashboardPage() {
     }
   })
 
-  // 6. Resolve Goal-Driven Personalization (Phase 3)
-  const personalizedPath = resolvePersonalizedPath(profile)
-  const recommendedMilestone = resolveNextRecommendedMilestone(
-    personalizedPath,
-    completedLessonIds,
-    curriculumLessons
-  )
-
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      <h1 className="sr-only">Dashboard</h1>
+
       {/* 0. Personalized Goal Header (Phase 3) */}
       <PersonalizedGoalBanner
         path={personalizedPath}

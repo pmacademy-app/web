@@ -110,7 +110,7 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
       expect(res.status).toBe(401)
     })
 
-    it('accepts valid Bearer token authorization header', async () => {
+    it('rejects Bearer token authorization header (SEC-16)', async () => {
       const secret = 'valid_bearer_secret'
       process.env.SEND_EMAIL_HOOK_SECRET = secret
 
@@ -123,7 +123,7 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
       })
 
       const res = await POST(req)
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(401)
     })
 
     it('accepts valid Svix / Supabase v1,whsec_... HMAC-SHA256 signature', async () => {
@@ -137,7 +137,7 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
       }
       const rawBody = JSON.stringify(payloadObj)
       const msgId = 'msg_svix_999'
-      const msgTimestamp = '1720000000'
+      const msgTimestamp = Math.floor(Date.now() / 1000).toString()
       const payloadToSign = `${msgId}.${msgTimestamp}.${rawBody}`
       const keyBytes = Buffer.from('test svix secret bytes', 'utf-8')
       const computedSig = crypto.createHmac('sha256', keyBytes).update(payloadToSign).digest('base64')

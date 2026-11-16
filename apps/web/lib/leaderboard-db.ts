@@ -14,6 +14,7 @@ import { calculateWeekStart, calculateRankings, type LeaderboardEntry, type RawL
 import * as db from '@/lib/db/leaderboard'
 import type { LeaderboardUserRow } from '@/lib/db/leaderboard'
 import { PublicError } from '@/lib/errors/public-error'
+import { log } from '@/lib/monitoring/log'
 
 export interface WeeklyLeaderboardPayload {
   weekStart: string
@@ -184,15 +185,96 @@ function getOrBuildWeeklyRawMetrics(
   return rebuild
 }
 
+interface RpcLeaderboardRow {
+  user_id: string
+  username: string | null
+  name: string | null
+  avatar_url: string | null
+  level: number
+  total_xp: number
+  current_streak: number
+  days_studied: number
+  lessons_completed: number
+  xp_earned: number
+  rank: number
+}
+
 /** Runs the four weekly aggregation queries and caches the result when it is complete. */
 async function buildWeeklyRawMetrics(
   supabase: SupabaseClient<Database>,
   weekStart: string
 ): Promise<LeaderboardCacheEntry> {
   const now = Date.now()
-  // Tracks whether any of the four aggregation queries failed. A partial board is
-  // still returned, but it must not be cached as if it were complete — see the
-  // cache write at the end of this function.
+  const weekStartDate = new Date(weekStart)
+  const weekStartIso = weekStartDate.toISOString()
+
+  // Attempt SQL RPC aggregation first (ENG-08, AG-31)
+  try {
+    const { data, error: rpcError } = await supabase.rpc('get_weekly_leaderboard', {
+      p_week_start: weekStartIso,
+      p_limit: 1000,
+      p_offset: 0,
+    })
+
+    const rpcRows = data as unknown as RpcLeaderboardRow[] | null
+    if (!rpcError && Array.isArray(rpcRows) && rpcRows.length > 0) {
+      log.info('leaderboard.weekly_rpc_path_used', {
+        weekStart,
+        rowCount: rpcRows.length,
+      })
+
+      const rawMetrics: RawLeaderboardUserMetric[] = rpcRows.map((row) => {
+        const levelInfo = calculateLevel(row.total_xp || 0)
+        return {
+          userId: row.user_id,
+          username: row.username ?? null,
+          name: row.name ?? null,
+          avatarUrl: row.avatar_url ?? null,
+          levelTitle: levelInfo.title,
+          level: row.level ?? levelInfo.level,
+          daysStudied: row.days_studied ?? 0,
+          lessonsCompleted: row.lessons_completed ?? 0,
+          xpEarned: row.xp_earned ?? 0,
+          currentStreak: row.current_streak ?? 0,
+          totalXp: row.total_xp ?? 0,
+        }
+      })
+
+      const userList: LeaderboardUserRow[] = rpcRows.map((row) => ({
+        id: row.user_id,
+        username: row.username,
+        name: row.name,
+        avatar_url: row.avatar_url,
+        total_xp: row.total_xp,
+        current_streak: row.current_streak,
+        level: row.level,
+      }))
+
+      const built: LeaderboardCacheEntry = {
+        timestamp: now,
+        users: userList,
+        optedOutUserIds: new Set<string>(),
+        rawMetrics,
+        degraded: false,
+      }
+
+      LEADERBOARD_CACHE.set(weekStart, built)
+      return built
+    } else if (rpcError) {
+      log.info('leaderboard.weekly_js_fallback_used', {
+        weekStart,
+        reason: rpcError.message,
+      })
+    }
+  } catch (rpcErr: unknown) {
+    const message = rpcErr instanceof Error ? rpcErr.message : String(rpcErr)
+    log.info('leaderboard.weekly_js_fallback_used', {
+      weekStart,
+      reason: message || 'RPC threw',
+    })
+  }
+
+  // Fallback JavaScript aggregation path
   let aggregationDegraded = false
 
   // 1. Fetch users with total_xp > 0.
@@ -233,7 +315,6 @@ async function buildWeeklyRawMetrics(
   const optedOutUserIds = new Set<string>(optedOutRows.map((r) => r.user_id))
 
   // 3. Fetch lesson progress in current week for consistency metric
-  const weekStartDate = new Date(weekStart)
   //
   // The `.in('user_id', <every qualifying id>)` filter this used to carry put the
   // entire user roster into a query string, which fails on URL length as the user

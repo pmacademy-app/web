@@ -1,3 +1,9 @@
+---
+seoTitle: "Value Proposition: How to Craft Compelling Product Value"
+seoDescription: "Craft clear, differentiated value propositions that resonate with target customers. Align target audience needs, core benefits, and market alternatives."
+inShort: "A value proposition is a concise statement explaining how a product solves customer problems, delivers specific benefits, and clearly differentiates from available alternatives. Effective value propositions focus on outcomes rather than features, explicitly identify target customer segments, and address both buyer and end-user requirements when those audiences diverge across enterprise workflows."
+---
+
 # Lesson 7: Value Proposition
 
 ## Why This Lesson Matters

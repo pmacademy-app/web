@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-The Curriculum Workspace allows administrators to inspect the full 9-module, 90-lesson PM Academy curriculum, monitor real-time learner content quality scores (clarity ratings and issue tags), inspect feedback comments, and view live student-facing lesson previews.
+The Curriculum Workspace allows administrators to inspect the full 9-module, 90-lesson Prodily curriculum, monitor real-time learner content quality scores (clarity ratings and issue tags), inspect feedback comments, and view live student-facing lesson previews.
 
 ---
 

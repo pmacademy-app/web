@@ -20,13 +20,14 @@ import {
   aggregateSignupCeiling,
 } from '@/lib/auth/signup-limits'
 import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
+import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE } from '@/lib/auth/password-policy'
 
 export const runtime = 'nodejs'
 
 const signupSchema = z.object({
   name: z.string().min(1, 'Full name is required.').min(2, 'Name must be at least 2 characters.').max(80).trim(),
   email: z.string().min(1, 'Email is required.').email('Please enter a valid email address.').trim().toLowerCase(),
-  password: z.string().min(6, 'Password must be at least 6 characters.'),
+  password: z.string().min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
   refCode: z.string().optional().nullable(),
   turnstileToken: z.string().min(1, 'Security verification is required.'),
   // Both are required and must be literally `true`. A missing or false value is a

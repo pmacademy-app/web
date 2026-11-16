@@ -22,7 +22,7 @@ describe('resolveApiAuthError — stable codes win over message re-derivation', 
 
   it('keeps the specific weak-password code even though the copy alone is ambiguous', () => {
     const resolved = resolveApiAuthError(
-      { error: 'Password does not meet security requirements. Please choose a password with at least 6 characters.', code: 'AUTH_PASSWORD_TOO_WEAK' },
+      { error: 'Password does not meet security requirements. Please choose a password with at least 10 characters.', code: 'AUTH_PASSWORD_TOO_WEAK' },
       'signup'
     )
     expect(resolved.code).toBe('AUTH_PASSWORD_TOO_WEAK')

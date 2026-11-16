@@ -1,3 +1,9 @@
+---
+seoTitle: "Customer Pain Points: Identifying Severity and Frequency"
+seoDescription: "Analyze customer pain points systematically using severity and frequency. Distinguish surface complaints from expensive, high-priority user problems."
+inShort: "A customer pain point is a specific, recurring obstacle or friction that prevents a user from achieving their desired outcome efficiently. Product managers evaluate pain points across severity, frequency, and emotional intensity to distinguish minor inconveniences from acute, high-impact problems that customers are actively seeking, and willing to pay, to resolve."
+---
+
 # Lesson 16: Pain Points
 
 ## Why This Lesson Matters

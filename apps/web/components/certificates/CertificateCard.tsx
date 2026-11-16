@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Image from 'next/image'
 import { ShieldCheck, Award, AlertCircle, CheckCircle2 } from 'lucide-react'
@@ -76,11 +74,11 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
 
         <div className="sm:text-right space-y-1.5 shrink-0">
           {isTest ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/40 text-[11px] font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-700 border border-amber-500/40 text-[11px] font-semibold">
               <AlertCircle className="w-3.5 h-3.5" /> {statusLabel}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-success border border-emerald-500/20 text-[11px] font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" /> {statusLabel}
             </span>
           )}
@@ -170,11 +168,11 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
               QR Verification
             </span>
             {isTest ? (
-              <div className="flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+              <div className="flex items-center gap-1 text-[11px] font-bold text-amber-700">
                 <AlertCircle className="w-3.5 h-3.5" /> Test only
               </div>
             ) : (
-              <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="flex items-center gap-1 text-[11px] font-bold text-success">
                 <ShieldCheck className="w-3.5 h-3.5" /> Scan to Verify
               </div>
             )}

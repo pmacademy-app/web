@@ -87,6 +87,8 @@ export const metadata: Metadata = {
     title: BRAND.metadata.homeTitle,
     description: BRAND.metadata.shortDescription,
     images: [BRAND.assets.ogImage],
+    site: '@prodily_pm',
+    creator: '@prodily_pm',
   },
 
   robots: {

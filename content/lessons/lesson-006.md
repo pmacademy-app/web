@@ -1,3 +1,9 @@
+---
+seoTitle: "Jobs to Be Done Framework: Understand Customer Motivation"
+seoDescription: "Apply the Jobs to Be Done (JTBD) framework to uncover core user motivations. Analyze functional, emotional, and social jobs to build better products."
+inShort: "The Jobs to Be Done framework posits that customers do not simply buy products; they hire them to make progress in specific circumstances. By decomposing customer needs into functional, emotional, and social dimensions, product managers identify true competitors and uncover actionable opportunities that traditional demographic segmentation and surface feature requests routinely obscure."
+---
+
 # Lesson 6: Jobs To Be Done
 
 ## Why This Lesson Matters

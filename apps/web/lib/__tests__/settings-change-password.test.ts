@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '../../app/api/settings/security/route'
 import * as authLib from '../auth'
 import * as supabaseLib from '../supabase'
+import { SupabaseFake } from './helpers/supabase-fake'
 
 const { mockEvaluatePersistentRateLimit } = vi.hoisted(() => ({
   mockEvaluatePersistentRateLimit: vi.fn(),
@@ -45,16 +46,14 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     vi.mocked(authLib.getAuthenticatedUserFromRequest).mockResolvedValue(
       mockUser as unknown as import('@supabase/supabase-js').User
     )
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue({
-      auth: {
-        signInWithPassword: mockSignInWithPassword,
-        admin: {
-          updateUserById: mockUpdateUserById,
-          signOut: mockAdminSignOut,
-          getUserById: mockGetUserById,
-        },
-      },
-    } as unknown as ReturnType<typeof supabaseLib.createServiceRoleClient>)
+    const fake = new SupabaseFake()
+    fake.auth.signInWithPassword = mockSignInWithPassword
+    fake.auth.admin.updateUserById = mockUpdateUserById
+    fake.auth.admin.signOut = mockAdminSignOut
+    fake.auth.admin.getUserById = mockGetUserById
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(
+      fake as unknown as ReturnType<typeof supabaseLib.createServiceRoleClient>
+    )
   })
 
   it('0. Rejects non-JSON Content-Type with 415', async () => {
@@ -93,7 +92,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(json.code).toBe('UNAUTHORIZED')
   })
 
-  it('2. Rejects short new password (< 6 chars) with 400', async () => {
+  it('2. Rejects short new password (< 10 chars) with 400', async () => {
     const req = new Request('https://prodily.app/api/settings/security', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -108,7 +107,7 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.success).toBe(false)
-    expect(json.error).toContain('at least 6 characters')
+    expect(json.error).toContain('at least 10 characters')
   })
 
   it('3. Rejects mismatched new passwords with 400', async () => {

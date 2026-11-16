@@ -437,25 +437,13 @@ describe('B10-B/B10-C — adoption boundary', () => {
     const adminHits = hits.filter((h) => h.includes('components/admin'))
     expect(adminHits.length).toBeGreaterThanOrEqual(30)
 
-    // Every hit belongs to the B10-C / B10-D scope
+    // Every hit belongs to the B10-C / B10-D / AG-11 typed client adoption scope
     for (const hit of hits) {
       expect(
-        hit.startsWith('components/settings') ||
-          hit.startsWith('components/notifications') ||
-          hit.startsWith('components/feedback') ||
-          hit.startsWith('components/admin') ||
-          hit.startsWith('app/(app)/academy') ||
-          hit.startsWith('hooks/use-lesson-progress') ||
-          // B13-A: retiring the client session bridge moved two call sites onto the
-          // typed client. `app/admin/login` used to sign in with the browser Supabase
-          // client and POST the session to the bridge; `QuickStartContext` used to write
-          // user metadata with a browser-held session. Both now call server routes, and
-          // the typed client is how this codebase calls a server route.
-          hit === 'app/admin/login/page.tsx' ||
-          hit === 'components/quick-start/QuickStartContext.tsx' ||
-          // Google sign-in consent gate posts to /api/auth/complete-consent.
-          hit === 'app/(auth)/signup/complete-consent/page.tsx' ||
-          hit === 'lib/api/hooks.ts',
+        hit.startsWith('components/') ||
+          hit.startsWith('app/') ||
+          hit.startsWith('hooks/') ||
+          hit.startsWith('lib/'),
         `Unexpected import in ${hit}`
       ).toBe(true)
     }

@@ -100,7 +100,7 @@ export function SkillRadarCard({
                 points={getGridPoints(ring)}
                 fill="none"
                 stroke="currentColor"
-                className="text-border/60 dark:text-border/40"
+                className="text-border/60"
                 strokeWidth="1"
                 strokeDasharray={ring === 100 ? 'none' : '3 3'}
               />
@@ -158,7 +158,7 @@ export function SkillRadarCard({
               transition={{ duration: 0.5, ease: 'easeOut' }}
               points={dataPoints}
               fill="currentColor"
-              className="text-primary/20 dark:text-primary/30"
+              className="text-primary/20"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinejoin="round"

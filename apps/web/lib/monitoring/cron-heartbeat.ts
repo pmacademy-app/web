@@ -17,7 +17,8 @@
  *
  * This checker runs inside process-email-queue, so it cannot report its own scheduler dying.
  * The held dead-man job (supabase/migrations/pending-approval/20261030000001_cron_heartbeat_deadman.sql)
- * reads the same heartbeat rows from inside the database and covers that case.
+ * reads the same heartbeat rows from inside the database and covers that case. It repeats the
+ * scheduled intervals below; eng01-deadman-sql-drift.test.ts fails if the two drift apart.
  *
  * Nothing here throws: a heartbeat or alert failure must never fail the cron run itself.
  */
@@ -48,7 +49,7 @@ export interface CronJobDefinition {
  * (supabase/migrations/pending-approval/20261024000003_schedule_cron_jobs_pg_cron.sql) and the
  * GitHub Actions fallback (.github/workflows/notification-scheduler.yml). The dead-man check
  * (pending-approval/20261030000001_cron_heartbeat_deadman.sql) repeats the scheduled intervals;
- * eng01-cron-heartbeat.test.ts fails if the two drift apart.
+ * eng01-deadman-sql-drift.test.ts fails if the two drift apart.
  */
 export const CRON_JOB_DEFINITIONS: readonly CronJobDefinition[] = [
   { job: 'process-email-queue', name: 'Process Email Queue', path: '/api/cron/process-email-queue', intervalMinutes: 5 },

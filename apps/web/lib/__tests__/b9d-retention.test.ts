@@ -42,7 +42,6 @@ describe('B9-D — the windows come from L-11', () => {
     'system_errors.operational': 90,
     'system_errors.security': 180,
     notification_events: 30,
-    user_notification_timeline: 30,
     rate_limits: 30,
   }
 

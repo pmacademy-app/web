@@ -28,7 +28,7 @@
 -- 3. Schedules six jobs. The cadence and method match CRON_JOB_DEFINITIONS in
 --    apps/web/lib/monitoring/cron-heartbeat.ts and .github/workflows/notification-scheduler.yml:
 --      prodily-process-email-queue   */5 * * * *   POST /api/cron/process-email-queue
---      prodily-process-broadcasts    */5 * * * *   GET  /api/cron/process-broadcasts
+--      prodily-process-broadcasts    */5 * * * *   POST /api/cron/process-broadcasts
 --      prodily-daily-reminder        30 * * * *    POST /api/cron/daily-reminder
 --      prodily-weekly-recap          30 * * * *    POST /api/cron/weekly-recap
 --      prodily-lifecycle             30 * * * *    POST /api/cron/lifecycle
@@ -173,7 +173,7 @@ END
 $$;
 
 SELECT cron.schedule('prodily-process-email-queue', '*/5 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/process-email-queue', 'POST')$cmd$);
-SELECT cron.schedule('prodily-process-broadcasts', '*/5 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/process-broadcasts', 'GET')$cmd$);
+SELECT cron.schedule('prodily-process-broadcasts', '*/5 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/process-broadcasts', 'POST')$cmd$);
 SELECT cron.schedule('prodily-daily-reminder', '30 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/daily-reminder', 'POST')$cmd$);
 SELECT cron.schedule('prodily-weekly-recap', '30 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/weekly-recap', 'POST')$cmd$);
 SELECT cron.schedule('prodily-lifecycle', '30 * * * *', $cmd$SELECT private.invoke_cron_endpoint('/api/cron/lifecycle', 'POST')$cmd$);
@@ -194,7 +194,7 @@ BEGIN
   FOR v_expected IN
     SELECT * FROM (VALUES
       ('prodily-process-email-queue', '*/5 * * * *', '/api/cron/process-email-queue', 'POST'),
-      ('prodily-process-broadcasts',  '*/5 * * * *', '/api/cron/process-broadcasts',  'GET'),
+      ('prodily-process-broadcasts',  '*/5 * * * *', '/api/cron/process-broadcasts',  'POST'),
       ('prodily-daily-reminder',      '30 * * * *',  '/api/cron/daily-reminder',      'POST'),
       ('prodily-weekly-recap',        '30 * * * *',  '/api/cron/weekly-recap',        'POST'),
       ('prodily-lifecycle',           '30 * * * *',  '/api/cron/lifecycle',           'POST'),

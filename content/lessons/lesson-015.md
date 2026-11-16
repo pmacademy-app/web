@@ -1,3 +1,9 @@
+---
+seoTitle: "User Journey Mapping: Visualizing End-to-End Experience"
+seoDescription: "Map complete user journeys across stages, touchpoints, and emotions. Identify critical drop-off moments and workflow friction points with evidence."
+inShort: "A user journey map is a visual representation of the step-by-step experience a user undergoes to accomplish a specific goal with a product. By documenting stages, actions, emotional highs and lows, touchpoints, and friction points across the full timeline, product teams identify gaps between user expectations and system behavior."
+---
+
 # Lesson 15: User Journey Mapping
 
 ## Why This Lesson Matters

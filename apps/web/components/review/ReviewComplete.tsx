@@ -51,7 +51,7 @@ export function ReviewComplete({
           <span className="text-[11px] font-semibold text-muted-foreground uppercase">
             XP Earned
           </span>
-          <p className="text-xl font-extrabold font-mono text-amber-500 mt-0.5 flex items-center justify-center gap-1">
+          <p className="text-xl font-extrabold font-mono text-warning mt-0.5 flex items-center justify-center gap-1">
             <Zap className="w-4 h-4 fill-current" />
             +{totalXpEarned}
           </p>
@@ -61,7 +61,7 @@ export function ReviewComplete({
           <span className="text-[11px] font-semibold text-muted-foreground uppercase">
             Recall Rate
           </span>
-          <p className="text-xl font-extrabold font-mono text-emerald-500 mt-0.5">
+          <p className="text-xl font-extrabold font-mono text-success mt-0.5">
             {recallAccuracy}%
           </p>
         </div>

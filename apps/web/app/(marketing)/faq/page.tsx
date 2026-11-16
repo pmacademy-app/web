@@ -10,14 +10,14 @@ import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: { absolute: 'Product Management Academy FAQ | Prodily' },
+  title: 'Frequently Asked Questions',
   description:
     "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
   alternates: {
     canonical: `${siteUrl}/faq`,
   },
   openGraph: {
-    title: { absolute: 'Product Management Academy FAQ | Prodily' },
+    title: 'Frequently Asked Questions | Prodily',
     description:
       "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
     url: `${siteUrl}/faq`,
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: { absolute: 'Product Management Academy FAQ | Prodily' },
+    title: 'Frequently Asked Questions | Prodily',
     description: 'Frequently asked questions about the free 90-lesson Prodily curriculum.',
     images: [BRAND.assets.ogImage],
   },
@@ -79,6 +79,26 @@ export default function FAQPage() {
 
         {/* ── Searchable FAQ Explorer ──────────────────────────────────── */}
         <FAQExplorer />
+
+        {/* ── Server-rendered FAQ fallback for non-JS clients & crawlers ── */}
+        <noscript>
+          <div className="space-y-4 pt-4">
+            {FAQ_ITEMS.map((item) => (
+              <details
+                key={item.question}
+                open
+                className="rounded-2xl border border-border bg-surface p-5 text-foreground"
+              >
+                <summary className="font-semibold text-base cursor-pointer focus:outline-none">
+                  {item.question}
+                </summary>
+                <p className="mt-3 text-sm text-ink-muted leading-relaxed">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </noscript>
 
         {/* ── Still Have Questions & Contact Box ───────────────────────── */}
         <section className="rounded-2xl border border-border bg-surface p-8 sm:p-10 shadow-xs space-y-6">

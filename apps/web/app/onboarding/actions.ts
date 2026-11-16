@@ -12,6 +12,7 @@ import {
   academyLessonPath,
 } from '@/lib/personalization/path-resolver'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
+import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
 import { validateUsername } from '@/lib/portfolio'
 import { trackProductEvent } from '@/lib/events/product-events'
 
@@ -25,6 +26,8 @@ export interface OnboardingData {
   // They remain in the payload for backward compatibility with any client that still sends them.
   goal: string // Primary goal — REQUIRED (drives completion + the recommended starting module)
   career_role: string // Experience level / Role — REQUIRED
+  weekly_goal_lessons?: number | null
+  session_minutes?: number | null
   name?: string // Deferred: display name
   username?: string // Deferred: public portfolio handle
   avatar_url?: string | null // Deferred
@@ -291,7 +294,12 @@ export async function submitOnboarding(data: OnboardingData) {
     }
     if (name) updatePayload.name = name
     if (username) updatePayload.username = username
-    if (data.avatar_url?.trim()) updatePayload.avatar_url = data.avatar_url.trim()
+    if (data.avatar_url?.trim()) {
+      if (!isValidAvatarUrl(data.avatar_url)) {
+        return { success: false, error: "Avatar URL must be hosted on Prodily's secure avatar storage." }
+      }
+      updatePayload.avatar_url = data.avatar_url.trim()
+    }
     if (data.bio?.trim()) updatePayload.bio = data.bio.trim()
     if (compositeLearningPurpose) updatePayload.learning_purpose = compositeLearningPurpose
     if (Array.isArray(data.topics) && data.topics.length > 0) updatePayload.onboarding_topics = data.topics
@@ -299,6 +307,12 @@ export async function submitOnboarding(data: OnboardingData) {
     if (data.linkedin_url?.trim()) updatePayload.linkedin_url = data.linkedin_url.trim()
     if (data.github_url?.trim()) updatePayload.github_url = data.github_url.trim()
     if (websiteUrl) updatePayload.website_url = websiteUrl
+    if (typeof data.weekly_goal_lessons === 'number' && data.weekly_goal_lessons >= 1 && data.weekly_goal_lessons <= 7) {
+      updatePayload.weekly_goal_lessons = data.weekly_goal_lessons
+    }
+    if (typeof data.session_minutes === 'number' && [10, 15, 20, 30, 45, 60].includes(data.session_minutes)) {
+      updatePayload.session_minutes = data.session_minutes
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: dbError } = await (dbSupabase.from('users') as any).update(updatePayload).eq('id', userId)
@@ -311,10 +325,13 @@ export async function submitOnboarding(data: OnboardingData) {
       return { error: 'Failed to save profile information. Please try again.' }
     }
 
-    // 2. Update auth metadata so middleware and the JWT reflect onboarding_complete and the
-    //    chosen path. Only the required fields are always written; deferred identity fields are
-    //    included only when supplied, mirroring the DB update above.
+    // 2. Update auth metadata so middleware and the JWT reflect onboarding_complete in app_metadata
+    //    and the chosen path in user_metadata. Only the required fields are always written; deferred
+    //    identity fields are included only when supplied, mirroring the DB update above.
     const { error: metaError } = await dbSupabase.auth.admin.updateUserById(userId, {
+      app_metadata: {
+        onboarding_complete: true,
+      },
       user_metadata: {
         ...(name ? { full_name: name } : {}),
         ...(username ? { username } : {}),

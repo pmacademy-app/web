@@ -1,7 +1,7 @@
-# Authentication Infrastructure & User State Sync — Prodily PM Academy
+# Authentication Infrastructure & User State Sync: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 (Turbopack) / Supabase Auth / PostgreSQL  
+**Framework:** Next.js 16.4.3 (Turbopack) / Supabase Auth / PostgreSQL  
 **Last Updated:** September 6, 2026  
 
 ---
@@ -94,6 +94,10 @@ Off unless `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` at build time. Security contro
 4. **Consent gate** (`app/(auth)/signup/complete-consent/page.tsx`). Same boxes as signup. "Agree and Continue" posts `{ decision: 'accept', next }` to `/api/auth/complete-consent`, which records consent and returns the redirect. "Cancel and delete my new account" asks for confirmation, then posts `decline`: a fresh unused Google-only account is deleted, otherwise the user is only signed out; both land on `/login?error=consent_declined`.
 5. **Errors** shown on `/login`: `oauth_cancelled`, `oauth_failed`, `oauth_rate_limited`, `oauth_unavailable`, `signups_closed`, `signup_limited`, `consent_declined`.
 6. **Settings.** `GET /api/settings/security/change-email` returns `hasPassword`. When it is `false`, Settings > Security shows "Managed by Google" on both cards and explains how to add a password with the reset email. The change-password and change-email routes answer 400 `PASSWORD_NOT_SET` for these accounts.
+
+### E. Trusted Claims and Onboarding Gate (SEC-21)
+
+Onboarding completion is recorded in `app_metadata.onboarding_complete` (written by the service role) and in `public.users.onboarding_completed`. The proxy and application layout evaluate access decisions using `app_metadata` and database columns (`onboarding_completed`, `goal`, `curriculum_access_override`). Client-writable `user_metadata` is never used for access authorization decisions.
 
 ---
 
@@ -277,3 +281,14 @@ See [ADR-006](decisions/ADR-006-api-error-response-contract.md).
 ## Auth Email Delivery Failures
 
 Delivery failures on `/api/auth/send-email-hook` and in `lib/email.ts` are recorded as structured incidents (`domain: auth` / `domain: email`) with the masked recipient, `email_action_type`, provider and status code. Until September 2026 this path emitted only `console.error`, so signup verification and password reset could fail with no admin-visible signal. See [`ERROR_MONITORING.md`](ERROR_MONITORING.md).
+
+---
+
+## Asymmetric JWT Signing Keys & Local Verification (ENG-03, ENG-04)
+
+With asymmetric signing keys (RS256/ES256), `supabase.auth.getClaims(jwt)` verifies JWTs locally using WebCrypto `crypto.subtle.verify` and cached JWKS keys, avoiding network round-trips to GoTrue. When symmetric signing keys (HS256) are used, `getClaims()` automatically falls back to `getUser()` over the network.
+
+The session proxy (`apps/web/proxy.ts`) and API auth resolver (`lib/auth.ts`) use `getClaims()` to verify identity and claims locally. Each layer verifies the token independently: headers asserting identity from clients or upstream are never trusted.
+
+The proxy matcher excludes public marketing pages (`/about`, `/contact`, `/faq`, `/frameworks`, `/glossary`, `/privacy`, `/reviews`, `/terms`, `/waitlist`) and static assets that do not need session verification.
+

@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Link from 'next/link'
 import { Award, Lock, CheckCircle, Clock, ChevronRight, Edit3 } from 'lucide-react'
@@ -31,19 +29,19 @@ export function CapstoneCard({ item }: CapstoneCardProps) {
       case 'submitted':
       case 'reviewed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-success border border-emerald-500/20">
             <CheckCircle className="w-3 h-3" /> Submitted
           </span>
         )
       case 'draft':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-warning border border-amber-500/20">
             <Edit3 className="w-3 h-3" /> Draft Saved
           </span>
         )
       case 'unlocked':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-info border border-blue-500/20">
             Ready to Start
           </span>
         )

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { calculateCapstoneWordCount } from '@/lib/capstones'
 import { marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify'
 import { cn } from '@/lib/utils'
 
 interface RichEditorProps {
@@ -43,10 +44,11 @@ export function RichEditor({
   const { wordCount, characterCount } = calculateCapstoneWordCount(value)
   const isWordCountMet = wordCount >= minWordCount
 
-  // Parse markdown to HTML for preview/read-only mode via useMemo (pure render computation)
+  // Parse markdown to HTML for preview/read-only mode via useMemo (pure render computation, sanitized via DOMPurify)
   const renderedHtml = useMemo(() => {
     try {
-      return marked.parse(value || '*No content written yet.*') as string
+      const parsed = marked.parse(value || '*No content written yet.*') as string
+      return DOMPurify.sanitize(parsed, { ALLOW_UNKNOWN_PROTOCOLS: false })
     } catch {
       return value || '*No content written yet.*'
     }
@@ -238,7 +240,7 @@ export function RichEditor({
         ) : (
           <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
             {isLocked ? (
-              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-mono text-[11px]">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-success font-mono text-[11px]">
                 LOCKED / SUBMITTED MODE
               </span>
             ) : (
@@ -271,7 +273,7 @@ export function RichEditor({
             <span
               className={cn(
                 'font-bold',
-                isWordCountMet ? 'text-emerald-500' : 'text-amber-500 font-semibold'
+                isWordCountMet ? 'text-success' : 'text-warning font-semibold'
               )}
             >
               {wordCount} / {minWordCount} words
@@ -284,7 +286,7 @@ export function RichEditor({
       {/* Editor Body */}
       {isPreview || isLocked ? (
         <div
-          className="p-6 min-h-[400px] prose dark:prose-invert max-w-none text-foreground leading-relaxed overflow-y-auto focus:outline-none"
+          className="p-6 min-h-[400px] prose max-w-none text-foreground leading-relaxed overflow-y-auto focus:outline-none"
           dangerouslySetInnerHTML={{ __html: renderedHtml }}
         />
       ) : (

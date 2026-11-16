@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="min-h-[70vh] pt-24 pb-16 lg:pt-28 lg:pb-20 flex flex-col items-center justify-center px-4 text-center">
-      <p className="text-body-sm text-locked font-medium mb-3">404</p>
+      <p className="text-body-sm text-ink-muted font-medium mb-3">404</p>
       <h1 className="text-h1 font-semibold text-foreground mb-3">
         This page is not in the curriculum.
       </h1>
-      <p className="text-body text-locked max-w-[480px] mb-8">
+      <p className="text-body text-ink-muted max-w-[480px] mb-8">
         The link may be outdated, or the page may have moved.
       </p>
       <Link

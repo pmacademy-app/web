@@ -28,6 +28,7 @@ import { useCapstoneAutosave } from '@/hooks/useCapstoneAutosave'
 import { RichEditor } from '@/components/capstones/RichEditor'
 import { CapstoneReflection } from '@/components/capstones/CapstoneReflection'
 import { SubmitConfirmationModal } from '@/components/capstones/SubmitConfirmationModal'
+import { apiGet, apiPost } from '@/lib/api/client'
 import {
   trackCapstoneSubmitted,
   trackPortfolioArtifactCreated,
@@ -50,6 +51,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [submitSuccessMsg, setSubmitSuccessMsg] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [reviewScores, setReviewScores] = useState<Record<string, number> | null>(null)
+  const [reviewFeedback, setReviewFeedback] = useState<string | null>(null)
+  const [isPublicSubmission, setIsPublicSubmission] = useState<boolean>(false)
+  const [isEditingResubmission, setIsEditingResubmission] = useState<boolean>(false)
   // XP the server actually awarded for this submission (from the submit response). Null when
   // the page was loaded after an earlier submission, so no figure is invented.
   const [awardedXp, setAwardedXp] = useState<number | null>(null)
@@ -78,9 +84,24 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch(`/api/capstones/${moduleSlug}`)
+        const res = await apiGet<{
+          userId?: string
+          status?: CapstoneStatus
+          submission?: {
+            content?: string
+            submitted_at?: string
+            review_scores?: Record<string, number> | null
+            review_feedback?: string | null
+            is_public?: boolean | null
+          }
+          reflection?: { content?: string; is_public?: boolean }
+          userProfile?: { username: string; isPortfolioPublic: boolean } | null
+          lessonsCompleted?: number
+          totalLessons?: number
+          requiredLessons?: number
+        }>(`/api/capstones/${moduleSlug}`)
         if (res.ok) {
-          const data = await res.json()
+          const data = res.data
           if (typeof data.userId === 'string' && data.userId) {
             setUserId(data.userId)
           }
@@ -88,6 +109,15 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             setServerInitialContent(data.submission.content || '')
             setSubmissionStatus(data.status || 'unlocked')
             setSubmittedAt(data.submission.submitted_at || null)
+            if (data.submission.review_scores) {
+              setReviewScores(data.submission.review_scores)
+            }
+            if (data.submission.review_feedback) {
+              setReviewFeedback(data.submission.review_feedback)
+            }
+            if (typeof data.submission.is_public === 'boolean') {
+              setIsPublicSubmission(data.submission.is_public)
+            }
           } else {
             setServerInitialContent(capstoneDef?.starterTemplate || '')
             setSubmissionStatus(data.status || 'locked')
@@ -114,7 +144,8 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
     }
   }, [moduleSlug, capstoneDef])
 
-  const isLocked = submissionStatus === 'submitted' || submissionStatus === 'reviewed'
+  const isLocked =
+    (submissionStatus === 'submitted' || submissionStatus === 'reviewed') && !isEditingResubmission
 
   // Debounced Autosave Hook
   const {
@@ -139,21 +170,23 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
       setIsSubmitting(true)
       await saveNow()
 
-      const res = await fetch(`/api/capstones/${moduleSlug}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          reflectionContent,
-          reflectionIsPublic,
-          isPublic,
-        }),
+      const res = await apiPost<{
+        submission?: { submitted_at?: string }
+        xpEarned?: number
+        message?: string
+        error?: string
+      }>(`/api/capstones/${moduleSlug}/submit`, {
+        content,
+        reflectionContent,
+        reflectionIsPublic,
+        isPublic,
       })
 
-      const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Submission failed.')
+        throw new Error(res.error.message || 'Submission failed.')
       }
+
+      const data = res.data
 
       // The draft is now a submission; drop the local backup so it cannot resurface.
       clearLocalDraft()
@@ -179,9 +212,11 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
       } catch (analyticsErr) {
         console.warn('Analytics tracking error:', analyticsErr)
       }
+      setIsEditingResubmission(false)
+      setSubmitError(null)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to submit capstone.'
-      alert(msg)
+      setSubmitError(msg)
     } finally {
       setIsSubmitting(false)
     }
@@ -349,26 +384,26 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
               {autosaveStatus === 'saving' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                  <span className="text-amber-500 font-semibold">Saving...</span>
+                  <span className="text-warning font-semibold">Saving...</span>
                 </>
               )}
               {autosaveStatus === 'saved' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-emerald-500 font-semibold">Draft Saved</span>
+                  <span className="text-success font-semibold">Draft Saved</span>
                 </>
               )}
               {autosaveStatus === 'error' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="text-red-500 font-semibold">Saved Locally</span>
+                  <span className="text-danger font-semibold">Saved Locally</span>
                 </>
               )}
             </div>
           )}
 
           {isLocked ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-success text-xs font-bold border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4" />
               <span>Submitted{formattedSubmittedDate ? ` on ${formattedSubmittedDate}` : ''}</span>
             </div>
@@ -385,12 +420,92 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* Submit Error Banner (replaces alert) */}
+      {submitError && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs font-medium text-destructive flex items-center justify-between gap-3">
+          <span>{submitError}</span>
+          <button
+            type="button"
+            onClick={() => setSubmitError(null)}
+            className="text-xs underline hover:no-underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Reviewer Feedback & Rubric Scores (AG-27) */}
+      {(reviewScores || reviewFeedback) && (
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+            <div>
+              <h2 className="text-base font-bold font-serif text-foreground flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary" /> Review & Rubric Evaluation
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isPublicSubmission
+                  ? 'Your capstone was approved and is published on your public portfolio.'
+                  : 'Review feedback and detailed rubric scores from the reviewer.'}
+              </p>
+            </div>
+            {!isPublicSubmission && !isEditingResubmission && (
+              <button
+                type="button"
+                onClick={() => setIsEditingResubmission(true)}
+                className="px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors cursor-pointer self-start sm:self-auto"
+              >
+                Edit and resubmit
+              </button>
+            )}
+          </div>
+
+          {reviewFeedback && (
+            <div className="p-4 rounded-xl bg-secondary/60 border border-border space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Reviewer Feedback</p>
+              <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{reviewFeedback}</p>
+            </div>
+          )}
+
+          {reviewScores && capstoneDef && capstoneDef.requirements.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Rubric Scores</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {capstoneDef.requirements.map((req) => {
+                  const score = reviewScores[req.id]
+                  const scoreLabel =
+                    score === 3
+                      ? 'Exemplary (3/3)'
+                      : score === 2
+                      ? 'Proficient (2/3)'
+                      : score === 1
+                      ? 'Developing (1/3)'
+                      : score === 0
+                      ? 'Missing (0/3)'
+                      : 'Not scored'
+                  return (
+                    <div key={req.id} className="p-3 rounded-lg border border-border bg-background space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-foreground text-xs">{req.label}</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                          {scoreLabel}
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground text-[11px] leading-tight">{req.description}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Post-Submission Portfolio Showcase Card (Phase 4 Direct-to-Portfolio) */}
       {isLocked && (
         <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-background p-6 md:p-7 shadow-xs space-y-4 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3.5">
-              <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-500 shrink-0">
+              <div className="p-3 rounded-xl bg-emerald-500/15 text-success shrink-0">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div className="space-y-0.5">
@@ -399,7 +514,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
                     Your capstone is now part of your portfolio!
                   </h2>
                   {awardedXp !== null && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-success border border-emerald-500/30">
                       +{awardedXp} XP Awarded
                     </span>
                   )}
@@ -456,7 +571,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
 
       {/* Success Notification Alert Banner (Temporary feedback if freshly submitted) */}
       {submitSuccessMsg && (
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between text-xs text-emerald-500 animate-in fade-in duration-300">
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between text-xs text-success animate-in fade-in duration-300">
           <div className="flex items-center gap-2.5 font-bold">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{submitSuccessMsg}</span>
@@ -556,7 +671,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             <span className="text-foreground flex items-center gap-1.5">
               <Award className="w-4 h-4 text-primary" /> Deliverable Readiness
             </span>
-            <span className={validation.isValid ? 'text-emerald-500 font-bold' : 'text-muted-foreground'}>
+            <span className={validation.isValid ? 'text-success font-bold' : 'text-muted-foreground'}>
               {validation.wordCount} / {capstoneDef.minWordCount} words {validation.isValid ? '(Ready to Submit ✓)' : `(${Math.max(0, capstoneDef.minWordCount - validation.wordCount)} words remaining)`}
             </span>
           </div>

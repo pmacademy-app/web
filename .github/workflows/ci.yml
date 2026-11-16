@@ -20,13 +20,20 @@ jobs:
     defaults:
       run:
         working-directory: ./apps/web
+    # Job-level env reaches every step, including third-party install scripts, so
+    # only public values live here. SEC-10: no step in this job gets the Supabase
+    # service-role key, the Resend key, the cron secret or the email hook secret.
+    #   - Unit tests: vitest.setup.ts forces mock Supabase values and a test cron
+    #     secret, and suites that need the email secrets set their own.
+    #   - next build: a CI build is never served. The build-time readers of the
+    #     service-role key (app/sitemap.ts, FeedbackAdminService) fall back to an
+    #     empty list when it is absent, and the email and cron secrets are only read
+    #     by request handlers at runtime.
+    # The two NEXT_PUBLIC_ Supabase values are inlined into the client bundle, so
+    # they are public by design and stay here for the build.
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      SEND_EMAIL_HOOK_SECRET: ${{ secrets.SEND_EMAIL_HOOK_SECRET }}
       # Turnstile. NEXT_PUBLIC_TURNSTILE_SITE_KEY is inlined into the client bundle at
       # build time, so `next.config.ts` refuses to produce a production build without
       # it — a bundle with no site key ships a signup page whose challenge never
@@ -50,17 +57,27 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/web/package-lock.json
 
+      # SEC-20: no install script runs during the install. Only the packages in the
+      # lockfile that declare one (`hasInstallScript`) are rebuilt, by name:
+      # esbuild and unrs-resolver (both `postinstall`). fsevents also declares one
+      # but is a macOS-only optional dependency that is never installed here.
+      # Re-check this list when the lockfile gains a new `hasInstallScript` entry.
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --ignore-scripts
+          npm rebuild esbuild unrs-resolver
 
+      # The step gets a true/false flag, never the key itself.
       - name: Verify Environment Presence (Safe Check)
+        env:
+          HAS_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
         run: |
           if [ -n "$NEXT_PUBLIC_SUPABASE_URL" ]; then
             echo "✓ NEXT_PUBLIC_SUPABASE_URL is configured in CI environment"
           else
             echo "::warning::NEXT_PUBLIC_SUPABASE_URL is not set in CI environment"
           fi
-          if [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+          if [ "$HAS_SERVICE_ROLE_KEY" = "true" ]; then
             echo "✓ SUPABASE_SERVICE_ROLE_KEY is configured in CI environment"
           else
             echo "::warning::SUPABASE_SERVICE_ROLE_KEY is not set in CI environment"
@@ -110,6 +127,14 @@ jobs:
       - name: Next.js Production Build
         run: npm run build
 
+      - name: Upload Next.js build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: apps/web/.next
+          include-hidden-files: true
+          retention-days: 1
+
   # Critical-path E2E (B14-C). A separate job from build-and-validate for two reasons.
   #
   # Cost: E2E installs a browser and boots the production server, and the roadmap is
@@ -126,17 +151,16 @@ jobs:
   # `e2e/support/env.ts` refuses outright to run against the production host. The
   # remaining specs need no account and run here on every triggered build.
   e2e:
+    needs: [build-and-validate]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
+    # Public values only at job level (SEC-10). The one sensitive secret this job
+    # needs is set on the step that starts the server; see "Run critical-path E2E".
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      SEND_EMAIL_HOOK_SECRET: ${{ secrets.SEND_EMAIL_HOOK_SECRET }}
       # The same published always-pass Turnstile dummies the build job documents. The
       # signup spec depends on them: without a solvable challenge the form never submits.
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
@@ -189,7 +213,11 @@ jobs:
       - name: Install dependencies
         if: steps.decide.outputs.run == 'true'
         working-directory: ./apps/web
-        run: npm ci
+        # Same install policy as build-and-validate: no install scripts, then
+        # rebuild only the packages that declare one.
+        run: |
+          npm ci --ignore-scripts
+          npm rebuild esbuild unrs-resolver
 
       - name: Parse & validate content pipeline
         if: steps.decide.outputs.run == 'true'
@@ -203,14 +231,24 @@ jobs:
 
       # Only built when no external base URL is supplied; with one, the specs run
       # against that deployment and Playwright's webServer is not used.
-      - name: Next.js Production Build
+      # Download prebuilt Next.js artifact from build-and-validate to eliminate redundant build
+      - name: Download Next.js build artifact
         if: steps.decide.outputs.run == 'true' && env.PLAYWRIGHT_TEST_BASE_URL == ''
-        working-directory: ./apps/web
-        run: npm run build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: apps/web/.next
 
+      # Playwright's webServer starts `next start` inside this step, so the server's
+      # runtime secrets belong here and nowhere else in the job. It needs the
+      # service-role key for its API routes. It does not get the Resend key (email
+      # falls back to a console log), the cron secret (no spec calls a cron route)
+      # or the email hook secret (Supabase never calls this CI server's hook).
       - name: Run critical-path E2E
         if: steps.decide.outputs.run == 'true'
         working-directory: ./apps/web
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run test:e2e
 
       - name: Upload Playwright report on failure
@@ -272,6 +310,52 @@ jobs:
           set -euo pipefail
           gitleaks dir . --config .gitleaks.toml --redact --no-banner --verbose --exit-code 1
 
+  # Replays migrations against a local Postgres instance, applies safe held
+  # migrations, runs the grant allowlist test, and verifies database types. (AG-04)
+  db-local:
+    name: Local Database Replay and Security Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: '3.1.0'
+
+      - name: Start local Supabase
+        run: |
+          supabase start
+
+      - name: Reset local database
+        run: |
+          supabase db reset
+
+      - name: Apply held migrations
+        run: |
+          bash scripts/ci/apply-held-migrations.sh
+
+      - name: Run grant allowlist test
+        run: |
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/tests/grant_allowlist.sql
+
+      - name: Run pgTAP database tests
+        run: |
+          supabase test db
+
+      - name: Check database types drift
+        run: |
+          bash scripts/ci/check-db-types-drift.sh
+
   # Applies pending migrations in supabase/migrations/ to the linked project.
   #
   # This job previously guarded its only step with
@@ -281,7 +365,7 @@ jobs:
   # F-REL-7 / B14-A. Credential presence is now asserted in its own step that FAILS,
   # and the applied state is verified after the push rather than assumed.
   deploy-supabase:
-    needs: build-and-validate
+    needs: [build-and-validate, db-local]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -298,10 +382,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # setup-cli v3 installs the CLI from npm and needs Node.js 20 or newer.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      # SEC-20: the CLI that writes to production is pinned, not fetched from npm
+      # at whatever version is newest on the day. The action is pinned to a commit
+      # SHA. The flags below (`--linked` plus `--yes`, commit 777c36a) were adapted
+      # to CLI v3, and 3.1.0 is the npm `latest` the old unpinned call resolved to
+      # when this pin was set, so the deploy behaves as before. Bump `version:` on
+      # purpose, after reading the CLI release notes, never by drift.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: '3.1.0'
 
       # Fail loudly rather than skipping. A migration job that silently does nothing is
       # worse than one that fails: the schema the application expects is simply absent,
@@ -322,24 +418,24 @@ jobs:
       - name: Link Supabase project
         run: |
           set -euo pipefail
-          npx supabase link --project-ref "${SUPABASE_PROJECT_ID}" --password "${SUPABASE_DB_PASSWORD}" --yes
+          supabase link --project-ref "${SUPABASE_PROJECT_ID}" --password "${SUPABASE_DB_PASSWORD}" --yes
 
       # Recorded before and after so a run's log answers "what did this change?" without
       # anyone needing production access.
       - name: Migration state BEFORE push
         run: |
           set -euo pipefail
-          npx supabase migration list --linked
+          supabase migration list --linked
 
       - name: Push pending migrations
         run: |
           set -euo pipefail
-          npx supabase db push --include-all --linked --password "${SUPABASE_DB_PASSWORD}" --yes
+          supabase db push --include-all --linked --password "${SUPABASE_DB_PASSWORD}" --yes
 
       - name: Migration state AFTER push
         run: |
           set -euo pipefail
-          npx supabase migration list --linked
+          supabase migration list --linked
 
       # The push above exits non-zero on failure, but a partial or no-op apply would
       # still pass. A dry run is the CLI's own answer to "is anything still pending?",
@@ -347,7 +443,7 @@ jobs:
       - name: Verify no migrations remain pending
         run: |
           set -euo pipefail
-          output="$(npx supabase db push --include-all --linked --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
+          output="$(supabase db push --include-all --linked --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
           echo "${output}"
           # `upToDate` is a structured field in the CLI's JSON output and is the primary
           # signal; the prose forms are accepted as a fallback across CLI versions.
@@ -361,3 +457,68 @@ jobs:
           fi
           echo "::error title=Migrations still pending after push::supabase db push --dry-run did not report the remote database as up to date. The deploy may be partial. Review the migration state output above before treating this deploy as complete."
           exit 1
+
+  # Deploys prebuilt Next.js application to Vercel production after database migrations
+  # have applied cleanly. (ENG-06 / AG-07)
+  deploy-vercel:
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [deploy-supabase]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Assert Vercel deployment credentials are present
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          missing=""
+          [ -n "${VERCEL_TOKEN:-}" ]      || missing="${missing} VERCEL_TOKEN"
+          [ -n "${VERCEL_ORG_ID:-}" ]    || missing="${missing} VERCEL_ORG_ID"
+          [ -n "${VERCEL_PROJECT_ID:-}" ] || missing="${missing} VERCEL_PROJECT_ID"
+          if [ -n "${missing}" ]; then
+            echo "::error title=Vercel production deploy cannot run::Missing repository secret(s):${missing}. Production was NOT deployed. Configure these secrets, then re-run this workflow."
+            exit 1
+          fi
+          echo "✓ All three Vercel deployment secrets are present."
+
+      - name: Pull Vercel Environment Information
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 pull --yes --environment=production --token="${VERCEL_TOKEN}"
+
+      - name: Build Project Artifacts
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 build --prod --token="${VERCEL_TOKEN}"
+
+      - name: Deploy Prebuilt Artifacts to Production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx --yes vercel@41.3.1 deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
+
+      - name: Verify Deployment Health
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --retry 5 --retry-delay 5 https://prodily.app/api/health

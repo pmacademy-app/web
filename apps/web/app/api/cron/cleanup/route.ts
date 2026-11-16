@@ -43,10 +43,18 @@ function deletionEnabledInEnvironment(): boolean {
   return process.env.RETENTION_DELETE_ENABLED === 'true'
 }
 
-async function readRequestedDryRun(request: Request): Promise<boolean> {
-  // Default true. A body that is absent, unparseable, or silent on `dryRun` leaves
-  // the route in report-only mode — the safe reading of an ambiguous request.
+async function readRequestedDryRun(request: Request, actorKind: string): Promise<boolean> {
+  // Safe default handling (ENG-09, AG-31):
+  // 1. An explicit boolean in the body always wins.
+  // 2. When actor is 'cron' and RETENTION_DELETE_ENABLED === 'true', no body defaults to false.
+  // 3. Admin calls with no body, or any caller when deletion is disabled, stay in safe dry-run mode.
   const body = (await request.json().catch(() => ({}))) as { dryRun?: unknown }
+  if (typeof body.dryRun === 'boolean') {
+    return body.dryRun
+  }
+  if (actorKind === 'cron' && deletionEnabledInEnvironment()) {
+    return false
+  }
   return typeof body.dryRun === 'boolean' ? body.dryRun : true
 }
 
@@ -57,8 +65,8 @@ export const POST = withRoute(
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/cleanup',
   },
-  async ({ request, requestId }) => withCronHeartbeat('cleanup', async () => {
-    const requestedDryRun = await readRequestedDryRun(request)
+  async ({ request, requestId, actor }) => withCronHeartbeat('cleanup', async () => {
+    const requestedDryRun = await readRequestedDryRun(request, actor.kind)
     const deletionEnabled = deletionEnabledInEnvironment()
     const dryRun = requestedDryRun || !deletionEnabled
 
@@ -105,11 +113,4 @@ export const POST = withRoute(
   })
 )
 
-/**
- * The scheduler calls POST; GET is kept for manual admin inspection.
- *
- * A GET has no body, so `readRequestedDryRun` returns true and the route is always
- * report-only over GET. That is the intended behaviour: browsing to this endpoint
- * must never delete anything.
- */
-export const GET = POST
+

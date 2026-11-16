@@ -1,29 +1,29 @@
-# Architecture Specification — Prodily PM Academy
+# Architecture Specification (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 App Router (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)
-**Last Updated:** September 6, 2026
+**Framework:** Next.js 16.4.3 App Router (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)
+**Last Updated:** November 12, 2026
 
 ---
 
 ## 1. Executive Summary & Tech Stack
 
-**Prodily PM Academy** is a structured, gamified Product Management learning application designed for high performance, zero runtime latency, and ₹0-at-launch serverless execution.
+**Prodily** is a structured, gamified Product Management learning application designed for high performance, zero runtime latency, and ₹0-at-launch serverless execution.
 
 | Tech Stack Layer | Technology | Purpose / Notes |
 |---|---|---|
-| **Framework** | Next.js 16.2.12 App Router (Turbopack) | Server Components, Route Handlers, `proxy.ts` request interceptor |
+| **Framework** | Next.js 16.4.3 App Router (Turbopack) | Server Components, Route Handlers, `proxy.ts` request interceptor |
 | **Frontend UI** | React 19.2.4, Tailwind CSS v4 + CSS design tokens | Responsive layout, light/dark theming, glassmorphic admin theme |
 | **Admin Charts** | Recharts 3.x (MIT, free) | Admin Panel dashboard time-series & funnel visualizations (client-side) |
 | **Content Pipeline** | Build-time Markdown Compiler (`scripts/compiler/compile.ts`) | Markdown → static JSON in `content/dist/` |
 | **Diagram Engine** | Build-time Mermaid v11 SVG Renderer | Node.js + JSDOM SVG compilation (0 client JS) |
-| **Search Engine** | FlexSearch Index Compiler | Pre-indexed search in `content/dist/search-index.json` |
-| **Database** | Supabase PostgreSQL (41 migration files) | User state, XP, streaks, leaderboard, notifications, broadcasts, referrals — see [`DATABASE.md`](DATABASE.md) |
+| **Search Engine** | Compiler-built JSON index (no search library) | `scripts/compiler/compile.ts` writes `content/dist/search-index.json`; `GET /api/search-index` serves it (cached for an hour) and `components/search/SearchOverlay.tsx` scores matches client-side |
+| **Database** | Supabase PostgreSQL (versioned files in `supabase/migrations/`) | User state, XP, streaks, leaderboard, notifications, broadcasts, referrals. See [`DATABASE.md`](DATABASE.md) |
 | **Authentication** | Supabase Auth + custom cookie session bridge | Email/password + PKCE, Send Email Hook, platform settings controls — see [`AUTHENTICATION.md`](AUTHENTICATION.md) |
 | **Email Delivery** | Dual-provider: Brevo (primary, configurable) + Resend, both via raw `fetch` (no SDK) | Transactional emails, broadcast engine, automatic Brevo→Resend fallback — see [`INTEGRATIONS.md`](INTEGRATIONS.md) |
 | **Background Cron** | GitHub Actions (`notification-scheduler.yml`) | Queue processing (5 min), retry (hourly), daily reminder, weekly recap, cleanup |
-| **Unit/Integration Tests** | Vitest | 100 test files in `lib/__tests__/`, 1029 tests passing |
-| **E2E Tests** | Playwright | 3 auth-lifecycle specs in `e2e/auth/` |
+| **Unit/Integration Tests** | Vitest | 304 tracked test files (273 in `lib/__tests__/`, 31 in `components/__tests__/`) as of 2026-11-12. See [`TESTING.md`](TESTING.md) |
+| **E2E Tests** | Playwright | 6 specs in `e2e/` (auth, flows, lesson signup) |
 
 ---
 
@@ -40,8 +40,9 @@ apps/web/
 │   │   ├── leaderboard/         # Global / Cohort / Friends leaderboard
 │   │   ├── notifications/       # Redirect stub → /dashboard (no standalone page;
 │   │   │                        #   the real notification UI is the header bell/drawer)
-│   │   ├── progress/            # "How am I doing" summary (skill radar, badges,
-│   │   │                        #   capstones, certificates)
+│   │   ├── progress/            # "How am I doing": index redirects to /progress/radar;
+│   │   │                        #   subpages radar, badges, capstones, certificates,
+│   │   │                        #   metrics, milestones
 │   │   ├── review/               # SM-2 flashcard review queue
 │   │   └── settings/            # Profile, portfolio, security, notification prefs
 │   ├── (auth)/                  # Unauthenticated login, signup, reset-password,
@@ -55,10 +56,10 @@ apps/web/
 │   ├── onboarding/              # Post-signup onboarding flow
 │   └── verify/[certificateId]/  # Public certificate verification page
 ├── components/                  # React components (Admin, UI, Marketing, Email, Modals)
-├── e2e/                         # Playwright E2E test specs (auth/ only)
+├── e2e/                         # Playwright E2E specs (auth/, flows/, lesson signup)
 ├── emails/                      # React Email templates & rendering engine
 ├── lib/                         # Core backend services, DB clients, rate limiters
-│   └── __tests__/               # Vitest unit/integration suites (100 files, 1029 tests)
+│   └── __tests__/               # Vitest unit/integration suites (273 files, 2026-11-12)
 ├── theme/                       # Design tokens (`theme/tokens.ts`) — see DESIGN_SYSTEM.md
 ├── types/
 │   └── database.ts              # Auto-generated Supabase TypeScript schema
@@ -74,7 +75,8 @@ content/
 └── dist/                        # Compiled output: curriculum.json, search-index.json,
                                   #   glossary-index.json, module-graph.json, lessons/
 
-supabase/migrations/              # 41 versioned PostgreSQL DDL migrations
+supabase/migrations/              # 70 top-level PostgreSQL migrations (2026-11-12); rollback/,
+                                  #   validation/ and pending-approval/ are never applied by the CLI
 scripts/compiler/                 # Build-time content compiler (compile.ts, mermaid-svg.ts)
 ```
 
@@ -108,5 +110,5 @@ Notable naming/structure notes:
 
 - **Custom session bridge vs. `@supabase/ssr`:** Auth session sync uses custom `sb-access-token`/`sb-refresh-token` cookies via `proxy.ts` and `AuthStateListener.tsx`, rather than the official `@supabase/ssr` package (not a dependency). Server components cannot auto-refresh expired tokens; see [`docs/ISSUES_KNOWN.md`](ISSUES_KNOWN.md).
 - **Email send limits:** only the daily quota is enforced, as a pre-dispatch gate in `processEmailQueue()`. There is no hourly limit and no global max-retry setting; retry attempts are per-priority from `PRIORITY_MATRIX`. The corresponding admin controls were removed in September 2026 rather than left implying enforcement. See [`docs/EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md).
-- **`/api/cron/cleanup` is a placeholder:** it always returns `{ cleanedRows: 0 }` and performs no actual cleanup today, despite being scheduled. See [`docs/CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md).
-- **Orphaned Modules, Obsolete Scripts & Dead UI Components (Phase 3 Audit):** A comprehensive multi-agent audit on branch `phase-3` cataloged 22 dead frontend components/primitives, 891 lines in disabled campaign runners (`lib/campaigns/portfolio-activation-runner.ts`), legacy search/animation helpers, 4 deprecated API routes, 4 unused database tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`), 1 unused stored procedure (`sync_user_xp`), 6 obsolete scripts, and 7 unimported NPM packages. See the canonical cleanup blueprint in [`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md).
+- **`/api/cron/cleanup` is report-only by default:** it runs the retention sweep (`lib/retention/sweep.ts`, windows in `lib/retention/policy.ts`) plus orphaned avatar storage cleanup, but deletes nothing unless the caller sends `dryRun: false` AND the environment sets `RETENTION_DELETE_ENABLED=true`. The scheduled job never sends `dryRun: false`, so live deletion is a deliberate human step. See [`docs/CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md).
+- **Dead-code pruning (Phase 3, done):** the `phase-3` audit's removals landed in PR #79 (commits 35dfe84, 306853e, ce95199, 710c174, 6876fb7): dead components, the disabled campaign runners (`lib/campaigns/` no longer exists), legacy search/animation helpers, orphaned API routes, and migration `20261031000001`, which dropped `weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline` and `sync_user_xp`. The post-Phase 3 cleanup branch then removed `/api/waitlist`, the retired `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED` flags, and more unused components; the `public.waitlist` table drop is held in `supabase/migrations/pending-approval/`. See [`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md).

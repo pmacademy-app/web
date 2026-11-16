@@ -477,8 +477,7 @@ export async function applyUserFilters(
 
   const { data, count, error } = await query
   if (error) {
-    console.error('[user-filter-query] applyUserFilters error:', error)
-    return { userIds: [], total: 0, page, pageSize, totalPages: 1 }
+    throw new Error(`Failed to apply user filters: ${error.message}`)
   }
 
   const rows = (data || []) as Array<{ id: string }>
@@ -553,6 +552,9 @@ export async function sampleMatchingUsers(
 
   query = query.order('created_at', { ascending: false }).limit(limit)
 
-  const { data } = await query
+  const { data, error } = await query
+  if (error) {
+    throw new Error(`Failed to sample matching users: ${error.message}`)
+  }
   return (data || []) as Array<{ id: string; name: string | null; email: string; career_role: string | null; goal: string | null; onboarding_completed: boolean }>
 }

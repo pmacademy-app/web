@@ -67,7 +67,6 @@ export const POST = withRoute(
       if (error instanceof PortfolioValidationError) {
         throw new RouteError(400, 'VALIDATION', error.message)
       }
-      console.error('[API POST /api/settings/portfolio] Error:', error)
       throw error
     }
   }

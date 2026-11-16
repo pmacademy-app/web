@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { revalidateAdminTag, REVALIDATABLE_ADMIN_TAGS, type AdminCacheTag } from '@/lib/admin/cache-tags'
 import { requireAdmin } from '@/lib/api/actor'
 import type { AdminCacheRevalidateResponse } from '@/lib/api/contracts/admin'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 
 /** Only the allowlisted admin tags; anything else (or a missing tag) is a 400. */
@@ -42,9 +42,9 @@ export const POST = withRoute(
       revalidateAdminTag(body.tag)
       return NextResponse.json<AdminCacheRevalidateResponse>({ success: true, tag: body.tag })
     } catch (error: unknown) {
-      const message = adminErrorMessage(error, 'Failed to refresh the admin cache.')
       console.error('[API POST /api/admin/cache/revalidate] Error:', error)
-      return NextResponse.json({ error: message }, { status: 500 })
+      const message = adminErrorMessage(error, 'Failed to refresh the admin cache.')
+      throw new RouteError(500, 'ADMIN_CACHE_REVALIDATE_FAILED', message)
     }
   }
 )

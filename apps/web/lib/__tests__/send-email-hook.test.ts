@@ -134,7 +134,7 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
       const res1 = await POST(unauthReq)
       expect(res1.status).toBe(401)
 
-      // Bearer token
+      // Bearer token rejected (SEC-16)
       const authReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
         method: 'POST',
         headers: { Authorization: 'Bearer test_secret_key_123' },
@@ -144,7 +144,7 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
         }),
       })
       const res2 = await POST(authReq)
-      expect(res2.status).toBe(200)
+      expect(res2.status).toBe(401)
 
       if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
       else delete process.env.SEND_EMAIL_HOOK_SECRET
@@ -159,11 +159,18 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
         email_data: { email_action_type: 'recovery', token_hash: 'th_hmac_999' },
       }
       const rawBody = JSON.stringify(payloadObj)
-      const sig = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
+      const now = Math.floor(Date.now() / 1000).toString()
+      const msgId = 'msg_hmac_1'
+      const payloadToSign = `${msgId}.${now}.${rawBody}`
+      const sig = crypto.createHmac('sha256', secret).update(payloadToSign).digest('base64')
 
       const hmacReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
         method: 'POST',
-        headers: { 'x-supabase-signature': sig },
+        headers: {
+          'webhook-id': msgId,
+          'webhook-timestamp': now,
+          'webhook-signature': `v1,${sig}`,
+        },
         body: rawBody,
       })
       const res = await POST(hmacReq)
@@ -184,7 +191,7 @@ describe('Supabase Send Email Auth Hook Unit Test Suite', () => {
       }
       const rawBody = JSON.stringify(payloadObj)
       const msgId = 'msg_123456789'
-      const msgTimestamp = '1700000000'
+      const msgTimestamp = Math.floor(Date.now() / 1000).toString()
       const payloadToSign = `${msgId}.${msgTimestamp}.${rawBody}`
       const keyBytes = Buffer.from('dGhpcyBpcyBhIHRlc3Qgc2VjcmV0', 'base64')
       const computedBase64Sig = crypto.createHmac('sha256', keyBytes).update(payloadToSign).digest('base64')

@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Trophy, Calendar, BookOpen, Eye, EyeOff, Zap, Award, Users, Shield, ChevronDown } from 'lucide-react'
+import { Trophy, Calendar, BookOpen, Eye, EyeOff, Users, Shield, ChevronDown } from 'lucide-react'
 import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import type { CohortItemPayload } from '@/lib/leaderboard-db'
 import { cn } from '@/lib/utils'
 import { LeaderboardPopoverModal } from './LeaderboardPopoverModal'
 import { CohortsSection } from './CohortsSection'
 import { FriendAccountabilitySection } from './FriendAccountabilitySection'
+import { apiPost } from '@/lib/api/client'
 
 interface LeaderboardHeaderProps {
   personalEntry: LeaderboardEntry | null
@@ -40,11 +41,7 @@ export function LeaderboardHeader({
     setLoading(true)
 
     try {
-      const res = await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isOptedIn: nextState }),
-      })
+      const res = await apiPost<{ success?: boolean }>('/api/leaderboard', { isOptedIn: nextState })
       if (res.ok && onOptInToggle) {
         onOptInToggle(nextState)
       }
@@ -154,13 +151,13 @@ export function LeaderboardHeader({
             className={cn(
               'inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer select-none',
               isOptedIn
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20'
                 : 'bg-secondary/60 border-border text-muted-foreground hover:text-foreground hover:bg-secondary'
             )}
           >
             {isOptedIn ? (
               <>
-                <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-success shrink-0" />
                 <span>Public</span>
               </>
             ) : (
@@ -193,7 +190,7 @@ export function LeaderboardHeader({
               title="Friend Accountability"
               subtitle="Study together and track each other's pace"
               icon={Shield}
-              iconClassName="bg-emerald-500/10 text-emerald-500"
+              iconClassName="bg-emerald-500/10 text-success"
               badgeText={`${friendEntries.length} Friends`}
             >
               <FriendAccountabilitySection
@@ -234,12 +231,12 @@ export function LeaderboardHeader({
 
         <div className="rounded-xl border border-border bg-card p-5 space-y-1 shadow-xs">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-emerald-500" /> Days Studied This Week
+            <Calendar className="w-3.5 h-3.5 text-success" /> Days Studied This Week
           </span>
           <div className="text-2xl font-bold font-serif text-foreground">
             {personalEntry ? personalEntry.daysStudied : 0} / 7 Days
           </div>
-          <span className="text-[10px] text-emerald-500 font-semibold">Active Study Habit</span>
+          <span className="text-[10px] text-success font-semibold">Active Study Habit</span>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-5 space-y-1 shadow-xs">

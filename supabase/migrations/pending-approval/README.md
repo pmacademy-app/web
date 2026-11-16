@@ -52,6 +52,8 @@ Leave the file here after applying it; the database, not the migration history, 
    removed (a separate follow-up). Both schedulers running at once is safe: each job dedupes on
    an idempotency key.
 
+If applied before AG-14, re-run it once so process-broadcasts uses POST.
+
 Undo: `rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`.
 
 ### `20261027000001_users_username_check.sql` (CQ-24)
@@ -64,6 +66,201 @@ fails to apply if any existing username breaks the rule. Steps in the runbook, s
 Revokes learner writes to `public.users` through PostgREST. Apply only **after** the code that
 stops writing `public.users` with a learner session is deployed, then confirm a learner-token
 `PATCH /rest/v1/users` is refused. Steps in the runbook, step (g).
+
+### `20261030000001_cron_heartbeat_deadman.sql` (ENG-01, audit W3, applied by hand, never moved)
+
+Adds an in-database dead-man check for the cron heartbeats. The app's own stale check runs inside
+the five-minute `process-email-queue` route, so it goes quiet when the scheduler or Vercel stops.
+This job, `prodily-deadman-cron-heartbeats`, runs `private.check_cron_heartbeats_deadman()` every
+15 minutes, reads the same `cron_heartbeat:<job>` rows and posts one alert per outage to a webhook.
+It stores its alert markers under `cron_deadman_alert:<job>` in `public.system_settings`. The job
+intervals in the SQL repeat `CRON_JOB_DEFINITIONS`; `apps/web/lib/__tests__/eng01-deadman-sql-drift.test.ts`
+fails if they drift. It does not cover pg_cron or the database itself stopping (see the header).
+
+Prerequisites:
+
+- `20261024000003_schedule_cron_jobs_pg_cron.sql` is applied and its validation passes.
+- The Vault secret `cron_alert_webhook_url` exists: an https webhook URL whose only power is
+  posting to one alert channel (for example the same value as `ALERT_WEBHOOK_URL` in Vercel).
+
+Run:
+
+1. In the Supabase dashboard Vault page (Integrations > Vault), create `cron_alert_webhook_url`.
+2. Paste the migration into the SQL editor and run it. It ends with a self-check that raises, and
+   rolls everything back, if the job, the function, its privileges or the secret is wrong.
+3. Run query 1 of `validation/20261030000001_cron_heartbeat_deadman_validation.sql`, then queries
+   2 and 4. Run query 3 after 30 minutes, when the job has run at least twice.
+
+Leave the file here after applying it, like 20261024000003.
+
+Undo: `rollback/20261030000001_cron_heartbeat_deadman.down.sql` unschedules the job, drops the
+function and deletes the `cron_deadman_alert:*` markers (bookkeeping only, no export needed). It
+keeps pg_cron, pg_net, the `private` schema and the Vault secret, which other jobs use.
+
+Post-Phase 3 cleanup (branch `chore/post-phase3-cleanup`). Both are owner-run in the SQL editor,
+in this order, and only after that branch is deployed. They are independent, so either can be
+skipped or delayed.
+
+### 1. `20261112000001_drop_waitlist_table.sql`
+
+Drops `public.waitlist`. The `/api/waitlist` route was removed on the branch and no UI posted to
+it. **Destructive: export the rows first.** They are personal data (names and emails), so keep the
+export outside the repository and never commit it.
+
+1. Deploy the branch, so nothing can insert any more.
+2. Export: `SELECT * FROM public.waitlist ORDER BY created_at;` and download the result as CSV.
+   Note `SELECT count(*) FROM public.waitlist;` to check the export against it. Do not paste the
+   exported rows into chat, tickets or AI agents. The CSV lands on local disk: delete it when
+   done (it is the only copy of the rows, so keep it until you are sure no rollback is needed).
+3. Run the migration in the SQL editor.
+4. Run `validation/20261112000001_drop_waitlist_table_validation.sql` (read-only).
+
+Undo: `rollback/20261112000001_drop_waitlist_table.down.sql` re-creates the empty table with its
+RLS policies and comment. It does not restore rows; re-import the CSV for that.
+
+### 2. `20261112000002_remove_retired_notification_flags.sql`
+
+Removes `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED`, which nothing read at run time,
+from the live flag store (the `feature_flags` row of `public.system_settings`) and from the unused
+`public.notification_feature_flags` table. Apply only after the branch is deployed: older code
+writes both keys back whenever an admin toggles any flag.
+
+1. Optional: note the current values (query in the migration header). They are not kept.
+2. Run the migration in the SQL editor.
+3. Run `validation/20261112000002_remove_retired_notification_flags_validation.sql` (read-only).
+4. After applying, redeploy (or restart) all instances, then re-run the validation after the next
+   admin flag toggle.
+
+Undo: `rollback/20261112000002_remove_retired_notification_flags.down.sql` puts both keys back as
+`true`. The previous values cannot be recovered.
+
+### `20261113000001_scrub_dead_letter_auth_links.sql` (ADR-005 gap, SEC-17, AG-02, one-off)
+
+Replaces `template_variables` with the marker `{"_scrubbed": "dead_letter"}` on every
+`email_queue` row with status `dead_letter` or `failed` and a `template_key` starting with
+`auth.`. Those rows still hold one-time verification and password-reset links that admins can
+read. The AG-02 app change already scrubs new dead letters
+(`apps/web/lib/notifications/queue/processor.ts`); this cleans up the rows written before it.
+The column is `NOT NULL`, so the marker is written instead of `NULL`. `updated_at` is left alone so
+the retention clock does not restart. Rows that can still be sent (pending, retrying, processing)
+are not touched.
+
+1. Deploy the AG-02 change first, so nothing writes unscrubbed dead letters any more and admin
+   retry refuses scrubbed auth rows.
+2. Optional: run the count query in the migration header to see how many rows will change.
+3. Run the migration in the SQL editor. Its self-check raises if any matching row still carries a
+   variable.
+4. Run `validation/20261113000001_scrub_dead_letter_auth_links_validation.sql` (read-only, expects 0).
+
+No export step: the only data removed is the expired links, and exporting them would copy the
+secret this removes. Leave the file here after applying it.
+
+Undo: `rollback/20261113000001_scrub_dead_letter_auth_links.down.sql` is a documented no-op. The
+scrubbed links cannot be restored, and they had expired anyway. A learner who still needs the
+email requests a new one.
+
+### `20261113000002_before_user_created_allow_signups.sql` (SEC-09, AG-12, database signup gate)
+
+Adds `public.hook_before_user_created(event jsonb)` returning `jsonb` to enforce the platform signup toggle directly in the database. When `public.system_settings` `product_settings.allowSignups` is `false`, the hook blocks the registration with HTTP 403: "New learner registrations are currently closed. Please check back later."
+
+Privileges: execute granted only to `supabase_auth_admin`; revoked from `PUBLIC`, `anon`, and `authenticated`. Runs as `SECURITY DEFINER` with fixed `search_path = public, pg_temp`.
+
+Prerequisites:
+- Verify that Supabase Auth Hooks are available on the active plan.
+- The AG-12 app change is deployed.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000002_before_user_created_allow_signups.sql` into the Supabase SQL editor and run it.
+2. In Supabase Dashboard: Auth > Hooks > Before User Created: select `public.hook_before_user_created`.
+3. Run `validation/20261113000002_before_user_created_allow_signups_validation.sql` (transaction rollback check).
+
+Undo:
+1. In Supabase Dashboard: Auth > Hooks: remove the Before User Created hook assignment.
+2. Run `rollback/20261113000002_before_user_created_allow_signups.down.sql` in the SQL editor to drop the function.
+
+### `20261113000003_backfill_onboarding_completed.sql` (SEC-21, AG-13, onboarding backfill)
+
+Backfills `public.users.onboarding_completed = true` for learners whose onboarding was recorded only in `auth.users.raw_user_meta_data->>'onboarding_complete'` prior to the switch to `app_metadata` and database-backed flags. Touches only rows where `public.users.onboarding_completed` is not true, `goal` is null, and `curriculum_access_override` is not true. Safe no-op if count is zero.
+
+Prerequisites:
+- Apply this migration before or immediately alongside deploying the AG-13 code change, so legacy users who completed onboarding are not redirected to /onboarding.
+
+Run:
+1. Optional pre-check: run `validation/20261113000003_backfill_onboarding_completed_validation.sql` to check how many rows will be updated.
+2. Paste `supabase/migrations/pending-approval/20261113000003_backfill_onboarding_completed.sql` into the Supabase SQL editor and run it.
+3. Re-run `validation/20261113000003_backfill_onboarding_completed_validation.sql` (expects count = 0).
+
+Undo:
+`rollback/20261113000003_backfill_onboarding_completed.down.sql`.
+
+### `20261113000004_capstone_review_feedback.sql` (PROD-03, AG-26, capstone review feedback and resubmission)
+
+Adds nullable `review_scores jsonb`, `review_feedback text`, `revision_count int not null default 0`, and `review_history jsonb` to `public.capstone_submissions`. Adds check constraints on feedback length (maximum 4000 characters) and revision count (non-negative).
+
+Privileges: Writes remain restricted to service role only. Learners read their own rows through existing SELECT RLS policies.
+
+Prerequisites:
+- Apply this migration before or alongside deploying the AG-26 code change.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000004_capstone_review_feedback.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000004_capstone_review_feedback_validation.sql` (schema verification and privilege checks).
+
+Undo:
+Run `rollback/20261113000004_capstone_review_feedback.down.sql` in the SQL editor.
+
+### `20261113000005_lesson_mastery.sql` (PROD-02, AG-28, lesson mastery threshold at 70 percent)
+
+Adds `best_score smallint` to `public.user_lesson_progress` and updates `public.record_lesson_quiz_completion` RPC to enforce a 70 percent passing threshold. Scores below 70 percent mark progress as `in_progress`. Existing `completed` rows are grandfathered and never downgraded by subsequent retakes.
+
+Privileges: Executable only by `service_role`. Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Fixed `search_path = public, pg_temp`.
+
+Prerequisites:
+- Deploy alongside or before AG-28 code change.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000005_lesson_mastery.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000005_lesson_mastery_validation.sql`.
+
+Undo:
+Run `rollback/20261113000005_lesson_mastery.down.sql` in the SQL editor.
+
+### `20261113000006_weekly_goal.sql` (PROD-06, PROD-13a, AG-29, weekly goal and session minutes)
+
+Adds `weekly_goal_lessons smallint` (1 to 7) and `session_minutes smallint` (10, 15, 20, 30, 45, 60) columns to `public.users` with check constraints. Used by learner settings, onboarding, weekly recap reports, and in-app milestone nudges.
+
+Privileges: Writes remain restricted to service role only.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000006_weekly_goal.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000006_weekly_goal_validation.sql`.
+
+Undo:
+Run `rollback/20261113000006_weekly_goal.down.sql` in the SQL editor.
+
+### `20261113000007_leaderboard_weekly_rpc.sql` (ENG-08, ENG-10, AG-31, weekly leaderboard RPC and DB size telemetry)
+
+Adds `public.get_weekly_leaderboard(p_week_start timestamptz, p_limit int, p_offset int)` returning the ranked weekly leaderboard aggregated in the database engine instead of loading all users, lessons, and XP rows into server memory. Also provides `public.get_database_size_bytes()` returning `bigint` for monitoring database size against the Supabase 500 MB free tier limit.
+
+Privileges: Executable only by `service_role`. Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Fixed `search_path = public, pg_temp`.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000007_leaderboard_weekly_rpc.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000007_leaderboard_weekly_rpc_validation.sql` (read-only verification of functions and covering indexes).
+
+Undo:
+Run `rollback/20261113000007_leaderboard_weekly_rpc.down.sql` in the SQL editor.
+
+### `20261113000008_drop_duplicate_indexes.sql` (ENG-08, AG-31, drop redundant duplicate indexes)
+
+Drops duplicate or redundant indexes to save database storage on the free tier. Contains detection query in header and conditionally drops duplicate indexes if present.
+
+Run:
+1. Paste `supabase/migrations/pending-approval/20261113000008_drop_duplicate_indexes.sql` into the Supabase SQL editor and run it.
+2. Run `validation/20261113000008_drop_duplicate_indexes_validation.sql`.
+
+Undo:
+Run `rollback/20261113000008_drop_duplicate_indexes.down.sql` in the SQL editor.
 
 ## Ops snippets (owner-run, never migrations)
 
@@ -111,8 +308,10 @@ admin access from the admin console (`/admin/users`, role toggle).
 approved and **applied to production on 2026-09-13 at 18:15:34Z**. It now lives in
 `supabase/migrations/` as part of the applied history.
 
-Execution record, including preflight numbers and the full post-migration
-reconciliation: [`docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`](../../../docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md).
+Its execution record (preflight numbers and the full post-migration reconciliation) was
+`docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`. That file was removed from the repository in
+commit `1dbd2a4` (2026-09-18). Read it from history with
+`git show 1dbd2a4^:docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`.
 
 ## Holding a migration
 

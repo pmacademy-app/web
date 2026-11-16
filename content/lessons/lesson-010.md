@@ -1,3 +1,9 @@
+---
+seoTitle: "Product Strategy Basics: Diagnosis, Policy & Action"
+seoDescription: "Learn how to formulate effective product strategies. Apply Richard Rumelt's kernel: challenge diagnosis, guiding policy, and coherent action plans."
+inShort: "Product strategy is a cohesive framework of choices that positions a product to win by addressing its most critical obstacles. Built on Richard Rumelt's strategy kernel, it combines an honest diagnosis of the market challenge, a guiding policy that focuses organizational energy, and coordinated actions that systematically execute that policy across development cycles."
+---
+
 # Lesson 10: Product Strategy Basics
 
 ## Why This Lesson Matters

@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { requireAdmin } from '@/lib/api/actor'
 import type { AdminLifecyclePreviewResponse } from '@/lib/api/contracts/admin'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { runLifecycle } from '@/lib/growth/lifecycle-run'
 
@@ -60,8 +60,7 @@ export const POST = withRoute(
       })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Failed to preview the lifecycle run.')
-      console.error('[API POST /api/admin/automations/lifecycle-preview] Error:', error)
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'ADMIN_AUTOMATIONS_PREVIEW_FAILED', message)
     }
   }
 )

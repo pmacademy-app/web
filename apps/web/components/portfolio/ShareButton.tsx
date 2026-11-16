@@ -13,6 +13,7 @@ import {
   portfolioShareText,
 } from '@/lib/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
+import { apiPost } from '@/lib/api/client'
 
 interface ShareButtonProps {
   username: string
@@ -111,12 +112,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
 
   const reportServerShare = (channel: string) => {
     try {
-      fetch('/api/portfolio/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, username, channel }),
-        keepalive: true,
-      }).catch(() => {})
+      void apiPost('/api/portfolio/share', { context, username, channel }, { keepalive: true }).catch(() => {})
     } catch {
       // Non-fatal
     }
@@ -213,7 +209,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
         : 'Copy Link'
 
   const primaryIcon = copied ? (
-    <Check aria-hidden="true" className="text-emerald-300" />
+    <Check aria-hidden="true" className="text-success" />
   ) : failed ? (
     <CircleAlert aria-hidden="true" />
   ) : canNativeShare ? (
@@ -278,7 +274,7 @@ export function ShareButton({ username, name, context = 'portfolio', badgeName, 
             title={failed ? shareUrl : 'Copy link'}
           >
             {copied ? (
-              <Check aria-hidden="true" className="text-emerald-500" />
+              <Check aria-hidden="true" className="text-success" />
             ) : failed ? (
               <CircleAlert aria-hidden="true" className="text-destructive" />
             ) : (

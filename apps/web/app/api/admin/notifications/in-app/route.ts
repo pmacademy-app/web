@@ -2,7 +2,7 @@ import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { z } from 'zod'
 
@@ -86,11 +86,11 @@ export const POST = withRoute(
       } = parsed.data
 
       if (audience === 'individual' && !targetUserId) {
-        return NextResponse.json({ error: 'Target user is required for individual audience.' }, { status: 400 })
+        throw new RouteError(400, 'INVALID_INPUT', 'Target user is required for individual audience.')
       }
 
       if (audience === 'cohort' && !targetCohortId) {
-        return NextResponse.json({ error: 'Target cohort is required for cohort audience.' }, { status: 400 })
+        throw new RouteError(400, 'INVALID_INPUT', 'Target cohort is required for cohort audience.')
       }
 
       const item = await InAppManagerService.createBroadcast({
@@ -121,10 +121,11 @@ export const POST = withRoute(
 
       return NextResponse.json({ success: true, item }, { status: 201 })
     } catch (err) {
-      console.error('[POST /api/admin/notifications/in-app] Error:', err)
-      return NextResponse.json(
-        { error: adminErrorMessage(err, 'Failed to create in-app notification') },
-        { status: 500 }
+      if (err instanceof RouteError) throw err
+      throw new RouteError(
+        500,
+        'IN_APP_NOTIFICATION_CREATE_FAILED',
+        adminErrorMessage(err, 'Failed to create in-app notification')
       )
     }
   }

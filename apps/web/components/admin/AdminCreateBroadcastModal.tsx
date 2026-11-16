@@ -90,7 +90,7 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
   const [subjectOverride, setSubjectOverride] = useState('')
   const [batchSize, setBatchSize] = useState<number>(100)
 
-  // Step 2: Audience — either a filtered segment or a hand-picked list of individuals.
+  // Step 2: Audience: either a filtered segment or a hand-picked list of individuals.
   const [audienceMode, setAudienceMode] = useState<'filtered' | 'individual'>('filtered')
   const [filters, setFilters] = useState<AdminUserFilters>({})
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])

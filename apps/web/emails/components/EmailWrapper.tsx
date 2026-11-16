@@ -26,6 +26,18 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{BRAND.fullName}</title>
+      </head>
+      <body
+        style={{
+          margin: 0,
+          padding: '32px 16px',
+          backgroundColor: '#FBFAF6',
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+          color: '#171A17',
+          lineHeight: 1.6,
+        }}
+      >
         {previewText && (
           <div
             style={{
@@ -42,18 +54,6 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
             {previewText}
           </div>
         )}
-      </head>
-      <body
-        style={{
-          margin: 0,
-          padding: '32px 16px',
-          backgroundColor: '#FBFAF6',
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          color: '#171A17',
-          lineHeight: 1.6,
-        }}
-      >
         <table
           role="presentation"
           width="100%"

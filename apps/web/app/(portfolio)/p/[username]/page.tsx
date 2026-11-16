@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import {
   getDedupedPublicPortfolioData,
@@ -27,7 +28,8 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
-  const portfolio = await getDedupedPublicPortfolioData(username)
+  const cleanUsername = username.toLowerCase()
+  const portfolio = await getDedupedPublicPortfolioData(cleanUsername)
 
   if (!portfolio || !portfolio.user.isPortfolioPublic) {
     return {
@@ -38,8 +40,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { name, bio, isFellow } = portfolio.user
-  const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
-  const ogImageUrl = `${SITE_ORIGIN}${portfolioOgCardPath(username)}`
+  const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, cleanUsername)
+  const ogImageUrl = `${SITE_ORIGIN}${portfolioOgCardPath(cleanUsername)}`
 
   const metaTitle = isFellow
     ? `${name} | Product Management Fellow at Prodily | Portfolio`
@@ -88,7 +90,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
   const { username } = await params
-  const portfolio = await getDedupedPublicPortfolioData(username)
+  if (username !== username.toLowerCase()) {
+    redirect(`/p/${username.toLowerCase()}`)
+  }
+  const portfolio = await getDedupedPublicPortfolioData(username.toLowerCase())
 
   // Counted here and ONLY here. It used to live inside the data fetch, which both
   // `generateMetadata()` and this component call — so every view was counted twice.
@@ -106,7 +111,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center space-y-4 shadow-sm">
-          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500 w-fit mx-auto">
+          <div className="p-3 rounded-2xl bg-amber-500/10 text-warning w-fit mx-auto">
             <Lock className="w-8 h-8" />
           </div>
           <h1 className="text-xl font-bold font-serif text-foreground">

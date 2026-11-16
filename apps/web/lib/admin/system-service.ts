@@ -54,7 +54,7 @@ export class SystemService {
    */
   public static async getHealthOverview(): Promise<AdminSystemHealthOverview> {
     try {
-      const { health, queue, authAvailable, notificationEvents24h } = await this.getBaseTelemetry()
+      const { health, queue, authAvailable, notificationEvents24h, dbSizeBytes } = await this.getBaseTelemetry()
 
       const lastChecked = health.lastCheckedAt
       const dbHealthy = health.status === 'healthy'
@@ -63,7 +63,7 @@ export class SystemService {
       // B6: Resolve scheduler telemetry from durable system_settings heartbeat
       let schedulerStatus: 'healthy' | 'degraded' | 'unknown' = 'unknown'
       let schedulerSummary = `${CRON_JOBS.length} jobs configured`
-      let schedulerDetail = 'GitHub Actions cron — no run telemetry'
+      let schedulerDetail = 'GitHub Actions cron: no run telemetry'
 
       try {
         const supabase = createServiceRoleClient()
@@ -105,7 +105,10 @@ export class SystemService {
           label: 'Database',
           status: health.status,
           lastChecked,
-          summary: `${health.databaseLatencyMs} ms latency`,
+          summary:
+            dbSizeBytes !== null
+              ? `${health.databaseLatencyMs} ms latency · ${(dbSizeBytes / (1024 * 1024)).toFixed(1)} MB`
+              : `${health.databaseLatencyMs} ms latency`,
           detail: 'Supabase PostgreSQL connection (live ping)',
         },
         {
@@ -223,7 +226,7 @@ export class SystemService {
   }
 
   private static async buildServiceDetails(): Promise<Record<string, AdminSystemServiceDetail>> {
-    const { supabase, health, queue, authAvailable, notificationEvents24h } = await this.getBaseTelemetry()
+    const { supabase, health, queue, authAvailable, notificationEvents24h, dbSizeBytes } = await this.getBaseTelemetry()
     const lastChecked = health.lastCheckedAt
     const queueTelemetryAvailable = !queue.failed
 
@@ -255,9 +258,19 @@ export class SystemService {
         label: 'Database',
         status: health.status,
         lastChecked,
-        summary: `${health.databaseLatencyMs} ms latency`,
+        summary:
+          dbSizeBytes !== null
+            ? `${health.databaseLatencyMs} ms latency · ${(dbSizeBytes / (1024 * 1024)).toFixed(1)} MB`
+            : `${health.databaseLatencyMs} ms latency`,
         metrics: [
           { label: 'Query latency', value: `${health.databaseLatencyMs} ms` },
+          {
+            label: 'Database storage',
+            value:
+              dbSizeBytes !== null
+                ? `${(dbSizeBytes / (1024 * 1024)).toFixed(1)} MB (${((dbSizeBytes / (500 * 1024 * 1024)) * 100).toFixed(1)}% of 500 MB)`
+                : 'Telemetry pending',
+          },
           { label: 'Environment', value: health.environment },
           { label: 'Last checked', value: new Date(lastChecked).toLocaleString() },
         ],
@@ -563,15 +576,71 @@ export class SystemService {
 
   /* ─── Private helpers ─────────────────────────────────────────────────── */
 
+  private static lastSizeAlertSentAt = 0
+
+  /**
+   * Fetches database size in bytes using the get_database_size_bytes RPC,
+   * with fallback to null if the RPC is unapplied or fails.
+   */
+  public static async getDatabaseSizeBytes(
+    supabase: ReturnType<typeof createServiceRoleClient>
+  ): Promise<number | null> {
+    try {
+      const { data, error } = await supabase.rpc('get_database_size_bytes')
+      if (error || typeof data !== 'number') return null
+
+      const sizeBytes = Number(data)
+      const MAX_FREE_TIER_BYTES = 500 * 1024 * 1024
+      const THRESHOLD_BYTES = 0.7 * MAX_FREE_TIER_BYTES
+
+      if (sizeBytes >= THRESHOLD_BYTES) {
+        await this.maybeSendDatabaseSizeAlert(sizeBytes, MAX_FREE_TIER_BYTES)
+      }
+
+      return sizeBytes
+    } catch {
+      return null
+    }
+  }
+
+  private static async maybeSendDatabaseSizeAlert(sizeBytes: number, maxBytes: number): Promise<void> {
+    const now = Date.now()
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000
+    if (now - this.lastSizeAlertSentAt < ONE_DAY_MS) {
+      return
+    }
+
+    this.lastSizeAlertSentAt = now
+    const usedMb = (sizeBytes / (1024 * 1024)).toFixed(1)
+    const pct = ((sizeBytes / maxBytes) * 100).toFixed(1)
+
+    try {
+      const { deliverOutOfBandAlert } = await import('@/lib/monitoring/out-of-band-alert')
+      await deliverOutOfBandAlert({
+        incidentId: `db-size-alert-${now}`,
+        severity: 'critical',
+        kind: 'db_size_threshold',
+        domain: 'db',
+        operation: 'system.database_size_monitor',
+        message: `Database storage at ${usedMb} MB (${pct}% of 500 MB free tier limit). Cleanup or tier upgrade required.`,
+        nextAction: 'Run retention cleanup or upgrade database plan',
+        fingerprint: 'db-size-70-percent-alert',
+      })
+    } catch (alertErr) {
+      console.warn('[SystemService] Failed to send database size alert:', alertErr)
+    }
+  }
+
   private static async getBaseTelemetry() {
     const supabase = createServiceRoleClient()
-    const [health, queue, authAvailable, notificationEvents24h] = await Promise.all([
+    const [health, queue, authAvailable, notificationEvents24h, dbSizeBytes] = await Promise.all([
       AdminConsoleService.getSystemHealth(),
       AdminConsoleService.getEmailQueueOverview(),
       this.checkAuthAvailability(supabase),
       this.countRecentNotificationEvents(supabase),
+      this.getDatabaseSizeBytes(supabase),
     ])
-    return { supabase, health, queue, authAvailable, notificationEvents24h }
+    return { supabase, health, queue, authAvailable, notificationEvents24h, dbSizeBytes }
   }
 
   /** Whether the Supabase Auth admin API is reachable (drives Auth status). */

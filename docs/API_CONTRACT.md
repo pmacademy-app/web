@@ -45,9 +45,10 @@ nothing — a label that outlived the thing it distinguished.
 
 ### Why defer rather than decide
 
-`docs/FINAL_IMPLEMENTATION_PLAN.md` already records this as **D-04 — "API versioning
-policy · Only meaningful once a non-web client exists · Revisit when D-01 resolved"**,
-and **D-01** defers the mobile platform choice with the instruction to *"build
+The locked plan of the time, `docs/FINAL_IMPLEMENTATION_PLAN.md` (deleted in `1dbd2a4`;
+read it with `git show 1dbd2a4^:docs/FINAL_IMPLEMENTATION_PLAN.md`), records this as
+**D-04: "API versioning policy · Only meaningful once a non-web client exists · Revisit
+when D-01 resolved"**, and **D-01** defers the mobile platform choice with the instruction to *"build
 client-agnostic contracts meanwhile; build no mobile-specific infrastructure now"*.
 
 A versioning scheme chosen now would be chosen with no second client to serve, which is
@@ -197,13 +198,14 @@ every page — a defect that survives review because each page still looks right
 - **Cron routes** — no external caller, and their `errors` arrays are diagnostic output
   bounded by the size of the job.
 
-### Deprecated and Orphaned Routes (Phase 3 Pruning Candidates)
+### Routes removed or kept in the Phase 3 cleanup
 
-The following routes were identified during the Phase 3 audit ([`docs/DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)) as dead or deprecated, marked for removal in Batch 3-B:
-- `POST /api/dev/send-test-email` — Orphaned dev duplicate; production testing uses `/api/admin/emails/test-send`.
-- `POST /api/cron/retry-failed` — Deprecated retry handler; retry processing was consolidated into `/api/cron/process-email-queue`.
-- `POST /api/waitlist` — Obsolete pre-launch endpoint; waitlist page redirects to `/signup`.
-- `POST /api/admin/system/storage-cleanup` — Uninvoked administrative route; cleanup is managed by scheduled cron executions.
+The Phase 3 dead-code audit ([`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)) flagged four routes. Outcome:
+
+- `POST /api/dev/send-test-email`: **removed** (PR #79). Test sends go through `/api/admin/emails/test-send`.
+- `POST /api/admin/system/storage-cleanup`: **removed** (PR #79). Orphaned avatar storage is swept by `/api/cron/cleanup`.
+- `POST /api/waitlist`: **removed** on `chore/post-phase3-cleanup`, together with its proxy entries, analytics event, `buildWaitlistConfirmationEmail` and the `Waitlist*` types. No UI posted to it. The `/waitlist` marketing page still redirects to `/signup`. The `public.waitlist` table is not dropped yet; see [`DATABASE.md`](DATABASE.md).
+- `POST /api/cron/retry-failed`: **kept**. It is still wired into the cron heartbeat (`lib/monitoring/cron-heartbeat.ts`), the admin system service (`lib/admin/system-service.ts`) and the manual `retry-failed-emails` job in `.github/workflows/notification-scheduler.yml`. It is not scheduled; `/api/cron/process-email-queue` does the routine retries every 5 minutes.
 
 ---
 
@@ -216,5 +218,7 @@ The following routes were identified during the Phase 3 audit ([`docs/DEAD_CODE_
   helper; unrelated to this contract
 - `docs/AUTHENTICATION.md` §1 — the client-agnostic session model (B13-A), the other half
   of what makes a non-web client possible
-- `docs/FINAL_IMPLEMENTATION_PLAN.md` — **D-01** (mobile platform) and **D-04** (API
-  versioning), the deferrals this policy defers to
+- **D-01** (mobile platform) and **D-04** (API versioning), the deferrals this policy
+  defers to. They were recorded in `docs/FINAL_IMPLEMENTATION_PLAN.md` (deleted in
+  `1dbd2a4`). The current plan is [`08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md)
+  at the repo root.

@@ -1,8 +1,8 @@
 # Prodily Admin Panel — Operator's Manual & Navigation Hub
 
-Welcome to the **Prodily PM Academy Admin Operating Manual**.
+Welcome to the **Prodily Admin Operating Manual**.
 
-This documentation suite provides operational procedures for administrators and operators managing Prodily PM Academy. Every procedure in this guide describes **what is currently implemented and live in the platform today**.
+This documentation suite provides operational procedures for administrators and operators managing Prodily. Every procedure in this guide describes **what is currently implemented and live in the platform today**.
 
 ---
 

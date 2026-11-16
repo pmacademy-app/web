@@ -20,9 +20,9 @@ export function RecentActivityCard({ activities }: RecentActivityCardProps) {
       case 'lesson_completed':
         return <BookOpen className="w-4 h-4 text-primary" />
       case 'quiz_completed':
-        return <CheckCircle className="w-4 h-4 text-emerald-500" />
+        return <CheckCircle className="w-4 h-4 text-success" />
       case 'streak_maintained':
-        return <Flame className="w-4 h-4 text-amber-500" />
+        return <Flame className="w-4 h-4 text-warning" />
       case 'xp_earned':
       default:
         return <Zap className="w-4 h-4 text-sky-500" />
@@ -66,7 +66,7 @@ export function RecentActivityCard({ activities }: RecentActivityCardProps) {
 
               <div className="flex flex-col items-end shrink-0">
                 {item.xpAmount ? (
-                  <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
+                  <span className="text-xs font-mono font-bold text-warning">
                     +{item.xpAmount} XP
                   </span>
                 ) : null}

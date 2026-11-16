@@ -1,0 +1,98 @@
+name: Nightly Database Backup
+
+on:
+  schedule:
+    # 21:30 UTC = 03:00 IST (a quiet hour for India)
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Dump, Encrypt, and Upload Database Backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: '3.1.0'
+
+      - name: Assert backup credentials and encryption key are present
+        env:
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          missing=""
+          [ -n "${BACKUP_ENCRYPTION_KEY:-}" ] || missing="${missing} BACKUP_ENCRYPTION_KEY"
+          [ -n "${SUPABASE_DB_PASSWORD:-}" ]   || missing="${missing} SUPABASE_DB_PASSWORD"
+          [ -n "${SUPABASE_PROJECT_ID:-}" ]    || missing="${missing} SUPABASE_PROJECT_ID"
+          if [ -n "${missing}" ]; then
+            echo "::error title=Database backup cannot run::Missing repository secret(s):${missing}. Backup was NOT created. Configure these secrets, then re-run this workflow."
+            exit 1
+          fi
+          echo "All required backup secrets are present."
+
+      - name: Set backup timestamp
+        id: timestamp
+        run: |
+          date_str=$(date -u +"%Y%m%d_%H%M%SZ")
+          echo "BACKUP_DATE=${date_str}" >> "$GITHUB_ENV"
+          echo "backup_date=${date_str}" >> "$GITHUB_OUTPUT"
+
+      - name: Dump remote database (roles, schema, data)
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p dump_temp
+          DB_URL="postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres"
+
+          echo "Dumping roles..."
+          supabase db dump --role-only --db-url "${DB_URL}" -f dump_temp/roles.sql
+
+          echo "Dumping schema..."
+          supabase db dump --db-url "${DB_URL}" -f dump_temp/schema.sql
+
+          echo "Dumping data..."
+          supabase db dump --data-only --db-url "${DB_URL}" -f dump_temp/data.sql
+
+          echo "Packaging raw dumps..."
+          tar -czf "dump_temp/prodily_backup_${BACKUP_DATE}.tar.gz" -C dump_temp roles.sql schema.sql data.sql
+          rm -f dump_temp/roles.sql dump_temp/schema.sql dump_temp/data.sql
+
+      - name: Encrypt backup archive with symmetric AES256
+        env:
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p backup_dist
+          gpg --batch --yes --passphrase "${BACKUP_ENCRYPTION_KEY}" --cipher-algo AES256 --symmetric -o "backup_dist/prodily_db_backup_${BACKUP_DATE}.tar.gz.gpg" "dump_temp/prodily_backup_${BACKUP_DATE}.tar.gz"
+          rm -rf dump_temp
+          ls -lh backup_dist/
+
+      - name: Upload encrypted database backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prodily-db-backup-${{ env.BACKUP_DATE }}
+          path: backup_dist/prodily_db_backup_*.tar.gz.gpg
+          retention-days: 30
+          if-no-files-found: error

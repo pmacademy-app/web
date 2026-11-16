@@ -18,17 +18,6 @@ export const TOKENS = {
     textMuted: '#70685A',
     cream: '#FFD9A0',
     mint: '#EAF5EF',
-    dark: {
-      primary: '#66D6A3',
-      accent: '#FFB454',
-      background: '#0E1110',
-      foreground: '#F4F1E8',
-      surface: '#161A18',
-      surfaceMuted: '#202520',
-      border: '#343A34',
-      purple: '#A78BFA',
-      textMuted: '#9EA59D',
-    },
     /**
      * Admin Panel — premium dark SaaS palette (Phase 1).
      * Scoped to the admin console via the `.admin-console` class in globals.css.

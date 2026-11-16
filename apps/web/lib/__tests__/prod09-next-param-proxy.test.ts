@@ -68,7 +68,7 @@ beforeEach(() => {
   mockGetProductSettings.mockResolvedValue({ maintenanceMode: false, requireEmailVerification: false })
   state.users = {
     fresh: { app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: {} },
-    onboarded: { app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: { onboarding_complete: true } },
+    onboarded: { app_metadata: { provider: 'email', providers: ['email'], onboarding_complete: true }, user_metadata: { onboarding_complete: true } },
   }
 })
 

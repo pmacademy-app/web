@@ -1,186 +1,203 @@
-# Comprehensive Dead Code & Technical Debt Audit — Prodily PM Academy
+# Dead Code and Technical Debt Audit: Prodily
 
-**Branch:** `phase-3`  
-**Date:** October 31, 2026  
-**Status:** 🟢 Completed & Fully Verified (Executed via Multi-Agent Pipeline)  
-**Execution Methodology:** Multi-Agent Pipeline (Static Analysis + Specialized Subagents: Frontend, Backend/API, Systems/Scripts/Dependencies)  
-**Scope Exclusions:** `08-IMPLEMENTATION_PLAN.md`, `audit/` folder.
+**Audit branch:** `phase-3` (audit recorded in `f44293f`)
+**Audit date:** 2026-10-31
+**Last updated:** 2026-11-13
+**Status:** Done. Batches 3-A to 3-D landed in PR #79 (merged 2026-11-09). The deferred items were handled on branch `chore/post-phase3-cleanup` (not merged yet). See §8 for what landed where and §9 for candidates not acted on.
+**Scope exclusions:** `08-IMPLEMENTATION-PLAN.md`, `audit/` folder.
+
+"Phase 3" in this document means the dead-code batches 3-A to 3-D. It is not plan Phase 3 (PR-14 to PR-20, platform safety) in [`../08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md), which is tracked in [`ROADMAP.md`](ROADMAP.md).
 
 ---
 
 ## Executive Summary
 
-As part of the **Phase 3** repository modernization, a comprehensive static analysis and cross-verification audit was conducted across the entire `prodily-monorepo` (`apps/web/`, `scripts/`, `supabase/`, and root tooling).
+A static analysis and cross-check of the `prodily-monorepo` (`apps/web/`, `scripts/`, `supabase/`, root tooling) found the items below. The original findings are kept; each table now has an **Outcome** column. Several findings were wrong or were overruled, and the outcome says so.
 
 The audit identified:
-- **22 Dead Frontend Components & Hooks**: 8 obsolete marketing sections/cards, 4 dead badge/leaderboard/progress modals, 4 unused UI primitives, 2 dead feedback components, 2 duplicate notification widgets, and 1 dead animation hook.
-- **4 Dead Backend Modules / 930+ Dead Service Lines**: 891 lines in `portfolio-activation-runner.ts` permanently gated off by `PORTFOLIO_ACTIVATION_DISABLED_REASON`, plus legacy search and animation helper modules.
-- **4 Deprecated / Orphaned API Routes**: Dev-only email sender (`/api/dev/send-test-email`), deprecated queue retry endpoint (`/api/cron/retry-failed`), defunct pre-launch waitlist handler (`/api/waitlist`), and orphaned storage cleanup handler (`/api/admin/system/storage-cleanup`).
-- **4 Unused Database Tables & 1 Orphaned Stored Procedure**: Tables with zero application reads/writes (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and 1 unused database RPC (`sync_user_xp`).
-- **6 Obsolete or One-off Maintenance Scripts**: Broken test fixtures, hardcoded PII email recovery scripts, and historical pre-migration diagnostics.
-- **7 Unused NPM Dependencies & 8 Deprecated V1 AST Types**: Orphaned AST parsers and legacy compiler data structures.
-- **5 Unreferenced Feature Flags**: Dead toggles in `DEFAULT_FEATURE_FLAGS` never consulted by application runtime.
+- **22 frontend components and hooks** flagged as dead (marketing sections and cards, badge, leaderboard and progress components, UI primitives, feedback components, notification widgets, one animation hook). Two of them (`NotificationBell`, `NotificationToast`) were false positives.
+- **Dead backend modules**: the disabled `portfolio-activation-runner.ts`, legacy search and animation helpers, the admin barrel.
+- **4 API routes** flagged as orphaned. Two were removed in PR #79, `/api/waitlist` on `chore/post-phase3-cleanup`, and `/api/cron/retry-failed` was a false positive and stays.
+- **4 unused tables and 1 RPC**, dropped by migration `20261031000001`.
+- **6 scripts**, of which 5 were tracked and removed; the sixth is gitignored.
+- **7 NPM packages** flagged; 5 removed net, because CI needs `@emnapi/core` and `@emnapi/runtime`.
+- **5 feature flags** flagged; 2 retired, 3 kept.
 
 ---
 
 ## 1. Frontend: Components, Primitives, and Hooks
 
 ### 1.1 Unused Marketing Page Sections & Helper Cards
-The live marketing landing page at `apps/web/app/(marketing)/page.tsx` renders: `Hero`, `SocialProof`, `CurriculumPreview`, `LearningExperience`, `ProductPhilosophy`, `PricingSection`, and `FinalCta`. The following components in `apps/web/components/marketing/` have **zero callers** across the repository:
+The live marketing landing page is `apps/web/app/(marketing)/page.tsx`. The audit first listed every section below as `components/marketing/<name>.tsx`; the sections actually live in `apps/web/components/marketing/sections/`. Paths here are corrected.
 
-| File Path | Description | Risk | Phase 3 Recommendation |
-|---|---|---|---|
-| [`apps/web/components/marketing/community.tsx`](file:///d:/Prodily/apps/web/components/marketing/community.tsx) | Legacy community section | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/experience.tsx`](file:///d:/Prodily/apps/web/components/marketing/experience.tsx) | Legacy experience section (superseded by `LearningExperience`) | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/faq.tsx`](file:///d:/Prodily/apps/web/components/marketing/faq.tsx) | Legacy FAQ accordion section | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/journey.tsx`](file:///d:/Prodily/apps/web/components/marketing/journey.tsx) | Legacy journey section | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/journey-timeline.tsx`](file:///d:/Prodily/apps/web/components/marketing/journey-timeline.tsx) | Sub-component for legacy journey | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/testimonials.tsx`](file:///d:/Prodily/apps/web/components/marketing/testimonials.tsx) | Static marketing testimonials | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/feature-card.tsx`](file:///d:/Prodily/apps/web/components/marketing/feature-card.tsx) | Unused feature card helper | Low | Prune in Batch 3-A |
-| [`apps/web/components/marketing/testimonial-card.tsx`](file:///d:/Prodily/apps/web/components/marketing/testimonial-card.tsx) | Unused testimonial card helper | Low | Prune in Batch 3-A |
+| File Path | Description | Outcome |
+|---|---|---|
+| `apps/web/components/marketing/sections/community.tsx` | Legacy community section | Removed on `chore/post-phase3-cleanup` |
+| `apps/web/components/marketing/sections/experience.tsx` | Legacy experience section | **Kept** by owner decision (pinned by `marketing-homepage-phase0c` and `b12b-marketing-server-components` tests) |
+| `apps/web/components/marketing/sections/faq.tsx` | Legacy FAQ section, duplicate of `home-faq.tsx` | Removed in PR #79 (`6876fb7`) |
+| `apps/web/components/marketing/sections/journey.tsx` | Legacy journey section | **Kept** by owner decision (pinned by tests, as above) |
+| `apps/web/components/marketing/sections/journey-timeline.tsx` | Sub-component of the journey section | **Kept** by owner decision (pinned by tests, as above) |
+| `apps/web/components/marketing/sections/testimonials.tsx` | Static marketing testimonials | Removed on `chore/post-phase3-cleanup` (also dropped from the `b11c` exempt list) |
+| `apps/web/components/marketing/feature-card.tsx` | Unused feature card helper | Removed in PR #79 (`6876fb7`) |
+| `apps/web/components/marketing/testimonial-card.tsx` | Unused testimonial card helper | Removed in PR #79 (`6876fb7`) |
+
+Also removed on `chore/post-phase3-cleanup` (not in the original audit): `components/marketing/product-mockup/lesson-card-preview.tsx`, `module-card-preview.tsx` and `xp-row-preview.tsx`. `product-mockup/skill-radar.tsx` is live and kept.
 
 ### 1.2 Unused Badge, Progress, and Leaderboard Components
-Following the ADR-009 modularization of `/progress` and `/badges`:
 
-| File Path | Description | Risk | Phase 3 Recommendation |
-|---|---|---|---|
-| [`apps/web/components/badges/BadgeNotification.tsx`](file:///d:/Prodily/apps/web/components/badges/BadgeNotification.tsx) | Toast notification popover for earned badges (unreferenced; in-app notification center handles unlocks) | Low | Prune in Batch 3-A |
-| [`apps/web/components/badges/BadgeShowcaseCard.tsx`](file:///d:/Prodily/apps/web/components/badges/BadgeShowcaseCard.tsx) | Standalone badge showcase card; `/badges` uses inline grid cards | Low | Prune in Batch 3-A |
-| [`apps/web/components/leaderboard/ProfileComparisonModal.tsx`](file:///d:/Prodily/apps/web/components/leaderboard/ProfileComparisonModal.tsx) | Modal to compare two learner profiles; never hooked into leaderboard rows | Low | Prune in Batch 3-A |
-| [`apps/web/components/progress/ProgressSectionDropdown.tsx`](file:///d:/Prodily/apps/web/components/progress/ProgressSectionDropdown.tsx) | Dropdown selector for progress sections; `/progress` tab layout is static | Low | Prune in Batch 3-A |
+| File Path | Description | Outcome |
+|---|---|---|
+| `apps/web/components/badges/BadgeNotification.tsx` | Toast popover for earned badges | Removed in PR #79 (`6876fb7`) |
+| `apps/web/components/progress/BadgeShowcaseCard.tsx` | Standalone badge showcase card (the audit gave the path as `components/badges/`) | Removed on `chore/post-phase3-cleanup` |
+| `apps/web/components/leaderboard/ProfileComparisonModal.tsx` | Profile comparison modal, never wired to rows | Removed in PR #79 (`6876fb7`). Its dead `onCompare` prop and Compare button in `LeaderboardTable` went on `chore/post-phase3-cleanup` |
+| `apps/web/components/progress/ProgressSectionDropdown.tsx` | Progress section dropdown | Removed in PR #79 (`6876fb7`) |
+
+Also removed on `chore/post-phase3-cleanup` (not in the original audit): `components/progress/CapstonesOverviewCard.tsx` and `components/notifications/DashboardNotificationsWidget.tsx`.
 
 ### 1.3 Unused Feedback & Notification Variants
-| File Path | Description | Risk | Phase 3 Recommendation |
-|---|---|---|---|
-| [`apps/web/components/feedback/error-state.tsx`](file:///d:/Prodily/apps/web/components/feedback/error-state.tsx) | Duplicate error state component; canonical shared component is `apps/web/components/ui/error-state.tsx` | Low | Prune in Batch 3-A |
-| [`apps/web/components/feedback/success-state.tsx`](file:///d:/Prodily/apps/web/components/feedback/success-state.tsx) | Duplicate success state; unused across application | Low | Prune in Batch 3-A |
-| [`apps/web/components/notifications/NotificationBell.tsx`](file:///d:/Prodily/apps/web/components/notifications/NotificationBell.tsx) | Orphaned standalone bell; canonical implementation is `NotificationCenter.tsx` in app header | Low | Prune in Batch 3-A |
-| [`apps/web/components/notifications/NotificationToast.tsx`](file:///d:/Prodily/apps/web/components/notifications/NotificationToast.tsx) | Unreferenced floating notification toast | Low | Prune in Batch 3-A |
+
+| File Path | Description | Outcome |
+|---|---|---|
+| `apps/web/components/feedback/error-state.tsx` | Duplicate of `components/ui/error-state.tsx` | Removed in PR #79 (`6876fb7`) |
+| `apps/web/components/feedback/success-state.tsx` | Unused success state | Removed in PR #79 (`35dfe84`) |
+| `apps/web/components/notifications/NotificationBell.tsx` | Flagged as an orphaned bell | **Kept**: false positive, mounted in `components/layout/Topbar.tsx` |
+| `apps/web/components/notifications/NotificationToast.tsx` | Flagged as an unreferenced toast | **Kept**: false positive, mounted in `components/layout/Topbar.tsx` |
 
 ### 1.4 Unused UI Primitives & Hooks
-| File Path | Description | Risk | Phase 3 Recommendation |
-|---|---|---|---|
-| [`apps/web/components/ui/accordion.tsx`](file:///d:/Prodily/apps/web/components/ui/accordion.tsx) | Radix accordion wrapper; 0 imports | Low | Prune in Batch 3-A |
-| [`apps/web/components/ui/badge.tsx`](file:///d:/Prodily/apps/web/components/ui/badge.tsx) | Generic badge primitive; 0 imports (app uses direct Tailwind badges) | Low | Prune in Batch 3-A |
-| [`apps/web/components/ui/card.tsx`](file:///d:/Prodily/apps/web/components/ui/card.tsx) | Generic card primitive; 0 imports | Low | Prune in Batch 3-A |
-| [`apps/web/components/ui/select.tsx`](file:///d:/Prodily/apps/web/components/ui/select.tsx) | Generic select primitive; 0 imports | Low | Prune in Batch 3-A |
-| [`apps/web/components/ui/toast.tsx`](file:///d:/Prodily/apps/web/components/ui/toast.tsx) | Generic toast primitive; 0 imports | Low | Prune in Batch 3-A |
-| [`apps/web/hooks/useXpAnimation.ts`](file:///d:/Prodily/apps/web/hooks/useXpAnimation.ts) | Framer motion XP increment hook; 0 imports | Low | Prune in Batch 3-A |
+
+| File Path | Description | Outcome |
+|---|---|---|
+| `apps/web/components/ui/accordion.tsx` | Radix accordion wrapper | Removed in PR #79 (`6876fb7`) |
+| `apps/web/components/ui/badge.tsx` | Generic badge primitive | Removed in PR #79 (`35dfe84`) |
+| `apps/web/components/ui/card.tsx` | Generic card primitive | Removed in PR #79 (`35dfe84`) |
+| `apps/web/components/ui/select.tsx` | Generic select primitive | Removed in PR #79 (`35dfe84`) |
+| `apps/web/components/ui/toast.tsx` | Generic toast primitive | Removed in PR #79 (`35dfe84`) |
+| `apps/web/hooks/useXpAnimation.ts` | XP increment animation hook | Removed in PR #79 (`35dfe84`) |
 
 ---
 
 ## 2. Backend: Modules, Services, and Route Handlers
 
 ### 2.1 Dead Modules and Abandoned Services
-| File Path | Lines | Details | Phase 3 Recommendation |
-|---|---|---|---|
-| [`apps/web/lib/campaigns/portfolio-activation-runner.ts`](file:///d:/Prodily/apps/web/lib/campaigns/portfolio-activation-runner.ts) | 891 | Blocked by `PORTFOLIO_ACTIVATION_DISABLED_REASON = 'Portfolio activation runner disabled pending activation review'`. 0 callers across the repository. Broadcast service replaced ad-hoc campaign runners. | Delete in Batch 3-B. (Frees 891 lines) |
-| [`apps/web/lib/search.ts`](file:///d:/Prodily/apps/web/lib/search.ts) | 35 | Legacy search function (`searchLessons()`) querying static array; replaced by `content/dist/search-index.json` and FlexSearch compiler. | Delete in Batch 3-B |
-| [`apps/web/lib/animation.ts`](file:///d:/Prodily/apps/web/lib/animation.ts) | 48 | Framer-motion transition constants (`fadeVariants`, `slideVariants`); 0 imports in app. | Delete in Batch 3-B |
-| [`apps/web/lib/admin/index.ts`](file:///d:/Prodily/apps/web/lib/admin/index.ts) | 12 | Barrel re-export file for admin services; consumers import directly from service files. | Delete in Batch 3-B |
-| `apps/web/lib/admin/cohort-service.ts` -> `deleteCohort` | 24 | Uncalled method; cohort management in admin has no UI/route for hard deletion. | Prune function export |
-| `apps/web/lib/admin/analytics-service.ts` -> `getCohortAnalytics` | 15 | Stub returning mock/empty cohort analytics; uncalled by admin UI. | Prune function export |
+
+| File Path | Details | Outcome |
+|---|---|---|
+| `apps/web/lib/campaigns/portfolio-activation-runner.ts` | Blocked by `PORTFOLIO_ACTIVATION_DISABLED_REASON`; no callers | Shrunk in `306853e`, deleted in `6876fb7` (PR #79). `lib/campaigns/` no longer exists |
+| `apps/web/lib/search.ts` | Legacy `searchLessons()` over a static array. Search is the compiler-built `content/dist/search-index.json`, served by `/api/search-index` and scored client-side; no search library is used | Removed in PR #79 (`306853e`) |
+| `apps/web/lib/animation.ts` | Framer-motion transition constants, no imports | Removed in PR #79 (`306853e`) |
+| `apps/web/lib/admin/index.ts` | Admin barrel re-export | Removed in PR #79 (`306853e`) |
+| `lib/admin/cohort-service.ts` `deleteCohort`, `lib/admin/analytics-service.ts` `getCohortAnalytics` | Reported as uncalled | Not found: neither function appears in the code or in `git log -S` history. No action |
+| `apps/web/lib/xp/duplicate-analysis.ts` (+ test) | Not in the original audit. Analysis helper for the finished B8-D/B8-E XP work | Removed on `chore/post-phase3-cleanup` |
 
 ### 2.2 Orphaned & Deprecated API Route Handlers
-| Route | Method | Description | Phase 3 Recommendation |
+
+| Route | Method | Description | Outcome |
 |---|---|---|---|
-| [`apps/web/app/api/dev/send-test-email/route.ts`](file:///d:/Prodily/apps/web/app/api/dev/send-test-email/route.ts) | `POST` | Dev-only duplicate of email testing. Production admin uses `/api/admin/emails/test-send`. | Remove route folder in Batch 3-B |
-| [`apps/web/app/api/cron/retry-failed/route.ts`](file:///d:/Prodily/apps/web/app/api/cron/retry-failed/route.ts) | `POST` | Deprecated cron endpoint. Retry processing is consolidated inside `/api/cron/process-email-queue`. Not scheduled in `notification-scheduler.yml`. | Remove route folder in Batch 3-B |
-| [`apps/web/app/api/waitlist/route.ts`](file:///d:/Prodily/apps/web/app/api/waitlist/route.ts) | `POST` | Pre-launch waitlist submission route. `/waitlist` redirects directly to `/signup`. Pre-launch waitlist phase is concluded. | Remove route folder in Batch 3-B |
-| [`apps/web/app/api/admin/system/storage-cleanup/route.ts`](file:///d:/Prodily/apps/web/app/api/admin/system/storage-cleanup/route.ts) | `POST` | Orphaned admin endpoint; cleanup is executed via scheduled cron job. | Remove route folder in Batch 3-B |
+| `apps/web/app/api/dev/send-test-email/route.ts` | `POST` | Dev-only duplicate of `/api/admin/emails/test-send` | Removed in PR #79 (`306853e`) |
+| `apps/web/app/api/cron/retry-failed/route.ts` | `POST` | Flagged as deprecated and unscheduled | **Kept**: false positive. Used by the cron heartbeat (`lib/monitoring/cron-heartbeat.ts`), the admin system service (`lib/admin/system-service.ts`) and the manual `retry-failed-emails` job in `.github/workflows/notification-scheduler.yml` |
+| `apps/web/app/api/waitlist/route.ts` | `POST` | Pre-launch waitlist handler; no UI posts to it | Removed on `chore/post-phase3-cleanup`, with its `proxy.ts` entries, the `waitlist_signup` event, `trackWaitlistSignup()`, `buildWaitlistConfirmationEmail()` and the waitlist types. The `public.waitlist` table drop is **held** in `supabase/migrations/pending-approval/20261112000001_drop_waitlist_table.sql` until the owner exports the rows |
+| `apps/web/app/api/admin/system/storage-cleanup/route.ts` | `POST` | Orphaned admin endpoint | Removed in PR #79 (`306853e`) |
 
 ---
 
 ## 3. Database: Unused Tables and Stored Procedures
 
-Cross-referencing `supabase/migrations/` and `apps/web/types/database.ts` against all queries in `apps/web/`:
-
-| Database Object | Type | Status & Usage Analysis | Phase 3 Recommendation |
+| Database Object | Type | Finding | Outcome |
 |---|---|---|---|
-| `public.weekly_leaderboard_snapshots` | Table | Created in `20260805000006`. No inserts, updates, or reads exist anywhere in application code or cron jobs. Leaderboard queries dynamically aggregate XP directly. | Drop via SQL migration in Batch 3-C |
-| `public.bookmarks` | Table | Created in `20260728000002`. Bookmark functionality was superseded by lesson progress and review queues. Zero active reads or writes in the app. | Drop via SQL migration in Batch 3-C |
-| `public.email_dead_letter` | Table | Created in `20260806000001`. The email queue engine marks failures with `status = 'failed'` and logs to `system_errors` rather than transferring rows to `email_dead_letter`. | Drop via SQL migration in Batch 3-C |
-| `public.user_notification_timeline` | Table | Created in `20260806000001`. Notification history is served directly by `in_app_notifications`. Zero application queries touch this table. | Drop via SQL migration in Batch 3-C |
-| `public.sync_user_xp(uuid)` | Stored Procedure / RPC | Defined in `20260805000001`. Zero callers in app or scripts. Trigger `update_user_xp_and_level()` handles automated XP summation. | Drop via SQL migration in Batch 3-C |
+| `public.weekly_leaderboard_snapshots` | Table | No reads or writes; leaderboards aggregate XP directly | Dropped by `20261031000001` (PR #79, `ce95199`) |
+| `public.bookmarks` | Table | No reads or writes | Dropped by `20261031000001`. Its account-deletion entry was removed on `chore/post-phase3-cleanup` |
+| `public.email_dead_letter` | Table | Permanent failures stay in `email_queue` (status `'dead_letter'`) | Dropped by `20261031000001`; the processor insert was removed in `6876fb7` |
+| `public.user_notification_timeline` | Table | Notification history is served by `in_app_notifications` | Dropped by `20261031000001`. Its retention rule and account-deletion entry were removed on `chore/post-phase3-cleanup` |
+| `public.sync_user_xp(uuid)` | RPC | No callers; the `update_user_xp_and_level()` trigger sums XP | Dropped by `20261031000001` |
+| `public.waitlist` | Table | Not in the original audit. Its route is gone | Drop **held** in `pending-approval/20261112000001` (owner exports rows first) |
+
+The migration shipped without a rollback. `supabase/migrations/rollback/20261031000001_phase3_drop_unused_tables.down.sql` was added on `chore/post-phase3-cleanup`: structure only, rows are not restored, and `sync_user_xp` comes back `service_role`-only.
 
 ---
 
 ## 4. Email Templates & Component Primitives
 
-| File Path | Description | Phase 3 Recommendation |
+| File Path | Description | Outcome |
 |---|---|---|
-| [`apps/web/emails/components/ProgressBar.tsx`](file:///d:/Prodily/apps/web/emails/components/ProgressBar.tsx) | Email progress bar component. 0 imports across all email templates in `apps/web/emails/`. | Prune in Batch 3-A |
-| `apps/web/emails/index.ts` -> `inactive.resume_learning` | Dead template key in email registry pointing to undefined or obsolete template. | Clean registry in Batch 3-A |
-| `apps/web/emails/index.ts` -> `system.weekly_recap` | Legacy recap entry superseded by `recap.weekly`. | Clean registry in Batch 3-A |
+| `apps/web/emails/components/ProgressBar.tsx` | Email progress bar, no imports | Removed in PR #79 (`35dfe84`) |
+| `apps/web/emails/index.ts` `inactive.resume_learning` | Flagged as a dead template key | **Kept**: the key is still registered and used |
+| `apps/web/emails/index.ts` `system.weekly_recap` | Duplicate of `recap.weekly` | Removed in PR #79 (`6876fb7`) |
 
 ---
 
 ## 5. Repository Scripts & Diagnostics
 
-The following scripts in `scripts/` and `apps/web/scripts/` are obsolete, broken, or one-off relics:
-
-| Script Path | Reason for Pruning | Phase 3 Recommendation |
+| Script Path | Reason | Outcome |
 |---|---|---|
-| [`scripts/compiler/tests/test-all-shapes.ts`](file:///d:/Prodily/scripts/compiler/tests/test-all-shapes.ts) | Broken test targeting non-existent `content/v2/test-shapes.md`. | Delete in Batch 3-D |
-| [`scripts/compiler/tests/compare-v1-v2.ts`](file:///d:/Prodily/scripts/compiler/tests/compare-v1-v2.ts) | Empty comparison stub. Compiler v2 is authoritative. | Delete in Batch 3-D |
-| [`apps/web/scripts/send-jolly-recovery-email.ts`](file:///d:/Prodily/apps/web/scripts/send-jolly-recovery-email.ts) | One-off recovery script containing hardcoded recipient email and auth tokens. | Delete immediately in Batch 3-D |
-| [`scripts/diagnostics/xp-duplicates.ts`](file:///d:/Prodily/scripts/diagnostics/xp-duplicates.ts) | One-off diagnostic script used during B8-D migration. Task completed. | Delete in Batch 3-D |
-| [`scripts/backup/postgrest-data-export.ts`](file:///d:/Prodily/scripts/backup/postgrest-data-export.ts) | Stopgap data exporter used prior to B8-E migration. Task completed. | Delete in Batch 3-D |
-| [`scripts/benchmark-concurrency.ts`](file:///d:/Prodily/scripts/benchmark-concurrency.ts) | Local stress test script for old signup rate limiter. Superseded by Vitest concurrency tests. | Delete in Batch 3-D |
+| `scripts/compiler/tests/test-all-shapes.ts` | Targets a missing `content/v2/test-shapes.md` | Removed in PR #79 (`710c174`) |
+| `scripts/compiler/tests/compare-v1-v2.ts` | Empty comparison stub | Removed in PR #79 (`710c174`), with the `test:parity` npm script |
+| `apps/web/scripts/send-jolly-recovery-email.ts` | One-off recovery script with a hardcoded recipient | Gitignored and never tracked, so no commit removes it. Delete the local copy by hand if it exists |
+| `scripts/diagnostics/xp-duplicates.ts` | One-off B8-D diagnostic | Removed in PR #79 (`710c174`) |
+| `scripts/backup/postgrest-data-export.ts` | Pre-B8-E stopgap exporter | Removed in PR #79 (`710c174`) |
+| `scripts/benchmark-concurrency.ts` | Old signup rate-limiter stress test | Removed in PR #79 (`710c174`), with the `benchmark` npm script |
 
-*Note on Compiler & Brand Assets:* `scripts/compiler/` and `scripts/brand/generate-assets.ts` utilize `unified`, `remark-*`, `unist-util-visit`, `mermaid`, and `sharp`. These packages must NOT be removed from dependencies.
+`scripts/compiler/` and `scripts/brand/generate-assets.ts` use `unified`, `remark-*`, `unist-util-visit`, `mermaid` and `sharp`. Those packages stay.
 
 ---
 
 ## 6. Dependencies & Feature Flags
 
 ### 6.1 Unused NPM Dependencies in `apps/web/package.json`
-The following dependencies have no static or dynamic imports across `apps/web/` and are not required at runtime:
-1. `bail`
-2. `hermes-parser`
-3. `lightningcss`
-4. `mdn-data`
-5. `@emnapi/core`
-6. `@emnapi/runtime`
-7. `@types/mdast`
 
-### 6.2 Dead Feature Flags in `lib/feature-flags.ts`
-The following feature flags in `DEFAULT_FEATURE_FLAGS` are neither queried in the frontend nor checked in backend services:
-- `ACHIEVEMENT_EMAIL_ENABLED`
-- `PORTFOLIO_EMAILS_ENABLED`
-- `WEEKLY_RECAP_ENABLED`
-- `MARKETING_EMAILS_ENABLED`
-- `SCHEDULER_ENABLED`
+| Package | Outcome |
+|---|---|
+| `bail` | Removed in `710c174` |
+| `hermes-parser` | Removed in `710c174` |
+| `lightningcss` | Removed in `710c174` |
+| `mdn-data` | Removed in `710c174` |
+| `@types/mdast` | Removed in `710c174` |
+| `@emnapi/core` | Removed in `710c174`, **restored** to `devDependencies` in `18e0e0b` (CI needs it) |
+| `@emnapi/runtime` | Removed in `710c174`, **restored** to `devDependencies` in `18e0e0b` (CI needs it) |
 
-*Action:* Prune from `DEFAULT_FEATURE_FLAGS` and remove dead keys from `FeatureFlag` type in Batch 3-B.
+Net: 5 packages removed. On `chore/post-phase3-cleanup`, `@types/qrcode` moved from `dependencies` to `devDependencies`.
 
-### 6.3 Deprecated V1 AST Types in `apps/web/types/index.ts`
-- `ParsedLesson`, `LessonMeta`, `QuizQuestion`, `FlashcardItem` (Superseded by Compiler v2 types in `types/lesson.ts`)
-- `WaitlistFormValues`, `WaitlistPayload`
-- `MarketingModule`, `SkillRadarDemoData`
+### 6.2 Dead Feature Flags in `lib/notifications/feature-flags/`
+The audit gave the path as `lib/feature-flags.ts`; the defaults live in `apps/web/lib/notifications/feature-flags/service.ts` and the type in `types.ts` beside it.
 
-*Action:* Prune dead interfaces in Batch 3-B.
+| Flag | Outcome |
+|---|---|
+| `ACHIEVEMENT_EMAIL_ENABLED` | Retired on `chore/post-phase3-cleanup` (default, type, admin toggle). Stored values are cleaned by the held `pending-approval/20261112000002_remove_retired_notification_flags.sql`; run it only after the code is deployed |
+| `PORTFOLIO_EMAILS_ENABLED` | Retired on `chore/post-phase3-cleanup`, same as above |
+| `WEEKLY_RECAP_ENABLED` | **Kept**: required by tests and the admin toggles |
+| `MARKETING_EMAILS_ENABLED` | **Kept**: required by tests and the admin toggles |
+| `SCHEDULER_ENABLED` | **Kept**: required by tests and the admin toggles |
+
+### 6.3 Deprecated V1 Types in `apps/web/types/index.ts`
+
+| Type | Outcome |
+|---|---|
+| `ParsedLesson`, `MarketingModule` | Removed in PR #79 (`6876fb7`) |
+| `LessonMeta`, `QuizQuestion`, `FlashcardItem` | Kept in PR #79, then removed on `chore/post-phase3-cleanup` after `knip` showed no users |
+| `WaitlistFormValues`, `WaitlistPayload` (with `ROLE_OPTIONS`, `RoleOption`) | Removed on `chore/post-phase3-cleanup` with the waitlist route |
+| `SkillRadarDemoData` | **Kept**: used by `config/content.ts` for the live marketing radar |
+
+The `knip` sweep on `chore/post-phase3-cleanup` also removed `ApiSuccess`, `ApiError`, `FeatureItem` and `TestimonialItem`, and made `CompiledLessonRef`, `CompiledFlashcard` and `CompiledGlossaryEntry` module-private.
 
 ---
 
-## 7. Phase 3 Execution Roadmap
+## 7. Phase 3 Execution Roadmap (as planned)
 
-To ensure zero regressions, Phase 3 execution will follow this ordered batching:
+The batches were planned in this order. §8 records what actually landed.
 
 ```mermaid
 flowchart TD
     subgraph Batch3A["Batch 3-A: UI & Components"]
-        A1["Prune 8 Dead Marketing Components"]
-        A2["Prune 4 Dead Progress/Badge Modals"]
-        A3["Prune 5 Unused UI Primitives"]
+        A1["Prune Dead Marketing Components"]
+        A2["Prune Dead Progress/Badge Modals"]
+        A3["Prune Unused UI Primitives"]
         A4["Prune ProgressBar & Duplicate States"]
     end
 
     subgraph Batch3B["Batch 3-B: Backend & Services"]
-        B1["Delete portfolio-activation-runner.ts (891 lines)"]
+        B1["Delete portfolio-activation-runner.ts"]
         B2["Delete lib/search.ts and lib/animation.ts"]
-        B3["Remove Deprecated API Routes (/api/waitlist, etc.)"]
-        B4["Clean Dead Feature Flags & V1 AST Types"]
+        B3["Remove Orphaned API Routes"]
+        B4["Clean Dead Feature Flags & V1 Types"]
     end
 
     subgraph Batch3C["Batch 3-C: Database Schema Migration"]
@@ -191,38 +208,65 @@ flowchart TD
     end
 
     subgraph Batch3D["Batch 3-D: Scripts & Dependencies"]
-        D1["Remove 6 Obsolete/One-off Scripts"]
-        D2["Uninstall 7 Unused Packages"]
+        D1["Remove Obsolete/One-off Scripts"]
+        D2["Uninstall Unused Packages"]
         D3["Full Vitest Suite & Build Verification"]
     end
 
     Batch3A --> Batch3B --> Batch3C --> Batch3D
 ```
 
-### Safety Invariants During Deletion:
-1. Every component removal must be accompanied by a workspace build check (`npm run build` or `npm run type-check`).
-2. Vitest suite (`305 files, 4566 tests`) must remain 100% passing at each batch boundary.
-3. Database migration must verify no foreign key dependencies block table drops.
+### Safety Invariants During Deletion
+1. Every removal is followed by `npm run typecheck` (from `apps/web`).
+2. The Vitest suite stays green at each batch boundary.
+3. Table drops are checked for foreign-key dependencies first.
 
 ---
 
-## 8. Multi-Agent Verification & Implementation Log
+## 8. Outcome
 
-During the Phase 3 implementation execution on `phase-3`, the multi-agent pipeline identified and safely resolved several critical edge cases:
+### PR #79 (merged 2026-11-09 as `0b04fd0`)
 
-1. **False Positive Prevention (Frontend)**:
-   - `NotificationBell.tsx` and `NotificationToast.tsx` were flagged in initial static analysis, but verified by the frontend agent as **actively mounted** in `apps/web/components/layout/Topbar.tsx`. Deleting them would have broken authenticated learner layout and toasts. They were **preserved**.
-   - `components/marketing/sections/faq.tsx`: Legacy duplicate of `home-faq.tsx` that previously imported the deleted `accordion.tsx`. Pruned cleanly.
-2. **Runtime Insert & Type Drift Prevention (Database & Backend)**:
-   - `apps/web/lib/notifications/queue/processor.ts` held an active insert into `email_dead_letter`. Pruned cleanly since permanent failures are tracked directly in `email_queue` (`status = 'dead_letter'`).
-   - `apps/web/lib/notifications/admin/service.ts` queried `email_dead_letter` and `user_notification_timeline`. Re-pointed to query `email_queue` directly, matching the dropped tables in migration `20261031000001_phase3_drop_unused_tables.sql`.
-   - `apps/web/types/database.ts` updated to remove all 4 dropped tables (`weekly_leaderboard_snapshots`, `bookmarks`, `email_dead_letter`, `user_notification_timeline`) and RPC `sync_user_xp`.
-3. **Active Configuration Types & Admin Flags Protected**:
-   - `SkillRadarDemoData` in `apps/web/types/index.ts` was protected as it is required by `config/content.ts` for the live marketing radar.
-   - Core academy types `LessonMeta` and `QuizQuestion` were preserved for the academy lesson runner and compiler.
-   - Feature flags (`SCHEDULER_ENABLED`, `MARKETING_EMAILS_ENABLED`, `WEEKLY_RECAP_ENABLED`) were preserved in `DEFAULT_FEATURE_FLAGS` as required by test suites and admin toggles.
-4. **CI/Workflow Synchronization**:
-   - `.github/workflows/notification-scheduler.yml` updated to remove the deprecated `retry-failed-emails` job and trigger input before pruning `/api/cron/retry-failed`.
-   - `apps/web/package-lock.json` synchronized via `npm install --package-lock-only`, ensuring `npm ci` succeeds without mismatch errors.
+| Commit | What landed |
+|---|---|
+| `f44293f` | This audit and the Phase 3 roadmap |
+| `35dfe84` | Batch 3-A part 1: `ui/badge`, `ui/card`, `ui/select`, `ui/toast`, `feedback/success-state`, `hooks/useXpAnimation`, `emails/components/ProgressBar` |
+| `306853e` | Batch 3-B: `lib/search.ts`, `lib/animation.ts`, `lib/admin/index.ts`, `/api/dev/send-test-email`, `/api/admin/system/storage-cleanup`; campaign runner shrunk |
+| `ce95199` | Batch 3-C: migration `20261031000001_phase3_drop_unused_tables.sql` |
+| `710c174` | Batch 3-D: 5 tracked scripts, 7 packages (2 later restored) |
+| `6876fb7` | Batch 3-A part 2 (`BadgeNotification`, `feedback/error-state`, `ProfileComparisonModal`, `feature-card`, `sections/faq`, `testimonial-card`, `ProgressSectionDropdown`, `ui/accordion`), campaign runner deleted, `system.weekly_recap` key, `types/database.ts` aligned with the dropped tables, processor and notifications admin service stopped touching them, `MarketingModule` and `ParsedLesson` removed, test allowlists updated |
+| `18e0e0b` | `@emnapi/core` and `@emnapi/runtime` restored to `devDependencies` |
 
+Deviations from the plan in PR #79: `/api/cron/retry-failed` and its workflow job were kept (false positive); `/api/waitlist` was not removed; `NotificationBell` and `NotificationToast` were kept (false positive); `experience`, `journey`, `journey-timeline`, `community` and `testimonials` sections were not removed; three of the five flags were kept; the migration had no rollback file.
 
+### Branch `chore/post-phase3-cleanup` (not merged yet)
+
+- `/api/waitlist` and everything that served it; `public.waitlist` drop held in `pending-approval/20261112000001`.
+- `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED` retired; stored-value cleanup held in `pending-approval/20261112000002` (run after deploy).
+- Components removed: `sections/community`, `sections/testimonials`, the three product-mockup previews, `DashboardNotificationsWidget`, `BadgeShowcaseCard`, `CapstonesOverviewCard`. `experience`, `journey` and `journey-timeline` stay by owner decision.
+- `lib/xp/duplicate-analysis.ts` and its test removed.
+- `knip` sweep: dead types, `config/content.ts` constants, `LEVEL_TITLES` and `getTitleForXp`, the `BrandMarkProdigy` alias, unused imports in 7 production files, the `LeaderboardTable` `onCompare` prop, the stale `ProfileComparisonModal` ESLint entry.
+- Retention rule and account-deletion entries for the dropped tables removed.
+- Rollback added for `20261031000001`; notes added to the `rollback/20261018000001_*` files that still reference `sync_user_xp`.
+- `@types/qrcode` moved to `devDependencies`.
+
+Full entries are in [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
+## 9. Remaining candidates (not acted on)
+
+Found by `knip` and grep on 2026-11-12. None of these were removed; each needs a check before it goes.
+
+- About 139 exports are used only inside their own file (`knip` "unused exports"). Most can lose the `export` keyword rather than be deleted.
+- Lib functions with no callers outside their own file, tests included:
+  - `lib/academy/lessons-db.ts`: `getUserLessonProgress`, `getUserCompletedLessonIds`
+  - `lib/lessons-completion-service.ts`: `isLessonUnlockedByOrderNumber`, `getFirstLockedLessonIndex`
+  - `lib/skillRadar.ts`: `getSkillRadarHistory`
+  - `lib/streaks/streaks.ts`: `isSameDay`
+  - `lib/notifications/`: `getEventDefinition` (`events/index.ts`), `filterReadyQueueItems` (`queue/helpers.ts`), `createTimelineRecordFromQueueItem` (`timeline/helpers.ts`), `computeAnalyticsAggregate` (`analytics/index.ts`), `getNotificationConfig` (`config.ts`), `QUEUE_CONSTANTS` (`constants.ts`)
+  - `lib/auth.ts`: `isProfileComplete`
+  - `lib/brand.ts`: `brandTitle`, `productCopy`
+  - `lib/design/tokens.ts`: `DURATION`, `EASING`, `BREAKPOINTS`, `Z_INDEX`
+- `@typescript-eslint/parser` is imported by `lib/__tests__/b8g-typed-db-migration.test.ts` but is not declared in `apps/web/package.json`; it is only installed transitively. Add it as an explicit `devDependency`.
+- The privacy page (`app/(marketing)/privacy/page.tsx`) still lists "lesson bookmarks" as collected data, but the `bookmarks` table is dropped. Changing it is an owner and legal call.

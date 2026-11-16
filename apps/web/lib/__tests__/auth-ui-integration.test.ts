@@ -62,7 +62,7 @@ describe('Phase 4 — Auth UI Error Handling Integration', () => {
       const result = classifyAuthError(weakPwErr, 'signup')
 
       expect(result.code).toBe('AUTH_PASSWORD_TOO_WEAK')
-      expect(result.message).toBe('Password does not meet security requirements. Please choose a password with at least 6 characters.')
+      expect(result.message).toBe('Password does not meet security requirements. Please choose a password with at least 10 characters.')
     })
 
     it('translates transient database 500 error during signup to provider unavailable guidance', () => {

@@ -94,10 +94,10 @@ export function CertificateActions({
           href={linkedInUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-sky-600/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 font-bold text-xs transition-all active:scale-95 shadow-xs"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-sky-600/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 font-bold text-xs transition-all active:scale-95 shadow-xs"
           title="Add this official certificate directly to your LinkedIn profile"
         >
-          <LinkedInIcon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+          <LinkedInIcon className="w-4 h-4 text-sky-600" />
           <span>Add to LinkedIn Profile</span>
         </a>
       </div>
@@ -124,8 +124,8 @@ export function CertificateActions({
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="text-emerald-500 font-bold">Link Copied!</span>
+              <Check className="w-3.5 h-3.5 text-success" />
+              <span className="text-success font-bold">Link Copied!</span>
             </>
           ) : (
             <>

@@ -82,4 +82,5 @@ regexes = [
   '''TEST_PLACEHOLDER''',                     # sensitive-data-redaction.test.ts
   '''ZmFrZS1vcGFxdWUtdG9rZW4tMTIz''',         # sensitive-data-redaction.test.ts — base64 of "fake-opaque-token-123"
   '''re_TestPlaceholder''',                   # Resend placeholders in the redaction suites and the archived Stage 2 audit
+  '''c2lnbmF0dXJlLXZhbHVl''',                 # eng11-observability.test.ts: synthetic JWT fixture for redaction test
 ]

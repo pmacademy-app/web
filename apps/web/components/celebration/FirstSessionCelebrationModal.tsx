@@ -62,7 +62,7 @@ export function FirstSessionCelebrationModal({
         {/* Rewards summary grid */}
         <div className="grid grid-cols-3 gap-2.5 py-4">
           <div className="rounded-xl border border-border/80 bg-muted/40 p-3 text-center space-y-1">
-            <div className="flex justify-center text-amber-500">
+            <div className="flex justify-center text-warning">
               <Zap className="w-5 h-5 fill-current" />
             </div>
             <div className="text-sm font-bold text-foreground font-mono">+{xpEarned} XP</div>

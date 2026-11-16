@@ -1,12 +1,12 @@
 # Prodily Marketing Email History & Campaign Archive
 
-This document serves as the authoritative internal historical record of all marketing email campaigns, re-engagement broadcasts, cohort outreach, and promotional communications sent for **Prodily** (**Prodily PM Academy**).
+This document serves as the authoritative internal historical record of all marketing email campaigns, re-engagement broadcasts, cohort outreach, and promotional communications sent for **Prodily** (named **Prodily PM Academy** when most of these campaigns ran; quoted email copy below keeps the name as sent).
 
 ---
 
 ## Executive Summary & Historical Overview
 
-Between **August 11, 2026** and **September 18, 2026**, Prodily executed twelve targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
+Between **August 11, 2026** and **September 18, 2026**, Prodily executed twelve targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains a database-backed broadcast scheduler and transactional template infrastructure. The automated waitlist confirmation email was retired in November 2026 (see Additional Email A).
 
 ### Summary of Campaigns
 
@@ -787,7 +787,7 @@ CAMPAIGN 8: portfolio_activation_sep_2026
 - **Campaign Identifier:** `portfolio_activation_sep_2026`
 - **Source Folder:** `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/`
 - **Script Path:** `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/send-portfolio-activation-campaign.ts`
-- **Service Runner:** `apps/web/lib/campaigns/portfolio-activation-runner.ts`
+- **Service Runner (historical):** `apps/web/lib/campaigns/portfolio-activation-runner.ts` was shrunk in commit 306853e and deleted in commit 6876fb7 (Phase 3 dead-code pruning); `apps/web/lib/campaigns/` no longer exists.
 - **Platform:** Brevo (`aditya@prodily.adityagangwani.me`) with Resend failover
 - **Campaign Purpose:** Re-engage learners by highlighting their live public portfolio URL (`/p/[username]`) and motivating them to submit their first capstone deliverable to unlock their visual Skill Radar.
 - **Audience:** Current registered Prodily learners with `0` submitted capstones.
@@ -1360,10 +1360,12 @@ In addition to scheduled mass re-engagement scripts, the Prodily repository cont
 
 ---
 
-### Additional Email A — Waitlist Confirmation Email
+### Additional Email A: Waitlist Confirmation Email (retired)
 
-- **Trigger:** Automatic upon submission of the `/waitlist` form (`apps/web/app/api/waitlist/route.ts`).
-- **Function:** `sendWaitlistConfirmationEmail({ name, email })` (`apps/web/lib/email.ts`).
+- **Status:** Retired in November 2026. The `/api/waitlist` route and `sendWaitlistConfirmationEmail` were removed, `/waitlist` now redirects to `/signup`, and the `public.waitlist` table drop is held in `supabase/migrations/pending-approval/20261112000001_drop_waitlist_table.sql`. The record below is historical.
+
+- **Trigger (historical):** Sent on submission of the `/waitlist` form (`apps/web/app/api/waitlist/route.ts`, since removed).
+- **Function (historical):** `sendWaitlistConfirmationEmail({ name, email })` in `apps/web/lib/email.ts` (since removed).
 - **Platform:** Brevo / Resend.
 - **Subject:** `You're on the PM Academy waitlist!`
 - **Sender:** `Prodily <welcome@prodily.adityagangwani.me>`
@@ -1419,8 +1421,9 @@ Registered in `apps/web/emails/index.ts`:
 
 | Template Key | Component | Default Subject Line | Category |
 |---|---|---|---|
-| `auth.verify_email` | `VerifyEmail` | `Confirm your PM Academy email address` | Critical Auth |
+| `auth.verify_email` | `VerifyEmail` | `Confirm your Prodily email address` | Critical Auth |
 | `auth.password_reset` | `PasswordReset` | `Reset your Prodily password` | Critical Auth |
+| `auth.email_change_verify` | `VerifyEmail` | `Confirm your new Prodily email address` | Critical Auth |
 | `admin.direct_message` | `DirectMessageEmail` | `{{subject}}` | Direct Admin |
 | `auth.welcome` | `WelcomeEmail` | `Welcome to Prodily!` | Lifecycle Automation |
 | `learning.module_complete` | `ModuleCompletedEmail` | `Module Complete: {{moduleName}}!` | Achievement Automation |
@@ -1428,6 +1431,13 @@ Registered in `apps/web/emails/index.ts`:
 | `achievement.level_up` | `LevelUpEmail` | `Level Up Unlocked: Level {{newLevel}}!` | Achievement Automation |
 | `achievement.certificate` | `CertificateEarned` | `Your Prodily Certificate is Ready!` | Achievement Automation |
 | `achievement.portfolio_published` | `PortfolioPublished` | `Your Public Portfolio is Live!` | Feature Showcase |
+| `achievement.fellow_granted` | `FellowGranted` | `You're now a Prodily PM Fellow!` | Achievement Automation |
+| `achievement.capstone_published` | `CapstonePublished` | `Your capstone is published` | Achievement Automation |
+| `nudge.portfolio_ready` | `ProofNudgeEmail` | `Your portfolio is ready to share` | Lifecycle Nudge |
+| `nudge.fellow_eligible` | `ProofNudgeEmail` | `You qualify for PM Fellow` | Lifecycle Nudge |
 | `learning.weekly_recap` | `WeeklyRecap` | `Your Week in Prodily` | Scheduled Digest |
-| `learning.daily_reminder` | `DailyReminder` | `Keep your learning streak alive on PM Academy!` | Daily Automation |
-| `inactive.resume_learning` | `WelcomeEmail` | `Resume your learning path on PM Academy` | Lifecycle Automation |
+| `learning.daily_reminder` | `DailyReminder` | `Keep your learning streak alive on Prodily!` | Daily Automation |
+| `inactive.resume_learning` | `WelcomeEmail` | `Resume your learning path on Prodily` | Lifecycle Automation |
+| `lifecycle.d1_never_started` | `LifecycleEmail` | `Ready to start your first lesson on Prodily?` | Lifecycle Automation |
+| `lifecycle.d3_started_not_finished` | `LifecycleEmail` | `Pick up where you left off on Prodily` | Lifecycle Automation |
+| `lifecycle.streak_broken` | `LifecycleEmail` | `Your learning streak is waiting on Prodily` | Lifecycle Automation |

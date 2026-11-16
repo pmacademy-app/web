@@ -48,7 +48,7 @@ function SettingsTabsContent() {
   return (
     <div className="space-y-4">
       {/* Option B: Sleek Recessed Segmented Control Strip */}
-      <div className="inline-flex max-w-full items-center p-0.5 bg-muted/60 dark:bg-muted/40 rounded-lg border border-border/60 gap-0.5 overflow-x-auto scrollbar-none shadow-2xs">
+      <div className="inline-flex max-w-full items-center p-0.5 bg-muted/60 rounded-lg border border-border/60 gap-0.5 overflow-x-auto scrollbar-none shadow-2xs">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key
           const isDanger = tab.key === 'danger-zone'

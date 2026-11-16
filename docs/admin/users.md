@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-The Users workspace allows administrators to search, inspect, troubleshoot, and manage all registered learners across Prodily PM Academy. It provides deep visibility into individual learning progress, activity timelines, earned credentials, communications history, and administrative account controls.
+The Users workspace allows administrators to search, inspect, troubleshoot, and manage all registered learners across Prodily. It provides deep visibility into individual learning progress, activity timelines, earned credentials, communications history, and administrative account controls.
 
 ---
 

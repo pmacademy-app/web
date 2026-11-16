@@ -40,7 +40,7 @@ export function NotificationToast() {
   const iconBgClass = isError
     ? 'bg-destructive/10 text-destructive'
     : isSuccess
-    ? 'bg-emerald-500/10 text-emerald-500'
+    ? 'bg-emerald-500/10 text-success'
     : 'bg-primary/10 text-primary'
 
   // The toast only exists after a client event, so there is no server render to match.
@@ -60,11 +60,11 @@ export function NotificationToast() {
         {isError ? (
           <AlertCircle className="w-5 h-5 text-destructive" />
         ) : toast.badgeName ? (
-          <Award className="w-5 h-5 text-amber-500" />
+          <Award className="w-5 h-5 text-warning" />
         ) : toast.xpEarned ? (
           <Sparkles className="w-5 h-5 text-primary animate-pulse" />
         ) : (
-          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+          <CheckCircle2 className="w-5 h-5 text-success" />
         )}
       </div>
 
@@ -72,7 +72,7 @@ export function NotificationToast() {
         <h4 className="text-xs font-bold text-foreground flex items-center justify-between">
           <span>{toast.title}</span>
           {toast.xpEarned && (
-            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
+            <span className="text-[11px] font-bold text-success bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">
               +{toast.xpEarned} XP
             </span>
           )}

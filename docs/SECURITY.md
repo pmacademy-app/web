@@ -1,4 +1,4 @@
-# Security Threat Model & Access Control — Prodily PM Academy
+# Security Threat Model & Access Control: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026  
@@ -33,25 +33,26 @@ All user-owned database tables enforce strict RLS policies:
 ## 3. Webhook & API Authentication Security
 
 1. **Supabase Auth Hook (`/api/auth/send-email-hook`)**:
-   - Verifies requests using `SEND_EMAIL_HOOK_SECRET`.
-   - Supports Bearer token, custom headers (`x-supabase-auth-secret`), query string, and Svix HMAC-SHA256 signatures.
+   - Verifies requests using Standard Webhooks (Svix) HMAC-SHA256 signatures (`webhook-signature` or `svix-signature`) over `${webhook-id}.${webhook-timestamp}.${body}` using `SEND_EMAIL_HOOK_SECRET`.
+   - Enforces a 5-minute (300 second) maximum timestamp drift to prevent replay attacks.
+   - Bearer token and custom header bypasses have been removed (SEC-16).
 2. **Email provider webhooks (`/api/email/webhooks`)** — this single route handles **two** distinct providers with two distinct verification mechanisms:
    - **Resend**: Svix HMAC-SHA256 signature verification via `RESEND_WEBHOOK_SECRET` (`verifySvixSignature()`).
-   - **Brevo**: a plain shared-secret header compare (`x-brevo-webhook-secret` / `x-webhook-secret`) against `BREVO_WEBHOOK_SECRET` — not HMAC-based.
+   - **Brevo**: a plain shared-secret header compare (`x-brevo-webhook-secret` / `x-webhook-secret`) against `BREVO_WEBHOOK_SECRET`: not HMAC-based.
    - Both reject unsigned/mismatched payloads with HTTP 401.
 3. **Cron Endpoints (`/api/cron/*`)**:
    - Enforces Bearer token authentication matching `CRON_SECRET`.
    - Rejects unauthorized calls with HTTP 401 and logs a warning with `logSystemError()`.
 
-### CSRF / Origin-Referer Scope
+### CSRF / Same-Origin Write Check (SEC-12)
 
-An Origin/Referer header check exists today on exactly **two** routes: `POST /api/auth/update-password` and `POST /api/auth/complete-consent` (the Google consent gate, which can delete a fresh account). It is not a platform-wide CSRF policy. Signup, login, and change-email do not currently enforce it.
+Cookie-authenticated mutating endpoints (POST, PUT, PATCH, DELETE) across `/api/*` enforce same-origin verification in `apps/web/proxy.ts` (SEC-12). Requests carrying session cookies must supply `Sec-Fetch-Site: same-origin` or a valid `Origin` header matching `BRAND.siteUrl` or the request host. Non-matching cross-origin requests are rejected with HTTP 403 Forbidden. Server-to-server endpoints (`api/auth/send-email-hook`, `api/email/webhooks`, `api/email/unsubscribe`, `api/cron/*`) are exempt.
 
 ---
 
 ## 3a. Signup Abuse Controls (added 2026-09-07)
 
-`POST /api/auth/signup` previously had **no rate limiting of any kind**, which allowed ~1,233 automated accounts to be created in ~25 hours (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). It now enforces, via the persistent cross-instance rate limiter (`lib/rate-limit.ts`):
+`POST /api/auth/signup` previously had **no rate limiting of any kind**, which allowed ~1,233 automated accounts to be created in ~25 hours (see `docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`, deleted in `1dbd2a4`; read it with `git show 1dbd2a4^:docs/archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`). It now enforces, via the persistent cross-instance rate limiter (`lib/rate-limit.ts`):
 - **5 signups / 15 minutes** per client IP (`x-forwarded-for` / `x-real-ip`).
 - **3 signups / 24 hours** per canonicalized email — Gmail `local+tag@gmail.com` addresses collapse to `local@gmail.com` before the check, closing the specific alias-abuse pattern seen in the incident.
 
@@ -80,7 +81,7 @@ Google sign-in is behind `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` (off by default; `GET
 
 - **Server-Only Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `SEND_EMAIL_HOOK_SECRET`, `CRON_SECRET`, `BREVO_API_KEY`, `BREVO_WEBHOOK_SECRET`, `RESEND_API_KEY`, and `RESEND_WEBHOOK_SECRET` are strictly server-side.
 - **Client Expose Prevention**: Never import service-role client into client components (`'use client'`).
-- **Secret Sanitization**: `lib/monitoring/redaction.ts` is the single redaction implementation, applied to logged messages, to `details` payloads recursively, to queue template variables before they reach `email_dead_letter` / `notification_events`, and to the outgoing message of `apiError()`. It redacts by value shape (provider keys `xkeysib-`/`xsmtpsib-`/`re_`, `whsec_` and Svix signatures, JWTs, database connection credentials, `Authorization` and cookie headers, session tokens, one-time auth tokens in URLs, passwords) **and** by key name for structured payloads. Email addresses are masked rather than dropped so the recipient domain stays diagnosable. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). Admin API responses use `adminErrorMessage()`, which sanitizes rather than genericizes: the operator keeps the diagnostic text, credentials and connection strings do not survive.
+- **Secret Sanitization**: `lib/monitoring/redaction.ts` is the single redaction implementation, applied to logged messages, to `details` payloads recursively, to queue template variables before they reach `notification_events` (the `email_dead_letter` table was dropped by `20261031000001`), and to the outgoing message of `apiError()`. It redacts by value shape (provider keys `xkeysib-`/`xsmtpsib-`/`re_`, `whsec_` and Svix signatures, JWTs, database connection credentials, `Authorization` and cookie headers, session tokens, one-time auth tokens in URLs, passwords) **and** by key name for structured payloads. Email addresses are masked rather than dropped so the recipient domain stays diagnosable. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). Admin API responses use `adminErrorMessage()`, which sanitizes rather than genericizes: the operator keeps the diagnostic text, credentials and connection strings do not survive.
 
 ---
 
@@ -230,3 +231,32 @@ into a commit is exactly the accident this scan exists to catch.
 minor updates are grouped; majors stay separate so each gets its own review and
 regression run. Dependabot is what keeps the audit allowlist converging rather
 than only growing.
+
+Every ecosystem sets `cooldown: { default-days: 3 }`: a new release is not
+proposed until it is 3 days old, which gives a compromised publish time to be
+caught and pulled first. Cooldown applies to version updates only, so security
+updates still arrive as soon as an advisory is published.
+
+### 5.4 CI secrets and install scripts
+
+Added 2026-11-13 (SEC-10, SEC-20). What changed in
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml):
+
+- **No sensitive secret at job level.** Job-level `env` reaches every step,
+  including third-party install scripts. `build-and-validate` and `e2e` now keep
+  only public values there: the two `NEXT_PUBLIC_SUPABASE_*` values (inlined into
+  the client bundle anyway) and the published Turnstile test keys.
+- **Secrets go only to the step that needs them.** In `build-and-validate`, no
+  step gets `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `CRON_SECRET` or
+  `SEND_EMAIL_HOOK_SECRET`: unit tests use the mocks in `vitest.setup.ts`, and a CI
+  build is never served (its build-time readers of the service-role key fall back
+  to an empty list). The environment check gets a true/false flag, not the key.
+  In `e2e`, only the step that starts the server gets `SUPABASE_SERVICE_ROLE_KEY`.
+- **Installs run no scripts.** Both jobs run `npm ci --ignore-scripts`, then
+  `npm rebuild esbuild unrs-resolver`, the only lockfile packages that declare an
+  install script on Linux. Re-check that list when the lockfile gains a new
+  `hasInstallScript` entry.
+- **The deploy CLI is pinned.** `deploy-supabase` installs the Supabase CLI with
+  `supabase/setup-cli`, pinned to a commit SHA, at a fixed `version:`, instead of
+  `npx supabase` resolving whatever is newest on the day. Bump the version on
+  purpose after reading the CLI release notes.

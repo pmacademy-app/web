@@ -5,13 +5,14 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { hasPasswordIdentity, type ServiceClient } from '@/lib/auth/oauth-account-guard'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { MIN_PASSWORD_LENGTH } from '@/lib/auth/password-policy'
 
 export const runtime = 'nodejs'
 
 /**
  * Maps a Supabase Auth Admin `updateUserById` password-change failure to safe,
  * authored copy. Returns `null` for anything not recognized so the caller can
- * rethrow it — an unmapped error is a genuine fault, not a user-facing one, and
+ * rethrow it: an unmapped error is a genuine fault, not a user-facing one, and
  * must go through `withRoute`'s generic handling rather than reach the client
  * as raw provider text.
  */
@@ -136,9 +137,9 @@ export const POST = withRoute(
       )
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(
-        { success: false, error: 'Password must be at least 6 characters long.' },
+        { success: false, error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.` },
         { status: 400 }
       )
     }

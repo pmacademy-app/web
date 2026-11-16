@@ -21,7 +21,7 @@ import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { LessonContextProvider } from '@/contexts/lesson-context'
-import { dispatchClientNotificationEvent } from '@/lib/events/client-event-bus'
+import { dispatchClientNotificationEvent, showClientToast } from '@/lib/events/client-event-bus'
 import type { CompiledLesson, CompiledBlock } from '@/types'
 import {
   BookOpen,
@@ -146,9 +146,12 @@ export function isTabUnlocked(tab: TabType, prog: LessonProgressV2 | null | unde
  * optional reflection.
  */
 export function lessonCompletedFromQuiz(
-  res: { isCompleted?: boolean; success?: boolean } | null | undefined
+  res: { isCompleted?: boolean; success?: boolean; isPassed?: boolean } | null | undefined
 ): boolean {
-  return !!res && (res.isCompleted === true || res.success === true)
+  if (!res) return false
+  if (res.isPassed === false) return false
+  if (res.isCompleted === false && !res.isPassed) return false
+  return res.isPassed === true || res.isCompleted === true || res.success === true
 }
 
 /**
@@ -283,7 +286,7 @@ function ReflectionForm({
 
       {xpEarned !== null ? (
         <div className="text-center py-8 space-y-3 animate-fade-in">
-          <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">
+          <p className="text-success font-bold text-lg">
             Reflection saved! +{xpEarned} XP earned.
           </p>
         </div>
@@ -391,9 +394,9 @@ function TheoryReadButton({
   if (theoryReadAt) {
     return (
       <div className="mt-8 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+        <div className="flex items-center gap-2 text-success font-bold text-sm">
           <Award className="h-5 w-5" />
-          Theory section completed. Quiz is now unlocked!
+          Lesson read. Quiz is now unlocked!
         </div>
         <Button onClick={onComplete} variant="outline" size="lg" className="font-semibold">
           Proceed to Quiz →
@@ -678,7 +681,7 @@ export default function LessonPageContent({
   if (error || !progress) {
     return (
       <div className="text-center py-20 space-y-4">
-        <p className="text-red-500 font-bold">Failed to load lesson progress. Please reload.</p>
+        <p className="text-danger font-bold">Failed to load lesson progress. Please reload.</p>
         <Link href="/academy" className="text-primary hover:underline text-sm font-semibold">
           Return to Curriculum
         </Link>
@@ -728,13 +731,13 @@ export default function LessonPageContent({
       return (
         <div className="max-w-lg mx-auto text-center py-12 space-y-8 animate-scale-up">
           <div className="flex justify-center">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 shadow-sm">
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-warning shadow-sm">
               <Trophy className="h-10 w-10" />
             </div>
           </div>
 
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-warning text-xs font-semibold uppercase tracking-wider">
               Module Achievement Unlocked
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
@@ -792,8 +795,11 @@ export default function LessonPageContent({
                       url: window.location.href,
                     }).catch(() => {})
                   } else {
-                    navigator.clipboard.writeText(window.location.href)
-                    alert('Achievement link copied to clipboard!')
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                      showClientToast('Link Copied', 'Achievement link copied to clipboard.', 'success')
+                    }).catch(() => {
+                      showClientToast('Copy Failed', 'Unable to copy link to clipboard.', 'error')
+                    })
                   }
                 }}
                 className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
@@ -820,7 +826,7 @@ export default function LessonPageContent({
             You completed <strong>{lesson.title}</strong>. Your skill radar has been updated.
           </p>
           {sessionQuizScore !== null && (
-            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            <p className="text-xs font-semibold text-success">
               You scored {sessionQuizScore}% on the practice quiz.
             </p>
           )}
@@ -861,10 +867,10 @@ export default function LessonPageContent({
 
   // ── Tab definitions ──────────────────────────────────────────────────────
   const tabs = [
-    { id: 'theory' as const, label: 'Theory', icon: BookOpen, unlocked: true },
-    { id: 'quiz' as const, label: 'Practice Quiz', icon: CheckSquare, unlocked: isQuizUnlocked },
-    { id: 'flashcards' as const, label: 'Flashcards', icon: Layers, unlocked: isFlashcardsUnlocked },
-    { id: 'reflection' as const, label: 'Reflection', icon: Edit3, unlocked: isReflectionUnlocked },
+    { id: 'theory' as const, label: 'Theory', icon: BookOpen, unlocked: true, lockHint: '' },
+    { id: 'quiz' as const, label: 'Practice Quiz', icon: CheckSquare, unlocked: isQuizUnlocked, lockHint: 'Read the lesson to unlock the quiz.' },
+    { id: 'flashcards' as const, label: 'Flashcards', icon: Layers, unlocked: isFlashcardsUnlocked, lockHint: 'Read the lesson to unlock flashcards.' },
+    { id: 'reflection' as const, label: 'Reflection', icon: Edit3, unlocked: isReflectionUnlocked, lockHint: 'Pass the quiz to unlock the reflection.' },
   ]
 
 
@@ -894,6 +900,8 @@ export default function LessonPageContent({
                 aria-selected={isActive}
                 aria-controls={`panel-${tab.id}`}
                 disabled={!tab.unlocked}
+                title={!tab.unlocked ? tab.lockHint : undefined}
+                aria-label={!tab.unlocked ? `${tab.label} (${tab.lockHint})` : tab.label}
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                   isActive
@@ -943,8 +951,13 @@ export default function LessonPageContent({
       <div className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
         {/* Theory Panel */}
         {activeTab === 'theory' && (
-          <div id="panel-theory" role="tabpanel" aria-labelledby="tab-theory">
-            {/* Phase 4 (revised, Step 7): quiet Core progress affordance — lowers perceived
+          <div
+            id="panel-theory"
+            role="tabpanel"
+            aria-labelledby="tab-theory"
+            className="max-w-[68ch] mx-auto text-base leading-relaxed"
+          >
+            {/* Phase 4 (revised, Step 7): quiet Core progress affordance: lowers perceived
                 effort for a fuller Core without gamification. Treatment only. */}
             {isTreatment && (
               <CoreReadingProgress estimatedMinutes={coreReadingMinutes} />

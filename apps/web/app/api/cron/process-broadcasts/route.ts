@@ -8,7 +8,8 @@ import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 export const runtime = 'nodejs'
 
 /**
- * GET /api/cron/process-broadcasts
+ * POST /api/cron/process-broadcasts
+ * GET /api/cron/process-broadcasts (legacy alias; retired in AG-15)
  *
  * Finds scheduled email and in-app broadcasts past their `scheduled_at` time and
  * executes their delivery.
@@ -17,10 +18,8 @@ export const runtime = 'nodejs'
  * authenticated admin session; anything else is rejected. Before B7-C the secret
  * was compared with `===` in this file, which is now a constant-time comparison
  * inside `resolveActor`.
- *
- * This route has no POST handler, matching the workflow, which calls it with GET.
  */
-export const GET = withRoute(
+export const POST = withRoute(
   {
     actor: { allow: ['cron', 'admin'] },
     operation: 'cron.process_broadcasts',

@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { reportClientError } from '@/lib/monitoring/client-error-beacon'
+
 /**
  * Root segment error boundary. It renders *inside* the root layout, so it must
  * not emit its own document shell — a nested html/body pair breaks
@@ -20,19 +22,20 @@ export default function RootSegmentError({
 }) {
   useEffect(() => {
     console.error('[RootSegmentError Boundary] Logged:', error)
+    reportClientError(error, 'root')
   }, [error])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center bg-background">
-      <p className="text-body-sm text-locked font-medium mb-3">500</p>
+      <p className="text-body-sm text-ink-muted font-medium mb-3">500</p>
       <h1 className="text-h1 font-semibold text-foreground mb-3">
         We hit an unexpected issue.
       </h1>
-      <p className="text-body text-locked max-w-[480px] mb-8">
+      <p className="text-body text-ink-muted max-w-[480px] mb-8">
         Refresh the page or try again in a moment.
       </p>
       {error.digest && (
-        <p className="text-body-sm text-locked font-mono mb-8 break-all">
+        <p className="text-body-sm text-ink-muted font-mono mb-8 break-all">
           Error ID: {error.digest}
         </p>
       )}

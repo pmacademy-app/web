@@ -269,6 +269,7 @@ export default function QuizBlock({ block }: BlockProps) {
   if (quizFinished) {
     const percentage = Math.round((correctCount / totalQuestions) * 100);
     const isPerfect = correctCount === totalQuestions;
+    const isPassed = percentage >= 70;
 
     return (
       <div className="max-w-xl mx-auto text-center py-8 space-y-8 animate-fade-in my-6">
@@ -276,7 +277,7 @@ export default function QuizBlock({ block }: BlockProps) {
           {isPerfect ? (
             <div className="relative">
               <div className="absolute -inset-1 rounded-full bg-amber-500 blur opacity-40 animate-pulse" />
-              <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 text-warning border border-amber-500/20">
                 <Trophy className="h-10 w-10 animate-bounce" />
               </div>
             </div>
@@ -296,11 +297,20 @@ export default function QuizBlock({ block }: BlockProps) {
             aria-describedby={summaryScoreId}
             className="text-2xl md:text-3xl font-bold font-serif text-foreground rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            {isPerfect ? 'Flawless Victory!' : 'Quiz Completed!'}
+            {isPerfect ? 'Flawless Victory!' : isPassed ? 'Quiz Completed!' : 'Keep Practicing!'}
           </h2>
           <p id={summaryScoreId} role="status" className="text-muted-foreground text-sm">
-            You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
-            <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
+            {isPassed ? (
+              <>
+                You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
+                <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
+              </>
+            ) : (
+              <>
+                Attempted, {percentage}%. You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
+                <span className="font-semibold">{totalQuestions}</span> correct answers. Retake to complete (70% required).
+              </>
+            )}
           </p>
         </div>
 
@@ -499,7 +509,7 @@ export default function QuizBlock({ block }: BlockProps) {
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                       <Check className="h-3 w-3" />
                     </span>
-                    <span className="text-emerald-600 dark:text-emerald-400">Correct!</span>
+                    <span className="text-success">Correct!</span>
                   </>
                 ) : (
                   <>

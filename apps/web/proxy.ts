@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
+import { isAllowedApiOrigin } from '@/lib/security/origin-check'
 // PROD-09: the one open-redirect guard for `next`. Its only runtime dependency is
 // `node:crypto`, which the proxy's Node.js runtime provides.
 import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
@@ -130,8 +131,8 @@ function passThrough(request: NextRequest, requestId: string): NextResponse {
  *
  * The id is resolved here *and* independently in `withRoute`, which is deliberate
  * rather than duplicated: the proxy's matcher excludes `api/cron`, `api/health`,
- * `api/email/webhooks`, `api/email/unsubscribe`, `api/auth/callback`, `api/og` and
- * `api/waitlist`, so a proxy-only implementation would leave exactly the scheduled
+ * `api/email/webhooks`, `api/email/unsubscribe`, `api/auth/callback` and `api/og`,
+ * so a proxy-only implementation would leave exactly the scheduled
  * and webhook traffic untraceable. Both sides call the same resolver, so when the
  * proxy does run it stamps the header and the handler adopts that value instead of
  * minting a second one.
@@ -200,9 +201,25 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path.startsWith('/api/admin/') ||
     path.startsWith('/api/cron/') ||
     path.startsWith('/api/email/') ||
-    path === '/api/waitlist' ||
-    path === '/api/contact'
+    path === '/api/contact' ||
+    // ENG-11: the error-boundary beacon. It reads no session, so verifying one here
+    // would cost an auth call per crash report, and the maintenance and consent gates
+    // would drop the very reports that explain an outage.
+    path === '/api/client-errors'
   const isProtectedLearnerApi = isApiRoute && !isExemptApi
+
+  // SEC-12: Enforce same-origin writes for cookie-authenticated API requests
+  if (isApiRoute && !isAllowedApiOrigin(request, path)) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Cross-origin request forbidden.',
+        code: 'FORBIDDEN',
+        requestId,
+      },
+      { status: 403, headers: { [REQUEST_ID_HEADER]: requestId } }
+    )
+  }
 
   // CQ-10: admin console APIs stay exempt from the learner gates above (maintenance mode,
   // email verification, consent), but they still get their session refreshed here. Since
@@ -263,8 +280,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
         let verifiedUserId: string | null = null
         try {
           if (accessToken) {
-            const { data } = await supabase.auth.getUser(accessToken)
-            if (data?.user) verifiedUserId = data.user.id
+            const { data, error } = await supabase.auth.getClaims(accessToken)
+            if (!error && data?.claims?.sub) verifiedUserId = data.claims.sub
           }
         } catch (err) {
           console.error('[proxy] /lessons access-check auth error:', err)
@@ -333,18 +350,44 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
     if (accessToken) {
       try {
-        const { data, error } = await supabase.auth.getUser(accessToken)
-        if (!error && data?.user) {
-          user = {
-            id: data.user.id,
-            email: data.user.email || '',
-            app_metadata: (data.user.app_metadata as Record<string, unknown>) || {},
-            user_metadata: (data.user.user_metadata as Record<string, unknown>) || {},
-            email_confirmed_at: data.user.email_confirmed_at,
+        type AuthWithGetClaims = {
+          getClaims?: (token: string) => Promise<{
+            data: { claims?: Record<string, unknown> } | null
+            error: unknown
+          }>
+        }
+        const authWithClaims = supabase.auth as unknown as AuthWithGetClaims
+        if (typeof authWithClaims.getClaims === 'function') {
+          const { data, error } = await authWithClaims.getClaims(accessToken)
+          const claims = data?.claims
+          if (!error && claims?.sub && typeof claims.sub === 'string') {
+            user = {
+              id: claims.sub,
+              email: typeof claims.email === 'string' ? claims.email : '',
+              app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
+              user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
+              email_confirmed_at:
+                typeof claims.email_confirmed_at === 'string'
+                  ? claims.email_confirmed_at
+                  : claims.email
+                    ? 'confirmed'
+                    : undefined,
+            }
+          }
+        } else {
+          const { data, error } = await supabase.auth.getUser(accessToken)
+          if (!error && data?.user) {
+            user = {
+              id: data.user.id,
+              email: data.user.email || '',
+              app_metadata: data.user.app_metadata || {},
+              user_metadata: data.user.user_metadata || {},
+              email_confirmed_at: data.user.email_confirmed_at,
+            }
           }
         }
       } catch (err) {
-        console.error('[proxy] getUser error:', err)
+        console.error('[proxy] auth verification error:', err)
       }
     }
 
@@ -373,6 +416,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     curriculum_access_override?: boolean
     auth_provider?: string
     terms_accepted_at?: string | null
+    onboarding_completed?: boolean
+    goal?: string | null
   }
   let cachedUserData: ProfileData | null = null
   async function loadUserProfileData() {
@@ -389,7 +434,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
       const { data } = await authorizedClient
         .from('users')
-        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at')
+        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at, onboarding_completed, goal')
         .eq('id', user.id)
         .maybeSingle()
       cachedUserData = (data || {}) as ProfileData
@@ -421,7 +466,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
   async function hasCurriculumAccessOverride(): Promise<boolean> {
     if (!user) return false
-    if (user.app_metadata?.curriculum_access_override || user.user_metadata?.curriculum_access_override) return true
+    // SEC-21: Trusted claim in app_metadata only (user_metadata is client-writable)
+    if (user.app_metadata?.curriculum_access_override === true) return true
 
     const profileData = await loadUserProfileData()
     return Boolean(profileData?.curriculum_access_override)
@@ -614,7 +660,20 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       }
     }
 
-    const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
+    // SEC-21: Trusted claim in app_metadata OR database public.users columns.
+    // Stop reading user_metadata for access decisions.
+    let isOnboardingComplete = Boolean(
+      user.app_metadata?.onboarding_complete === true ||
+      user.app_metadata?.onboarding_completed === true
+    )
+    if (!isOnboardingComplete) {
+      const profileData = await loadUserProfileData()
+      isOnboardingComplete = Boolean(
+        profileData?.onboarding_completed ||
+        profileData?.goal != null ||
+        profileData?.curriculum_access_override
+      )
+    }
     const isOnboardingPage = path === ONBOARDING_PAGE
 
     if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
@@ -656,40 +715,44 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
  * itself independently and reads nothing from the session, so running session
  * verification for it bought nothing.
  *
- * This narrows only WHICH PATHS ENTER — it does not change what the proxy does for
- * anything that still enters. Verified `getUser()`, refresh-session handling, cookie
+ * This narrows only which paths enter: it does not change what the proxy does for
+ * anything that still enters. Verified getClaims(), refresh-session handling, cookie
  * clearing, protected-page redirects and admin authorization are all untouched (B3).
  *
- * Newly excluded, each verified route-by-route rather than by pathname assumption:
+ * Excluded paths, each verified route-by-route rather than by pathname assumption:
  *
  *   api/cron/*              CRON_SECRET bearer, else `requireAdminUser(request)`.
  *                           That fallback resolves the user from the request itself
  *                           (`getAuthenticatedUserFromRequest` reads the cookie and
- *                           calls `supabase.auth.getUser()`), so admin access still
+ *                           verifies the token), so admin access still
  *                           works without the proxy having run.
  *   api/health              No auth of any kind; returns a liveness probe. A health
  *                           check should also answer during maintenance mode.
- *   api/og/*                Deliberately public — social crawlers must fetch it
+ *   api/og/*                Deliberately public: social crawlers must fetch it
  *                           unauthenticated. Portfolio privacy is enforced inside the
  *                           handler, not here.
  *   api/email/webhooks      Svix (Resend) / shared-secret (Brevo) signature auth.
  *   api/email/unsubscribe   One-time `unsubscribe_token` from the email itself.
+ *   public marketing pages  about, contact, faq, frameworks, glossary, privacy,
+ *                           reviews, terms, waitlist: static marketing content
+ *                           with no session dependency.
  *
  * `api/email/*` is listed as its two concrete routes rather than as a namespace on
  * purpose: they authenticate by two different mechanisms, and a future
  * session-backed route added under that prefix must NOT inherit an exclusion by
  * accident.
  *
- * Everything else still matches: all pages, and every other API route.
+ * Everything else still matches: app pages, admin, curriculum, lessons, auth, and session APIs.
  */
 export const config = {
   matcher: [
     /*
      * Match all paths except:
      * - API routes that carry their own independent authentication (see above)
+     * - Public marketing pages (about, contact, faq, frameworks, glossary, privacy, reviews, terms, waitlist)
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist|[^/]*\\.[^/]*$).*)',
   ],
 }

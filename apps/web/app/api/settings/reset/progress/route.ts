@@ -4,6 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { resetProgress } from '@/lib/settings/settings-service'
+import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
 
 export const POST = withRoute(
   {
@@ -13,10 +14,17 @@ export const POST = withRoute(
     summary: 'Unexpected failure while resetting learner progress',
   },
   async ({ request, actor }) => {
-    // No body schema: the single optional field is tolerated in any shape, as
-    // before migration, so a malformed body still resets everything rather than
-    // becoming a 400.
     const body = await request.json().catch(() => ({}))
+    const reauth = await verifyDestructiveReauth({
+      actor,
+      body,
+      expectedPhrase: 'RESET',
+    })
+
+    if (!reauth.ok) {
+      return reauth.response
+    }
+
     const moduleSlug = body.module_slug
 
     const supabase = createServiceRoleClient()

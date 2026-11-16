@@ -1,7 +1,7 @@
-# Engineering Rules & Guidelines — Prodily PM Academy
+# Engineering Rules & Guidelines (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Last Updated:** September 6, 2026  
+**Last Updated:** November 12, 2026  
 
 ---
 
@@ -31,19 +31,25 @@
 
 ## 3. Verification Standards Before Commits
 
-Before declaring any work complete or committing to `main`:
+Before declaring any work complete or opening a pull request, run the focused checks locally:
 
 ```bash
 # From apps/web/
 
-# 1. Run all unit & integration test suites via Vitest
-npm test
+# 1. Run the Vitest files that cover what you changed
+npx vitest run lib/__tests__/<file>.test.ts
 
-# 2. Run ESLint check
+# 2. Or run the matching focused script from package.json (test:rls, test:admin,
+#    test:auth, test:a11y, test:email, and the other test:* scripts)
+npm run test:<area>
+
+# 3. TypeScript typecheck
+npm run typecheck
+
+# 4. ESLint check
 npm run lint
-
-# 3. Run production build (includes TypeScript type checking & static page rendering)
-npm run build
 ```
 
-Never claim a task is resolved without concrete build and test output verification.
+The full Vitest suite (`npm test`) and the production build (`npm run build`) tend to time out on a local machine. Leave them to CI: `.github/workflows/ci.yml` runs both on every pull request to `main` and every push to `main`, and a PR is not done until those checks are green.
+
+Never claim a task is resolved without concrete test output. Report what you actually ran and its real result.

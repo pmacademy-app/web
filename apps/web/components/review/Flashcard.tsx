@@ -68,7 +68,7 @@ export function Flashcard({ card, isFlipped, onFlip }: FlashcardProps) {
           }`}
         >
           <div className="flex items-center justify-between text-xs text-muted-foreground border-b border-border/50 pb-3">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-success uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
               Key Takeaway / Answer
             </span>

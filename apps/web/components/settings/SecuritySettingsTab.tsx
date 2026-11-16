@@ -10,6 +10,11 @@ import { apiPost } from '@/lib/api/client'
 import { useDirtyFormGuard } from '@/hooks/use-dirty-form-guard'
 import { showClientToast } from '@/lib/events/client-event-bus'
 import { logout } from '@/lib/auth/logout'
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_NEW_MIN_LENGTH_MESSAGE,
+  PASSWORD_MIN_LENGTH_HINT,
+} from '@/lib/auth/password-policy'
 import type {
   ChangeEmailGetResponse,
   ChangeEmailPostResponse,
@@ -203,6 +208,7 @@ function ChangeEmailCard() {
             <Input
               id="settings-email-password"
               type={showEmailPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               required
               disabled={submittingEmail}
               value={emailPassword}
@@ -228,6 +234,8 @@ function ChangeEmailCard() {
           <Input
             id="settings-new-email"
             type="email"
+            autoComplete="email"
+            inputMode="email"
             required
             disabled={submittingEmail}
             value={newEmail}
@@ -241,7 +249,7 @@ function ChangeEmailCard() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-border">
         <div className="flex-1">
           {emailSuccessMsg && (
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+            <span className="text-xs font-semibold text-success flex items-center gap-1.5 animate-in fade-in-0" role="status">
               <CheckCircle2 className="w-4 h-4 shrink-0" /> {emailSuccessMsg}
             </span>
           )}
@@ -293,8 +301,8 @@ export function SecuritySettingsTab() {
       return
     }
 
-    if (newPassword.length < 6) {
-      const msg = 'New password must be at least 6 characters long.'
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      const msg = PASSWORD_NEW_MIN_LENGTH_MESSAGE
       setErrorMessage(msg)
       showClientToast('Password Update Failed', msg, 'error')
       return
@@ -393,6 +401,7 @@ export function SecuritySettingsTab() {
               <Input
                 id="settings-current-password"
                 type={showCurrentPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 required
                 disabled={saving}
                 value={currentPassword}
@@ -421,11 +430,12 @@ export function SecuritySettingsTab() {
                 <Input
                   id="settings-new-password"
                   type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   disabled={saving}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 6 characters"
+                  placeholder={`Minimum ${MIN_PASSWORD_LENGTH} characters`}
                   className="rounded-xl pr-10"
                 />
                 <button
@@ -438,7 +448,7 @@ export function SecuritySettingsTab() {
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Must be at least 6 characters long.
+                {PASSWORD_MIN_LENGTH_HINT}
               </p>
             </div>
 
@@ -451,6 +461,7 @@ export function SecuritySettingsTab() {
                 <Input
                   id="settings-confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   disabled={saving}
                   value={confirmPassword}
@@ -474,7 +485,7 @@ export function SecuritySettingsTab() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-border">
           <div className="flex-1">
             {successMessage && (
-              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+              <span className="text-xs font-semibold text-success flex items-center gap-1.5 animate-in fade-in-0" role="status">
                 <CheckCircle2 className="w-4 h-4 shrink-0" /> Password updated successfully!
               </span>
             )}
@@ -484,7 +495,7 @@ export function SecuritySettingsTab() {
               </span>
             )}
             {!successMessage && !errorMessage && isPasswordDirty && (
-              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+              <span className="text-[11px] font-medium text-warning bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
                 Unsaved changes
               </span>
             )}

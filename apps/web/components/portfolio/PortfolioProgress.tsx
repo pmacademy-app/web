@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { BookOpen, Layers, CheckCircle2, TrendingUp } from 'lucide-react'
 import type { PublicPortfolioPayload } from '@/lib/portfolio-db'

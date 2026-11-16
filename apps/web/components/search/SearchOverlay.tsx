@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react'
 import { useSearch } from './SearchOverlayProvider'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import {
   buildCurriculumModuleIndex,
   resolveLessonAccess,
@@ -26,6 +27,7 @@ import {
 } from '@/lib/curriculum-access'
 import { getModuleMeta, getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
+import { apiGet } from '@/lib/api/client'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,9 +99,9 @@ function loadSearchIndex(): Promise<SearchEntry[]> {
     _indexCallbacks.push(resolve)
     if (_indexLoading) return
     _indexLoading = true
-    fetch('/api/search-index')
-      .then((r) => r.json())
-      .then((data: SearchEntry[]) => {
+    apiGet<SearchEntry[]>('/api/search-index')
+      .then((res) => {
+        const data = res.ok && Array.isArray(res.data) ? res.data : []
         _indexCache = data
         _indexCallbacks.forEach((cb) => cb(data))
         _indexCallbacks = []
@@ -135,18 +137,18 @@ let _accessLoaded = false
 async function loadCurriculumAccess(): Promise<AccessData | null> {
   if (_accessLoaded) return _accessCache
   try {
-    const res = await fetch('/api/user/curriculum-access')
+    const res = await apiGet<{
+      completedIds?: string[]
+      openedIds?: string[]
+      treatment?: boolean
+      override?: boolean
+    }>('/api/user/curriculum-access')
     if (!res.ok) {
       _accessLoaded = true
       _accessCache = null
       return null
     }
-    const data = (await res.json()) as {
-      completedIds: string[]
-      openedIds: string[]
-      treatment: boolean
-      override: boolean
-    }
+    const data = res.data
     _accessCache = {
       completedIds: new Set(data.completedIds ?? []),
       openedIds: new Set(data.openedIds ?? []),
@@ -363,22 +365,16 @@ export function SearchOverlay() {
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 pt-16 sm:pt-4"
-      aria-modal="true"
-      role="dialog"
-      aria-label="Search curriculum"
-    >
-      {/* High-grade ambient backdrop with subtle blur */}
-      <div
-        className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs transition-opacity duration-200"
-        onClick={closeSearch}
-        aria-hidden="true"
-      />
-
-      {/* Modern Command Palette Panel */}
-      <div className="relative w-full max-w-2xl bg-card border border-border shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
-        {/* Seamless Search Input Bar */}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && closeSearch()}>
+      <DialogContent
+        showCloseButton={false}
+        className="block w-full max-w-2xl bg-card border border-border shadow-2xl rounded-2xl overflow-hidden p-0 gap-0 max-h-[85vh] flex flex-col"
+      >
+        <DialogTitle className="sr-only">Search curriculum</DialogTitle>
+        <DialogDescription className="sr-only">Search curriculum lessons and modules</DialogDescription>
+        {/* Modern Command Palette Panel */}
+        <div className="relative w-full bg-card flex flex-col flex-1 min-h-0">
+          {/* Seamless Search Input Bar */}
         <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5 border-b border-border bg-card">
           <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <Search className="w-4 h-4" />
@@ -566,13 +562,13 @@ export function SearchOverlay() {
                         {isLocked ? (
                           <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                         ) : isCompleted ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <Check className="w-3.5 h-3.5 text-success" />
                         ) : entry.type === 'lesson' ? (
                           <BookOpen className="w-3.5 h-3.5 text-primary" />
                         ) : entry.type === 'glossary' ? (
-                          <FileText className="w-3.5 h-3.5 text-blue-500" />
+                          <FileText className="w-3.5 h-3.5 text-info" />
                         ) : (
-                          <Layers className="w-3.5 h-3.5 text-amber-500" />
+                          <Layers className="w-3.5 h-3.5 text-warning" />
                         )}
                       </div>
 
@@ -585,7 +581,7 @@ export function SearchOverlay() {
                             {positionLabel} · {moduleChipLabel(entry.moduleName)}
                           </span>
                           {isCompleted && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-success border border-emerald-500/20">
                               Completed
                             </span>
                           )}
@@ -595,7 +591,7 @@ export function SearchOverlay() {
                             </span>
                           )}
                           {isLocked && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-warning border border-amber-500/20">
                               <Lock className="w-2.5 h-2.5" />
                               {prereqLabel ? `Locked · complete ${prereqLabel}` : 'Locked'}
                             </span>
@@ -625,6 +621,7 @@ export function SearchOverlay() {
           )}
         </div>
       </div>
-    </div>
+    </DialogContent>
+  </Dialog>
   )
 }

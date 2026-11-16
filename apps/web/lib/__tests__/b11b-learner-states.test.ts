@@ -173,13 +173,6 @@ describe('B11-B — Learner States: Adoption Across Target Surfaces', () => {
     expect(content).toContain('<Skeleton')
   })
 
-  it('DashboardNotificationsWidget uses Skeleton from @/components/ui/skeleton', () => {
-    const file = path.join(webRoot, 'components/notifications/DashboardNotificationsWidget.tsx')
-    const content = readFileSync(file, 'utf8')
-    expect(content).toContain("import { Skeleton } from '@/components/ui/skeleton'")
-    expect(content).toContain('<Skeleton')
-  })
-
   it('NotificationCenterDrawer uses ErrorState and EmptyState', () => {
     const file = path.join(webRoot, 'components/notifications/NotificationCenterDrawer.tsx')
     const content = readFileSync(file, 'utf8')
@@ -202,12 +195,5 @@ describe('B11-B — Learner States: Adoption Across Target Surfaces', () => {
     expect(content).toContain("import { EmptyState as SharedEmptyState } from '@/components/ui/empty-state'")
     expect(content).toContain("import { buttonVariants } from '@/components/ui/button'")
     expect(content).toContain('<SharedEmptyState')
-  })
-
-  it('BadgeShowcaseCard uses EmptyState', () => {
-    const file = path.join(webRoot, 'components/progress/BadgeShowcaseCard.tsx')
-    const content = readFileSync(file, 'utf8')
-    expect(content).toContain("import { EmptyState } from '@/components/ui/empty-state'")
-    expect(content).toContain('<EmptyState')
   })
 })

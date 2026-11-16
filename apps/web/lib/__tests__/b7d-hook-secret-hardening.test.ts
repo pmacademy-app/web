@@ -109,11 +109,18 @@ const PAYLOAD = {
   email_data: { email_action_type: 'signup', token_hash: 'th_b7d_123' },
 }
 
-/** Signs exactly the way the standard webhook scheme does: HMAC over the raw body. */
-function signStandardWebhook(rawBody: string, secret: string): string {
+/** Signs exactly the way the standard webhook scheme does: HMAC over `${msgId}.${msgTimestamp}.${rawBody}`. */
+function signStandardWebhook(
+  rawBody: string,
+  secret: string,
+  msgId = 'msg-b7d-1',
+  msgTimestamp = Math.floor(Date.now() / 1000).toString()
+): { signature: string; msgId: string; msgTimestamp: string } {
   const base64Part = secret.replace(/^v1,/, '').replace(/^whsec_/, '')
   const keyBytes = Buffer.from(base64Part, 'base64')
-  return crypto.createHmac('sha256', keyBytes).update(rawBody).digest('base64')
+  const payloadToSign = `${msgId}.${msgTimestamp}.${rawBody}`
+  const signature = crypto.createHmac('sha256', keyBytes).update(payloadToSign).digest('base64')
+  return { signature, msgId, msgTimestamp }
 }
 
 let previousSecret: string | undefined
@@ -131,9 +138,14 @@ afterEach(() => {
 describe('B7-D — standard webhook HMAC authentication still works', () => {
   it('accepts a valid v1,whsec_ signature over the raw body', async () => {
     const rawBody = JSON.stringify(PAYLOAD)
+    const { signature, msgId, msgTimestamp } = signStandardWebhook(rawBody, PROD_SHAPED_SECRET)
     const req = new NextRequest(HOOK_URL, {
       method: 'POST',
-      headers: { 'webhook-signature': `v1,${signStandardWebhook(rawBody, PROD_SHAPED_SECRET)}` },
+      headers: {
+        'webhook-id': msgId,
+        'webhook-timestamp': msgTimestamp,
+        'webhook-signature': `v1,${signature}`,
+      },
       body: rawBody,
     })
 
@@ -146,10 +158,15 @@ describe('B7-D — standard webhook HMAC authentication still works', () => {
       ...PAYLOAD,
       user: { ...PAYLOAD.user, email: 'attacker@example.com' },
     })
+    const { signature, msgId, msgTimestamp } = signStandardWebhook(signedBody, PROD_SHAPED_SECRET)
 
     const req = new NextRequest(HOOK_URL, {
       method: 'POST',
-      headers: { 'webhook-signature': `v1,${signStandardWebhook(signedBody, PROD_SHAPED_SECRET)}` },
+      headers: {
+        'webhook-id': msgId,
+        'webhook-timestamp': msgTimestamp,
+        'webhook-signature': `v1,${signature}`,
+      },
       body: tamperedBody,
     })
 
@@ -158,9 +175,14 @@ describe('B7-D — standard webhook HMAC authentication still works', () => {
 
   it('rejects an invalid signature', async () => {
     const rawBody = JSON.stringify(PAYLOAD)
+    const now = Math.floor(Date.now() / 1000).toString()
     const req = new NextRequest(HOOK_URL, {
       method: 'POST',
-      headers: { 'webhook-signature': 'v1,bm90LWEtcmVhbC1zaWduYXR1cmU=' },
+      headers: {
+        'webhook-id': 'msg_invalid',
+        'webhook-timestamp': now,
+        'webhook-signature': 'v1,bm90LWEtcmVhbC1zaWduYXR1cmU=',
+      },
       body: rawBody,
     })
 

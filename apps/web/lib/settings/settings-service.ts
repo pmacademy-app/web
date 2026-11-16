@@ -328,7 +328,6 @@ export async function deleteAccount(
     'user_flashcard_srs',
     'xp_events',
     'reflections',
-    'bookmarks',
     'capstone_submissions',
     'certificates',
     'user_badges',
@@ -337,7 +336,6 @@ export async function deleteAccount(
     'cohort_members',
     'user_notification_preferences',
     'in_app_notifications',
-    'user_notification_timeline',
     'user_feedback',
     'user_feedback_prompts',
   ]

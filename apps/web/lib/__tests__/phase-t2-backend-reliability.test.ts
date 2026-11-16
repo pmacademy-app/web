@@ -348,25 +348,10 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
       expect(touchedTables).not.toContain('quiz_attempts')
     })
 
-    it('propagates XP errors instead of silently swallowing them in fallback path', async () => {
-      // PGRST202 is in MISSING_RPC_ERROR_CODES (lib/academy/lessons-db.ts): the fallback runs.
+    it('throws on a missing RPC error instead of running any fallback', async () => {
       mockSupabase.rpc.mockResolvedValueOnce({
         data: null,
         error: { code: 'PGRST202', message: 'Could not find the function' },
-      })
-      mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'quiz_attempts') {
-          return createChainableBuilder(null, null)
-        }
-        if (table === 'user_lesson_progress') {
-          return createChainableBuilder({ completed_at: 'now', xp_earned: 30 }, null)
-        }
-        if (table === 'xp_events') {
-          const b = createChainableBuilder([], null)
-          b.insert = vi.fn().mockResolvedValue({ error: new Error('Ledger write constraint failure') })
-          return b
-        }
-        return createChainableBuilder({ current_streak: 2 }, null)
       })
 
       await expect(
@@ -376,10 +361,10 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
           'les_04ix6b',
           [{ question_id: 'q-les_04ix6b-1', selected_option: 0 }]
         )
-      ).rejects.toThrow('Failed to record XP event')
+      ).rejects.toThrow('record_lesson_quiz_completion failed (PGRST202)')
 
       const touchedTables = mockSupabase.from.mock.calls.map((c: unknown[]) => c[0])
-      expect(touchedTables).toContain('quiz_attempts')
+      expect(touchedTables).not.toContain('quiz_attempts')
     })
   })
 

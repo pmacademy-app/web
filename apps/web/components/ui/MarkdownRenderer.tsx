@@ -1,4 +1,5 @@
 import { Marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify'
 
 // ─── Custom Marked renderers ──────────────────────────────────────────────────
 
@@ -10,7 +11,7 @@ const customRenderer = {
     if (lang === 'mermaid') {
       return ''
     }
-    const cleanLang = lang || ''
+    const cleanLang = escapeHtml(lang || '')
     const formattedCode = escapeHtml(text)
     const langBadge = cleanLang
       ? `<div class="bg-muted/80 px-4 py-1.5 border-b border-border"><span class="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">${cleanLang}</span></div>`
@@ -42,13 +43,16 @@ interface MarkdownRendererProps {
 }
 
 export default function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
-  // Parse during render on both server (for SEO) and client
-  const html = markedInstance.parse(content) as string
+  // Parse during render on both server (for SEO) and client, then sanitize with DOMPurify
+  const parsedHtml = markedInstance.parse(content) as string
+  const cleanHtml = DOMPurify.sanitize(parsedHtml, {
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+  })
 
   return (
     <div
-      className={`prose prose-neutral dark:prose-invert max-w-none prose-p:text-foreground/85 prose-strong:text-foreground prose-em:text-foreground/80 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-headings:font-serif prose-headings:text-foreground prose-li:text-foreground/85 prose-li:leading-relaxed ${className}`}
-      dangerouslySetInnerHTML={{ __html: html }}
+      className={`prose prose-neutral max-w-none prose-p:text-foreground/85 prose-strong:text-foreground prose-em:text-foreground/80 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-headings:font-serif prose-headings:text-foreground prose-li:text-foreground/85 prose-li:leading-relaxed ${className}`}
+      dangerouslySetInnerHTML={{ __html: cleanHtml }}
     />
   )
 }

@@ -1,4 +1,3 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
@@ -15,13 +14,8 @@ export const GET = withRoute(
     summary: 'Unexpected failure in GET /api/admin/emails/queue',
   },
   async () => {
-    try {
-      const queueOverview = await AdminConsoleService.getEmailQueueOverview()
-      return NextResponse.json({ success: true, queue: queueOverview })
-    } catch (err) {
-      const message = adminErrorMessage(err, 'Failed to fetch email queue overview')
-      return NextResponse.json({ success: false, error: message }, { status: 500 })
-    }
+    const queueOverview = await AdminConsoleService.getEmailQueueOverview()
+    return NextResponse.json({ success: true, queue: queueOverview })
   }
 )
 
@@ -34,22 +28,17 @@ export const POST = withRoute(
   },
   async ({ actor }) => {
     const admin = requireAdmin(actor)
-    try {
-      const result = await processEmailQueue(50)
-      await logAdminAction(
-        admin.userId!,
-        admin.email!,
-        'trigger_email_queue_processing',
-        'queue',
-        undefined,
-        { processed: result.processed }
-      )
+    const result = await processEmailQueue(50)
+    await logAdminAction(
+      admin.userId!,
+      admin.email!,
+      'trigger_email_queue_processing',
+      'queue',
+      undefined,
+      { processed: result.processed }
+    )
 
-      revalidateAdminShell()
-      return NextResponse.json({ success: true, result })
-    } catch (err) {
-      const message = adminErrorMessage(err, 'Failed to process email queue')
-      return NextResponse.json({ success: false, error: message }, { status: 500 })
-    }
+    revalidateAdminShell()
+    return NextResponse.json({ success: true, result })
   }
 )

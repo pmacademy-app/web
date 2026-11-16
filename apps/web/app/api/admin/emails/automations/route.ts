@@ -1,7 +1,7 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import type { EmailAutomationKey } from '@/lib/notifications/automations/types'
 
 export const GET = withRoute(
   {
@@ -11,7 +11,6 @@ export const GET = withRoute(
     summary: 'Unexpected failure in GET /api/admin/emails/automations',
   },
   async () => {
-
     const state = await EmailAutomationsService.getState()
     return NextResponse.json({ success: true, state })
   }
@@ -25,25 +24,29 @@ export const POST = withRoute(
     summary: 'Unexpected failure in POST /api/admin/emails/automations',
   },
   async ({ request }) => {
-
-    try {
-      const body = await request.json()
-      const { settingKey, payload } = body
-
-      if (!settingKey || !payload) {
-        return NextResponse.json({ error: 'Missing settingKey or payload' }, { status: 400 })
-      }
-
-      const result = await EmailAutomationsService.updateSetting(settingKey, payload)
-      if (!result.success) {
-        return NextResponse.json({ success: false, error: result.error || 'Failed to update setting' }, { status: 400 })
-      }
-
-      const updatedState = await EmailAutomationsService.getState()
-      return NextResponse.json({ success: true, state: updatedState })
-    } catch (err) {
-      const errorMsg = adminErrorMessage(err, 'Invalid request payload')
-      return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
+    let body: {
+      settingKey?: 'toggle' | 'global_pause' | 'daily_limit'
+      payload?: { automationKey?: EmailAutomationKey; enabled?: boolean; limit?: number }
     }
+    // Targeted parse: bad JSON is a client validation error, not a server fault.
+    try {
+      body = (await request.json()) as typeof body
+    } catch {
+      throw new RouteError(400, 'VALIDATION', 'Invalid JSON body')
+    }
+
+    const { settingKey, payload } = body
+
+    if (!settingKey || !payload) {
+      throw new RouteError(400, 'VALIDATION', 'Missing settingKey or payload')
+    }
+
+    const result = await EmailAutomationsService.updateSetting(settingKey, payload)
+    if (!result.success) {
+      throw new RouteError(400, 'VALIDATION', result.error || 'Failed to update setting')
+    }
+
+    const updatedState = await EmailAutomationsService.getState()
+    return NextResponse.json({ success: true, state: updatedState })
   }
 )

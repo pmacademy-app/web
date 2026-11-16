@@ -19,7 +19,7 @@
 --    first_run_at, last_run_at as ISO strings) and measures from last_success_at, else
 --    first_run_at, else last_run_at, exactly as evaluateHeartbeat does. A job is overdue once that
 --    is older than GREATEST(2 x interval, 30) minutes. The intervals below mirror
---    CRON_JOB_DEFINITIONS; eng01-cron-heartbeat.test.ts parses this file and fails if they drift.
+--    CRON_JOB_DEFINITIONS; eng01-deadman-sql-drift.test.ts parses this file and fails if they drift.
 --    retry-failed is manual and never checked.
 --    A job with no heartbeat row starts a grace period on the first run that sees it
 --    (missing_since) and alerts once the same threshold has passed.

@@ -10,6 +10,8 @@ export interface WeeklyRecapProps {
   xpEarnedThisWeek?: number
   currentStreak?: number
   daysStudiedThisWeek?: number
+  weeklyGoalLessons?: number | null
+  sessionMinutes?: number | null
   /** Growth R5 B9: the single next step toward the learner's proof (from selectProofNextStep). */
   proofStepText?: string | null
   proofStepUrl?: string | null
@@ -26,17 +28,27 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
   xpEarnedThisWeek = 0,
   currentStreak = 0,
   daysStudiedThisWeek = 0,
+  weeklyGoalLessons = null,
   proofStepText = null,
   proofStepUrl = null,
   referralRewardXp = null,
   appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
+  const hasGoal = typeof weeklyGoalLessons === 'number' && weeklyGoalLessons > 0
+  const preview = hasGoal
+    ? `Your weekly Prodily recap: you finished ${lessonsCompletedThisWeek} of your ${weeklyGoalLessons} lessons this week!`
+    : `Your weekly Prodily recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`
+
   return (
-    <EmailWrapper previewText={`Your weekly Prodily recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`} unsubscribeToken={unsubscribeToken}>
+    <EmailWrapper previewText={preview} unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Your Weekly Progress Recap 📊</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Hi {userName}, here is a look at your learning progress in Prodily over the past week:
+        {hasGoal
+          ? lessonsCompletedThisWeek >= weeklyGoalLessons
+            ? `Hi ${userName}, you finished ${lessonsCompletedThisWeek} of your ${weeklyGoalLessons} lessons this week! You met your weekly goal.`
+            : `Hi ${userName}, you finished ${lessonsCompletedThisWeek} of your ${weeklyGoalLessons} lessons this week. Keep going to reach your goal next week!`
+          : `Hi ${userName}, here is a look at your learning progress in Prodily over the past week:`}
       </p>
 
       <table role="presentation" width="100%" border={0} cellPadding={0} cellSpacing={0}>
@@ -50,7 +62,11 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
         </tr>
         <tr>
           <td width="50%" style={{ paddingRight: '6px' }}>
-            <StatCard label="Current Streak" value={`${currentStreak} Days 🔥`} />
+            {hasGoal ? (
+              <StatCard label="Weekly Goal" value={`${lessonsCompletedThisWeek} / ${weeklyGoalLessons} Lessons`} />
+            ) : (
+              <StatCard label="Current Streak" value={`${currentStreak} Days 🔥`} />
+            )}
           </td>
           <td width="50%" style={{ paddingLeft: '6px' }}>
             <StatCard label="Days Studied" value={`${daysStudiedThisWeek} / 7`} />

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 export const GET = withRoute(
   {
@@ -110,7 +111,15 @@ export const PATCH = withRoute(
       .upsert(updatePayload as never, { onConflict: 'user_id' })
 
     if (error) {
-      console.error('[API:settings/notifications] Error updating preferences:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'settings.notifications.update_preferences',
+        message: `Error updating preferences: ${error.message}`,
+        userId: authUserId,
+        details: { error: error.message },
+      })
+      throw new RouteError(500, 'SERVER_ERROR', 'Failed to update notification preferences')
     }
 
     return NextResponse.json({ success: true, updated: body })

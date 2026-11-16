@@ -208,6 +208,7 @@ describe('B7-F — migration scope', () => {
 
     expect(settings).toEqual([
       'settings/delete-account/route.ts',
+      'settings/goal/route.ts',
       'settings/notifications/route.ts',
       'settings/portfolio/route.ts',
       'settings/profile/route.ts',

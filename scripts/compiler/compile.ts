@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { createRequire } from 'module';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -39,9 +40,21 @@ const SOURCE_DIR = path.join(ROOT_DIR, 'content/lessons');
 const DIST_DIR = path.join(ROOT_DIR, 'content/dist');
 const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
+const DATES_PATH = path.join(ROOT_DIR, 'content/lesson-dates.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '16';
+const CACHE_VERSION = '18';
+
+export function loadLessonDates(): Record<string, string> {
+  if (!fs.existsSync(DATES_PATH)) {
+    throw new Error(`Content build failed: missing lesson dates file at ${DATES_PATH}`);
+  }
+  try {
+    return JSON.parse(fs.readFileSync(DATES_PATH, 'utf-8'));
+  } catch (err) {
+    throw new Error(`Content build failed: could not parse ${DATES_PATH}: ${err}`);
+  }
+}
 
 interface CacheManifest {
   version: string;
@@ -106,13 +119,103 @@ export function resolveCompanyName(heading: string, firstParagraphMarkdown?: str
   return '';
 }
 
+export function parseYaml(str: string): Record<string, any> {
+  try {
+    const requireWeb = createRequire(path.resolve(__dirname, '../../apps/web/package.json'));
+    const yaml = requireWeb('js-yaml');
+    const loaded = yaml.load(str);
+    return typeof loaded === 'object' && loaded !== null ? loaded : {};
+  } catch {
+    const result: Record<string, any> = {};
+    const lines = str.split(/\r?\n/);
+    let currentKey: string | null = null;
+    let currentValue: string[] = [];
+
+    const flush = () => {
+      if (currentKey) {
+        result[currentKey] = currentValue.join(' ').trim();
+      }
+      currentKey = null;
+      currentValue = [];
+    };
+
+    for (const line of lines) {
+      const match = line.match(/^([a-zA-Z0-9_-]+)\s*:\s*(.*)$/);
+      if (match) {
+        flush();
+        currentKey = match[1];
+        let val = match[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (val.length > 0) {
+          currentValue.push(val);
+        }
+      } else if (currentKey) {
+        currentValue.push(line.trim());
+      }
+    }
+    flush();
+    return result;
+  }
+}
+
+export function extractFrontmatterAndMetadata(source: string): {
+  seoTitle?: string;
+  seoDescription?: string;
+  inShort?: string;
+  markdownBody: string;
+} {
+  let markdownBody = source;
+  let rawMetadata: Record<string, any> = {};
+
+  const frontmatterMatch = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (frontmatterMatch) {
+    markdownBody = source.slice(frontmatterMatch[0].length);
+    rawMetadata = parseYaml(frontmatterMatch[1]);
+  } else {
+    const fencedMatch = source.match(/^```(?:yaml|metadata|meta)?\r?\n([\s\S]*?)\r?\n```\r?\n?/);
+    if (fencedMatch) {
+      markdownBody = source.slice(fencedMatch[0].length);
+      rawMetadata = parseYaml(fencedMatch[1]);
+    }
+  }
+
+  const getField = (keys: string[]): string | undefined => {
+    for (const k of keys) {
+      for (const [rawKey, val] of Object.entries(rawMetadata)) {
+        if (rawKey.toLowerCase().replace(/[\s_-]+/g, '') === k.toLowerCase().replace(/[\s_-]+/g, '')) {
+          if (typeof val === 'string' && val.trim().length > 0) {
+            return val.trim();
+          }
+        }
+      }
+    }
+    return undefined;
+  };
+
+  const seoTitle = getField(['seoTitle', 'seotitle', 'seo_title', 'seo title']);
+  const seoDescription = getField(['seoDescription', 'seodescription', 'seo_description', 'seo description']);
+  const inShort = getField(['inShort', 'inshort', 'in_short', 'in short']);
+
+  return { seoTitle, seoDescription, inShort, markdownBody };
+}
+
 export async function compileLesson(
   filePath: string,
   registry: Record<string, string>,
-  numToId: Record<number, string>
+  numToId: Record<number, string>,
+  lessonDates?: Record<string, string>
 ): Promise<{ lesson: any; context: CompilerContext }> {
-  const sourceContent = fs.readFileSync(filePath, 'utf-8');
+  const rawSource = fs.readFileSync(filePath, 'utf-8');
+  const { seoTitle: fmTitle, seoDescription: fmDesc, inShort: fmInShort, markdownBody } = extractFrontmatterAndMetadata(rawSource);
   const lessonId = getOrCreateLessonId(filePath);
+
+  const dates = lessonDates || (fs.existsSync(DATES_PATH) ? loadLessonDates() : {});
+  const lessonDate = dates[lessonId];
+  if (!lessonDate && fs.existsSync(DATES_PATH)) {
+    throw new Error(`Content build failed: lesson ${lessonId} (${filePath}) has no date in content/lesson-dates.json`);
+  }
 
   const ctx: CompilerContext = {
     filePath,
@@ -133,7 +236,7 @@ export async function compileLesson(
     .use(remarkHeadingIds)
     .use(remarkA11yLint, ctx);
 
-  const mdast = processor.parse(sourceContent);
+  const mdast = processor.parse(markdownBody);
   const transformedAst = processor.runSync(mdast);
 
   // 2. Segment document by H2 headings
@@ -169,11 +272,24 @@ export async function compileLesson(
   let prerequisitesRaw = 'None';
   let nextLessonRaw = '';
   let futureTopicsUnlockedRaw = '';
+  let seoTitle: string | undefined = fmTitle;
+  let seoDescription: string | undefined = fmDesc;
+  let inShort: string | undefined = fmInShort;
 
   if (learningPathSegment) {
     const tableNode = learningPathSegment.nodes.find((n) => n.type === 'table');
     if (tableNode) {
       const rawMeta = parseTableNode(tableNode);
+
+      if (!seoTitle) {
+        seoTitle = rawMeta['SEO Title'] || rawMeta['seoTitle'] || rawMeta['seo_title'];
+      }
+      if (!seoDescription) {
+        seoDescription = rawMeta['SEO Description'] || rawMeta['seoDescription'] || rawMeta['seo_description'];
+      }
+      if (!inShort) {
+        inShort = rawMeta['In Short'] || rawMeta['inShort'] || rawMeta['in_short'];
+      }
       
       // Map raw keys to schema expected labels
       const moduleStr = rawMeta['Module'] || '1 — Foundations';
@@ -239,6 +355,33 @@ export async function compileLesson(
           metadata.prerequisites.push(numToId[num]);
         }
       }
+    }
+  }
+
+  // Enforce SEO field constraints if present
+  if (seoTitle !== undefined) {
+    if (typeof seoTitle !== 'string' || seoTitle.length > 60) {
+      throw new Error(
+        `Compilation error in ${filePath}: seoTitle must be up to 60 characters, found ${seoTitle?.length ?? 0} characters ("${seoTitle}")`
+      );
+    }
+  }
+
+  if (seoDescription !== undefined) {
+    const len = typeof seoDescription === 'string' ? seoDescription.length : 0;
+    if (len < 120 || len > 160) {
+      throw new Error(
+        `Compilation error in ${filePath}: seoDescription must be between 120 and 160 characters, found ${len} characters ("${seoDescription}")`
+      );
+    }
+  }
+
+  if (inShort !== undefined) {
+    const words = typeof inShort === 'string' ? inShort.trim().split(/\s+/).filter(Boolean).length : 0;
+    if (words < 40 || words > 80) {
+      throw new Error(
+        `Compilation error in ${filePath}: inShort must be between 40 and 80 words, found ${words} words ("${inShort}")`
+      );
     }
   }
 
@@ -578,6 +721,9 @@ export async function compileLesson(
     estimatedReadingTime: metadata.estimatedReadingTime,
     estimatedCompletionTime: metadata.estimatedCompletionTime,
     prerequisites: metadata.prerequisites,
+    ...(seoTitle ? { seoTitle } : {}),
+    ...(seoDescription ? { seoDescription } : {}),
+    ...(inShort ? { inShort } : {}),
     sourceFile: normalizePath(filePath),
     blocks,
     assets: ctx.assets.map((a) => ({
@@ -590,8 +736,8 @@ export async function compileLesson(
       headings: headingList,
     },
     glossaryTermsIntroduced: ctx.glossaryTerms.map((t) => t.term),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: lessonDate ? `${lessonDate}T00:00:00.000Z` : '2026-10-31T00:00:00.000Z',
+    updatedAt: lessonDate ? `${lessonDate}T00:00:00.000Z` : '2026-10-31T00:00:00.000Z',
   };
 
   lessonObj.contentHash = computeHash(JSON.stringify(lessonObj.blocks));
@@ -660,6 +806,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
 
   // Load registry and build backfill indices
   const registryMap = loadRegistry();
+  const lessonDates = loadLessonDates();
   const numToId: Record<number, string> = {};
   for (const [filePath, lessonId] of Object.entries(registryMap)) {
     const fileName = path.basename(filePath);
@@ -709,7 +856,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
 
     // Compile
     try {
-      const { lesson, context } = await compileLesson(file, registryMap, numToId);
+      const { lesson, context } = await compileLesson(file, registryMap, numToId, lessonDates);
       
       // Validate
       const issues = validateCompiledLesson(lesson, context);
@@ -807,6 +954,10 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
       estimatedReadingTime: l.estimatedReadingTime,
       estimatedCompletionTime: l.estimatedCompletionTime,
       prerequisites: l.prerequisites,
+      updatedAt: l.updatedAt || '2026-10-31T00:00:00.000Z',
+      ...(l.seoTitle ? { seoTitle: l.seoTitle } : {}),
+      ...(l.seoDescription ? { seoDescription: l.seoDescription } : {}),
+      ...(l.inShort ? { inShort: l.inShort } : {}),
     });
 
     if (!moduleLessons[l.module]) {
@@ -861,7 +1012,7 @@ export async function compileAllContent(validateOnly = false): Promise<boolean> 
   fs.writeFileSync(path.join(DIST_DIR, 'glossary-index.json'), JSON.stringify(glossaryIndex, null, 2), 'utf-8');
 
   // 4. Generate search-index.json
-  console.log('🔎 Generating FlexSearch-friendly search index...');
+  console.log('🔎 Generating search index JSON...');
   const searchDocs: any[] = [];
   
   compiledLessons.forEach((l) => {

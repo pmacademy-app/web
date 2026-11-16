@@ -85,6 +85,49 @@ export function extractAvatarStoragePath(urlOrPath: string | null | undefined): 
 }
 
 /**
+ * SEC-13: Validates that an avatar URL points to Prodily's Supabase Storage avatars bucket.
+ * Accepts null/empty string (clearing avatar), relative storage paths within avatars bucket,
+ * or absolute URLs on the project's Supabase Storage host under `/storage/v1/object/public/avatars/`.
+ * Rejects external domains, foreign buckets, and arbitrary third-party URLs.
+ */
+export function isValidAvatarUrl(
+  urlOrPath: string | null | undefined,
+  supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+): boolean {
+  if (!urlOrPath) return true
+  const cleaned = urlOrPath.trim()
+  if (!cleaned) return true
+
+  // Relative storage paths within avatars bucket (e.g. "usr-123/avatar-1.jpg" or "avatars/usr-123/avatar-1.jpg")
+  if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+    if (cleaned.includes('..') || cleaned.startsWith('/')) return false
+    return true
+  }
+
+  try {
+    const parsed = new URL(cleaned)
+    let expectedHost: string | null = null
+    if (supabaseUrl) {
+      try {
+        expectedHost = new URL(supabaseUrl).host
+      } catch {}
+    }
+
+    const isAuthorizedHost = expectedHost
+      ? parsed.host === expectedHost
+      : parsed.host.endsWith('.supabase.co') || parsed.host.endsWith('.supabase.in')
+
+    if (!isAuthorizedHost) return false
+
+    // Path must start with /storage/v1/object/public/avatars/
+    const pathname = decodeURIComponent(parsed.pathname)
+    return pathname.startsWith(`/storage/v1/object/public/${AVATAR_BUCKET}/`)
+  } catch {
+    return false
+  }
+}
+
+/**
  * Normalizes an avatar URL or storage path to an absolute public URL.
  * Handles:
  * - null/undefined/empty string -> null

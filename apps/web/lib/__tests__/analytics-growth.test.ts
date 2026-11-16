@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { SupabaseFake } from './helpers/supabase-fake'
 
 /**
  * C6: the analytics growth tab. Every metric is a head count (no row scans), bounded by the
@@ -53,7 +54,10 @@ function fakeClient(respond: (q: Recorded) => { count: number | null; error: { m
           .then(resolve, reject)
       return builder
     },
-    rpc: async () => ({ data: [], error: null }),
+    rpc(fn: string, args?: Record<string, unknown>) {
+      const fallbackFake = new SupabaseFake()
+      return fallbackFake.rpc(fn, args)
+    },
   }
   return { client: client as never, queries }
 }

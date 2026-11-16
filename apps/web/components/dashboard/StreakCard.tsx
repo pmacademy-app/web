@@ -18,20 +18,20 @@ export function StreakCard({ streakStatus }: StreakCardProps) {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-success border border-emerald-500/20">
             Active Today
           </span>
         )
       case 'at_risk':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-amber-500/10 text-warning border border-amber-500/20">
             <AlertTriangle className="w-3 h-3" />
             Study Due Today
           </span>
         )
       case 'broken':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 border border-rose-500/20">
             Reset Needed
           </span>
         )
@@ -48,7 +48,7 @@ export function StreakCard({ streakStatus }: StreakCardProps) {
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Flame className="w-5 h-5 text-amber-500 fill-amber-500/20" />
+          <Flame className="w-5 h-5 text-warning fill-amber-500/20" />
           <h3 className="text-sm font-bold font-serif text-foreground">
             Daily Study Streak
           </h3>

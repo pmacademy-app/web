@@ -61,7 +61,6 @@ export type GovernedEmailPurpose =
   | 'auth.email_change_verify'
   | 'auth.reauthentication'
   | 'auth.invite'
-  | 'waitlist.confirmation'
   | 'contact.acknowledgement'
 
 const CRITICAL_PURPOSES = new Set<GovernedEmailPurpose>([
@@ -85,7 +84,6 @@ const RECIPIENT_LIMITS: Record<GovernedEmailPurpose, { limit: number; windowMs: 
   'auth.email_change_verify': { limit: 4, windowMs: 60 * 60 * 1000 },
   'auth.reauthentication': { limit: 6, windowMs: 60 * 60 * 1000 },
   'auth.invite': { limit: 3, windowMs: 24 * 60 * 60 * 1000 },
-  'waitlist.confirmation': { limit: 2, windowMs: 24 * 60 * 60 * 1000 },
   // Contact alerts all go to one internal support inbox, so this is a platform-wide
   // ceiling on support notifications rather than a per-learner one — sized for real
   // support volume, not for a single person's inbox. Per-submitter throttling for

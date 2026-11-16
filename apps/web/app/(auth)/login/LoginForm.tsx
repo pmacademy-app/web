@@ -15,6 +15,7 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { GoogleButton } from '@/components/auth/GoogleButton'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { buildGoogleStartHref, isGoogleAuthEnabled } from '@/lib/auth/google-auth'
+import { apiPost } from '@/lib/api/client'
 
 // Build-time inlined flag, so this is constant for the life of the bundle.
 const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
@@ -150,37 +151,27 @@ export default function LoginForm({ next, errorParam, verified, resetSuccess }: 
 
     startTransition(async () => {
       try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
-        })
-
-        if (res.status >= 502 && res.status <= 504) {
-          const classified = classifyAuthError(new Error(`${res.status} Bad Gateway / Service Unavailable`), 'login')
-          setAuthError(classified)
-          recordAuthTelemetry(classified, 'login')
-          return
-        }
-
-        let json: {
+        const result = await apiPost<{
           success?: boolean
           error?: string
           code?: string
           errorId?: string
           redirect?: string
-        } = {}
-        try {
-          json = await res.json()
-        } catch {
-          const classified = classifyAuthError(new Error(`HTTP ${res.status}: Invalid server response`), 'login')
+        }>('/api/auth/login', values)
+
+        if (!result.ok) {
+          const classified = resolveApiAuthError(
+            { error: result.error.message, code: result.error.code, errorId: result.error.errorId },
+            'login',
+            'Authentication failed'
+          )
           setAuthError(classified)
           recordAuthTelemetry(classified, 'login')
           return
         }
 
-        if (!res.ok || !json.success) {
-          // Prefer the server's stable code over re-deriving one from the message.
+        const json = result.data
+        if (!json.success) {
           const classified = resolveApiAuthError(json, 'login', 'Authentication failed')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'login')

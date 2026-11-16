@@ -3,11 +3,15 @@ import nextTs from "eslint-config-next/typescript";
 
 import requireWithRoute from "./eslint-rules/require-with-route.mjs";
 import noRawButton from "./eslint-rules/no-raw-button.mjs";
+import noRawApiFetch from "./eslint-rules/no-raw-api-fetch.mjs";
+import noRawPaletteText from "./eslint-rules/no-raw-palette-text.mjs";
 
 const prodily = {
   rules: {
     "require-with-route": requireWithRoute.rules["require-with-route"],
     "no-raw-button": noRawButton.rules["no-raw-button"],
+    "no-raw-api-fetch": noRawApiFetch.rules["no-raw-api-fetch"],
+    "no-raw-palette-text": noRawPaletteText.rules["no-raw-palette-text"],
   },
 };
 
@@ -118,12 +122,10 @@ const RAW_BUTTON_ALLOWLIST = [
   "admin/UsersWorkspace.tsx",
   "admin/admin-toast.tsx",
   "auth/ResendVerificationCard.tsx",
-  "badges/BadgeNotification.tsx",
   "capstones/RichEditor.tsx",
   "capstones/SubmitConfirmationModal.tsx",
   "feedback/ContextualFeedbackModal.tsx",
   "feedback/LessonFeedbackWidget.tsx",
-  "feedback/error-state.tsx",
   "layout/Sidebar.tsx",
   "layout/SystemAnnouncementBanner.tsx",
   "layout/Topbar.tsx",
@@ -133,12 +135,9 @@ const RAW_BUTTON_ALLOWLIST = [
   "leaderboard/LeaderboardHeader.tsx",
   "leaderboard/LeaderboardPopoverModal.tsx",
   "leaderboard/LeaderboardScopeSwitcher.tsx",
-  "leaderboard/LeaderboardTable.tsx",
-  "leaderboard/ProfileComparisonModal.tsx",
   "marketing/faq-explorer.tsx",
   "marketing/reviews-explorer.tsx",
   "marketing/sections/experience.tsx",
-  "marketing/sections/testimonials.tsx",
   "notifications/NotificationBell.tsx",
   "notifications/NotificationCenterDrawer.tsx",
   "notifications/NotificationItemCard.tsx",
@@ -146,7 +145,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "notifications/NotificationToast.tsx",
   "portfolio/FeaturedCapstoneCard.tsx",
   "portfolio/PortfolioCapstones.tsx",
-  "progress/ProgressSectionDropdown.tsx",
   "quick-start/QuickStartModal.tsx",
   "quiz/QuizOption.tsx",
   "review/QualitySelector.tsx",
@@ -160,7 +158,6 @@ const RAW_BUTTON_ALLOWLIST = [
   "settings/ReferralSettingsTab.tsx",
   "settings/SecuritySettingsTab.tsx",
   "settings/SettingsTabs.tsx",
-  "ui/accordion.tsx",
 ];
 
 const eslintConfig = [
@@ -193,6 +190,32 @@ const eslintConfig = [
     plugins: { prodily },
     rules: {
       "prodily/no-raw-button": ["error", { allow: RAW_BUTTON_ALLOWLIST }],
+    },
+  },
+  {
+    // CQ-30: ban raw fetch('/api/...') in favor of the typed API client.
+    files: [
+      "app/**/*.{ts,tsx,js,jsx}",
+      "components/**/*.{ts,tsx,js,jsx}",
+      "hooks/**/*.{ts,tsx,js,jsx}",
+      "lib/**/*.{ts,tsx,js,jsx}",
+    ],
+    plugins: { prodily },
+    rules: {
+      "prodily/no-raw-api-fetch": "error",
+    },
+  },
+  {
+    // UX-04 / AG-18: ban raw palette text colors in favor of semantic tokens.
+    files: [
+      "app/**/*.{ts,tsx,js,jsx}",
+      "components/**/*.{ts,tsx,js,jsx}",
+      "blocks/**/*.{ts,tsx,js,jsx}",
+      "renderer/**/*.{ts,tsx,js,jsx}",
+    ],
+    plugins: { prodily },
+    rules: {
+      "prodily/no-raw-palette-text": "error",
     },
   },
   {

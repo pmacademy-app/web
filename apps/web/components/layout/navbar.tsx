@@ -16,6 +16,7 @@ import { DASHBOARD_HREF, LOGIN_HREF, NAV_LINKS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background'
@@ -327,52 +328,35 @@ export function Navbar() {
       </header>
 
       {/* Mobile Menu Sheet */}
-      {menuOpen && (
-          <>
-            {/* Overlay */}
-            <div
-              className="fixed inset-0 z-[45] bg-foreground/30 backdrop-blur-[2px] lg:hidden animate-in fade-in duration-300 fill-mode-both motion-reduce:animate-none"
-              onClick={closeMenu}
-              aria-hidden="true"
-            />
+      <Dialog open={menuOpen} onOpenChange={(open) => !open && closeMenu()}>
+        <DialogContent
+          side="right"
+          showCloseButton={false}
+          className="lg:hidden w-[min(20rem,85vw)] bg-surface border-l border-border flex flex-col pt-16 pb-8 px-6 overflow-y-auto"
+        >
+          <DialogTitle className="sr-only">Navigation menu</DialogTitle>
+          <DialogDescription className="sr-only">Site navigation and links</DialogDescription>
+          {/* Close */}
+          <button
+            ref={closeButtonRef}
+            type="button"
+            aria-label="Close menu"
+            onClick={closeMenu}
+            className="
+              absolute top-3 right-3
+              w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm
+              text-foreground hover:bg-surface-muted
+              transition-colors duration-[120ms]
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
+            "
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
 
-            {/* Sheet */}
-            <div
-              ref={sheetRef}
-              id="mobile-menu"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Navigation menu"
-              className="
-                fixed top-0 right-0 bottom-0 z-[60]
-                w-[min(20rem,85vw)] bg-surface border-l border-border
-                flex flex-col pt-16 pb-8 px-6 overflow-y-auto
-                lg:hidden
-                animate-in slide-in-from-right duration-300 ease-out-quint fill-mode-both
-                motion-reduce:animate-none
-              "
-            >
-              {/* Close */}
-              <button
-                ref={closeButtonRef}
-                type="button"
-                aria-label="Close menu"
-                onClick={closeMenu}
-                className="
-                  absolute top-3 right-3
-                  w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm
-                  text-foreground hover:bg-surface-muted
-                  transition-colors duration-[120ms]
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-                "
-              >
-                <X size={20} aria-hidden="true" />
-              </button>
-
-              {/* Intro copy */}
-              <p className="text-body-sm text-ink-muted mb-6">
-                A structured path to learn product management, build product work, and create proof of your skills.
-              </p>
+          {/* Intro copy */}
+          <p className="text-body-sm text-ink-muted mb-6">
+            A structured path to learn product management, build product work, and create proof of your skills.
+          </p>
 
               {/* Nav links */}
               <nav aria-label="Mobile navigation" className="flex flex-col gap-1 mb-8">
@@ -435,9 +419,8 @@ export function Navbar() {
 
                 <SessionCTA authenticated={authenticated} size="lg" onNavigate={closeMenu} />
               </div>
-            </div>
-          </>
-        )}
+            </DialogContent>
+          </Dialog>
     </>
   )
 }

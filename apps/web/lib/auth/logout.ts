@@ -26,6 +26,7 @@
  */
 
 import { clearDeferredQuickStart } from '@/lib/quick-start/deferred-launch'
+import { apiPost } from '@/lib/api/client'
 
 /** Learner-facing destination after logout. */
 export const LEARNER_LOGIN_PATH = '/login'
@@ -95,26 +96,21 @@ export async function logout(
     // reports the revocation outcome separately, because a cleared cookie with a
     // live refresh token behind it is a different situation from a clean logout.
     try {
-      const response = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'sign_out' }),
+      const result = await apiPost<{ revocation?: string }>('/api/auth/session', {
+        action: 'sign_out',
       })
 
-      if (!response.ok) {
-        // fetch only rejects on transport errors, so a 5xx would otherwise read
-        // as a successful logout while the cookies are still set.
-        failures.push({
-          step: 'session_cookie_clear',
-          reason: `server responded ${response.status}`,
-        })
-      } else {
-        const body = (await response.json().catch(() => null)) as { revocation?: string } | null
-        if (body?.revocation === 'failed') {
-          // The cookies are gone, so this browser is logged out; the refresh token may
-          // still be live at the provider. Surfaced rather than swallowed.
-          failures.push({ step: 'provider_sign_out', reason: 'provider revocation failed' })
+      if (!result.ok) {
+        if (result.error.kind === 'parse' && result.error.status >= 200 && result.error.status < 300) {
+          // An unreadable 2xx sign-out body is treated as success rather than inventing a failure
+        } else {
+          failures.push({
+            step: 'session_cookie_clear',
+            reason: result.error.kind === 'network' ? 'Failed to fetch' : `server responded ${result.error.status}`,
+          })
         }
+      } else if (result.data?.revocation === 'failed') {
+        failures.push({ step: 'provider_sign_out', reason: 'provider revocation failed' })
       }
     } catch (err) {
       failures.push({ step: 'session_cookie_clear', reason: describe(err) })

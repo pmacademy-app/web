@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { Star, CheckCircle2, MessageSquarePlus } from 'lucide-react'
 import { ContextualFeedbackModal } from '@/components/feedback/ContextualFeedbackModal'
+import { apiGet } from '@/lib/api/client'
 
 export interface PublishedTestimonial {
   id: string
@@ -31,12 +32,9 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
     async function loadTestimonials() {
       setLoading(true)
       try {
-        const res = await fetch('/api/testimonials')
-        if (res.ok) {
-          const data = await res.json()
-          if (Array.isArray(data.testimonials)) {
-            setReviews(data.testimonials)
-          }
+        const res = await apiGet<{ testimonials?: PublishedTestimonial[] }>('/api/testimonials')
+        if (res.ok && Array.isArray(res.data.testimonials)) {
+          setReviews(res.data.testimonials)
         }
       } catch (err) {
         console.warn('Failed to load dynamic testimonials:', err)

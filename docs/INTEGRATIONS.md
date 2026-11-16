@@ -1,4 +1,4 @@
-# External Integrations & Service Matrix — Prodily PM Academy
+# External Integrations & Service Matrix (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** September 6, 2026  
@@ -11,7 +11,7 @@ Email is a **dual-provider system**, not Resend alone: `PRIMARY_EMAIL_PROVIDER` 
 
 | External Service | Integration Purpose | Authentication Method | Integration Status | Required Verification / Config |
 |---|---|---|---|---|
-| **Supabase PostgreSQL** | User State, Progress, XP, Queue, Errors | Service Role Key / Anon Key | 🟢 Connected & verified (41 migrations) | Database credentials configured |
+| **Supabase PostgreSQL** | User State, Progress, XP, Queue, Errors | Service Role Key / Anon Key | 🟢 Connected & verified (versioned migrations in `supabase/migrations/`) | Database credentials configured |
 | **Supabase Auth** | Email/password + PKCE Authentication, Sessions | JWT / Auth Hook HTTP Secret | 🟡 Configured — Verification Required | Requires `SEND_EMAIL_HOOK_SECRET` in Supabase Auth Dashboard |
 | **Brevo API** | Transactional Outbound Email Delivery (primary or fallback) | `BREVO_API_KEY` | 🟡 Configured — Verification Required | Requires `BREVO_API_KEY` & verified sender domain |
 | **Resend API** | Transactional Outbound Email Delivery (primary or fallback) | `RESEND_API_KEY` Bearer Token | 🟡 Configured — Verification Required | Requires `RESEND_API_KEY` & sending domain DNS setup |
@@ -20,7 +20,7 @@ Email is a **dual-provider system**, not Resend alone: `PRIMARY_EMAIL_PROVIDER` 
 | **Google Analytics 4** | Pageview/event analytics | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | 🟢 Connected & verified | Rendered via `@next/third-parties/google` in `app/layout.tsx` when the env var is set |
 | **Vercel Analytics & Speed Insights** | Traffic and performance telemetry | Automatic (Vercel platform) | 🟢 Connected & verified | Both `@vercel/analytics` and `@vercel/speed-insights` are imported and rendered in `app/layout.tsx` |
 | **GitHub Actions — `ci.yml`** | Lint/typecheck/test/build/E2E on PRs & pushes to `main` | N/A (repo-scoped) | 🟢 Connected & verified | — |
-| **GitHub Actions — `notification-scheduler.yml`** | Cron: email queue (5 min), broadcasts (5 min), retries (hourly), daily reminder, weekly recap, cleanup (no-op) | Bearer `CRON_SECRET` Header | 🟠 Code exists — Config Required | Requires `CRON_SECRET` & `APP_URL` in GitHub Repository Secrets |
+| **GitHub Actions: `notification-scheduler.yml`** | Cron: email queue (5 min), broadcasts (5 min), retries (hourly), daily reminder, weekly recap, retention cleanup (report-only unless `RETENTION_DELETE_ENABLED=true`) | Bearer `CRON_SECRET` Header | 🟠 Code exists, config required | Requires `CRON_SECRET` & `APP_URL` in GitHub Repository Secrets |
 | **Vercel** | Next.js Hosting & Edge Network | Vercel Deployment Tokens | 🟢 Connected & verified | Automatic CI/CD deployment on push to `main` |
 
 ---

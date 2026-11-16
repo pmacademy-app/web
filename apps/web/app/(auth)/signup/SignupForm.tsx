@@ -17,6 +17,8 @@ import { MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 import { LegalConsentFields } from '@/components/auth/LegalConsentFields'
 import { GoogleButton } from '@/components/auth/GoogleButton'
 import { buildGoogleStartHref, isGoogleAuthEnabled } from '@/lib/auth/google-auth'
+import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE, PASSWORD_PLACEHOLDER } from '@/lib/auth/password-policy'
+import { apiPost } from '@/lib/api/client'
 
 // Build-time inlined flag, so this is constant for the life of the bundle.
 const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
@@ -37,7 +39,7 @@ const signupSchema = z.object({
   password: z
     .string()
     .min(1, 'Password is required.')
-    .min(6, 'Password must be at least 6 characters.'),
+    .min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
   // Mirrors the server schema in app/api/auth/signup/route.ts. The client copy is
   // for the inline error; the server's is the one that actually blocks the account.
   acceptedTerms: z.literal(true, {
@@ -132,35 +134,42 @@ export default function SignupForm({ refCode = null, next = null }: SignupFormPr
 
     startTransition(async () => {
       try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...values, refCode, turnstileToken }),
-        })
+        const result = await apiPost<{
+          success?: boolean
+          error?: string
+          code?: string
+          redirect?: string
+        }>('/api/auth/signup', { ...values, refCode, turnstileToken })
 
-        if (res.status >= 502 && res.status <= 504) {
+        if (!result.ok) {
           resetTurnstile()
-          const classified = classifyAuthError(new Error(`${res.status} Bad Gateway / Service Unavailable`), 'signup')
+          if (
+            result.error.status === 403 &&
+            (result.error.code === 'SIGNUPS_DISABLED' ||
+              result.error.message.toLowerCase().includes('registrations are currently closed'))
+          ) {
+            setAuthError({
+              code: 'AUTH_UNKNOWN_ERROR',
+              message: result.error.message || 'New learner registrations are currently closed. Please check back later.',
+              retryable: false,
+              isNetworkError: false,
+            })
+            return
+          }
+          const classified = resolveApiAuthError(
+            { error: result.error.message, code: result.error.code },
+            'signup',
+            'Registration failed'
+          )
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')
           return
         }
 
-        let json: { success?: boolean; error?: string; code?: string; redirect?: string } = {}
-        try {
-          json = await res.json()
-        } catch {
+        const json = result.data
+        if (!json.success) {
           resetTurnstile()
-          const classified = classifyAuthError(new Error(`HTTP ${res.status}: Invalid server response`), 'signup')
-          setAuthError(classified)
-          recordAuthTelemetry(classified, 'signup')
-          return
-        }
-
-        if (!res.ok || !json.success) {
-          resetTurnstile()
-          // SIGNUPS_DISABLED is a known platform-control response, not an auth error
-          if (res.status === 403 && (json.code === 'SIGNUPS_DISABLED' || json.error?.toLowerCase().includes('registrations are currently closed'))) {
+          if (json.code === 'SIGNUPS_DISABLED' || json.error?.toLowerCase().includes('registrations are currently closed')) {
             setAuthError({
               code: 'AUTH_UNKNOWN_ERROR',
               message: json.error || 'New learner registrations are currently closed. Please check back later.',
@@ -340,7 +349,7 @@ export default function SignupForm({ refCode = null, next = null }: SignupFormPr
             disabled={isLoading}
             error={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
-            placeholder="Min. 6 characters"
+            placeholder={PASSWORD_PLACEHOLDER}
             {...register('password')}
           />
           {errors.password && (

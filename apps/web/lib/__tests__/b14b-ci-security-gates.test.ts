@@ -152,7 +152,7 @@ describe('B14-B — CI security configuration is present', () => {
   })
 
   it('keeps the migration deploy gated on the existing build job only', () => {
-    expect(ci).toMatch(/deploy-supabase:\s*\n\s*needs:\s*build-and-validate/)
+    expect(ci).toMatch(/deploy-supabase:[\s\S]*?needs:\s*\[?[^\]\n]*build-and-validate/)
   })
 
   it('ships an allowlist in which every entry carries a reason and a review date', () => {

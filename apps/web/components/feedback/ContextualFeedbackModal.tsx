@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { MessageSquare, Star, X, Send, CheckCircle2, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { apiPost } from '@/lib/api/client'
 
 interface ContextualFeedbackModalProps {
   isOpen: boolean
@@ -35,11 +37,7 @@ export function ContextualFeedbackModal({
 
   const handleDismiss = async () => {
     try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'dismiss', promptKey }),
-      })
+      await apiPost('/api/feedback', { action: 'dismiss', promptKey })
     } catch {
       // Ignored
     }
@@ -78,45 +76,41 @@ export function ContextualFeedbackModal({
           return
         }
 
-        const res = await fetch('/api/testimonials', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            authorName: authorName.trim(),
-            content,
-            rating,
-            headline,
-            authorRole: authorRole || 'Prodily Learner',
-            allowPublicFeature,
-          }),
+        const res = await apiPost<{ success?: boolean; error?: string }>('/api/testimonials', {
+          authorName: authorName.trim(),
+          content,
+          rating,
+          headline,
+          authorRole: authorRole || 'Prodily Learner',
+          allowPublicFeature,
         })
 
-        const data = await res.json()
-        if (res.ok && data.success) {
+        if (res.ok && res.data.success) {
           setSuccess(true)
           setTimeout(() => onClose(), 1800)
         } else {
-          setError(data.error || 'Failed to submit review.')
+          const errorMsg = res.ok
+            ? res.data.error || 'Failed to submit review.'
+            : res.error.message || 'Failed to submit review.'
+          setError(errorMsg)
         }
       } else {
-        const res = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content,
-            category: 'curriculum',
-            sourceEvent,
-            rating,
-            promptKey,
-          }),
+        const res = await apiPost<{ success?: boolean; error?: string }>('/api/feedback', {
+          content,
+          category: 'curriculum',
+          sourceEvent,
+          rating,
+          promptKey,
         })
 
-        const data = await res.json()
-        if (res.ok && data.success) {
+        if (res.ok && res.data.success) {
           setSuccess(true)
           setTimeout(() => onClose(), 1800)
         } else {
-          setError(data.error || 'Failed to submit feedback.')
+          const errorMsg = res.ok
+            ? res.data.error || 'Failed to submit feedback.'
+            : res.error.message || 'Failed to submit feedback.'
+          setError(errorMsg)
         }
       }
     } catch {
@@ -127,13 +121,11 @@ export function ContextualFeedbackModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="feedback-modal-title"
-    >
-      <div className="w-full max-w-lg bg-background border border-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
+      <DialogContent
+        showCloseButton={false}
+        className="block w-full max-w-lg bg-background border border-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative"
+      >
         <Button
           type="button"
           variant="ghost"
@@ -147,7 +139,7 @@ export function ContextualFeedbackModal({
 
         {success ? (
           <div className="py-8 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-success flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground">Thank You!</h3>
@@ -164,10 +156,10 @@ export function ContextualFeedbackModal({
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div>
-                <h3 id="feedback-modal-title" className="text-base font-bold text-foreground font-serif">
+                <DialogTitle id="feedback-modal-title" className="text-base font-bold text-foreground font-serif">
                   {title}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground leading-snug">{description}</DialogDescription>
               </div>
             </div>
 
@@ -213,7 +205,7 @@ export function ContextualFeedbackModal({
                   >
                     <Star
                       className={`w-5 h-5 transition-colors ${
-                        star <= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/40'
+                        star <= rating ? 'fill-amber-400 text-warning' : 'text-muted-foreground/40'
                       }`}
                     />
                   </button>
@@ -327,7 +319,7 @@ export function ContextualFeedbackModal({
             </div>
           </form>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

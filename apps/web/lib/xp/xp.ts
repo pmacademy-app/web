@@ -186,8 +186,6 @@ export const LEVEL_THRESHOLDS: LevelThreshold[] = [
   { level: 9, title: 'Chief Product Officer', minXp: 14000 },
 ]
 
-export const LEVEL_TITLES = LEVEL_THRESHOLDS
-
 export interface LevelInfo {
   level: number
   title: string
@@ -241,11 +239,6 @@ export function calculateLevel(totalXp: number): LevelInfo {
     currentLevelMinXp: currentThreshold.minXp,
     nextLevelMinXp: nextThreshold.minXp,
   }
-}
-
-export function getTitleForXp(xp: number): { level: number; title: string } {
-  const info = calculateLevel(xp)
-  return { level: info.level, title: info.title }
 }
 
 export function getLevelTitle(level: number): string {

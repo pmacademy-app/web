@@ -1,7 +1,7 @@
-# Notification Platform Specification — Prodily PM Academy
+# Notification Platform Specification (Prodily)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 / React 19 / PostgreSQL  
+**Framework:** Next.js 16.4.3 / React 19 / PostgreSQL  
 **Last Updated:** September 6, 2026  
 
 ---

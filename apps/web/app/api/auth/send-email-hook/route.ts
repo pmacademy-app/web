@@ -58,44 +58,14 @@ function getSecretBytes(secret: string): Buffer {
   return Buffer.from(clean, 'utf-8')
 }
 
+// Allowed clock drift between webhook timestamp and server clock: 5 minutes (300 seconds).
+export const WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS = 300
+
 function verifyHookSecret(request: NextRequest, rawBody: string, secret: string): boolean {
-  const cleanSecret = secret.trim()
-  let unprefixedSecret = cleanSecret
-  if (unprefixedSecret.startsWith('v1,')) {
-    unprefixedSecret = unprefixedSecret.substring(3).trim()
-  }
-  if (unprefixedSecret.startsWith('whsec_')) {
-    unprefixedSecret = unprefixedSecret.substring(6).trim()
-  }
+  // SEC-16: Bearer token and custom-header bypasses have been removed.
+  void secretMatchesAny
 
-  // The same shared secret is accepted in three spellings, because the value in
-  // SEND_EMAIL_HOOK_SECRET may or may not carry the `v1,` and `whsec_` prefixes
-  // depending on how it was copied out of the dashboard.
-  const acceptedSecrets = [secret, cleanSecret, unprefixedSecret]
-
-  // 1. Authorization header check (Bearer token).
-  //    B7-D / F-SEC-12: compared in constant time. The previous `===` chain
-  //    returned as soon as a byte differed, which is a timing oracle on a
-  //    long-lived shared secret.
-  const authHeader = request.headers.get('authorization')
-  if (authHeader) {
-    const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-    if (secretMatchesAny(token, acceptedSecrets)) return true
-  }
-
-  // 2. Custom header checks — likewise constant-time.
-  const headerSecret =
-    request.headers.get('x-supabase-auth-secret') ||
-    request.headers.get('x-hook-secret') ||
-    request.headers.get('x-secret')
-  if (headerSecret) {
-    const val = headerSecret.trim()
-    if (secretMatchesAny(val, acceptedSecrets)) return true
-  }
-
-  // 3. Standard Webhook / Svix / Supabase signature check — the mechanism
-  //    production actually uses (verified 2026-09-14: the configured secret is in
-  //    `v1,whsec_...` form). HMAC over the raw body, compared with timingSafeEqual.
+  // 3. Standard Webhook / Svix / Supabase signature check
   const signatureHeader =
     request.headers.get('webhook-signature') ||
     request.headers.get('svix-signature') ||
@@ -103,67 +73,67 @@ function verifyHookSecret(request: NextRequest, rawBody: string, secret: string)
     request.headers.get('x-signature') ||
     request.headers.get('x-webhook-signature')
 
-  if (signatureHeader) {
-    const msgId =
-      request.headers.get('webhook-id') ||
-      request.headers.get('svix-id') ||
-      request.headers.get('x-supabase-id') ||
-      ''
+  const msgId =
+    request.headers.get('webhook-id') ||
+    request.headers.get('svix-id') ||
+    request.headers.get('x-supabase-id') ||
+    ''
 
-    const msgTimestamp =
-      request.headers.get('webhook-timestamp') ||
-      request.headers.get('svix-timestamp') ||
-      ''
+  const msgTimestamp =
+    request.headers.get('webhook-timestamp') ||
+    request.headers.get('svix-timestamp') ||
+    ''
 
-    const sigParts = signatureHeader.split(/[\s,]+/)
-    let v1Sig = ''
-    let tSig = msgTimestamp
+  if (!signatureHeader || !msgId || !msgTimestamp) {
+    return false
+  }
 
-    if (signatureHeader.startsWith('v1,')) {
-      v1Sig = signatureHeader.substring(3).trim()
-    } else {
-      for (const part of sigParts) {
-        const p = part.trim()
-        if (p.startsWith('v1=')) {
-          v1Sig = p.substring(3).trim()
-        } else if (p.startsWith('t=') && !tSig) {
-          tSig = p.substring(2).trim()
-        } else if (!v1Sig && p && !p.startsWith('t=')) {
-          v1Sig = p
-        }
-      }
+  // Reject timestamps more than 5 minutes from now in either direction (prevent replay attacks)
+  const timestampSeconds = parseInt(msgTimestamp, 10)
+  if (!Number.isFinite(timestampSeconds)) {
+    return false
+  }
+  const nowSeconds = Math.floor(Date.now() / 1000)
+  if (Math.abs(nowSeconds - timestampSeconds) > WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS) {
+    return false
+  }
+
+  // Extract v1 signature candidates from header
+  const sigParts = signatureHeader.split(/[\s,]+/)
+  const v1Signatures: string[] = []
+
+  if (signatureHeader.startsWith('v1,')) {
+    v1Signatures.push(signatureHeader.substring(3).trim())
+  }
+  for (const part of sigParts) {
+    const p = part.trim()
+    if (p.startsWith('v1=')) {
+      v1Signatures.push(p.substring(3).trim())
+    } else if (p.startsWith('v1,')) {
+      v1Signatures.push(p.substring(3).trim())
     }
+  }
 
-    if (v1Sig) {
-      const secretBytes = getSecretBytes(secret)
+  if (v1Signatures.length === 0) {
+    return false
+  }
 
-      const payloadCandidates: string[] = []
-      if (msgId && tSig) {
-        payloadCandidates.push(`${msgId}.${tSig}.${rawBody}`)
+  const secretBytes = getSecretBytes(secret)
+  const payloadToSign = `${msgId}.${msgTimestamp}.${rawBody}`
+  const expectedHmacBase64 = crypto.createHmac('sha256', secretBytes).update(payloadToSign).digest('base64')
+  const expectedBuffer = Buffer.from(expectedHmacBase64)
+
+  for (const v1Sig of v1Signatures) {
+    try {
+      const sigBuffer = Buffer.from(v1Sig)
+      if (
+        sigBuffer.length === expectedBuffer.length &&
+        crypto.timingSafeEqual(sigBuffer, expectedBuffer)
+      ) {
+        return true
       }
-      if (tSig) {
-        payloadCandidates.push(`${tSig}.${rawBody}`)
-      }
-      payloadCandidates.push(rawBody)
-
-      for (const candidate of payloadCandidates) {
-        const hmacBase64 = crypto.createHmac('sha256', secretBytes).update(candidate).digest('base64')
-        const hmacBase64Url = Buffer.from(hmacBase64, 'base64').toString('base64url')
-        const hmacHex = crypto.createHmac('sha256', secretBytes).update(candidate).digest('hex')
-
-        for (const expected of [hmacBase64, hmacBase64Url, hmacHex]) {
-          try {
-            if (
-              expected.length === v1Sig.length &&
-              crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(v1Sig))
-            ) {
-              return true
-            }
-          } catch {
-            // Ignore length mismatches
-          }
-        }
-      }
+    } catch {
+      // Length mismatch or invalid buffer
     }
   }
 

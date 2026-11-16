@@ -1,3 +1,9 @@
+---
+seoTitle: "What is Product Management? Role, Scope & Impact"
+seoDescription: "Product Management is the discipline of deciding what problem to solve with evidence. Learn the core definition, scope, and accountability triangle."
+inShort: "Product Management is the discipline of deciding, with evidence, what problem is worth solving and ensuring the resulting solution creates customer and business value. Rather than writing code or designing interfaces directly, a PM achieves outcomes through cross-functional influence, balancing desirability, feasibility, and viability."
+---
+
 # Lesson 1: What is Product Management?
 
 ## Why This Lesson Matters

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { clampPagination, paginated, toRange } from '@/lib/api/pagination'
@@ -30,8 +30,7 @@ export const GET = withRoute(
       return NextResponse.json({ success: true, ...body, requests: body.items })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Failed to fetch Fellow request queue.')
-      console.error('[API GET /api/admin/fellow-requests] Error:', error)
-      return NextResponse.json({ error: message }, { status: 500 })
+      throw new RouteError(500, 'ADMIN_FELLOW_REQUESTS_FETCH_FAILED', message)
     }
   }
 )

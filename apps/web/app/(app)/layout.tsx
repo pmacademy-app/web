@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
@@ -54,7 +54,10 @@ export default async function AuthenticatedLayout({
   }
 
   const isOnboardingComplete = Boolean(
-    authUser.user_metadata?.onboarding_complete || profile?.goal || profile?.curriculum_access_override
+    authUser.app_metadata?.onboarding_complete === true ||
+    profile?.onboarding_completed ||
+    profile?.goal != null ||
+    profile?.curriculum_access_override
   )
 
   if (!isOnboardingComplete) {

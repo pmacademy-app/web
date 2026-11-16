@@ -94,7 +94,7 @@ export function AdminSystemAlertsView() {
     ADMIN_ALERTS_SWR_CONFIG
   )
 
-  const alerts = data?.success ? (data.alerts || []) : []
+  const alerts = React.useMemo(() => (data?.success && data.alerts ? data.alerts : []), [data])
   const unackCriticalCount = data?.success ? (data.unacknowledgedCriticalCount || 0) : 0
   const error = queryError?.message || (data && !data.success ? data.error || 'The alerts service returned an unexpected response.' : null)
   const loading = isLoading

@@ -50,7 +50,7 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
     <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="flex items-center gap-2">
-          <CertIcon className="w-5 h-5 text-amber-500" />
+          <CertIcon className="w-5 h-5 text-warning" />
           <h2 className="text-xl font-bold font-serif text-foreground">
             Official Certificates &amp; Credentials
           </h2>
@@ -72,7 +72,7 @@ export function CertificatesCard({ certificates, completedLessons, completedPerc
                 className="p-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
               >
                 <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-500 block">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-warning block">
                     {statusLabel} • {cert.certificate_code}
                   </span>
                   <h3 className="text-lg font-bold font-serif text-foreground">

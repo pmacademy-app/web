@@ -43,7 +43,7 @@ export function CapstoneReflection({
             className="flex items-center gap-2 text-xs font-medium cursor-pointer select-none text-muted-foreground hover:text-foreground"
           >
             {isPublic ? (
-              <Globe className="w-3.5 h-3.5 text-emerald-500" />
+              <Globe className="w-3.5 h-3.5 text-success" />
             ) : (
               <Lock className="w-3.5 h-3.5 text-muted-foreground" />
             )}
@@ -68,14 +68,14 @@ export function CapstoneReflection({
           disabled={isLocked}
           rows={4}
           placeholder="What were your biggest tradeoffs or breakthroughs while completing this capstone? How will you apply this on real product teams?"
-          className="w-full p-3.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground/50 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 leading-relaxed resize-y"
+          className="w-full p-3.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground/50 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 leading-relaxed resize-y"
           aria-label="Personal Reflection Text"
         />
 
         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
           <span>Reflections earn XP when submitted.</span>
           {isPublic && (
-            <span className="flex items-center gap-1 text-emerald-500 font-semibold">
+            <span className="flex items-center gap-1 text-success font-semibold">
               <Check className="w-3 h-3" /> Will be attached to public profile export
             </span>
           )}

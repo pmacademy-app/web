@@ -15,7 +15,12 @@ import { getFromEmail } from '@/lib/email'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
-import { calculateRetryDelayMinutes } from './helpers'
+import {
+  calculateRetryDelayMinutes,
+  isAuthTemplateKey,
+  scrubbedTemplateVariables,
+  scrubTemplateVariablesForDeadLetter,
+} from './helpers'
 import { classifyProviderFailure } from '../providers/failure-classification'
 import { log } from '@/lib/monitoring/log'
 
@@ -345,9 +350,14 @@ export async function reclaimStaleProcessingItems(
 
     if (!error && Array.isArray(data)) {
       const reclaimed = data as Array<{ id: string; curr_status?: string; new_status?: string; prev_status?: string }>
+      const items = reclaimed.map((r) => ({ id: String(r.id), newStatus: String(r.new_status || r.curr_status || 'retrying') }))
+      await scrubReclaimedAuthDeadLetters(
+        supabase,
+        items.filter((item) => item.newStatus === 'dead_letter').map((item) => item.id)
+      )
       return {
         reclaimedCount: reclaimed.length,
-        items: reclaimed.map((r) => ({ id: String(r.id), newStatus: String(r.new_status || r.curr_status || 'retrying') })),
+        items,
       }
     }
   } catch (rpcErr) {
@@ -363,7 +373,7 @@ export async function reclaimStaleProcessingItems(
   try {
     const query = supabase
       .from('email_queue')
-      .select('id, status, attempt_count, max_attempts, failed_at')
+      .select('id, status, template_key, attempt_count, max_attempts, failed_at')
       .eq('status', 'processing')
 
     if (typeof (query as unknown as { lte?: unknown }).lte !== 'function') {
@@ -391,6 +401,10 @@ export async function reclaimStaleProcessingItems(
             failed_at: nowIso,
             processing_at: null,
             updated_at: nowIso,
+            // ADR-005: a dead-lettered auth email must not keep its one-time link.
+            ...(isAuthTemplateKey(row.template_key)
+              ? { template_variables: scrubbedTemplateVariables('dead_letter') }
+              : {}),
           })
           .eq('id', id)
           .eq('status', 'processing')
@@ -432,6 +446,34 @@ export async function reclaimStaleProcessingItems(
   } catch (fallbackErr) {
     log.exception('queue.reclaim_fallback_failed', fallbackErr)
     return { reclaimedCount: 0, items: [] }
+  }
+}
+
+/**
+ * Scrubs auth rows that `reclaim_stale_processing_items` just moved to `dead_letter`.
+ *
+ * The RPC updates the rows in SQL and cannot drop `template_variables` itself, so the
+ * one-time link would otherwise stay on the dead-lettered row (ADR-005). Best effort: a
+ * failure is logged and the reclaim result stands; the owner-run scrub SQL
+ * (20261113000001_scrub_dead_letter_auth_links) catches anything left behind.
+ */
+async function scrubReclaimedAuthDeadLetters(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  deadLetteredIds: string[]
+): Promise<void> {
+  if (deadLetteredIds.length === 0) return
+  try {
+    const { error } = await supabase
+      .from('email_queue')
+      .update({ template_variables: scrubbedTemplateVariables('dead_letter') })
+      .in('id', deadLetteredIds)
+      .like('template_key', 'auth.%')
+      .eq('status', 'dead_letter')
+    if (error) {
+      log.warn('queue.reclaim_dead_letter_scrub_failed', { count: deadLetteredIds.length })
+    }
+  } catch (scrubErr) {
+    log.warnException('queue.reclaim_dead_letter_scrub_failed', scrubErr, { count: deadLetteredIds.length })
   }
 }
 
@@ -747,6 +789,10 @@ async function processSingleBatch(
               provider_attempts: (serializeAttempts(sendResult.attempts) as unknown as import('@/lib/supabase').Json),
               processing_at: null,
               updated_at: new Date().toISOString(),
+              // ADR-005: the link has been sent, so the row no longer needs it.
+              ...(isAuthTemplateKey(templateKey)
+                ? { template_variables: scrubbedTemplateVariables('delivered') }
+                : {}),
             })
             .eq('id', queueId)
         )
@@ -1030,6 +1076,9 @@ async function handlePermanentFailure(
         failed_at: now,
         provider: context?.provider || null,
         provider_attempts: (attempts as unknown as import('@/lib/supabase').Json),
+        // ADR-005: auth templates drop their variables (and the one-time link in them);
+        // every other template keeps them so an admin retry can re-render the email.
+        template_variables: (scrubTemplateVariablesForDeadLetter(templateKey, templateVariables) as unknown as import('@/lib/supabase').Json),
         processing_at: null,
         updated_at: now,
       })

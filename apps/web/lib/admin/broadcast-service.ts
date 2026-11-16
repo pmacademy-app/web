@@ -9,6 +9,7 @@
 
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { RouteError } from '@/lib/api/with-route'
 import type { Json } from '@/types/database'
 import { applyUserFilters, countMatchingUsers, sampleMatchingUsers } from './user-filter-query'
 import type { AdminUserFilters } from './types'
@@ -105,11 +106,11 @@ export function isPortfolioActivationBroadcast(b: {
 }
 
 /** Thrown by executeBroadcastBatch for a campaign that must not be sent (CQ-02). */
-export class BroadcastRefusedError extends Error {
+export class BroadcastRefusedError extends RouteError {
   readonly broadcastId: string
 
   constructor(broadcastId: string, message: string) {
-    super(message)
+    super(409, 'CONFLICT', message, { broadcastId })
     this.name = 'BroadcastRefusedError'
     this.broadcastId = broadcastId
   }
@@ -128,25 +129,20 @@ export class BroadcastService {
   ): Promise<BroadcastListResult> {
     const supabase = createServiceRoleClient()
     const offset = (page - 1) * pageSize
-    try {
-      const { data, count, error } = await supabase
-        .from('email_broadcasts')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range(offset, offset + pageSize - 1)
+    const { data, count, error } = await supabase
+      .from('email_broadcasts')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + pageSize - 1)
 
-      if (error) throw error
-      const total = count ?? 0
-      return {
-        broadcasts: (data || []) as unknown as BroadcastRecord[],
-        total,
-        page,
-        pageSize,
-        totalPages: Math.max(1, Math.ceil(total / pageSize)),
-      }
-    } catch (err) {
-      console.error('[BroadcastService] listBroadcasts failed:', err)
-      return { broadcasts: [], total: 0, page, pageSize, totalPages: 1 }
+    if (error) throw new Error(`Failed to list broadcasts: ${error.message}`)
+    const total = count ?? 0
+    return {
+      broadcasts: (data || []) as unknown as BroadcastRecord[],
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
     }
   }
 
@@ -155,18 +151,13 @@ export class BroadcastService {
    */
   static async getBroadcast(id: string): Promise<BroadcastRecord | null> {
     const supabase = createServiceRoleClient()
-    try {
-      const { data, error } = await supabase
-        .from('email_broadcasts')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      if (error) throw error
-      return data as unknown as BroadcastRecord | null
-    } catch (err) {
-      console.error('[BroadcastService] getBroadcast failed:', err)
-      return null
-    }
+    const { data, error } = await supabase
+      .from('email_broadcasts')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) throw new Error(`Failed to get broadcast: ${error.message}`)
+    return data as unknown as BroadcastRecord | null
   }
 
   /**
@@ -174,27 +165,22 @@ export class BroadcastService {
    */
   static async createBroadcast(input: CreateBroadcastInput): Promise<BroadcastRecord | null> {
     const supabase = createServiceRoleClient()
-    try {
-      const { data, error } = await supabase
-        .from('email_broadcasts')
-        .insert({
-          name: input.name.trim(),
-          description: input.description?.trim() || null,
-          template_key: input.template_key,
-          subject_override: input.subject_override?.trim() || null,
-          batch_size: input.batch_size ?? 100,
-          status: 'draft',
-          recipient_filters: (input.recipient_filters ?? {}) as Json,
-          created_by: input.created_by || null,
-        })
-        .select('*')
-        .single()
-      if (error) throw error
-      return data as unknown as BroadcastRecord
-    } catch (err) {
-      console.error('[BroadcastService] createBroadcast failed:', err)
-      return null
-    }
+    const { data, error } = await supabase
+      .from('email_broadcasts')
+      .insert({
+        name: input.name.trim(),
+        description: input.description?.trim() || null,
+        template_key: input.template_key,
+        subject_override: input.subject_override?.trim() || null,
+        batch_size: input.batch_size ?? 100,
+        status: 'draft',
+        recipient_filters: (input.recipient_filters ?? {}) as Json,
+        created_by: input.created_by || null,
+      })
+      .select('*')
+      .single()
+    if (error) throw new Error(`Failed to create broadcast: ${error.message}`)
+    return data as unknown as BroadcastRecord
   }
 
   /**
@@ -207,31 +193,26 @@ export class BroadcastService {
     allowStatuses: BroadcastStatus[] = ['draft']
   ): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
-    try {
-      const existing = await this.getBroadcast(id)
-      if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (!allowStatuses.includes(existing.status)) {
-        return {
-          success: false,
-          error: `Cannot update broadcast in '${existing.status}' state.`,
-        }
+    const existing = await this.getBroadcast(id)
+    if (!existing) return { success: false, error: 'Broadcast not found.' }
+    if (!allowStatuses.includes(existing.status)) {
+      return {
+        success: false,
+        error: `Cannot update broadcast in '${existing.status}' state.`,
       }
-
-      const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
-      if (input.name !== undefined) patch.name = input.name.trim()
-      if (input.description !== undefined) patch.description = input.description.trim() || null
-      if (input.template_key !== undefined) patch.template_key = input.template_key
-      if (input.subject_override !== undefined) patch.subject_override = input.subject_override.trim() || null
-      if (input.batch_size !== undefined) patch.batch_size = input.batch_size
-      if (input.recipient_filters !== undefined) patch.recipient_filters = input.recipient_filters as unknown as Json
-
-      const { error } = await supabase.from('email_broadcasts').update(patch as never).eq('id', id)
-      if (error) throw error
-      return { success: true }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Update failed'
-      return { success: false, error: msg }
     }
+
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (input.name !== undefined) patch.name = input.name.trim()
+    if (input.description !== undefined) patch.description = input.description.trim() || null
+    if (input.template_key !== undefined) patch.template_key = input.template_key
+    if (input.subject_override !== undefined) patch.subject_override = input.subject_override.trim() || null
+    if (input.batch_size !== undefined) patch.batch_size = input.batch_size
+    if (input.recipient_filters !== undefined) patch.recipient_filters = input.recipient_filters as unknown as Json
+
+    const { error } = await supabase.from('email_broadcasts').update(patch as never).eq('id', id)
+    if (error) throw new Error(`Failed to update broadcast: ${error.message}`)
+    return { success: true }
   }
 
   /**
@@ -239,19 +220,14 @@ export class BroadcastService {
    */
   static async deleteBroadcast(id: string): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
-    try {
-      const existing = await this.getBroadcast(id)
-      if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (existing.status !== 'draft') {
-        return { success: false, error: 'Only draft broadcasts can be deleted.' }
-      }
-      const { error } = await supabase.from('email_broadcasts').delete().eq('id', id)
-      if (error) throw error
-      return { success: true }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Delete failed'
-      return { success: false, error: msg }
+    const existing = await this.getBroadcast(id)
+    if (!existing) return { success: false, error: 'Broadcast not found.' }
+    if (existing.status !== 'draft') {
+      return { success: false, error: 'Only draft broadcasts can be deleted.' }
     }
+    const { error } = await supabase.from('email_broadcasts').delete().eq('id', id)
+    if (error) throw new Error(`Failed to delete broadcast: ${error.message}`)
+    return { success: true }
   }
 
   /**
@@ -262,22 +238,17 @@ export class BroadcastService {
     scheduledAt: string
   ): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
-    try {
-      const existing = await this.getBroadcast(id)
-      if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (!['draft', 'scheduled'].includes(existing.status)) {
-        return { success: false, error: `Cannot schedule broadcast in '${existing.status}' state.` }
-      }
-      const { error } = await supabase
-        .from('email_broadcasts')
-        .update({ status: 'scheduled', scheduled_at: scheduledAt, updated_at: new Date().toISOString() })
-        .eq('id', id)
-      if (error) throw error
-      return { success: true }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Schedule failed'
-      return { success: false, error: msg }
+    const existing = await this.getBroadcast(id)
+    if (!existing) return { success: false, error: 'Broadcast not found.' }
+    if (!['draft', 'scheduled'].includes(existing.status)) {
+      return { success: false, error: `Cannot schedule broadcast in '${existing.status}' state.` }
     }
+    const { error } = await supabase
+      .from('email_broadcasts')
+      .update({ status: 'scheduled', scheduled_at: scheduledAt, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    if (error) throw new Error(`Failed to schedule broadcast: ${error.message}`)
+    return { success: true }
   }
 
   /**
@@ -285,22 +256,17 @@ export class BroadcastService {
    */
   static async cancelBroadcast(id: string): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
-    try {
-      const existing = await this.getBroadcast(id)
-      if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (['completed', 'failed', 'cancelled'].includes(existing.status)) {
-        return { success: false, error: `Cannot cancel broadcast in '${existing.status}' state.` }
-      }
-      const { error } = await supabase
-        .from('email_broadcasts')
-        .update({ status: 'cancelled', scheduled_at: null, updated_at: new Date().toISOString() })
-        .eq('id', id)
-      if (error) throw error
-      return { success: true }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Cancel failed'
-      return { success: false, error: msg }
+    const existing = await this.getBroadcast(id)
+    if (!existing) return { success: false, error: 'Broadcast not found.' }
+    if (['completed', 'failed', 'cancelled'].includes(existing.status)) {
+      return { success: false, error: `Cannot cancel broadcast in '${existing.status}' state.` }
     }
+    const { error } = await supabase
+      .from('email_broadcasts')
+      .update({ status: 'cancelled', scheduled_at: null, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    if (error) throw new Error(`Failed to cancel broadcast: ${error.message}`)
+    return { success: true }
   }
 
   /**
@@ -468,6 +434,7 @@ export class BroadcastService {
 
       const eventId = `broadcast-${broadcastId}-${user.id}`
 
+      // Reason for try/catch: per-recipient enqueue failure increments failed count and does not abort the remaining batch.
       try {
         const enqueueRes = await enqueueNotificationItem({
           userId: user.id,
@@ -494,6 +461,7 @@ export class BroadcastService {
     }
 
     // Trigger queue processing for this batch
+    // Reason for try/catch: immediate queue flush trigger is best effort; background processor or cron picks up remaining items.
     try {
       await processEmailQueue(batchSize)
     } catch (err) {
@@ -542,6 +510,7 @@ export class BroadcastService {
     const supabase = createServiceRoleClient()
     let processed = 0
     let errors = 0
+    // Reason for try/catch: top-level scheduled broadcast runner catches DB query errors to return error totals to scheduler.
     try {
       const { data: due } = await supabase
         .from('email_broadcasts')
@@ -550,6 +519,7 @@ export class BroadcastService {
         .lte('scheduled_at', new Date().toISOString())
 
       for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: Record<string, unknown> }>) {
+        // Reason for try/catch: individual broadcast batch execution failure marks that broadcast failed and continues with remaining due broadcasts.
         try {
           if (isPortfolioActivationBroadcast(b)) {
             // CQ-02: mark the row failed so the cron stops picking it up. Never fall

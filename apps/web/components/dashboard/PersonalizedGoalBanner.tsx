@@ -35,7 +35,7 @@ export function PersonalizedGoalBanner({ path, milestone }: PersonalizedGoalBann
               Personalized Path
             </span>
             {path.goalBadge && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-warning text-xs font-semibold">
                 <Target className="w-3 h-3" />
                 {path.goalBadge}
               </span>

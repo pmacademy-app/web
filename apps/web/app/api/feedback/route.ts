@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 /**
  * Deliberately open to `anonymous` — feedback is collected from signed-out visitors
@@ -72,7 +73,14 @@ export const POST = withRoute(
       .single()
 
     if (error || !data) {
-      console.error('[api/feedback] Error inserting private feedback:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'feedback.insert',
+        message: `Error inserting feedback: ${error?.message || 'unknown'}`,
+        userId: userId ?? undefined,
+        details: { error: error?.message },
+      })
       throw new RouteError(500, 'SERVER_ERROR', 'Failed to record feedback.')
     }
 

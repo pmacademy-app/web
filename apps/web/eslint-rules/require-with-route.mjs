@@ -138,6 +138,8 @@ const rule = {
   },
 }
 
-export default {
+const plugin = {
   rules: { 'require-with-route': rule },
 }
+
+export default plugin

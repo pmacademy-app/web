@@ -22,14 +22,14 @@ const mockUsers: Record<string, { id: string; email: string; app_metadata?: Reco
   [VALID_LEARNER_TOKEN]: {
     id: 'usr_learner_1',
     email: 'learner@example.com',
-    app_metadata: { provider: 'email' },
+    app_metadata: { provider: 'email', onboarding_complete: true },
     user_metadata: { onboarding_complete: true, full_name: 'Learner One' },
     email_confirmed_at: '2026-01-01T00:00:00Z',
   },
   [VALID_ADMIN_TOKEN]: {
     id: 'usr_admin_1',
     email: 'admin@prodily.app',
-    app_metadata: { is_admin: true },
+    app_metadata: { is_admin: true, onboarding_complete: true },
     user_metadata: { onboarding_complete: true, full_name: 'Admin One' },
     email_confirmed_at: '2026-01-01T00:00:00Z',
   },
@@ -81,20 +81,20 @@ vi.mock('@supabase/supabase-js', () => {
           }),
           signOut: vi.fn(async () => ({ error: null })),
         },
-        from: (_table: string) => ({
+        from: () => ({
           select: () => ({
             eq: (_col: string, val: string) => ({
               maybeSingle: async () => {
                 if (val === 'usr_admin_1') {
-                  return { data: { is_admin: true, email: 'admin@prodily.app' }, error: null }
+                  return { data: { is_admin: true, email: 'admin@prodily.app', onboarding_completed: true }, error: null }
                 }
-                return { data: { is_admin: false, email: 'learner@example.com' }, error: null }
+                return { data: { is_admin: false, email: 'learner@example.com', onboarding_completed: true }, error: null }
               },
               single: async () => {
                 if (val === 'usr_admin_1') {
-                  return { data: { is_admin: true, email: 'admin@prodily.app' }, error: null }
+                  return { data: { is_admin: true, email: 'admin@prodily.app', onboarding_completed: true }, error: null }
                 }
-                return { data: { is_admin: false, email: 'learner@example.com' }, error: null }
+                return { data: { is_admin: false, email: 'learner@example.com', onboarding_completed: true }, error: null }
               },
             }),
           }),

@@ -146,6 +146,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetRef, TurnstileWidgetPro
 
         <div
           ref={containerRef}
+          role="region"
           className="min-h-[65px] flex items-center justify-center"
           aria-label="Cloudflare Turnstile security challenge"
         />

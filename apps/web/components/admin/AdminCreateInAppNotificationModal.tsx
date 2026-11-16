@@ -39,9 +39,9 @@ const CATEGORIES: Array<{ key: InAppCategory; label: string }> = [
 ]
 
 const PRIORITIES: Array<{ key: InAppPriorityLevel; label: string; desc: string; color: string }> = [
-  { key: 'urgent', label: 'Urgent', desc: 'Critical alerts shown prominently at the top', color: 'text-red-400 border-red-500/30 bg-red-500/10' },
-  { key: 'high', label: 'High', desc: 'Important course updates & time-sensitive notices', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10' },
-  { key: 'medium', label: 'Medium', desc: 'Standard updates & milestones (default)', color: 'text-blue-400 border-blue-500/30 bg-blue-500/10' },
+  { key: 'urgent', label: 'Urgent', desc: 'Critical alerts shown prominently at the top', color: 'text-danger border-red-500/30 bg-red-500/10' },
+  { key: 'high', label: 'High', desc: 'Important course updates & time-sensitive notices', color: 'text-warning border-amber-500/30 bg-amber-500/10' },
+  { key: 'medium', label: 'Medium', desc: 'Standard updates & milestones (default)', color: 'text-info border-blue-500/30 bg-blue-500/10' },
   { key: 'low', label: 'Low', desc: 'Optional tips & background announcements', color: 'text-slate-400 border-slate-500/30 bg-slate-500/10' },
 ]
 

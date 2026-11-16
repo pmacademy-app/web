@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Camera, Loader2, Upload, Trash2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { apiPost, apiDelete } from '@/lib/api/client'
 
 interface AvatarUploadProps {
   userId?: string
@@ -13,15 +14,16 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: AvatarUploadProps) {
+  const [prevPropUrl, setPrevPropUrl] = useState(currentAvatarUrl)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(currentAvatarUrl || null)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (currentAvatarUrl !== prevPropUrl) {
+    setPrevPropUrl(currentAvatarUrl)
     setAvatarUrl(currentAvatarUrl || null)
-  }, [currentAvatarUrl])
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -47,19 +49,18 @@ export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: Av
       const formData = new FormData()
       formData.append('file', file)
 
-      const res = await fetch('/api/user/avatar', {
-        method: 'POST',
-        body: formData,
-      })
+      const res = await apiPost<{ success?: boolean; error?: string; avatarUrl?: string }>('/api/user/avatar', formData)
 
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'An error occurred during avatar upload.')
+      if (!res.ok || !res.data.success) {
+        const errorMsg = res.ok
+          ? res.data.error || 'An error occurred during avatar upload.'
+          : res.error.message || 'An error occurred during avatar upload.'
+        throw new Error(errorMsg)
       }
 
-      setAvatarUrl(data.avatarUrl)
-      if (onUploadSuccess) {
+      const data = res.data
+      setAvatarUrl(data.avatarUrl || null)
+      if (onUploadSuccess && data.avatarUrl) {
         onUploadSuccess(data.avatarUrl)
       }
     } catch (err: unknown) {
@@ -81,14 +82,13 @@ export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: Av
     setError(null)
 
     try {
-      const res = await fetch('/api/user/avatar', {
-        method: 'DELETE',
-      })
+      const res = await apiDelete<{ success?: boolean; error?: string }>('/api/user/avatar')
 
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to remove avatar.')
+      if (!res.ok || !res.data.success) {
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to remove avatar.'
+          : res.error.message || 'Failed to remove avatar.'
+        throw new Error(errorMsg)
       }
 
       setAvatarUrl(null)

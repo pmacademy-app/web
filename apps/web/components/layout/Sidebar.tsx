@@ -135,6 +135,8 @@ export default function Sidebar({
       : {}
     const accessibleName = item.external ? `${item.label} (opens in a new tab)` : item.label
 
+    const isPortfolioActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+
     if (collapsed) {
       return (
         <div key="portfolio-nav" className="w-full flex justify-center group relative">
@@ -145,6 +147,7 @@ export default function Sidebar({
             data-portfolio-nav={item.state}
             className="w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
             aria-label={accessibleName}
+            aria-current={isPortfolioActive ? 'page' : undefined}
           >
             <Briefcase className="w-5 h-5 shrink-0" aria-hidden="true" />
           </Link>
@@ -167,6 +170,7 @@ export default function Sidebar({
         onClick={handleClick}
         {...newTabProps}
         data-portfolio-nav={item.state}
+        aria-current={isPortfolioActive ? 'page' : undefined}
         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
       >
         <Briefcase className="w-5 h-5 shrink-0" aria-hidden="true" />
@@ -319,6 +323,7 @@ export default function Sidebar({
                   <Link
                     href="/progress"
                     onClick={onClose}
+                    aria-current={isProgressActive ? 'page' : undefined}
                     className={cn(
                       'w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                       isProgressActive
@@ -377,6 +382,7 @@ export default function Sidebar({
                           key={sub.href}
                           href={sub.href}
                           onClick={onClose}
+                          aria-current={isSubActive ? 'page' : undefined}
                           className={cn(
                             'flex items-center py-1.5 px-2 rounded-md text-xs transition-colors group select-none',
                             isSubActive
@@ -400,6 +406,7 @@ export default function Sidebar({
                 <Link
                   href={link.href}
                   onClick={onClose}
+                  aria-current={isActive ? 'page' : undefined}
                   {...(link.quickStartTarget ? { 'data-quick-start-target': link.quickStartTarget } : {})}
                   className={cn(
                     'w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
@@ -427,6 +434,7 @@ export default function Sidebar({
               key={link.href}
               href={link.href}
               onClick={onClose}
+              aria-current={isActive ? 'page' : undefined}
               {...(link.quickStartTarget ? { 'data-quick-start-target': link.quickStartTarget } : {})}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',

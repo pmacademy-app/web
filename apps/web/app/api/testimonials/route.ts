@@ -3,6 +3,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 /** Published testimonials are marketing copy on the public site. */
 export const GET = withRoute(
@@ -75,7 +76,14 @@ export const POST = withRoute(
       .single()
 
     if (error || !data) {
-      console.error('[api/testimonials] Error inserting testimonial review:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'testimonials.insert',
+        message: `Error inserting testimonial review: ${error?.message || 'unknown'}`,
+        userId: requireUserId(actor),
+        details: { error: error?.message },
+      })
       throw new RouteError(500, 'SERVER_ERROR', 'Failed to submit review for moderation.')
     }
 

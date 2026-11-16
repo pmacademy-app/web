@@ -1,4 +1,4 @@
-# Deployment & Infrastructure Guide — Prodily PM Academy
+# Deployment & Infrastructure Guide: Prodily
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Last Updated:** October 28, 2026
@@ -8,14 +8,14 @@
 ## 1. Production Hosting & Build Configuration
 
 - **Hosting Platform**: Vercel Serverless Platform.
-- **Framework & Runtime**: Next.js 16.2.12 App Router (Node.js runtime for API Route Handlers).
+- **Framework & Runtime**: Next.js 16.4.3 App Router (Node.js runtime for API Route Handlers).
 - **Build Engine**: Next.js Turbopack compiler engine.
 - **Vercel Root Directory**: `apps/web` (configured in Vercel Dashboard).
 - **Vercel Config**: Single `apps/web/vercel.json` (`{ "framework": "nextjs" }`). No root-level `vercel.json`.
 - **Build Pipeline (`npm run build`)**:
   1. Compiles 90 Markdown lessons (`npm run content:compile`).
   2. Compiles embedded Mermaid diagrams to static SVGs via Node.js + JSDOM.
-  3. Pre-builds FlexSearch index (`content/dist/search-index.json`).
+  3. Writes the search index as plain JSON (`content/dist/search-index.json`, from `scripts/compiler/compile.ts`). There is no search library; `GET /api/search-index` serves the file and caches it for an hour.
   4. Runs TypeScript type checking across all App Router routes and components.
   5. Renders static App Router pages.
 - **CI Pipeline (`.github/workflows/ci.yml`)**, distinct from the pipeline above — runs on every PR and push to `main`: content compile → lint → typecheck → unit/integration tests → `next build` → Playwright install → E2E tests → (push to `main` only) Supabase migration deploy job.
@@ -137,7 +137,7 @@ lower(email) = lower('<your email>');`) and make sure the account is genuinely y
 
 ## 4. Phase 6–8 deployment (activation programme)
 
-Phases 6, 7 and 8 are code-complete. The Phase 7 capstone-threshold experiment flag is **off by default**; the Phase 4 recut and Phase 6 module-entry unlock are **on by default** since owner decision D5 (2026-10-20). Full rationale in [`PHASE_HISTORY.md`](PHASE_HISTORY.md) and ADR-008/009/010.
+Phases 6, 7 and 8 are code-complete. The Phase 7 capstone-threshold experiment flag is **off by default**; the Phase 4 recut and Phase 6 module-entry unlock are **on by default** since owner decision D5 (2026-10-20). Full rationale in ADR-008/009/010 (`docs/decisions/`) and in `docs/PHASE_HISTORY.md`, which was deleted in `f4343d3` (read it with `git show f4343d3^:docs/PHASE_HISTORY.md`).
 
 ### 4.1 What ships (verified in code)
 
@@ -326,3 +326,60 @@ The migration is **held, owner-applied**: [`supabase/migrations/pending-approval
 **Pause or undo:** `SELECT cron.alter_job(jobid, active := false) FROM cron.job WHERE jobname LIKE 'prodily-%';` pauses all six. To remove them, run [`rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`](../supabase/migrations/pending-approval/rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql), after making sure the GitHub `schedule:` block is still in place.
 
 **Housekeeping:** `cron.job_run_details` keeps one row per run (about 300 a day for these jobs). Clear old rows now and then on the free tier's 500 MB database: `DELETE FROM cron.job_run_details WHERE end_time < now() - interval '14 days';`. `pg_net` clears its own responses after about 6 hours.
+
+---
+
+## 8. Release Order: Database Migrations Before Application Deployment (ENG-06 / AG-07)
+
+To prevent new code from running against an unmigrated schema, production deployments follow a strict, coordinated order:
+
+1. **GitHub Actions on `main`:**
+   - Job `deploy-supabase` runs first and applies all pending migrations in `supabase/migrations/` to the production database via the pinned Supabase CLI.
+   - Job `deploy-vercel` runs only after `deploy-supabase` completes successfully (`needs: [deploy-supabase]`).
+   - The Vercel CLI pulls environment configuration, prebuilds production artifacts (`vercel build --prod`), and deploys prebuilt assets (`vercel deploy --prebuilt --prod`).
+   - The job verifies deployment health by curling `https://prodily.app/api/health`.
+
+2. **Vercel Git Integration (`apps/web/vercel.json`):**
+   - Automatic Git-triggered production deployment for `main` is disabled:
+     ```json
+     "git": {
+       "deploymentEnabled": {
+         "main": false
+       }
+     }
+     ```
+   - Pull request preview deployments remain enabled.
+
+3. **Owner Setup (Required before merging):**
+   - Vercel dashboard > Account Settings > Tokens: create a personal access token.
+   - Obtain `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` from project settings or `.vercel/project.json`.
+   - GitHub repository > Settings > Secrets and variables > Actions: add the three secrets:
+     - `VERCEL_TOKEN`
+     - `VERCEL_ORG_ID`
+     - `VERCEL_PROJECT_ID`
+
+4. **Rollback Procedure:**
+   - If an application deployment needs to be rolled back immediately, open the Vercel dashboard > Deployments, find the previous known-good deployment, and promote it to production.
+   - If a database migration must also be rolled back, execute the corresponding `.down.sql` script in `supabase/migrations/pending-approval/rollback/` via the Supabase SQL Editor.
+
+---
+
+## 9. Nightly Database Backups and Restore Drills (ENG-07 / AG-08)
+
+Because the free Supabase tier does not provide automated downloadable daily backups, database resilience is maintained through a zero-cost scheduled backup workflow:
+
+1. **Workflow (`.github/workflows/db-backup.yml`):**
+   - **Schedule**: Nightly at 21:30 UTC (03:00 IST, off-peak hours in India), plus on-demand `workflow_dispatch`.
+   - **Dumps**: Dumps roles, schema, and table data using the pinned Supabase CLI.
+   - **Encryption**: Packages the SQL dumps and encrypts them with AES256 symmetric encryption via GnuPG using the `BACKUP_ENCRYPTION_KEY` secret. Unencrypted SQL files are scrubbed before upload.
+   - **Retention**: Uploads the encrypted archive (`prodily_db_backup_<timestamp>.tar.gz.gpg`) to GitHub Actions Artifacts with a 30-day retention period.
+
+2. **Required Repository Secrets:**
+   - `BACKUP_ENCRYPTION_KEY`: Symmetric key held only by the owner in a secure password manager.
+   - `SUPABASE_DB_PASSWORD`: Production database user password.
+   - `SUPABASE_PROJECT_ID`: Supabase project reference ID.
+
+3. **Restore Drill Runbook:**
+   - Full instructions for downloading, decrypting, and test-restoring an archive into a local Supabase instance are detailed in [`docs/ops/restore-drill.md`](ops/restore-drill.md).
+
+

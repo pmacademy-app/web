@@ -108,14 +108,16 @@ export function ReferralSettingsTab() {
         {/* Copy Link Input Bar */}
         <div className="space-y-2 pt-2 border-t border-border/60">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-foreground">Your Personal Referral Link</label>
+            <label htmlFor="setting-referral-link-input" className="text-xs font-semibold text-foreground">Your Personal Referral Link</label>
             <span className="text-[11px] text-muted-foreground font-mono">Code: {referralCode}</span>
           </div>
 
           <div className="flex items-center gap-2 p-2 rounded-xl border border-border bg-secondary/40">
             <input
+              id="setting-referral-link-input"
               type="text"
               readOnly
+              aria-label="Your personal referral link"
               value={referralLink}
               className="flex-1 min-w-0 bg-transparent text-base sm:text-xs font-mono text-foreground focus:outline-hidden px-2 select-all overflow-hidden text-ellipsis"
             />
@@ -126,7 +128,7 @@ export function ReferralSettingsTab() {
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <Check className="w-3.5 h-3.5 text-success" />
                   Copied!
                 </>
               ) : (
@@ -172,7 +174,7 @@ export function ReferralSettingsTab() {
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-info flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -184,7 +186,7 @@ export function ReferralSettingsTab() {
         </div>
 
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-success flex items-center justify-center shrink-0">
             <Award className="w-5 h-5" />
           </div>
           <div>
@@ -196,7 +198,7 @@ export function ReferralSettingsTab() {
         </div>
 
         <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-warning flex items-center justify-center shrink-0">
             <Zap className="w-5 h-5" />
           </div>
           <div>
@@ -256,7 +258,7 @@ export function ReferralSettingsTab() {
 
                 <div>
                   {item.status === 'rewarded' || item.status === 'activated' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-success border border-emerald-500/20">
                       <Check className="w-3 h-3" />
                       Activated
                     </span>

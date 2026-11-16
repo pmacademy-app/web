@@ -82,7 +82,6 @@ export type AchievementCelebrationCtaAction =
   | 'continue_learning'
 
 type EventMap = {
-  waitlist_signup:          Record<string, never>
   hero_cta_click:           { location: HeroCTALocation }
   curriculum_view:          Record<string, never>
   faq_expand:               { question_index: number }
@@ -186,13 +185,8 @@ function trackEvent<K extends keyof EventMap>(
 
 // ─── Named event functions ────────────────────────────────────────────────────
 
-/** Fired after a successful 201 response from POST /api/waitlist. */
-export function trackWaitlistSignup() {
-  trackEvent('waitlist_signup')
-}
-
 /**
- * Fired when any "Join Waitlist" CTA button is clicked.
+ * Fired when a primary marketing CTA (nav, hero, or a homepage section) is clicked.
  * @param location - Which section the CTA was in
  */
 export function trackHeroCTAClick(location: HeroCTALocation) {
@@ -485,9 +479,53 @@ export function trackAchievementCelebrationCtaClicked(
   trackEvent('achievement_celebration_cta_clicked', { kind, action })
 }
 
+// ─── AI Referrer Classification (AEO-03, AG-25) ─────────────────────────────
 
+export interface ReferrerClassification {
+  isAiReferral: boolean
+  source?: string
+}
 
+const AI_REFERRER_DOMAINS: Readonly<Record<string, string>> = {
+  'chatgpt.com': 'chatgpt',
+  'chat.openai.com': 'chatgpt',
+  'perplexity.ai': 'perplexity',
+  'gemini.google.com': 'gemini',
+  'copilot.microsoft.com': 'copilot',
+  'claude.ai': 'claude',
+}
 
+/**
+ * Classifies an incoming referrer URL to identify known AI answer engines.
+ * Strips all query strings, paths, and fragments immediately to avoid PII leaks.
+ */
+export function classifyReferrer(referrerUrl?: string | null): ReferrerClassification {
+  if (!referrerUrl || typeof referrerUrl !== 'string') {
+    return { isAiReferral: false }
+  }
 
+  const trimmed = referrerUrl.trim()
+  if (!trimmed) {
+    return { isAiReferral: false }
+  }
 
+  try {
+    const hasProtocol = trimmed.startsWith('http://') || trimmed.startsWith('https://')
+    const parsed = new URL(hasProtocol ? trimmed : `https://${trimmed}`)
+    const hostname = parsed.hostname.toLowerCase()
+
+    for (const [domain, source] of Object.entries(AI_REFERRER_DOMAINS)) {
+      if (hostname === domain || hostname.endsWith(`.${domain}`)) {
+        return {
+          isAiReferral: true,
+          source,
+        }
+      }
+    }
+
+    return { isAiReferral: false }
+  } catch {
+    return { isAiReferral: false }
+  }
+}
 

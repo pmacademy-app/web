@@ -39,7 +39,7 @@ describe('Certificates & Credentials System 2.0 Unit Test Suite', () => {
       expect(jsonLd['@context']).toBe('https://schema.org')
       expect(jsonLd['@type']).toBe('EducationalOccupationalCredential')
       expect(jsonLd.identifier).toBe('PMA-2026-A1B2C3D4')
-      expect((jsonLd.grantee as { name: string }).name).toBe('Sarah Connor')
+      expect(jsonLd.grantee).toBeUndefined()
       expect(jsonLd.url).toBe('https://prodily.app/verify/PMA-2026-A1B2C3D4')
     })
   })

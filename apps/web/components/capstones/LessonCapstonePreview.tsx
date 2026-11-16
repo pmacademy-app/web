@@ -70,9 +70,9 @@ export function LessonCapstonePreview({ moduleSlug, className = '' }: LessonCaps
         <span
           className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
             alreadySubmitted
-              ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+              ? 'bg-emerald-500/10 text-success border-emerald-500/20'
               : isReady
-                ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                ? 'bg-blue-500/10 text-info border-blue-500/20'
                 : 'bg-muted text-muted-foreground border-border'
           }`}
         >

@@ -1,6 +1,5 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
 import type { AdminUserFilters } from '@/lib/admin/types'
 
@@ -19,17 +18,16 @@ export const POST = withRoute(
     summary: 'Unexpected failure in POST /api/admin/emails/broadcasts/recipient-count',
   },
   async ({ request }) => {
+    let body: { filters?: AdminUserFilters }
+    // Targeted parse: bad JSON is a client validation error, not a server fault.
     try {
-      const body = await request.json()
-      const filters = (body.filters ?? {}) as AdminUserFilters
-
-      const count = await BroadcastService.previewRecipientCount(filters)
-      return NextResponse.json({ success: true, count })
-    } catch (err) {
-      return NextResponse.json(
-        { error: adminErrorMessage(err, 'Internal server error') },
-        { status: 500 }
-      )
+      body = (await request.json()) as { filters?: AdminUserFilters }
+    } catch {
+      throw new RouteError(400, 'VALIDATION', 'Invalid JSON body')
     }
+
+    const filters = (body.filters ?? {}) as AdminUserFilters
+    const count = await BroadcastService.previewRecipientCount(filters)
+    return NextResponse.json({ success: true, count })
   }
 )

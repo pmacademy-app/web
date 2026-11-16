@@ -51,5 +51,5 @@ For developer testing and pipeline verification:
 ## 4. Verification & LinkedIn Integration
 
 Every issued certificate is backed by public verification at `/verify/[certificateId]`:
-- Validates the student's name, issuing authority ("Prodily · PM Academy"), issue date, and credential status.
+- Validates the student's name, issuing authority ("Issued by Prodily", from `BRAND.certificateIssuerLine`), issue date, and credential status.
 - Integrates with the official LinkedIn Add-to-Profile URL (`buildLinkedInCertificationUrl()`), allowing learners to add the credential to their LinkedIn profile in one click.

@@ -35,12 +35,24 @@ vi.mock('@/lib/api/actor', () => ({
 
 // Pass-through: the route's own auth wrapper is covered elsewhere; here we only
 // care how the handler maps the service's refusal.
-vi.mock('@/lib/api/with-route', () => ({
-  withRoute:
-    (_config: unknown, handler: (ctx: { actor: unknown; params: Record<string, string> }) => Promise<Response>) =>
-    (_req: unknown, ctx: { params: Record<string, string> }) =>
-      handler({ actor: { kind: 'admin' }, params: ctx.params }),
-}))
+vi.mock('@/lib/api/with-route', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/api/with-route')>()
+  return {
+    ...actual,
+    withRoute:
+      (_config: unknown, handler: (ctx: { actor: unknown; params: Record<string, string> }) => Promise<Response>) =>
+      async (_req: unknown, ctx: { params: Record<string, string> }) => {
+        try {
+          return await handler({ actor: { kind: 'admin' }, params: ctx.params })
+        } catch (err) {
+          if (err instanceof actual.RouteError) {
+            return Response.json({ success: false, error: err.message }, { status: err.status })
+          }
+          throw err
+        }
+      },
+  }
+})
 
 import {
   BroadcastService,

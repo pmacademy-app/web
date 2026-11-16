@@ -20,11 +20,25 @@ const urlField = (label: string) =>
 
 export const profileUpdateSchema = z.object({
   name: z.string().max(100, 'Name must be 100 characters or fewer.').optional().nullable(),
+  avatar_url: z.string().max(1000).optional().nullable(),
   bio: z.string().max(500, 'Bio must be 500 characters or fewer.').optional().nullable(),
   linkedin_url: urlField('LinkedIn URL'),
   github_url: urlField('GitHub URL'),
   website_url: urlField('Website URL'),
 })
+
+export const goalUpdateSchema = z.object({
+  weekly_goal_lessons: z.number().int().min(1).max(7).nullable().optional(),
+  session_minutes: z.union([z.literal(10), z.literal(15), z.literal(20), z.literal(30), z.literal(45), z.literal(60)]).nullable().optional(),
+})
+
+export type GoalUpdateInput = z.infer<typeof goalUpdateSchema>
+
+export interface GoalGetResponse {
+  success: boolean
+  weekly_goal_lessons: number | null
+  session_minutes: number | null
+}
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>
 

@@ -176,8 +176,12 @@ export type Database = {
           id: string
           is_public: boolean
           module_slug: string
+          review_feedback: string | null
+          review_history: Json | null
+          review_scores: Json | null
           reviewed_at: string | null
           reviewed_by: string | null
+          revision_count: number
           status: string
           submitted_at: string
           user_id: string | null
@@ -187,8 +191,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug: string
+          review_feedback?: string | null
+          review_history?: Json | null
+          review_scores?: Json | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          revision_count?: number
           status?: string
           submitted_at?: string
           user_id?: string | null
@@ -198,8 +206,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           module_slug?: string
+          review_feedback?: string | null
+          review_history?: Json | null
+          review_scores?: Json | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          revision_count?: number
           status?: string
           submitted_at?: string
           user_id?: string | null
@@ -1568,6 +1580,7 @@ export type Database = {
       }
       user_lesson_progress: {
         Row: {
+          best_score: number | null
           completed_at: string | null
           deep_dive_opened_at: string | null
           lesson_id: string
@@ -1579,6 +1592,7 @@ export type Database = {
           xp_earned: number
         }
         Insert: {
+          best_score?: number | null
           completed_at?: string | null
           deep_dive_opened_at?: string | null
           lesson_id: string
@@ -1590,6 +1604,7 @@ export type Database = {
           xp_earned?: number
         }
         Update: {
+          best_score?: number | null
           completed_at?: string | null
           deep_dive_opened_at?: string | null
           lesson_id?: string
@@ -1726,6 +1741,7 @@ export type Database = {
           portfolio_verification_override: string | null
           portfolio_view_count: number
           privacy_version: string | null
+          session_minutes: number | null
           streak_freezes_available: number
           terms_accepted_at: string | null
           terms_version: string | null
@@ -1734,6 +1750,7 @@ export type Database = {
           total_xp: number
           username: string | null
           website_url: string | null
+          weekly_goal_lessons: number | null
         }
         Insert: {
           age_confirmed_at?: string | null
@@ -1767,6 +1784,7 @@ export type Database = {
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
           privacy_version?: string | null
+          session_minutes?: number | null
           streak_freezes_available?: number
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1775,6 +1793,7 @@ export type Database = {
           total_xp?: number
           username?: string | null
           website_url?: string | null
+          weekly_goal_lessons?: number | null
         }
         Update: {
           age_confirmed_at?: string | null
@@ -1808,6 +1827,7 @@ export type Database = {
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
           privacy_version?: string | null
+          session_minutes?: number | null
           streak_freezes_available?: number
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1816,6 +1836,7 @@ export type Database = {
           total_xp?: number
           username?: string | null
           website_url?: string | null
+          weekly_goal_lessons?: number | null
         }
         Relationships: [
           {
@@ -1923,6 +1944,30 @@ export type Database = {
     }
     Functions: {
       calculate_user_level:{ Args: { p_xp: number }; Returns: number }
+      get_database_size_bytes: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_weekly_leaderboard: {
+        Args: {
+          p_week_start: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          user_id: string
+          username: string | null
+          name: string | null
+          avatar_url: string | null
+          level: number
+          total_xp: number
+          current_streak: number
+          days_studied: number
+          lessons_completed: number
+          xp_earned: number
+          rank: number
+        }[]
+      }
       claim_email_queue_items: {
         Args: { p_batch_size: number }
         Returns: {

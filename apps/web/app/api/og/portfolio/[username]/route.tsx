@@ -5,6 +5,7 @@ import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { BRAND } from '@/lib/brand'
 import { OG, ProdilyLogoMark } from '@/lib/og/brand'
 import { needsCanonicalOgRedirect, portfolioOgCardPath, redirectToOgCardPath } from '@/lib/og/card-paths'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 /**
  * Cached, not dynamic.
@@ -563,7 +564,13 @@ export async function GET(request: Request, { params }: RouteProps) {
       }
     )
   } catch (error) {
-    console.error('[API GET /api/og/portfolio/[username]] Error:', error)
+    void logSystemError({
+      severity: 'error',
+      category: 'api',
+      operation: 'og.portfolio.render',
+      message: `Failed to generate portfolio OG image: ${error instanceof Error ? error.message : String(error)}`,
+      details: { error: String(error) },
+    })
     return new Response('Failed to generate OpenGraph preview image', { status: 500 })
   }
 }

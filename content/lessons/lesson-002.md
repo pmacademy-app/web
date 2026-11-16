@@ -1,3 +1,9 @@
+---
+seoTitle: "Product vs Project: Key Differences for Product Managers"
+seoDescription: "Understand the structural differences between products and projects. Learn why products evolve continuously while projects have fixed scopes and deadlines."
+inShort: "A project is a temporary endeavor with a fixed scope, budget, and predefined end date where success equals delivery on time. A product is an ongoing, value-generating asset that evolves through continuous iteration based on customer feedback and business outcomes, where success equals sustained value creation rather than project completion."
+---
+
 # Lesson 2: Product vs. Project
 
 ## Why This Lesson Matters

@@ -14,6 +14,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { recordReflectionAction } from '@/lib/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 const reflectionPostSchema = z.object({
   lesson_id: z.string(),  // accepts stable les_XXXXXX IDs or legacy slugs
@@ -45,7 +46,14 @@ export const GET = withRoute(
       .maybeSingle()
 
     if (error) {
-      console.error(`[api/reflections] Error loading reflection:`, error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'reflections.get',
+        message: `Error loading reflection: ${error.message}`,
+        userId: requireUserId(actor),
+        details: { lessonId, error: error.message },
+      })
       throw new RouteError(500, 'SERVER_ERROR', 'Database error')
     }
 

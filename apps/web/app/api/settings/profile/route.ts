@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { profileUpdateSchema } from '@/lib/api/contracts/settings'
+import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 export { profileUpdateSchema }
 
@@ -38,13 +40,18 @@ export const POST = withRoute(
     body: profileUpdateSchema,
   },
   async ({ actor, body }) => {
-    const { name, bio, linkedin_url, github_url, website_url } = body
+    const { name, avatar_url, bio, linkedin_url, github_url, website_url } = body
+
+    if (avatar_url && !isValidAvatarUrl(avatar_url)) {
+      throw new RouteError(400, 'VALIDATION_ERROR', "Avatar URL must be hosted on Prodily's secure avatar storage.")
+    }
 
     const supabase = createServiceRoleClient()
     const { error } = await supabase
       .from('users')
       .update({
         name: typeof name === 'string' ? name.trim() : null,
+        avatar_url: typeof avatar_url === 'string' && avatar_url.trim() ? avatar_url.trim() : null,
         bio: typeof bio === 'string' ? bio.trim() : null,
         linkedin_url: typeof linkedin_url === 'string' && linkedin_url.trim() ? linkedin_url.trim() : null,
         github_url: typeof github_url === 'string' && github_url.trim() ? github_url.trim() : null,
@@ -56,7 +63,14 @@ export const POST = withRoute(
       // N-3: the driver error is logged, never returned. Before B7-F the outer
       // catch on this route sent `error.message` straight to an authenticated
       // learner, which can carry a connection string.
-      console.error('[API POST /api/settings/profile] Error updating profile:', error)
+      void logSystemError({
+        severity: 'error',
+        category: 'db',
+        operation: 'settings.profile.update',
+        message: `Failed to update profile settings: ${error.message}`,
+        userId: actor.kind === 'learner' ? actor.userId : undefined,
+        details: { error: error.message },
+      })
       throw new RouteError(400, 'SERVER_ERROR', 'Failed to update profile settings.')
     }
 

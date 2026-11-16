@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Send, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { apiGet, apiPost } from '@/lib/api/client'
 
 export function ContactForm() {
   const [name, setName] = useState('')
@@ -20,11 +21,10 @@ export function ContactForm() {
     let mounted = true
     const checkSession = async () => {
       try {
-        const res = await fetch('/api/auth/session')
-        const data = await res.json()
-        if (mounted && data.user) {
-          if (data.user.email) setEmail(data.user.email)
-          if (data.user.full_name) setName(data.user.full_name)
+        const res = await apiGet<{ user?: { email?: string; full_name?: string } }>('/api/auth/session')
+        if (mounted && res.ok && res.data.user) {
+          if (res.data.user.email) setEmail(res.data.user.email)
+          if (res.data.user.full_name) setName(res.data.user.full_name)
         }
       } catch {
         // Ignored for anonymous visitors
@@ -43,19 +43,23 @@ export function ContactForm() {
     setSuccess(false)
 
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, category, message }),
+      const res = await apiPost<{ success?: boolean; error?: string }>('/api/contact', {
+        name,
+        email,
+        subject,
+        category,
+        message,
       })
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (res.ok && res.data.success) {
         setSuccess(true)
         setMessage('')
         setSubject('')
       } else {
-        setError(data.error || 'Failed to submit contact message. Please try again.')
+        const errorMsg = res.ok
+          ? res.data.error || 'Failed to submit contact message. Please try again.'
+          : res.error.message || 'Failed to submit contact message. Please try again.'
+        setError(errorMsg)
       }
     } catch (err) {
       console.error('[ContactForm] Error submitting contact message:', err)
@@ -73,7 +77,7 @@ export function ContactForm() {
       </p>
 
       {success && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-start gap-3 text-xs font-semibold">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-success flex items-start gap-3 text-xs font-semibold">
           <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-sm">Message Sent Successfully!</p>

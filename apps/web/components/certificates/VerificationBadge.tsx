@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { ShieldCheck, CheckCircle2 } from 'lucide-react'
 
@@ -16,9 +14,9 @@ export function VerificationBadge({ certificateCode, issuedAt }: VerificationBad
   })
 
   return (
-    <div className="no-print rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center justify-between gap-4 text-emerald-500 animate-in fade-in duration-300">
+    <div className="no-print rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center justify-between gap-4 text-success animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-500 shrink-0">
+        <div className="p-2 rounded-lg bg-emerald-500/20 text-success shrink-0">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
@@ -32,7 +30,7 @@ export function VerificationBadge({ certificateCode, issuedAt }: VerificationBad
         </div>
       </div>
 
-      <div className="text-right font-mono text-[11px] font-bold text-emerald-500 shrink-0 hidden sm:block">
+      <div className="text-right font-mono text-[11px] font-bold text-success shrink-0 hidden sm:block">
         Code: {certificateCode}
       </div>
     </div>

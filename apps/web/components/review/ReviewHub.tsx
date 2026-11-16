@@ -10,6 +10,7 @@ import { QualitySelector } from './QualitySelector'
 import { EmptyState } from './EmptyState'
 import { ReviewComplete } from './ReviewComplete'
 import { Layers } from 'lucide-react'
+import { apiGet, apiPost } from '@/lib/api/client'
 
 interface ReviewHubProps {
   initialDueCards: FlashcardItem[]
@@ -67,9 +68,9 @@ export function ReviewHub({
           onRestartSession={async () => {
             setIsSubmitting(true)
             try {
-              const res = await fetch('/api/review/queue')
+              const res = await apiGet<{ dueCards?: FlashcardItem[]; stats?: ReviewStatsType }>('/api/review/queue')
               if (res.ok) {
-                const data = await res.json()
+                const data = res.data
                 setDueCards(data.dueCards || [])
                 setStats(data.stats || stats)
               }
@@ -100,10 +101,9 @@ export function ReviewHub({
 
     try {
       // Submit review rating to server-side API endpoint
-      const response = await fetch(`/api/flashcards/${currentCard.id}/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating, lessonId: currentCard.lessonId }),
+      const response = await apiPost<{ xpEarned?: number }>(`/api/flashcards/${currentCard.id}/review`, {
+        rating,
+        lessonId: currentCard.lessonId,
       })
 
       if (!response.ok) {
@@ -111,9 +111,7 @@ export function ReviewHub({
       } else {
         // Count only the XP the server reports for this review (it dedupes per card per day),
         // never a client-side guess. Absent or malformed means no figure.
-        const data: unknown = await response.json().catch(() => null)
-        const reportedXp =
-          data && typeof data === 'object' ? (data as { xpEarned?: unknown }).xpEarned : undefined
+        const reportedXp = response.data?.xpEarned
         cardXp = typeof reportedXp === 'number' && Number.isFinite(reportedXp) && reportedXp > 0 ? reportedXp : 0
 
         // Track session stats & immediate real-time stats update
@@ -142,10 +140,9 @@ export function ReviewHub({
       } else {
         const finalReviewedCount = reviewedCount + 1
         const finalXpEarned = xpEarned + cardXp
-        fetch('/api/review/complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cardsReviewedCount: finalReviewedCount, xpEarned: finalXpEarned }),
+        void apiPost('/api/review/complete', {
+          cardsReviewedCount: finalReviewedCount,
+          xpEarned: finalXpEarned,
         }).catch((e) => console.warn('[ReviewHub] Failed to call review complete:', e))
 
         setDueCards([])

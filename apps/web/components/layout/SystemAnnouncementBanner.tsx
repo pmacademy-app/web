@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Info, AlertTriangle, ShieldAlert, CheckCircle2, X, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SystemAnnouncementItem } from '@/lib/admin/announcements-service'
+import { apiGet, apiPost } from '@/lib/api/client'
 
 interface SystemAnnouncementBannerProps {
   initialAnnouncements?: SystemAnnouncementItem[]
@@ -16,26 +17,26 @@ const TYPE_STYLES = {
   info: {
     bg: 'bg-gradient-to-r from-blue-950/80 via-indigo-950/80 to-blue-950/80 border-blue-500/30 text-blue-100',
     icon: Info,
-    iconColor: 'text-blue-400',
-    badge: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+    iconColor: 'text-info',
+    badge: 'bg-blue-500/20 text-info border-blue-500/40',
   },
   warning: {
     bg: 'bg-gradient-to-r from-amber-950/80 via-orange-950/80 to-amber-950/80 border-amber-500/30 text-amber-100',
     icon: AlertTriangle,
-    iconColor: 'text-amber-400',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    iconColor: 'text-warning',
+    badge: 'bg-amber-500/20 text-warning border-amber-500/40',
   },
   critical: {
     bg: 'bg-gradient-to-r from-rose-950/90 via-red-950/90 to-rose-950/90 border-red-500/40 text-red-100',
     icon: ShieldAlert,
-    iconColor: 'text-red-400',
-    badge: 'bg-red-500/20 text-red-300 border-red-500/40',
+    iconColor: 'text-danger',
+    badge: 'bg-red-500/20 text-danger border-red-500/40',
   },
   success: {
     bg: 'bg-gradient-to-r from-emerald-950/80 via-teal-950/80 to-emerald-950/80 border-emerald-500/30 text-emerald-100',
     icon: CheckCircle2,
-    iconColor: 'text-emerald-400',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+    iconColor: 'text-success',
+    badge: 'bg-emerald-500/20 text-success border-emerald-500/40',
   },
 }
 
@@ -65,10 +66,11 @@ export function SystemAnnouncementBanner({
         if (userId) params.set('userId', userId)
         if (cohortId) params.set('cohortId', cohortId)
 
-        const res = await fetch(`/api/announcements/active?${params.toString()}`)
-        const json = await res.json()
-        if (isMounted && json.success && Array.isArray(json.announcements)) {
-          setAnnouncements(json.announcements)
+        const res = await apiGet<{ success?: boolean; announcements?: SystemAnnouncementItem[] }>(
+          `/api/announcements/active?${params.toString()}`
+        )
+        if (isMounted && res.ok && res.data.success && Array.isArray(res.data.announcements)) {
+          setAnnouncements(res.data.announcements)
         }
       } catch (err) {
         console.warn('[SystemAnnouncementBanner] Failed to fetch announcements:', err)
@@ -89,11 +91,7 @@ export function SystemAnnouncementBanner({
     try {
       localStorage.setItem('prodily_dismissed_announcements', JSON.stringify(Array.from(nextDismissed)))
       if (userId) {
-        await fetch(`/api/announcements/${id}/dismiss`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        })
+        await apiPost(`/api/announcements/${id}/dismiss`, { userId })
       }
     } catch (err) {
       console.warn('[SystemAnnouncementBanner] Dismiss sync error:', err)

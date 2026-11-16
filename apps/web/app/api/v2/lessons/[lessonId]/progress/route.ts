@@ -116,6 +116,7 @@ export const GET = withRoute(
         status: 'not_started',
         theory_read_at: null,
         quiz_score: null,
+        best_score: null,
         quiz_attempts: 0,
         xp_earned: 0,
         completed_at: null,

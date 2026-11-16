@@ -18,7 +18,7 @@ BEGIN
   FROM cron.job j
   JOIN (VALUES
     ('prodily-process-email-queue', '*/5 * * * *', 'SELECT private.invoke_cron_endpoint(''/api/cron/process-email-queue'', ''POST'')'),
-    ('prodily-process-broadcasts',  '*/5 * * * *', 'SELECT private.invoke_cron_endpoint(''/api/cron/process-broadcasts'', ''GET'')'),
+    ('prodily-process-broadcasts',  '*/5 * * * *', 'SELECT private.invoke_cron_endpoint(''/api/cron/process-broadcasts'', ''POST'')'),
     ('prodily-daily-reminder',      '30 * * * *',  'SELECT private.invoke_cron_endpoint(''/api/cron/daily-reminder'', ''POST'')'),
     ('prodily-weekly-recap',        '30 * * * *',  'SELECT private.invoke_cron_endpoint(''/api/cron/weekly-recap'', ''POST'')'),
     ('prodily-lifecycle',           '30 * * * *',  'SELECT private.invoke_cron_endpoint(''/api/cron/lifecycle'', ''POST'')'),

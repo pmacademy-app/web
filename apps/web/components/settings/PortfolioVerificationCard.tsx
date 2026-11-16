@@ -36,7 +36,7 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
             )}
           >
             {isVerified ? (
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <ShieldCheck className="w-4 h-4 text-success" />
             ) : (
               <ShieldX className="w-4 h-4 text-muted-foreground" />
             )}
@@ -52,7 +52,7 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
           className={cn(
             'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border shrink-0',
             isVerified
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+              ? 'bg-emerald-500/10 text-success border-emerald-500/25'
               : 'bg-muted text-muted-foreground border-border'
           )}
         >
@@ -75,7 +75,7 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
         {criteria.map((c) => (
           <div key={c.label} className="flex items-center gap-2 text-xs">
             {c.met ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
             ) : (
               <Circle className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             )}
