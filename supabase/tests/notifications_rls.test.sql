@@ -57,13 +57,11 @@ SELECT extensions.lives_ok(
 );
 
 -- 4. Learner E cannot update Learner F notification (affects 0 rows due to RLS)
+WITH updated AS (
+  UPDATE public.in_app_notifications SET is_read = true WHERE id = 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid RETURNING id
+)
 SELECT extensions.is(
-  (
-    WITH updated AS (
-      UPDATE public.in_app_notifications SET is_read = true WHERE id = 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid RETURNING id
-    )
-    SELECT count(*)::int FROM updated
-  ),
+  (SELECT count(*)::int FROM updated),
   0,
   'Learner E cannot update notification belonging to Learner F'
 );
