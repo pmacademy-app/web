@@ -500,7 +500,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx --yes vercel@41.3.1 pull --yes --environment=production --token="${VERCEL_TOKEN}"
+          npx --yes vercel@65.16.0 pull --yes --environment=production --token="${VERCEL_TOKEN}"
 
       - name: Build Project Artifacts
         env:
@@ -508,7 +508,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx --yes vercel@41.3.1 build --prod --token="${VERCEL_TOKEN}"
+          npx --yes vercel@65.16.0 build --prod --token="${VERCEL_TOKEN}"
 
       - name: Deploy Prebuilt Artifacts to Production
         env:
@@ -516,7 +516,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx --yes vercel@41.3.1 deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
+          npx --yes vercel@65.16.0 deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
 
       - name: Verify Deployment Health
         run: |
