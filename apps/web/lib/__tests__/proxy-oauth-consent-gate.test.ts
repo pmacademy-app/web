@@ -189,3 +189,48 @@ describe('consent gate: users who are never gated', () => {
     expect((await proxy(req('/dashboard', 'google'))).status).toBe(200)
   })
 })
+
+describe('onboarding gate: learner with no onboarding claim in app_metadata', () => {
+  beforeEach(() => {
+    state.users.fresh = { app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: {} }
+  })
+
+  it('fails open when the profile read errors, instead of forcing onboarding', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    state.profileError = { code: '57014', message: 'canceling statement due to statement timeout' }
+    const res = await proxy(req('/dashboard', 'fresh'))
+    expect(res.status).toBe(200)
+    expect(res.headers.get('location')).toBeNull()
+    expect(warn).toHaveBeenCalledWith('[proxy] onboarding gate failed open: profile unavailable', { userId: 'id-fresh' })
+    warn.mockRestore()
+    error.mockRestore()
+  })
+
+  it('fails open when the profile read throws', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    state.profileThrows = true
+    expect((await proxy(req('/dashboard', 'fresh'))).status).toBe(200)
+    warn.mockRestore()
+    error.mockRestore()
+  })
+
+  it('still sends a learner with a missing profile row to onboarding', async () => {
+    state.profile = null
+    const res = await proxy(req('/dashboard', 'fresh'))
+    expect(res.status).toBe(307)
+    expect(new URL(res.headers.get('location')!).pathname).toBe('/onboarding')
+  })
+
+  it('still sends a learner who has not onboarded to onboarding', async () => {
+    state.profile = { auth_provider: 'email', onboarding_completed: false, goal: null }
+    const res = await proxy(req('/dashboard', 'fresh'))
+    expect(new URL(res.headers.get('location')!).pathname).toBe('/onboarding')
+  })
+
+  it('lets a learner with a goal through', async () => {
+    state.profile = { auth_provider: 'email', onboarding_completed: false, goal: 'switch_to_pm' }
+    expect((await proxy(req('/dashboard', 'fresh'))).status).toBe(200)
+  })
+})

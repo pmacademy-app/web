@@ -23,8 +23,7 @@
 SET search_path = public, pg_temp;
 
 UPDATE public.users pu
-SET onboarding_completed = true,
-    updated_at = now()
+SET onboarding_completed = true
 FROM auth.users au
 WHERE pu.id = au.id
   AND au.raw_user_meta_data->>'onboarding_complete' = 'true'
