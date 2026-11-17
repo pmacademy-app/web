@@ -35,8 +35,8 @@ vi.mock('@/emails', () => ({
 // Phase 1.6 — the daily reminder now passes the REAL due-card count and suppresses
 // zero-due sends. Stub the SRS helper so the timezone/idempotency test below exercises
 // eligible learners (with due cards) rather than the suppression path.
-vi.mock('@/lib/flashcards-service', () => ({
-  getDueCardsCount: vi.fn(async () => 3),
+vi.mock('@/lib/flashcards-due-counts', () => ({
+  getDueCardsCounts: vi.fn(async (_s: unknown, ids: readonly string[]) => new Map(ids.map((id) => [id, 3]))),
 }))
 
 import { POST as handleWebhook } from '../../app/api/email/webhooks/route'

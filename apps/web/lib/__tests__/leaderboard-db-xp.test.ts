@@ -29,6 +29,8 @@ let tableErrors: Record<string, any> = {}
 let inFilterSizes: Record<string, number> = {}
 /** Every `.range()` window applied per table. */
 let rangeCalls: Record<string, Array<[number, number]>> = {}
+/** Every `.order()` column applied per table. */
+let orderCalls: Record<string, string[]> = {}
 
 function createChain(table: string) {
   const chain: any = {
@@ -37,6 +39,10 @@ function createChain(table: string) {
       return chain
     }),
     eq: vi.fn(() => chain),
+    order: vi.fn((column: string) => {
+      ;(orderCalls[table] ||= []).push(column)
+      return chain
+    }),
     gt: vi.fn(() => chain),
     gte: vi.fn(() => chain),
     in: vi.fn((_field: string, ids: any[]) => {
@@ -77,6 +83,7 @@ function seedHealthyTables() {
   tableErrors = {}
   inFilterSizes = {}
   rangeCalls = {}
+  orderCalls = {}
   tableRows = {
     users: [
       {
@@ -267,5 +274,104 @@ describe('bounded aggregation (F-COR-4)', () => {
     expect(mockLogErrorReport).toHaveBeenCalledWith(
       expect.objectContaining({ operation: 'leaderboard.weekly_opt_outs' })
     )
+  })
+
+  // Audit 2026-11-17 #11: a paged read without ORDER BY can repeat or skip rows between pages.
+  it('orders every paged read by a unique key', async () => {
+    const { getWeeklyLeaderboard } = await loadModule()
+    await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
+
+    expect(orderCalls.users).toEqual(['id'])
+    expect(orderCalls.user_leaderboard_settings).toEqual(['user_id'])
+    expect(orderCalls.user_lesson_progress).toEqual(['user_id', 'lesson_id'])
+    expect(orderCalls.xp_events).toEqual(['id'])
+  })
+})
+
+/**
+ * Audit 2026-11-17 #17: the SQL path (held migration 20261113000007, get_weekly_leaderboard).
+ * The RPC leaves opted-out learners off the roster; the viewer must not be added back with
+ * zeroed numbers, and the board must not stop at the first page of the RPC.
+ */
+describe('weekly leaderboard RPC path', () => {
+  const rpcRow = (i: number) => ({
+    user_id: `user-${String(i).padStart(5, '0')}`,
+    username: `u${i}`,
+    name: `User ${i}`,
+    avatar_url: null,
+    level: 1,
+    total_xp: 100,
+    current_streak: 0,
+    days_studied: 1,
+    lessons_completed: 1,
+    xp_earned: 10,
+    rank: i + 1,
+  })
+
+  function rpcClient(rows: any[]) {
+    const rpcCalls: any[] = []
+    const client: any = {
+      from: supabase.from,
+      rpc: vi.fn(async (_name: string, args: any) => {
+        rpcCalls.push(args)
+        return { data: rows.slice(args.p_offset, args.p_offset + args.p_limit), error: null }
+      }),
+    }
+    return { client, rpcCalls }
+  }
+
+  it('pages past 1000 rows', async () => {
+    const { client, rpcCalls } = rpcClient(Array.from({ length: 2300 }, (_, i) => rpcRow(i)))
+
+    const { getWeeklyLeaderboard } = await loadModule()
+    const payload = await getWeeklyLeaderboard(client, 'user-00000', WEEK_START)
+
+    expect(payload.entries.length).toBe(2300)
+    expect(rpcCalls.map((a) => a.p_offset)).toEqual([0, 1000, 2000])
+    // The JS fallback did not run.
+    expect(rangeCalls.users).toBeUndefined()
+  })
+
+  /** The viewer's own users row, as selectSingleRankedUser reads it. */
+  const withViewerRow = (client: any) => ({
+    ...client,
+    from: (table: string) => {
+      const chain = supabase.from(table)
+      if (table === 'users') {
+        const viewer = { id: USER_ID, username: 'me', name: 'Me', avatar_url: null, total_xp: 500, current_streak: 3, level: 2 }
+        chain.maybeSingle = vi.fn(() => Promise.resolve({ data: viewer, error: null }))
+      }
+      return chain
+    },
+  })
+
+  it('does not add an opted-out viewer back with zeroed weekly numbers', async () => {
+    tableRows.user_leaderboard_settings = [{ user_id: USER_ID }]
+    const { client } = rpcClient([rpcRow(0), rpcRow(1)])
+
+    const { getWeeklyLeaderboard } = await loadModule()
+    const payload = await getWeeklyLeaderboard(withViewerRow(client), USER_ID, WEEK_START)
+
+    expect(orderCalls.user_leaderboard_settings).toEqual(['user_id'])
+    expect(payload.entries.some((e) => e.userId === USER_ID)).toBe(false)
+    expect(payload.personalEntry).toBeNull()
+    expect(payload.entries.length).toBe(2)
+  })
+
+  it('still adds an opted-in viewer who is not on the RPC roster', async () => {
+    const { client } = rpcClient([rpcRow(0)])
+
+    const { getWeeklyLeaderboard } = await loadModule()
+    const payload = await getWeeklyLeaderboard(withViewerRow(client), USER_ID, WEEK_START)
+
+    expect(payload.personalEntry?.userId).toBe(USER_ID)
+  })
+
+  it('suppresses the board when the opt-out list cannot be read', async () => {
+    tableErrors.user_leaderboard_settings = { message: 'down' }
+    const { client } = rpcClient([rpcRow(0)])
+
+    const { getWeeklyLeaderboard } = await loadModule()
+    await expect(getWeeklyLeaderboard(client, USER_ID, WEEK_START)).rejects.toBeTruthy()
   })
 })

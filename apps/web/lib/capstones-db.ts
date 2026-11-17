@@ -509,6 +509,11 @@ export async function submitCapstoneAction(
       updatePayload.review_history = history
       updatePayload.review_scores = null
       updatePayload.review_feedback = null
+      // The previous review now lives in review_history. Clearing the stamp puts the new revision
+      // back in the admin "awaiting review" queue (status 'submitted' AND reviewed_at IS NULL) and
+      // lets the next review stamp it and notify the learner again.
+      updatePayload.reviewed_at = null
+      updatePayload.reviewed_by = null
     }
 
     const { data: updated, error: updateError } = await supabase

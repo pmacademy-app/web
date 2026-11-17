@@ -397,7 +397,7 @@ describe('B9-D — an unapplied migration fails closed rather than deleting', ()
     }
   })
 
-  it('only sweeps the two rules that have no hold semantics by design', async () => {
+  it('only sweeps the rules that have no hold semantics by design', async () => {
     const { db } = dbMissingHoldColumn()
 
     const result = await runRetentionSweep(db, { dryRun: false, now: NOW })
@@ -406,7 +406,8 @@ describe('B9-D — an unapplied migration fails closed rather than deleting', ()
     // A rate-limit bucket and a dated daily counter are never subject to a legal
     // hold, which is why neither has a hold column. Both are expired operational
     // telemetry, so sweeping them without the migration loses nothing retainable.
-    expect(swept).toEqual(['rate_limits', 'system_settings.daily_counters'])
+    // product_events (audit 2026-11-17 #1) has no hold column either.
+    expect(swept).toEqual(['product_events', 'rate_limits', 'system_settings.daily_counters'])
   })
 })
 

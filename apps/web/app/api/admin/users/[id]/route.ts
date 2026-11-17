@@ -77,10 +77,8 @@ export const DELETE = withRoute(
         )
       }
 
-      // 4. Cascade delete application data (user tables, badges, certificates delinking, queue)
-      await deleteAccount(supabase, id)
-
-      // 5. Permanently delete GoTrue auth user to prevent zombie accounts
+      // 4. Delete the GoTrue auth user first. public.users cascades from auth.users, so a
+      // failure here must stop the request before any data is touched (no zombie logins).
       const { error: authDeleteError } = await supabase.auth.admin.deleteUser(id)
       if (authDeleteError) {
         void logSystemError({
@@ -91,11 +89,26 @@ export const DELETE = withRoute(
           userId: id,
           details: { error: authDeleteError.message },
         })
+        throw new RouteError(500, 'ACCOUNT_DELETE_FAILED', 'Could not delete the account. Nothing was removed.')
+      }
+
+      // 5. Leftover cleanup the cascade does not cover (avatar files). The login is already gone,
+      // so a cleanup failure is logged, not returned: the orphaned-avatar sweep is the backstop.
+      try {
+        await deleteAccount(supabase, id)
+      } catch (cleanupError) {
+        void logSystemError({
+          severity: 'error',
+          category: 'auth',
+          operation: 'admin.users.delete_cleanup',
+          message: `Post-deletion cleanup failed for ${id}: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`,
+          userId: id,
+        })
       }
 
       await logAdminAction(admin.userId, admin.email, 'admin_user_deleted', 'user', id, {
         targetEmail: targetUser.email,
-        authDeleted: !authDeleteError,
+        authDeleted: true,
       })
 
       revalidatePath('/admin/users')
@@ -105,9 +118,9 @@ export const DELETE = withRoute(
       return NextResponse.json({
         success: true,
         deletedUserId: id,
-        authDeleted: !authDeleteError,
+        authDeleted: true,
       })
-    } catch (error: unknown) {
+} catch (error: unknown) {
       if (error instanceof RouteError) throw error
       const message = adminErrorMessage(error, 'Failed to delete user account.')
       throw new RouteError(500, 'DELETE_USER_FAILED', message)

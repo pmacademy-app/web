@@ -12,6 +12,7 @@ import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { TEST_CERTIFICATE_PREFIX, generateCertificateCode, isTestCertificateCode } from '@/lib/certificates'
 import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
+import { escapeLike } from '@/lib/db/escape-like'
 import { trackProductEvent } from '@/lib/events/product-events'
 
 // Defined in the client-safe module so UI can ask without importing this data layer.
@@ -408,7 +409,8 @@ export async function verifyCertificate(
   let { data: cert } = await supabase
     .from('certificates')
     .select('*')
-    .ilike('certificate_code', cleanCode)
+    // Escaped: an unescaped `%` or `_` from the URL would list other learners' certificates.
+    .ilike('certificate_code', escapeLike(cleanCode))
     .maybeSingle()
 
   if (!cert) {

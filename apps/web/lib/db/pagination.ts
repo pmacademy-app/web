@@ -29,10 +29,14 @@ export interface PageResult<T> {
  * `.range(from, to)` on the same filters. The loop stops on a short page, which is
  * the only reliable signal that the last page was reached.
  *
+ * Required: the query must have a stable, total order (`.order()` on a unique key, or on
+ * columns that together are unique) before `.range()`. Postgres does not promise the same
+ * row order between two queries without one, so pages could repeat or skip rows.
+ *
  * The million-row ceiling is a guard against a builder that ignores its window and
  * returns a full page forever; it is not a business limit.
  *
- * Not the same as `fetchAllRows` in lib/growth/fetch-all-rows.ts: this one throws on a failed page, that one returns `{ data, error }`.
+ * Throws on a failed page; callers that want `{ data, error }` wrap the promise.
  */
 export async function fetchAllRows<T>(
   buildPage: (from: number, to: number) => PromiseLike<PageResult<T>>

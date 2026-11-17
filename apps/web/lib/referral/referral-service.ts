@@ -12,6 +12,7 @@ import { SettingsService } from '@/lib/admin/settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
+import { escapeLike } from '@/lib/db/escape-like'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { BRAND } from '@/lib/brand'
 import { trackProductEvent } from '@/lib/events/product-events'
@@ -100,7 +101,8 @@ export async function resolveReferralCode(
   const { data: userByUsername } = (await (supabase
     .from('users') as unknown as DBChain)
     .select('id, username, name')
-    .ilike('username', cleanCode)
+    // Escaped: `_` in a username is an ILIKE wildcard and could match a second user.
+    .ilike('username', escapeLike(cleanCode))
     .maybeSingle()) as unknown as { data: { id: string; username: string | null; name: string | null } | null }
 
   if (userByUsername) {

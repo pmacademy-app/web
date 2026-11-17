@@ -5,7 +5,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
-import { getDueCardsCount } from '@/lib/flashcards-service'
+import { getDueCardsCounts } from '@/lib/flashcards-due-counts'
 import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 import { daysSinceLastActivity, shouldSendReminder } from '@/lib/notifications/reminder-cadence'
 import { findQueuedIdempotencyKeys, isInSendWindow } from '@/lib/notifications/send-window'
@@ -72,6 +72,9 @@ export const POST = withRoute(
     let skippedPages = 0
 
     const startTime = Date.now()
+    // Set when the run did not do its job (users read failed, or an exception), so the
+    // response is a 500 and withCronHeartbeat records the run as failed (audit #3).
+    let failure: string | null = null
 
     try {
       let lastSeenId: string | null = null
@@ -109,6 +112,7 @@ export const POST = withRoute(
             operation: 'cron_daily_reminder_query',
             message: `Database query failure in /api/cron/daily-reminder: ${queryErr.message}`,
           }))
+          failure = 'users query failed'
           break
         }
 
@@ -180,10 +184,10 @@ export const POST = withRoute(
           [...dueThisRun.values()].map((d) => d.idempotencyKey)
         )
 
+        const candidates: Array<{ user: (typeof users)[number]; due: NonNullable<ReturnType<typeof dueThisRun.get>> }> = []
         for (const user of users) {
           if (!user.email) continue
 
-          const userPref = prefMap.get(user.id)
           const due = dueThisRun.get(user.id)
           if (!due) {
             remindersSkippedTimezone++
@@ -218,26 +222,34 @@ export const POST = withRoute(
             continue
           }
 
-          // Phase 1.6 — use the REAL due-card count from the SRS engine, never a
-          // hardcoded placeholder. Users with zero due cards (including everyone who
-          // has never started a lesson, and so has no unlocked cards) are suppressed
-          // here — sending "you have cards waiting" to someone with none is the same
-          // defect as a zero-activity recap. The never-started audience is owned by
-          // the D+1 lifecycle sequence instead (see /api/cron/lifecycle), so no user
-          // is contacted twice for the same gap.
-          let dueCount = 0
+          candidates.push({ user, due })
+        }
+
+        // Phase 1.6: use the REAL due-card count from the SRS engine, never a hardcoded
+        // placeholder. Users with zero due cards (including everyone who has never started a
+        // lesson, and so has no unlocked cards) are suppressed: sending "you have cards
+        // waiting" to someone with none is the same defect as a zero-activity recap. The
+        // never-started audience is owned by the D+1 lifecycle sequence instead (see
+        // /api/cron/lifecycle), so no user is contacted twice for the same gap.
+        // One batched read for the page's remaining learners (audit #16); a failed read
+        // suppresses their sends, as the per-learner read did.
+        let dueCounts: Map<string, number> | null = null
+        if (candidates.length > 0) {
           try {
-            dueCount = await getDueCardsCount(supabase, user.id)
+            dueCounts = await getDueCardsCounts(supabase, candidates.map((c) => c.user.id), now)
           } catch (dueErr) {
-            console.warn('[cron/daily-reminder] due-card count failed; suppressing send', user.id, dueErr)
-            remindersSkippedNoDueCards++
-            continue
+            console.warn('[cron/daily-reminder] due-card counts failed; suppressing sends for this page', dueErr)
           }
+        }
+
+        for (const { user, due } of candidates) {
+          const dueCount = dueCounts?.get(user.id) ?? 0
           if (dueCount <= 0) {
             remindersSkippedNoDueCards++
             continue
           }
 
+          const userPref = prefMap.get(user.id)
           // PROD-05: users.current_streak only resets on the learner's next activity, so a
           // lapsed learner still stores their old streak. The email shows the effective
           // streak in their timezone (0 once it has broken, freezes included).
@@ -279,8 +291,9 @@ export const POST = withRoute(
         if (users.length < BATCH_SIZE) break
       }
 
-      await EmailAutomationsService.recordDigestRun('dailyReminder')
+      if (!failure) await EmailAutomationsService.recordDigestRun('dailyReminder')
     } catch (err) {
+      failure = 'unhandled exception'
       const { logSystemError } = await import('@/lib/monitoring/logger')
       after(() => logSystemError({
         severity: 'error',
@@ -291,7 +304,8 @@ export const POST = withRoute(
     }
 
     return NextResponse.json({
-      success: true,
+      success: failure === null,
+      ...(failure ? { error: failure } : {}),
       timestamp: new Date().toISOString(),
       remindersQueued,
       remindersSkippedTimezone,
@@ -300,6 +314,6 @@ export const POST = withRoute(
       remindersSkippedAlreadyQueued,
       remindersSkippedCadence,
       skippedPages,
-    })
+    }, { status: failure ? 500 : 200 })
   })
 )

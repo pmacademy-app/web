@@ -13,6 +13,7 @@ import { calculateLevel } from '@/lib/xp'
 import { calculateWeekStart, calculateRankings, type LeaderboardEntry, type RawLeaderboardUserMetric } from '@/lib/leaderboard'
 import * as db from '@/lib/db/leaderboard'
 import type { LeaderboardUserRow } from '@/lib/db/leaderboard'
+import { fetchAllRows } from '@/lib/db'
 import { PublicError } from '@/lib/errors/public-error'
 import { log } from '@/lib/monitoring/log'
 
@@ -209,69 +210,87 @@ async function buildWeeklyRawMetrics(
   const weekStartIso = weekStartDate.toISOString()
 
   // Attempt SQL RPC aggregation first (ENG-08, AG-31)
+  let rpcRows: RpcLeaderboardRow[] = []
   try {
-    const { data, error: rpcError } = await supabase.rpc('get_weekly_leaderboard', {
-      p_week_start: weekStartIso,
-      p_limit: 1000,
-      p_offset: 0,
+    // Paged: one call returns at most p_limit rows, and the board must not stop at the
+    // first page. A failed page throws and falls back to the JS path below.
+    const pages = await fetchAllRows<RpcLeaderboardRow>(async (from, to) => {
+      const { data, error } = await supabase.rpc('get_weekly_leaderboard', {
+        p_week_start: weekStartIso,
+        p_limit: to - from + 1,
+        p_offset: from,
+      })
+      return { data: (data as unknown as RpcLeaderboardRow[] | null) ?? null, error }
     })
-
-    const rpcRows = data as unknown as RpcLeaderboardRow[] | null
-    if (!rpcError && Array.isArray(rpcRows) && rpcRows.length > 0) {
-      log.info('leaderboard.weekly_rpc_path_used', {
-        weekStart,
-        rowCount: rpcRows.length,
-      })
-
-      const rawMetrics: RawLeaderboardUserMetric[] = rpcRows.map((row) => {
-        const levelInfo = calculateLevel(row.total_xp || 0)
-        return {
-          userId: row.user_id,
-          username: row.username ?? null,
-          name: row.name ?? null,
-          avatarUrl: row.avatar_url ?? null,
-          levelTitle: levelInfo.title,
-          level: row.level ?? levelInfo.level,
-          daysStudied: row.days_studied ?? 0,
-          lessonsCompleted: row.lessons_completed ?? 0,
-          xpEarned: row.xp_earned ?? 0,
-          currentStreak: row.current_streak ?? 0,
-          totalXp: row.total_xp ?? 0,
-        }
-      })
-
-      const userList: LeaderboardUserRow[] = rpcRows.map((row) => ({
-        id: row.user_id,
-        username: row.username,
-        name: row.name,
-        avatar_url: row.avatar_url,
-        total_xp: row.total_xp,
-        current_streak: row.current_streak,
-        level: row.level,
-      }))
-
-      const built: LeaderboardCacheEntry = {
-        timestamp: now,
-        users: userList,
-        optedOutUserIds: new Set<string>(),
-        rawMetrics,
-        degraded: false,
-      }
-
-      LEADERBOARD_CACHE.set(weekStart, built)
-      return built
-    } else if (rpcError) {
-      log.info('leaderboard.weekly_js_fallback_used', {
-        weekStart,
-        reason: rpcError.message,
-      })
-    }
+    // Ranks can move between page reads, so a learner may appear on two pages.
+    const seen = new Set<string>()
+    rpcRows = pages.filter((row) => !seen.has(row.user_id) && Boolean(seen.add(row.user_id)))
   } catch (rpcErr: unknown) {
     const message = rpcErr instanceof Error ? rpcErr.message : String(rpcErr)
     log.info('leaderboard.weekly_js_fallback_used', {
       weekStart,
       reason: message || 'RPC threw',
     })
+  }
+
+  if (rpcRows.length > 0) {
+    log.info('leaderboard.weekly_rpc_path_used', {
+      weekStart,
+      rowCount: rpcRows.length,
+    })
+
+    // The RPC already leaves opted-out learners off the roster, but the viewer is added
+    // back by ensureUserPresent when absent, so the exclusion list is still needed here.
+    // Fails closed like the JS path: without it an opted-out viewer cannot be recognised.
+    let optedOutRows: { user_id: string }[] = []
+    try {
+      optedOutRows = await db.selectOptedOutUserIds(supabase)
+    } catch (optOutError) {
+      await reportLeaderboardQueryFailure(
+        'leaderboard.weekly_opt_outs',
+        'Weekly leaderboard opt-out query failed',
+        optOutError
+      )
+      throw optOutError
+    }
+
+    const rawMetrics: RawLeaderboardUserMetric[] = rpcRows.map((row) => {
+      const levelInfo = calculateLevel(row.total_xp || 0)
+      return {
+        userId: row.user_id,
+        username: row.username ?? null,
+        name: row.name ?? null,
+        avatarUrl: row.avatar_url ?? null,
+        levelTitle: levelInfo.title,
+        level: row.level ?? levelInfo.level,
+        daysStudied: row.days_studied ?? 0,
+        lessonsCompleted: row.lessons_completed ?? 0,
+        xpEarned: row.xp_earned ?? 0,
+        currentStreak: row.current_streak ?? 0,
+        totalXp: row.total_xp ?? 0,
+      }
+    })
+
+    const userList: LeaderboardUserRow[] = rpcRows.map((row) => ({
+      id: row.user_id,
+      username: row.username,
+      name: row.name,
+      avatar_url: row.avatar_url,
+      total_xp: row.total_xp,
+      current_streak: row.current_streak,
+      level: row.level,
+    }))
+
+    const built: LeaderboardCacheEntry = {
+      timestamp: now,
+      users: userList,
+      optedOutUserIds: new Set<string>(optedOutRows.map((r) => r.user_id)),
+      rawMetrics,
+      degraded: false,
+    }
+
+    LEADERBOARD_CACHE.set(weekStart, built)
+    return built
   }
 
   // Fallback JavaScript aggregation path
@@ -428,13 +447,18 @@ async function buildWeeklyRawMetrics(
 /**
  * Ensures a user is represented in a raw-metrics list even if they have 0 total_xp
  * (e.g. brand new users, or users in a cohort with no activity yet).
+ *
+ * An opted-out learner who is not in the list is left out: the SQL path drops opted-out
+ * learners from the roster, so adding them back here would rank them with zeroed weekly
+ * numbers they never had.
  */
 async function ensureUserPresent(
   supabase: SupabaseClient<Database>,
   rawMetrics: RawLeaderboardUserMetric[],
-  userId: string
+  userId: string,
+  optedOutUserIds: ReadonlySet<string>
 ): Promise<RawLeaderboardUserMetric[]> {
-  if (rawMetrics.some((m) => m.userId === userId)) {
+  if (rawMetrics.some((m) => m.userId === userId) || optedOutUserIds.has(userId)) {
     return rawMetrics
   }
 
@@ -482,7 +506,7 @@ export async function getWeeklyLeaderboard(
   }
   const cached = await getOrBuildWeeklyRawMetrics(supabase, weekStart)
 
-  const rawMetrics = await ensureUserPresent(supabase, cached.rawMetrics, userId)
+  const rawMetrics = await ensureUserPresent(supabase, cached.rawMetrics, userId, cached.optedOutUserIds)
 
   // Calculate final rankings
   const rankedEntries = calculateRankings(rawMetrics, userId)
@@ -532,7 +556,7 @@ export async function getCohortLeaderboard(
 
   let rawMetrics = cached.rawMetrics.filter((m) => memberIds.has(m.userId))
   if (isMember) {
-    rawMetrics = await ensureUserPresent(supabase, rawMetrics, userId)
+    rawMetrics = await ensureUserPresent(supabase, rawMetrics, userId, cached.optedOutUserIds)
   }
 
   const rankedEntries = calculateRankings(rawMetrics, userId)

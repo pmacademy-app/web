@@ -140,6 +140,19 @@ export const RETENTION_RULES: readonly RetentionRule[] = [
     // hold on, and its rows are dead within minutes of their window closing.
     supportsHold: false,
   },
+  {
+    id: 'product_events',
+    table: 'product_events',
+    timestampColumn: 'occurred_at',
+    idColumn: 'id',
+    days: 30,
+    // Per-learner event rows carry user_id, so they are telemetry, not the
+    // aggregate non-PII analytics L-11 keeps long-term. The admin north star
+    // reads only the current and previous week.
+    reason: 'L-11: operational telemetry 30d',
+    // No retention_hold column on this table (20261024000001_product_events.sql).
+    supportsHold: false,
+  },
 ]
 
 /** The dated daily-counter keys in `system_settings`, e.g. `email_sent_count_2026_09_15`. */

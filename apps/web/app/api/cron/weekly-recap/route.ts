@@ -7,7 +7,7 @@ import { getBatchUserNotificationPreferences } from '@/lib/notifications/prefere
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { loadProofStates } from '@/lib/growth/proof-state-db'
-import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
 import { BRAND } from '@/lib/brand'
@@ -82,6 +82,9 @@ export const POST = withRoute(
     const siteOrigin = (process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl).replace(/\/$/, '')
     // Growth R5 B9: the referral line states the live reward (once per run).
     const referralRewardXp = await resolveReferralRewardXp()
+    // Set when the run did not do its job (users read failed, or an exception), so the
+    // response is a 500 and withCronHeartbeat records the run as failed (audit #3).
+    let failure: string | null = null
 
     try {
       let lastSeenId: string | null = null
@@ -95,7 +98,7 @@ export const POST = withRoute(
 
         let queryBuilder = supabase
           .from('users')
-          .select('id, email, name, total_xp, current_streak, weekly_goal_lessons, session_minutes')
+          .select('id, email, name, total_xp, current_streak, weekly_goal_lessons, session_minutes, timezone')
           .not('email', 'is', null)
 
         if (lastSeenId) {
@@ -114,18 +117,26 @@ export const POST = withRoute(
             operation: 'cron_weekly_recap_query',
             message: `Database query failure in /api/cron/weekly-recap: ${queryErr.message}`,
           })
+          failure = 'users query failed'
           break
         }
 
-        const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
+        const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number; timezone?: string | null }>
         if (users.length === 0) break
 
         const userIds = users.map((u) => u.id)
 
-        // Batch fetch in parallel: weekly XP events, weekly completed lessons, and notification preferences
+        // A failed paged read resolves to `{ data: null, error }` instead of throwing.
+        const settle = <T,>(read: Promise<T[]>) =>
+          read.then(
+            (data) => ({ data, error: null as unknown }),
+            (error: unknown) => ({ data: null, error }),
+          )
+
+        // Batch fetch in parallel: weekly XP events, weekly completed lessons, and notification preferences.
+        // Both activity reads are paged: a week of rows for a whole page of learners can pass the 1000-row cap.
         const [xpRes, lessonRes, prefRead] = await Promise.all([
-          // Paged: a week of XP events for a whole page of learners can pass the 1000-row cap.
-          fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((lo, hi) =>
+          settle(fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((lo, hi) =>
             supabase
               .from('xp_events')
               .select('user_id, xp_amount, created_at')
@@ -133,13 +144,18 @@ export const POST = withRoute(
               .gte('created_at', weekStartDate)
               .order('id')
               .range(lo, hi),
-          ),
-          supabase
-            .from('user_lesson_progress')
-            .select('user_id')
-            .in('user_id', userIds)
-            .eq('status', 'completed')
-            .gte('completed_at', weekStartDate),
+          )),
+          settle(fetchAllRows<{ user_id: string }>((lo, hi) =>
+            supabase
+              .from('user_lesson_progress')
+              .select('user_id')
+              .in('user_id', userIds)
+              .eq('status', 'completed')
+              .gte('completed_at', weekStartDate)
+              .order('user_id')
+              .order('lesson_id')
+              .range(lo, hi),
+          )),
           // Strict: a failed read must not stand in as "everyone opted in" (see the skip below).
           getBatchUserNotificationPreferences(supabase, userIds, { strict: true }).then(
             (map) => ({ map, error: null }),
@@ -165,10 +181,28 @@ export const POST = withRoute(
         }
         const prefMap = prefRead.map
 
+        // A failed XP or lesson read would mail "0 XP" or "0 lessons", or drop the recap, so it
+        // also skips the page until the next run (audit #5).
+        if (!xpRes.data || !lessonRes.data) {
+          skippedPages++
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          const err = xpRes.error ?? lessonRes.error
+          const reason = err instanceof Error ? err.message : String(err)
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: 'cron_weekly_recap_activity',
+            message: `Weekly activity read failed in /api/cron/weekly-recap; page skipped: ${reason}`,
+          })
+          lastSeenId = users[users.length - 1].id
+          if (users.length < BATCH_SIZE) break
+          continue
+        }
+
         const xpMap = new Map<string, number>()
         // Distinct UTC days with any XP this week: the recap's "days studied".
         const studyDays = new Map<string, Set<string>>()
-        for (const row of (xpRes.data || []) as Array<{ user_id: string; xp_amount: number; created_at?: string }>) {
+        for (const row of xpRes.data) {
           if (!row.user_id) continue
           xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.xp_amount || 0))
           if (row.created_at) {
@@ -179,7 +213,7 @@ export const POST = withRoute(
         }
 
         const lessonMap = new Map<string, number>()
-        for (const row of (lessonRes.data || []) as Array<{ user_id: string }>) {
+        for (const row of lessonRes.data) {
           lessonMap.set(row.user_id, (lessonMap.get(row.user_id) || 0) + 1)
         }
 
@@ -200,7 +234,8 @@ export const POST = withRoute(
           if (!user.email) continue
 
           const userPref = prefMap.get(user.id)
-          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          // Preferences row first, then the profile timezone, as the daily reminder does (audit #9).
+          const userLocalTime = getUserLocalTime(userPref?.timezone || user.timezone || 'UTC')
           const targetDay = userPref?.preferredRecapDay ?? weeklySched.dayOfWeek ?? 0
           const targetHour = userPref?.preferredRecapHour ?? weeklySched.hourUtc ?? 18
 
@@ -288,8 +323,9 @@ export const POST = withRoute(
         if (users.length < BATCH_SIZE) break
       }
 
-      await EmailAutomationsService.recordDigestRun('weeklyRecap')
+      if (!failure) await EmailAutomationsService.recordDigestRun('weeklyRecap')
     } catch (err) {
+      failure = 'unhandled exception'
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
         severity: 'error',
@@ -300,13 +336,14 @@ export const POST = withRoute(
     }
 
     return NextResponse.json({
-      success: true,
+      success: failure === null,
+      ...(failure ? { error: failure } : {}),
       timestamp: new Date().toISOString(),
       recapsQueued,
       recapsSkippedTimezone,
       recapsSkippedNoActivity,
       recapsSkippedAlreadyQueued,
       skippedPages,
-    })
+    }, { status: failure ? 500 : 200 })
   })
 )

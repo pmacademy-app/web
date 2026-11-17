@@ -3,10 +3,22 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
 import { getTotalXp } from '../xp/xp-service'
 import { getLessonIdsForModule } from '../curriculum-registry'
+import { AVATAR_BUCKET } from '../avatar/avatar-service'
+
+/**
+ * Stops a reset at the first failed write, so the route answers with an error
+ * instead of telling the learner the reset is done while their data is still there.
+ */
+function throwIfResetFailed(error: { message: string } | null, step: string): void {
+  if (error) {
+    throw new Error(`Failed to reset ${step}: ${error.message}`)
+  }
+}
 
 /**
  * Resets user lesson progress, quiz attempts, flashcard SRS, reflections, and capstone submissions.
  * If moduleSlug is provided (and not 'all'), resets progress for canonical lessons in that module.
+ * Throws on the first failed delete.
  */
 export async function resetProgress(
   supabase: SupabaseClient<Database>,
@@ -24,7 +36,7 @@ export async function resetProgress(
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
 
-      if (pErr) console.warn('[settings-service] Reset module progress warning:', pErr)
+      throwIfResetFailed(pErr, 'module lesson progress')
 
       const { error: qErr } = await supabase
         .from('quiz_attempts')
@@ -32,7 +44,7 @@ export async function resetProgress(
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
 
-      if (qErr) console.warn('[settings-service] Reset module quiz attempts warning:', qErr)
+      throwIfResetFailed(qErr, 'module quiz attempts')
 
       const { error: fErr } = await supabase
         .from('user_flashcard_srs')
@@ -40,7 +52,7 @@ export async function resetProgress(
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
 
-      if (fErr) console.warn('[settings-service] Reset module flashcards warning:', fErr)
+      throwIfResetFailed(fErr, 'module flashcards')
 
       const reflectionKeys = [...lessonIds, `capstone-${moduleSlug}`]
       const { error: rErr } = await supabase
@@ -49,14 +61,16 @@ export async function resetProgress(
         .eq('user_id', userId)
         .in('lesson_id', reflectionKeys)
 
-      if (rErr) console.warn('[settings-service] Reset module reflections warning:', rErr)
+      throwIfResetFailed(rErr, 'module reflections')
     } else {
       // Fallback for legacy slug pattern
-      await supabase
+      const { error: legacyErr } = await supabase
         .from('user_lesson_progress')
         .delete()
         .eq('user_id', userId)
         .ilike('lesson_id', `%${moduleSlug}%`)
+
+      throwIfResetFailed(legacyErr, 'module lesson progress')
     }
 
     // 2. Delete capstone submissions for this module specifically
@@ -66,7 +80,7 @@ export async function resetProgress(
       .eq('user_id', userId)
       .eq('module_slug', moduleSlug)
       
-    if (cErr) console.warn('[settings-service] Reset module capstones warning:', cErr)
+    throwIfResetFailed(cErr, 'module capstones')
   } else {
     // Delete all lesson progress and quiz attempts for full reset
     const { error: pErr } = await supabase
@@ -74,35 +88,35 @@ export async function resetProgress(
       .delete()
       .eq('user_id', userId)
 
-    if (pErr) console.warn('[settings-service] Reset all progress warning:', pErr)
+    throwIfResetFailed(pErr, 'lesson progress')
 
     const { error: qErr } = await supabase
       .from('quiz_attempts')
       .delete()
       .eq('user_id', userId)
 
-    if (qErr) console.warn('[settings-service] Reset quiz attempts warning:', qErr)
+    throwIfResetFailed(qErr, 'quiz attempts')
 
     const { error: cErr } = await supabase
       .from('capstone_submissions')
       .delete()
       .eq('user_id', userId)
 
-    if (cErr) console.warn('[settings-service] Reset capstones warning:', cErr)
+    throwIfResetFailed(cErr, 'capstones')
 
     const { error: fErr } = await supabase
       .from('user_flashcard_srs')
       .delete()
       .eq('user_id', userId)
 
-    if (fErr) console.warn('[settings-service] Reset flashcards warning:', fErr)
+    throwIfResetFailed(fErr, 'flashcards')
 
     const { error: rErr } = await supabase
       .from('reflections')
       .delete()
       .eq('user_id', userId)
       
-    if (rErr) console.warn('[settings-service] Reset reflections warning:', rErr)
+    throwIfResetFailed(rErr, 'reflections')
   }
 
   // Synchronize progress-derived badges so that reset learning state does not leave orphaned achievements
@@ -227,10 +241,12 @@ export async function resetXp(
   }
 
   // Update denormalized total_xp cache to 0
-  await supabase
+  const { error: cacheError } = await supabase
     .from('users')
     .update({ total_xp: 0, level: 1 })
     .eq('id', userId)
+
+  throwIfResetFailed(cacheError, 'XP total')
 
   return 0
 }
@@ -284,81 +300,53 @@ export async function resetSkillRadar(
 }
 
 /**
- * Permanently deletes user account with full RLS-table cascade,
- * revokes public portfolio URL, delinks certificates, and emits account.deleted event.
+ * Removes the application data of a deleted account that the database cascade does
+ * not cover, then deletes the `public.users` row.
+ *
+ * The learner route calls this AFTER `auth.admin.deleteUser` has succeeded.
+ * `public.users.id` references `auth.users(id) ON DELETE CASCADE`, and every
+ * user-owned table references `public.users(id) ON DELETE CASCADE` (progress, quiz
+ * attempts, flashcards, XP events, reflections, capstones, badges, certificates,
+ * leaderboard settings, friends, cohort membership, notification preferences,
+ * events, queue and in-app notifications, feedback, referrals, product events).
+ * Audit, contact and error rows use ON DELETE SET NULL. So the auth delete alone
+ * removes all of that, and there is no per-table loop here.
+ *
+ * Certificates: `certificates.user_id` is `ON DELETE CASCADE NOT NULL`, so issued
+ * certificates are deleted with the account and their verification links stop
+ * resolving. They are not retained or anonymised.
+ *
+ * Storage does not cascade: avatar objects under `avatars/<userId>/` are removed
+ * here. The `users` delete is a no-op after the auth delete, and does the cascade
+ * for callers that run this before deleting the auth user.
+ *
+ * Throws on the first failure.
  */
 export async function deleteAccount(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<void> {
-  // 1. Emit account.deleted event to drop queued notifications
-  try {
-    await supabase
-      .from('notification_events')
-      .insert({
-        user_id: userId,
-        event_type: 'account.deleted',
-        payload: { deleted_at: new Date().toISOString() },
-      })
-
-    // Delete pending queued emails for this user
-    await supabase
-      .from('email_queue')
-      .delete()
-      .eq('user_id', userId)
-  } catch (err) {
-    console.warn('[settings-service] Warning clearing notification queue during account deletion:', err)
+  // 1. Avatar objects in Storage (not covered by any foreign key).
+  const bucket = supabase.storage.from(AVATAR_BUCKET)
+  const { data: avatarFiles, error: listErr } = await bucket.list(userId, { limit: 1000 })
+  if (listErr) {
+    throw new Error(`Failed to list avatar files during account deletion: ${listErr.message}`)
   }
-
-  // 2. Delink issued certificates from live profile (retained for legal/audit verification)
-  try {
-    await supabase
-      .from('certificates')
-      .update({ learner_name: 'Former Learner' })
-      .eq('user_id', userId)
-  } catch (err) {
-    console.warn('[settings-service] Warning delinking certificates during account deletion:', err)
-  }
-
-  // 3. Cascade deletion across user-owned tables
-
-  const userTables = [
-    'user_lesson_progress',
-    'quiz_attempts',
-    'user_flashcard_srs',
-    'xp_events',
-    'reflections',
-    'capstone_submissions',
-    'certificates',
-    'user_badges',
-    'user_leaderboard_settings',
-    'user_friends',
-    'cohort_members',
-    'user_notification_preferences',
-    'in_app_notifications',
-    'user_feedback',
-    'user_feedback_prompts',
-  ]
-
-  for (const table of userTables) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await supabase.from(table as any)
-        .delete()
-        .eq('user_id', userId)
-    } catch (err) {
-      console.warn(`[settings-service] Warning deleting from table ${table}:`, err)
+  const avatarPaths = (avatarFiles ?? []).map((file) => `${userId}/${file.name}`)
+  if (avatarPaths.length > 0) {
+    const { error: removeErr } = await bucket.remove(avatarPaths)
+    if (removeErr) {
+      throw new Error(`Failed to remove avatar files during account deletion: ${removeErr.message}`)
     }
   }
 
-  // 4. Finally delete user row from users table
+  // 2. The profile row. Cascades to every user-owned table.
   const { error: userErr } = await supabase
     .from('users')
     .delete()
     .eq('id', userId)
 
   if (userErr) {
-    console.error('[settings-service] Error deleting user row:', userErr)
-    throw new Error('Failed to complete account deletion.')
+    throw new Error(`Failed to delete user row during account deletion: ${userErr.message}`)
   }
 }

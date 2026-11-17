@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { deleteAccount } from '@/lib/settings/settings-service'
 import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -30,20 +30,35 @@ export const POST = withRoute(
     // Use service-role client for admin operations (bypasses RLS, has auth.admin access)
     const supabase = createServiceRoleClient()
 
-    // 1. Delete all application-owned data rows (cascades through all user tables)
-    await deleteAccount(supabase, userId)
-
-    // 2. Permanently delete the Supabase Auth user: this is the critical step that
-    //    prevents the user from logging in again. Requires service_role key.
+    // 1. Delete the Supabase Auth user first. This is what stops the login working,
+    //    and `public.users` plus every user-owned table cascade from it. If it fails,
+    //    nothing has been touched and the learner is told, instead of being told
+    //    "deleted" while the login still works.
     const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId)
     if (authDeleteError) {
       void logSystemError({
         severity: 'error',
         category: 'auth',
         operation: 'settings.delete_account_auth_user',
-        message: `Auth user deletion failed for ${userId}: ${authDeleteError.message}`,
+        message: `Auth user deletion failed: ${authDeleteError.message}`,
         userId,
         details: { error: authDeleteError.message },
+      })
+      throw new RouteError(500, 'ACCOUNT_DELETE_FAILED', 'We could not delete your account. Please try again.')
+    }
+
+    // 2. Clean up what does not cascade (avatar files in Storage). The account is
+    //    already gone, so a failure here is recorded for follow-up, not returned:
+    //    the learner cannot retry it, and the orphaned-avatar sweep is the backstop.
+    try {
+      await deleteAccount(supabase, userId)
+    } catch (cleanupError) {
+      void logSystemError({
+        severity: 'error',
+        category: 'auth',
+        operation: 'settings.delete_account_cleanup',
+        message: `Post-deletion cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`,
+        userId,
       })
     }
 

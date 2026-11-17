@@ -37,6 +37,15 @@ vi.mock('@/lib/supabase', async (importOriginal) => {
   return { ...actual, createServiceRoleClient: () => fakeHolder.current }
 })
 
+// lessons-db runs its completion hooks in after(). Outside a request scope after() throws and
+// the hooks run inline, so these assertions see them.
+vi.mock('next/server', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  after: () => {
+    throw new Error('`after` was called outside a request scope.')
+  },
+}))
+
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn(async () => authUser.current),
 }))

@@ -24,20 +24,13 @@ vi.mock('@/lib/notifications/automations/service', () => ({
   },
 }))
 
-vi.mock('@/lib/flashcards-service', () => ({
-  getDueCardsCount: vi.fn(async () => 4),
+vi.mock('@/lib/flashcards-due-counts', () => ({
+  getDueCardsCounts: vi.fn(async (_s: unknown, ids: readonly string[]) => new Map(ids.map((id) => [id, 4]))),
 }))
 
 vi.mock('@/lib/monitoring/logger', () => ({
   logSystemError: vi.fn(async () => undefined),
   logErrorReport: vi.fn(async () => undefined),
-}))
-
-vi.mock('@/lib/growth/fetch-all-rows', () => ({
-  fetchAllRows: vi.fn(async () => ({
-    data: [{ user_id: 'u-0001', xp_amount: 50, created_at: new Date().toISOString() }],
-    error: null,
-  })),
 }))
 
 vi.mock('@/lib/growth/proof-state-db', () => ({
@@ -312,6 +305,9 @@ function cronSupabase({
       }
       if (table === 'user_lesson_progress') {
         return thenableBuilder({ data: users.map((u) => ({ user_id: u.id })), error: null })
+      }
+      if (table === 'xp_events') {
+        return thenableBuilder({ data: [{ user_id: 'u-0001', xp_amount: 50, created_at: new Date().toISOString() }], error: null })
       }
       if (table === 'email_suppressions') return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
       if (table === 'email_queue') {

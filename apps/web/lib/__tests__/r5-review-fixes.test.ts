@@ -8,7 +8,7 @@ const cache = vi.hoisted(() => ({ revalidatePath: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: cache.revalidatePath, revalidateTag: vi.fn() }))
 
 import { revalidateCapstoneOgCards } from '@/lib/og/revalidate-capstone-cards'
-import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { applicableNudges } from '@/lib/growth/proof-nudges'
 import type { ProofState } from '@/lib/growth/proof-state'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
@@ -46,18 +46,16 @@ describe('fetchAllRows', () => {
   it('reads past the 1000-row cap page by page', async () => {
     const all = Array.from({ length: 2300 }, (_, i) => i)
     const ranges: Array<[number, number]> = []
-    const { data, error } = await fetchAllRows<number>(async (from, to) => {
+    const data = await fetchAllRows<number>(async (from, to) => {
       ranges.push([from, to])
       return { data: all.slice(from, to + 1), error: null }
     })
-    expect(error).toBeNull()
     expect(data).toHaveLength(2300)
     expect(ranges).toEqual([[0, 999], [1000, 1999], [2000, 2999]])
   })
 
-  it('reports a failed page', async () => {
-    const result = await fetchAllRows(async () => ({ data: null, error: { message: 'down' } }))
-    expect(result.error).toEqual({ message: 'down' })
+  it('fails the whole read on a failed page', async () => {
+    await expect(fetchAllRows(async () => ({ data: null, error: { message: 'down' } }))).rejects.toThrow('down')
   })
 })
 
@@ -79,7 +77,7 @@ describe('Fellow nudge eligibility', () => {
 describe('public portfolio lookup', () => {
   it('escapes ILIKE wildcards in the username before the lookup', () => {
     const code = source('lib/portfolio-db.ts')
-    expect(code).toContain(".ilike('username', sanitizedUsername.replace(")
-    expect(code).toContain('%_]/g')
+    expect(code).toContain(".ilike('username', escapeLike(sanitizedUsername))")
+    expect(source('lib/db/escape-like.ts')).toContain('%_]/g')
   })
 })

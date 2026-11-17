@@ -229,29 +229,32 @@ describe('Platform Hardening, Security & Production Reliability', () => {
   })
 
   describe('3. Data Integrity: Complete Account Deletion Cascade', () => {
-    it('deletes user records from all tables including user_feedback and user_feedback_prompts', async () => {
+    it('deletes the users row (every user table, user_feedback included, cascades from it) and the avatar files', async () => {
+      // Audit 2026-11-17 #7: user_feedback, user_feedback_prompts, user_lesson_progress and
+      // the other user tables reference public.users(id) ON DELETE CASCADE, so the
+      // per-table loop is gone. Storage does not cascade and is cleaned explicitly.
       const deletedTables: string[] = []
 
       const mockDeleteChain = {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
-        insert: vi.fn().mockResolvedValue({ error: null }),
-        update: vi.fn().mockReturnThis(),
       }
+      const list = vi.fn().mockResolvedValue({ data: [{ name: 'avatar-1.png' }], error: null })
+      const remove = vi.fn().mockResolvedValue({ data: [], error: null })
 
       const mockSupabase = {
         from: vi.fn().mockImplementation((table: string) => {
           deletedTables.push(table)
           return mockDeleteChain
         }),
+        storage: { from: vi.fn(() => ({ list, remove })) },
       } as unknown as SupabaseClient<Database>
 
       await deleteAccount(mockSupabase, 'target_user_xyz')
 
-      expect(deletedTables).toContain('user_feedback')
-      expect(deletedTables).toContain('user_feedback_prompts')
-      expect(deletedTables).toContain('user_lesson_progress')
-      expect(deletedTables).toContain('users')
+      expect(deletedTables).toEqual(['users'])
+      expect(mockDeleteChain.eq).toHaveBeenCalledWith('id', 'target_user_xyz')
+      expect(remove).toHaveBeenCalledWith(['target_user_xyz/avatar-1.png'])
     })
   })
 

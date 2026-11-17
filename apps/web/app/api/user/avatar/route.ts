@@ -4,6 +4,18 @@ import { AvatarService, MAX_AVATAR_SIZE_BYTES, ALLOWED_AVATAR_MIME_TYPES } from 
 
 export const runtime = 'nodejs'
 
+/** Reads the image type from the file signature: PNG, JPEG or WebP, otherwise null. */
+function sniffImageMimeType(bytes: Uint8Array): 'image/png' | 'image/jpeg' | 'image/webp' | null {
+  const startsWith = (sig: number[], offset = 0) =>
+    bytes.length >= offset + sig.length && sig.every((b, i) => bytes[offset + i] === b)
+
+  if (startsWith([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return 'image/png'
+  if (startsWith([0xff, 0xd8, 0xff])) return 'image/jpeg'
+  // "RIFF" <4-byte size> "WEBP"
+  if (startsWith([0x52, 0x49, 0x46, 0x46]) && startsWith([0x57, 0x45, 0x42, 0x50], 8)) return 'image/webp'
+  return null
+}
+
 export const POST = withRoute(
   {
     actor: { allow: ['learner'] },
@@ -66,10 +78,18 @@ export const POST = withRoute(
       throw new RouteError(400, 'VALIDATION', 'Image file size exceeds maximum limit of 2MB.')
     }
 
+    // The declared type is caller-controlled. Store under the type the bytes prove,
+    // and refuse a file whose bytes disagree with what it claims to be.
+    const sniffedType = sniffImageMimeType(fileBuffer)
+    const declaredType = mimeType.toLowerCase() === 'image/jpg' ? 'image/jpeg' : mimeType.toLowerCase()
+    if (!sniffedType || sniffedType !== declaredType) {
+      throw new RouteError(400, 'VALIDATION', 'File content does not match a supported image format (PNG, JPG, WebP).')
+    }
+
     const result = await AvatarService.uploadAndSetUserAvatar({
       userId: requireUserId(actor),
       fileBuffer,
-      mimeType,
+      mimeType: sniffedType,
       fileName,
     })
 

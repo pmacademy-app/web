@@ -7,7 +7,6 @@ import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
 import { isSafeNotificationLink, parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
 import { clampPagination, paginated, toRange, DEFAULT_PAGE_SIZE } from '@/lib/api/pagination'
-import { logSystemError } from '@/lib/monitoring/logger'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -95,8 +94,13 @@ export const GET = withRoute(
     const { data: items, count, error } = itemsResult
     const unreadCount = unreadResult.count
 
+    // A failed read is a fault, not an empty inbox: answering "no notifications"
+    // would hide the outage behind a quiet bell. withRoute turns this into a 500.
     if (error) {
-      console.warn('[API:notifications] Error fetching notification items from Supabase:', error)
+      throw new Error(`notifications read failed: ${error.message}`)
+    }
+    if (unreadResult.error) {
+      throw new Error(`notifications unread count failed: ${unreadResult.error.message}`)
     }
 
     const rawItems = (items || []) as unknown as InAppNotificationRow[]
@@ -151,15 +155,9 @@ export const PATCH = withRoute(
         .eq('user_id', userId)
         .eq('is_read', false)
 
-      if (error) {
-        void logSystemError({
-          severity: 'error',
-          category: 'db',
-          operation: 'notifications.mark_all_read',
-          message: `Error marking all read: ${error instanceof Error ? error.message : String(error)}`,
-          userId,
-        })
-      }
+      // Thrown, not logged and answered as success: the badge would come back on
+      // reload. withRoute records the incident and returns 500.
+      if (error) throw new Error(`notifications.mark_all_read failed: ${describeDbError(error)}`)
 
       return NextResponse.json({ success: true, message: 'All notifications marked as read' })
     }
@@ -175,15 +173,7 @@ export const PATCH = withRoute(
           .eq('user_id', userId)
           .eq('is_read', false)
 
-        if (error) {
-          void logSystemError({
-            severity: 'error',
-            category: 'db',
-            operation: 'notifications.mark_batch_read',
-            message: `Error marking batch read: ${error instanceof Error ? error.message : String(error)}`,
-            userId,
-          })
-        }
+        if (error) throw new Error(`notifications.mark_batch_read failed: ${describeDbError(error)}`)
 
         return NextResponse.json({ success: true, markedIds: idsToMark, count: idsToMark.length })
       }
@@ -202,19 +192,18 @@ export const PATCH = withRoute(
       .eq('id', notificationId)
       .eq('user_id', userId)
 
-    if (error) {
-      void logSystemError({
-        severity: 'error',
-        category: 'db',
-        operation: 'notifications.update_read_state',
-        message: `Error updating read state: ${error instanceof Error ? error.message : String(error)}`,
-        userId,
-      })
-    }
+    if (error) throw new Error(`notifications.update_read_state failed: ${describeDbError(error)}`)
 
     return NextResponse.json({ success: true, notificationId, isRead })
   }
 )
+
+/** PostgREST errors are plain objects, not `Error` instances. */
+function describeDbError(error: unknown): string {
+  if (error instanceof Error) return error.message
+  const message = (error as { message?: unknown } | null)?.message
+  return typeof message === 'string' ? message : String(error)
+}
 
 function getDeepLinkForCategory(category?: string): string {
   switch (category) {
@@ -225,7 +214,7 @@ function getDeepLinkForCategory(category?: string): string {
     case 'certificates':
       return '/progress'
     case 'security':
-      return '/account'
+      return '/settings?tab=security'
     default:
       return '/dashboard'
   }

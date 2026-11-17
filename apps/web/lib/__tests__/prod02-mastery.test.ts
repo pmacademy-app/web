@@ -3,6 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { recordQuizAttemptAction } from '@/lib/academy/lessons-db'
 import { lessonCompletedFromQuiz } from '@/app/(app)/academy/[moduleSlug]/[lessonId]/lesson-content'
 
+// lessons-db runs its completion hooks in after(). Outside a request scope after() throws and
+// the hooks run inline, so these assertions see them.
+vi.mock('next/server', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  after: () => {
+    throw new Error('`after` was called outside a request scope.')
+  },
+}))
+
 vi.mock('@/lib/streaks-db', () => ({
   updateUserStreak: vi.fn().mockResolvedValue(undefined),
 }))

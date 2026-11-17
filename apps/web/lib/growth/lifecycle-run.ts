@@ -11,7 +11,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { runProofNudgesForPage, type NudgeCandidate } from '@/lib/growth/proof-nudges-run'
 import type { ProofNudgeKey } from '@/lib/growth/proof-nudges'
 import { loadProofStates } from '@/lib/growth/proof-state-db'
-import { fetchAllRows } from '@/lib/growth/fetch-all-rows'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
 import { BRAND } from '@/lib/brand'
 import { getStreakStatusSummary } from '@/lib/streaks/streaks'
@@ -216,6 +216,9 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
             .order('user_id')
             .order('lesson_id')
             .range(lo, hi)
+        ).then(
+          (data) => ({ data, error: null as unknown }),
+          (error: unknown) => ({ data: [] as Array<{ user_id: string; status: string }>, error }),
         ),
       ])
 
@@ -225,7 +228,7 @@ export async function runLifecycle({ source, dryRun, force, now }: LifecycleRunO
         result.pagesSkipped++
         result.proofNudges.pagesSkipped++
         const { logSystemError } = await import('@/lib/monitoring/logger')
-        const reason = (progressRes.error as { message?: string }).message ?? String(progressRes.error)
+        const reason = progressRes.error instanceof Error ? progressRes.error.message : String(progressRes.error)
         await logSystemError({
           severity: 'error',
           category: 'cron',
