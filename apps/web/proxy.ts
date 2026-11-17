@@ -420,6 +420,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     goal?: string | null
   }
   let cachedUserData: ProfileData | null = null
+  let profileLookupFailed = false
   async function loadUserProfileData() {
     if (!user) return null
     if (cachedUserData !== null) return cachedUserData
@@ -432,15 +433,20 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
         auth: { persistSession: false },
       })
 
-      const { data } = await authorizedClient
+      const { data, error } = await authorizedClient
         .from('users')
         .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at, onboarding_completed, goal')
         .eq('id', user.id)
         .maybeSingle()
+      if (error) {
+        profileLookupFailed = true
+        console.error('[proxy] User profile database check error:', { userId: user.id, code: error.code, message: error.message })
+      }
       cachedUserData = (data || {}) as ProfileData
       return cachedUserData
     } catch (err) {
       console.error('[proxy] User profile database check error:', err)
+      profileLookupFailed = true
       cachedUserData = {}
       return cachedUserData
     }
@@ -666,6 +672,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       user.app_metadata?.onboarding_complete === true ||
       user.app_metadata?.onboarding_completed === true
     )
+    let onboardingStateUnknown = false
     if (!isOnboardingComplete) {
       const profileData = await loadUserProfileData()
       isOnboardingComplete = Boolean(
@@ -673,10 +680,16 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
         profileData?.goal != null ||
         profileData?.curriculum_access_override
       )
+      // A failed profile read must not send an onboarded learner back to onboarding: fail open,
+      // like the consent gate. A missing row (no error) still goes to onboarding.
+      onboardingStateUnknown = !isOnboardingComplete && profileLookupFailed
+      if (onboardingStateUnknown) {
+        console.warn('[proxy] onboarding gate failed open: profile unavailable', { userId: user.id })
+      }
     }
     const isOnboardingPage = path === ONBOARDING_PAGE
 
-    if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
+    if (!isOnboardingComplete && !onboardingStateUnknown && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
       // Force onboarding goal selection for learners (admins & override users are unaffected).
       // The page they asked for rides along as `next` so onboarding can finish there. The
       // dashboard is onboarding's default anyway, and an /onboarding path as `next` would
