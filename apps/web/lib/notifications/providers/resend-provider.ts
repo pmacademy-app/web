@@ -44,7 +44,15 @@ export class ResendProvider implements NotificationProvider {
 
       const headers: Record<string, string> = {}
       if (payload.variables.suppressListUnsubscribe !== true) {
-        headers['List-Unsubscribe'] = `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
+        const token = typeof payload.variables.unsubscribeToken === 'string' ? payload.variables.unsubscribeToken.trim() : ''
+        if (token) {
+          // RFC 8058 one-click: the mail client POSTs `List-Unsubscribe=One-Click` to this URL.
+          headers['List-Unsubscribe'] = `<${siteUrl}/api/email/unsubscribe?token=${encodeURIComponent(token)}>`
+          headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click'
+        } else {
+          headers['List-Unsubscribe'] = `<${siteUrl}/settings?tab=notifications>`
+        }
       }
       if (payload.variables.headers && typeof payload.variables.headers === 'object') {
         Object.assign(headers, payload.variables.headers)

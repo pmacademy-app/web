@@ -12,6 +12,8 @@
  *
  * The bounded paging is `F-COR-4` and stays: an unbounded `.select()` is truncated
  * at PostgREST's row cap with no error, which drops everyone past it off the board.
+ * Every paged read orders by a unique key: without an ORDER BY, Postgres may return
+ * rows in a different order per page, so rows repeat or go missing across pages.
  */
 
 import { fetchAllRows, type Db, type Row, type Selected } from '@/lib/db'
@@ -38,6 +40,7 @@ export function selectRankedUsers(db: Db): Promise<LeaderboardUserRow[]> {
       .from('users')
       .select('id, username, name, avatar_url, total_xp, current_streak, level')
       .gt('total_xp', 0)
+      .order('id', { ascending: true })
       .range(from, to)
   )
 }
@@ -50,7 +53,12 @@ export function selectRankedUsers(db: Db): Promise<LeaderboardUserRow[]> {
  */
 export function selectOptedOutUserIds(db: Db): Promise<OptOutRow[]> {
   return fetchAllRows<OptOutRow>((from, to) =>
-    db.from('user_leaderboard_settings').select('user_id').eq('is_opted_in', false).range(from, to)
+    db
+      .from('user_leaderboard_settings')
+      .select('user_id')
+      .eq('is_opted_in', false)
+      .order('user_id', { ascending: true })
+      .range(from, to)
   )
 }
 
@@ -69,6 +77,9 @@ export function selectWeeklyLessonProgress(db: Db, weekStartIso: string): Promis
       .select('user_id, status, completed_at')
       .eq('status', 'completed')
       .gte('completed_at', weekStartIso)
+      // The primary key (user_id, lesson_id), so pages partition the rows.
+      .order('user_id', { ascending: true })
+      .order('lesson_id', { ascending: true })
       .range(from, to)
   )
 }
@@ -85,6 +96,7 @@ export function selectWeeklyXpEvents(db: Db, weekStartIso: string): Promise<Week
       .from('xp_events')
       .select('user_id, xp_amount, created_at')
       .gte('created_at', weekStartIso)
+      .order('id', { ascending: true })
       .range(from, to)
   )
 }

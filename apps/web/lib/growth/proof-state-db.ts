@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import type { FellowRequestRowStatus } from '@/lib/fellow'
 import { deriveProofState, type ProofState, type ProofUserRow } from './proof-state'
-import { fetchAllRows } from './fetch-all-rows'
+import { fetchAllRows, type PageResult } from '@/lib/db/pagination'
 
 /**
  * Batch loader for proof state (Growth R5 / B1), for the scheduled jobs (nudges, weekly recap,
@@ -19,7 +19,14 @@ interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
-type Rows<T> = Promise<{ data: T[] | null; error: unknown }>
+type Rows<T> = Promise<PageResult<T>>
+
+/** A failed paged read resolves to `{ data: null, error }`, like the single-shot reads here. */
+const paged = <T,>(page: (from: number, to: number) => Rows<T>): Promise<{ data: T[] | null; error: unknown }> =>
+  fetchAllRows<T>(page).then(
+    (data) => ({ data, error: null }),
+    (error: unknown) => ({ data: null, error }),
+  )
 
 export async function loadProofStates(
   supabase: SupabaseClient<Database>,
@@ -39,7 +46,7 @@ export async function loadProofStates(
       .in('id', ids) as unknown as Rows<ProofUserRow & { id: string }>,
     // Multi-row reads are paged (fetchAllRows): one learner can have ~90 progress rows, and a
     // response is capped at 1000 rows without an error.
-    fetchAllRows<{ user_id: string; module_slug: string; status: string; is_public: boolean | null }>(
+    paged<{ user_id: string; module_slug: string; status: string; is_public: boolean | null }>(
       (lo, hi) =>
         from('capstone_submissions')
           .select('user_id, module_slug, status, is_public')
@@ -48,15 +55,16 @@ export async function loadProofStates(
           .order('module_slug')
           .range(lo, hi) as unknown as Rows<{ user_id: string; module_slug: string; status: string; is_public: boolean | null }>,
     ),
-    fetchAllRows<{ user_id: string; status: string }>(
+    paged<{ user_id: string; status: string }>(
       (lo, hi) =>
         from('fellow_requests')
           .select('user_id, status, requested_at')
           .in('user_id', ids)
           .order('requested_at', { ascending: false })
+          .order('id')
           .range(lo, hi) as unknown as Rows<{ user_id: string; status: string }>,
     ),
-    fetchAllRows<{ user_id: string; lesson_id: string }>(
+    paged<{ user_id: string; lesson_id: string }>(
       (lo, hi) =>
         from('user_lesson_progress')
           .select('user_id, lesson_id')

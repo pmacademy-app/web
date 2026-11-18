@@ -4,6 +4,7 @@ import { adminErrorMessage } from '@/lib/errors/api-response'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+import { buildIlikeOrFilter } from '@/lib/admin/search-filter'
 
 export interface AdminSearchResultItem {
   id: string
@@ -60,7 +61,8 @@ export const GET = withRoute(
       const { data, error } = await supabase
         .from('users')
         .select('id, name, email, username, is_admin')
-        .or(`name.ilike.%${query}%,email.ilike.%${query}%,username.ilike.%${query}%`)
+        // Shared helper quotes and escapes the term, so a comma or parenthesis cannot break the filter.
+        .or(buildIlikeOrFilter(['name', 'email', 'username'], query))
         .limit(5)
 
       if (error || !data) return []
@@ -125,7 +127,7 @@ export const GET = withRoute(
       const { data, error } = await supabase
         .from('certificates')
         .select('id, certificate_code, learner_name, career_title')
-        .or(`certificate_code.ilike.%${query}%,learner_name.ilike.%${query}%,career_title.ilike.%${query}%`)
+        .or(buildIlikeOrFilter(['certificate_code', 'learner_name', 'career_title'], query))
         .limit(5)
 
       if (error || !data) return []
@@ -144,7 +146,7 @@ export const GET = withRoute(
       const { data, error } = await supabase
         .from('contact_messages')
         .select('id, subject, name, email, status')
-        .or(`subject.ilike.%${query}%,name.ilike.%${query}%,email.ilike.%${query}%`)
+        .or(buildIlikeOrFilter(['subject', 'name', 'email'], query))
         .limit(5)
 
       if (error || !data) return []

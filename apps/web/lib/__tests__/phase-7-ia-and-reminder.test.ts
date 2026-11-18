@@ -41,7 +41,7 @@ describe('Phase 7 (7.4) — reminder due count is real, not hardcoded', () => {
 
   it('the cron daily-reminder path uses the SRS due count and suppresses at zero', () => {
     const src = read('app/api/cron/daily-reminder/route.ts')
-    expect(src).toContain('getDueCardsCount')
+    expect(src).toContain('getDueCardsCounts')
     expect(src).not.toMatch(/dueCount:\s*5/)
   })
 })

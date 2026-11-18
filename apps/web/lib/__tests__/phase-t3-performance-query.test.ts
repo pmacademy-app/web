@@ -6,7 +6,7 @@ import {
   recordBatchFlashcardReviews,
   getDueCardsCount,
 } from '../flashcards-service'
-import * as flashcardsService from '../flashcards-service'
+import * as dueCountsModule from '../flashcards-due-counts'
 import { SystemService } from '../admin/system-service'
 import { processEmailQueue } from '../notifications/queue/processor'
 import { calculateSM2, SRSRating } from '../srs'
@@ -197,9 +197,11 @@ describe('Phase T3 — Performance & Query Architecture Suite', () => {
 
       // Phase 1.6 — the daily reminder now passes the real due-card count and
       // suppresses zero-due sends. Stub the SRS helper so this pagination test
-      // exercises eligible learners; restore it afterwards so T3.3 (which tests the
-      // real getDueCardsCount) is unaffected.
-      const dueCardsSpy = vi.spyOn(flashcardsService, 'getDueCardsCount').mockResolvedValue(4)
+      // exercises eligible learners; restore it afterwards. The route reads the counts
+      // for a whole page in one batched call (getDueCardsCounts).
+      const dueCardsSpy = vi
+        .spyOn(dueCountsModule, 'getDueCardsCounts')
+        .mockImplementation(async (_s, ids) => new Map(ids.map((id) => [id, 4])))
       try {
 
       // Simulate 150 eligible users in the database

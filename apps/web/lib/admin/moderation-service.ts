@@ -290,8 +290,8 @@ export class ModerationService {
    * Filter: `status` is one of CAPSTONE_STATUS_FILTERS ('all' when absent or unknown, as
    * CapstonesView does) and is an exact `status` match.
    *
-   * Order: the view sorts awaiting-review submissions (status 'submitted', no reviewed_at)
-   * first, oldest first, then everything else newest first. PostgREST cannot order by
+   * Order: the view sorts awaiting-review submissions (status 'submitted', no reviewed_at;
+   * a resubmission clears reviewed_at, so it counts as awaiting) first, oldest first, then everything else newest first. PostgREST cannot order by
    * that expression, so the list is read as two segments — awaiting, then the rest — and
    * the page window is split across them. Both segments are counted up front, so no slice
    * is ever requested past its end. Learner names come from one batched `users` lookup.
@@ -421,6 +421,9 @@ export class ModerationService {
    *     review never produces a duplicate: the published email is keyed per submission, and the
    *     in-app write is keyed by the event id. The publishing re-review has its own id
    *     (`capstone-reviewed-<id>-published`), so it adds one in-app row saying "published".
+   *   - a learner resubmission clears `reviewed_at`/`reviewed_by` (capstones-db, the old review is
+   *     kept in review_history), so the new revision is awaiting again and its first review is a
+   *     "first review" here: it is stamped and notified, keyed `capstone-reviewed-<id>-r<revision>`.
    *
    * This method performs the server-side authorization boundary's *work*; authorization itself is
    * enforced upstream (the `/api/admin/capstones/[id]/review` route is admin-gated via `withRoute`),
@@ -489,7 +492,10 @@ export class ModerationService {
         return false
       }
 
-      const alreadyReviewed = Boolean(current.reviewed_at)
+      // A review always leaves status 'reviewed', so a 'submitted' row is a revision nobody has
+      // reviewed yet, even when it still carries reviewed_at (a resubmission saved before the
+      // resubmit path started clearing it).
+      const alreadyReviewed = Boolean(current.reviewed_at) && current.status !== 'submitted'
       // This review publishes a capstone that is not published yet (first approve, or an approve
       // after an earlier reject). Approving an already published capstone again is not a change.
       const publishedNow = action === 'approve' && !(current.status === 'reviewed' && current.is_public === true)
@@ -559,9 +565,10 @@ export class ModerationService {
           action,
           feedback: reviewData?.feedback,
           revisionCount: current.revision_count ?? 0,
-          // The first review keeps the plain event id. A later review that publishes gets its own,
-          // or its in-app notice would be dropped as a duplicate of the first review's.
-          publishedOnReReview: alreadyReviewed,
+          // The first review of the first revision keeps the plain event id. A later review that
+          // publishes gets its own, or its in-app notice would be dropped as a duplicate of the
+          // first review's.
+          publishedOnReReview: publishedNow && (alreadyReviewed || (current.revision_count ?? 0) > 0),
         })
       }
 
@@ -656,9 +663,17 @@ export class ModerationService {
       // two rows as one capstone (verifyCapstones in achievement-celebrations.ts): it celebrates
       // at most once, through the `-published` row when there is one, and not at all if either
       // row is already celebrated. The email is keyed by submission id, not by this.
+      // A resubmission (revision_count > 0) that is not published gets `-r<revision>`, so each
+      // reviewed revision reaches the learner instead of being dropped as a duplicate of the first.
       const firstReviewEventId = `capstone-reviewed-${input.submissionId}`
+      const revision = input.revisionCount ?? 0
+      const eventId = input.publishedOnReReview
+        ? `${firstReviewEventId}-published`
+        : revision > 0
+          ? `${firstReviewEventId}-r${revision}`
+          : firstReviewEventId
       await globalNotificationDispatcher.dispatch({
-        id: input.publishedOnReReview ? `${firstReviewEventId}-published` : firstReviewEventId,
+        id: eventId,
         event: 'capstone.reviewed',
         userId: input.userId,
         userEmail: typeof learner?.email === 'string' ? learner.email : '',

@@ -13,6 +13,14 @@ const mocks = vi.hoisted(() => ({ referralCheck: vi.fn(), dispatch: vi.fn() }))
 vi.mock('@/lib/referral/referral-service', () => ({ onFirstLessonCompletedReferralCheck: mocks.referralCheck }))
 vi.mock('@/lib/notifications/dispatcher', () => ({ globalNotificationDispatcher: { dispatch: mocks.dispatch } }))
 vi.mock('@/lib/notifications/events/connectors', () => ({ initializeNotificationConnectors: vi.fn() }))
+// lessons-db runs its completion hooks in after(). Outside a request scope after() throws and
+// the hooks run inline, so these assertions see them.
+vi.mock('next/server', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  after: () => {
+    throw new Error('`after` was called outside a request scope.')
+  },
+}))
 
 import { recordQuizAttemptAction } from '@/lib/academy/lessons-db'
 

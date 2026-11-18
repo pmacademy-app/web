@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { withRoute } from '@/lib/api/with-route'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { escapeLike } from '@/lib/db/escape-like'
 import { ensureUserProfile } from '@/lib/auth'
 import { AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
@@ -133,7 +134,7 @@ export const POST = withRoute(
               const { data: publicUser } = await supabase
                 .from('users')
                 .select('id')
-                .ilike('email', email.trim())
+                .ilike('email', escapeLike(email.trim()))
                 .maybeSingle()
 
               if (publicUser?.id) {

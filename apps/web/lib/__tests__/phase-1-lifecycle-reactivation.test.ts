@@ -25,13 +25,18 @@ vi.mock('@/lib/notifications/automations/service', () => ({
 
 // Real SRS due-card computation is stubbed; the daily reminder passes whatever this
 // returns and suppresses when it is zero.
-vi.mock('@/lib/flashcards-service', () => ({
-  getDueCardsCount: vi.fn(async () => 0),
+vi.mock('@/lib/flashcards-due-counts', () => ({
+  getDueCardsCounts: vi.fn(async (_s: unknown, ids: readonly string[]) => new Map(ids.map((id) => [id, 0]))),
 }))
 
 import * as supabaseModule from '@/lib/supabase'
 import { SupabaseFake } from './helpers/supabase-fake'
-import { getDueCardsCount } from '@/lib/flashcards-service'
+import { getDueCardsCounts } from '@/lib/flashcards-due-counts'
+
+/** Every learner in the batched due-card read gets `n` due cards. */
+function dueEach(n: number) {
+  vi.mocked(getDueCardsCounts).mockImplementation(async (_s, ids) => new Map(ids.map((id) => [id, n])))
+}
 import {
   createDefaultNotificationPreferences,
   isChannelEnabledByPreferences,
@@ -192,7 +197,7 @@ describe('Phase 1.1 — enqueueNotificationItem honours stored preferences, defa
 // ── 1.3 / 1.6 — Daily reminder audience & zero-due suppression ────────────────
 describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card gating', () => {
   beforeEach(() => {
-    vi.mocked(getDueCardsCount).mockReset()
+    vi.mocked(getDueCardsCounts).mockReset()
   })
 
   function reminderSupabase({ users, prefRows = [], inserts }: {
@@ -226,7 +231,7 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
 
   it('selects a lapsed user (streak broken) with due cards and passes the REAL due count', async () => {
     const inserts: Array<Record<string, unknown>> = []
-    vi.mocked(getDueCardsCount).mockResolvedValue(7)
+    dueEach(7)
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
       reminderSupabase({
         users: [{ id: 'u-0001', email: 'lapsed@example.com', name: 'Lapsed', current_streak: 0, last_streak_date: new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10), timezone: 'UTC' }],
@@ -243,7 +248,7 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
 
   it('suppresses a user whose real due count is zero (never-started / all-reviewed)', async () => {
     const inserts: Array<Record<string, unknown>> = []
-    vi.mocked(getDueCardsCount).mockResolvedValue(0)
+    dueEach(0)
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
       reminderSupabase({
         users: [{ id: 'u-0001', email: 'nocards@example.com', name: 'NoCards', current_streak: 0, last_streak_date: null, timezone: 'UTC' }],
@@ -259,7 +264,7 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
 
   it('skips a user who already registered activity today (last_streak_date == local today)', async () => {
     const inserts: Array<Record<string, unknown>> = []
-    vi.mocked(getDueCardsCount).mockResolvedValue(5)
+    dueEach(5)
     const todayUtc = new Date().toISOString().slice(0, 10)
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(
       reminderSupabase({
@@ -272,12 +277,12 @@ describe('Phase 1.3/1.6 — daily reminder audience inversion & real due-card ga
     expect(body.remindersQueued).toBe(0)
     expect(body.remindersSkippedActiveToday).toBe(1)
     // due count is never even computed for active-today users
-    expect(getDueCardsCount).not.toHaveBeenCalled()
+    expect(getDueCardsCounts).not.toHaveBeenCalled()
   })
 
   it('processes more than 100 eligible users across pages without skipping or duplicating', async () => {
     const inserts: Array<Record<string, unknown>> = []
-    vi.mocked(getDueCardsCount).mockResolvedValue(3)
+    dueEach(3)
     const users = Array.from({ length: 150 }, (_, i) => ({
       id: `u-${String(i).padStart(4, '0')}`,
       email: `user${i}@example.com`,

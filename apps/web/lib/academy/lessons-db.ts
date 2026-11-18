@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
+import { after } from 'next/server'
 import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
 import { getCoreReadingMinutes, sampleQuizQuestions } from './lesson-structure'
 import { getRecutVariant } from './experiment'
@@ -539,10 +540,92 @@ async function recordScoredQuizAttempt(
     }
   }
 
-  await updateUserStreak(supabase, userId)
+  // The response reports isFirstLesson / totalCompletedLessons (the lesson page celebrates the
+  // first lesson), so this one read stays before the return. Every other hook runs after it.
+  const { data: userProgress, error: progressError } = await supabase
+    .from('user_lesson_progress')
+    .select('lesson_id, status')
+    .eq('user_id', userId)
+  if (progressError) {
+    // Without it no module (or certificate) can be detected for this completion.
+    console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
+  }
 
-  let totalCompletedLessons = 0
+  const completedLessonIds = new Set(
+    (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
+  )
+  const totalCompletedLessons = completedLessonIds.size
 
+  // Audit 2026-11-17 #8: streak, notifications, referral, module completion and certificate
+  // issuance run once the response is sent. Each step tolerates its own failure.
+  await runAfterResponse(async () => {
+    try {
+      await updateUserStreak(supabase, userId)
+    } catch (streakErr) {
+      console.warn('[lessons-db] Streak update warning:', streakErr)
+    }
+    await runQuizCompletionHooks(supabase, {
+      userId,
+      lessonId,
+      lesson,
+      scorePercentage,
+      isNewlyCompleted,
+      totalXpToAward,
+      completedLessonIds,
+    })
+  })
+
+  return {
+    success: true,
+    isCompleted: typeof envelope.status === 'string' ? envelope.status === 'completed' : isPassed,
+    isPassed,
+    isNewlyCompleted,
+    bestScore,
+    isFirstLesson: totalCompletedLessons === 1,
+    totalCompletedLessons,
+    correctCount,
+    totalQuestions,
+    scorePercentage,
+    xpEarned: totalXpToAward,
+    isPerfect: correctCount === totalQuestions,
+    isFirstAttempt,
+  }
+}
+
+/**
+ * Runs `task` once the response has been sent, via after(). Outside a request scope (a unit
+ * test, a script) after() throws, and the task is awaited inline instead. `task` must not throw.
+ */
+async function runAfterResponse(task: () => Promise<void>): Promise<void> {
+  try {
+    after(task)
+  } catch {
+    await task()
+  }
+}
+
+/** Notifications, referral activation, module completion and certificate issuance for a quiz. */
+async function runQuizCompletionHooks(
+  supabase: SupabaseClient<Database>,
+  {
+    userId,
+    lessonId,
+    lesson,
+    scorePercentage,
+    isNewlyCompleted,
+    totalXpToAward,
+    completedLessonIds,
+  }: {
+    userId: string
+    lessonId: string
+    lesson: CompiledLesson
+    scorePercentage: number
+    isNewlyCompleted: boolean
+    totalXpToAward: number
+    completedLessonIds: Set<string>
+  }
+): Promise<void> {
+  const totalCompletedLessons = completedLessonIds.size
   try {
     const { data: userRec } = await supabase
       .from('users')
@@ -594,20 +677,6 @@ async function recordScoredQuizAttempt(
       })
     }
 
-    const { data: userProgress, error: progressError } = await supabase
-      .from('user_lesson_progress')
-      .select('lesson_id, status')
-      .eq('user_id', userId)
-    if (progressError) {
-      // Without it no module (or certificate) can be detected for this completion.
-      console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
-    }
-
-    const completedLessonIds = new Set(
-      (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
-    )
-    totalCompletedLessons = completedLessonIds.size
-
     // Phase 7: activate the referral reward once the learner has a completed lesson.
     if (totalCompletedLessons >= 1 && isNewlyCompleted) {
       try {
@@ -656,22 +725,6 @@ async function recordScoredQuizAttempt(
     }
   } catch (modErr) {
     console.warn('[lessons-db] Notification dispatch warning:', modErr)
-  }
-
-  return {
-    success: true,
-    isCompleted: typeof envelope.status === 'string' ? envelope.status === 'completed' : isPassed,
-    isPassed,
-    isNewlyCompleted,
-    bestScore,
-    isFirstLesson: totalCompletedLessons === 1,
-    totalCompletedLessons,
-    correctCount,
-    totalQuestions,
-    scorePercentage,
-    xpEarned: totalXpToAward,
-    isPerfect: correctCount === totalQuestions,
-    isFirstAttempt,
   }
 }
 

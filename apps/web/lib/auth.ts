@@ -6,6 +6,7 @@ import { globalNotificationDispatcher } from './notifications/dispatcher'
 import { initializeNotificationConnectors } from './notifications/events/connectors'
 import { consentFromAuthMetadata, type ConsentRecord } from './legal/consent'
 import { trackProductEvent } from './events/product-events'
+import { log } from './monitoring/log'
 
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
@@ -188,6 +189,8 @@ export const getServerUser = cache(resolveServerUser)
  * present (matching the layout's existing defense-in-depth), falling back to
  * the service-role client otherwise. Returns null when unauthenticated or the
  * row does not yet exist — callers own the ensureUserProfile() bootstrap path.
+ * Throws ProfileReadError when the query itself fails, so a transient error is
+ * never mistaken for a missing row.
  */
 export const getCurrentUserProfile = cache(async (): Promise<UserProfile | null> => {
   const authUser = await getServerUser()
@@ -199,14 +202,34 @@ export const getCurrentUserProfile = cache(async (): Promise<UserProfile | null>
     ? createAuthenticatedServerClient(accessToken)
     : createServiceRoleClient()
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('id', authUser.id)
     .maybeSingle()
 
+  // A failed read is not "no profile". Returning null here sends the (app) layout and
+  // the dashboard into ensureUserProfile() (re-creation) and, when that also fails,
+  // a critical alert plus a redirect to /login. Throwing instead lets the error
+  // boundary show a retry page; nothing is created or signed out on a DB blip.
+  if (error) {
+    log.error('auth.current_user_profile.read_failed', {
+      userId: authUser.id,
+      code: (error as { code?: string }).code ?? null,
+    })
+    throw new ProfileReadError()
+  }
+
   return (data as UserProfile | null) ?? null
 })
+
+/** Thrown by getCurrentUserProfile when the profile read itself fails. */
+export class ProfileReadError extends Error {
+  constructor() {
+    super('Could not load the user profile.')
+    this.name = 'ProfileReadError'
+  }
+}
 
 const requestAuthCache = new WeakMap<Request, Promise<User | null>>()
 

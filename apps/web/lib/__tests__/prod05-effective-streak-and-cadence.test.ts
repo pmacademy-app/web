@@ -46,8 +46,8 @@ vi.mock('@/lib/notifications/queue/processor', () => ({
   enqueueNotificationItem: vi.fn(async () => ({ success: true })),
 }))
 
-vi.mock('@/lib/flashcards-service', () => ({
-  getDueCardsCount: vi.fn(async () => 4),
+vi.mock('@/lib/flashcards-due-counts', () => ({
+  getDueCardsCounts: vi.fn(async (_s: unknown, ids: readonly string[]) => new Map(ids.map((id) => [id, 4]))),
 }))
 
 vi.mock('@/lib/monitoring/cron-heartbeat', () => ({
@@ -68,8 +68,8 @@ vi.mock('@/lib/notifications/lifecycle/holdout', () => ({
   isLifecycleHoldout: vi.fn(() => false),
 }))
 
-vi.mock('@/lib/growth/fetch-all-rows', () => ({
-  fetchAllRows: vi.fn(async () => ({ data: [{ user_id: 'u-1', status: 'completed' }], error: null })),
+vi.mock('@/lib/db/pagination', () => ({
+  fetchAllRows: vi.fn(async () => [{ user_id: 'u-1', status: 'completed' }]),
 }))
 
 vi.mock('@/lib/growth/proof-state-db', () => ({
@@ -87,7 +87,7 @@ vi.mock('@/lib/growth/proof-nudges-run', () => ({
 
 import * as supabaseModule from '@/lib/supabase'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
-import { getDueCardsCount } from '@/lib/flashcards-service'
+import { getDueCardsCounts } from '@/lib/flashcards-due-counts'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { shiftLocalDate } from '@/lib/notifications/send-window'
 import { getLocalDateString, getStreakStatusSummary } from '@/lib/streaks/streaks'
@@ -136,7 +136,7 @@ beforeEach(() => {
   process.env.CRON_SECRET = TEST_CRON_SECRET
   hoisted.afterCallbacks.length = 0
   vi.mocked(enqueueNotificationItem).mockClear()
-  vi.mocked(getDueCardsCount).mockClear()
+  vi.mocked(getDueCardsCounts).mockClear()
   vi.mocked(logSystemError).mockClear()
 })
 
@@ -238,7 +238,7 @@ describe('PROD-05 daily reminder route', () => {
     expect(body.remindersQueued).toBe(0)
     expect(body.remindersSkippedCadence).toBe(1)
     expect(enqueueNotificationItem).not.toHaveBeenCalled()
-    expect(getDueCardsCount).not.toHaveBeenCalled()
+    expect(getDueCardsCounts).not.toHaveBeenCalled()
   })
 
   it('sends on day 7 and passes the effective streak (0), not the stored one', async () => {
@@ -262,10 +262,11 @@ describe('PROD-05 daily reminder route', () => {
     expect(vars.currentStreak).toBe(4)
   })
 
-  it('logs a users query failure through after(), not fire-and-forget', async () => {
+  it('logs a users query failure through after(), not fire-and-forget, and returns 500', async () => {
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(supabaseWithUsers([], { usersError: 'boom' }) as never)
     const res = await handleDailyReminder(reminderRequest())
-    expect(res.status).toBe(200)
+    // Audit #3: a failed users read is a failed run, so the heartbeat records it as failed.
+    expect(res.status).toBe(500)
     expect(logSystemError).not.toHaveBeenCalled()
     expect(hoisted.afterCallbacks).toHaveLength(1)
     await hoisted.afterCallbacks[0]()

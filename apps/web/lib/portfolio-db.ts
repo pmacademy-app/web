@@ -15,6 +15,7 @@ import type { Database, TablesUpdate } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
+import { escapeLike } from '@/lib/db/escape-like'
 import {
   validateUsername,
   validateWritableUrl,
@@ -137,7 +138,7 @@ export async function getPublicPortfolioData(
     .select('*')
     // Escaped: in ILIKE, `_` and `%` are wildcards, and usernames may contain `_`. Unescaped,
     // /p/a_b could resolve to another learner's public portfolio.
-    .ilike('username', sanitizedUsername.replace(/[\\%_]/g, (char) => `\\${char}`))
+    .ilike('username', escapeLike(sanitizedUsername))
     .limit(1)
 
   if (userError || !users || users.length === 0) {
@@ -516,7 +517,8 @@ export async function updatePortfolioSettings(
   const { data: existingUsers } = await supabase
     .from('users')
     .select('id')
-    .ilike('username', cleanUsername)
+    // Escaped: `_` is common in usernames and is a single-character wildcard in ILIKE.
+    .ilike('username', escapeLike(cleanUsername))
     .neq('id', userId)
     .limit(1)
 
