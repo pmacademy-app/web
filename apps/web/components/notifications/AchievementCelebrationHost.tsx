@@ -13,11 +13,13 @@ import {
 import { isLessonPath, shouldLaunchDeferredQuickStart } from '@/lib/quick-start/deferred-launch'
 import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import type { ReferralStatsResponse } from '@/lib/api/contracts/settings'
-import { AchievementCelebrationModal } from '@/components/celebration/AchievementCelebrationModal'
-import { ReferralShareModal } from '@/components/referral/ReferralShareModal'
+import {
+  AchievementCelebrationModalLazy,
+  ReferralShareModalLazy,
+  useOpenedOnce,
+} from '@/components/layout/lazy-modals'
+import { NOTIFICATIONS_SUMMARY_KEY, type NotificationsSummaryResponse } from './notifications-summary'
 
-/** The bell's SWR key (NotificationBell.tsx). Sharing it means one request serves both. */
-const NOTIFICATIONS_SUMMARY_KEY = '/api/notifications?limit=1'
 const REFERRALS_PATH = '/api/referrals'
 
 /** A celebration's "Invite peers" flow: closed, fetching the link, or showing it. */
@@ -25,11 +27,6 @@ type ReferralState =
   | { phase: 'idle' }
   | { phase: 'loading' }
   | { phase: 'open'; link: string; source: string; rewardXp?: number }
-
-interface NotificationsSummaryResponse {
-  success: boolean
-  unreadCount: number
-}
 
 interface AchievementCelebrationHostProps {
   /** The server-read Quick Start flag, as passed to `QuickStartProvider`. */
@@ -131,20 +128,30 @@ export function AchievementCelebrationHost({ quickStartCompleted }: AchievementC
     setReferral({ phase: 'idle' })
   }, [])
 
+  const shownCelebration = blocked ? null : celebration
+  // Each modal's code downloads the first time it has something to show (perf plan item 5),
+  // then stays mounted so later opens and closes behave as before.
+  const celebrationMounted = useOpenedOnce(shownCelebration !== null)
+  const referralMounted = useOpenedOnce(referral.phase === 'open')
+
   return (
     <>
-      <AchievementCelebrationModal
-        celebration={blocked ? null : celebration}
-        onClose={handleClose}
-        onInvitePeers={handleInvitePeers}
-      />
-      <ReferralShareModal
-        isOpen={referral.phase === 'open'}
-        onClose={handleReferralClose}
-        referralLink={referral.phase === 'open' ? referral.link : ''}
-        source={referral.phase === 'open' ? referral.source : undefined}
-        rewardXp={referral.phase === 'open' ? referral.rewardXp : undefined}
-      />
+      {celebrationMounted && (
+        <AchievementCelebrationModalLazy
+          celebration={shownCelebration}
+          onClose={handleClose}
+          onInvitePeers={handleInvitePeers}
+        />
+      )}
+      {referralMounted && (
+        <ReferralShareModalLazy
+          isOpen={referral.phase === 'open'}
+          onClose={handleReferralClose}
+          referralLink={referral.phase === 'open' ? referral.link : ''}
+          source={referral.phase === 'open' ? referral.source : undefined}
+          rewardXp={referral.phase === 'open' ? referral.rewardXp : undefined}
+        />
+      )}
     </>
   )
 }

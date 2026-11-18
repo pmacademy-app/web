@@ -2,7 +2,8 @@ import React from 'react';
 import { BlockProps } from '../../renderer/registry';
 
 export default function MermaidBlock({ block }: BlockProps) {
-  const svg = typeof block.svg === 'string' ? block.svg : typeof block.staticSvg === 'string' ? block.staticSvg : '';
+  // The compiler emits only `svg`; the lesson page strips the legacy `staticSvg` duplicate.
+  const svg = typeof block.svg === 'string' ? block.svg : '';
 
   // Diagrams are pre-rendered to static SVG at content:compile time. Raw Mermaid
   // source must never reach the browser, so there is no source-fallback path here.

@@ -98,7 +98,6 @@ export async function mdastToBlocks(nodes: any[], lessonId: string): Promise<any
           normalized,
           authorTheme,
           svg,
-          staticSvg: svg,
         };
         block.blockId = generateBlockId(lessonId, block);
         // Sync ID of mermaid block

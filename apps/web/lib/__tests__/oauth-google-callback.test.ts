@@ -133,6 +133,7 @@ function expectOAuthCookiesCleared(res: Response & { cookies: { get(n: string): 
 function expectNoSession(res: Response & { cookies: { get(n: string): { value: string } | undefined } }) {
   expect(res.cookies.get('sb-access-token')?.value).toBeFalsy()
   expect(res.cookies.get('sb-refresh-token')?.value).toBeFalsy()
+  expect(res.cookies.get('prodily_signed_in')?.value).toBeFalsy()
 }
 
 describe('auth/callback: Google OAuth', () => {
@@ -270,6 +271,8 @@ describe('auth/callback: Google OAuth', () => {
     expect(res.headers.get('location')).toBe(`${ORIGIN}/learn/module-2`)
     expect(res.cookies.get('sb-access-token')?.value).toBe('at_g')
     expect(res.cookies.get('sb-refresh-token')?.value).toBe('rt_g')
+    // Perf plan item 7: the readable signed-in hint is set with the session.
+    expect(res.cookies.get('prodily_signed_in')?.value).toBe('1')
     expectOAuthCookiesCleared(res)
 
     // New vs existing was decided before ensureUserProfile.

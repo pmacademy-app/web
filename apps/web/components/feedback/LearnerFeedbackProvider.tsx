@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useUsageTimeTracker } from '@/hooks/useUsageTimeTracker'
-import { ContextualFeedbackModal } from './ContextualFeedbackModal'
+import { ContextualFeedbackModalLazy, useOpenedOnce } from '@/components/layout/lazy-modals'
 
 /**
  * Contextual feedback prompts are triggered by three sources:
@@ -49,8 +49,12 @@ export function LearnerFeedbackProvider() {
     return () => window.removeEventListener('learner:feedback:prompt', handlePromptEvent)
   }, [])
 
+  // The listeners above stay eager; the modal's code downloads on its first prompt.
+  const modalMounted = useOpenedOnce(modalOpen)
+  if (!modalMounted) return null
+
   return (
-    <ContextualFeedbackModal
+    <ContextualFeedbackModalLazy
       isOpen={modalOpen}
       promptKey={promptKey}
       title={title}

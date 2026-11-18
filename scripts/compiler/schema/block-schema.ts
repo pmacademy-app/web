@@ -195,7 +195,6 @@ const mermaidBlockSchema = z.object({
   normalized: z.string(),
   authorTheme: z.record(z.string()).optional(),
   svg: z.string().optional(),
-  staticSvg: z.string().optional(),
 });
 
 // Future block types

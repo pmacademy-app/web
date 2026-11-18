@@ -104,7 +104,8 @@ export interface ApiClientProviderProps {
 /**
  * SWR configuration provider for the Prodily application.
  *
- * Establishes global deduplication, focus revalidation, and failure retry boundaries.
+ * Establishes global deduplication, failure retry boundaries, and no focus revalidation
+ * unless a call site asks for it.
  */
 export function ApiClientProvider({ children, value }: ApiClientProviderProps) {
   return React.createElement(
@@ -112,7 +113,10 @@ export function ApiClientProvider({ children, value }: ApiClientProviderProps) {
     {
       value: {
         fetcher: apiFetcher,
-        revalidateOnFocus: true,
+        // Off by default (perf plan item 6): a tab switch used to refetch every query on the
+        // page. Data that really changes in another tab opts back in at its call site
+        // (the notification bell, lesson progress, the admin consoles).
+        revalidateOnFocus: false,
         dedupingInterval: 2000,
         shouldRetryOnError: defaultShouldRetryOnError,
         ...value,

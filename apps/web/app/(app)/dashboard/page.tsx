@@ -67,12 +67,17 @@ export default async function DashboardPage() {
   // requests instead of each issuing their own. A Supabase builder re-runs its request every time
   // it is awaited, so each is wrapped once in a real Promise (Promise.resolve calls then() once).
   const profilePromise = getCurrentUserProfile()
+  // A failed progress read throws (CQ-07) instead of standing in as "no lessons": the review
+  // queue reuses these rows, and it must never show every card as locked on a DB blip.
   const progressPromise = Promise.resolve(
     supabase
       .from('user_lesson_progress')
       .select('lesson_id, status, quiz_score, quiz_attempts')
       .eq('user_id', authUser.id),
-  ).then(({ data }) => data ?? [])
+  ).then(({ data, error }) => {
+    if (error) throw new Error(`[dashboard] user_lesson_progress read failed: ${error.message}`, { cause: error })
+    return data ?? []
+  })
   const capstonesPromise = Promise.resolve(
     supabase.from('capstone_submissions').select('id, module_slug, status, is_public').eq('user_id', authUser.id),
   ).then(({ data }) => data ?? [])
@@ -105,7 +110,9 @@ export default async function DashboardPage() {
     progressPromise,
     fetchCurriculumData(),
     // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
-    getUserStreakStatus(supabase, authUser.id).catch((err) => {
+    // Perf item 8: the streak and review loaders reuse the profile and progress rows read above
+    // instead of re-reading `users` (twice) and `user_lesson_progress`.
+    getUserStreakStatus(supabase, authUser.id, { profile: profilePromise }).catch((err) => {
       after(() =>
         logSystemError({
           severity: 'error',
@@ -117,7 +124,7 @@ export default async function DashboardPage() {
       )
       return notStartedStreakStatus()
     }),
-    getReviewQueueData(supabase, authUser.id),
+    getReviewQueueData(supabase, authUser.id, { profile: profilePromise, progressRows: progressPromise }),
     capstonesPromise,
     (supabase
       .from('xp_events') as unknown as DBChain)

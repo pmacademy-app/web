@@ -34,10 +34,14 @@ export const GET = withRoute(
   },
   async ({ request, actor }) => {
   const userId = requireUserId(actor)
+  const { searchParams } = new URL(request.url)
+  // `summary=1`: the bell's poll. Only the unread count, from one head count query.
+  const summaryOnly = searchParams.get('summary') === '1'
 
   // Feature flag check
   const inAppEnabled = await globalFeatureFlagService.isEnabledAsync('IN_APP_NOTIFICATIONS_ENABLED')
   if (!inAppEnabled) {
+    if (summaryOnly) return NextResponse.json({ success: true, unreadCount: 0 })
     return NextResponse.json({
       success: true,
       ...paginated([], { limit: DEFAULT_PAGE_SIZE, offset: 0 }, 0),
@@ -47,7 +51,23 @@ export const GET = withRoute(
     })
   }
 
-  const { searchParams } = new URL(request.url)
+  const supabase = createServiceRoleClient()
+  const unreadCountQuery = () =>
+    supabase
+      .from('in_app_notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_read', false)
+
+  if (summaryOnly) {
+    const unreadResult = await unreadCountQuery()
+    // Same rule as the full read: a failed count is a 500, never a quiet bell.
+    if (unreadResult.error) {
+      throw new Error(`notifications unread count failed: ${unreadResult.error.message}`)
+    }
+    return NextResponse.json({ success: true, unreadCount: unreadResult.count ?? 0 })
+  }
+
   const category = searchParams.get('category')
   const unreadOnly = searchParams.get('unreadOnly') === 'true'
   // B13-B: the shared contract. `page` is still accepted so an already-deployed client
@@ -62,11 +82,11 @@ export const GET = withRoute(
     offset: searchParams.get('offset') ?? legacyOffsetFromPage,
   })
 
-  const supabase = createServiceRoleClient()
-
+    // No exact count: the drawer reads items and grouped only, and the pagination contract
+    // allows a null total (hasMore then comes from the page size).
     let query = supabase
       .from('in_app_notifications')
-      .select('id, user_id, category, title, body, action_url, secondary_action, priority, is_read, created_at', { count: 'exact' })
+      .select('id, user_id, category, title, body, action_url, secondary_action, priority, is_read, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -82,16 +102,9 @@ export const GET = withRoute(
     query = query.range(from, to)
 
     // Execute item query and unread count query concurrently in parallel
-    const [itemsResult, unreadResult] = await Promise.all([
-      query,
-      supabase
-        .from('in_app_notifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('is_read', false),
-    ])
+    const [itemsResult, unreadResult] = await Promise.all([query, unreadCountQuery()])
 
-    const { data: items, count, error } = itemsResult
+    const { data: items, error } = itemsResult
     const unreadCount = unreadResult.count
 
     // A failed read is a fault, not an empty inbox: answering "no notifications"
@@ -124,7 +137,7 @@ export const GET = withRoute(
 
     return NextResponse.json({
       success: true,
-      ...paginated(formattedItems, page, count),
+      ...paginated(formattedItems, page),
       unreadCount: unreadCount || formattedItems.filter((i) => !i.isRead).length,
       grouped,
     })

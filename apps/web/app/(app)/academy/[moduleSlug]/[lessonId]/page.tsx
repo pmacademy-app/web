@@ -22,6 +22,7 @@ import { resolveLessonAccessForUser } from '@/lib/lessons-completion-service'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { getRecutVariant } from '@/lib/academy/experiment'
 import { withSampledQuiz } from '@/lib/academy/lesson-structure'
+import { toClientLesson } from '@/lib/academy/client-lesson'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { getModuleTitle } from '@/lib/curriculum/module-meta'
@@ -296,6 +297,9 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     recutVariant === 'treatment'
       ? withSampledQuiz(lesson, `${user?.id ?? 'anon'}:${lessonId}`)
       : lesson
+  // Performance plan item 1: drop server-only fields (Mermaid source, duplicate staticSvg,
+  // search text, source path) so they are not serialized into the client payload.
+  const clientLesson = toClientLesson(renderedLesson)
 
   // 7. Render lesson content via the v2 client shell
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
@@ -339,7 +343,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         />
       )}
       <LessonPageContent
-        lesson={renderedLesson}
+        lesson={clientLesson}
         prevLessonUrl={prevLessonUrl}
         nextLessonUrl={nextLessonUrl}
         nextLessonTitle={nextMeta?.title ?? null}

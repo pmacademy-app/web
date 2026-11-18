@@ -175,10 +175,35 @@ export async function resolveLessonAccessForUser(
       .eq('user_id', userId),
   ])
 
-  const rows = (progressRows ?? []) as { lesson_id: string; status: string }[]
+  return resolveLessonAccessFromRows(lessonId, {
+    ...opts,
+    override: Boolean(user?.curriculum_access_override),
+    progressRows: progressRows ?? [],
+  })
+}
+
+export interface LessonProgressStatusRow {
+  lesson_id: string
+  status: string
+}
+
+/**
+ * The decision half of resolveLessonAccessForUser, for a caller that already loaded the
+ * learner's override flag and progress rows (the quiz submit path reuses them afterwards).
+ */
+export function resolveLessonAccessFromRows(
+  lessonId: string,
+  opts: {
+    curriculum: Pick<CurriculumEntry, 'id' | 'module'>[]
+    treatment: boolean
+    index?: CurriculumModuleIndex
+    override: boolean
+    progressRows: readonly LessonProgressStatusRow[]
+  }
+): LessonAccessInfo {
   const completedIds = new Set<string>()
   const openedIds = new Set<string>()
-  for (const r of rows) {
+  for (const r of opts.progressRows) {
     openedIds.add(r.lesson_id) // any row means the learner has opened/started this lesson
     if (r.status === 'completed') completedIds.add(r.lesson_id)
   }
@@ -189,7 +214,7 @@ export async function resolveLessonAccessForUser(
     completedIds,
     openedIds,
     treatment: opts.treatment,
-    override: Boolean(user?.curriculum_access_override),
+    override: opts.override,
   })
 }
 

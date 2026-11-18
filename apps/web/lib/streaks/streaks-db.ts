@@ -157,11 +157,35 @@ export function notStartedStreakStatus(): StreakStatusSummary {
   }
 }
 
-export async function getUserStreakStatus(
+/** The `users` columns getUserStreakStatus reads. A full profile row satisfies it. */
+export type StreakProfileRow = Pick<
+  Database['public']['Tables']['users']['Row'],
+  'timezone' | 'current_streak' | 'longest_streak' | 'streak_freezes_available' | 'last_streak_date'
+>
+
+export interface StreakStatusOptions {
+  /**
+   * The learner's profile row when the caller already loads it (the dashboard does). `null`
+   * means "no row yet" and yields the not-started summary; a rejected promise counts as a
+   * failed read and throws (CQ-01). Omit it to read the row here.
+   */
+  profile?: StreakProfileRow | null | PromiseLike<StreakProfileRow | null>
+}
+
+async function readStreakProfile(
   supabase: SupabaseClient<Database>,
-  userId: string
-): Promise<StreakStatusSummary> {
-  const { data: userProfile, error: profileError } = await supabase
+  userId: string,
+  options: StreakStatusOptions | undefined
+): Promise<StreakProfileRow | null> {
+  if (options?.profile !== undefined) {
+    try {
+      return await options.profile
+    } catch (err) {
+      throw new Error('Streak profile read failed: ' + (err instanceof Error ? err.message : String(err)), { cause: err })
+    }
+  }
+
+  const { data, error } = await supabase
     .from('users')
     .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
     .eq('id', userId)
@@ -169,9 +193,18 @@ export async function getUserStreakStatus(
 
   // CQ-01: a failed read must not look like a learner with no streak. Callers
   // decide how to degrade; a genuinely missing row is still "not started".
-  if (profileError) {
-    throw new Error('Streak profile read failed: ' + profileError.message)
+  if (error) {
+    throw new Error('Streak profile read failed: ' + error.message)
   }
+  return data
+}
+
+export async function getUserStreakStatus(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  options?: StreakStatusOptions
+): Promise<StreakStatusSummary> {
+  const userProfile = await readStreakProfile(supabase, userId, options)
   if (!userProfile) {
     return notStartedStreakStatus()
   }

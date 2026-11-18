@@ -6,7 +6,7 @@ import Topbar from './Topbar'
 import { MobileTabBar } from './MobileTabBar'
 import { SystemAnnouncementBanner } from './SystemAnnouncementBanner'
 import { SearchOverlayProvider } from '@/components/search/SearchOverlayProvider'
-import { SearchOverlay } from '@/components/search/SearchOverlay'
+import { SearchOverlayHost } from './lazy-modals'
 import { LearnerFeedbackProvider } from '@/components/feedback/LearnerFeedbackProvider'
 
 interface AppShellProps {
@@ -111,8 +111,8 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
       {/* Native App-like Mobile Bottom Navigation Tab Bar */}
       <MobileTabBar onOpenMenu={() => setIsSidebarOpen(true)} />
 
-      {/* Search Overlay — mounted at shell level, lazy index loaded on first open */}
-      <SearchOverlay />
+      {/* Search overlay: its code and index load on first open (preloaded on intent, see the host) */}
+      <SearchOverlayHost />
       <LearnerFeedbackProvider />
     </SearchOverlayProvider>
   )

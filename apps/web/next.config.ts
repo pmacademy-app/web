@@ -11,6 +11,11 @@ const nextConfig = {
   // Optimise production builds
   poweredByHeader: false,
 
+  // React Compiler (performance plan item 4): automatic memoization of client components.
+  // Runs through babel-plugin-react-compiler (devDependency). Opt a component out with
+  // the 'use no memo' directive if it misbehaves.
+  reactCompiler: true,
+
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],

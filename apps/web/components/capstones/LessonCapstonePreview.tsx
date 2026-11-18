@@ -40,7 +40,7 @@ export function LessonCapstonePreview({ moduleSlug, className = '' }: LessonCaps
   const definition = getCapstoneForModule(moduleSlug)
   // Only modules that actually have a capstone definition get a preview.
   const endpoint = definition ? `/api/capstones/${encodeURIComponent(definition.moduleSlug)}` : null
-  const { data } = useApiQuery<CapstoneModuleResponse>(endpoint)
+  const { data } = useApiQuery<CapstoneModuleResponse>(endpoint, { revalidateOnFocus: false })
 
   if (!definition) return null
 

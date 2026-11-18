@@ -218,8 +218,7 @@ const validationRules: ValidationRule[] = [
         for (const block of blocks) {
           if (block.type === 'mermaid' && typeof block.source === 'string') {
             const hasSvg = typeof block.svg === 'string' && block.svg.length > 0;
-            const hasStaticSvg = typeof block.staticSvg === 'string' && block.staticSvg.length > 0;
-            if (!hasSvg && !hasStaticSvg) {
+            if (!hasSvg) {
               issues.push({
                 id: 'mermaid-svg',
                 severity: 'error',

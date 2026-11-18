@@ -353,7 +353,7 @@ export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbac
       tags?: string[]
       comment?: string | null
     }
-  }>(endpoint)
+  }>(endpoint, { revalidateOnFocus: false })
 
   if (!endpoint) return null
 

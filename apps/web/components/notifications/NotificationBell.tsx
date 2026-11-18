@@ -5,13 +5,9 @@ import { Bell } from 'lucide-react'
 import { NotificationCenterDrawer } from './NotificationCenterDrawer'
 import { subscribeClientNotificationEvent } from '@/lib/events/client-event-bus'
 import { useApiQuery } from '@/lib/api/hooks'
+import { NOTIFICATIONS_SUMMARY_KEY, type NotificationsSummaryResponse } from './notifications-summary'
 
 const NOTIFICATION_POLL_INTERVAL_MS = 300000 // 5 minutes background heartbeat
-
-interface NotificationsSummaryResponse {
-  success: boolean
-  unreadCount: number
-}
 
 export function NotificationBell() {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
@@ -19,7 +15,7 @@ export function NotificationBell() {
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
 
   const { data, mutate } = useApiQuery<NotificationsSummaryResponse>(
-    '/api/notifications?limit=1',
+    NOTIFICATIONS_SUMMARY_KEY,
     {
       refreshInterval: drawerOpen ? 0 : NOTIFICATION_POLL_INTERVAL_MS,
       revalidateOnFocus: true,
