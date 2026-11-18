@@ -1,8 +1,20 @@
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { AvatarService, MAX_AVATAR_SIZE_BYTES, ALLOWED_AVATAR_MIME_TYPES } from '@/lib/avatar/avatar-service'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
+
+/**
+ * The avatar shows on the cached public portfolio (ISR, 1 hour) and the cached weekly
+ * leaderboard (5 minutes), so a change purges both. Best-effort: both helpers never throw.
+ */
+async function purgeAvatarCaches(userId: string): Promise<void> {
+  invalidateLeaderboardCache('max')
+  await revalidatePublicPortfolioForUser(createServiceRoleClient(), userId)
+}
 
 /** Reads the image type from the file signature: PNG, JPEG or WebP, otherwise null. */
 function sniffImageMimeType(bytes: Uint8Array): 'image/png' | 'image/jpeg' | 'image/webp' | null {
@@ -86,12 +98,14 @@ export const POST = withRoute(
       throw new RouteError(400, 'VALIDATION', 'File content does not match a supported image format (PNG, JPG, WebP).')
     }
 
+    const userId = requireUserId(actor)
     const result = await AvatarService.uploadAndSetUserAvatar({
-      userId: requireUserId(actor),
+      userId,
       fileBuffer,
       mimeType: sniffedType,
       fileName,
     })
+    await purgeAvatarCaches(userId)
 
     return Response.json({ success: true, avatarUrl: result.avatarUrl }, { status: 200 })
   }
@@ -105,7 +119,9 @@ export const DELETE = withRoute(
     errorMessage: 'An error occurred while removing avatar.',
   },
   async ({ actor }) => {
-    await AvatarService.removeUserAvatar(requireUserId(actor))
+    const userId = requireUserId(actor)
+    await AvatarService.removeUserAvatar(userId)
+    await purgeAvatarCaches(userId)
     return Response.json({ success: true, message: 'Avatar removed successfully.' }, { status: 200 })
   }
 )

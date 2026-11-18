@@ -214,7 +214,40 @@ The Phase 3 dead-code audit ([`DEAD_CODE_AUDIT.md`](DEAD_CODE_AUDIT.md)) flagged
 
 ---
 
-## 4. Related
+## 4. Quiz receipts
+
+`POST /api/v2/lessons/[lessonId]/quiz/check` reveals a question's correct option after the
+learner commits an answer (one check per learner, attempt and question). So that the reveal
+cannot change the score, the check response also carries `receipt`: an HMAC-SHA256 signed
+record of the checked answer (`lib/academy/quiz-receipts.ts`). The format is
+`<payload>.<signature>`, both base64url, where the payload is the JSON
+`{u, l, q, a, t, iat}` (user id, lesson id, question id, answer index, attempt id, issued-at
+in Unix seconds). Receipts expire after 24 hours.
+
+The quiz block sends `{ attempts, attemptId, receipts }` to `POST .../quiz`. For every
+question with a valid receipt for this learner, lesson and attempt, the submit scores the
+receipt's answer and ignores the submitted one. Questions without a receipt are scored from
+the submitted answer (offline fallback, older clients). A receipt that fails verification
+(bad signature, another learner, lesson or attempt, expired, or conflicting with another
+receipt for the same question) is ignored and withholds the first-attempt perfect bonus; a
+warning with the user id only is logged. The perfect bonus also needs a valid receipt for
+every submitted question, so leaving receipts out still scores but never earns the bonus.
+Known limit: such a submission still counts toward completion and normal quiz XP; closing
+that fully needs a server-side record of each check.
+
+**Secret:** `QUIZ_RECEIPT_SECRET`, a random string of at least 32 bytes
+(`openssl rand -base64 48`), server only, never prefixed with `NEXT_PUBLIC_`. Rotating it
+invalidates receipts issued before the rotation, which costs a learner mid-quiz at most the
+perfect bonus for that attempt.
+
+**Without the secret** (unset, or shorter than 32 characters) receipts are off: the check
+route returns no `receipt`, the submit ignores any receipts and scores the submitted answers
+exactly as before, and one warning is logged per server process. The site keeps working
+until the variable is added in Vercel.
+
+---
+
+## 5. Related
 
 - `apps/web/lib/api/pagination.ts` — the implementation
 - `apps/web/lib/__tests__/b13b-pagination-contract.test.ts` — the tests, including the

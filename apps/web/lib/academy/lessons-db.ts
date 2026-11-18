@@ -397,12 +397,16 @@ async function loadQuizForWrite(lessonId: string) {
  * The learner quiz submission path (POST /api/v2/lessons/[lessonId]/quiz). SEC-08: the
  * answers must cover exactly the quiz the learner was served, each question once, and the
  * lesson must be open to the learner. Every check runs before any write.
+ *
+ * `denyPerfectBonus` withholds the first-attempt perfect bonus (the route sets it when a
+ * submission carries an invalid or forged quiz receipt, lib/academy/quiz-receipts.ts).
  */
 export async function submitQuizAttempt(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonId: string,
-  attempts: QuizAnswer[]
+  attempts: QuizAnswer[],
+  options: { denyPerfectBonus?: boolean } = {}
 ) {
   const { lesson, pool } = await loadQuizForWrite(lessonId)
   const scored = scoreQuizSubmission(pool, getServedQuizQuestions(pool, userId, lessonId), attempts, {
@@ -416,6 +420,7 @@ export async function submitQuizAttempt(
     xpConfig,
     progressRows: access.progressRows,
     contact: access.contact,
+    denyPerfectBonus: options.denyPerfectBonus === true,
   })
 }
 
@@ -518,6 +523,8 @@ interface QuizPrefetch {
   /** Progress rows read before the RPC, or null when that read failed. */
   progressRows?: LessonProgressStatusRow[] | null
   contact?: LearnerContact
+  /** Passes a zero perfect bonus to the RPC (a submission with an invalid quiz receipt). */
+  denyPerfectBonus?: boolean
 }
 
 /**
@@ -580,7 +587,7 @@ async function recordScoredQuizAttempt(
     p_total_questions: totalQuestions,
     p_attempts: validatedAttempts as Json,
     p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
-    p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
+    p_quiz_perfect_bonus_xp: prefetched.denyPerfectBonus ? 0 : xpConfig.QUIZ_PERFECT_BONUS,
   })
 
   if (rpcError) {

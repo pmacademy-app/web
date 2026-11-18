@@ -3,6 +3,7 @@
 import { useCallback } from 'react'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPatch, apiPost } from '@/lib/api/client'
+import type { QuizSubmitProof } from '@/blocks/quiz/check-answer'
 
 export interface LessonProgressV2 {
   status: 'not_started' | 'in_progress' | 'completed'
@@ -94,12 +95,14 @@ export function useLessonProgressV2(lessonId: string, initialProgress?: LessonPr
 
   const recordQuizAttempt = useCallback(
     async (
-      attempts: { question_id: string; selected_option: number; is_correct: boolean }[]
+      attempts: { question_id: string; selected_option: number; is_correct: boolean }[],
+      proof?: QuizSubmitProof
     ): Promise<QuizAttemptApiResponse> => {
       const nowIso = new Date().toISOString()
+      // Check receipts make the server score each checked question as it was checked.
       const res = await apiPost<QuizAttemptApiResponse>(
         `/api/v2/lessons/${lessonId}/quiz`,
-        { attempts }
+        proof ? { attempts, attemptId: proof.attemptId, receipts: proof.receipts } : { attempts }
       )
       if (!res.ok) {
         throw new Error(res.error.message)

@@ -12,11 +12,13 @@ import { createRoot, type Root } from 'react-dom/client'
 // Quiz answers are not in the lesson payload (lib/academy/client-lesson.ts). On the learner
 // lesson page QuizBlock checks each committed answer with POST .../quiz/check and shows the
 // result from the response; offline it reveals nothing and offers a retry; a 429 (already
-// checked in this attempt) is "answer saved", not a crash. The final submit is unchanged.
+// checked in this attempt) is "answer saved", not a crash. The final submit carries the
+// attempt id and any check receipts, so the server scores each checked question as checked.
 
 import QuizBlock from '@/blocks/quiz/QuizBlock'
 import { LessonContextProvider, type QuizAttempt } from '@/contexts/lesson-context'
 import type { BlockProps } from '@/renderer/registry'
+import type { QuizSubmitProof } from '@/blocks/quiz/check-answer'
 
 const LESSON = 'les_test01'
 
@@ -34,7 +36,7 @@ const EXPLANATIONS: Record<string, string> = {
 let container: HTMLDivElement
 let root: Root
 let fetchMock: ReturnType<typeof vi.fn>
-let onQuizComplete: ReturnType<typeof vi.fn<(attempts: QuizAttempt[]) => Promise<unknown>>>
+let onQuizComplete: ReturnType<typeof vi.fn<(attempts: QuizAttempt[], proof?: QuizSubmitProof) => Promise<unknown>>>
 
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
@@ -107,7 +109,7 @@ beforeEach(() => {
   vi.spyOn(Math, 'random').mockReturnValue(0.999)
   fetchMock = vi.fn(honestServer())
   vi.stubGlobal('fetch', fetchMock)
-  onQuizComplete = vi.fn<(attempts: QuizAttempt[]) => Promise<unknown>>(async () => ({ correctCount: 1, totalQuestions: 2, scorePercentage: 50, xpEarned: 10 }))
+  onQuizComplete = vi.fn<(attempts: QuizAttempt[], proof?: QuizSubmitProof) => Promise<unknown>>(async () => ({ correctCount: 1, totalQuestions: 2, scorePercentage: 50, xpEarned: 10 }))
   container = document.createElement('div')
   document.body.appendChild(container)
   root = createRoot(container)
@@ -177,6 +179,51 @@ describe('QuizBlock server answer check', () => {
     expect(ids[0]).toBe(ids[1])
     expect(ids[2]).not.toBe(ids[0])
     expect(container.textContent).toContain('Correct!')
+  })
+
+  it('sends the attempt id and the check receipts with the submit, and starts fresh after Retry Quiz', async () => {
+    const honest = honestServer()
+    fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+      const res = await honest(url, init)
+      if (res.status !== 200) return res
+      const body = (await res.json()) as Record<string, unknown>
+      const sent = JSON.parse(String(init?.body)) as { questionId: string; answer: number }
+      return jsonResponse(200, { ...body, receipt: `rcpt-${sent.questionId}-${sent.answer}` })
+    })
+    renderQuiz()
+    await answer(2)
+    act(() => buttonByText('Next Question').click())
+    await answer(0)
+    act(() => buttonByText('Finish Quiz').click())
+    await flush()
+
+    const attemptId = checkCalls()[0].body.attemptId
+    expect(onQuizComplete).toHaveBeenCalledTimes(1)
+    expect(onQuizComplete.mock.calls[0][1]).toEqual({
+      attemptId,
+      receipts: [`rcpt-${QUESTIONS[0].id}-2`, `rcpt-${QUESTIONS[1].id}-0`],
+    })
+    // The answer payload is still sent alongside.
+    expect(onQuizComplete.mock.calls[0][0].map((a) => a.selected_option)).toEqual([2, 0])
+
+    act(() => buttonByText('Retry Quiz').click())
+    await answer(1)
+    act(() => buttonByText('Next Question').click())
+    await answer(1)
+    act(() => buttonByText('Finish Quiz').click())
+    await flush()
+
+    const retry = onQuizComplete.mock.calls[1][1] as { attemptId: string; receipts: string[] }
+    expect(retry.attemptId).not.toBe(attemptId)
+    expect(retry.receipts).toEqual([`rcpt-${QUESTIONS[0].id}-1`, `rcpt-${QUESTIONS[1].id}-1`])
+  })
+
+  it('submits no receipts when the server issues none', async () => {
+    renderQuiz([QUESTIONS[0]])
+    await answer(0)
+    act(() => buttonByText('Finish Quiz').click())
+    await flush()
+    expect(onQuizComplete.mock.calls[0][1]).toEqual({ attemptId: checkCalls()[0].body.attemptId, receipts: [] })
   })
 
   it('reveals nothing when offline and lets the learner retry', async () => {

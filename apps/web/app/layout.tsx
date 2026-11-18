@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
 import { ConsentGatedAnalytics } from '@/components/legal/ConsentGatedAnalytics'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -157,6 +158,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Vercel Web Analytics (cookieless, no identifiers) */}
         <Analytics />
+
+        {/* Vercel Speed Insights: real-visitor Core Web Vitals, cookieless, no identifiers.
+            Collects nothing until Speed Insights is enabled for the project in Vercel. */}
+        <SpeedInsights />
 
         <CookieConsentBanner />
       </body>

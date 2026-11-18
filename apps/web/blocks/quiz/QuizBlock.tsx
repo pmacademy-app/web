@@ -92,6 +92,9 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
   // Bumped on every check and on reset, so a late response for an old question is ignored.
   const checkSeqRef = useRef(0);
   const [correctCount, setCorrectCount] = useState(0);
+  // Signed receipts from the check route for this attempt, sent with the submit so each
+  // checked question is scored as checked.
+  const receiptsRef = useRef<string[]>([]);
   // Ref mirrors attempts state for reliable access in async callbacks
   const attemptsRef = useRef<{ question_id: string; selected_option: number; is_correct: boolean }[]>([]);
 
@@ -132,6 +135,7 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
   const handleReset = () => {
     checkSeqRef.current += 1;
     attemptIdRef.current = null;
+    receiptsRef.current = [];
     setCurrentIndex(0);
     setSelectedOption(null);
     setAnswerResult(null);
@@ -220,6 +224,7 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
         }
         const moveFocus = focusWasInside || focusIsInside(quizRootRef.current);
         if (outcome.kind === 'revealed') {
+          if (outcome.reveal.receipt) receiptsRef.current = [...receiptsRef.current, outcome.reveal.receipt];
           applyResult(outcome.reveal, moveFocus);
         } else {
           applyResult({ correct: null, correctAnswer: null, explanation: '' }, moveFocus);
@@ -244,8 +249,12 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
         setSubmitting(true);
         setServerXp(null);
         setServerScore(null);
+        const attemptId = attemptIdRef.current;
         lessonCtx
-          .onQuizComplete(attemptsRef.current)
+          .onQuizComplete(
+            attemptsRef.current,
+            attemptId ? { attemptId, receipts: receiptsRef.current } : undefined
+          )
           .then((result) => {
             setServerXp(readServerXp(result));
             setServerScore(readServerScore(result));
