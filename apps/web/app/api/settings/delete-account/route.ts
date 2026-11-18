@@ -5,6 +5,8 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { deleteAccount } from '@/lib/settings/settings-service'
 import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
 
 export const POST = withRoute(
   {
@@ -29,6 +31,17 @@ export const POST = withRoute(
 
     // Use service-role client for admin operations (bypasses RLS, has auth.admin access)
     const supabase = createServiceRoleClient()
+
+    // The handle whose cached public pages must be purged once the account is gone. Read first,
+    // because the row cascades away with the auth user. Best-effort: a failed read only costs the
+    // purge (the pages then expire within the hour), never the deletion.
+    let username: string | null = null
+    try {
+      const { data } = await supabase.from('users').select('username').eq('id', userId).maybeSingle()
+      username = data?.username ?? null
+    } catch {
+      username = null
+    }
 
     // 1. Delete the Supabase Auth user first. This is what stops the login working,
     //    and `public.users` plus every user-owned table cascade from it. If it fails,
@@ -61,6 +74,10 @@ export const POST = withRoute(
         userId,
       })
     }
+
+    // The cached portfolio and leaderboard must stop showing the deleted learner.
+    revalidatePublicPortfolio(username)
+    invalidateLeaderboardCache({ expire: 0 })
 
     // 3. Clear session cookies from the response so the browser is immediately logged out
     const response = NextResponse.json({ success: true })

@@ -12,6 +12,7 @@
  * `.in()` filter, which fails on URL length as the user base grows.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { installDataCacheFake } from './helpers/data-cache-fake'
 
 const mockLogErrorReport = vi.fn()
 
@@ -69,7 +70,7 @@ function createChain(table: string) {
 
 const supabase: any = { from: vi.fn((table: string) => createChain(table)) }
 
-/** The module holds a 45s cache keyed by week start; re-import for a clean one. */
+/** Re-imported per test so the in-flight and failure maps start empty. */
 async function loadModule() {
   vi.resetModules()
   return import('../leaderboard-db')
@@ -250,7 +251,7 @@ describe('bounded aggregation (F-COR-4)', () => {
     await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
     expect(mockLogErrorReport).toHaveBeenCalledTimes(1)
 
-    // Recover, then ask again inside the 45s TTL. A cached failure would pin the
+    // Recover, then ask again inside the cache window. A cached failure would pin the
     // zeroed board; a non-cached one re-queries and returns the real number.
     tableErrors = {}
     const payload = await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
@@ -259,6 +260,7 @@ describe('bounded aggregation (F-COR-4)', () => {
 
   it('caches a complete board so the second call issues no further queries', async () => {
     const { getWeeklyLeaderboard } = await loadModule()
+    await installDataCacheFake()
     await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
     const rangeCountAfterFirst = rangeCalls.users.length
 

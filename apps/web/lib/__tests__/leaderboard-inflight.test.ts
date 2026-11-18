@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+import { installDataCacheFake } from './helpers/data-cache-fake'
 
 const mockLogErrorReport = vi.fn()
 vi.mock('@/lib/monitoring/logger', () => ({
@@ -199,6 +200,7 @@ describe('weekly leaderboard negative cache for failed rebuilds', () => {
 
   it('does not flag a healthy build, fresh or served from the cache', async () => {
     const { getWeeklyLeaderboard } = await loadModule()
+    await installDataCacheFake()
 
     const fresh = await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
     now += 1_000
@@ -226,8 +228,9 @@ describe('weekly leaderboard negative cache for failed rebuilds', () => {
     expect(recovered.personalEntry?.daysStudied).toBe(1)
   })
 
-  it('still serves a complete board from the 45s cache without new queries', async () => {
+  it('serves a complete board from the data cache without new queries', async () => {
     const { getWeeklyLeaderboard } = await loadModule()
+    await installDataCacheFake()
     await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
     now += 30_000
     await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)

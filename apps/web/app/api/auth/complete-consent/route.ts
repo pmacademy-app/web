@@ -130,6 +130,21 @@ export const POST = withRoute(
         }
       }
 
+      // Every branch above ends with consent on the profile row. Mirror it into the signed
+      // app_metadata claim so the proxy can skip its per-request profile read (perf plan
+      // item 16). GoTrue merges app_metadata keys, so provider data is kept. Best effort:
+      // without the claim the proxy reads the row, which now carries consent, so a failure
+      // here costs one query per request and nothing else. The current access token gains
+      // the claim on its next refresh; this route does not rotate the session itself.
+      try {
+        const { error: claimError } = await admin.auth.admin.updateUserById(userId, {
+          app_metadata: { terms_accepted: true },
+        })
+        if (claimError) log.warn('auth.consent.claim_update_failed', { userId })
+      } catch (err) {
+        log.warnException('auth.consent.claim_update_failed', err, { userId })
+      }
+
       log.info('auth.consent.accepted', { userId })
       return NextResponse.json({ success: true, redirect: sanitizeNextPath(body.next) })
     }

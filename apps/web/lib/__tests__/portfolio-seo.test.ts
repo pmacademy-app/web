@@ -47,7 +47,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
         if (table === 'users') {
           return {
             select: vi.fn(() => ({
-              ilike: vi.fn(() => ({
+              eq: vi.fn(() => ({
                 limit: vi.fn(async () => {
                   if (userData === null) {
                     return { data: [], error: null }

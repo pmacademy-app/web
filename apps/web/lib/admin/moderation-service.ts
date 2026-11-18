@@ -581,8 +581,8 @@ export class ModerationService {
         // Revalidation error is non-fatal
       }
 
-      // A review can publish or unpublish the capstone: its public page renders per request, but
-      // its OG card is cached, so drop it (Growth R5 B13b). The portfolio card shows the public
+      // A review can publish or unpublish the capstone: its public page and its OG card are both
+      // cached, so drop them (Growth R5 B13b, perf plan item 13). The portfolio card shows the public
       // project count, so it goes too.
       if (current.user_id) {
         try {
@@ -596,6 +596,9 @@ export class ModerationService {
             )
             revalidateCapstoneOgCards(owner.username, [current.module_slug])
             revalidatePortfolioOgCard(owner.username)
+            // The public portfolio and capstone pages are cached too (perf plan item 13).
+            const { revalidatePublicPortfolio } = await import('@/lib/portfolio-revalidate')
+            revalidatePublicPortfolio(owner.username, [current.module_slug])
           }
         } catch {
           // Non-fatal, like the revalidation above.

@@ -11,12 +11,8 @@
  * narrows it incorrectly fails here rather than in the usage dashboard.
  */
 import { describe, it, expect } from 'vitest'
-import { config as proxyConfig } from '../../proxy'
-
-/** Applies the deployed matcher exactly as Next.js does: full-path regex match. */
-function entersProxy(pathname: string): boolean {
-  return proxyConfig.matcher.some((pattern) => new RegExp(`^${pattern}$`).test(pathname))
-}
+// Applies the deployed matcher exactly as Next.js does, has/missing conditions included.
+import { entersProxy, SIGNED_IN } from './helpers/proxy-matcher'
 
 describe('V-OPT-1: session proxy matcher', () => {
   // Every path here authenticates itself and reads nothing from the session, so
@@ -61,10 +57,27 @@ describe('V-OPT-1: session proxy matcher', () => {
     }
   )
 
-  it.each(['/', '/login', '/signup', '/reset-password', '/p/someone', '/verify/abc', '/curriculum'])(
-    'still routes public page %s through the proxy (redirects and referral cookies depend on it)',
+  it.each(['/login', '/signup', '/reset-password'])(
+    'still routes auth page %s through the proxy (signed-in redirects depend on it)',
     (path) => {
       expect(entersProxy(path)).toBe(true)
+    }
+  )
+
+  it.each(['/', '/curriculum', '/lessons/lesson-001'])(
+    'routes %s through the proxy only for a signed-in visitor (perf plan item 15)',
+    (path) => {
+      expect(entersProxy(path, SIGNED_IN)).toBe(true)
+      expect(entersProxy(path)).toBe(false)
+    }
+  )
+
+  it.each(['/p/someone', '/verify/abc', '/maintenance'])(
+    'routes %s through the proxy only for a consented referral visit (perf plan item 15)',
+    (path) => {
+      expect(entersProxy(path)).toBe(false)
+      expect(entersProxy(path, SIGNED_IN)).toBe(false)
+      expect(entersProxy(path, { query: { ref: 'ABC' }, cookies: { prodily_cookie_consent: 'accepted' } })).toBe(true)
     }
   )
 

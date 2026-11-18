@@ -486,6 +486,11 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
    * a profile query here. A merged password account keeps auth_provider 'email' and is
    * never gated, nor is a legacy password user with null consent. A failed or missing
    * profile read answers false: the gate fails open rather than locking learners out.
+   *
+   * Perf plan item 16: /api/auth/complete-consent writes `app_metadata.terms_accepted`
+   * once consent is recorded, so a token carrying that signed claim skips the profile
+   * read. app_metadata is only writable with the service role, so the claim is trusted
+   * like `is_admin`. Tokens minted before the claim existed fall back to the read.
    */
   let consentFailOpenLogged = false
   async function needsConsent(): Promise<boolean> {
@@ -494,6 +499,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     const signedInWithGoogle =
       user.app_metadata?.provider === 'google' || (Array.isArray(providers) && providers.includes('google'))
     if (!signedInWithGoogle) return false
+    if (user.app_metadata?.terms_accepted === true) return false
 
     const profileData = await loadUserProfileData()
     // auth_provider is NOT NULL, so its absence means the read failed or the row is missing.
@@ -755,7 +761,26 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
  * session-backed route added under that prefix must NOT inherit an exclusion by
  * accident.
  *
- * Everything else still matches: app pages, admin, curriculum, lessons, auth, and session APIs.
+ * Conditional public pages (perf plan item 15). For an anonymous visitor without `?ref`
+ * the proxy did nothing on these but stamp the request id and pass through, so they no
+ * longer enter it unconditionally. They enter only when the proxy has work to do:
+ *
+ *   /, /curriculum, /lessons/*   with an `sb-access-token` or `sb-refresh-token` cookie.
+ *                                /curriculum and /lessons/* redirect signed-in learners to
+ *                                /academy. `/` has no session branch today; it stays
+ *                                matched for signed-in visitors so a future one is not
+ *                                silently skipped.
+ *   all of the above, plus       with a `?ref` query AND a cookie-consent cookie: the
+ *   /maintenance, /verify/*,     referral cookie. The proxy still checks the consent value
+ *   /p/*                         itself; the matcher only requires the cookie to exist.
+ *
+ * `has` entries are ANDed within one matcher object and the matcher objects are ORed,
+ * which is why each cookie gets its own entry. Maintenance mode is unaffected: the proxy
+ * enforces it only on app pages and learner APIs, never on these public pages. Static
+ * security headers (CSP and friends) come from next.config.ts, not from here.
+ *
+ * Everything else still matches unconditionally: app pages, admin, /curriculum/<module>,
+ * auth pages, and every API route outside the exclusions above (SEC-12 origin check).
  */
 export const config = {
   matcher: [
@@ -763,9 +788,29 @@ export const config = {
      * Match all paths except:
      * - API routes that carry their own independent authentication (see above)
      * - Public marketing pages (about, contact, faq, frameworks, glossary, privacy, reviews, terms, waitlist)
+     * - The conditional public pages (root, curriculum, lessons, maintenance, verify, p),
+     *   which the entries below match only when the proxy has work to do
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist|verify/|p/|maintenance$|curriculum$|lessons/|$|[^/]*\\.[^/]*$).*)',
+    { source: '/', has: [{ type: 'cookie', key: 'sb-access-token' }] },
+    { source: '/', has: [{ type: 'cookie', key: 'sb-refresh-token' }] },
+    {
+      source: '/',
+      has: [
+        { type: 'query', key: 'ref' },
+        { type: 'cookie', key: 'prodily_cookie_consent' },
+      ],
+    },
+    { source: '/:sessionPath(curriculum|lessons/.+)', has: [{ type: 'cookie', key: 'sb-access-token' }] },
+    { source: '/:sessionPath(curriculum|lessons/.+)', has: [{ type: 'cookie', key: 'sb-refresh-token' }] },
+    {
+      source: '/:refPath(curriculum|maintenance|lessons/.+|verify/.+|p/.+)',
+      has: [
+        { type: 'query', key: 'ref' },
+        { type: 'cookie', key: 'prodily_cookie_consent' },
+      ],
+    },
   ],
 }

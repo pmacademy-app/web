@@ -7,6 +7,7 @@
  * Enforces strict privacy: users with `is_opted_in = false` are never exposed publicly.
  */
 
+import { revalidateTag, unstable_cache } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { calculateLevel } from '@/lib/xp'
@@ -70,26 +71,128 @@ export async function toggleLeaderboardOptIn(
   const { error } = await db.upsertLeaderboardOptIn(supabase, userId, isOptedIn, now)
 
   if (error) throw error
+  // The cached board carries the opt-out list. Expired, not marked stale: a learner who just
+  // opted out must not be served once more from the old board.
+  invalidateLeaderboardCache({ expire: 0 })
   return { success: true, isOptedIn }
 }
 
-// In-memory cache for weekly leaderboard calculations (45-second TTL)
-interface LeaderboardCacheEntry {
-  timestamp: number
-  users: LeaderboardUserRow[]
-  optedOutUserIds: Set<string>
+/**
+ * Cache tag of the weekly board (perf plan item 14). Anything that changes who is on the board or
+ * how they are shown (leaderboard opt-in, display name, username, avatar, account deletion) calls
+ * `invalidateLeaderboardCache`.
+ */
+export const LEADERBOARD_CACHE_TAG = 'leaderboard'
+
+/** How long a cached board is served before Next rebuilds it, in seconds. */
+export const LEADERBOARD_REVALIDATE_SECONDS = 300
+
+/**
+ * Marks the cached weekly board stale on every instance. Best-effort: revalidateTag throws outside
+ * a request scope, and a failed purge must never fail the write that triggered it.
+ *
+ * `'max'` (the default) serves the old board once more while the rebuild runs, which is right for
+ * cosmetic changes such as a new display name. A privacy change passes `{ expire: 0 }` so the next
+ * request rebuilds instead of being served a board that still lists a learner who opted out.
+ */
+export function invalidateLeaderboardCache(profile: 'max' | { expire: number } = 'max'): void {
+  try {
+    revalidateTag(LEADERBOARD_CACHE_TAG, profile)
+  } catch {
+    // Best-effort, see above.
+  }
+}
+
+/**
+ * The roster-wide weekly board, the part that is the same for every viewer. This is what the
+ * cross-instance data cache stores, so it must survive JSON: arrays, never Sets or Maps.
+ */
+interface CachedWeeklyBoard {
+  optedOutUserIds: string[]
   rawMetrics: RawLeaderboardUserMetric[]
-  // True when an aggregation query failed. Such an entry is handed back to the callers
-  // of that rebuild but never stored in LEADERBOARD_CACHE.
+}
+
+/** A built board as the request uses it. */
+interface LeaderboardCacheEntry {
+  optedOutUserIds: ReadonlySet<string>
+  rawMetrics: RawLeaderboardUserMetric[]
+  // True when an aggregation query failed. Such a board is handed back to the callers of that
+  // load but never stored in the data cache.
   degraded: boolean
 }
 
-const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
-const CACHE_TTL_MS = 45 * 1000
+interface BuiltWeeklyBoard extends CachedWeeklyBoard {
+  degraded: boolean
+}
 
-// Rebuilds currently running, keyed like the cache. Concurrent cache misses (the
-// dashboard widget and the leaderboard page both drive this) share one rebuild instead
-// of each running the four full paged scans.
+/**
+ * Thrown from inside the cached function for a degraded board. unstable_cache stores only values
+ * that resolve, so throwing keeps the zeroed numbers out of the cache (the next request retries)
+ * while the caller still receives the board from the error.
+ */
+class DegradedBoardError extends Error {
+  constructor(readonly board: CachedWeeklyBoard) {
+    super('weekly leaderboard degraded; not cached')
+    this.name = 'DegradedBoardError'
+  }
+}
+
+/**
+ * unstable_cache needs Next's incremental cache, which exists inside a request, a route handler
+ * or a render. Outside one (scripts, some test harnesses) it throws this invariant before running
+ * the function, and the board is then built directly.
+ */
+function isMissingIncrementalCache(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('incrementalCache missing')
+}
+
+/**
+ * Reads the weekly board through the cross-instance data cache (tag `leaderboard`, 5 minutes).
+ *
+ * The closure's client is used only on a miss; the entry's identity is the key parts, so every
+ * caller shares one entry per week. Every caller passes a service-role client, so the board does
+ * not depend on whose client built it. Per-viewer work (the viewer's own entry, adding an absent
+ * viewer back, the opted-out viewer rule) happens after this returns, never inside it.
+ */
+async function loadWeeklyBoard(
+  supabase: SupabaseClient<Database>,
+  weekStart: string
+): Promise<LeaderboardCacheEntry> {
+  const compute = async (): Promise<CachedWeeklyBoard> => {
+    const built = await buildWeeklyRawMetrics(supabase, weekStart)
+    const board: CachedWeeklyBoard = { optedOutUserIds: built.optedOutUserIds, rawMetrics: built.rawMetrics }
+    if (built.degraded) throw new DegradedBoardError(board)
+    return board
+  }
+
+  let board: CachedWeeklyBoard
+  let degraded = false
+  try {
+    try {
+      board = await unstable_cache(compute, ['leaderboard-weekly', 'v1', weekStart], {
+        tags: [LEADERBOARD_CACHE_TAG],
+        revalidate: LEADERBOARD_REVALIDATE_SECONDS,
+      })()
+    } catch (error) {
+      if (!isMissingIncrementalCache(error)) throw error
+      board = await compute()
+    }
+  } catch (error) {
+    if (!(error instanceof DegradedBoardError)) throw error
+    board = error.board
+    degraded = true
+  }
+
+  return {
+    optedOutUserIds: new Set(board.optedOutUserIds),
+    rawMetrics: board.rawMetrics,
+    degraded,
+  }
+}
+
+// Loads currently running on this instance, keyed by week. Concurrent calls (the dashboard widget
+// and the leaderboard page both drive this) share one read of the data cache, and on a miss one
+// rebuild, instead of each running the four full paged scans.
 const LEADERBOARD_INFLIGHT = new Map<string, Promise<LeaderboardCacheEntry>>()
 
 // Short negative cache for rebuilds that failed outright (the opt-out query throws, so
@@ -143,24 +246,18 @@ async function reportLeaderboardQueryFailure(
 }
 
 /**
- * Builds (or reuses the cached) raw weekly metrics for ALL opted-in-eligible users.
- * Shared by global, cohort-scoped, and friend-scoped ranking views so the expensive
- * aggregation queries run at most once per week per 45-second window, regardless of
- * how many scopes/cohorts are viewed.
+ * Returns the raw weekly metrics for ALL opted-in-eligible users. Shared by global, cohort-scoped,
+ * and friend-scoped ranking views, so the expensive aggregation runs at most once per week per
+ * revalidate window across all instances, regardless of how many scopes or cohorts are viewed.
  *
- * Concurrent misses share a single in-flight rebuild, and a rebuild that failed outright
- * is remembered for FAILURE_CACHE_TTL_MS so an outage is not re-scanned on every request.
+ * Concurrent calls on one instance share a single in-flight load, and a rebuild that failed
+ * outright is remembered for FAILURE_CACHE_TTL_MS so an outage is not re-scanned on every request.
  */
 function getOrBuildWeeklyRawMetrics(
   supabase: SupabaseClient<Database>,
   weekStart: string
 ): Promise<LeaderboardCacheEntry> {
   const now = Date.now()
-  const cached = LEADERBOARD_CACHE.get(weekStart)
-  if (cached && now - cached.timestamp <= CACHE_TTL_MS) {
-    return Promise.resolve(cached)
-  }
-
   const failure = LEADERBOARD_FAILURES.get(weekStart)
   if (failure) {
     if (now - failure.timestamp <= FAILURE_CACHE_TTL_MS) {
@@ -172,7 +269,7 @@ function getOrBuildWeeklyRawMetrics(
   const inFlight = LEADERBOARD_INFLIGHT.get(weekStart)
   if (inFlight) return inFlight
 
-  const rebuild = buildWeeklyRawMetrics(supabase, weekStart)
+  const rebuild = loadWeeklyBoard(supabase, weekStart)
     .catch((error: unknown) => {
       LEADERBOARD_FAILURES.set(weekStart, { timestamp: Date.now(), error })
       throw error
@@ -200,12 +297,14 @@ interface RpcLeaderboardRow {
   rank: number
 }
 
-/** Runs the four weekly aggregation queries and caches the result when it is complete. */
+/**
+ * Runs the weekly aggregation (the RPC, or the four paged queries as a fallback). Caching is the
+ * caller's job (loadWeeklyBoard), which stores only a board that is not degraded.
+ */
 async function buildWeeklyRawMetrics(
   supabase: SupabaseClient<Database>,
   weekStart: string
-): Promise<LeaderboardCacheEntry> {
-  const now = Date.now()
+): Promise<BuiltWeeklyBoard> {
   const weekStartDate = new Date(weekStart)
   const weekStartIso = weekStartDate.toISOString()
 
@@ -271,26 +370,11 @@ async function buildWeeklyRawMetrics(
       }
     })
 
-    const userList: LeaderboardUserRow[] = rpcRows.map((row) => ({
-      id: row.user_id,
-      username: row.username,
-      name: row.name,
-      avatar_url: row.avatar_url,
-      total_xp: row.total_xp,
-      current_streak: row.current_streak,
-      level: row.level,
-    }))
-
-    const built: LeaderboardCacheEntry = {
-      timestamp: now,
-      users: userList,
-      optedOutUserIds: new Set<string>(optedOutRows.map((r) => r.user_id)),
+    return {
+      optedOutUserIds: optedOutRows.map((r) => r.user_id),
       rawMetrics,
       degraded: false,
     }
-
-    LEADERBOARD_CACHE.set(weekStart, built)
-    return built
   }
 
   // Fallback JavaScript aggregation path
@@ -330,8 +414,6 @@ async function buildWeeklyRawMetrics(
     )
     throw optOutError
   }
-
-  const optedOutUserIds = new Set<string>(optedOutRows.map((r) => r.user_id))
 
   // 3. Fetch lesson progress in current week for consistency metric
   //
@@ -426,22 +508,14 @@ async function buildWeeklyRawMetrics(
     }
   })
 
-  const built: LeaderboardCacheEntry = {
-    timestamp: now,
-    users: userList,
-    optedOutUserIds,
+  // A degraded board is returned but never cached (loadWeeklyBoard). Caching it would pin the
+  // wrong numbers for the full window and suppress recovery on the next request: the same
+  // "a wrong answer looks like a quiet week" failure mode as F-COR-1, one layer up.
+  return {
+    optedOutUserIds: optedOutRows.map((r) => r.user_id),
     rawMetrics,
     degraded: aggregationDegraded,
   }
-
-  // Only cache a complete result. Caching a degraded board would pin the wrong
-  // numbers for the full TTL and suppress recovery on the next request — the same
-  // "a wrong answer looks like a quiet week" failure mode as F-COR-1, one layer up.
-  if (!aggregationDegraded) {
-    LEADERBOARD_CACHE.set(weekStart, built)
-  }
-
-  return built
 }
 
 /**

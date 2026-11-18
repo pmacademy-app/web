@@ -40,7 +40,7 @@ import {
   getRecutExperimentConfig,
   isRecutTreatment,
 } from '@/lib/academy/experiment'
-import { getBlocksForTab } from '@/app/(app)/academy/[moduleSlug]/[lessonId]/lesson-content'
+import { getBlocksForTab } from '@/app/(app)/academy/[moduleSlug]/[lessonId]/lesson-tabs'
 import { verifyTheoryReadEngagement, calculateQuizXp } from '@/lib/xp'
 import type { CompiledBlock, CompiledLesson } from '@/types'
 

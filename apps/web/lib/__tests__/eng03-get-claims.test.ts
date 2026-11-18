@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { config as proxyConfig } from '../../proxy'
+import { entersProxy, SIGNED_IN } from './helpers/proxy-matcher'
 import { getAuthenticatedUserFromRequest } from '../auth'
 import * as supabaseModule from '../supabase'
 
 /**
  * ENG-03 / ENG-04: getClaims fast path, independent verification, and proxy matcher narrowing.
  */
-
-function entersProxy(pathname: string): boolean {
-  return proxyConfig.matcher.some((pattern) => new RegExp(`^${pattern}$`).test(pathname))
-}
 
 describe('ENG-03: Local JWT verification via getClaims', () => {
   beforeEach(() => {
@@ -179,20 +175,18 @@ describe('ENG-04: Narrowed session proxy matcher', () => {
     }
   })
 
-  it('includes curriculum, lesson previews, and auth pages', () => {
-    const authedAndPreviewPages = [
-      '/',
-      '/curriculum',
-      '/lessons/lesson-001',
-      '/login',
-      '/signup',
-      '/reset-password',
-      '/p/someuser',
-    ]
-
-    for (const page of authedAndPreviewPages) {
+  it('includes auth pages unconditionally', () => {
+    for (const page of ['/login', '/signup', '/reset-password']) {
       expect(entersProxy(page)).toBe(true)
     }
+  })
+
+  it('includes curriculum and lesson previews only for signed-in visitors (perf plan item 15)', () => {
+    for (const page of ['/', '/curriculum', '/lessons/lesson-001']) {
+      expect(entersProxy(page, SIGNED_IN)).toBe(true)
+      expect(entersProxy(page)).toBe(false)
+    }
+    expect(entersProxy('/p/someuser', SIGNED_IN)).toBe(false)
   })
 
   it('includes protected and admin API routes while excluding static assets and crons', () => {

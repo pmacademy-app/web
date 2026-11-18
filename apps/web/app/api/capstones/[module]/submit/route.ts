@@ -7,6 +7,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { evaluateBadgesAfterXp } from '@/lib/badges/evaluate-after-xp'
 import { submitCapstoneAction } from '@/lib/capstones-db'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { hasXpEvent } from '@/lib/xp-service'
@@ -129,6 +130,9 @@ export const POST = withRoute(
     } catch {
       // Revalidation warning is non-fatal
     }
+    // A submission publishes (or revises) the capstone on the cached public portfolio and its
+    // capstone page. Best-effort, never throws.
+    await revalidatePublicPortfolioForUser(supabase, userId, [moduleSlug])
 
     return NextResponse.json({
       success: true,

@@ -13,7 +13,7 @@ import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, TablesUpdate } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
-import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
+import { getSkillRadarSummary, type SkillRadarPreloadedData, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { escapeLike } from '@/lib/db/escape-like'
 import {
@@ -34,7 +34,12 @@ import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
-type ReflectionRow = Database['public']['Tables']['reflections']['Row']
+type PublicReflectionRow = Pick<Database['public']['Tables']['reflections']['Row'], 'lesson_id' | 'content' | 'created_at'>
+type SkillRadarProgressRow = NonNullable<SkillRadarPreloadedData['progressRows']>[number]
+
+/** The user columns the public portfolio renders. Nothing else is read, so nothing else can leak. */
+const PUBLIC_PORTFOLIO_USER_COLUMNS =
+  'id, username, name, bio, avatar_url, linkedin_url, github_url, website_url, current_streak, longest_streak, total_xp, is_fellow, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count, portfolio_verification_override'
 
 export interface PublicCapstoneItem {
   id: string
@@ -131,14 +136,18 @@ export async function getPublicPortfolioData(
   username: string
 ): Promise<PublicPortfolioPayload | null> {
   const sanitizedUsername = username.trim().toLowerCase()
+  if (!sanitizedUsername) return null
 
-  // 1. Fetch user by username (or fallback to id if matches uuid)
+  // 1. Fetch the user by username: an exact match on the stored value, which the
+  // users.username unique index serves directly. Usernames are always written lowercase
+  // (updatePortfolioSettings lowercases before saving; the pending CQ-24 constraint pins
+  // [a-z0-9_-]), so equality on the lowercased handle finds every reachable portfolio.
+  // The previous ILIKE could not use that index and scanned users on every view. `eq` has
+  // no wildcards, so no LIKE escaping is needed.
   const { data: users, error: userError } = await supabase
     .from('users')
-    .select('*')
-    // Escaped: in ILIKE, `_` and `%` are wildcards, and usernames may contain `_`. Unescaped,
-    // /p/a_b could resolve to another learner's public portfolio.
-    .ilike('username', escapeLike(sanitizedUsername))
+    .select(PUBLIC_PORTFOLIO_USER_COLUMNS)
+    .eq('username', sanitizedUsername)
     .limit(1)
 
   if (userError || !users || users.length === 0) {
@@ -154,38 +163,46 @@ export async function getPublicPortfolioData(
 
   const userId = user.id
 
-  // 2. Fetch Skill Radar using existing backend service
-  const skillRadar = await getSkillRadarSummary(supabase, userId)
+  // 2-4. The remaining reads depend only on the user id, so they run together. Lesson
+  // progress is read once, with the columns the skill radar needs, and handed to it,
+  // instead of the radar reading the same table a second time.
+  const [progressRes, submissionsRes, reflectionsRes] = await Promise.all([
+    supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', userId),
+    // Public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)
+    supabase
+      .from('capstone_submissions')
+      .select('id, module_slug, content, submitted_at, status')
+      .eq('user_id', userId)
+      .in('status', ['submitted', 'reviewed'])
+      .neq('is_public', false)
+      .order('submitted_at', { ascending: false }),
+    // Public reflections only
+    supabase
+      .from('reflections')
+      .select('lesson_id, content, created_at')
+      .eq('user_id', userId)
+      .eq('is_public', true),
+  ])
 
-  // 3. Fetch completed lesson progress
-  const { data: progressRows } = await supabase
-    .from('user_lesson_progress')
-    .select('lesson_id, status')
-    .eq('user_id', userId)
-    .eq('status', 'completed')
+  if (progressRes.error) {
+    console.error('[portfolio-db] Error fetching user_lesson_progress for portfolio:', progressRes.error)
+  }
+  const allProgressRows = (progressRes.data ?? []) as SkillRadarProgressRow[]
+  const skillRadar = await getSkillRadarSummary(supabase, userId, { progressRows: allProgressRows })
 
-  const completedLessonsCount = progressRows?.length ?? 0
+  const completedLessonIds = allProgressRows.filter((p) => p.status === 'completed').map((p) => p.lesson_id)
+  const completedLessonsCount = completedLessonIds.length
   const totalLessonsCount = CURRICULUM_LESSON_COUNT
-  const completedModulesCount = countCompletedModules((progressRows ?? []).map((p) => p.lesson_id))
+  const completedModulesCount = countCompletedModules(completedLessonIds)
   const progressPercentage = Math.min(100, Math.round((completedLessonsCount / totalLessonsCount) * 100))
 
-  // 4. Fetch public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)
-  const { data: submissions } = await supabase
-    .from('capstone_submissions')
-    .select('*')
-    .eq('user_id', userId)
-    .in('status', ['submitted', 'reviewed'])
-    .neq('is_public', false)
-    .order('submitted_at', { ascending: false })
+  const submissions = submissionsRes.data
+  const reflections = reflectionsRes.data
 
-  // 5. Fetch public reflections only
-  const { data: reflections } = await supabase
-    .from('reflections')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_public', true)
-
-  const publicReflectionMap = new Map<string, ReflectionRow>()
+  const publicReflectionMap = new Map<string, PublicReflectionRow>()
   if (reflections) {
     for (const ref of reflections) {
       publicReflectionMap.set(ref.lesson_id, ref)
@@ -305,23 +322,19 @@ export async function getPublicPortfolioData(
 }
 
 /**
- * Request-scoped deduplication of the public portfolio read.
+ * Render-scoped deduplication of the public portfolio read.
  *
- * `getPublicPortfolioData()` costs five-plus Supabase round trips plus skill-radar and
- * readiness computation, and the page ran the whole thing TWICE per view — once in
- * `generateMetadata()` and again in the component — because neither call was
- * deduplicated. React's `cache()` collapses them into one computation per request.
+ * `generateMetadata()` and the page component both need the payload; React's `cache()`
+ * collapses them into one computation per render.
  *
- * Deliberately request-scoped and NOT a cross-request cache. A portfolio can be made
- * private at any time, so a cross-request cache would keep serving a payload that is
- * no longer public until it expired or was purged. Purging would have to be proven,
- * and this codebase has never invoked `revalidateTag` — every `tags` option in it is
- * decorative — while Next 16 has changed that API. Caching public portfolio data
- * across requests is therefore gated on building and verifying that invalidation
- * path, not on adding a `revalidate` value. See the V-OPT-2 report.
- *
- * Privacy is unchanged by this: the underlying function still returns `null` for a
- * private portfolio, and nothing is retained past the request.
+ * The cross-request cache is the page itself (perf plan item 13): /p/[username] and its
+ * capstone pages are ISR with `revalidate = 3600`, so this runs once per regeneration, not
+ * once per view. A private or missing portfolio renders as "unavailable" and that result is
+ * cached too, which is safe because every write that changes what the page shows purges the
+ * exact paths (lib/portfolio-revalidate.ts): the portfolio settings save (visibility,
+ * profile, username old and new), profile edits, capstone submit and review, capstone
+ * reflections, and account deletion. Nothing here reads cookies or headers, and the payload
+ * is the same for every viewer.
  */
 export const getDedupedPublicPortfolioData = cache(
   async (username: string): Promise<PublicPortfolioPayload | null> => {
@@ -329,6 +342,36 @@ export const getDedupedPublicPortfolioData = cache(
     return getPublicPortfolioData(createServiceRoleClient(), username.trim().toLowerCase())
   }
 )
+
+/**
+ * Records one public view of a portfolio, looked up by username.
+ *
+ * Called from POST /api/portfolio/[username]/view (the client beacon on the cached page), never
+ * during render: a cached page cannot count views, and a write in render would make the page
+ * uncacheable. Resolves the id with the same exact, indexed username match as the page and only
+ * for a public portfolio; `incrementPortfolioViewCount` re-checks visibility itself. Never throws.
+ */
+export async function recordPortfolioView(
+  supabase: SupabaseClient<Database>,
+  username: string
+): Promise<boolean> {
+  try {
+    const handle = username.trim().toLowerCase()
+    if (!handle) return false
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', handle)
+      .eq('is_portfolio_public', true)
+      .maybeSingle()
+    if (error || !data?.id) return false
+    await incrementPortfolioViewCount(supabase, data.id)
+    return true
+  } catch (err) {
+    console.warn('[portfolio-db] Non-fatal portfolio view record warning:', err)
+    return false
+  }
+}
 
 /**
  * Atomically increments the portfolio visitor count for a user if public.

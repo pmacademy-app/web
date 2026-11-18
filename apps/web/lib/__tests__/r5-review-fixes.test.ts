@@ -75,9 +75,16 @@ describe('Fellow nudge eligibility', () => {
 })
 
 describe('public portfolio lookup', () => {
-  it('escapes ILIKE wildcards in the username before the lookup', () => {
+  // Perf plan item 13: an exact match on the lowercased handle replaced the escaped ILIKE. `eq`
+  // has no wildcards, so /p/a_b can never resolve to another learner, and the unique index serves it.
+  it('matches the username exactly, so `_` and `%` are never wildcards', () => {
     const code = source('lib/portfolio-db.ts')
-    expect(code).toContain(".ilike('username', escapeLike(sanitizedUsername))")
+    const body = code.slice(
+      code.indexOf('export async function getPublicPortfolioData'),
+      code.indexOf('export const getDedupedPublicPortfolioData')
+    )
+    expect(body).toContain(".eq('username', sanitizedUsername)")
+    expect(body).not.toContain('.ilike(')
     expect(source('lib/db/escape-like.ts')).toContain('%_]/g')
   })
 })

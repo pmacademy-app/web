@@ -5,7 +5,11 @@
  *
  * This replaces LessonViewShell (v1) for the new block-tree renderer architecture.
  * It:
- *   - Renders the lesson via <BlockTreeRenderer> instead of hardcoded section components
+ *   - Shows the theory and Deep-dive content that page.tsx renders on the server (the
+ *     `theory` and `deepDive` slots), so markdown parsing and sanitizing never run in the
+ *     browser (performance plan item 12)
+ *   - Renders the quiz and flashcard blocks directly; `lesson.blocks` holds only the blocks
+ *     the interactive tabs read
  *   - Uses useLessonProgressV2 (stable lessonId, /api/v2/* endpoints)
  *   - Tracks theory read engagement, quiz submission, and reflection completion
  *   - Renders a tab-based shell: Theory | Practice Quiz | Flashcards | Reflection
@@ -19,10 +23,11 @@ import { useSearchParams } from 'next/navigation'
 import { useLessonProgressV2 } from '@/hooks/use-lesson-progress-v2'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
-import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
+import dynamic from 'next/dynamic'
+import { BlockErrorBoundary } from '@/renderer/block-error-boundary'
+import type { BlockProps } from '@/renderer/registry'
 import { LessonContextProvider } from '@/contexts/lesson-context'
 import { dispatchClientNotificationEvent, showClientToast } from '@/lib/events/client-event-bus'
-import type { CompiledBlock } from '@/types'
 import type { ClientLesson } from '@/lib/academy/client-lesson'
 import {
   BookOpen,
@@ -62,12 +67,7 @@ import { LessonCapstonePreview } from '@/components/capstones/LessonCapstonePrev
 import { getCapstoneHref } from '@/config/capstones'
 import { formatPositionLabel, lessonBreadcrumbLabels } from '@/lib/curriculum/lesson-position'
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
-import {
-  getCoreBlocks,
-  getDeepDiveBlocks,
-  getCoreReadingMinutes,
-  getDeepDiveReadingMinutes,
-} from '@/lib/academy/lesson-structure'
+import { getBlocksForTab, type TabType } from './lesson-tabs'
 import type { RecutVariant } from '@/lib/academy/experiment'
 
 
@@ -93,40 +93,47 @@ interface LessonPageContentProps {
    * Defaults to `control` so the split is off unless the experiment is enabled.
    */
   recutVariant?: RecutVariant
+  /**
+   * Theory blocks rendered on the server (Core blocks under treatment, every non-tab block
+   * under control). Built by page.tsx with BlockTreeServerRenderer.
+   */
+  theory: React.ReactNode
+  /** Server-rendered Deep-dive blocks (treatment only); null when there are none. */
+  deepDive?: React.ReactNode
+  /** Core reading estimate in minutes, computed on the server from the full block list. */
+  coreReadingMinutes: number
+  /** Deep-dive reading estimate in minutes, computed on the server. */
+  deepDiveReadingMinutes: number
 }
 
-type TabType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
+// The quiz and flashcard blocks are the only blocks this shell renders itself. Importing them
+// directly (not through the block registry) keeps the markdown blocks, and with them marked
+// and DOMPurify, out of the lesson page's browser bundle. Both stay lazily loaded.
+const QuizBlock = dynamic<BlockProps>(() => import('@/blocks/quiz/QuizBlock'))
+const FlashcardDeckBlock = dynamic<BlockProps>(() => import('@/blocks/flashcards/FlashcardDeckBlock'))
 
-// ─── Helper: extract blocks by type ─────────────────────────────────────────
-//
-// Phase 4 (§4.1): under the `treatment` variant the theory surface renders only the Core
-// blocks; the Deep-dive is rendered separately (and lazily) by <DeepDiveSection>. Under
-// `control` the theory surface renders every non-tab block exactly as before, so the
-// experiment's control arm is a faithful reproduction of the pre-Phase-4 lesson.
-
-export function getBlocksForTab(
-  blocks: CompiledBlock[],
-  tab: TabType,
-  variant: RecutVariant = 'control'
-): CompiledBlock[] {
-  if (tab === 'theory') {
-    if (variant === 'treatment') {
-      return getCoreBlocks(blocks)
-    }
-    // Control: everything except quiz, flashcardDeck, reflection (legacy behaviour).
-    const EXCLUDED = new Set(['quiz', 'flashcardDeck', 'reflection'])
-    return blocks.filter((b) => !EXCLUDED.has(b.type))
-  }
-  if (tab === 'quiz') {
-    return blocks.filter((b) => b.type === 'quiz')
-  }
-  if (tab === 'flashcards') {
-    return blocks.filter((b) => b.type === 'flashcardDeck')
-  }
-  if (tab === 'reflection') {
-    return blocks.filter((b) => b.type === 'reflection')
-  }
-  return []
+function TabBlocks({
+  lesson,
+  tab,
+}: {
+  lesson: ClientLesson
+  tab: 'quiz' | 'flashcards'
+}) {
+  const Block = tab === 'quiz' ? QuizBlock : FlashcardDeckBlock
+  return (
+    <>
+      {getBlocksForTab(lesson.blocks, tab).map((block) => (
+        <BlockErrorBoundary
+          key={block.blockId}
+          blockId={block.blockId}
+          blockType={block.type}
+          lessonId={lesson.id}
+        >
+          <Block block={block} lessonId={lesson.id} />
+        </BlockErrorBoundary>
+      ))}
+    </>
+  )
 }
 
 export function isTabUnlocked(tab: TabType, prog: LessonProgressV2 | null | undefined): boolean {
@@ -489,6 +496,50 @@ function CoreReadingProgress({ estimatedMinutes }: { estimatedMinutes: number })
   )
 }
 
+// ─── Theory read submission ──────────────────────────────────────────────────
+//
+// Lives outside the component so the component has no try/finally (React Compiler skips
+// components that use a `finally` clause). Resolves to null on success, or the message to
+// show the learner when the server rejects the read (engagement threshold not met).
+
+const THEORY_READ_FALLBACK_ERROR =
+  'Engagement threshold not met. Please review the theory content thoroughly before proceeding to the quiz.'
+
+export async function submitTheoryRead(
+  recordTheoryRead: (activeSeconds?: number, scrollPercentage?: number) => Promise<unknown>,
+  lessonId: string,
+  activeSeconds: number,
+  scrollPercentage: number
+): Promise<string | null> {
+  try {
+    await recordTheoryRead(activeSeconds, scrollPercentage)
+    trackTheoryRead(lessonId)
+    return null
+  } catch (err: unknown) {
+    return err instanceof Error && err.message ? err.message : THEORY_READ_FALLBACK_ERROR
+  }
+}
+
+/**
+ * First-lesson celebration lock: true the first time it is called in this browser (and
+ * records that), false afterwards. When localStorage is unavailable it returns true so the
+ * celebration still shows. Kept outside the component because the React Compiler cannot
+ * compile conditional expressions inside a try/catch in a component.
+ */
+export function claimFirstSessionCelebration(): boolean {
+  try {
+    const alreadyCelebrated =
+      typeof window !== 'undefined' &&
+      localStorage.getItem('prodily_first_session_celebrated') === 'true'
+    if (alreadyCelebrated) return false
+    localStorage.setItem('prodily_first_session_celebrated', 'true')
+    return true
+  } catch {
+    // LocalStorage unavailable - fallback to in-memory trigger
+    return true
+  }
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function LessonPageContent({
@@ -502,6 +553,10 @@ export default function LessonPageContent({
   moduleName,
   initialProgress,
   recutVariant = 'control',
+  theory,
+  deepDive = null,
+  coreReadingMinutes,
+  deepDiveReadingMinutes,
 }: LessonPageContentProps) {
   const {
     progress,
@@ -513,14 +568,8 @@ export default function LessonPageContent({
     recordDeepDiveOpened,
   } = useLessonProgressV2(lesson.id, initialProgress)
 
-  // Phase 4: Core / Deep-dive derived once per lesson. Under control these are unused (the
-  // theory surface renders the full block set) but computing them is cheap and pure.
-  const deepDiveBlocks = React.useMemo(() => getDeepDiveBlocks(lesson.blocks), [lesson.blocks])
-  const coreReadingMinutes = React.useMemo(() => getCoreReadingMinutes(lesson), [lesson])
-  const deepDiveReadingMinutes = React.useMemo(
-    () => getDeepDiveReadingMinutes(lesson),
-    [lesson]
-  )
+  // Phase 4: the Core / Deep-dive split and both reading estimates are computed on the server
+  // (page.tsx), which has the full block list. The client only receives the results.
   const isTreatment = recutVariant === 'treatment'
   const headerReadingMinutes = isTreatment ? coreReadingMinutes : lesson.estimatedReadingTime
 
@@ -652,18 +701,7 @@ export default function LessonPageContent({
             trackFirstLessonCompleted(lesson.id, res.xpEarned)
 
             // Deduplication lock: celebrate once per learner browser/session
-            try {
-              const alreadyCelebrated =
-                typeof window !== 'undefined' &&
-                localStorage.getItem('prodily_first_session_celebrated') === 'true'
-
-              if (!alreadyCelebrated) {
-                localStorage.setItem('prodily_first_session_celebrated', 'true')
-                setCelebrationXp(res.xpEarned || 50)
-                setShowFirstSessionCelebration(true)
-              }
-            } catch {
-              // LocalStorage unavailable - fallback to in-memory trigger
+            if (claimFirstSessionCelebration()) {
               setCelebrationXp(res.xpEarned || 50)
               setShowFirstSessionCelebration(true)
             }
@@ -703,26 +741,27 @@ export default function LessonPageContent({
   const isFlashcardsUnlocked = !!progress.theory_read_at
   const isReflectionUnlocked = progress.status === 'completed'
 
-  const handleTheoryComplete = async () => {
+  const handleTheoryComplete = () => {
     setTheorySubmitting(true)
     setTheoryError(null)
-    try {
-      await recordTheoryRead(activeSecondsRef.current, scrollPercentRef.current)
-      trackTheoryRead(lesson.id)
-      handleTabChange('quiz')
-    } catch (err: unknown) {
-      const msg = (err instanceof Error && err.message)
-        ? err.message
-        : 'Engagement threshold not met. Please review the theory content thoroughly before proceeding to the quiz.'
-      setTheoryError(msg)
-      dispatchClientNotificationEvent({
-        title: 'Engagement Requirement',
-        body: msg,
-        variant: 'error',
-      })
-    } finally {
+    void submitTheoryRead(
+      recordTheoryRead,
+      lesson.id,
+      activeSecondsRef.current,
+      scrollPercentRef.current
+    ).then((msg) => {
+      if (msg === null) {
+        handleTabChange('quiz')
+      } else {
+        setTheoryError(msg)
+        dispatchClientNotificationEvent({
+          title: 'Engagement Requirement',
+          body: msg,
+          variant: 'error',
+        })
+      }
       setTheorySubmitting(false)
-    }
+    })
   }
 
   const handleReflectionComplete = () => {
@@ -974,10 +1013,9 @@ export default function LessonPageContent({
               onQuizComplete={handleQuizComplete}
               onAdvanceTab={(tab) => handleTabChange(tab)}
             >
-              <BlockTreeRenderer
-                blocks={getBlocksForTab(lesson.blocks, 'theory', recutVariant)}
-                lessonId={lesson.id}
-              />
+              {/* Server-rendered theory (page.tsx). Engagement tracking reads window scroll
+                  and focus time, so it measures this content without a ref on it. */}
+              {theory}
             </LessonContextProvider>
             <TheoryReadButton
               theoryReadAt={progress.theory_read_at}
@@ -985,20 +1023,20 @@ export default function LessonPageContent({
               isLoading={theorySubmitting}
               error={theoryError}
             />
-            {/* Phase 4 (§4.1): Deep-dive is visible, labelled and reachable — rendered below
-                the Core so it is never required to unlock the quiz, and mounted lazily so it
-                does not enlarge the Core payload or the theory-gate scroll surface. Only under
-                the treatment variant; control renders the full lesson inline above. */}
-            {isTreatment && deepDiveBlocks.length > 0 && (
+            {/* Phase 4 (§4.1): Deep-dive is visible, labelled and reachable, rendered below
+                the Core so it is never required to unlock the quiz, and mounted only when
+                opened so it does not enlarge the theory-gate scroll surface. Only under the
+                treatment variant; control renders the full lesson inline above. */}
+            {isTreatment && deepDive != null && (
               <DeepDiveSection
-                blocks={deepDiveBlocks}
-                lessonId={lesson.id}
                 estimatedMinutes={deepDiveReadingMinutes}
                 onOpen={() => {
                   trackDeepDiveOpened(lesson.id)
                   void recordDeepDiveOpened()
                 }}
-              />
+              >
+                {deepDive}
+              </DeepDiveSection>
             )}
           </div>
         )}
@@ -1011,10 +1049,7 @@ export default function LessonPageContent({
               onQuizComplete={handleQuizComplete}
               onAdvanceTab={(tab) => handleTabChange(tab)}
             >
-              <BlockTreeRenderer
-                blocks={getBlocksForTab(lesson.blocks, 'quiz')}
-                lessonId={lesson.id}
-              />
+              <TabBlocks lesson={lesson} tab="quiz" />
             </LessonContextProvider>
           </div>
         )}
@@ -1032,10 +1067,7 @@ export default function LessonPageContent({
                 handleTabChange(flashcardsAdvanceTarget(isReflectionUnlocked))
               }
             >
-              <BlockTreeRenderer
-                blocks={getBlocksForTab(lesson.blocks, 'flashcards')}
-                lessonId={lesson.id}
-              />
+              <TabBlocks lesson={lesson} tab="flashcards" />
             </LessonContextProvider>
           </div>
         )}

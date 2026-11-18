@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * Phase 4 — Deep Dive section.
  *
@@ -10,24 +8,26 @@
  * is a progressive-disclosure affordance, not a way to bury content.
  *
  * Two deliberate behaviours:
- *   - The block tree is mounted only once the learner expands the section. That keeps the
- *     initial Core payload small (a Deep-dive averages a mermaid diagram + ~1,600 words) and
- *     — importantly — keeps the theory-engagement scroll gate measuring the Core surface,
- *     not the full historical lesson. Consuming the Deep-dive is never required to reach the
- *     quiz.
+ *   - The Deep-dive content (rendered on the server by page.tsx and passed in as children) is
+ *     mounted only once the learner expands the section. That keeps the theory-engagement
+ *     scroll gate measuring the Core surface, not the full historical lesson. Consuming the
+ *     Deep-dive is never required to reach the quiz.
  *   - Expanding fires `onOpen` exactly once, so depth consumption is observable (GA4 +
  *     server marker) per §4.4 rather than assumed.
+ *
+ * No 'use client' directive on purpose: this module is imported only by the client lesson
+ * shell (lesson-content.tsx), which already makes it a client component. Import it from a
+ * client module, never directly from a Server Component.
  */
 
 import { useState, useCallback } from 'react'
 import { BookMarked, ChevronDown } from 'lucide-react'
-import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { Button } from '@/components/ui/button'
-import type { CompiledBlock } from '@/types'
+import type { ReactNode } from 'react'
 
 interface DeepDiveSectionProps {
-  blocks: CompiledBlock[]
-  lessonId: string
+  /** Server-rendered Deep-dive blocks. */
+  children: ReactNode
   /** Honest reading estimate for the extended material, in minutes. */
   estimatedMinutes: number
   /** Fired once, the first time the learner opens the section. */
@@ -35,8 +35,7 @@ interface DeepDiveSectionProps {
 }
 
 export function DeepDiveSection({
-  blocks,
-  lessonId,
+  children,
   estimatedMinutes,
   onOpen,
 }: DeepDiveSectionProps) {
@@ -54,7 +53,7 @@ export function DeepDiveSection({
     })
   }, [hasOpened, onOpen])
 
-  if (!blocks || blocks.length === 0) return null
+  if (children == null) return null
 
   return (
     <section className="mt-10 border-t border-border pt-8" aria-labelledby="deep-dive-heading">
@@ -95,7 +94,7 @@ export function DeepDiveSection({
 
       {expanded && (
         <div id="deep-dive-content" className="mt-6 animate-fade-in">
-          <BlockTreeRenderer blocks={blocks} lessonId={lessonId} />
+          {children}
         </div>
       )}
     </section>

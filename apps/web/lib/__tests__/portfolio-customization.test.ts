@@ -87,7 +87,13 @@ describe('Phase 5: Portfolio Evolution & Customization Test Suite', () => {
                   })),
                 })),
               })),
+              // The public read matches the username exactly (.eq(...).limit), the settings reads
+              // by id (.eq(...).single / maybeSingle).
               eq: vi.fn(() => ({
+                limit: vi.fn(async () => ({
+                  data: user ? [user] : [],
+                  error: overrides.userError ?? null,
+                })),
                 single: vi.fn(async () => ({
                   data: user,
                   error: overrides.userError ?? null,
