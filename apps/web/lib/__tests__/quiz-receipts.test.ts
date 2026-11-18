@@ -63,7 +63,7 @@ import {
 import { POST as checkPOST } from '../../app/api/v2/lessons/[lessonId]/quiz/check/route'
 import { POST as submitPOST } from '../../app/api/v2/lessons/[lessonId]/quiz/route'
 
-const SECRET = 'test-quiz-receipt-secret-0123456789abcdef'
+const SECRET = 'test-quiz-receipt-secret-0000000000000000' // synthetic, not a credential
 const LESSON = 'les_04ix6b'
 
 type Question = { id: string; options: string[]; correctAnswer: number; explanation: string }
