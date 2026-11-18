@@ -30,6 +30,13 @@ interface RichEditorProps {
   id?: string
 }
 
+const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+
+/** Text-safe HTML: every character that could open a tag or attribute is escaped. */
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch])
+}
+
 export function RichEditor({
   value,
   onChange,
@@ -50,7 +57,9 @@ export function RichEditor({
       const parsed = marked.parse(value || '*No content written yet.*') as string
       return DOMPurify.sanitize(parsed, { ALLOW_UNKNOWN_PROTOCOLS: false })
     } catch {
-      return value || '*No content written yet.*'
+      // L10: this string goes into dangerouslySetInnerHTML, so a parser or sanitizer
+      // failure must render the raw markdown as text, never as HTML.
+      return escapeHtml(value || '*No content written yet.*')
     }
   }, [value])
 

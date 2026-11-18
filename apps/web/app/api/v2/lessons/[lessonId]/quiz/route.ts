@@ -14,9 +14,13 @@
  * Quiz receipts (lib/academy/quiz-receipts.ts): the check route reveals a question's correct
  * option and, when QUIZ_RECEIPT_SECRET is set, signs the answer it checked. A question with a
  * valid receipt for this learner, lesson and attempt is scored from the receipt, whatever the
- * client now sends for it; a question without one is scored from the submitted answer (offline
+ * client now sends for it. A question without one is checked against the check route's
+ * per-(learner, question) record: if the learner checked it recently they saw the answer
+ * without proving which option they committed to, so it scores as incorrect and the perfect
+ * bonus is withheld. A question never checked is scored from the submitted answer (offline
  * fallback, older clients). An invalid or forged receipt is ignored and costs the first-attempt
- * perfect bonus. Without the secret receipts are ignored and scoring is as before.
+ * perfect bonus. If the record lookup fails the submit fails open (scores as if unchecked).
+ * Without the secret receipts and records are ignored and scoring is as before.
  */
 
 import { after } from 'next/server'
@@ -27,6 +31,7 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { isLessonIdFormat, MAX_QUIZ_ATTEMPTS, QUIZ_QUESTION_ID_PATTERN } from '@/lib/academy/lesson-ids'
 import {
   applyQuizReceipts,
+  findRecentlyCheckedQuestions,
   getQuizReceiptSecret,
   QUIZ_ATTEMPT_ID_PATTERN,
   QUIZ_RECEIPT_MAX_LENGTH,
@@ -95,9 +100,10 @@ export const POST = withRoute(
 
     // A checked question is scored from its signed receipt, not from the submitted answer.
     // With receipts on, the perfect bonus also needs a valid receipt for every submitted
-    // question: leaving receipts out (to submit answers learned from the check) still scores,
-    // but cannot earn the bonus. Without the secret, scoring and the bonus are as before.
+    // question, and a question checked recently but submitted without its receipt scores as
+    // incorrect. Without the secret, scoring and the bonus are as before.
     let denyPerfectBonus = false
+    let forfeitedQuestionIds: Set<string> | null = null
     const secret = getQuizReceiptSecret()
     if (secret) {
       const receipted = applyQuizReceipts(
@@ -113,6 +119,19 @@ export const POST = withRoute(
       } else if (receipted.covered < cleanAttempts.length) {
         denyPerfectBonus = true
       }
+
+      const unreceipted = cleanAttempts
+        .map((a) => a.question_id)
+        .filter((id) => !receipted.receiptedQuestionIds.has(id))
+      if (unreceipted.length > 0) {
+        const checked = await findRecentlyCheckedQuestions(serviceSupabase, userId, unreceipted)
+        if (checked === null) {
+          console.warn('[quiz-receipts] check record lookup failed; scoring unreceipted answers as submitted', { userId })
+        } else if (checked.size > 0) {
+          forfeitedQuestionIds = checked
+          denyPerfectBonus = true
+        }
+      }
     }
 
     const result = await submitQuizAttempt(
@@ -120,7 +139,7 @@ export const POST = withRoute(
       userId,
       params.lessonId,
       cleanAttempts,
-      { denyPerfectBonus }
+      forfeitedQuestionIds ? { denyPerfectBonus, forfeitedQuestionIds } : { denyPerfectBonus }
     )
 
     // PROD-15 / North Star: record quiz submission and lesson mastery events.

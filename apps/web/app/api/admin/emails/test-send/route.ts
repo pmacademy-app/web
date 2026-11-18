@@ -82,8 +82,8 @@ export const POST = withRoute(
       // this path sends unsaved editor content directly, bypassing the save-time
       // sanitization on the template CRUD routes.
       const cleanHtml = sanitizeEmailHtml(bodyHtml)
-      finalSubject = interpolateVariables(subjectLine || 'Test Email', sampleVariables)
-      finalHtml = interpolateVariables(cleanHtml, sampleVariables)
+      finalSubject = interpolateVariables(subjectLine || 'Test Email', sampleVariables, 'subject')
+      finalHtml = interpolateVariables(cleanHtml, sampleVariables, 'html')
       finalText = bodyText ? interpolateVariables(bodyText, sampleVariables) : stripHtmlToPlainText(finalHtml)
     } else {
       const rendered = await renderEmailTemplate(templateKey, sampleVariables)

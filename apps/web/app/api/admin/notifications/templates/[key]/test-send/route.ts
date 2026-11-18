@@ -35,13 +35,13 @@ export const POST = withRoute(
 
       const mergedVariables = { ...TEMPLATE_SAMPLE_VARIABLES, ...variables, email: recipientEmail }
       const rawSubject = subjectLine || entry.subjectLine
-      const subject = interpolateVariables(rawSubject, mergedVariables)
+      const subject = interpolateVariables(rawSubject, mergedVariables, 'subject')
 
       let html = ''
       let text = ''
 
       if (bodyHtml && typeof bodyHtml === 'string' && bodyHtml.trim()) {
-        const interpolatedHtml = interpolateVariables(bodyHtml, mergedVariables)
+        const interpolatedHtml = interpolateVariables(bodyHtml, mergedVariables, 'html')
         html = interpolatedHtml.startsWith('<!DOCTYPE') ? interpolatedHtml : `<!DOCTYPE html>${interpolatedHtml}`
         text = bodyText ? interpolateVariables(bodyText, mergedVariables) : stripHtmlToPlainText(interpolatedHtml)
       } else {

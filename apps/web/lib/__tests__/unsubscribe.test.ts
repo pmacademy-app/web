@@ -139,6 +139,19 @@ describe('Email Unsubscribe Route Unit Test Suite', () => {
     expect(res.status).toBe(400)
   })
 
+  it('POST with format=json confirms without echoing the email address (L7)', async () => {
+    const req = new NextRequest(`http://localhost:3000/api/email/unsubscribe?token=${TOKEN}&format=json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'List-Unsubscribe=One-Click',
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(200)
+    const body = await res.text()
+    expect(JSON.parse(body)).toEqual({ success: true, message: 'Successfully unsubscribed from non-essential emails.' })
+    expect(body.toLowerCase()).not.toContain('learner@example.com')
+  })
+
   it('POST with an unknown token is rejected with 404 and writes nothing', async () => {
     const req = new NextRequest('http://localhost:3000/api/email/unsubscribe?token=nope&format=json', {
       method: 'POST',

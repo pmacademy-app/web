@@ -226,14 +226,32 @@ in Unix seconds). Receipts expire after 24 hours.
 
 The quiz block sends `{ attempts, attemptId, receipts }` to `POST .../quiz`. For every
 question with a valid receipt for this learner, lesson and attempt, the submit scores the
-receipt's answer and ignores the submitted one. Questions without a receipt are scored from
-the submitted answer (offline fallback, older clients). A receipt that fails verification
-(bad signature, another learner, lesson or attempt, expired, or conflicting with another
-receipt for the same question) is ignored and withholds the first-attempt perfect bonus; a
-warning with the user id only is logged. The perfect bonus also needs a valid receipt for
-every submitted question, so leaving receipts out still scores but never earns the bonus.
-Known limit: such a submission still counts toward completion and normal quiz XP; closing
-that fully needs a server-side record of each check.
+receipt's answer and ignores the submitted one. A receipt that fails verification (bad
+signature, another learner, lesson or attempt, expired, or conflicting with another receipt
+for the same question) is ignored and withholds the first-attempt perfect bonus; a warning
+with the user id only is logged. The perfect bonus also needs a valid receipt for every
+submitted question.
+
+**Check records.** Each successful check (after every gate has passed, before the answer is
+returned) also writes an attempt-independent record per learner and question through the
+persistent limiter: key `lesson_quiz_checked_<userId>_<questionId>` in `rate_limits`, via
+`consume_rate_limit` with a 2 hour window and a limit high enough that it never blocks. For
+every submitted question without a valid receipt, the submit makes one batched read of those
+rows (service-role client). The limiter window is fixed (`last_requested_at` is the window
+start), so the submit looks back two windows (4 hours), which covers every check made in the
+last 2 hours.
+
+- Checked recently, no valid receipt: the learner saw the answer without proving which
+  option they committed to. The question scores as incorrect (the submitted option is still
+  recorded) and the perfect bonus is withheld.
+- Never checked (offline, a failed check, an older client): scored from the submitted
+  answer, as before.
+- A retry attempt after seeing the answers is allowed: its own checks issue new receipts for
+  the new attempt id, and receipted questions are not looked up.
+- If the record read fails, the submit fails open (scores as if unchecked) and logs a
+  warning with the user id only.
+
+No migration: the records reuse `rate_limits` and its 30 day retention rule.
 
 **Secret:** `QUIZ_RECEIPT_SECRET`, a random string of at least 32 bytes
 (`openssl rand -base64 48`), server only, never prefixed with `NEXT_PUBLIC_`. Rotating it
@@ -241,7 +259,7 @@ invalidates receipts issued before the rotation, which costs a learner mid-quiz 
 perfect bonus for that attempt.
 
 **Without the secret** (unset, or shorter than 32 characters) receipts are off: the check
-route returns no `receipt`, the submit ignores any receipts and scores the submitted answers
+route returns no `receipt` and writes no check record, the submit ignores any receipts and records and scores the submitted answers
 exactly as before, and one warning is logged per server process. The site keeps working
 until the variable is added in Vercel.
 

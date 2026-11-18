@@ -30,10 +30,15 @@
  * What it must never become is an input to authorization. `resolveActor()` owns that,
  * Bearer-first then cookie, and this value is never consulted there.
  *
- * The residual risk is an XSS on the web app calling login with this header to lift a
- * refresh token. That attack requires script execution, at which point the attacker can
- * already drive the authenticated session directly. The header does not widen it, and
- * the mitigation is the CSP and the XSS controls, not this flag.
+ * The residual risk was an XSS on the web app calling login or refresh with this header
+ * to lift a refresh token: an access token dies within the hour, a refresh token gives
+ * the attacker a session that survives the XSS being fixed. So a request that carries
+ * any browser signal never gets body tokens, whatever it declares (see
+ * `hasBrowserSignals`). Script in a page cannot remove those signals: `Sec-Fetch-*`
+ * and `Origin` are forbidden request headers, and same-origin fetches send cookies.
+ *
+ * No native client exists in this repository today. The mode is kept for the planned
+ * mobile client (plan section 15); a native HTTP client sends none of these headers.
  */
 
 /** The header a non-browser client sets to identify itself. */
@@ -48,11 +53,27 @@ export const NATIVE_CLIENT_TYPE = 'native'
  * Deliberately an exact, case-insensitive match on one value rather than a
  * "not a browser" heuristic. Sniffing the user agent would put a parser in the auth
  * path and would silently change behaviour whenever a user-agent string changed;
- * an explicit opt-in is a decision the client makes and a reviewer can see.
+ * an explicit opt-in is a decision the client makes and a reviewer can see. The opt-in
+ * can only be refused by browser signals, never granted by their absence alone.
  */
 export function isNativeClient(request: { headers: { get(name: string): string | null } }): boolean {
   const declared = request.headers.get(CLIENT_TYPE_HEADER)
-  return typeof declared === 'string' && declared.trim().toLowerCase() === NATIVE_CLIENT_TYPE
+  if (typeof declared !== 'string' || declared.trim().toLowerCase() !== NATIVE_CLIENT_TYPE) return false
+  return !hasBrowserSignals(request)
+}
+
+/** Session cookie names. A native client has no cookie jar the server writes to. */
+const SESSION_COOKIE_PATTERN = /(?:^|;\s*)(?:sb-access-token|sb-refresh-token|supabase-auth-token)=/
+
+/**
+ * True when the request looks like it came from a browser: fetch metadata headers, an
+ * `Origin` header, or this app's session cookies. Any one is enough to refuse body tokens.
+ */
+export function hasBrowserSignals(request: { headers: { get(name: string): string | null } }): boolean {
+  const { headers } = request
+  if (headers.get('sec-fetch-site') || headers.get('sec-fetch-mode') || headers.get('sec-fetch-dest')) return true
+  if (headers.get('origin')) return true
+  return SESSION_COOKIE_PATTERN.test(headers.get('cookie') || '')
 }
 
 /**

@@ -265,10 +265,11 @@ describe('B7-E — the pre-existing abuse controls came through unchanged', () =
     expect(source).toContain("actor.kind === 'learner' ? actor.userId : getClientIpBucket(request)")
   })
 
-  it('feedback keeps the single shared anonymous bucket it shipped with', () => {
+  it('feedback keys its anonymous bucket per trusted client IP (L12)', () => {
     const source = routeSource('feedback/route.ts')
 
-    expect(source).toContain("'anon_feedback'")
+    expect(source).toContain('`anon_feedback:${getClientIpBucket(request)}`')
+    expect(source).not.toContain("'anon_feedback'")
     expect(source).toContain('limit: 5')
   })
 

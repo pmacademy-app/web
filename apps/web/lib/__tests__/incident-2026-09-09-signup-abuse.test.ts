@@ -508,7 +508,9 @@ describe('Incident 2026-09-09 — governed email gateway', () => {
   it('the platform-wide ceiling blocks auth mail when both IP and address are rotated', async () => {
     const { sends } = setupGateway({
       limiter: (key) =>
-        key === 'email_global:governed'
+        // Auth verification draws on the signup-side aggregate (H1 split the old shared
+        // `email_global:governed` bucket by purpose group).
+        key === 'email_global:auth_signup'
           ? { success: false, remaining: 0, resetInMs: 3_600_000 }
           : { success: true, remaining: 5, resetInMs: 0 },
     })

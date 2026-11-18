@@ -386,6 +386,23 @@ describe('writes purge the cached public pages', () => {
     expect(purged()).toEqual(['/p/ada', '/p/ada/capstones/discovery'])
   })
 
+  it('reflections (L9): content over 10,000 characters is refused before any write', async () => {
+    mocks.client = fakeClient({ users: { data: { username: 'ada' } } }).client
+    mocks.recordReflectionAction.mockClear()
+    const { POST } = await import('../../app/api/reflections/route')
+    const handler = POST as unknown as (ctx: { request: Request; actor: unknown }) => Promise<Response>
+    await expect(
+      handler({
+        request: new Request('https://prodily.app/api/reflections', {
+          method: 'POST',
+          body: JSON.stringify({ lesson_id: 'les_000001', content: 'x'.repeat(10_001) }),
+        }),
+        actor: { kind: 'learner', userId: 'u1' },
+      })
+    ).rejects.toThrow()
+    expect(mocks.recordReflectionAction).not.toHaveBeenCalled()
+  })
+
   it('account deletion: purges the deleted learner pages and expires the leaderboard', async () => {
     const fake = fakeClient({ users: { data: { username: 'ada' } } })
     mocks.client = fake.client

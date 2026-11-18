@@ -89,7 +89,7 @@ vi.mock('@supabase/supabase-js', async (importOriginal) => {
   return { ...actual, createClient: vi.fn(() => h.makeClient('anon')) }
 })
 
-vi.mock('@/lib/auth', () => ({ ensureUserProfile: h.ensureUserProfile }))
+vi.mock('@/lib/auth', () => ({ ensureUserProfile: h.ensureUserProfile, SIGNUP_CONSENT_APP_METADATA_KEY: 'signup_consent' }))
 
 vi.mock('@/lib/referral/referral-service', () => ({
   applyPendingReferral: h.applyPendingReferral,

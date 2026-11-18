@@ -391,6 +391,12 @@ describe('POST /api/capstones/[module]/submit', () => {
     expect(res.status).toBe(400)
     expect(submitCapstoneAction).not.toHaveBeenCalled()
   })
+
+  it('L9: answers 400 for oversized content or reflection without calling the service', async () => {
+    expect((await submit({ content: 'x'.repeat(100_001) })).status).toBe(400)
+    expect((await submit({ content: 'ok', reflectionContent: 'x'.repeat(10_001) })).status).toBe(400)
+    expect(submitCapstoneAction).not.toHaveBeenCalled()
+  })
 })
 
 // ─── W1: the capstone GET carries the userId the workspace keys its draft on ──

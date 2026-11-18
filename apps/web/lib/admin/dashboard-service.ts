@@ -12,7 +12,7 @@ import {
 import { AdminConsoleService } from './service'
 import { ADMIN_CACHE_TAGS } from './cache-tags'
 import { cacheWithMaxAge } from './bounded-cache'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { fetchActiveUsers, fetchFunnelDistinctUsers } from './analytics-rpc'
 import type {
   AdminAttentionItem,

@@ -209,9 +209,11 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // answer and reveals it after the learner commits, on `withRoute`).
   // 136 since perf plan item 13 added `portfolio/[username]/view/route.ts` (the public portfolio
   // view beacon, moved out of the cached page render, on `withRoute`).
-  it('accounts for all 136 routes', () => {
-    expect(files).toHaveLength(136)
-    expect(migrated).toHaveLength(133)
+  // 135 since the security pass removed the unused `auth/update-password/route.ts` (the reset
+  // page uses a server action; the route was on `withRoute`).
+  it('accounts for all 135 routes', () => {
+    expect(files).toHaveLength(135)
+    expect(migrated).toHaveLength(132)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
@@ -228,8 +230,9 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
 
     // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
     expect(inGroup('cron/')).toBe(7)
-    // 10 auth routes since Google sign-in added auth/google and auth/complete-consent.
-    expect(inGroup('auth/')).toBe(10)
+    // 10 auth routes since Google sign-in added auth/google and auth/complete-consent; 9 since
+    // the unused auth/update-password route was removed.
+    expect(inGroup('auth/')).toBe(9)
     expect(inGroup('settings/')).toBe(12)
     expect(inGroup('admin/')).toBe(62)
   })

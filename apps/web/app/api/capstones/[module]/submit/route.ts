@@ -14,9 +14,19 @@ import { hasXpEvent } from '@/lib/xp-service'
 
 // CQ-12: declared on the wrapper, so a malformed or mistyped body is a clean 400 rather
 // than a hand-parsed cast (or a 500 incident on invalid JSON).
+// L9: generous ceilings that no real submission reaches (the longest capstone template is
+// a few thousand words), so a scripted payload cannot store megabytes per row.
+const MAX_CAPSTONE_CONTENT_CHARS = 100_000
+const MAX_REFLECTION_CHARS = 10_000
+
 const submitSchema = z.object({
-  content: z.string({ message: 'Content payload must be a string.' }),
-  reflectionContent: z.string().optional(),
+  content: z
+    .string({ message: 'Content payload must be a string.' })
+    .max(MAX_CAPSTONE_CONTENT_CHARS, `Capstone content must be ${MAX_CAPSTONE_CONTENT_CHARS.toLocaleString('en-US')} characters or fewer.`),
+  reflectionContent: z
+    .string()
+    .max(MAX_REFLECTION_CHARS, `Reflection must be ${MAX_REFLECTION_CHARS.toLocaleString('en-US')} characters or fewer.`)
+    .optional(),
   reflectionIsPublic: z.boolean().optional(),
   isPublic: z.boolean().optional(),
 })

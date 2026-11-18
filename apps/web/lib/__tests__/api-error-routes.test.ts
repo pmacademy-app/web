@@ -22,6 +22,7 @@ vi.mock('@/lib/admin/settings-service', () => ({
 }))
 
 vi.mock('@/lib/auth', () => ({
+  SIGNUP_CONSENT_APP_METADATA_KEY: 'signup_consent',
   ensureUserProfile: vi.fn(async () => undefined),
   getAuthenticatedUserFromRequest: vi.fn(async () => null),
 }))

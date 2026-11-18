@@ -562,6 +562,45 @@ body {
   }
 }
 
+/* ─── Engine-free motion (replaces framer-motion) ───────────────────────────
+   [data-reveal] is set only by hooks/use-reveal-on-scroll.ts, and only on elements
+   that are off screen once JavaScript runs, so content is visible at rest without it.
+   ring-draw sweeps an SVG progress ring from empty to its stroke-dashoffset; the
+   element sets --ring-from (the circumference) and its final offset inline.
+---------------------------------------------------------------------------- */
+[data-reveal] {
+  transition:
+    opacity 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: var(--ring-from);
+  }
+}
+
+@utility animate-ring-draw {
+  animation: ring-draw 1s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal='pending'] {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  .animate-ring-draw {
+    animation: none !important;
+  }
+}
+
 /* ─── Marketing depth and surface effects (homepage round 2) ────────────────
    Recipes are exposed as class names through components/marketing/styles.ts.
    Rules for everything below:

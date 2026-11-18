@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from '../supabase'
 import { AdminConsoleService } from './service'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 import type {
   AdminSystemHealthOverview,
   AdminSystemServiceStatus,
@@ -371,6 +371,7 @@ export class SystemService {
           .from('system_errors')
           .select('id, fingerprint, severity, category, operation, message, status, timestamp')
           .order('timestamp', { ascending: false })
+          .order('id')
           .range(from, to)
         if (severity) query = query.eq('severity', severity)
         if (category) query = query.eq('category', category)

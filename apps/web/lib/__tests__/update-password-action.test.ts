@@ -1,17 +1,19 @@
 /**
- * Security & architecture tests for updatePasswordAction() Server Action.
+ * Security tests for updatePasswordAction() (the reset page's server action).
  *
- * Verifies the authorization chain:
- *   HttpOnly access token -> getUser(accessToken) -> validated userId -> admin.updateUserById(userId, password)
+ * Authorization chain (H1):
+ *   signed recovery marker (callback, recovery links only)
+ *   + httpOnly session -> getUser(accessToken) / refresh -> validated userId
+ *   -> marker.uid === userId -> rate limits -> admin.updateUserById -> global sign-out
  *
- * Key properties tested:
- * 1. accessToken is explicitly passed to auth.getUser(accessToken) for JWT validation
- * 2. userId is ALWAYS derived from Supabase JWT validation, never from client input
- * 3. Admin API is only called after successful identity verification
- * 4. Failed getUser() prevents Admin API call
- * 5. Expired/invalid tokens are handled cleanly
- * 6. Recovery cookies are cleared on success and on terminal failure
- * 7. Service role client is not exposed; no user-controlled userId path exists
+ * Properties tested:
+ * 1. A session without a valid recovery marker cannot change the password
+ * 2. The marker must name the same user the session resolves to
+ * 3. userId comes only from provider validation, never from client input
+ * 4. Server-side minimum length, persistent per-IP and per-user limits
+ * 5. Every session is revoked after a successful change (L5)
+ * 6. Recovery cookies and the marker are cleared on success and terminal failure
+ * 7. Provider error text never crosses to the browser
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -19,19 +21,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 // --- Shared mock state -------------------------------------------------------
 const mockGetUser = vi.fn()
 const mockUpdateUserById = vi.fn()
+const mockAdminSignOut = vi.fn()
 const mockRefreshSession = vi.fn()
 const mockCookieGet = vi.fn()
 const mockCookieDelete = vi.fn()
+const mockRateLimit = vi.fn()
 
-// --- Mock next/headers -------------------------------------------------------
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({
     get: mockCookieGet,
     delete: mockCookieDelete,
   })),
+  headers: vi.fn(async () => new Headers({ 'x-real-ip': '203.0.113.7' })),
 }))
 
-// --- Mock @supabase/supabase-js createClient ---------------------------------
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     auth: {
@@ -41,183 +44,170 @@ vi.mock('@supabase/supabase-js', () => ({
   })),
 }))
 
-// --- Mock lib/supabase -------------------------------------------------------
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(() => ({
     auth: {
       admin: {
         updateUserById: mockUpdateUserById,
+        signOut: mockAdminSignOut,
       },
     },
   })),
 }))
 
+vi.mock('@/lib/rate-limit', () => ({
+  evaluatePersistentRateLimit: (...args: unknown[]) => mockRateLimit(...args),
+}))
+
 import { updatePasswordAction } from '../../app/(auth)/reset-password/actions'
+import { RECOVERY_MARKER_COOKIE, signRecoveryMarker } from '@/lib/auth/recovery-marker'
 import * as supabaseLib from '@/lib/supabase'
 
-// --- Test Suite --------------------------------------------------------------
-describe('updatePasswordAction() Server Action — Authorization Chain', () => {
+const USER_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+const ACCESS_TOKEN = 'valid-recovery-access-token-jwt'
+const PASSWORD = 'MyNewSecurePass!'
+
+function cookieJar(values: Record<string, string | undefined>) {
+  mockCookieGet.mockImplementation((name: string) => (values[name] ? { value: values[name] } : undefined))
+}
+
+function validUser(id = USER_ID) {
+  mockGetUser.mockResolvedValue({ data: { user: { id, email: 'user@example.com' } }, error: null })
+}
+
+describe('updatePasswordAction() recovery-only authorization chain', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://mock.supabase.co'
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'mock-anon-key'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key'
+    process.env.OAUTH_STATE_SECRET = 'test-oauth-state-secret-at-least-32-chars-long'
+    mockRateLimit.mockResolvedValue({ success: true, remaining: 4, resetInMs: 60_000 })
+    mockUpdateUserById.mockResolvedValue({ data: { user: { id: USER_ID } }, error: null })
+    mockAdminSignOut.mockResolvedValue({ data: null, error: null })
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  // --- 1. No session cookies ----------------------------------------------
-  it('1. Returns error immediately when no cookies present (no Admin API call)', async () => {
-    mockCookieGet.mockReturnValue(undefined) // no access or refresh token
-
-    const result = await updatePasswordAction('newPassword123')
-
-    expect(result.error).toBe(
-      'No active recovery session found. Please request a new password reset link.'
-    )
-    // Critical: Admin API must NOT be called without any session
-    expect(mockUpdateUserById).not.toHaveBeenCalled()
+  it('returns an error without any session cookie (no provider or Admin call)', async () => {
+    cookieJar({ [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    const result = await updatePasswordAction(PASSWORD)
+    expect(result.error).toBe('No active recovery session found. Please request a new password reset link.')
     expect(mockGetUser).not.toHaveBeenCalled()
+    expect(mockUpdateUserById).not.toHaveBeenCalled()
   })
 
-  // --- 2. Valid access token -> explicit getUser(accessToken) -> successful update --
-  it('2. Valid access token: explicitly passes token to getUser(accessToken) -> admin.updateUserById() called with that exact userId', async () => {
-    const VALIDATED_USER_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
-    const ACCESS_TOKEN = 'valid-recovery-access-token-jwt'
+  it('H1: a normal session without the recovery marker cannot change the password', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN })
+    validUser()
+    const result = await updatePasswordAction(PASSWORD)
+    expect(result.code).toBe('AUTH_SESSION_SYNC_FAILED')
+    expect(mockUpdateUserById).not.toHaveBeenCalled()
+    // A legitimately signed-in learner is not logged out by opening the form.
+    expect(mockCookieDelete).not.toHaveBeenCalledWith('sb-access-token')
+  })
 
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: ACCESS_TOKEN }
-      return undefined
-    })
+  it('H1: a forged or expired marker is refused', async () => {
+    validUser()
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: 'forged.marker' })
+    expect((await updatePasswordAction(PASSWORD)).code).toBe('AUTH_SESSION_SYNC_FAILED')
 
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: VALIDATED_USER_ID, email: 'user@example.com' } },
-      error: null,
-    })
+    const stale = signRecoveryMarker(USER_ID, Date.now() - 11 * 60 * 1000)!
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: stale })
+    expect((await updatePasswordAction(PASSWORD)).code).toBe('AUTH_SESSION_SYNC_FAILED')
+    expect(mockUpdateUserById).not.toHaveBeenCalled()
+  })
 
-    mockUpdateUserById.mockResolvedValue({
-      data: { user: { id: VALIDATED_USER_ID } },
-      error: null,
-    })
+  it('H1: a marker issued for another user is refused', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker('someone-else')! })
+    validUser()
+    const result = await updatePasswordAction(PASSWORD)
+    expect(result.error).toBeTruthy()
+    expect(mockUpdateUserById).not.toHaveBeenCalled()
+  })
 
-    const result = await updatePasswordAction('MyNewSecurePass!')
+  it('valid marker + session: updates the validated user, revokes all sessions, clears cookies', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    validUser()
 
-    // Explicit validation check: getUser was called with the exact access token from the cookie
+    const result = await updatePasswordAction(PASSWORD)
+
+    expect(result).toEqual({ success: true })
     expect(mockGetUser).toHaveBeenCalledWith(ACCESS_TOKEN)
-
-    // Admin API must have been called with EXACTLY the validated userId
-    expect(mockUpdateUserById).toHaveBeenCalledWith(VALIDATED_USER_ID, {
-      password: 'MyNewSecurePass!',
+    expect(mockUpdateUserById).toHaveBeenCalledWith(USER_ID, {
+      password: PASSWORD,
+      app_metadata: { password_set: true },
     })
-    expect(result.success).toBe(true)
-    expect(result.error).toBeUndefined()
-
-    // Cookies must be cleared
+    expect(mockAdminSignOut).toHaveBeenCalledWith(ACCESS_TOKEN, 'global')
     expect(mockCookieDelete).toHaveBeenCalledWith('sb-access-token')
     expect(mockCookieDelete).toHaveBeenCalledWith('sb-refresh-token')
+    expect(mockCookieDelete).toHaveBeenCalledWith({ name: RECOVERY_MARKER_COOKIE, path: '/reset-password' })
   })
 
-  // --- 3. CRITICAL: No client-controlled userId path ----------------------
-  it('3. No client-controlled userId: Admin API only ever receives userId from getUser() JWT validation', async () => {
-    const REAL_USER_ID = 'real-user-uuid-abcd-1234-5678-ef90abcdef12'
-    const ATTACKER_TOKEN = 'attacker-crafted-token'
-
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: ATTACKER_TOKEN }
-      return undefined
-    })
-
-    // Supabase validates the JWT and returns the REAL user (ignores any attacker claim)
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: REAL_USER_ID, email: 'real@example.com' } },
-      error: null,
-    })
-
-    mockUpdateUserById.mockResolvedValue({ data: { user: { id: REAL_USER_ID } }, error: null })
-
-    await updatePasswordAction('newpass123')
-
-    expect(mockGetUser).toHaveBeenCalledWith(ATTACKER_TOKEN)
-    // Regardless of what was in the cookie, the userId fed to admin API is what Supabase validated
-    expect(mockUpdateUserById).toHaveBeenCalledWith(REAL_USER_ID, expect.any(Object))
-    expect(mockUpdateUserById).toHaveBeenCalledTimes(1)
+  it('a failed global sign-out does not undo a successful change', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    validUser()
+    mockAdminSignOut.mockRejectedValue(new Error('network'))
+    expect(await updatePasswordAction(PASSWORD)).toEqual({ success: true })
   })
 
-  // --- 4. Failed getUser() -> Admin API NOT called -------------------------
-  it('4. When getUser() fails (invalid/expired JWT), Admin API is NOT called and falls through to refresh', async () => {
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'expired-access-token' }
-      return undefined // no refresh token
-    })
+  it('enforces the server-side minimum length before reading any cookie', async () => {
+    const result = await updatePasswordAction('short')
+    expect(result.code).toBe('AUTH_PASSWORD_TOO_WEAK')
+    expect(result.error).toBe('Password must be at least 10 characters.')
+    expect(mockCookieGet).not.toHaveBeenCalled()
+  })
 
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: { message: 'JWT expired', code: 'token_expired' },
-    })
+  it('applies the persistent per-IP and per-user limits (fail closed)', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    validUser()
+    await updatePasswordAction(PASSWORD)
+    expect(mockRateLimit).toHaveBeenCalledWith('update_pwd_ip:203.0.113.7', expect.objectContaining({ limit: 10, failClosed: true }))
+    expect(mockRateLimit).toHaveBeenCalledWith(`update_pwd_user:user:${USER_ID}`, expect.objectContaining({ limit: 5, failClosed: true }))
+  })
 
-    const result = await updatePasswordAction('newpass123')
-
-    // No refresh token available -> terminal failure, no Admin API call
+  it('returns AUTH_RATE_LIMITED and changes nothing when a limit is exhausted', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    validUser()
+    mockRateLimit.mockImplementation(async (key: string) =>
+      key.startsWith('update_pwd_user:') ? { success: false, remaining: 0, resetInMs: 1 } : { success: true, remaining: 1, resetInMs: 1 }
+    )
+    const result = await updatePasswordAction(PASSWORD)
+    expect(result.code).toBe('AUTH_RATE_LIMITED')
     expect(mockUpdateUserById).not.toHaveBeenCalled()
-    expect(result.error).toBeTruthy()
   })
 
-  // --- 5. Expired access token + valid refresh token fallback -------------
-  it('5. Expired access token + valid refresh token: userId from refresh -> Admin API called with that userId', async () => {
-    const REFRESH_USER_ID = 'refresh-user-uuid-1234-abcd-5678-ef90abcdef12'
-
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'expired-access-token' }
-      if (name === 'sb-refresh-token') return { value: 'valid-refresh-token' }
-      return undefined
+  it('expired access token + valid refresh token: user id from the refresh, sign-out with the fresh token', async () => {
+    cookieJar({
+      'sb-access-token': 'expired-access-token',
+      'sb-refresh-token': 'valid-refresh-token',
+      [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)!,
     })
-
-    // Access token getUser() fails
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: { message: 'JWT expired', code: 'token_expired' },
-    })
-
-    // Refresh token exchange succeeds
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'JWT expired', code: 'token_expired' } })
     mockRefreshSession.mockResolvedValue({
-      data: {
-        session: {
-          access_token: 'new-access-token',
-          refresh_token: 'new-refresh-token',
-          user: { id: REFRESH_USER_ID, email: 'user@example.com' },
-        },
-        user: { id: REFRESH_USER_ID },
-      },
+      data: { session: { access_token: 'new-access-token', refresh_token: 'new-refresh', user: { id: USER_ID } } },
       error: null,
     })
 
-    mockUpdateUserById.mockResolvedValue({ data: { user: { id: REFRESH_USER_ID } }, error: null })
+    const result = await updatePasswordAction(PASSWORD)
 
-    const result = await updatePasswordAction('newpass123')
-
-    // Admin API called with userId from the refresh session (server-validated)
-    expect(mockUpdateUserById).toHaveBeenCalledWith(REFRESH_USER_ID, { password: 'newpass123' })
     expect(result.success).toBe(true)
+    expect(mockUpdateUserById).toHaveBeenCalledWith(USER_ID, expect.objectContaining({ password: PASSWORD }))
+    expect(mockAdminSignOut).toHaveBeenCalledWith('new-access-token', 'global')
   })
 
-  // --- 6. Expired/invalid refresh token -> clean failure -------------------
-  it('6. Expired/invalid refresh token: Admin API NOT called, cookies cleared, friendly error returned', async () => {
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'expired-access-token' }
-      if (name === 'sb-refresh-token') return { value: 'expired-refresh-token' }
-      return undefined
+  it('expired refresh token: no Admin call, cookies cleared, friendly error', async () => {
+    cookieJar({
+      'sb-access-token': 'expired-access-token',
+      'sb-refresh-token': 'expired-refresh-token',
+      [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)!,
     })
-
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'JWT expired' } })
+    mockRefreshSession.mockResolvedValue({ data: { session: null }, error: { message: 'Refresh token not found' } })
 
-    mockRefreshSession.mockResolvedValue({
-      data: { session: null, user: null },
-      error: { message: 'Refresh token not found', code: 'refresh_token_not_found' },
-    })
-
-    const result = await updatePasswordAction('newpass123')
+    const result = await updatePasswordAction(PASSWORD)
 
     expect(mockUpdateUserById).not.toHaveBeenCalled()
     expect(result.error).toContain('expired')
@@ -225,105 +215,25 @@ describe('updatePasswordAction() Server Action — Authorization Chain', () => {
     expect(mockCookieDelete).toHaveBeenCalledWith('sb-refresh-token')
   })
 
-  // --- 7. Admin API failure propagates as error ----------------------------
-  it('7. Admin API failure (e.g., user not found in DB) returns error, does not throw', async () => {
-    const USER_ID = 'abcd1234-ef56-7890-abcd-ef1234567890'
+  it('returns classified copy, never the raw GoTrue message', async () => {
+    cookieJar({ 'sb-access-token': ACCESS_TOKEN, [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
+    validUser()
+    const RAW = 'Password should be at least 6 characters. [gotrue:422] relation "auth.users" constraint violated'
+    mockUpdateUserById.mockResolvedValue({ data: { user: null }, error: { message: RAW, status: 422, code: 'weak_password' } })
 
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'valid-token' }
-      return undefined
-    })
-
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: USER_ID, email: 'user@example.com' } },
-      error: null,
-    })
-
-    mockUpdateUserById.mockResolvedValue({
-      data: { user: null },
-      error: { message: 'User not found' },
-    })
-
-    const result = await updatePasswordAction('newpass123')
-
-    expect(result.error).toBeTruthy()
-    expect(result.success).toBeUndefined()
-  })
-
-  // --- 7b. The provider's own message must not cross to the browser ---
-  it('7b. Admin API failure returns classified copy, never the raw GoTrue message', async () => {
-    const USER_ID = 'abcd1234-ef56-7890-abcd-ef1234567890'
-
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'valid-token' }
-      return undefined
-    })
-
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: USER_ID, email: 'user@example.com' } },
-      error: null,
-    })
-
-    // A realistic GoTrue error: internal wording, an error code, and a status.
-    const RAW_PROVIDER_MESSAGE =
-      'Password should be at least 6 characters. [gotrue:422] relation "auth.users" constraint violated'
-    mockUpdateUserById.mockResolvedValue({
-      data: { user: null },
-      error: { message: RAW_PROVIDER_MESSAGE, status: 422, code: 'weak_password' },
-    })
-
-    const result = await updatePasswordAction('short')
-
-    // The action's return value is serialized to the browser, so the raw string must
-    // not appear anywhere in it, not merely go unrendered.
+    const result = await updatePasswordAction(PASSWORD)
     const serialized = JSON.stringify(result)
-    expect(serialized).not.toContain(RAW_PROVIDER_MESSAGE)
+    expect(serialized).not.toContain(RAW)
     expect(serialized).not.toContain('gotrue')
-    expect(serialized).not.toContain('auth.users')
-
-    // Classified copy and a stable code take its place.
     expect(result.code).toBe('AUTH_PASSWORD_TOO_WEAK')
-    expect(result.error).toContain('security requirements')
+    expect(mockAdminSignOut).not.toHaveBeenCalled()
   })
 
-  // --- 8. createServiceRoleClient is called ONLY after identity verified ---
-  it('8. createServiceRoleClient() is invoked only after successful getUser() identity check', async () => {
-    const createServiceRoleClientSpy = vi.spyOn(supabaseLib, 'createServiceRoleClient')
-
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'valid-token' }
-      return undefined
-    })
-
-    // Simulate failed identity verification
+  it('createServiceRoleClient() is not invoked when identity verification fails', async () => {
+    const spy = vi.spyOn(supabaseLib, 'createServiceRoleClient')
+    cookieJar({ 'sb-access-token': 'bad', [RECOVERY_MARKER_COOKIE]: signRecoveryMarker(USER_ID)! })
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'JWT invalid' } })
-
-    await updatePasswordAction('newpass123')
-
-    // Service role client must NOT be created when identity verification fails
-    expect(createServiceRoleClientSpy).not.toHaveBeenCalled()
-  })
-
-  // --- 9. Successful update clears recovery cookies ------------------------
-  it('9. Successful update clears both recovery cookies', async () => {
-    const USER_ID = 'success-user-uuid-1234-5678-abcdef901234'
-
-    mockCookieGet.mockImplementation((name: string) => {
-      if (name === 'sb-access-token') return { value: 'valid-token' }
-      return undefined
-    })
-
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: USER_ID, email: 'user@example.com' } },
-      error: null,
-    })
-
-    mockUpdateUserById.mockResolvedValue({ data: { user: { id: USER_ID } }, error: null })
-
-    await updatePasswordAction('newValidPass123')
-
-    expect(mockCookieDelete).toHaveBeenCalledWith('sb-access-token')
-    expect(mockCookieDelete).toHaveBeenCalledWith('sb-refresh-token')
+    await updatePasswordAction(PASSWORD)
+    expect(spy).not.toHaveBeenCalled()
   })
 })
-

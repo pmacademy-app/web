@@ -22,7 +22,12 @@ vi.mock('next/server', async (importOriginal) => {
 
 vi.mock('@/lib/supabase', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/supabase')>()
-  return { ...actual, createServiceRoleClient: () => ({}) }
+  // The submit route reads check records from rate_limits; none exist in this file (the
+  // records are covered in quiz-check-record.test.ts).
+  const noRows = {
+    select: () => ({ in: () => ({ gte: async () => ({ data: [], error: null }) }) }),
+  }
+  return { ...actual, createServiceRoleClient: () => ({ from: () => noRows }) }
 })
 
 vi.mock('@/lib/api/actor', async (importOriginal) => {

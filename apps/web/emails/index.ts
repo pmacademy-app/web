@@ -136,13 +136,49 @@ export function stripHtmlToPlainText(html: string): string {
 }
 
 /**
- * Safely interpolates `{{variableName}}` placeholders in a string.
+ * How an interpolated value is made safe for where it lands.
+ *
+ *  - `text`: a plain-text body. Inserted as is.
+ *  - `html`: an HTML body. HTML-escaped, so a learner-controlled value such as a
+ *    display name cannot inject markup or links into a published template. URL
+ *    variables (`appUrl`, `resetUrl`, ...) keep working inside `href="{{resetUrl}}"`:
+ *    the browser decodes `&amp;` back to `&` in an attribute value, and an escaped `"`
+ *    cannot close the attribute.
+ *  - `subject`: a header line. CR/LF and other control characters become a space so a
+ *    value cannot start a new header or split the subject.
  */
-export function interpolateVariables(template: string, variables: Record<string, unknown>): string {
+export type InterpolationContext = 'text' | 'html' | 'subject'
+
+export function escapeHtmlValue(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function toSafeValue(raw: string, context: InterpolationContext): string {
+  if (context === 'html') return escapeHtmlValue(raw)
+  if (context === 'subject') return raw.replace(/[\u0000-\u001f\u007f]+/g, ' ')
+  return raw
+}
+
+/**
+ * Interpolates `{{variableName}}` placeholders in a string.
+ *
+ * Pass `'html'` for an HTML body and `'subject'` for a subject line; the default
+ * `'text'` inserts values unchanged and is only for plain-text bodies.
+ */
+export function interpolateVariables(
+  template: string,
+  variables: Record<string, unknown>,
+  context: InterpolationContext = 'text'
+): string {
   if (!template) return ''
   return template.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key) => {
     if (key in variables && variables[key] !== undefined && variables[key] !== null) {
-      return String(variables[key])
+      return toSafeValue(String(variables[key]), context)
     }
     return ''
   })
@@ -189,8 +225,8 @@ export async function renderEmailTemplate(
 
         if (publishedVersion && publishedVersion.body_html?.trim()) {
           const rawSubject = publishedVersion.subject_line || entry?.subjectLine || 'Update from Prodily'
-          const subject = interpolateVariables(rawSubject, variables)
-          const interpolatedHtml = interpolateVariables(publishedVersion.body_html, variables)
+          const subject = interpolateVariables(rawSubject, variables, 'subject')
+          const interpolatedHtml = interpolateVariables(publishedVersion.body_html, variables, 'html')
           const html = interpolatedHtml.startsWith('<!DOCTYPE') ? interpolatedHtml : `<!DOCTYPE html>${interpolatedHtml}`
           const text = publishedVersion.body_text
             ? interpolateVariables(publishedVersion.body_text, variables)
@@ -216,7 +252,7 @@ export async function renderEmailTemplate(
   const rawHtml = renderToStaticMarkup(element)
   const html = `<!DOCTYPE html>${rawHtml}`
   const text = stripHtmlToPlainText(rawHtml)
-  const subject = interpolateVariables(entry.subjectLine, variables)
+  const subject = interpolateVariables(entry.subjectLine, variables, 'subject')
 
   return { html, text, subject }
 }

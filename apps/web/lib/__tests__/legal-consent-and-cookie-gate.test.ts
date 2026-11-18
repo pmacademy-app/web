@@ -51,6 +51,7 @@ vi.mock('@/lib/supabase', () => ({
 
 const mockEnsureUserProfile = vi.fn()
 vi.mock('@/lib/auth', () => ({
+  SIGNUP_CONSENT_APP_METADATA_KEY: 'signup_consent',
   ensureUserProfile: (...args: unknown[]) => mockEnsureUserProfile(...args),
 }))
 
@@ -236,7 +237,10 @@ describe('P0-1 — consent records and existing users', () => {
     // Imported lazily: this suite mocks '@/lib/auth' for the route tests above, so
     // the real implementation is read from source instead of executed.
     const src = read('lib/auth.ts')
-    expect(src).toContain('consentFromAuthMetadata(user.user_metadata)')
+    // M4: an omitted consent is read only from server-written app_metadata, never from
+    // the user-editable user_metadata.
+    expect(src).toContain('consentFromServerMetadata(user)')
+    expect(src).not.toContain('consentFromAuthMetadata(user.user_metadata)')
     expect(src).toContain('...(consent ?? {})')
   })
 

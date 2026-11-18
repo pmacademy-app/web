@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { sendEmail } from '@/lib/email'
+import { sendGovernedEmail } from '@/lib/email-governance'
 import { EMAIL_HTTP_TIMEOUT_MS } from '@/lib/notifications/config'
 import { log } from '@/lib/monitoring/log'
 
@@ -26,6 +26,75 @@ export function isTransientBounce(data: Record<string, unknown>): boolean {
   if (!bounce || typeof bounce !== 'object') return false
   const type = (bounce as Record<string, unknown>).type
   return typeof type === 'string' && type.toLowerCase() === 'transient'
+}
+
+/**
+ * Largest webhook body this route will buffer, in bytes.
+ *
+ * Provider delivery events are a few KB and inbound mail arrives as metadata (the body
+ * is fetched from the Resend API afterwards), so 256 KiB leaves plenty of headroom. The
+ * cap is applied BEFORE authentication: the signature check needs the whole body, so
+ * without it an unauthenticated caller could make every instance buffer an arbitrarily
+ * large request.
+ */
+export const MAX_WEBHOOK_BODY_BYTES = 256 * 1024
+
+/** Support inbox that receives forwarded copies of inbound mail. */
+const SUPPORT_FORWARD_TO = 'pmacademyapp@gmail.com'
+
+class PayloadTooLargeError extends Error {}
+
+/**
+ * Reads the body as text, refusing once it passes `maxBytes`.
+ *
+ * The declared length is checked first so an honest oversized request is refused
+ * without reading it; the stream is then counted as it arrives, because the header
+ * is optional and can lie. Either way no more than `maxBytes` is ever buffered.
+ * (Same approach as the private helper in `app/api/client-errors/route.ts`.)
+ */
+async function readCappedText(request: Request, maxBytes: number): Promise<string> {
+  const declared = Number(request.headers.get('content-length'))
+  if (Number.isFinite(declared) && declared > maxBytes) throw new PayloadTooLargeError()
+  if (!request.body) return ''
+
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
+  let received = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    received += value.byteLength
+    if (received > maxBytes) {
+      await reader.cancel().catch(() => {})
+      throw new PayloadTooLargeError()
+    }
+    chunks.push(value)
+  }
+
+  const joined = new Uint8Array(received)
+  let offset = 0
+  for (const chunk of chunks) {
+    joined.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return new TextDecoder().decode(joined)
+}
+
+/**
+ * The first recipient address in a provider field.
+ *
+ * Resend sends `to` as an array of addresses; `String(['a@x', 'b@y'])` is
+ * `'a@x,b@y'`, which is not an address and used to be written to `email_suppressions`
+ * as one.
+ */
+function firstAddress(value: unknown): string {
+  if (Array.isArray(value)) return typeof value[0] === 'string' ? value[0] : ''
+  return typeof value === 'string' ? value : ''
+}
+
+/** One header-safe line: no CR/LF or other control characters, bounded length. */
+function singleLine(value: string, max: number): string {
+  return value.replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().substring(0, max)
 }
 
 function escapeHtml(unsafe: string): string {
@@ -132,8 +201,19 @@ async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; 
 }
 
 export async function POST(request: Request) {
+  let rawBody: string
   try {
-    const rawBody = await request.text()
+    rawBody = await readCappedText(request, MAX_WEBHOOK_BODY_BYTES)
+  } catch (err) {
+    if (err instanceof PayloadTooLargeError) {
+      log.warn('email.webhook.payload_too_large', { maxBytes: MAX_WEBHOOK_BODY_BYTES })
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 })
+    }
+    log.warnException('email.webhook.body_read_failed', err)
+    return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 })
+  }
+
+  try {
     const resendSecret = process.env.RESEND_WEBHOOK_SECRET
     const brevoSecret = process.env.BREVO_WEBHOOK_SECRET
 
@@ -364,7 +444,12 @@ export async function POST(request: Request) {
         // Suppression is also what keeps the retry routes from requeueing these rows —
         // they exclude suppressed recipients before requeueing.
         if (eventType === 'email.complained' || eventType === 'email.bounced') {
-          const rawEmail = String(data.email || data.to || data.recipient || payload.email || '').trim().toLowerCase()
+          const rawEmail = (
+            firstAddress(data.email) ||
+            firstAddress(data.to) ||
+            firstAddress(data.recipient) ||
+            firstAddress(payload.email)
+          ).trim().toLowerCase()
           if (rawEmail && rawEmail.includes('@')) {
             // A. Synchronize suppression record in email_suppressions
             await supabase
@@ -423,12 +508,11 @@ export async function POST(request: Request) {
 
     // 2. Fetch full email content from Resend Receiving API if email_id is present
     let textBody = String(data.text || '')
-    let htmlBody = String(data.html || '')
-
-    if ((!textBody && !htmlBody) && emailId) {
+    // The sender's HTML is never used: it is attacker-controlled markup. Only the text
+    // part is stored and forwarded (escaped).
+    if (!textBody && emailId) {
       const fetched = await fetchInboundEmailBody(emailId)
       if (fetched.text) textBody = fetched.text
-      if (fetched.html) htmlBody = fetched.html
     }
 
     const finalMessageBody = textBody.trim() || 'Inbound email received without body content.'
@@ -475,25 +559,42 @@ export async function POST(request: Request) {
       })
     }
 
-    // 4. Forward alert email to pmacademyapp@gmail.com inbox via sendEmail()
+    // 4. Forward a copy to the support inbox through the governed gateway.
+    //
+    // Anyone on the internet can mail hello@, so this used to be an unmetered path to a
+    // paid provider (raw `sendEmail()`, no quota, no rate limit), and it pasted the
+    // sender's own `html` into the forward unescaped. Now the forward draws on its own
+    // small budget (`support.inbound_forward`) and carries only the escaped plain text.
+    // When the budget is spent the message is still stored above; only the copy is
+    // skipped.
     try {
-      await sendEmail({
-        to: 'pmacademyapp@gmail.com',
-        subject: `Fwd: [Direct Email Inquiry] ${subject}`,
+      const safeSubject = singleLine(subject, 200)
+      const forwardKey = insertedId
+        ? `inbound:${insertedId}`
+        : `inbound:${crypto.createHash('sha256').update(emailId || rawBody).digest('hex').slice(0, 32)}`
+      const forwardBody = finalMessageBody.substring(0, 3000)
+      const forward = await sendGovernedEmail({
+        purpose: 'support.inbound_forward',
+        to: SUPPORT_FORWARD_TO,
+        subject: `Fwd: [Direct Email Inquiry] ${safeSubject}`,
         html: `
           <h2>Direct Inbound Email Received</h2>
-          <p><strong>From:</strong> ${escapeHtml(senderName)} (&lt;<a href="mailto:${escapeHtml(senderEmail)}">${escapeHtml(senderEmail)}</a>&gt;)</p>
+          <p><strong>From:</strong> ${escapeHtml(senderName)} (&lt;${escapeHtml(senderEmail)}&gt;)</p>
           <p><strong>To:</strong> hello@prodily.app</p>
-          <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
-          <p><strong>Database Record ID:</strong> <code>${insertedId || 'N/A'}</code></p>
+          <p><strong>Subject:</strong> ${escapeHtml(safeSubject)}</p>
+          <p><strong>Database Record ID:</strong> <code>${escapeHtml(insertedId || 'N/A')}</code></p>
           <hr />
-          <p><strong>Message Content:</strong></p>
+          <p><strong>Message Content (plain text):</strong></p>
           <blockquote style="background:#f5f5f5; padding:12px; border-left:4px solid #3b82f6; font-family:sans-serif;">
-            ${htmlBody || escapeHtml(finalMessageBody).replace(/\n/g, '<br />')}
+            ${escapeHtml(forwardBody).replace(/\n/g, '<br />')}
           </blockquote>
         `,
-        text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.app\nSubject: ${subject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${finalMessageBody}`,
+        text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.app\nSubject: ${safeSubject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${forwardBody}`,
+        idempotencyKey: forwardKey,
       })
+      if (!forward.sent) {
+        log.warn('email.webhook.forward_not_sent', { blocked: forward.blocked ?? null, statusCode: forward.statusCode ?? null })
+      }
     } catch (forwardErr) {
       log.warnException('email.webhook.forward_failed', forwardErr)
       const { logSystemError } = await import('@/lib/monitoring/logger')
@@ -515,6 +616,7 @@ export async function POST(request: Request) {
       operation: 'resend_webhook_exception',
       message: `Unhandled exception in Resend webhook: ${errorMsg}`,
     })
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
+    // The detail is in the log above; the caller gets a generic message.
+    return NextResponse.json({ success: false, error: 'Invalid webhook payload' }, { status: 400 })
   }
 }

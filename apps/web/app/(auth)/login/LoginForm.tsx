@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+// zod/mini: same validation core and messages as full zod, a fraction of the client
+// bundle. Checks run in the listed order, so the first message per field is unchanged.
+import * as z from 'zod/mini'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
@@ -21,16 +23,16 @@ import { apiPost } from '@/lib/api/client'
 const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
 
 const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required.')
-    .email('Please enter a valid email address.')
-    .trim()
-    .toLowerCase(),
-  password: z
-    .string()
-    .min(1, 'Password is required.')
-    .min(6, 'Password must be at least 6 characters.'),
+  email: z.string().check(
+    z.minLength(1, 'Email is required.'),
+    z.regex(z.regexes.email, 'Please enter a valid email address.'),
+    z.trim(),
+    z.toLowerCase(),
+  ),
+  password: z.string().check(
+    z.minLength(1, 'Password is required.'),
+    z.minLength(6, 'Password must be at least 6 characters.'),
+  ),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>

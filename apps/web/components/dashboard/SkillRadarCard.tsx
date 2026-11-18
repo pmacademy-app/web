@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import type { SkillCluster, SkillValues } from '@/types'
 import { SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
 import { SKILL_CLUSTER_IDS, ClusterBreakdown } from '@/lib/skillRadar'
@@ -151,14 +150,12 @@ export function SkillRadarCard({
               )
             })}
 
-            {/* User Data Polygon with Framer Motion Animation */}
-            <motion.polygon
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+            {/* User Data Polygon: fades and grows from 80% around its own centre on
+                mount (tw-animate-css enter keyframe), off under reduced motion. */}
+            <polygon
               points={dataPoints}
               fill="currentColor"
-              className="text-primary/20"
+              className="text-primary/20 origin-center [transform-box:fill-box] animate-in fade-in zoom-in-80 duration-500 ease-out motion-reduce:animate-none"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinejoin="round"

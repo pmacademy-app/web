@@ -27,6 +27,8 @@ function AdminConfirmDialog({
   destructive = false,
   onConfirm,
   onCancel,
+  children,
+  confirmDisabled = false,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -37,6 +39,10 @@ function AdminConfirmDialog({
   destructive?: boolean
   onConfirm?: () => void
   onCancel?: () => void
+  /** Optional extra content between the description and the buttons (e.g. a step-up password field). */
+  children?: React.ReactNode
+  /** Disables the confirm button, e.g. until a required field is filled. */
+  confirmDisabled?: boolean
 }) {
   const shellRef = useAdminShell()
 
@@ -55,6 +61,7 @@ function AdminConfirmDialog({
               </AlertDialogPrimitive.Description>
             )}
           </div>
+          {children && <div className="mt-4">{children}</div>}
           <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <AlertDialogPrimitive.Close
               render={<Button variant="outline" />}
@@ -68,6 +75,7 @@ function AdminConfirmDialog({
                 <Button variant={destructive ? 'destructive' : 'default'} />
               }
               onClick={onConfirm}
+              disabled={confirmDisabled}
               className={cn(destructive ? '' : 'bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90')}
             >
               {confirmLabel}

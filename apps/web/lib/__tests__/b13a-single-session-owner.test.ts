@@ -233,6 +233,22 @@ describe('B13-A — the native client path', () => {
     expect(isNativeClient(headers({ [CLIENT_TYPE_HEADER]: '' }))).toBe(false)
   })
 
+  it('refuses body tokens when the request carries any browser signal', () => {
+    // A same-origin XSS can set X-Client-Type but cannot strip fetch metadata, Origin
+    // or the cookies a same-origin fetch sends, so it never lifts a refresh token.
+    const native = { [CLIENT_TYPE_HEADER]: NATIVE_CLIENT_TYPE }
+    expect(isNativeClient(headers({ ...native, 'sec-fetch-site': 'same-origin' }))).toBe(false)
+    expect(isNativeClient(headers({ ...native, 'sec-fetch-mode': 'cors' }))).toBe(false)
+    expect(isNativeClient(headers({ ...native, origin: 'https://prodily.app' }))).toBe(false)
+    expect(isNativeClient(headers({ ...native, cookie: 'sb-refresh-token=r' }))).toBe(false)
+    expect(isNativeClient(headers({ ...native, cookie: 'theme=x; sb-access-token=a' }))).toBe(false)
+    expect(
+      sessionForClient(headers({ ...native, 'sec-fetch-site': 'same-origin' }), { refresh_token: 'r' })
+    ).toEqual({})
+    // An unrelated cookie is not a session signal.
+    expect(isNativeClient(headers({ ...native, cookie: 'prodily_cookie_consent=1' }))).toBe(true)
+  })
+
   it('returns the session to a native caller', () => {
     const session = { access_token: 'a', refresh_token: 'r' }
     const result = sessionForClient(

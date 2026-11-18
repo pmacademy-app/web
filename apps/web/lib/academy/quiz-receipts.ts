@@ -12,11 +12,24 @@
  * in Unix seconds). The signature is HMAC-SHA256 over `qr1.<payload>` with the server secret
  * QUIZ_RECEIPT_SECRET.
  *
+ * Check records: a receipt only helps if the client sends it. To stop a client from checking a
+ * question, learning the answer and then submitting without the receipt, the check route also
+ * writes an attempt-independent record per (learner, question) into the persistent limiter
+ * table (`rate_limits`, key `lesson_quiz_checked_<userId>_<questionId>`). The submit reads those
+ * records for every question that has no valid receipt: a recent record means the learner saw
+ * the answer without proving which option they committed to, so that question scores as
+ * incorrect and the perfect bonus is withheld. A question with no record keeps the submitted
+ * answer (offline fallback, older clients).
+ *
  * Rollout: without the secret (or with one shorter than 32 characters) receipts are off: the
- * check route issues none and the submit scores exactly as before. One warning is logged per
- * process, not per request.
+ * check route issues no receipt and writes no record, and the submit scores exactly as before.
+ * One warning is logged per process, not per request.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto'
+
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+import type { Database } from '@/lib/supabase'
 
 /** Random id the client mints per quiz attempt (crypto.randomUUID or a fallback). */
 export const QUIZ_ATTEMPT_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/
@@ -174,6 +187,8 @@ export interface ReceiptedAnswers<T extends SubmittedAnswer> {
   invalid: number
   /** Submitted questions that carry a valid receipt. */
   covered: number
+  /** Ids of the submitted questions that carry a valid receipt. */
+  receiptedQuestionIds: ReadonlySet<string>
 }
 
 /**
@@ -219,15 +234,72 @@ export function applyQuizReceipts<T extends SubmittedAnswer>(
   }
 
   let replaced = 0
-  let covered = 0
+  const receiptedQuestionIds = new Set<string>()
   const applied = attempts.map((a) => {
     const signed = checked.get(a.question_id)
     if (signed === undefined) return a
-    covered++
+    receiptedQuestionIds.add(a.question_id)
     if (signed === a.selected_option) return a
     replaced++
     return { ...a, selected_option: signed }
   })
 
-  return { attempts: applied, replaced, invalid, covered }
+  return { attempts: applied, replaced, invalid, covered: receiptedQuestionIds.size, receiptedQuestionIds }
+}
+
+/**
+ * The check record window. The record lives in `rate_limits` and is written through the
+ * persistent limiter (consume_rate_limit), whose window is fixed: `last_requested_at` is the
+ * start of the live window and is not moved by later checks inside it. A check at time t
+ * therefore always leaves `last_requested_at >= t - window`.
+ */
+export const QUIZ_CHECK_RECORD_WINDOW_MS = 2 * 60 * 60 * 1000
+
+/**
+ * How far back the submit looks for a record: two windows. By the rule above this covers every
+ * check made in the last QUIZ_CHECK_RECORD_WINDOW_MS (2 hours), and some made up to 4 hours ago.
+ */
+export const QUIZ_CHECK_RECORD_LOOKBACK_MS = 2 * QUIZ_CHECK_RECORD_WINDOW_MS
+
+/**
+ * The limit passed with the record. It only has to be unreachable so the record never blocks a
+ * check: the per-attempt rule (1) and the hourly cap (450) on the check route are far below it.
+ */
+export const QUIZ_CHECK_RECORD_LIMIT = 1_000_000
+
+/** The limiter key that records "this learner checked this question". Attempt-independent. */
+export function quizCheckRecordKey(userId: string, questionId: string): string {
+  return `lesson_quiz_checked_${userId}_${questionId}`
+}
+
+/**
+ * The questions, among `questionIds`, that this learner checked recently (a record within the
+ * lookback). One read of `rate_limits` with the service-role client. Returns null when the read
+ * fails, so the caller can fail open.
+ */
+export async function findRecentlyCheckedQuestions(
+  supabase: Pick<SupabaseClient<Database>, 'from'>,
+  userId: string,
+  questionIds: readonly string[],
+  nowMs: number = Date.now()
+): Promise<Set<string> | null> {
+  const found = new Set<string>()
+  if (questionIds.length === 0) return found
+
+  const byKey = new Map(questionIds.map((id) => [quizCheckRecordKey(userId, id), id]))
+  try {
+    const { data, error } = await supabase
+      .from('rate_limits')
+      .select('key, last_requested_at')
+      .in('key', [...byKey.keys()])
+      .gte('last_requested_at', new Date(nowMs - QUIZ_CHECK_RECORD_LOOKBACK_MS).toISOString())
+    if (error || !Array.isArray(data)) return null
+    for (const row of data) {
+      const questionId = byKey.get(row.key)
+      if (questionId) found.add(questionId)
+    }
+    return found
+  } catch {
+    return null
+  }
 }

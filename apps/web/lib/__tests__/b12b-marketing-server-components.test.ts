@@ -18,6 +18,10 @@ import path from 'node:path'
  * `community`, `faq`, `testimonials` and the explorer components still use framer-motion
  * and are not on `/` — B12-B's objective and its measurement are the landing page, and
  * widening past that would be optimizing something nothing measured.
+ *
+ * Later (perf pass): the explorers and the dashboard and review components moved to CSS
+ * as well and framer-motion left package.json. components/__tests__/css-motion-no-framer
+ * pins that for the whole app.
  */
 
 const ROOT = path.resolve(import.meta.dirname, '../../')

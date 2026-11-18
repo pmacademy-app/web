@@ -1,5 +1,5 @@
 import { LEVEL_TIERS, STREAK_BUCKETS } from './analytics-aggregation'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 
 import type { AdminLevelDistribution, AdminModuleDropOff, AdminStreakBucket } from './types'
 

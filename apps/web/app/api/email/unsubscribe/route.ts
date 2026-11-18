@@ -219,13 +219,14 @@ export const POST = withRoute(
       const userId = await findUserIdByToken(supabase, token)
       if (!userId) return invalidTokenResponse(isJson)
 
-      const email = await performUnsubscribe(supabase, userId)
+      await performUnsubscribe(supabase, userId)
 
+      // The address is deliberately not echoed. Anyone holding the token (a forwarded
+      // email, a mail-scanner prefetch log) could otherwise learn whose it is.
       if (isJson) {
         return NextResponse.json({
           success: true,
           message: 'Successfully unsubscribed from non-essential emails.',
-          email,
         })
       }
 

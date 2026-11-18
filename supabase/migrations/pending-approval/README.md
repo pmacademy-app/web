@@ -67,6 +67,16 @@ Revokes learner writes to `public.users` through PostgREST. Apply only **after**
 stops writing `public.users` with a learner session is deployed, then confirm a learner-token
 `PATCH /rest/v1/users` is refused. Steps in the runbook, step (g).
 
+**Status (2026-11-19): ready to release, apply it first.** Its precondition (T29) is in the code:
+`app/api/auth/login/route.ts` signs in on `authClient` and writes through a second, session-less
+`createServiceRoleClient()` (`supabase`), and the `token_hash` path of
+`app/api/auth/callback/route.ts` runs `verifyOtp` on `authClient` and does every `public.users`
+read and write through a separate `admin` client. The PKCE path writes through `admin` too.
+Confirm that build is the one deployed to production, then apply this before the 20261119 files
+below. Until it is applied a learner can still PATCH their own row, including `current_streak`,
+`longest_streak`, `streak_freezes_available` and the onboarding columns, which the column guard
+does not cover (audit Q10 below).
+
 ### `20261030000001_cron_heartbeat_deadman.sql` (ENG-01, audit W3, applied by hand, never moved)
 
 Adds an in-database dead-man check for the cron heartbeats. The app's own stale check runs inside
@@ -185,6 +195,25 @@ Backfills `public.users.onboarding_completed = true` for learners whose onboardi
 Prerequisites:
 - Apply this migration before or immediately alongside deploying the AG-13 code change, so legacy users who completed onboarding are not redirected to /onboarding.
 
+**Risk (review note 2026-11-19, SQL unchanged):** the backfill trusts
+`raw_user_meta_data->>'onboarding_complete'`, and `raw_user_meta_data` is user-editable: any
+signed-in learner can set it with `supabase.auth.updateUser({ data: { onboarding_complete: true } })`
+using the anon key, today and until the moment this runs. A learner who does so before the
+backfill gets `onboarding_completed = true` without finishing onboarding. The impact is small (they
+skip the onboarding redirect; no privilege or curriculum access is granted, rows with
+`curriculum_access_override` are excluded), but the reviewed SQL does not guard against it. Before
+running it, either:
+
+- add a cutoff so only accounts that existed before the switch can match, by appending
+  `AND au.created_at < '<AG-13 production deploy timestamp>'::timestamptz` to the `WHERE` of both
+  the migration and its validation query (accounts created after the switch can only have
+  completed onboarding through the database column), or
+- review the candidates first:
+  `SELECT au.id, au.created_at, au.updated_at FROM auth.users au JOIN public.users pu ON pu.id = au.id WHERE au.raw_user_meta_data->>'onboarding_complete' = 'true' AND pu.onboarding_completed IS NOT TRUE AND pu.goal IS NULL AND pu.curriculum_access_override IS NOT TRUE ORDER BY au.updated_at DESC;`
+  and treat rows whose `updated_at` is after the AG-13 deploy as suspect.
+
+Adding the cutoff changes the reviewed semantics (fewer rows match), so note it in the release.
+
 Run:
 1. Optional pre-check: run `validation/20261113000003_backfill_onboarding_completed_validation.sql` to check how many rows will be updated.
 2. Paste `supabase/migrations/pending-approval/20261113000003_backfill_onboarding_completed.sql` into the Supabase SQL editor and run it.
@@ -200,6 +229,9 @@ Adds nullable `review_scores jsonb`, `review_feedback text`, `revision_count int
 Privileges: Writes remain restricted to service role only. Learners read their own rows through existing SELECT RLS policies.
 
 Prerequisites:
+- Apply `20261119000005_drop_anon_portfolio_policies.sql` first. Until it is applied,
+  "Public can view public capstones" lets the anon key read every column of every `is_public`
+  capstone, so the new review fields would be public the moment they are written.
 - Apply this migration before or alongside deploying the AG-26 code change.
 
 Run:
@@ -261,6 +293,57 @@ Run:
 
 Undo:
 Run `rollback/20261113000008_drop_duplicate_indexes.down.sql` in the SQL editor.
+
+### November 2026 database review (20261119000001 to 20261119000006)
+
+Six independent hardening migrations from the read-only review of the applied migrations, plus one
+read-only audit. Each is owner-run in the SQL editor, ends with a self-check that raises (and so
+rolls the whole script back) if the end state is wrong, and has a rollback and a read-only
+validation next to it. None needs an app change: every table they close is read and written by the
+app only through `createServiceRoleClient()`.
+
+Apply order:
+
+1. `20261027000002_lock_public_users.sql` (see above, ready).
+2. `20261119000005_drop_anon_portfolio_policies.sql` (L1). **Before `20261113000004`.**
+3. `20261119000001_contact_messages_service_only.sql` (M2).
+4. `20261119000002_system_announcements_service_only.sql` (M3).
+5. `20261119000004_cohort_members_and_friends_lockdown.sql` (M6).
+6. `20261119000003_avatars_bucket_hardening.sql` (M5). After applying, upload an avatar from the
+   settings page once to confirm uploads still work.
+7. `20261119000006_default_privileges_tables_sequences.sql` (L2).
+8. Then the rest of the held list (`20261113000004` and later) as already planned.
+
+For each: paste it into the SQL editor and run it, then run its
+`validation/<name>_validation.sql` (read-only, raises on failure, prints `<ts> validation passed`).
+
+| File | Finding | What it does | Rollback restores |
+| --- | --- | --- | --- |
+| `20261119000001_contact_messages_service_only.sql` | M2 | Drops "Anyone can insert contact message"; revokes INSERT, UPDATE, DELETE from PUBLIC, anon, authenticated and SELECT from anon. Learners keep the own-row SELECT. | The policy as 20260810000002 created it, and the anon/authenticated grants. |
+| `20261119000002_system_announcements_service_only.sql` | M3 | Drops both policies and revokes ALL from PUBLIC, anon, authenticated. No client read is left (the app reads through the service role and filters the audience in memory). | `GRANT ALL` to anon and authenticated, and both policies as 20260822000001 created them. |
+| `20261119000003_avatars_bucket_hardening.sql` | M5 | Sets `file_size_limit = 2097152` and `allowed_mime_types` (png, jpeg, webp, plus `image/jpg` because the avatar service forwards that type unchanged); keeps the bucket public; drops the three learner write policies and the listing SELECT policy. | No size or type limit, and the four storage.objects policies as 20260819000001 created them. |
+| `20261119000004_cohort_members_and_friends_lockdown.sql` | M6 | cohort_members: drops the USING (true) SELECT and the join and leave policies, keeps the own-row SELECT, revokes all writes. user_friends: drops all policies, revokes ALL. | The six policies as 20260805000006 created them, and the grants. |
+| `20261119000005_drop_anon_portfolio_policies.sql` | L1 | Drops "Public can view public capstones" and "Public can view public reflections"; revokes anon access to both tables. Public portfolios keep working (service role). | anon grants and both policies as 20260728000002 created them. |
+| `20261119000006_default_privileges_tables_sequences.sql` | L2 | `ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE ALL ON TABLES, SEQUENCES FROM anon, authenticated`. Existing objects keep their grants; service_role keeps its default. A new learner-facing table now needs an explicit GRANT. | The legacy default (`GRANT ALL ON TABLES, SEQUENCES TO anon, authenticated`). |
+
+Every rollback re-opens the hole it undoes; use one only to unblock an outage. No migration here
+changes or deletes data, so no export is needed.
+
+After applying each one, delete its rows (marked `removed_by`) from
+`supabase/tests/grant_allowlist.sql` in the release commit. If you also add it to
+`supabase/tests/held-migrations.txt`, CI replays it and runs its validation (all six validations are
+catalog-only and safe on an empty database).
+
+### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
+
+Twelve SELECT-only queries that look for use of the holes these and earlier migrations closed:
+admins and fellows with no grant in `admin_audit_logs`, quiz XP above the content maximum or for
+lessons never attempted (SEC-01 RPC window), broadcasts not created by an admin (SEC-03), fellow
+requests approved without an admin reviewer (SEC-06), testimonials published without a moderator
+(SEC-05), certificates that fail the issuance prerequisites, `total_xp` or `level` out of step with
+`xp_events`, streaks longer than the account is old, contact-form spam, and one-sided friendships or
+private cohort joins. Each query states its window and what a hit means. Run it once after the
+migrations above, one query at a time, and keep the results out of chat, tickets and AI agents.
 
 ## Ops snippets (owner-run, never migrations)
 

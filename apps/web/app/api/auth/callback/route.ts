@@ -16,6 +16,7 @@ import {
 } from '@/lib/referral/referral-service'
 import { log } from '@/lib/monitoring/log'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import { setRecoveryMarker } from '@/lib/auth/recovery-marker'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
@@ -542,6 +543,22 @@ export async function GET(request: NextRequest) {
         if (type === 'email_change') {
           const successUrl = new URL('/email-verified', requestUrl.origin)
           return data.session ? redirectWithSession(successUrl, data.session) : NextResponse.redirect(successUrl)
+        }
+
+        if (type === 'recovery') {
+          // H1: the recovery session is an ordinary session, so the reset action also
+          // needs proof that this browser came through a recovery link. Without a
+          // signing secret, or without a session, there is nothing to reset with:
+          // send the learner back to request a new link instead.
+          if (!data.session) {
+            return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
+          }
+          const response = redirectWithSession(new URL('/reset-password?mode=update', requestUrl.origin), data.session)
+          if (!setRecoveryMarker(response, data.user.id)) {
+            log.error('auth.callback.recovery_marker_unavailable')
+            return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
+          }
+          return response
         }
 
         if (data.session) {

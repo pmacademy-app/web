@@ -172,18 +172,84 @@ describe('Email daily quota enforcement (pre-dispatch, atomic, non-bypassable)',
     expect(fake.rpc).not.toHaveBeenCalledWith('increment_daily_email_quota', expect.anything())
   })
 
-  it('fails safe (proceeds without blocking) if the quota RPC itself errors, rather than wedging the queue', async () => {
+  // M4: the quota gate fails CLOSED. It used to degrade to "allow" on a thrown RPC and
+  // on an RPC `error` result, which turned the daily cap off whenever the database
+  // misbehaved. The item now goes back to the queue with its attempt returned.
+  it('fails closed when the quota RPC throws: no send, item deferred with its attempt given back', async () => {
+    const updates: Record<string, unknown>[] = []
     const fake = buildFakeSupabase({
       claimedRows: [makeQueueRow()],
       quotaAvailable: 'error',
+      onQueueUpdate: (p) => updates.push(p),
     })
     vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(fake)
 
     const result = await processEmailQueue(10)
 
-    // A broken quota RPC must not silently block all mail forever; it degrades to "allow" and logs.
+    expect(mockSend).not.toHaveBeenCalled()
+    expect(result.delivered).toBe(0)
+    expect(result.skipped).toBe(1)
+    const deferred = updates.find((u) => u.status === 'retrying')
+    expect(deferred?.error_message).toBe('Daily quota check unavailable')
+    expect(deferred?.attempt_count).toBe(0)
+    expect(updates.some((u) => u.status === 'delivered' || u.status === 'dead_letter')).toBe(false)
+  })
+
+  it('fails closed when the quota RPC returns an error, and skips the RPC for the rest of the batch', async () => {
+    const updates: Record<string, unknown>[] = []
+    const fake = buildFakeSupabase({
+      claimedRows: [makeQueueRow({ id: 'row-a' }), makeQueueRow({ id: 'row-b' })],
+      quotaAvailable: true,
+      onQueueUpdate: (p) => updates.push(p),
+    })
+    ;(fake.rpc as unknown as ReturnType<typeof vi.fn>) = vi.fn(async (name: string) => {
+      if (name === 'claim_email_queue_items') {
+        return { data: [makeQueueRow({ id: 'row-a' }), makeQueueRow({ id: 'row-b' })], error: null }
+      }
+      if (name === 'increment_daily_email_quota') {
+        return { data: null, error: { message: 'permission denied' } }
+      }
+      return { data: null, error: null }
+    })
+    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(fake)
+
+    const result = await processEmailQueue(10)
+
+    expect(mockSend).not.toHaveBeenCalled()
+    expect(result.skipped).toBe(2)
+    const quotaCalls = (fake.rpc as unknown as ReturnType<typeof vi.fn>).mock.calls.filter(
+      (c: unknown[]) => c[0] === 'increment_daily_email_quota'
+    )
+    expect(quotaCalls.length).toBeLessThanOrEqual(2)
+    expect(updates.filter((u) => u.status === 'retrying')).toHaveLength(2)
+  })
+
+  it('counts an item against the daily quota once: a retry after a provider failure is not charged again', async () => {
+    const fake = buildFakeSupabase({
+      claimedRows: [makeQueueRow({ attempt_count: 2 })],
+      quotaAvailable: false,
+    })
+    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(fake)
+
+    const result = await processEmailQueue(10)
+
+    expect(fake.rpc).not.toHaveBeenCalledWith('increment_daily_email_quota', expect.anything())
     expect(mockSend).toHaveBeenCalledTimes(1)
     expect(result.delivered).toBe(1)
+  })
+
+  it('a quota deferral gives the attempt back so the item is not walked to the dead-letter queue', async () => {
+    const updates: Record<string, unknown>[] = []
+    const fake = buildFakeSupabase({
+      claimedRows: [makeQueueRow({ attempt_count: 1 })],
+      quotaAvailable: false,
+      onQueueUpdate: (p) => updates.push(p),
+    })
+    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(fake)
+
+    await processEmailQueue(10)
+
+    expect(updates.find((u) => u.status === 'retrying')?.attempt_count).toBe(0)
   })
 
   it('passes the configured dailyLimit through to the atomic RPC on every non-critical item (no separate read-then-write in application code)', async () => {

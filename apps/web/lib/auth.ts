@@ -11,6 +11,30 @@ import { log } from './monitoring/log'
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
 /**
+ * The `app_metadata` key that carries a signup consent record written by the server.
+ *
+ * M4: consent is never recovered from `user_metadata`. GoTrue lets the account holder write
+ * `user_metadata` (the `data` option of a direct `/auth/v1/signup` call with the public anon key,
+ * or `auth.updateUser` later), so trusting it let anyone create an account outside the signup
+ * route with a forged terms and age consent, which `ensureUserProfile` then recorded on first
+ * login. `app_metadata` can only be written with the service role key (admin API), so a record
+ * found here was put there by our own server.
+ */
+export const SIGNUP_CONSENT_APP_METADATA_KEY = 'signup_consent'
+
+/**
+ * Consent recorded server-side in `app_metadata.signup_consent`, or `null`.
+ *
+ * Reuses the shape check of `consentFromAuthMetadata`. Anything the account holder can write
+ * (`user_metadata`) is ignored, even when it looks like a valid record.
+ */
+export function consentFromServerMetadata(user: Pick<User, 'app_metadata'>): ConsentRecord | null {
+  const appMetadata: unknown = user.app_metadata
+  if (!appMetadata || typeof appMetadata !== 'object') return null
+  return consentFromAuthMetadata((appMetadata as Record<string, unknown>)[SIGNUP_CONSENT_APP_METADATA_KEY])
+}
+
+/**
  * Ensures a user record exists in the public `users` table upon authentication.
  * If the user record doesn't exist, it creates one with default values.
  */
@@ -22,7 +46,8 @@ export async function ensureUserProfile(
     timezone?: string
     provider?: string
     /**
-     * `undefined` (omitted): derive consent from auth metadata (Flow A signup).
+     * `undefined` (omitted): use the server-written `app_metadata.signup_consent`, if any
+     * (never `user_metadata`, see `SIGNUP_CONSENT_APP_METADATA_KEY`).
      * `null`: no consent was given; the columns stay NULL even if metadata has some.
      */
     consent?: ConsentRecord | null
@@ -48,13 +73,14 @@ export async function ensureUserProfile(
   const provider = extra?.provider ?? user.app_metadata?.provider ?? 'email'
   const timezone = extra?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC'
 
-  // Signup consent. Flow B (verification OFF) hands it in directly; Flow A creates
-  // this row at verification time instead, so the consent captured on the signup
-  // form travels in auth metadata — the same carrier the pending referral code
-  // uses — and is recovered here. `null` for any path that never presented the
-  // agreement (OAuth, legacy accounts): the columns stay NULL rather than
-  // recording a consent that did not happen.
-  const consent = extra?.consent !== undefined ? extra.consent : consentFromAuthMetadata(user.user_metadata)
+  // Signup consent. Flow B (verification OFF) hands it in directly. Every other caller
+  // omits it, and the only carrier trusted here is `app_metadata.signup_consent`, which
+  // only the service role can write. `user_metadata` is NOT read (M4): the account
+  // holder controls it, so a direct GoTrue signup could forge a consent record. `null`
+  // when nothing server-written exists (OAuth, legacy accounts, direct GoTrue signups,
+  // and Flow A until the signup route writes app_metadata): the columns stay NULL
+  // rather than recording a consent that did not happen.
+  const consent = extra?.consent !== undefined ? extra.consent : consentFromServerMetadata(user)
 
   const { data: inserted, error } = await supabase
     .from('users')

@@ -18,7 +18,11 @@
  * server from the compiled lesson. When QUIZ_RECEIPT_SECRET is set the response also carries a
  * signed `receipt` of the checked answer (lib/academy/quiz-receipts.ts), and the submit scores
  * that answer for this question, so learning the right option here cannot change the score.
- * Without the secret no receipt is issued and the response is as before.
+ * With the secret set the route also records that this learner checked this question (an
+ * attempt-independent `lesson_quiz_checked_<userId>_<questionId>` row in the persistent limiter
+ * table, written after every gate has passed and before the answer is returned). A submit that
+ * leaves this question's receipt out scores it as incorrect while that record is recent.
+ * Without the secret no receipt is issued, nothing is recorded and the response is as before.
  */
 
 import { z } from 'zod'
@@ -27,8 +31,16 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { isLessonIdFormat, QUIZ_QUESTION_ID_PATTERN } from '@/lib/academy/lesson-ids'
 import { assertLessonAccessible } from '@/lib/academy/lessons-db'
-import { getQuizReceiptSecret, QUIZ_ATTEMPT_ID_PATTERN, signQuizReceipt } from '@/lib/academy/quiz-receipts'
+import {
+  getQuizReceiptSecret,
+  QUIZ_ATTEMPT_ID_PATTERN,
+  QUIZ_CHECK_RECORD_LIMIT,
+  QUIZ_CHECK_RECORD_WINDOW_MS,
+  quizCheckRecordKey,
+  signQuizReceipt,
+} from '@/lib/academy/quiz-receipts'
 import { fetchCompiledLesson } from '@/lib/lesson-loader'
+import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { createServiceRoleClient } from '@/lib/supabase'
 import type { CompiledQuizQuestion } from '@/types'
 
@@ -116,6 +128,19 @@ export const POST = withRoute(
     await assertLessonAccessible(createServiceRoleClient(), userId, lessonId)
 
     const secret = getQuizReceiptSecret()
+    if (secret) {
+      // A record, not a limit: the limit is unreachable, so the decision is ignored. If the
+      // limiter is down it degrades to the in-memory counter, which leaves no record, and the
+      // submit then scores this question from the submitted answer (no penalty).
+      try {
+        await evaluatePersistentRateLimit(quizCheckRecordKey(userId, question.id), {
+          limit: QUIZ_CHECK_RECORD_LIMIT,
+          windowMs: QUIZ_CHECK_RECORD_WINDOW_MS,
+        })
+      } catch {
+        // Never let the record decide whether the learner gets their result.
+      }
+    }
     const receipt = secret
       ? signQuizReceipt(
           { userId, lessonId, questionId: question.id, answer: body.answer, attemptId: body.attemptId },

@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache'
 
 import { createServiceRoleClient } from '../supabase'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { getLessonIdsForModule, getModuleSlugForLessonId } from '@/lib/curriculum-registry'
 import {
   computeRecutExperimentSummary,
@@ -308,16 +308,18 @@ async function aggregateExperimentReadout(): Promise<ExperimentReadout> {
 
     const [users, progress, capstones] = await Promise.all([
       fetchAllRows<UserRow>((from, to) =>
-        supabase.from('users').select('id, created_at').range(from, to)
+        supabase.from('users').select('id, created_at').order('id').range(from, to)
       ),
       fetchAllRows<ProgressRow>((from, to) =>
         supabase
           .from('user_lesson_progress')
           .select('user_id, lesson_id, status, completed_at, deep_dive_opened_at')
+          .order('user_id')
+          .order('lesson_id')
           .range(from, to)
       ),
       fetchAllRows<CapstoneRow>((from, to) =>
-        supabase.from('capstone_submissions').select('user_id, module_slug, status').range(from, to)
+        supabase.from('capstone_submissions').select('user_id, module_slug, status').order('id').range(from, to)
       ),
     ])
 

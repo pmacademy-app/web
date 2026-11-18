@@ -21,12 +21,20 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  // Granting admin needs the acting admin's own password (server step-up check).
+  const [currentPassword, setCurrentPassword] = useState('')
 
   const nextRole = !isAdmin
   const actionLabel = nextRole ? 'promote to ADMIN' : 'demote to LEARNER'
 
-  const handleToggleRole = async () => {
+  const closeConfirm = () => {
     setConfirmOpen(false)
+    setCurrentPassword('')
+  }
+
+  const handleToggleRole = async () => {
+    const password = currentPassword
+    closeConfirm()
     setLoading(true)
     setSuccess(false)
 
@@ -34,6 +42,7 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
       const result = await apiPatch<{ success: boolean; error?: string }>('/api/admin/users', {
         targetUserId: userId,
         makeAdmin: nextRole,
+        ...(nextRole ? { currentPassword: password } : {}),
       })
 
       if (result.ok && result.data.success) {
@@ -81,14 +90,32 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
 
       <AdminConfirmDialog
         open={confirmOpen}
-        onOpenChange={setConfirmOpen}
+        onOpenChange={(open) => (open ? setConfirmOpen(true) : closeConfirm())}
         title={`${nextRole ? 'Promote' : 'Demote'} ${userEmail}?`}
         description={`Are you sure you want to ${actionLabel}? This changes their access level in the console.`}
         confirmLabel={nextRole ? 'Make Admin' : 'Demote to Learner'}
         destructive={!nextRole}
         onConfirm={handleToggleRole}
-        onCancel={() => setConfirmOpen(false)}
-      />
+        onCancel={closeConfirm}
+        confirmDisabled={nextRole && currentPassword.length === 0}
+      >
+        {nextRole ? (
+          <div className="space-y-1.5">
+            <label htmlFor={`admin-stepup-${userId}`} className="text-xs font-semibold text-admin-fg">
+              Your password
+            </label>
+            <input
+              id={`admin-stepup-${userId}`}
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full rounded-md border border-admin-border bg-admin-surface-raised px-3 py-2 text-sm text-admin-fg outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+            />
+            <p className="text-xs text-admin-fg-muted">Granting admin access needs your own password.</p>
+          </div>
+        ) : null}
+      </AdminConfirmDialog>
     </div>
   )
 }

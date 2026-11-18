@@ -44,6 +44,7 @@ vi.mock('@/lib/supabase', () => ({
 }))
 
 vi.mock('@/lib/auth', () => ({
+  SIGNUP_CONSENT_APP_METADATA_KEY: 'signup_consent',
   ensureUserProfile: vi.fn().mockResolvedValue({ id: 'usr-1' }),
 }))
 
@@ -73,7 +74,6 @@ vi.mock('@/lib/referral/referral-service', () => ({
 
 // Import route handlers under test
 import { POST as loginPOST } from '@/app/api/auth/login/route'
-import { POST as updatePasswordPOST } from '@/app/api/auth/update-password/route'
 import { POST as telemetryPOST } from '@/app/api/auth/telemetry/route'
 import { POST as signupPOST } from '@/app/api/auth/signup/route'
 
@@ -244,86 +244,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
     })
   })
 
-  // ============================================================================
-  // 2. POST /api/auth/update-password Rate Limiting
-  // ============================================================================
-  describe('2. Update-Password Rate Limiting (POST /api/auth/update-password)', () => {
-    const validToken = 'header.' + Buffer.from(JSON.stringify({ sub: 'usr-test-99' })).toString('base64url') + '.sig'
-
-    it('permits authenticated password updates below limit', async () => {
-      const req = createRequest(
-        'https://prodily.app/api/auth/update-password',
-        { newPassword: 'newSecretPassword123' },
-        { Authorization: `Bearer ${validToken}`, 'x-real-ip': '203.0.113.55' }
-      )
-
-      const res = await updatePasswordPOST(req)
-      const data = await res.json()
-
-      expect(res.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(mockEvaluateRateLimit).toHaveBeenCalledWith('update_pwd_ip:203.0.113.55', expect.objectContaining({ limit: 10, failClosed: true }))
-      expect(mockEvaluateRateLimit).toHaveBeenCalledWith('update_pwd_user:user:usr-test-99', expect.objectContaining({ limit: 5, failClosed: true }))
-      expect(mockSupabase.auth.updateUser).toHaveBeenCalledWith({ password: 'newSecretPassword123' })
-    })
-
-    it('rejects unauthenticated requests before consuming rate limit budget', async () => {
-      const req = createRequest('https://prodily.app/api/auth/update-password', {
-        newPassword: 'newSecretPassword123',
-      })
-
-      const res = await updatePasswordPOST(req)
-      expect(res.status).toBe(401)
-      // Rate limiter must NOT have been called for an unauthenticated request
-      expect(mockEvaluateRateLimit).not.toHaveBeenCalled()
-    })
-
-    it('blocks authenticated requests when rate limit is exceeded', async () => {
-      mockEvaluateRateLimit.mockResolvedValue({ success: false, remaining: 0, resetInMs: 120000 })
-
-      const req = createRequest(
-        'https://prodily.app/api/auth/update-password',
-        { newPassword: 'newSecretPassword123' },
-        { Authorization: `Bearer ${validToken}` }
-      )
-
-      const res = await updatePasswordPOST(req)
-      const data = await res.json()
-
-      expect(res.status).toBe(429)
-      expect(data.code).toBe('AUTH_RATE_LIMITED')
-      expect(data.error).toBe('Too many password update attempts. Please wait a while before trying again.')
-      expect(mockSupabase.auth.updateUser).not.toHaveBeenCalled()
-    })
-
-    it('isolates user rate limits (User A exhausted does not block User B)', async () => {
-      const userAToken = 'header.' + Buffer.from(JSON.stringify({ sub: 'user-a' })).toString('base64url') + '.sig'
-      const userBToken = 'header.' + Buffer.from(JSON.stringify({ sub: 'user-b' })).toString('base64url') + '.sig'
-
-      mockEvaluateRateLimit.mockImplementation(async (key: string) => {
-        if (key === 'update_pwd_user:user:user-a') {
-          return { success: false, remaining: 0, resetInMs: 60000 }
-        }
-        return { success: true, remaining: 4, resetInMs: 60000 }
-      })
-
-      // User A blocked
-      const resA = await updatePasswordPOST(createRequest(
-        'https://prodily.app/api/auth/update-password',
-        { newPassword: 'validPassword123' },
-        { Authorization: `Bearer ${userAToken}` }
-      ))
-      expect(resA.status).toBe(429)
-
-      // User B succeeds
-      const resB = await updatePasswordPOST(createRequest(
-        'https://prodily.app/api/auth/update-password',
-        { newPassword: 'validPassword123' },
-        { Authorization: `Bearer ${userBToken}` }
-      ))
-      expect(resB.status).toBe(200)
-    })
-  })
+  // 2. The update-password route was removed: nothing called it, and the reset page
+  // uses updatePasswordAction (rate limits covered in update-password.test.ts).
 
   // ============================================================================
   // 3. Telemetry Client-IP Hardening
