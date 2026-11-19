@@ -55,7 +55,7 @@ export default async function LoginPage({
 
         <div className="relative max-w-md space-y-8">
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground/70">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground/90">
               Welcome back
             </p>
             <h2 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl text-balance">
@@ -71,7 +71,7 @@ export default async function LoginPage({
                 </span>
                 <span>
                   <span className="block font-semibold">{title}</span>
-                  <span className="mt-0.5 block text-sm leading-relaxed text-primary-foreground/75">{body}</span>
+                  <span className="mt-0.5 block text-sm leading-relaxed text-primary-foreground/90">{body}</span>
                 </span>
               </li>
             ))}
@@ -87,7 +87,7 @@ export default async function LoginPage({
               />
             ))}
           </div>
-          <p className="text-sm text-primary-foreground/75">
+          <p className="text-sm text-primary-foreground/90">
             Nine career levels. Every lesson moves you up the ladder.
           </p>
         </div>
