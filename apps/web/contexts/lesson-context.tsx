@@ -16,6 +16,8 @@
 
 import React, { createContext, useContext } from 'react'
 
+import type { QuizSubmitProof } from '@/blocks/quiz/check-answer'
+
 export interface QuizAttempt {
   question_id: string
   selected_option: number
@@ -24,7 +26,8 @@ export interface QuizAttempt {
 
 export interface LessonContextValue {
   lessonId: string
-  onQuizComplete?: (attempts: QuizAttempt[]) => Promise<unknown>
+  /** `proof` carries the attempt id and check receipts (lib/academy/quiz-receipts.ts). */
+  onQuizComplete?: (attempts: QuizAttempt[], proof?: QuizSubmitProof) => Promise<unknown>
   onFlashcardsComplete?: () => void
   onReflectionComplete?: () => void
   onAdvanceTab?: (tab: 'theory' | 'quiz' | 'flashcards' | 'reflection') => void
@@ -42,7 +45,7 @@ export function LessonContextProvider({
 }: {
   children: React.ReactNode
   lessonId: string
-  onQuizComplete?: (attempts: QuizAttempt[]) => Promise<unknown>
+  onQuizComplete?: (attempts: QuizAttempt[], proof?: QuizSubmitProof) => Promise<unknown>
   onFlashcardsComplete?: () => void
   onReflectionComplete?: () => void
   onAdvanceTab?: (tab: 'theory' | 'quiz' | 'flashcards' | 'reflection') => void

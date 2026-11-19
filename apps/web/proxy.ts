@@ -39,6 +39,9 @@ const CONSENT_GATE_PAGE = '/signup/complete-consent'
 const LEARNER_LOGIN_PAGE = '/login'
 const ONBOARDING_PAGE = '/onboarding'
 
+/** Signed-in app sections matched on a segment boundary (see isAppPage). */
+const APP_SECTIONS = ['/badges', '/capstones', '/notifications'] as const
+
 /**
  * The page the visitor asked for (path plus query), as a `next` value, or null when it
  * is not a safe same-origin page path (UX-07 / PROD-09).
@@ -181,7 +184,11 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   const isAdminArea = path.startsWith('/admin')
   const isAdminProtectedPage = isAdminArea && !isAdminLoginPage && !isAccessDeniedPage
 
+  // L1: badges, capstones and notifications (all under app/(app)) were missing, so
+  // maintenance mode, onboarding and the Google consent gate skipped them.
+  // lib/__tests__/proxy-app-pages.test.ts fails when a new (app) segment is not covered.
   const isAppPage =
+    APP_SECTIONS.some((section) => path === section || path.startsWith(`${section}/`)) ||
     path.startsWith('/dashboard') ||
     (path === '/review' || path.startsWith('/review/')) ||
     path.startsWith('/progress') ||
@@ -793,7 +800,7 @@ export const config = {
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist|verify/|p/|maintenance$|curriculum$|lessons/|$|[^/]*\\.[^/]*$).*)',
+    '/((?!(?:_next/static|_next/image|content|brand|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist)(?:/|$)|(?:favicon\\.ico|robots\\.txt|sitemap\\.xml|maintenance|curriculum)$|verify/|p/|lessons/|$|[^/]*\\.[^/]*$).*)',
     { source: '/', has: [{ type: 'cookie', key: 'sb-access-token' }] },
     { source: '/', has: [{ type: 'cookie', key: 'sb-refresh-token' }] },
     {

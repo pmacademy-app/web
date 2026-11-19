@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Search, X } from 'lucide-react'
 import { FAQ_ITEMS } from '@/config/content'
 import { trackFAQExpand } from '@/lib/analytics'
@@ -12,6 +11,12 @@ export function FAQExplorer() {
   const prefersReducedMotion = useReducedMotion()
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const [searchQuery, setSearchQuery] = useState('')
+  // The answer that is animating shut. It stays mounted until its collapse
+  // transition ends, the way AnimatePresence kept an exiting child in the DOM.
+  const [closingIndex, setClosingIndex] = useState<number | null>(null)
+  // Like AnimatePresence initial={false}: the answer open on first paint does not
+  // animate in; only answers opened by the user do.
+  const [hasToggled, setHasToggled] = useState(false)
 
   const filteredItems = useMemo(() => {
     if (!searchQuery.trim()) return FAQ_ITEMS.map((item, idx) => ({ ...item, originalIndex: idx }))
@@ -24,6 +29,8 @@ export function FAQExplorer() {
   }, [searchQuery])
 
   const toggleItem = (originalIndex: number) => {
+    setHasToggled(true)
+    setClosingIndex(prefersReducedMotion ? null : openIndex)
     if (openIndex === originalIndex) {
       setOpenIndex(null)
     } else {
@@ -116,24 +123,38 @@ export function FAQExplorer() {
                   </div>
                 </button>
 
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`faq-answer-${item.originalIndex}`}
-                      role="region"
-                      aria-labelledby={`faq-btn-${item.originalIndex}`}
-                      initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                      transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: [0, 0, 0.2, 1] }}
-                      className="overflow-hidden"
-                    >
+                {(isOpen || closingIndex === item.originalIndex) && (
+                  <div
+                    id={`faq-answer-${item.originalIndex}`}
+                    role="region"
+                    aria-labelledby={`faq-btn-${item.originalIndex}`}
+                    data-state={isOpen ? 'open' : 'closed'}
+                    inert={!isOpen}
+                    onTransitionEnd={(e) => {
+                      if (e.target === e.currentTarget && !isOpen) setClosingIndex(null)
+                    }}
+                    onTransitionCancel={(e) => {
+                      if (e.target === e.currentTarget && !isOpen) setClosingIndex(null)
+                    }}
+                    className={cn(
+                      // Height animates via grid rows (0fr to 1fr), the CSS stand-in for
+                      // height: auto. @starting-style (`starting:`) gives the mount its
+                      // collapsed first frame; browsers without it just show the answer.
+                      'grid transition-[grid-template-rows,opacity] duration-220 ease-[cubic-bezier(0,0,0.2,1)]',
+                      hasToggled && 'starting:grid-rows-[0fr] starting:opacity-0',
+                      isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                      // No transition means @starting-style never applies: the answer just appears.
+                      prefersReducedMotion && 'transition-none',
+                      'motion-reduce:transition-none',
+                    )}
+                  >
+                    <div className="min-h-0 overflow-hidden">
                       <div className="px-5 sm:px-6 pb-6 pt-1 text-sm sm:text-base text-ink-muted leading-relaxed border-t border-border/60">
                         {item.answer}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}

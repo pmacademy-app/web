@@ -159,6 +159,10 @@ export default function PrivacyPage() {
               <p className="text-xs">Stores encrypted user profiles, application state, and handles authentication sessions.</p>
             </div>
             <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
+              <span className="font-bold text-xs text-foreground">Vercel Inc. (Hosting, Web Analytics and Speed Insights)</span>
+              <p className="text-xs">Hosts and serves the website. Vercel Web Analytics and Speed Insights measure page views and page speed without cookies and without identifying you; they record no names, emails or learning data.</p>
+            </div>
+            <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
               <span className="font-bold text-xs text-foreground">Google LLC (Optional Sign-In)</span>
               <p className="text-xs">Only used if you choose Continue with Google. Google confirms your identity and shares your email address, name, and avatar with us. Its handling of your Google account is governed by Google&apos;s own privacy policy.</p>
             </div>

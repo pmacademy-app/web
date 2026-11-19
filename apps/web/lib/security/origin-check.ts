@@ -68,9 +68,12 @@ export function isAllowedApiOrigin(request: Request, pathname: string): boolean 
       const refererOrigin = getBaseOrigin(refererHeader)
       return Boolean(refererOrigin && (refererOrigin === brandOrigin || refererOrigin === requestUrlOrigin))
     }
-    // Requests without origin/referer (e.g. internal server requests or test runners)
-    // are allowed unless explicitly marked cross-site
-    return secFetchSite !== 'cross-site'
+    // L3: a cookie-bearing write with no Origin, no Referer and no Sec-Fetch-Site has
+    // nothing to prove it came from this site, so it is refused. Every current browser
+    // sends Origin on a non-GET fetch or form post; server-to-server callers carry no
+    // session cookie (they authenticate by bearer token or signature) and the webhook,
+    // hook and cron routes are exempt above.
+    return Boolean(secFetchSite) && secFetchSite !== 'cross-site'
   }
 
   const candidateOrigin = getBaseOrigin(originHeader)

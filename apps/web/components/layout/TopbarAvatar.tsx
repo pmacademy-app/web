@@ -1,11 +1,28 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { User } from 'lucide-react'
 
 interface TopbarAvatarProps {
   name: string | null
   avatarUrl?: string | null
+}
+
+/**
+ * Only Supabase Storage URLs go through the image optimizer: they are the hosts
+ * next.config `images.remotePatterns` allows (`**.supabase.co`, `**.supabase.in`).
+ * Anything else (an OAuth provider photo, a legacy relative path) renders as-is via
+ * `unoptimized`, because the default loader throws in development for an unlisted host
+ * and the optimizer rejects it in production.
+ */
+function isOptimizableAvatarUrl(url: string): boolean {
+  try {
+    const { protocol, hostname } = new URL(url)
+    return protocol === 'https:' && /\.supabase\.(co|in)$/.test(hostname)
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -23,6 +40,8 @@ export function TopbarAvatar({ name, avatarUrl }: TopbarAvatarProps) {
   // Remember which URL failed rather than a boolean, so a new avatar URL gets
   // a fresh attempt without an effect to reset the flag.
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
+  // next/image rejects a src with leading or trailing whitespace.
+  const src = avatarUrl?.trim() ?? ''
 
   return (
     <div
@@ -30,13 +49,18 @@ export function TopbarAvatar({ name, avatarUrl }: TopbarAvatarProps) {
       aria-hidden="true"
       data-testid="topbar-avatar"
     >
-      {avatarUrl && avatarUrl !== failedUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- user-supplied remote URL, matches prior markup
-        <img
-          src={avatarUrl}
+      {src && src !== failedUrl ? (
+        // Fixed 32px box: width/height with no `sizes` gives a 1x/2x srcset (w=32, w=64),
+        // which is what the Next docs recommend for fixed-size images. A `sizes` prop would
+        // switch to the full responsive srcset with a 3840px fallback src for no gain.
+        <Image
+          src={src}
           alt=""
+          width={32}
+          height={32}
+          unoptimized={!isOptimizableAvatarUrl(src)}
           className="w-full h-full object-cover"
-          onError={() => setFailedUrl(avatarUrl)}
+          onError={() => setFailedUrl(src)}
         />
       ) : (
         <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs select-none">

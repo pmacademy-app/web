@@ -54,22 +54,16 @@ export class BrevoProvider implements NotificationProvider {
           headers['List-Unsubscribe'] = `<${siteUrl}/settings?tab=notifications>`
         }
       }
-      if (payload.variables.headers && typeof payload.variables.headers === 'object') {
-        Object.assign(headers, payload.variables.headers)
-      } else if (payload.variables.customHeaders && typeof payload.variables.customHeaders === 'object') {
-        Object.assign(headers, payload.variables.customHeaders)
-      }
+      // No caller-supplied headers or tags: `variables` can carry template data, and a
+      // `headers` / `customHeaders` / `tags` key in it used to be copied straight into
+      // the provider request. The only headers this transport sets are its own.
 
       let tags: string[] | undefined
       if (payload.variables.suppressMarketingTags !== true) {
-        if (Array.isArray(payload.variables.tags)) {
-          tags = (payload.variables.tags as unknown[]).map(String)
-        } else {
-          tags = [
-            payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_'),
-            `v${String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
-          ]
-        }
+        tags = [
+          payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_'),
+          `v${String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
+        ]
       }
 
       const bodyPayload: Record<string, unknown> = {

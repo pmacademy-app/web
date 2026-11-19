@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { RotateCw, Sparkles, HelpCircle } from 'lucide-react'
 import type { FlashcardItem } from '@/lib/srs'
 
@@ -23,11 +22,12 @@ export function Flashcard({ card, isFlipped, onFlip }: FlashcardProps) {
         }
       }}
     >
-      <motion.div
-        className="relative w-full min-h-[280px] md:min-h-[320px] rounded-2xl border border-border bg-card p-6 md:p-8 shadow-md transition-all group-hover:shadow-lg group-hover:border-primary/40 flex flex-col justify-between"
-        initial={false}
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      {/* 3D flip in CSS: the card rotates on Y over 400ms while hover shadow and
+          border keep their quick 150ms. Instant under reduced motion. */}
+      <div
+        className={`relative w-full min-h-[280px] md:min-h-[320px] rounded-2xl border border-border bg-card p-6 md:p-8 shadow-md group-hover:shadow-lg group-hover:border-primary/40 flex flex-col justify-between [transition:transform_400ms_cubic-bezier(0.23,1,0.32,1),box-shadow_150ms_cubic-bezier(0.4,0,0.2,1),border-color_150ms_cubic-bezier(0.4,0,0.2,1)] motion-reduce:[transition:none] ${
+          isFlipped ? '[transform:rotateY(180deg)]' : '[transform:rotateY(0deg)]'
+        }`}
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front Side */}
@@ -85,7 +85,7 @@ export function Flashcard({ card, isFlipped, onFlip }: FlashcardProps) {
             Rate your recall quality below (0 to 5)
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   )
 }

@@ -69,6 +69,7 @@ import { formatPositionLabel, lessonBreadcrumbLabels } from '@/lib/curriculum/le
 import { DeepDiveSection } from '@/components/academy/DeepDiveSection'
 import { getBlocksForTab, type TabType } from './lesson-tabs'
 import type { RecutVariant } from '@/lib/academy/experiment'
+import type { QuizSubmitProof } from '@/blocks/quiz/check-answer'
 
 
 
@@ -681,8 +682,11 @@ export default function LessonPageContent({
   }, [progress, markInProgress])
 
   const handleQuizComplete = useCallback(
-    async (attempts: { question_id: string; selected_option: number; is_correct: boolean }[]) => {
-      const res = await recordQuizAttempt(attempts)
+    async (
+      attempts: { question_id: string; selected_option: number; is_correct: boolean }[],
+      proof?: QuizSubmitProof
+    ) => {
+      const res = await recordQuizAttempt(attempts, proof)
       if (res) {
         trackQuizCompleted(lesson.id, res.score)
         if (lessonCompletedFromQuiz(res)) {

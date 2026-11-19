@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { submitOnboarding, OnboardingData } from '@/app/onboarding/actions'
+import { submitOnboarding, checkUsernameAvailability, OnboardingData } from '@/app/onboarding/actions'
 import { proxy } from '@/proxy'
 import { NextRequest } from 'next/server'
 import { SettingsService } from '@/lib/admin/settings-service'
@@ -24,6 +24,7 @@ vi.mock('next/headers', () => ({
       mockCookieStore.delete(name)
     },
   })),
+  headers: vi.fn(async () => new Headers({ 'x-real-ip': '198.51.100.9' })),
 }))
 
 const mockGetUser = vi.fn(async (token?: string) => {
@@ -395,5 +396,79 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
       const updatePayload = mockDbUpdate.mock.calls[0][0]
       expect(updatePayload).not.toHaveProperty('name')
     })
+    describe('M2: server-side schema and identity lock', () => {
+      it('rejects a goal that is not a configured option', async () => {
+        const result = await submitOnboarding({ goal: 'definitely_not_a_goal', career_role: 'beginner' })
+        expect(result).toEqual({ error: 'Please choose your primary learning goal.' })
+        expect(mockDbUpdate).not.toHaveBeenCalled()
+      })
+
+      it('rejects a non-slug option id and an unknown learning preference', async () => {
+        expect(await submitOnboarding({ goal: '<script>', career_role: 'beginner' })).toHaveProperty('error')
+        expect(
+          await submitOnboarding({ goal: 'become_pm', career_role: 'beginner', learning_preference: 'telepathy' })
+        ).toHaveProperty('error')
+        expect(mockDbUpdate).not.toHaveBeenCalled()
+      })
+
+      it('rejects too many topics and an unknown topic', async () => {
+        const many = Array.from({ length: 21 }, (_, i) => 'topic_' + i)
+        expect(await submitOnboarding({ goal: 'become_pm', career_role: 'beginner', topics: many })).toHaveProperty('error')
+        expect(
+          await submitOnboarding({ goal: 'become_pm', career_role: 'beginner', topics: ['discovery', 'astrology'] })
+        ).toHaveProperty('error')
+        expect(mockDbUpdate).not.toHaveBeenCalled()
+      })
+
+      it('applies validateWritableUrl to the profile links', async () => {
+        for (const field of ['linkedin_url', 'github_url', 'website_url'] as const) {
+          const result = await submitOnboarding({ goal: 'become_pm', career_role: 'beginner', [field]: 'javascript:alert(1)' })
+          expect(result, field).toHaveProperty('error')
+        }
+        expect(await submitOnboarding({ goal: 'become_pm', career_role: 'beginner', bio: 'x'.repeat(501) })).toHaveProperty('error')
+        expect(mockDbUpdate).not.toHaveBeenCalled()
+      })
+
+      it('ignores identity fields once onboarding is complete', async () => {
+        const { createServiceRoleClient } = await import('@/lib/supabase')
+        const update = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) })
+        const lockedClient = {
+          from: vi.fn(() => ({
+            update,
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({ data: { onboarding_completed: true, username: 'old_handle' }, error: null }),
+              }),
+            }),
+          })),
+          auth: { admin: { updateUserById: mockUpdateUserById } },
+        }
+        vi.mocked(createServiceRoleClient).mockReturnValueOnce(lockedClient as unknown as ReturnType<typeof createServiceRoleClient>)
+
+        const result = await submitOnboarding({
+          goal: 'become_pm',
+          career_role: 'beginner',
+          username: 'new_handle',
+          name: 'New Name',
+          bio: 'rewritten',
+          linkedin_url: 'https://linkedin.com/in/new',
+        })
+
+        expect(result).toMatchObject({ success: true })
+        const payload = update.mock.calls[0][0]
+        expect(payload).toMatchObject({ goal: 'become_pm', career_role: 'beginner' })
+        for (const key of ['username', 'name', 'bio', 'linkedin_url', 'avatar_url', 'website_url']) {
+          expect(payload, key).not.toHaveProperty(key)
+        }
+      })
+    })
+  })
+})
+
+describe('checkUsernameAvailability IP limit (M2)', () => {
+  it('refuses after 30 checks a minute from one IP', async () => {
+    let last: Awaited<ReturnType<typeof checkUsernameAvailability>> | null = null
+    for (let i = 0; i < 31; i++) last = await checkUsernameAvailability('handle_' + i)
+    expect(last).toEqual({ available: false, error: 'Too many username checks. Please wait a minute and try again.' })
   })
 })

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+// zod/mini: same validation core and messages as full zod, a fraction of the client
+// bundle. Checks run in the listed order, so the first message per field is unchanged.
+import * as z from 'zod/mini'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
@@ -24,22 +26,22 @@ import { apiPost } from '@/lib/api/client'
 const GOOGLE_AUTH_ENABLED = isGoogleAuthEnabled()
 
 const signupSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Full name is required.')
-    .min(2, 'Name must be at least 2 characters.')
-    .max(80, 'Name must be less than 80 characters.')
-    .trim(),
-  email: z
-    .string()
-    .min(1, 'Email is required.')
-    .email('Please enter a valid email address.')
-    .trim()
-    .toLowerCase(),
-  password: z
-    .string()
-    .min(1, 'Password is required.')
-    .min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
+  name: z.string().check(
+    z.minLength(1, 'Full name is required.'),
+    z.minLength(2, 'Name must be at least 2 characters.'),
+    z.maxLength(80, 'Name must be less than 80 characters.'),
+    z.trim(),
+  ),
+  email: z.string().check(
+    z.minLength(1, 'Email is required.'),
+    z.regex(z.regexes.email, 'Please enter a valid email address.'),
+    z.trim(),
+    z.toLowerCase(),
+  ),
+  password: z.string().check(
+    z.minLength(1, 'Password is required.'),
+    z.minLength(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
+  ),
   // Mirrors the server schema in app/api/auth/signup/route.ts. The client copy is
   // for the inline error; the server's is the one that actually blocks the account.
   acceptedTerms: z.literal(true, {

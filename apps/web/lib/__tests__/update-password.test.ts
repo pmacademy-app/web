@@ -1,170 +1,158 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest, NextResponse } from 'next/server'
+/**
+ * Password recovery: the signed recovery marker (H1) and the callback's recovery branch.
+ *
+ * The old `/api/auth/update-password` route was removed: nothing called it (the reset page
+ * uses `updatePasswordAction`), and its `updateUser` call on a session-less client could not
+ * succeed (L7). The action itself is covered in `update-password-action.test.ts`.
+ */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { NextRequest } from 'next/server'
 
-// Spy on logSystemError to verify monitoring behavior
-const mockLogSystemError = vi.fn().mockResolvedValue('mock-system-error-id')
-vi.mock('@/lib/monitoring/logger', () => ({
-  logSystemError: (options: unknown) => mockLogSystemError(options),
+const h = vi.hoisted(() => ({
+  verifyOtp: vi.fn(),
+  ensureUserProfile: vi.fn(),
 }))
 
-import { POST } from '../../app/api/auth/update-password/route'
+vi.mock('@supabase/supabase-js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@supabase/supabase-js')>()
+  return { ...actual, createClient: () => ({ auth: { verifyOtp: h.verifyOtp } }) }
+})
 
-describe('Password Update Endpoint Security & Functional Unit Tests', () => {
+vi.mock('@/lib/supabase', () => ({
+  createServiceRoleClient: () => ({ auth: { verifyOtp: h.verifyOtp, admin: {} }, from: () => ({}) }),
+}))
+
+vi.mock('@/lib/auth', () => ({ ensureUserProfile: h.ensureUserProfile }))
+vi.mock('@/lib/referral/referral-service', () => ({
+  applyPendingReferral: vi.fn(),
+  createReferralAttribution: vi.fn(),
+  isPlausibleReferralCode: () => false,
+}))
+
+import { GET } from '../../app/api/auth/callback/route'
+import {
+  RECOVERY_MARKER_COOKIE,
+  RECOVERY_MARKER_MAX_AGE_SECONDS,
+  recoveryMarkerCookieOptions,
+  signRecoveryMarker,
+  verifyRecoveryMarker,
+} from '@/lib/auth/recovery-marker'
+import { signOAuthIntent } from '@/lib/auth/oauth-intent'
+
+const SECRET = 'test-oauth-state-secret-at-least-32-chars-long'
+
+describe('recovery marker', () => {
+  beforeEach(() => {
+    vi.stubEnv('OAUTH_STATE_SECRET', SECRET)
+  })
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('round-trips the user id', () => {
+    const token = signRecoveryMarker('user-1')!
+    expect(verifyRecoveryMarker(token)).toBe('user-1')
+  })
+
+  it('expires after ten minutes', () => {
+    const now = Date.now()
+    const token = signRecoveryMarker('user-1', now)!
+    expect(verifyRecoveryMarker(token, now + (RECOVERY_MARKER_MAX_AGE_SECONDS - 1) * 1000)).toBe('user-1')
+    expect(verifyRecoveryMarker(token, now + (RECOVERY_MARKER_MAX_AGE_SECONDS + 1) * 1000)).toBeNull()
+  })
+
+  it('rejects tampering, junk and a marker signed under another secret', () => {
+    const token = signRecoveryMarker('user-1')!
+    const [payload, sig] = token.split('.')
+    const forgedPayload = Buffer.from(JSON.stringify({ uid: 'admin', iat: Date.now(), n: 'x' })).toString('base64url')
+    expect(verifyRecoveryMarker(`${forgedPayload}.${sig}`)).toBeNull()
+    expect(verifyRecoveryMarker(`${payload}.${sig}x`)).toBeNull()
+    expect(verifyRecoveryMarker('not-a-token')).toBeNull()
+    expect(verifyRecoveryMarker(undefined)).toBeNull()
+
+    vi.stubEnv('OAUTH_STATE_SECRET', 'a-completely-different-secret-of-32-chars')
+    expect(verifyRecoveryMarker(token)).toBeNull()
+  })
+
+  it('is domain-separated from the OAuth intent signed with the same secret', () => {
+    const intent = signOAuthIntent({ terms: true, age: true, ref: null, next: '/x', iat: Date.now() }, SECRET)
+    expect(verifyRecoveryMarker(intent)).toBeNull()
+  })
+
+  it('falls back to a key derived from the service role key when no OAuth secret exists', () => {
+    vi.stubEnv('OAUTH_STATE_SECRET', '')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key-that-is-long-enough-to-use')
+    const token = signRecoveryMarker('user-2')
+    expect(token).not.toBeNull()
+    expect(verifyRecoveryMarker(token)).toBe('user-2')
+  })
+
+  it('refuses to sign without any secret', () => {
+    vi.stubEnv('OAUTH_STATE_SECRET', '')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '')
+    expect(signRecoveryMarker('user-1')).toBeNull()
+  })
+
+  it('cookie is httpOnly, SameSite=Strict, scoped to the reset page and short-lived', () => {
+    expect(recoveryMarkerCookieOptions()).toMatchObject({
+      httpOnly: true,
+      sameSite: 'strict',
+      path: '/reset-password',
+      maxAge: 600,
+    })
+  })
+})
+
+describe('auth/callback recovery branch', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubEnv('OAUTH_STATE_SECRET', SECRET)
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://mock.supabase.co')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon')
+  })
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
-  it('Rejects non-JSON Content-Type with 415', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body: 'newPassword=123456',
-    })
-    const res = await POST(req)
-    expect(res.status).toBe(415)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('Unsupported Content-Type. Expected application/json')
+  const recoveryUrl = 'https://prodily.app/api/auth/callback?token_hash=th&type=recovery&next=/dashboard'
+  const session = { access_token: 'at', refresh_token: 'rt', expires_in: 3600 }
+
+  it('sets the session and a marker bound to the user, and lands on the reset form', async () => {
+    h.verifyOtp.mockResolvedValue({ data: { user: { id: 'user-9' }, session }, error: null })
+
+    const res = await GET(new NextRequest(recoveryUrl))
+    const location = new URL(res.headers.get('location') || '')
+
+    expect(location.pathname).toBe('/reset-password')
+    expect(location.searchParams.get('mode')).toBe('update')
+    expect(res.cookies.get('sb-access-token')?.value).toBe('at')
+    const marker = res.cookies.get(RECOVERY_MARKER_COOKIE)?.value
+    expect(verifyRecoveryMarker(marker)).toBe('user-9')
+    expect(h.ensureUserProfile).not.toHaveBeenCalled()
   })
 
-  it('Rejects untrusted Origin header with 403', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        origin: 'https://evil-attacker-site.com',
-      },
-      body: JSON.stringify({ newPassword: 'newpassword123' }),
-    })
-    const res = await POST(req)
-    expect(res.status).toBe(403)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('Forbidden: Untrusted Origin')
-  })
+  it('without a signing secret, hands out no session and asks for a new link', async () => {
+    vi.stubEnv('OAUTH_STATE_SECRET', '')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '')
+    h.verifyOtp.mockResolvedValue({ data: { user: { id: 'user-9' }, session }, error: null })
 
-  it('Rejects short password (< 10 chars) with 400', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ newPassword: '123' }),
-    })
-    const res = await POST(req)
-    expect(res.status).toBe(400)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('Password must be at least 10 characters.')
-  })
+    const res = await GET(new NextRequest(recoveryUrl))
 
-  it('Rejects request with neither sb-access-token nor sb-refresh-token with 401 and clears cookies', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ newPassword: 'validPassword123' }),
-    })
-    const res = (await POST(req)) as NextResponse
-    expect(res.status).toBe(401)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('No active recovery session found. Please request a new password reset link.')
-    expect(res.cookies.get('sb-access-token')?.value).toBe('')
-    expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
-    // Does not log false-positive system error alert
-    expect(mockLogSystemError).not.toHaveBeenCalled()
-  })
-
-  it('Successfully updates password and deletes recovery cookies', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        cookie: 'sb-access-token=mock-valid-token; sb-refresh-token=mock-refresh-token',
-      },
-      body: JSON.stringify({ newPassword: 'newValidPassword123' }),
-    })
-
-    const res = (await POST(req)) as NextResponse
-    if (res.status === 200) {
-      const json = await res.json()
-      expect(json.success).toBe(true)
-      expect(res.cookies.get('sb-access-token')?.value).toBe('')
-      expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
-    } else {
-      expect([200, 400, 401]).toContain(res.status)
-    }
-  })
-
-  it('Refresh-token fallback: when access token is expired, falls back to refresh token and suppresses false-positive system alerts on expected expiration', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        cookie: 'sb-refresh-token=expired-but-present-refresh-token',
-      },
-      body: JSON.stringify({ newPassword: 'newValidPassword123' }),
-    })
-    const res = (await POST(req)) as NextResponse
-    expect(res.status).toBe(401)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('Your password reset link has expired. Please request a new one.')
-    expect(res.cookies.get('sb-access-token')?.value).toBe('')
-    expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
-    // Critical assertion: standard expired refresh token MUST NOT log a system error alert
-    expect(mockLogSystemError).not.toHaveBeenCalled()
-  })
-
-  it('Redirects recovery failures to /reset-password?error=expired rather than /login?error=auth_failed', async () => {
-    const { GET: callbackGET } = await import('../../app/api/auth/callback/route')
-    const req = new NextRequest('http://localhost:3000/api/auth/callback?type=recovery&token_hash=invalid_hash')
-    const res = await callbackGET(req)
-    expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/reset-password?error=expired')
-    expect(res.headers.get('location')).not.toContain('/login?error=auth_failed')
+    expect(res.cookies.get('sb-access-token')).toBeUndefined()
+    expect(res.cookies.get(RECOVERY_MARKER_COOKIE)).toBeUndefined()
   })
 
-  it('Email verification failure redirects to /login?error=verification_failed (not generic auth_failed)', async () => {
-    const { GET: callbackGET } = await import('../../app/api/auth/callback/route')
-    const req = new NextRequest('http://localhost:3000/api/auth/callback?type=signup&token_hash=invalid_hash')
-    const res = await callbackGET(req)
-    expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/login?error=verification_failed')
-    expect(res.headers.get('location')).not.toContain('auth_failed')
+  it('a rejected token sets no marker', async () => {
+    h.verifyOtp.mockResolvedValue({ data: { user: null, session: null }, error: { message: 'expired' } })
+    const res = await GET(new NextRequest(recoveryUrl))
+    expect(res.headers.get('location')).toContain('/reset-password?error=expired')
+    expect(res.cookies.get(RECOVERY_MARKER_COOKIE)).toBeUndefined()
   })
 
-  it('Rejects untrusted Referer header with 403', async () => {
-    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        referer: 'https://evil-attacker-site.com/attack',
-      },
-      body: JSON.stringify({ newPassword: 'newpassword123' }),
-    })
-    const res = await POST(req)
-    expect(res.status).toBe(403)
-    const json = await res.json()
-    expect(json.success).toBe(false)
-    expect(json.error).toBe('Forbidden: Untrusted Referer')
+  it('a non-recovery verification never sets the marker', async () => {
+    h.verifyOtp.mockResolvedValue({ data: { user: { id: 'user-9', email: 'a@b.c' }, session }, error: null })
+    const res = await GET(new NextRequest('https://prodily.app/api/auth/callback?token_hash=th&type=magiclink'))
+    expect(res.cookies.get(RECOVERY_MARKER_COOKIE)).toBeUndefined()
   })
 })
-
-describe('classifyAuthError: Auth session missing regression guard', () => {
-  it('does NOT classify "Auth session missing!" as AUTH_UNKNOWN_ERROR with the generic message', async () => {
-    const { classifyAuthError } = await import('@/lib/auth/errors')
-    const result = classifyAuthError({ message: 'Auth session missing!' }, 'reset_password')
-    // Must not produce the unactionable generic message that confused users
-    expect(result.message).not.toBe('An unexpected authentication error occurred. Please try again.')
-    // Must produce the specific expired-session message
-    expect(result.message).toContain('expired')
-    expect(result.rawCode).toBe('auth_session_missing')
-  })
-
-  it('classifies "Auth session missing!" with requiresAction reset_password', async () => {
-    const { classifyAuthError } = await import('@/lib/auth/errors')
-    const result = classifyAuthError('Auth session missing!', 'reset_password')
-    expect(result.requiresAction).toBe('reset_password')
-    expect(result.retryable).toBe(false)
-  })
-})
-

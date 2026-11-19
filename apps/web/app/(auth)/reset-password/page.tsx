@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+// zod/mini: same validation core and messages as full zod, a fraction of the client
+// bundle. Checks run in the listed order, so the first message per field is unchanged.
+import * as z from 'zod/mini'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, CheckCircle2, KeyRound } from 'lucide-react'
@@ -24,28 +26,28 @@ import {
 } from '@/lib/auth/password-policy'
 
 const requestSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required.')
-    .email('Please enter a valid email address.')
-    .trim()
-    .toLowerCase(),
+  email: z.string().check(
+    z.minLength(1, 'Email is required.'),
+    z.regex(z.regexes.email, 'Please enter a valid email address.'),
+    z.trim(),
+    z.toLowerCase(),
+  ),
 })
 
 const updateSchema = z
   .object({
-    newPassword: z
-      .string()
-      .min(1, 'New password is required.')
-      .min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
-    confirmPassword: z
-      .string()
-      .min(1, 'Please confirm your new password.'),
+    newPassword: z.string().check(
+      z.minLength(1, 'New password is required.'),
+      z.minLength(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
+    ),
+    confirmPassword: z.string().check(z.minLength(1, 'Please confirm your new password.')),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Passwords do not match.',
-    path: ['confirmPassword'],
-  })
+  .check(
+    z.refine((data) => data.newPassword === data.confirmPassword, {
+      error: 'Passwords do not match.',
+      path: ['confirmPassword'],
+    }),
+  )
 
 type RequestFormValues = z.infer<typeof requestSchema>
 type UpdateFormValues = z.infer<typeof updateSchema>

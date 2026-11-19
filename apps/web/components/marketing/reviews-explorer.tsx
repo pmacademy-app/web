@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import { cn } from '@/lib/utils'
 import { Star, CheckCircle2, MessageSquarePlus } from 'lucide-react'
 import { ContextualFeedbackModal } from '@/components/feedback/ContextualFeedbackModal'
 import { apiGet } from '@/lib/api/client'
@@ -106,27 +106,27 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
       ) : (
         /* Dynamic Reviews Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-          <AnimatePresence mode="popLayout">
-            {reviews.map((rev, index) => (
-              <motion.article
-                layout
-                key={rev.id}
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.22, delay: index * 0.04 }}
-                className="
-                  bg-surface border border-border rounded-2xl p-6 shadow-xs
-                  hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(23,26,23,0.06)] hover:-translate-y-0.5
-                  transition-all duration-200 flex flex-col justify-between space-y-4
-                "
-              >
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-0.5 text-skill-leadership">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} className="fill-skill-leadership" />
-                      ))}
+          {reviews.map((rev, index) => (
+            // Fade and rise 16px on mount with a 40ms stagger (tw-animate-css enter
+            // keyframe). The resting style is fully visible, so the cards still show if
+            // CSS animation never runs. No movement under reduced motion.
+            <article
+              key={rev.id}
+              style={prefersReducedMotion ? undefined : { animationDelay: `${index * 40}ms` }}
+              className={cn(
+                'bg-surface border border-border rounded-2xl p-6 shadow-xs',
+                'hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(23,26,23,0.06)] hover:-translate-y-0.5',
+                'transition-all duration-200 flex flex-col justify-between space-y-4',
+                !prefersReducedMotion &&
+                  'animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards motion-reduce:animate-none',
+              )}
+            >
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-0.5 text-skill-leadership">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className="fill-skill-leadership" />
+                    ))}
                     </div>
                     <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded border border-primary/20">
                       <CheckCircle2 size={11} />
@@ -150,9 +150,8 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
                     </span>
                   )}
                 </div>
-              </motion.article>
+              </article>
             ))}
-          </AnimatePresence>
         </div>
       )}
 

@@ -9,7 +9,7 @@ import {
   PASSWORD_WEAK_REQUIREMENTS_MESSAGE,
 } from '@/lib/auth/password-policy'
 import { classifyAuthError, resolveApiAuthError } from '@/lib/auth/errors'
-import { POST as updatePasswordPOST } from '@/app/api/auth/update-password/route'
+import { updatePasswordAction } from '@/app/(auth)/reset-password/actions'
 import * as authLib from '@/lib/auth'
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -34,6 +34,7 @@ vi.mock('@/lib/monitoring/logger', () => ({
 }))
 
 vi.mock('@/lib/auth', () => ({
+  SIGNUP_CONSENT_APP_METADATA_KEY: 'signup_consent',
   ensureUserProfile: vi.fn(async () => undefined),
   getAuthenticatedUserFromRequest: vi.fn(async () => null),
 }))
@@ -161,35 +162,21 @@ describe('SEC-15 Password Policy (10-character minimum)', () => {
     })
   })
 
-  describe('Update-password route password validation', () => {
-    it('rejects a 9-character password at update-password with 400', async () => {
-      vi.mocked(authLib.getAuthenticatedUserFromRequest).mockResolvedValue(null)
-      const req = new NextRequest('https://prodily.app/api/auth/update-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPassword: '123456789' }),
-      })
-
-      const res = await updatePasswordPOST(req)
-      expect(res.status).toBe(400)
-      const json = await res.json()
-      expect(json.success).toBe(false)
-      expect(json.error).toBe('Password must be at least 10 characters.')
+  describe('Reset-password action password validation', () => {
+    // The /api/auth/update-password route was removed (unused); the reset page calls
+    // updatePasswordAction, which enforces the same minimum before reading any cookie.
+    it('rejects a 9-character password at the reset action', async () => {
+      const result = await updatePasswordAction('123456789')
+      expect(result.success).toBeUndefined()
+      expect(result.code).toBe('AUTH_PASSWORD_TOO_WEAK')
+      expect(result.error).toBe('Password must be at least 10 characters.')
     })
 
-    it('accepts a 10-character password at update-password', async () => {
-      vi.mocked(authLib.getAuthenticatedUserFromRequest).mockResolvedValue(null)
-      const req = new NextRequest('https://prodily.app/api/auth/update-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPassword: '1234567890' }),
-      })
-
-      const res = await updatePasswordPOST(req)
-      // Should pass password length check and proceed to token check (401 because no tokens in request)
-      expect(res.status).toBe(401)
-      const json = await res.json()
-      expect(json.error).toBe('No active recovery session found. Please request a new password reset link.')
+    it('accepts a 10-character password past the length check', async () => {
+      const result = await updatePasswordAction('1234567890')
+      // No request scope or session here, so it fails later, never on length.
+      expect(result.error).not.toBe('Password must be at least 10 characters.')
+      expect(result.code).not.toBe('AUTH_PASSWORD_TOO_WEAK')
     })
   })
 

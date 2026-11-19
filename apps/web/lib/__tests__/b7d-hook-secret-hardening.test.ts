@@ -293,7 +293,6 @@ describe('B7-D — auth route migration scope', () => {
       'auth/session/route.ts',
       'auth/signup/route.ts',
       'auth/telemetry/route.ts',
-      'auth/update-password/route.ts',
     ])
   })
 
@@ -318,12 +317,13 @@ describe('B7-D — auth route migration scope', () => {
   it('migrated exactly the eight auth routes in this wave', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
-    // 8 from this wave plus the 2 Google sign-in routes.
-    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(10)
+    // 8 from this wave plus the 2 Google sign-in routes, minus update-password (removed
+    // unused; the reset page uses a server action).
+    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(9)
   })
 
   it('every migrated auth route declares an explicit actor policy', () => {
-    for (const route of ['login', 'signup', 'logout', 'refresh', 'session', 'telemetry', 'resend-verification', 'update-password']) {
+    for (const route of ['login', 'signup', 'logout', 'refresh', 'session', 'telemetry', 'resend-verification']) {
       const source = readFileSync(path.join(API_DIR, 'auth', route, 'route.ts'), 'utf8')
       expect(source).toContain('withRoute')
       expect(source).toContain('actor: { allow:')

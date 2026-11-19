@@ -160,7 +160,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       mockSettings.maintenanceMode = true
       const req = new NextRequest('https://prodily.app/api/v2/lessons/les_123/quiz', {
         method: 'POST',
-        headers: { cookie: 'sb-access-token=mock-learner-token' },
+        // L3: a cookie-bearing write must carry an origin signal, as every browser sends.
+        headers: { origin: 'https://prodily.app', cookie: 'sb-access-token=mock-learner-token' },
       })
       const res = await proxy(req)
       expect(res.status).toBe(503)
@@ -173,7 +174,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       mockSettings.maintenanceMode = true
       const req = new NextRequest('https://prodily.app/api/v2/lessons/les_123/quiz', {
         method: 'POST',
-        headers: { cookie: 'sb-access-token=mock-admin-token' },
+        // L3: a cookie-bearing write must carry an origin signal, as every browser sends.
+        headers: { origin: 'https://prodily.app', cookie: 'sb-access-token=mock-admin-token' },
       })
       const res = await proxy(req)
       // Admin should NOT be blocked with 503
@@ -263,7 +265,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       mockSettings.requireEmailVerification = true
       const req = new NextRequest('https://prodily.app/api/v2/lessons/les_123/quiz', {
         method: 'POST',
-        headers: { cookie: 'sb-access-token=mock-unverified-token' },
+        // L3: a cookie-bearing write must carry an origin signal, as every browser sends.
+        headers: { origin: 'https://prodily.app', cookie: 'sb-access-token=mock-unverified-token' },
       })
       const res = await proxy(req)
       expect(res.status).toBe(403)
@@ -275,7 +278,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
       mockSettings.requireEmailVerification = true
       const req = new NextRequest('https://prodily.app/api/v2/lessons/les_123/quiz', {
         method: 'POST',
-        headers: { cookie: 'sb-access-token=mock-learner-token' },
+        // L3: a cookie-bearing write must carry an origin signal, as every browser sends.
+        headers: { origin: 'https://prodily.app', cookie: 'sb-access-token=mock-learner-token' },
       })
       const res = await proxy(req)
       expect(res.status).not.toBe(403)

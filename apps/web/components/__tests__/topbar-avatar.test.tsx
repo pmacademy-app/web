@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, afterEach, beforeEach } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import * as React from 'react'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -15,6 +15,10 @@ import { join } from 'node:path'
 // fix any learner without a name, or whose name contained "aditya", saw the founder's photo.
 
 import { TopbarAvatar } from '@/components/layout/TopbarAvatar'
+
+// vitest.setup.ts stubs next/image to render nothing. The avatar is a next/image now,
+// so this suite uses the real component to see the markup it actually ships.
+vi.mock('next/image', async () => await vi.importActual('next/image'))
 
 let container: HTMLDivElement
 let root: Root
@@ -65,6 +69,38 @@ describe('TopbarAvatar', () => {
     const img = container.querySelector('img')
     expect(img).not.toBeNull()
     expect(img?.getAttribute('src')).toBe('https://cdn.example.com/u/1.png')
+  })
+
+  it('renders a 32px next/image so a Supabase photo is served small', () => {
+    const url = 'https://abc123.supabase.co/storage/v1/object/public/avatars/u1/a.png'
+    render(<TopbarAvatar name="Aditya" avatarUrl={url} />)
+    const img = container.querySelector('img')!
+    expect(img.getAttribute('width')).toBe('32')
+    expect(img.getAttribute('height')).toBe('32')
+    expect(img.getAttribute('alt')).toBe('')
+    // Through the optimizer at 32px (1x) and 64px (2x), never the full-size original.
+    const src = img.getAttribute('src')!
+    expect(src).toContain('/_next/image?url=')
+    expect(decodeURIComponent(src)).toContain(url)
+    expect(src).toMatch(/[?&]w=64(&|$)/)
+    const srcset = img.getAttribute('srcset') ?? ''
+    expect(srcset).toMatch(/w=32&q=\d+ 1x/)
+    expect(srcset).toMatch(/w=64&q=\d+ 2x/)
+  })
+
+  it('serves a host outside remotePatterns as-is instead of through the optimizer', () => {
+    render(<TopbarAvatar name="Aditya" avatarUrl="  https://lh3.googleusercontent.com/a/photo  " />)
+    const img = container.querySelector('img')!
+    expect(img.getAttribute('src')).toBe('https://lh3.googleusercontent.com/a/photo')
+    expect(img.getAttribute('width')).toBe('32')
+  })
+
+  it('uses next/image, not a raw img tag', () => {
+    const source = readFileSync(join(__dirname, '..', 'layout', 'TopbarAvatar.tsx'), 'utf8')
+    expect(source).toContain("from 'next/image'")
+    expect(source).not.toMatch(/<img/)
+    expect(source).toMatch(/width=\{32\}/)
+    expect(source).toMatch(/height=\{32\}/)
   })
 
   it('falls back to the initial when the photo fails to load', () => {

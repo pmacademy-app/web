@@ -3,16 +3,17 @@ import { NextResponse } from 'next/server'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 /**
  * Deliberately open to `anonymous` — feedback is collected from signed-out visitors
  * too, and the row simply carries a null `user_id`.
  *
- * The bucket keeps its pre-migration shape exactly: per-learner when signed in, and
- * one shared `anon_feedback` bucket otherwise. A shared anonymous bucket is a
- * stricter ceiling than a per-IP one, so it is preserved rather than "improved".
- * The rule is declared on the wrapper and no body schema is, which keeps the
- * original order — authenticate, throttle, then parse.
+ * The bucket is per learner when signed in, and per client IP otherwise (L12). One
+ * shared anonymous bucket let a single script use up the allowance for every signed-out
+ * visitor at once, which is a denial of service on feedback, not a stricter ceiling.
+ * The rule is declared on the wrapper and no body schema is, which keeps the original
+ * order: authenticate, throttle, then parse.
  */
 export const POST = withRoute(
   {
@@ -22,7 +23,8 @@ export const POST = withRoute(
     errorMessage: 'Error submitting feedback.',
     rateLimit: [
       {
-        key: ({ actor }) => (actor.kind === 'learner' ? actor.userId : 'anon_feedback'),
+        key: ({ actor, request }) =>
+          actor.kind === 'learner' ? actor.userId : `anon_feedback:${getClientIpBucket(request)}`,
         limit: 5,
         windowMs: 60 * 1000,
       },

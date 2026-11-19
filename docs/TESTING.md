@@ -60,7 +60,7 @@ The list below is a representative sample of `apps/web/lib/__tests__/` grouped b
 - `auth-ui-integration.test.ts` — Login, registration form validation, and verification pending UI.
 - `auth-errors.test.ts` — Authentication error classification and message mapping.
 - `settings-change-password.test.ts` — Password change and strength validation.
-- `update-password.test.ts` — Password recovery token update route.
+- `update-password.test.ts`: password recovery marker and the callback's recovery branch.
 - `unsubscribe.test.ts` — One-click email unsubscribe tokens and preference updates.
 - `middleware-auth.test.ts` — Proxy route protection and session token verification.
 - `platform-behavior.test.ts` — Platform-wide controls: Maintenance Mode, Allow Signups, Require Email Verification.

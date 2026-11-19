@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import { useRevealOnScroll } from '@/hooks/use-reveal-on-scroll'
 import { ArrowRight } from 'lucide-react'
 import type { FrameworkItem } from '@/lib/frameworks'
 import { cn } from '@/lib/utils'
@@ -166,6 +166,9 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
 
 export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
   const prefersReducedMotion = useReducedMotion()
+  // Cards are visible in the server HTML (the SEO audit flagged the old opacity: 0
+  // start). Only cards still off screen after hydration are hidden, then revealed.
+  const revealRef = useRevealOnScroll(prefersReducedMotion)
 
   return (
     <div className="relative max-w-5xl mx-auto py-8">
@@ -193,13 +196,10 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
           }
 
           return (
-            <motion.div
+            <div
               key={fw.slug}
               id={fw.slug}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              ref={revealRef}
               className="relative flex items-center w-full"
             >
               
@@ -286,7 +286,7 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                 </article>
               </div>
 
-            </motion.div>
+            </div>
           )
         })}
       </div>

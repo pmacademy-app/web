@@ -226,12 +226,16 @@ interface ScoredQuizSubmission {
  * With `requireComplete`, the answers must cover exactly the served quiz or exactly the full
  * bank (the full bank is accepted so a kill-switch flip between render and submit does not
  * strand a learner mid-quiz).
+ *
+ * A question in `forfeited` scores as incorrect whatever option was submitted; the submitted
+ * option is still recorded. The quiz route sets it for a question whose answer the learner saw
+ * on the check route without a receipt for it (lib/academy/quiz-receipts.ts).
  */
 export function scoreQuizSubmission(
   pool: QuizQuestionDefinition[],
   served: QuizQuestionDefinition[],
   attempts: QuizAnswer[],
-  options: { requireComplete: boolean }
+  options: { requireComplete: boolean; forfeited?: ReadonlySet<string> }
 ): ScoredQuizSubmission {
   if (attempts.length === 0) {
     throw new PublicError('Attempts array cannot be empty', { status: 400, code: 'VALIDATION' })
@@ -260,7 +264,7 @@ export function scoreQuizSubmission(
     return {
       question_id: a.question_id,
       selected_option: a.selected_option,
-      is_correct: a.selected_option === correctAnswer,
+      is_correct: a.selected_option === correctAnswer && !options.forfeited?.has(a.question_id),
     }
   })
 
@@ -397,16 +401,22 @@ async function loadQuizForWrite(lessonId: string) {
  * The learner quiz submission path (POST /api/v2/lessons/[lessonId]/quiz). SEC-08: the
  * answers must cover exactly the quiz the learner was served, each question once, and the
  * lesson must be open to the learner. Every check runs before any write.
+ *
+ * `denyPerfectBonus` withholds the first-attempt perfect bonus (the route sets it when a
+ * submission carries an invalid or forged quiz receipt, lib/academy/quiz-receipts.ts).
+ * `forfeitedQuestionIds` scores those questions as incorrect (see scoreQuizSubmission).
  */
 export async function submitQuizAttempt(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonId: string,
-  attempts: QuizAnswer[]
+  attempts: QuizAnswer[],
+  options: { denyPerfectBonus?: boolean; forfeitedQuestionIds?: ReadonlySet<string> } = {}
 ) {
   const { lesson, pool } = await loadQuizForWrite(lessonId)
   const scored = scoreQuizSubmission(pool, getServedQuizQuestions(pool, userId, lessonId), attempts, {
     requireComplete: true,
+    forfeited: options.forfeitedQuestionIds,
   })
   // getRuntimeXpValues never rejects (it falls back to the last good values) and is usually a
   // cache hit, so starting it beside the access check costs nothing when access is denied.
@@ -416,6 +426,7 @@ export async function submitQuizAttempt(
     xpConfig,
     progressRows: access.progressRows,
     contact: access.contact,
+    denyPerfectBonus: options.denyPerfectBonus === true,
   })
 }
 
@@ -518,6 +529,8 @@ interface QuizPrefetch {
   /** Progress rows read before the RPC, or null when that read failed. */
   progressRows?: LessonProgressStatusRow[] | null
   contact?: LearnerContact
+  /** Passes a zero perfect bonus to the RPC (a submission with an invalid quiz receipt). */
+  denyPerfectBonus?: boolean
 }
 
 /**
@@ -580,7 +593,7 @@ async function recordScoredQuizAttempt(
     p_total_questions: totalQuestions,
     p_attempts: validatedAttempts as Json,
     p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
-    p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
+    p_quiz_perfect_bonus_xp: prefetched.denyPerfectBonus ? 0 : xpConfig.QUIZ_PERFECT_BONUS,
   })
 
   if (rpcError) {

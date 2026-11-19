@@ -3,7 +3,8 @@
  *
  * Google sign-ups without consent pass `consent: null` (no consent, whatever the
  * metadata says) and `skipWelcome: true` (the welcome goes out from the consent
- * gate). Every other caller omits both and keeps its behaviour.
+ * gate). Every other caller omits both; an omitted consent comes only from the
+ * server-written `app_metadata.signup_consent`, never from `user_metadata` (M4).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
@@ -48,9 +49,21 @@ describe('ensureUserProfile consent and welcome options', () => {
     h.dispatch.mockResolvedValue(undefined)
   })
 
-  it('omitted consent is derived from auth metadata and the welcome is sent (existing behaviour)', async () => {
-    await ensureUserProfile(fakeClient(), user)
+  it('omitted consent is taken from server-written app_metadata and the welcome is sent', async () => {
+    const serverUser = {
+      id: 'usr_1',
+      email: 'a@example.com',
+      app_metadata: { provider: 'email', signup_consent: METADATA_CONSENT },
+      user_metadata: { full_name: 'A' },
+    } as never
+    await ensureUserProfile(fakeClient(), serverUser)
     expect(h.inserted[0]).toMatchObject(METADATA_CONSENT)
+    expect(h.dispatch).toHaveBeenCalledWith(expect.objectContaining({ id: 'welcome-usr_1', event: 'user.registered' }))
+  })
+
+  it('omitted consent ignores user-editable user_metadata (M4)', async () => {
+    await ensureUserProfile(fakeClient(), user)
+    for (const key of Object.keys(METADATA_CONSENT)) expect(h.inserted[0]).not.toHaveProperty(key)
     expect(h.dispatch).toHaveBeenCalledWith(expect.objectContaining({ id: 'welcome-usr_1', event: 'user.registered' }))
   })
 

@@ -225,6 +225,28 @@ describe('quiz submit round trips (item 9)', () => {
   })
 })
 
+describe('quiz submit perfect bonus (quiz receipts)', () => {
+  async function bonusSent(options?: { denyPerfectBonus?: boolean }) {
+    const db = buildDb(seed(completedEarlier()), 'original')
+    invalidateRuntimeXpCache()
+    const xp = await getRuntimeXpValues(db.client)
+    await submitQuizAttempt(db.client as never, USER, LESSON, answers(LESSON, true), options)
+    const params = db.client.rpc.mock.calls[0][1] as Row
+    return { sent: params.p_quiz_perfect_bonus_xp, configured: xp.QUIZ_PERFECT_BONUS }
+  }
+
+  it('passes the configured perfect bonus to the RPC by default', async () => {
+    const { sent, configured } = await bonusSent()
+    expect(configured).toBeGreaterThan(0)
+    expect(sent).toBe(configured)
+  })
+
+  it('passes a zero perfect bonus when the route withholds it', async () => {
+    const { sent } = await bonusSent({ denyPerfectBonus: true })
+    expect(sent).toBe(0)
+  })
+})
+
 describe('quiz submit completion counts match the progress the RPC wrote', () => {
   it('first completion of the very first lesson', async () => {
     const { result } = await submit(FIRST_LESSON, seed([]), true)

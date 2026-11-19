@@ -16,8 +16,23 @@ const PUBLIC_ROUTES = [
 test.describe('A11y audits: public marketing and auth pages', () => {
   for (const route of PUBLIC_ROUTES) {
     test(`accessibility audit for route ${route}`, async ({ page }) => {
+      // Audit the settled page, not a frame of an entrance animation: mid-fade text is
+      // partly transparent and axe measures it as low contrast (seen on /frameworks).
+      // The site honours reduced motion, and any CSS or WAAPI animation still running
+      // is allowed to finish before the scan.
+      await page.emulateMedia({ reducedMotion: 'reduce' })
       await page.goto(route)
       await page.waitForLoadState('domcontentloaded')
+      // Looping animations (a pulsing dot, a spinner) never finish, so only finite ones count.
+      await page.waitForFunction(
+        () =>
+          document
+            .getAnimations()
+            .filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
+            .every((animation) => animation.playState !== 'running'),
+        undefined,
+        { timeout: 5000 }
+      )
 
       const accessibilityScanResults = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])

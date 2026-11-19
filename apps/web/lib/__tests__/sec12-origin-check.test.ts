@@ -119,6 +119,43 @@ describe('SEC-12: Origin Check and Same-Origin Protection for API Writes', () =>
       expect(isAllowedApiOrigin(validPost, '/api/settings/profile')).toBe(true)
     })
 
+    it('L3: rejects a cookie-bearing POST with no Origin, no Referer and no Sec-Fetch-Site', () => {
+      const bare = new Request('https://prodily.app/api/settings/profile', {
+        method: 'POST',
+        headers: { cookie: 'sb-access-token=mock-token' },
+      })
+      expect(isAllowedApiOrigin(bare, '/api/settings/profile')).toBe(false)
+    })
+
+    it('L3: still allows a same-site fetch-metadata POST, and a matching Referer, without Origin', () => {
+      const sameSite = new Request('https://prodily.app/api/settings/profile', {
+        method: 'POST',
+        headers: { cookie: 'sb-access-token=mock-token', 'sec-fetch-site': 'same-site' },
+      })
+      expect(isAllowedApiOrigin(sameSite, '/api/settings/profile')).toBe(true)
+
+      const referer = new Request('https://prodily.app/api/settings/profile', {
+        method: 'POST',
+        headers: { cookie: 'sb-access-token=mock-token', referer: 'https://prodily.app/settings' },
+      })
+      expect(isAllowedApiOrigin(referer, '/api/settings/profile')).toBe(true)
+    })
+
+    it('L3: a bearer-only write with no cookie and no Origin is unaffected', () => {
+      const bearer = new Request('https://prodily.app/api/progress', {
+        method: 'POST',
+        headers: { authorization: 'Bearer token' },
+      })
+      expect(isAllowedApiOrigin(bearer, '/api/progress')).toBe(true)
+    })
+
+    it('L3: exempt server routes are unaffected without any origin signal', () => {
+      for (const p of ['/api/cron/cleanup', '/api/email/webhooks', '/api/auth/send-email-hook']) {
+        const req = new Request(`https://prodily.app${p}`, { method: 'POST', headers: { cookie: 'sb-access-token=x' } })
+        expect(isAllowedApiOrigin(req, p), p).toBe(true)
+      }
+    })
+
     it('allows exempt server routes even with cross-origin header', () => {
       const exemptReq = new Request('https://prodily.app/api/email/webhooks', {
         method: 'POST',

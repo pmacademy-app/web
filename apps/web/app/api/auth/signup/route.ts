@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { withRoute } from '@/lib/api/with-route'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile } from '@/lib/auth'
+import { ensureUserProfile, SIGNUP_CONSENT_APP_METADATA_KEY } from '@/lib/auth'
 import { createReferralAttribution, isPlausibleReferralCode } from '@/lib/referral/referral-service'
 import { apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
@@ -21,11 +21,13 @@ import {
 } from '@/lib/auth/signup-limits'
 import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE } from '@/lib/auth/password-policy'
+import { fullNameSchema } from '@/lib/auth/full-name'
 
 export const runtime = 'nodejs'
 
 const signupSchema = z.object({
-  name: z.string().min(1, 'Full name is required.').min(2, 'Name must be at least 2 characters.').max(80).trim(),
+  // Letters, marks, spaces, apostrophes, hyphens and periods only: see lib/auth/full-name.ts.
+  name: fullNameSchema,
   email: z.string().min(1, 'Email is required.').email('Please enter a valid email address.').trim().toLowerCase(),
   password: z.string().min(MIN_PASSWORD_LENGTH, PASSWORD_MIN_LENGTH_MESSAGE),
   refCode: z.string().optional().nullable(),
@@ -296,6 +298,23 @@ export const POST = withRoute(
         // not exist as far as the application is concerned until the learner clicks the
         // verification link, and `/api/auth/callback` does both at that point.
 
+        // The consent record is trusted only from app_metadata, which only the service
+        // role can write (`ensureUserProfile` ignores user_metadata, which a direct GoTrue
+        // signUp can forge). Written on a separate session-less admin client. Best effort:
+        // without it the learner is still created, just without a recorded consent.
+        if (data?.user?.id) {
+          try {
+            const { error: consentError } = await createServiceRoleClient().auth.admin.updateUserById(data.user.id, {
+              app_metadata: { [SIGNUP_CONSENT_APP_METADATA_KEY]: consent },
+            })
+            if (consentError) {
+              log.warn('auth.signup.consent_app_metadata_failed', { userId: data.user.id })
+            }
+          } catch {
+            log.warn('auth.signup.consent_app_metadata_failed', { userId: data.user.id })
+          }
+        }
+
         return NextResponse.json({
           success: true,
           verificationRequired: true,
@@ -310,6 +329,9 @@ export const POST = withRoute(
           password,
           email_confirm: true,
           user_metadata: { full_name: name, ...consent },
+          // Server-set copy of the consent record: the only source `ensureUserProfile`
+          // trusts when the profile is created later (recovery path at first login).
+          app_metadata: { [SIGNUP_CONSENT_APP_METADATA_KEY]: consent },
         })
 
         if (createError) {

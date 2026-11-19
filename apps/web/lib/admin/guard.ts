@@ -159,3 +159,39 @@ export async function logAdminAction(
   }
 }
 
+
+/**
+ * Audit write that fails closed (L8). `logAdminAction` swallows every error so routine
+ * console actions never fail on logging; a privilege grant must not happen unrecorded, so
+ * callers that change privileges use this and undo the change when it returns false.
+ */
+export async function logAdminActionStrict(
+  adminId: string,
+  adminEmail: string,
+  action: string,
+  targetType: string,
+  targetId?: string,
+  details?: Record<string, unknown>
+): Promise<boolean> {
+  try {
+    const supabase = createServiceRoleClient()
+    const { error } = await (supabase.from('admin_audit_logs') as unknown as {
+      insert: (row: Record<string, unknown>) => Promise<{ error: unknown }>
+    }).insert({
+      admin_user_id: adminId,
+      admin_email: adminEmail,
+      action,
+      target_resource: targetType,
+      target_id: targetId || null,
+      metadata: details || {},
+    })
+    if (error) {
+      console.error(`[AdminAuditLog] Strict audit insert failed for ${action} by ${adminEmail}:`, error)
+      return false
+    }
+    return true
+  } catch (error) {
+    console.error(`[AdminAuditLog] Strict audit insert failed for ${action} by ${adminEmail}:`, error)
+    return false
+  }
+}

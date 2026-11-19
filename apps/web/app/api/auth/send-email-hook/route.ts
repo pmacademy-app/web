@@ -4,7 +4,6 @@ import { BRAND } from '@/lib/brand'
 import { renderEmailTemplate } from '@/emails'
 import { maskEmail } from '@/lib/email'
 import { sendGovernedEmail, type GovernedEmailPurpose } from '@/lib/email-governance'
-import { getClientIpBucket } from '@/lib/security/client-ip'
 import { secretMatchesAny } from '@/lib/security/constant-time'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
 import { log } from '@/lib/monitoring/log'
@@ -194,22 +193,26 @@ export async function POST(request: NextRequest) {
   const rawBody = await request.text()
   const secret = process.env.SEND_EMAIL_HOOK_SECRET
 
-  // 1. Verify hook secret if configured in environment (fail closed in production)
+  // 1. Verify the hook secret. Fails closed unless this is explicitly local dev or a
+  //    test run: an unset or unknown NODE_ENV (a misconfigured preview or staging
+  //    deploy) must not turn this into an unauthenticated "send any auth email" API.
+  //    Same rule as the email webhooks route.
+  const allowUnverified = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
   if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      log.error('auth.hook.secret_not_configured', { environment: 'production' })
+    if (!allowUnverified) {
+      log.error('auth.hook.secret_not_configured', { environment: process.env.NODE_ENV ?? 'unset' })
       try {
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
           severity: 'error',
           category: 'auth',
           operation: 'send_email_hook_auth',
-          message: 'Unauthorized request: SEND_EMAIL_HOOK_SECRET environment variable missing in production',
+          message: 'Unauthorized request: SEND_EMAIL_HOOK_SECRET environment variable missing outside development/test',
         })
       } catch {}
       return jsonResponse({ error: 'Unauthorized: Missing hook secret configuration' }, 401)
     }
-    log.warn('auth.hook.secret_not_configured', { environment: 'non_production', failClosed: false })
+    log.warn('auth.hook.secret_not_configured', { environment: process.env.NODE_ENV, failClosed: false })
   } else {
     const isValid = verifyHookSecret(request, rawBody, secret)
     if (!isValid) {
@@ -339,8 +342,10 @@ export async function POST(request: NextRequest) {
   try {
     rendered = await renderEmailTemplate(templateKey, templateVariables)
   } catch (err) {
-    log.exception('auth.hook.template_render_failed', err, { templateKey })
-    return jsonResponse({ error: `Template render failure: ${err instanceof Error ? err.message : 'Unknown'}` }, 500)
+    // The detail stays in the server log. The response goes back to Supabase Auth and
+    // can surface to the learner's client, so it carries no template internals.
+    log.exception('auth.hook.template_render_failed', err, { templateKey, actionType, recipient: maskEmail(toEmail) })
+    return jsonResponse({ error: 'Email could not be prepared' }, 500)
   }
 
   // 5. Send through the governed gateway.
@@ -364,7 +369,12 @@ export async function POST(request: NextRequest) {
     // new verification request (new token) is not. The token is hashed rather than
     // stored — the ledger row is long-lived and must not carry a live credential.
     idempotencyKey: `auth:${user.id}:${actionType}:${fingerprintToken(tokenHash)}`,
-    ipBucket: getClientIpBucket(request),
+    // Deliberately no `ipBucket`. The caller of this hook is Supabase Auth, not the
+    // learner, so the request IP is Supabase's: every auth email on the platform would
+    // share one bucket and anyone could exhaust it to block all verification and
+    // password-reset mail. The per-recipient limit (keyed on the address) and the
+    // auth-only aggregate bucket still apply; per-client limits live on the routes
+    // that trigger these emails (signup, resend-verification, password reset).
   })
 
   if (sendResult.blocked) {
@@ -383,7 +393,9 @@ export async function POST(request: NextRequest) {
       // correct here: retrying would only produce another duplicate.
       return jsonResponse({ success: true, message: 'Email already dispatched for this request', deduplicated: true }, 200)
     }
-    return jsonResponse({ error: 'Email temporarily unavailable', reason: sendResult.blocked }, blockedStatus)
+    // The block reason is logged above; the response stays generic so it does not tell
+    // a caller which control (recipient, aggregate, quota) it ran into.
+    return jsonResponse({ error: 'Email temporarily unavailable' }, blockedStatus)
   }
 
   if (!sendResult.sent) {

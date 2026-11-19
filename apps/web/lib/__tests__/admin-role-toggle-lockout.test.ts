@@ -21,7 +21,15 @@ vi.mock('@/lib/auth', () => ({
 vi.mock('@/lib/admin/guard', () => ({
   requireAdminUser: vi.fn(),
   logAdminAction: vi.fn().mockResolvedValue(undefined),
+  logAdminActionStrict: vi.fn().mockResolvedValue(true),
 }))
+
+// L8 step-up: the acting admin's password is checked on a session-less anon client.
+const signInWithPassword = vi.hoisted(() => vi.fn())
+vi.mock('@supabase/supabase-js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@supabase/supabase-js')>()
+  return { ...actual, createClient: () => ({ auth: { signInWithPassword } }) }
+})
 
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(),
@@ -90,7 +98,17 @@ function actAs(userId: string) {
 describe('PATCH /api/admin/users admin lockout guards', () => {
   beforeEach(() => {
     vi.mocked(adminGuardLib.logAdminAction).mockClear()
+    vi.mocked(adminGuardLib.logAdminActionStrict).mockClear()
+    vi.mocked(adminGuardLib.logAdminActionStrict).mockResolvedValue(true)
     vi.mocked(adminGuardLib.requireAdminUser).mockReset()
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://mock.supabase.co')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon')
+    signInWithPassword.mockReset()
+    signInWithPassword.mockImplementation(async ({ password }: { password: string }) =>
+      password === 'right-password'
+        ? { data: { session: { access_token: 'step-up-at' } }, error: null }
+        : { data: { session: null }, error: { message: 'Invalid login credentials' } }
+    )
   })
 
   it('refuses self-demotion with 400 and writes nothing', async () => {
@@ -131,7 +149,7 @@ describe('PATCH /api/admin/users admin lockout guards', () => {
     const { client } = fakeUsersClient([{ id: 'admin-a', is_admin: true }])
     vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
 
-    const promote = await adminUsersPatch(patchRequest({ targetUserId: 'ghost', makeAdmin: true }))
+    const promote = await adminUsersPatch(patchRequest({ targetUserId: 'ghost', makeAdmin: true, currentPassword: 'right-password' }))
     expect(promote.status).toBe(404)
 
     const demote = await adminUsersPatch(patchRequest({ targetUserId: 'ghost', makeAdmin: false }))
@@ -169,18 +187,85 @@ describe('PATCH /api/admin/users admin lockout guards', () => {
     ])
     vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
 
-    const res = await adminUsersPatch(patchRequest({ targetUserId: 'learner-1', makeAdmin: true }))
+    const res = await adminUsersPatch(patchRequest({ targetUserId: 'learner-1', makeAdmin: true, currentPassword: 'right-password' }))
 
     expect(res.status).toBe(200)
     expect(updates).toEqual([{ id: 'learner-1', is_admin: true }])
-    expect(adminGuardLib.logAdminAction).toHaveBeenCalledWith(
+    expect(adminGuardLib.logAdminActionStrict).toHaveBeenCalledWith(
       'admin-a',
       'admin-a@prodily.app',
       'grant_admin_role',
       'user',
       'learner-1',
-      { makeAdmin: true }
+      { makeAdmin: true, stepUp: 'password' }
     )
+    expect(signInWithPassword).toHaveBeenCalledWith({ email: 'admin-a@prodily.app', password: 'right-password' })
+  })
+
+  it('L8: refuses a grant without the current password (400 STEP_UP_REQUIRED), writes nothing', async () => {
+    actAs('admin-a')
+    const { client, updates } = fakeUsersClient([
+      { id: 'admin-a', is_admin: true },
+      { id: 'learner-1', is_admin: false },
+    ])
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
+
+    const res = await adminUsersPatch(patchRequest({ targetUserId: 'learner-1', makeAdmin: true }))
+
+    expect(res.status).toBe(400)
+    expect((await res.json()).code).toBe('STEP_UP_REQUIRED')
+    expect(updates).toHaveLength(0)
+  })
+
+  it('L8: refuses a grant with a wrong password (403), writes nothing', async () => {
+    actAs('admin-a')
+    const { client, updates } = fakeUsersClient([
+      { id: 'admin-a', is_admin: true },
+      { id: 'learner-1', is_admin: false },
+    ])
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
+
+    const res = await adminUsersPatch(
+      patchRequest({ targetUserId: 'learner-1', makeAdmin: true, currentPassword: 'wrong' })
+    )
+
+    expect(res.status).toBe(403)
+    expect((await res.json()).code).toBe('STEP_UP_FAILED')
+    expect(updates).toHaveLength(0)
+  })
+
+  it('L8: undoes the grant and returns 500 when the audit row cannot be written', async () => {
+    actAs('admin-a')
+    vi.mocked(adminGuardLib.logAdminActionStrict).mockResolvedValue(false)
+    const rows = [
+      { id: 'admin-a', is_admin: true },
+      { id: 'learner-1', is_admin: false },
+    ]
+    const { client, updates } = fakeUsersClient(rows)
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
+
+    const res = await adminUsersPatch(
+      patchRequest({ targetUserId: 'learner-1', makeAdmin: true, currentPassword: 'right-password' })
+    )
+
+    expect(res.status).toBe(500)
+    expect(updates).toEqual([
+      { id: 'learner-1', is_admin: true },
+      { id: 'learner-1', is_admin: false },
+    ])
+    expect(rows.find((r) => r.id === 'learner-1')?.is_admin).toBe(false)
+  })
+
+  it('demotion needs no password', async () => {
+    actAs('admin-a')
+    const { client } = fakeUsersClient([
+      { id: 'admin-a', is_admin: true },
+      { id: 'admin-b', is_admin: true },
+    ])
+    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
+    const res = await adminUsersPatch(patchRequest({ targetUserId: 'admin-b', makeAdmin: false }))
+    expect(res.status).toBe(200)
+    expect(signInWithPassword).not.toHaveBeenCalled()
   })
 
   it('returns 500 and logs nothing when the write fails', async () => {
@@ -188,7 +273,7 @@ describe('PATCH /api/admin/users admin lockout guards', () => {
     const { client } = fakeUsersClient([{ id: 'learner-1', is_admin: false }], { updateError: true })
     vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(client)
 
-    const res = await adminUsersPatch(patchRequest({ targetUserId: 'learner-1', makeAdmin: true }))
+    const res = await adminUsersPatch(patchRequest({ targetUserId: 'learner-1', makeAdmin: true, currentPassword: 'right-password' }))
 
     expect(res.status).toBe(500)
     expect(adminGuardLib.logAdminAction).not.toHaveBeenCalled()

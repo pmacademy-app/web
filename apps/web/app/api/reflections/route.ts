@@ -17,9 +17,16 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
 import { logSystemError } from '@/lib/monitoring/logger'
 
+// L9: far above any real reflection, low enough that a scripted write cannot store
+// megabytes per row. Capstone reflections share the 10k ceiling with the submit route.
+const MAX_REFLECTION_CHARS = 10_000
+
 const reflectionPostSchema = z.object({
-  lesson_id: z.string(),  // accepts stable les_XXXXXX IDs or legacy slugs
-  content: z.string().min(1, 'Reflection content cannot be empty'),
+  lesson_id: z.string().max(200),  // accepts stable les_XXXXXX IDs or legacy slugs
+  content: z
+    .string()
+    .min(1, 'Reflection content cannot be empty')
+    .max(MAX_REFLECTION_CHARS, `Reflection must be ${MAX_REFLECTION_CHARS.toLocaleString('en-US')} characters or fewer.`),
   is_public: z.boolean().default(false),
 })
 

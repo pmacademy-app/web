@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache'
 
 import { createServiceRoleClient } from '../supabase'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 import {
   computeActivationFunnel,
   computeReturnCohorts,
@@ -93,6 +93,7 @@ async function aggregateActivationFunnel(
           .select(
             'id, created_at, onboarding_completed, onboarding_step_reached, terms_accepted_at'
           )
+          .order('id')
           .range(from, to)
       ),
       fetchAllRows<BaselineProgressRow & { deep_dive_opened_at: string | null }>((from, to) =>
@@ -101,13 +102,15 @@ async function aggregateActivationFunnel(
           .select(
             'user_id, lesson_id, status, theory_read_at, completed_at, quiz_attempts, deep_dive_opened_at'
           )
+          .order('user_id')
+          .order('lesson_id')
           .range(from, to)
       ),
       fetchAllRows<BaselineXpEventRow>((from, to) =>
-        supabase.from('xp_events').select('user_id, source_type, created_at').range(from, to)
+        supabase.from('xp_events').select('user_id, source_type, created_at').order('id').range(from, to)
       ),
       fetchAllRows<BaselineCapstoneRow>((from, to) =>
-        supabase.from('capstone_submissions').select('user_id, module_slug, status').range(from, to)
+        supabase.from('capstone_submissions').select('user_id, module_slug, status').order('id').range(from, to)
       ),
       fetchVerificationState(supabase),
     ])

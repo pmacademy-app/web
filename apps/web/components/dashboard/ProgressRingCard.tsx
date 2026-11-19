@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import type { CSSProperties } from 'react'
 import { GraduationCap, CheckCircle } from 'lucide-react'
 
 interface ProgressRingCardProps {
@@ -54,15 +54,20 @@ export function ProgressRingCard({
               cx={radius}
               cy={radius}
             />
-            <motion.circle
+            {/* Sweeps in from empty on mount (animate-ring-draw keyframe in globals.css) and
+                eases between values when progress changes. Off under reduced motion. */}
+            <circle
               stroke="currentColor"
-              className="text-primary"
+              className="text-primary animate-ring-draw transition-[stroke-dashoffset] duration-1000 ease-out motion-reduce:transition-none"
               fill="transparent"
               strokeWidth={stroke}
               strokeDasharray={`${circumference} ${circumference}`}
-              initial={{ strokeDashoffset: circumference }}
-              animate={{ strokeDashoffset }}
-              transition={{ duration: 1, ease: 'easeOut' }}
+              style={
+                {
+                  strokeDashoffset: `${strokeDashoffset}px`,
+                  '--ring-from': `${circumference}px`,
+                } as CSSProperties
+              }
               strokeLinecap="round"
               r={normalizedRadius}
               cx={radius}

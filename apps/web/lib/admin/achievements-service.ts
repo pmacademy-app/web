@@ -11,7 +11,7 @@
  */
 
 import { createServiceRoleClient } from '../supabase'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 import { BADGE_DEFINITIONS } from '@/config/badges'
 import { BRAND } from '@/lib/brand'
 import {
@@ -160,7 +160,7 @@ export class AchievementsService {
       const [keyMap, userBadges] = await Promise.all([
         this.fetchBadgeKeyMap(supabase),
         fetchAllRows<{ user_id: string; badge_id: string }>((from, to) =>
-          supabase.from('user_badges').select('user_id, badge_id').range(from, to)
+          supabase.from('user_badges').select('user_id, badge_id').order('user_id').order('badge_id').range(from, to)
         ),
       ])
 
@@ -206,7 +206,7 @@ export class AchievementsService {
 
       const [userBadges, countRes] = await Promise.all([
         fetchAllRows<UserBadgeRow>((from, to) =>
-          supabase.from('user_badges').select('user_id, badge_id, earned_at').eq('badge_id', badgeId).range(from, to)
+          supabase.from('user_badges').select('user_id, badge_id, earned_at').eq('badge_id', badgeId).order('user_id').range(from, to)
         ),
         supabase.from('user_badges').select('*', { count: 'exact', head: true }).eq('badge_id', badgeId),
       ])
@@ -261,7 +261,7 @@ export class AchievementsService {
     const supabase = createServiceRoleClient()
     try {
       const certRows = await fetchAllRows<CertificateRow>((from, to) =>
-        supabase.from('certificates').select('*').order('issued_at', { ascending: false }).range(from, to)
+        supabase.from('certificates').select('*').order('issued_at', { ascending: false }).order('id').range(from, to)
       )
 
       const userMap = await this.fetchUsersByIds(

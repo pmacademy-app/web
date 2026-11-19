@@ -556,19 +556,5 @@ describe('T1.3 — Login Unconfirmed User Resolution & Scalability', () => {
   })
 })
 
-// ─── T1.4: Password Reset Error Leakage Tests ────────────────────────────────
-
-describe('T1.4 — Password Reset Error Sanitization', () => {
-  it('verifies update-password retry path sanitizes errors via apiClassifiedAuthError rather than leaking raw message', () => {
-    const routeSrc = fs.readFileSync(
-      path.resolve(__dirname, '../../app/api/auth/update-password/route.ts'),
-      'utf8'
-    )
-
-    // The old vulnerable pattern was: error: retryError.message || 'Failed to update password'
-    expect(routeSrc).not.toContain('error: retryError.message ||')
-    expect(routeSrc).toContain('const response = apiClassifiedAuthError({')
-    expect(routeSrc).toContain('cause: retryError')
-    expect(routeSrc).toContain("context: 'reset_password'")
-  })
-})
+// T1.4 (update-password route error sanitization) retired with the route. The reset
+// action's sanitization is covered in update-password-action.test.ts.

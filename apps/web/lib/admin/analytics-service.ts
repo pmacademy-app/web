@@ -35,7 +35,7 @@ import { ADMIN_CACHE_TAGS } from './cache-tags'
 import { cacheWithMaxAge } from './bounded-cache'
 import { getOrderedModuleSlugs } from './curriculum-aggregation'
 import { CURRICULUM_MODULE_META } from './curriculum-meta'
-import { fetchAllRows } from './fetch-all'
+import { fetchAllRows } from '@/lib/db/pagination'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 

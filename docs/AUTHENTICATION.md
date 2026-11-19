@@ -136,7 +136,7 @@ Verification resend requests (`/api/auth/resend-verification`) enforce a databas
 
 - **Password Reset Request:** `app/(auth)/reset-password/page.tsx` initiates reset via Supabase Auth `resetPasswordForEmail()`.
 - **Email Delivery:** Rendered via Send Email Hook action `recovery` pointing to `/reset-password?type=recovery`.
-- **Password Update:** `app/api/auth/update-password/route.ts` validates and updates the password, with an access-token→refresh-token fallback and an Origin/Referer check. Note: this Origin/Referer CSRF-style check is currently only applied to this one route, not platform-wide — see [`SECURITY.md`](SECURITY.md).
+- **Password Update:** `app/(auth)/reset-password/actions.ts` (`updatePasswordAction`) sets the new password. It only works for a recovery session: the callback's `type=recovery` branch sets a signed, 10-minute, httpOnly, SameSite=Strict `prodily_recovery` marker bound to the user id (`lib/auth/recovery-marker.ts`), and the action requires it, enforces the minimum length and persistent per-IP and per-user limits, then revokes every session of the account. The old `/api/auth/update-password` route was removed (unused).
 
 ---
 

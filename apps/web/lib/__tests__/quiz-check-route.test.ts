@@ -213,7 +213,8 @@ describe('POST /api/v2/lessons/[lessonId]/quiz scores on the server', () => {
       expect.anything(),
       actorState.userId,
       LESSON,
-      pool.map((q) => ({ question_id: q.id, selected_option: wrongAnswer(q) }))
+      pool.map((q) => ({ question_id: q.id, selected_option: wrongAnswer(q) })),
+      { denyPerfectBonus: false }
     )
   })
 

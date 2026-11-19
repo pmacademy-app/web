@@ -62,7 +62,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './'),
-      'framer-motion': path.resolve(import.meta.dirname, './node_modules/framer-motion/dist/cjs/index.js'),
     },
   },
 })

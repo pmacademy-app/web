@@ -138,8 +138,52 @@ describe('item 15: proxy matcher', () => {
       '/api/client-errors',
       '/api/auth/login',
       '/api/admin/users',
+      '/badges',
+      '/capstones/discovery',
+      '/notifications',
     ]) {
       expect(entersProxy(p), p).toBe(true)
+    }
+  })
+
+  it('L2: exclusions end on a segment boundary, so a look-alike path still enters', () => {
+    for (const p of [
+      '/terms-x',
+      '/termsfoo',
+      '/contentfoo',
+      '/aboutus',
+      '/privacy-admin',
+      '/reviewsx',
+      '/brandnew',
+      '/api/healthz',
+      '/api/health-admin',
+      '/api/cronjob',
+      '/api/ogx',
+      '/api/email/webhooks-admin',
+      '/api/auth/callbackx',
+      '/maintenance/x',
+      '/curriculum/module-1',
+    ]) {
+      expect(entersProxy(p), p).toBe(true)
+    }
+  })
+
+  it('L2: the excluded sections still exclude their own sub-paths', () => {
+    for (const p of [
+      '/about/team',
+      '/glossary/okr',
+      '/frameworks/rice',
+      '/content/x',
+      '/brand/logo',
+      '/api/health/',
+      '/api/og/portfolio/x',
+      '/api/cron/cleanup',
+      '/robots.txt',
+      '/sitemap.xml',
+      '/maintenance',
+      '/curriculum',
+    ]) {
+      expect(entersProxy(p), p).toBe(false)
     }
   })
 

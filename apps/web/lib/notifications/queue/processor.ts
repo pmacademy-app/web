@@ -22,6 +22,8 @@ import {
   scrubTemplateVariablesForDeadLetter,
 } from './helpers'
 import { classifyProviderFailure } from '../providers/failure-classification'
+import { reserveProviderQuota, releaseProviderQuota } from '../providers/provider-quota'
+import { resolvePrimaryProvider, getSecondaryProvider, isProviderConfigured, type EmailProviderName } from '../config'
 import { log } from '@/lib/monitoring/log'
 
 /** Backoff base used when the admin setting is unavailable or invalid. */
@@ -56,6 +58,82 @@ function withProcessingStatusGuard<T>(builder: T): T {
     return (builder as unknown as { eq: (col: string, val: string) => T }).eq('status', 'processing')
   }
   return builder
+}
+
+/** How long an item waits when a control it needs (quota, suppression read) was unreadable. */
+const CONTROL_UNAVAILABLE_RETRY_MS = 5 * 60 * 1000
+
+/**
+ * Hands a claimed item back without dispatching it and without spending an attempt.
+ *
+ * Used when a gate refuses (quota spent) or cannot be evaluated (quota RPC or
+ * suppression read failed). The claim already incremented `attempt_count`, so it is
+ * put back: a control being down is not a delivery attempt, and it must not walk the
+ * item to `max_attempts` and the dead-letter queue.
+ */
+async function deferQueueItem(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  queueId: string,
+  attemptCount: number,
+  reason: string,
+  delayMs: number
+): Promise<void> {
+  await withProcessingStatusGuard(
+    supabase.from('email_queue')
+      .update({
+        status: 'retrying',
+        next_retry_at: new Date(Date.now() + delayMs).toISOString(),
+        error_message: reason,
+        attempt_count: Math.max(0, attemptCount - 1),
+        processing_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', queueId)
+  )
+}
+
+/**
+ * The provider options a queued send may carry, picked from its template variables.
+ *
+ * `template_variables` is template data. It used to be spread whole into the provider
+ * call, so any key in it (`headers`, `customHeaders`, `tags`, `fromEmail`, `replyTo`)
+ * became a provider option: whoever could put data into a queue row could set the
+ * sender or arbitrary mail headers. Only the per-recipient unsubscribe token crosses
+ * over; everything else is set here.
+ */
+export function buildQueueProviderVariables(
+  templateVariables: Record<string, unknown>,
+  rendered: { subject: string; html: string; text: string }
+): Record<string, unknown> {
+  const variables: Record<string, unknown> = {
+    fromEmail: getFromEmail(),
+    subject: rendered.subject,
+    html: rendered.html,
+    text: rendered.text,
+  }
+  const token = templateVariables.unsubscribeToken
+  if (typeof token === 'string' && token.trim()) {
+    variables.unsubscribeToken = token.trim()
+  }
+  return variables
+}
+
+/**
+ * Reserves one send against a provider's daily allowance, the same way the governed
+ * gateway does (`lib/email-governance.ts`, step 6), so queued and direct mail draw on
+ * ONE per-provider counter. Returns the provider that was charged, or null when both
+ * are spent.
+ */
+async function reserveQueueProviderQuota(
+  dailyLimit: number
+): Promise<{ charged: EmailProviderName; prefer?: EmailProviderName } | null> {
+  const primary = resolvePrimaryProvider()
+  if (await reserveProviderQuota(primary, dailyLimit)) return { charged: primary }
+  const secondary = getSecondaryProvider(primary)
+  if (isProviderConfigured(secondary) && (await reserveProviderQuota(secondary, dailyLimit))) {
+    return { charged: secondary, prefer: secondary }
+  }
+  return null
 }
 
 export interface EnqueueNotificationParams {
@@ -161,6 +239,7 @@ export async function enqueueNotificationItem(
   // Strict read: a failed read must not stand in as the defaults, which would mail a
   // learner who opted out (CQ-03). A missing row still resolves to the defaults.
   const allowBypass = globalPriorityMatrix.evaluatePreferenceBypass(priorityLevel)
+  let resolvedPrefs: UserNotificationPreferences | undefined = params.preloadedPreferences
   if (!allowBypass && !isCritical) {
     let userPrefs = params.preloadedPreferences
     if (!userPrefs) {
@@ -171,10 +250,30 @@ export async function enqueueNotificationItem(
         return { success: false, reason: 'Notification preferences read failed; send blocked' }
       }
     }
+    resolvedPrefs = userPrefs
     const isAllowed = isChannelEnabledByPreferences(userPrefs, params.category, params.channel)
     if (!isAllowed) {
       await recordSkippedEvent(supabase, params, `user_preference_disabled:${params.category}`)
       return { success: false, reason: `User disabled '${params.category}' notifications for channel '${params.channel}'` }
+    }
+  }
+
+  // 4b. Unsubscribe token (L1)
+  //
+  // The footer link and the RFC 8058 List-Unsubscribe one-click header both need the
+  // recipient's own `unsubscribe_token`, and callers almost never passed it, so most
+  // optional mail fell back to the settings page (which needs a sign-in). The
+  // preferences row is usually already loaded above (or preloaded by the batch
+  // caller); otherwise it is a best-effort read, and a missing token only means the
+  // settings-page fallback.
+  let templateVariables = params.templateVariables
+  if (!isCritical && params.channel === 'email' && typeof templateVariables.unsubscribeToken !== 'string') {
+    if (!resolvedPrefs) {
+      resolvedPrefs = await getResolvedUserNotificationPreferences(supabase, params.userId).catch(() => undefined)
+    }
+    const token = resolvedPrefs?.unsubscribeToken
+    if (typeof token === 'string' && token.trim()) {
+      templateVariables = { ...templateVariables, unsubscribeToken: token.trim() }
     }
   }
 
@@ -251,7 +350,7 @@ export async function enqueueNotificationItem(
         to_email: params.toEmail,
         to_name: params.toName || null,
         template_key: params.templateKey,
-        template_variables: (params.templateVariables as unknown as import('@/lib/supabase').Json),
+        template_variables: (templateVariables as unknown as import('@/lib/supabase').Json),
         event_id: toStoredEventId(params.eventId),
         event_type: params.eventType,
         priority: priorityDef.numericValue,
@@ -666,6 +765,10 @@ async function processSingleBatch(
     concurrency = Math.min(10, Math.max(1, Math.floor(envConcurrency)))
   }
 
+  // Set once the daily-quota RPC fails in this batch; every later optional item is
+  // deferred without calling it again.
+  let quotaGateUnavailable = false
+
   const outcomes = await mapConcurrent(
     claimedRows,
     concurrency,
@@ -697,40 +800,80 @@ async function processSingleBatch(
         }
       }
 
-      // C. Check Suppression (Optional emails only — critical auth emails bypass suppression)
-      const { data: suppression } = await supabase.from('email_suppressions').select('id').eq('email', toEmail).maybeSingle()
-      if (suppression && !isCritical) {
-        await withProcessingStatusGuard(
-          supabase.from('email_queue')
-            .update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() })
-            .eq('id', queueId)
-        )
-        return 'suppressed'
+      // C. Check Suppression (Optional emails only; critical auth emails bypass suppression)
+      //
+      // Lowercased to match how suppressions are written (webhooks, unsubscribe), and
+      // fails closed: when the read errors we cannot tell whether the address
+      // unsubscribed or bounced, so the item waits rather than being sent (same rule as
+      // enqueue, CQ-03).
+      if (!isCritical) {
+        let suppressed = false
+        let readFailed = false
+        try {
+          const { data: suppression, error: suppressionError } = await supabase
+            .from('email_suppressions')
+            .select('id')
+            .eq('email', toEmail.trim().toLowerCase())
+            .maybeSingle()
+          if (suppressionError) readFailed = true
+          else suppressed = Boolean(suppression)
+        } catch {
+          readFailed = true
+        }
+
+        if (readFailed) {
+          log.warn('queue.suppression_check_failed', { queueId, gated: true })
+          await deferQueueItem(supabase, queueId, attemptCount, 'Suppression check unavailable', CONTROL_UNAVAILABLE_RETRY_MS)
+          return 'skipped'
+        }
+        if (suppressed) {
+          await withProcessingStatusGuard(
+            supabase.from('email_queue')
+              .update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() })
+              .eq('id', queueId)
+          )
+          return 'suppressed'
+        }
       }
 
-      // C2. Global Daily Send Quota — checked BEFORE dispatch
-      if (!isCritical) {
-        let quotaAvailable = true
+      // C2. Global daily send quota (optional email), checked BEFORE dispatch.
+      //
+      // Fails closed. It used to treat an RPC error (`hasQuota` undefined) and a thrown
+      // exception as "quota available", so a database fault turned the daily cap off.
+      // Now the item goes back to the queue untouched, and the rest of the batch skips
+      // the RPC and does the same.
+      //
+      // Counted once per item, on its first attempt. A retry after a provider failure
+      // or a reclaimed lease was already counted, and counting it again let failing
+      // sends eat the day's allowance. A deferral (below) gives its attempt back, so a
+      // deferred item is checked again next time.
+      if (!isCritical && attemptCount <= 1) {
+        if (quotaGateUnavailable) {
+          await deferQueueItem(supabase, queueId, attemptCount, 'Daily quota check unavailable', CONTROL_UNAVAILABLE_RETRY_MS)
+          return 'skipped'
+        }
+
+        let quotaAvailable = false
         try {
-          const { data: hasQuota } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
-          quotaAvailable = hasQuota !== false
+          const { data: hasQuota, error: quotaError } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
+          if (quotaError) {
+            quotaGateUnavailable = true
+          } else {
+            quotaAvailable = hasQuota === true
+          }
         } catch (quotaErr) {
-          log.warnException('queue.daily_quota_check_failed', quotaErr, { gated: false })
+          quotaGateUnavailable = true
+          log.warnException('queue.daily_quota_check_failed', quotaErr, { gated: true })
+        }
+
+        if (quotaGateUnavailable) {
+          log.warn('queue.daily_quota_unavailable', { queueId, gated: true })
+          await deferQueueItem(supabase, queueId, attemptCount, 'Daily quota check unavailable', CONTROL_UNAVAILABLE_RETRY_MS)
+          return 'skipped'
         }
 
         if (!quotaAvailable) {
-          const nextRetryAt = new Date(Date.now() + 60 * 60 * 1000).toISOString() // retry in 1h
-          await withProcessingStatusGuard(
-            supabase.from('email_queue')
-              .update({
-                status: 'retrying',
-                next_retry_at: nextRetryAt,
-                error_message: 'Daily email send quota reached',
-                processing_at: null,
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', queueId)
-          )
+          await deferQueueItem(supabase, queueId, attemptCount, 'Daily email send quota reached', 60 * 60 * 1000)
           return 'skipped'
         }
       }
@@ -759,24 +902,38 @@ async function processSingleBatch(
       // item later instead. The idempotency key is stable across those retries so a
       // Resend attempt cannot duplicate on retry.
       const isCriticalTemplate = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
+
+      // E0. Per-provider quota, reserved BEFORE dispatch and given back when no provider
+      //     accepted the message, exactly as the governed gateway does. The queue used
+      //     to dispatch without touching this counter, so queued and direct mail each
+      //     believed they had the whole provider allowance to themselves.
+      const reservation = await reserveQueueProviderQuota(automationsState.dailyLimit)
+      if (!reservation) {
+        await deferQueueItem(supabase, queueId, attemptCount, 'All provider quotas exhausted', 60 * 60 * 1000)
+        return 'skipped'
+      }
+
       const sendResult = await sendEmailWithFailover(
         {
           recipient: { userId, email: toEmail, name: toName },
           channel: 'email',
           templateKey,
           templateVersion: 1,
-          variables: {
-            ...templateVariables,
-            fromEmail: (templateVariables.fromEmail as string) || getFromEmail(),
+          variables: buildQueueProviderVariables(templateVariables, {
             subject,
             html: renderedHtml,
             text: renderedText,
-          },
+          }),
           criticality: isCriticalTemplate ? 'critical' : 'standard',
           idempotencyKey: `queue:${queueId}`,
         },
-        globalProviderRegistry
+        globalProviderRegistry,
+        reservation.prefer
       )
+
+      if (!sendResult.success) {
+        await releaseProviderQuota(reservation.charged)
+      }
 
       if (sendResult.success) {
         await withProcessingStatusGuard(

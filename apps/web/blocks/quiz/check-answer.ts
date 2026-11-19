@@ -5,6 +5,9 @@
  * commits an answer. The route allows one check per (attempt, question); a second check is a
  * 429, which this maps to `already-answered` so the block can move on without revealing
  * anything and without crashing.
+ *
+ * When the server signs the checked answer it returns a `receipt`; QuizBlock sends the receipts
+ * with the final submit, and the server scores each checked question from its receipt.
  */
 import { apiPost } from '@/lib/api/client'
 
@@ -13,7 +16,18 @@ export interface QuizCheckReveal {
   correct: boolean
   correctAnswer: number
   explanation: string
+  /** Signed receipt of the checked answer, sent back with the submit. Absent while receipts are off. */
+  receipt?: string
 }
+
+/** What QuizBlock sends with the final submit so checked questions are scored as checked. */
+export interface QuizSubmitProof {
+  attemptId: string
+  receipts: string[]
+}
+
+/** Matches the server's QUIZ_RECEIPT_MAX_LENGTH; a longer value is not a receipt. */
+const MAX_RECEIPT_LENGTH = 512
 
 export type QuizCheckOutcome =
   | { kind: 'revealed'; reveal: QuizCheckReveal }
@@ -46,7 +60,7 @@ export function createQuizAttemptId(): string {
 /** Reads the reveal without trusting its shape. */
 function readReveal(data: unknown, optionCount: number): QuizCheckReveal | null {
   if (!data || typeof data !== 'object') return null
-  const { correct, correctAnswer, explanation } = data as Record<string, unknown>
+  const { correct, correctAnswer, explanation, receipt } = data as Record<string, unknown>
   if (typeof correct !== 'boolean') return null
   if (
     typeof correctAnswer !== 'number' ||
@@ -56,7 +70,15 @@ function readReveal(data: unknown, optionCount: number): QuizCheckReveal | null 
   ) {
     return null
   }
-  return { correct, correctAnswer, explanation: typeof explanation === 'string' ? explanation : '' }
+  const reveal: QuizCheckReveal = {
+    correct,
+    correctAnswer,
+    explanation: typeof explanation === 'string' ? explanation : '',
+  }
+  if (typeof receipt === 'string' && receipt.length > 0 && receipt.length <= MAX_RECEIPT_LENGTH) {
+    reveal.receipt = receipt
+  }
+  return reveal
 }
 
 export async function checkQuizAnswer(input: {

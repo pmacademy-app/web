@@ -62,6 +62,7 @@ export type GovernedEmailPurpose =
   | 'auth.reauthentication'
   | 'auth.invite'
   | 'contact.acknowledgement'
+  | 'support.inbound_forward'
 
 const CRITICAL_PURPOSES = new Set<GovernedEmailPurpose>([
   'auth.verify_email',
@@ -89,6 +90,10 @@ const RECIPIENT_LIMITS: Record<GovernedEmailPurpose, { limit: number; windowMs: 
   // support volume, not for a single person's inbox. Per-submitter throttling for
   // this flow lives on the route's own IP/user rate limit.
   'contact.acknowledgement': { limit: 60, windowMs: 24 * 60 * 60 * 1000 },
+  // Copies of inbound mail to hello@ forwarded to the same support inbox. Anyone on
+  // the internet can mail that address, so this is a small fixed budget: once it is
+  // spent the message is still stored in `contact_messages`, it just is not forwarded.
+  'support.inbound_forward': { limit: 40, windowMs: 24 * 60 * 60 * 1000 },
 }
 
 /**
@@ -102,21 +107,61 @@ const RECIPIENT_LIMITS: Record<GovernedEmailPurpose, { limit: number; windowMs: 
 const IP_EMAIL_LIMIT = { limit: 15, windowMs: 60 * 60 * 1000 }
 
 /**
- * Platform-wide ceiling on ungoverned-origin email, per hour.
+ * Platform-wide ceilings, per hour, one per aggregate group.
  *
  * This is the control that actually stops a campaign rotating both IPs and addresses:
- * neither rotation buys any budget here, because the key is constant. The threshold is
- * derived from the operator's own configured daily email limit
+ * neither rotation buys any budget here, because the key is constant. The thresholds
+ * are derived from the operator's own configured daily email limit
  * (`system_settings.email_daily_send_limit`, surfaced as `dailyLimit`) rather than
- * invented — one hour's worth of it, with a floor so a small configured limit cannot
- * wedge legitimate signups.
+ * invented, with a floor so a small configured limit cannot wedge legitimate mail.
+ *
+ * The groups are separate on purpose. There used to be one `email_global:governed`
+ * bucket shared by every purpose, including the public contact form, so anyone who
+ * could fill it (contact spam, or signups to fresh addresses) blocked every password
+ * reset on the platform for the rest of the hour. Now:
+ *
+ *   auth_signup    verification, invite: the purposes unauthenticated signup drives
+ *   auth_recovery  password reset, email change, reauthentication: an existing
+ *                  account's way back in, which a signup flood must not starve
+ *   contact        the support inbox alert for the contact form
+ *   support_inbound  forwarded copies of inbound mail to the support address
+ *
+ * Each auth group gets an eighth of the daily allowance per hour (floor 20), so a burst
+ * cannot spend the whole day in one hour, and recovery keeps its own budget. The groups
+ * may add up to more than the daily allowance: the real daily spend ceiling is the
+ * per-provider quota reservation in step 6, which every group still has to pass.
  */
 const AGGREGATE_WINDOW_MS = 60 * 60 * 1000
-const AGGREGATE_FLOOR = 20
 
-function aggregateHourlyCeiling(dailyLimit: number): number {
-  const derived = Math.ceil((Number.isFinite(dailyLimit) && dailyLimit > 0 ? dailyLimit : 100) / 24)
-  return Math.max(AGGREGATE_FLOOR, derived)
+export type GovernedAggregateGroup = 'auth_signup' | 'auth_recovery' | 'contact' | 'support_inbound'
+
+const AGGREGATE_GROUPS: Record<GovernedEmailPurpose, GovernedAggregateGroup> = {
+  'auth.verify_email': 'auth_signup',
+  'auth.invite': 'auth_signup',
+  'auth.password_reset': 'auth_recovery',
+  'auth.email_change_verify': 'auth_recovery',
+  'auth.reauthentication': 'auth_recovery',
+  'contact.acknowledgement': 'contact',
+  'support.inbound_forward': 'support_inbound',
+}
+
+const AGGREGATE_SIZING: Record<GovernedAggregateGroup, { divisor: number; floor: number }> = {
+  auth_signup: { divisor: 8, floor: 20 },
+  auth_recovery: { divisor: 8, floor: 20 },
+  contact: { divisor: 24, floor: 10 },
+  support_inbound: { divisor: 24, floor: 10 },
+}
+
+/** The rate-limit key of the platform-wide bucket a purpose draws from. */
+export function aggregateBucketKey(purpose: GovernedEmailPurpose): string {
+  return `email_global:${AGGREGATE_GROUPS[purpose]}`
+}
+
+/** Hourly ceiling of the platform-wide bucket a purpose draws from. */
+export function aggregateHourlyCeiling(purpose: GovernedEmailPurpose, dailyLimit: number): number {
+  const { divisor, floor } = AGGREGATE_SIZING[AGGREGATE_GROUPS[purpose]]
+  const daily = Number.isFinite(dailyLimit) && dailyLimit > 0 ? dailyLimit : 100
+  return Math.max(floor, Math.ceil(daily / divisor))
 }
 
 export interface GovernedEmailRequest {
@@ -134,7 +179,12 @@ export interface GovernedEmailRequest {
    * not.
    */
   idempotencyKey: string
-  /** Trusted client IP bucket, when the send was triggered by an inbound request. */
+  /**
+   * Trusted client IP bucket, when the send was triggered directly by an end user's
+   * request (the contact form). Leave it unset for server-to-server callers such as
+   * the Supabase Auth hook: there the "client" is Supabase itself, so every learner
+   * would share one IP bucket and anyone could exhaust it.
+   */
   ipBucket?: string
   fromEmail?: string
   replyTo?: string
@@ -347,7 +397,7 @@ export async function sendGovernedEmail(request: GovernedEmailRequest): Promise<
   // 4. Rate limits. All three fail closed: an unreachable limiter must not become an
   //    unmetered path to a paid provider.
   const recipientLimit = RECIPIENT_LIMITS[purpose]
-  const aggregateLimit = aggregateHourlyCeiling(automations?.dailyLimit ?? 100)
+  const aggregateLimit = aggregateHourlyCeiling(purpose, automations?.dailyLimit ?? 100)
 
   const [recipientCheck, ipCheck, aggregateCheck] = await Promise.all([
     evaluatePersistentRateLimit(`email_to:${purpose}:${to.toLowerCase()}`, {
@@ -357,7 +407,7 @@ export async function sendGovernedEmail(request: GovernedEmailRequest): Promise<
     request.ipBucket
       ? evaluatePersistentRateLimit(`email_ip:${request.ipBucket}`, { ...IP_EMAIL_LIMIT, failClosed: true })
       : Promise.resolve({ success: true, remaining: 0, resetInMs: 0 }),
-    evaluatePersistentRateLimit('email_global:governed', {
+    evaluatePersistentRateLimit(aggregateBucketKey(purpose), {
       limit: aggregateLimit,
       windowMs: AGGREGATE_WINDOW_MS,
       failClosed: true,
