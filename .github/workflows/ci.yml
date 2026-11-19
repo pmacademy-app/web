@@ -3,6 +3,12 @@ name: PM Academy CI
 on:
   push:
     branches: [ main ]
+    # A docs-only merge has nothing to build or deploy.
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'audit/**'
+      - 'tasks/**'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -16,6 +22,10 @@ concurrency:
 
 jobs:
   build-and-validate:
+    # Validation already passed on the pull request (branches must be up to date
+    # before merging), so a push to main skips it and goes straight to deploy. A manual
+    # workflow_dispatch run still validates everything.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -265,6 +275,10 @@ jobs:
   # silently hold back a migration deploy that is otherwise correct. Nothing here
   # is advisory-only — both steps fail the job when they find something.
   security-audit:
+    # Validation already passed on the pull request (branches must be up to date
+    # before merging), so a push to main skips it and goes straight to deploy. A manual
+    # workflow_dispatch run still validates everything.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -314,6 +328,10 @@ jobs:
   # migrations, runs the grant allowlist test, and verifies database types. (AG-04)
   db-local:
     name: Local Database Replay and Security Checks
+    # Validation already passed on the pull request (branches must be up to date
+    # before merging), so a push to main skips it and goes straight to deploy. A manual
+    # workflow_dispatch run still validates everything.
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -321,38 +339,66 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # The path filter below diffs against the base branch, which needs its history.
+          fetch-depth: 0
+
+      # A pull request replays the database only when it touches the schema, the
+      # database tests, the generated types or this workflow. Every other run does.
+      - name: Decide whether the database replay runs
+        id: decide
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          git fetch --no-tags origin "${GITHUB_BASE_REF}" >/dev/null 2>&1 || true
+          changed="$(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" || true)"
+          if echo "${changed}" | grep -qE '^(supabase/|scripts/ci/|apps/web/types/database\.ts|\.github/workflows/ci\.yml)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "Database-related files changed: running the replay."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"; echo "No database-related files changed: skipping the replay."
+          fi
 
       - name: Setup Node.js
+        if: steps.decide.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '24'
 
       - name: Setup Supabase CLI
+        if: steps.decide.outputs.run == 'true'
         uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
         with:
           version: '3.1.0'
 
       - name: Start local Supabase
+        if: steps.decide.outputs.run == 'true'
         run: |
           supabase start
 
       - name: Reset local database
+        if: steps.decide.outputs.run == 'true'
         run: |
           supabase db reset
 
       - name: Apply held migrations
+        if: steps.decide.outputs.run == 'true'
         run: |
           bash scripts/ci/apply-held-migrations.sh
 
       - name: Run grant allowlist test
+        if: steps.decide.outputs.run == 'true'
         run: |
           psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/tests/grant_allowlist.sql
 
       - name: Run pgTAP database tests
+        if: steps.decide.outputs.run == 'true'
         run: |
           supabase test db
 
       - name: Check database types drift
+        if: steps.decide.outputs.run == 'true'
         run: |
           bash scripts/ci/check-db-types-drift.sh
 
@@ -366,7 +412,9 @@ jobs:
   # and the applied state is verified after the push rather than assumed.
   deploy-supabase:
     needs: [build-and-validate, db-local]
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    # The validation jobs are skipped on a push to main (see build-and-validate), so
+    # run unless one of them actually failed or the run was cancelled.
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
