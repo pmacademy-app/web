@@ -54,6 +54,8 @@ export interface RuleOutcome {
   deleted: number
   /** True when the rule stopped on its batch ceiling or the time budget. */
   truncated: boolean
+  /** Set when the rule did not run for an expected reason (its held migration is not applied). */
+  skipped?: 'table_missing'
   error?: string
 }
 
@@ -66,6 +68,14 @@ export interface SweepResult {
   rules: RuleOutcome[]
   budgetExhausted: boolean
 }
+
+/**
+ * PostgREST and Postgres codes for "this table does not exist": PGRST205 (not in the
+ * schema cache) and 42P01 (undefined_table).
+ */
+const MISSING_TABLE_CODES = new Set(['PGRST205', '42P01'])
+
+class MissingTableError extends Error {}
 
 /** Applies a rule's filters to a select or delete builder. */
 function applyFilters(
@@ -129,16 +139,24 @@ export async function sweepRule(
         rule,
         cutoffIso
       ) as unknown as {
-        limit: (n: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: { message: string } | null }>
+        limit: (n: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: { message: string; code?: string } | null }>
       }
 
       const { data, error } = await selectQuery.limit(DELETE_BATCH_SIZE)
+      if (error && rule.tableMayBeMissing && error.code && MISSING_TABLE_CODES.has(error.code)) {
+        throw new MissingTableError(error.message)
+      }
       if (error) throw new Error(error.message)
 
-      const ids = (data ?? []).map((row) => row[rule.idColumn]).filter((v) => v !== null && v !== undefined)
-      if (ids.length === 0) break
+      const matched = (data ?? []).map((row) => row[rule.idColumn]).filter((v) => v !== null && v !== undefined)
+      if (matched.length === 0) break
 
-      outcome.eligible += ids.length
+      // Counts and batching follow the matched rows. The delete list is deduplicated: a
+      // rule keyed on a non-unique column (security_event_counts.day) matches the same
+      // value many times, and its delete then removes every row of those days, so
+      // `deleted` is a lower bound for such a rule.
+      const ids = [...new Set(matched)]
+      outcome.eligible += matched.length
 
       if (!options.dryRun) {
         const deleteQuery = (db.from(rule.table as never) as unknown as {
@@ -149,20 +167,26 @@ export async function sweepRule(
 
         const { error: deleteError } = await deleteQuery
         if (deleteError) throw new Error(deleteError.message)
-        outcome.deleted += ids.length
+        outcome.deleted += matched.length
       }
 
       // In dry-run the rows are still there, so a second pass would count the same
       // ids forever. One page is enough to report the shape of the backlog.
       if (options.dryRun) {
-        outcome.truncated = ids.length === DELETE_BATCH_SIZE
+        outcome.truncated = matched.length === DELETE_BATCH_SIZE
         break
       }
 
-      if (ids.length < DELETE_BATCH_SIZE) break
+      if (matched.length < DELETE_BATCH_SIZE) break
       if (batch === MAX_BATCHES_PER_RULE - 1) outcome.truncated = true
     }
   } catch (err) {
+    if (err instanceof MissingTableError) {
+      // Expected until the held migration is applied: nothing to sweep, nothing failed.
+      outcome.skipped = 'table_missing'
+      log.info('retention.rule_skipped', { rule: rule.id, table: rule.table, reason: 'table_missing' })
+      return outcome
+    }
     outcome.error = err instanceof Error ? err.message : String(err)
     // Reported, not thrown: one unreachable table must not stop the other rules.
     log.warnException('retention.rule_failed', err, { rule: rule.id, table: rule.table })

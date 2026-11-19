@@ -312,7 +312,9 @@ Apply order:
 6. `20261119000003_avatars_bucket_hardening.sql` (M5). After applying, upload an avatar from the
    settings page once to confirm uploads still work.
 7. `20261119000006_default_privileges_tables_sequences.sql` (L2).
-8. Then the rest of the held list (`20261113000004` and later) as already planned.
+8. `20261119000007_security_events.sql` (security digest, see below). Independent of 1 to 7; it
+   revokes its own grants, so it is safe before or after them.
+9. Then the rest of the held list (`20261113000004` and later) as already planned.
 
 For each: paste it into the SQL editor and run it, then run its
 `validation/<name>_validation.sql` (read-only, raises on failure, prints `<ts> validation passed`).
@@ -333,6 +335,33 @@ After applying each one, delete its rows (marked `removed_by`) from
 `supabase/tests/grant_allowlist.sql` in the release commit. If you also add it to
 `supabase/tests/held-migrations.txt`, CI replays it and runs its validation (all six validations are
 catalog-only and safe on an empty database).
+
+### `20261119000007_security_events.sql` (rule-based daily security summary)
+
+Adds `public.security_event_counts` (daily counters per IST day, event type, app, ip bucket and
+subject hash), `public.record_security_event(...)` (SECURITY DEFINER upsert with a 50000-rows-a-day
+flood guard) and `public.security_digests` (one summary row per day, written by the admin console).
+Both tables have RLS on with no policy; only `service_role` has privileges and EXECUTE. The column
+names, the event type list and the function signature are a contract with the admin console.
+
+No app deploy order: `apps/web/lib/security/security-events.ts` already calls the function and, until
+this is applied, sees PostgREST `PGRST202` and stops calling for 10 minutes at a time. The retention
+sweep skips both tables while they do not exist. The event types and their triggers are listed in
+`docs/SECURITY.md` (section 4c).
+
+Run:
+1. Paste the migration into the SQL editor and run it. Its self-check raises (and rolls everything
+   back) if RLS, the grants, SECURITY DEFINER or the pinned search_path is wrong.
+2. Run `validation/20261119000007_security_events_validation.sql` (read-only, catalog only).
+3. After the next failed login, `SELECT * FROM public.security_event_counts ORDER BY last_seen DESC LIMIT 5;`
+   should show a `login_failed` row with a masked `subject_hint`.
+
+It is in `supabase/tests/held-migrations.txt`, so CI replays it and runs its validation. It adds no
+rows to `supabase/tests/grant_allowlist.sql`, because it grants nothing to anon or authenticated.
+
+Undo: `rollback/20261119000007_security_events.down.sql` drops the function and both tables (the
+counters are 30-day telemetry, so no export is needed; export `security_digests` first only to keep
+past summaries).
 
 ### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
 

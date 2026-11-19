@@ -1,5 +1,7 @@
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { secretsMatch } from '@/lib/security/constant-time'
+import { getClientIpBucket } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 
 /**
  * Canonical actor resolution (B7-A).
@@ -115,6 +117,7 @@ async function resolve(request: Request, allow: ReadonlySet<ActorKind>): Promise
     return { ok: true, actor: { kind: 'anonymous' } }
   }
 
+  if (allow.has('cron')) recordSecurityEvent('cron_auth_failed', { ipBucket: getClientIpBucket(request), path: request.url })
   return deny(401, 'no allowed actor kind matched')
 }
 

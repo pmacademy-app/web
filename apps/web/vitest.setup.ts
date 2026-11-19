@@ -176,6 +176,16 @@ vi.mock('next/server', () => {
   }
 })
 
+// Security event recording is fire-and-forget instrumentation on many failure paths. Left
+// real, it would call each suite's mocked service-role client from inside `after()` and
+// disturb call counts and queued responses that have nothing to do with it. Suites that
+// assert on it import `recordSecurityEvent` (this vi.fn); the helper's own suite uses
+// vi.importActual.
+vi.mock('@/lib/security/security-events', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/security/security-events')>()),
+  recordSecurityEvent: vi.fn(),
+}))
+
 vi.mock('next/cache', () => ({
   unstable_cache: vi.fn((fn) => fn),
   revalidateTag: vi.fn(),

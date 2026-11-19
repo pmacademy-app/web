@@ -4,6 +4,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { sendGovernedEmail } from '@/lib/email-governance'
 import { EMAIL_HTTP_TIMEOUT_MS } from '@/lib/notifications/config'
 import { log } from '@/lib/monitoring/log'
+import { getClientIpBucket } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 
 /**
  * True when a provider's bounce payload explicitly reports a TRANSIENT failure.
@@ -242,6 +244,7 @@ export async function POST(request: Request) {
         if (!isValid) {
           const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
           log.warn('email.webhook.signature_rejected', { provider: 'resend' })
+          recordSecurityEvent('webhook_auth_failed', { ipBucket: getClientIpBucket(request), path: '/api/email/webhooks' })
           const { logSystemError } = await import('@/lib/monitoring/logger')
           void logSystemError({
             severity: 'warning',
@@ -270,6 +273,7 @@ export async function POST(request: Request) {
         const isValid = verifyBrevoWebhookAuth(request, brevoSecret)
         if (!isValid) {
           log.warn('email.webhook.signature_rejected', { provider: 'brevo' })
+          recordSecurityEvent('webhook_auth_failed', { ipBucket: getClientIpBucket(request), path: '/api/email/webhooks' })
           const { logSystemError } = await import('@/lib/monitoring/logger')
           void logSystemError({
             severity: 'warning',
@@ -282,6 +286,7 @@ export async function POST(request: Request) {
       } else if (resendSecret) {
         // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
         log.warn('email.webhook.unauthenticated', { reason: 'missing_headers' })
+        recordSecurityEvent('webhook_auth_failed', { ipBucket: getClientIpBucket(request), path: '/api/email/webhooks' })
         return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
       } else if (!allowUnverified) {
         // No webhook secret configured at all — cannot authenticate; reject in production.

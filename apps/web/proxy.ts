@@ -5,6 +5,8 @@ import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
 import { isAllowedApiOrigin } from '@/lib/security/origin-check'
+import { getClientIpBucket } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 // PROD-09: the one open-redirect guard for `next`. Its only runtime dependency is
 // `node:crypto`, which the proxy's Node.js runtime provides.
 import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
@@ -215,6 +217,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
   // SEC-12: Enforce same-origin writes for cookie-authenticated API requests
   if (isApiRoute && !isAllowedApiOrigin(request, path)) {
+    recordSecurityEvent('origin_rejected', { ipBucket: getClientIpBucket(request), path })
     return NextResponse.json(
       {
         success: false,

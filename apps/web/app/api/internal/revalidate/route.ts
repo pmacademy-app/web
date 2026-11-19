@@ -6,6 +6,7 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { classifyRevalidatePath, isRevalidatableTag } from '@/lib/internal/revalidate-allowlist'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 import { secretsMatch } from '@/lib/security/constant-time'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -87,6 +88,7 @@ export const POST = withRoute(
   },
   async ({ request }) => {
     if (!isAuthorized(request)) {
+      recordSecurityEvent('internal_revalidate_auth_failed', { ipBucket: getClientIpBucket(request), path: '/api/internal/revalidate' })
       throw new RouteError(401, 'UNAUTHORIZED', 'Authentication required.')
     }
 

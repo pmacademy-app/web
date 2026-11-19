@@ -7,6 +7,7 @@ import { sendGovernedEmail, type GovernedEmailPurpose } from '@/lib/email-govern
 import { secretMatchesAny } from '@/lib/security/constant-time'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
 import { log } from '@/lib/monitoring/log'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 
 export const runtime = 'nodejs'
 
@@ -217,6 +218,7 @@ export async function POST(request: NextRequest) {
     const isValid = verifyHookSecret(request, rawBody, secret)
     if (!isValid) {
       log.warn('auth.hook.signature_rejected')
+      recordSecurityEvent('email_hook_auth_failed', { path: '/api/auth/send-email-hook' })
       try {
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
@@ -283,6 +285,7 @@ export async function POST(request: NextRequest) {
 
     case 'recovery': {
       templateKey = 'auth.password_reset'
+      recordSecurityEvent('password_reset_requested', { subject: toEmail, path: '/api/auth/send-email-hook' })
       const resetUrl = buildAuthCallbackUrl(siteUrl, tokenHash, 'recovery', email_data.redirect_to)
       templateVariables = { userName, resetUrl }
       break
@@ -388,6 +391,7 @@ export async function POST(request: NextRequest) {
       recipient: masked,
     })
     const blockedStatus = sendResult.blocked === 'duplicate' ? 200 : 429
+    if (blockedStatus === 429 && actionType === 'recovery') recordSecurityEvent('password_reset_rate_limited', { subject: toEmail, path: '/api/auth/send-email-hook' })
     if (blockedStatus === 200) {
       // The identical message is already in flight or delivered. Reporting success is
       // correct here: retrying would only produce another duplicate.
