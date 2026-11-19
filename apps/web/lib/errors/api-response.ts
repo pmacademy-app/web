@@ -106,6 +106,8 @@ export async function apiInternalError(options: {
   subject?: { userId?: string; maskedEmail?: string; templateKey?: string }
   /** The originating request's correlation id, recorded on the incident. */
   requestId?: string
+  /** The server-resolved user (the route's actor), written to `system_errors.user_id`. */
+  userId?: string
   extra?: Record<string, unknown>
 }): Promise<NextResponse> {
   const errorId = `err_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`
@@ -119,6 +121,9 @@ export async function apiInternalError(options: {
       summary: options.summary,
       subject: options.subject,
       requestId: options.requestId,
+      // The logger stores a redacted, bounded copy of its stack.
+      error: options.cause,
+      ...(options.userId ? { userId: options.userId } : {}),
       details: {
         errorId,
         // Sanitized by the logger before it is persisted.

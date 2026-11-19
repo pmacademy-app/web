@@ -52,10 +52,21 @@ Sanitisation is idempotent: prefix rules run first so the marker records which *
 ### Deduplication
 
 - An MD5 fingerprint is computed from `domain:kind:operation:stabilizedSummary`. `stabilizeForFingerprint()` collapses uuids, emails, timestamps and long digit runs, so legacy call sites that interpolate ids into their message still group.
-- Repeats inside a **15-minute** window increment the stored `occurrence_count` instead of inserting a new row.
+- Repeats inside a **15-minute** window increment the stored `occurrence_count` instead of inserting a new row. The window runs from the row's `updated_at` (last seen), so a continuous outage stays one row.
 - Critical incidents fan out an admin in-app notification at most **once per fingerprint per hour**, dispatched in parallel.
 
 `summary` must be a stable sentence with no ids in it — identifiers belong in `subject`. An id in the summary gives every occurrence its own fingerprint and turns one outage into one alert per affected user.
+
+### Error fields, ignore list and release tagging
+
+This contract is shared with the admin repo, which reads the same rows and writes `app: 'admin'`.
+
+- **`details` fields on every row**: `app` (`'web'`), `runtime` (`'server'` or `'client'`), `release` (first 12 characters of the commit, omitted when unknown) and `stack` (redacted, at most 30 frames and 4000 characters, only when an Error with a stack was caught). Browser reports also carry `source` (`'boundary'`, `'window.onerror'` or `'unhandledrejection'`). Existing fields such as `requestId`, `path` and `digest` are unchanged.
+- **`user_id`** is set from the server-resolved actor (`withRoute` learner). Browser reports leave it empty: the beacon route is anonymous and never trusts a client-sent id.
+- **Ignore list**: `system_settings` key `monitoring_ignored_fingerprints`, a JSON array of fingerprints (at most 500), written by the admin app. The logger caches it for 60 seconds and fails open to an empty list. An ignored fingerprint is still recorded and counted; it never sends a webhook or in-app alert.
+- **Regression**: when the latest row for a fingerprint is `resolved`, a recurrence inserts a new `new` row with `details.regression = true` instead of counting onto the resolved row.
+- **Release tagging**: the server reads `VERCEL_GIT_COMMIT_SHA`; the browser bundle reads `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`, which `next.config.ts` fills from `VERCEL_GIT_COMMIT_SHA` when Vercel does not expose it.
+- **Browser capture**: the error boundaries plus window `error` and `unhandledrejection` listeners (installed once by `ApiClientProvider`) post to `/api/client-errors`, at most 5 reports per page load. ResizeObserver loop errors, bare "Script error." and errors from extension or foreign-origin scripts are dropped. The route caps each IP at 10 per minute and all callers together at 300 per 10 minutes.
 
 ---
 

@@ -227,7 +227,14 @@ describe('ENG-11: client error beacon payload', () => {
     const [url, init] = fetchSpy.mock.calls[0] as unknown as [string, RequestInit]
     expect(url).toBe('/api/client-errors')
     expect(init.keepalive).toBe(true)
-    expect(JSON.parse(String(init.body))).toEqual({ message: 'admin crash', path: '/admin', boundary: 'admin' })
+    // Shape pinned deliberately: the shared monitoring contract added source, app and stack.
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      message: 'admin crash',
+      path: '/admin',
+      boundary: 'admin',
+      source: 'boundary',
+      app: 'web',
+    })
   })
 
   it('never throws, even when sending fails', () => {
@@ -268,10 +275,12 @@ describe('ENG-11: POST /api/client-errors', () => {
   it('charges a per-IP bucket with a strict limit', async () => {
     await POST(report(VALID))
 
-    expect(evaluatePersistentRateLimit).toHaveBeenCalledTimes(1)
+    // Two buckets: the per-IP rule first, then the global cap across every caller.
+    expect(evaluatePersistentRateLimit).toHaveBeenCalledTimes(2)
     const [key, opts] = evaluatePersistentRateLimit.mock.calls[0]
     expect(key).toBe('client_errors:203.0.113.7')
     expect(opts).toMatchObject({ limit: 10, windowMs: 60_000 })
+    expect(evaluatePersistentRateLimit.mock.calls[1][0]).toBe('client_errors:global')
   })
 
   it('refuses with 429 once the limit is spent, without recording anything', async () => {

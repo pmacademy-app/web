@@ -104,6 +104,15 @@ const nextConfig = {
   // Optimise production builds
   poweredByHeader: false,
 
+  // Release tag for browser error reports (lib/monitoring/client-error-beacon.ts).
+  // Vercel exposes NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA only while "Automatically expose
+  // System Environment Variables" is on, so the server-side VERCEL_GIT_COMMIT_SHA is the
+  // fallback. `env` values are inlined at build time; a commit SHA is not a secret.
+  env: {
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA:
+      process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '',
+  },
+
   // React Compiler (performance plan item 4): automatic memoization of client components.
   // Runs through babel-plugin-react-compiler (devDependency). Opt a component out with
   // the 'use no memo' directive if it misbehaves.

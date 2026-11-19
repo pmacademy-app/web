@@ -42,7 +42,38 @@ export interface LogSystemErrorOptions {
   resendId?: string
   userId?: string
   details?: Record<string, unknown>
+  /** The caught value. When it is an Error with a stack, the redacted stack is stored. */
+  error?: unknown
+  /** A stack captured elsewhere (the browser beacon). Redacted and bounded here. */
+  stack?: string
+  /** Where the failure happened. Defaults to 'server'. */
+  runtime?: MonitoringRuntime
+  /** Release reported by the browser. Defaults to this server's commit. */
+  release?: string
 }
+
+/** Which repo wrote the row. The admin repo writes 'admin' into the same table. */
+export const MONITORING_APP = 'web'
+
+export type MonitoringRuntime = 'server' | 'client'
+
+/** Longest stored stack, after redaction. */
+export const MAX_STACK_LENGTH = 4000
+
+/** Most stack frames kept. The frames past this are almost always framework internals. */
+export const MAX_STACK_FRAMES = 30
+
+/** Release tags are the first 12 characters of the commit SHA. */
+export const RELEASE_LENGTH = 12
+
+/** `system_settings` key holding the admin-managed list of fingerprints that never alert. */
+export const IGNORED_FINGERPRINTS_SETTING_KEY = 'monitoring_ignored_fingerprints'
+
+/** Largest ignore list honoured. Entries past this are dropped. */
+const MAX_IGNORED_FINGERPRINTS = 500
+
+/** How long the ignore list is cached in memory per server instance. */
+const IGNORED_FINGERPRINTS_TTL_MS = 60 * 1000
 
 /** Dedup window: repeats inside this window increment a counter instead of inserting. */
 const DEDUP_WINDOW_MS = 15 * 60 * 1000
@@ -86,6 +117,133 @@ export function stabilizeForFingerprint(input: string): string {
 
 function buildFingerprint(parts: string[]): string {
   return crypto.createHash('md5').update(parts.join(':')).digest('hex')
+}
+
+/** A V8 (`    at fn (file:1:2)`) or Firefox/Safari (`fn@file:1:2`) frame line. */
+const STACK_FRAME_LINE = /^\s*at\s|@\S*:\d+(:\d+)?\s*$/
+
+/**
+ * Redacts and bounds a stack: the header lines are kept, then at most
+ * `MAX_STACK_FRAMES` frames, then the result is capped at `MAX_STACK_LENGTH`.
+ * Redaction runs before truncation so a cut can never split a secret past the
+ * patterns that would have caught it.
+ */
+export function formatStack(raw: string): string | undefined {
+  if (typeof raw !== 'string' || !raw.trim()) return undefined
+  const kept: string[] = []
+  let frames = 0
+  for (const line of raw.split(/\r?\n/)) {
+    if (STACK_FRAME_LINE.test(line)) {
+      if (frames >= MAX_STACK_FRAMES) break
+      frames++
+    }
+    kept.push(line)
+  }
+  const redacted = redactText(kept.join('\n'))
+  return redacted.length > MAX_STACK_LENGTH ? redacted.slice(0, MAX_STACK_LENGTH) : redacted
+}
+
+/** The stack of a thrown value, when it has one. Non-Error throws carry none. */
+function stackOf(error: unknown): string | undefined {
+  if (error instanceof Error && typeof error.stack === 'string') return error.stack
+  if (error && typeof error === 'object' && typeof (error as { stack?: unknown }).stack === 'string') {
+    return (error as { stack: string }).stack
+  }
+  return undefined
+}
+
+/** First 12 characters of a commit SHA, or undefined when there is none. */
+export function normalizeRelease(value: string | undefined | null): string | undefined {
+  const trimmed = typeof value === 'string' ? value.trim() : ''
+  return trimmed ? trimmed.slice(0, RELEASE_LENGTH) : undefined
+}
+
+/** This deployment's release tag, from Vercel's build-time commit SHA. */
+function serverRelease(): string | undefined {
+  return normalizeRelease(process.env.VERCEL_GIT_COMMIT_SHA)
+}
+
+/**
+ * The fields every report carries in `details`, shared with the admin repo:
+ * `app`, `runtime`, and `stack` / `release` when known. Added AFTER the generic
+ * details sanitizer, whose 2000-character string cap would cut the stack short;
+ * the stack is redacted by `formatStack` instead.
+ */
+function monitoringFields(options: {
+  error?: unknown
+  stack?: string
+  runtime?: MonitoringRuntime
+  release?: string
+}): Record<string, unknown> {
+  const rawStack = options.stack ?? stackOf(options.error)
+  const stack = rawStack ? formatStack(rawStack) : undefined
+  const release = normalizeRelease(options.release) ?? serverRelease()
+  return {
+    ...(stack ? { stack } : {}),
+    ...(release ? { release } : {}),
+    app: MONITORING_APP,
+    runtime: options.runtime === 'client' ? 'client' : 'server',
+  }
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/** `system_errors.user_id` is a uuid foreign key: anything else would fail the insert. */
+function validUserId(value: string | undefined): string | undefined {
+  return value && UUID_PATTERN.test(value) ? value : undefined
+}
+
+// ─── Ignore list ──────────────────────────────────────────────────────────────
+
+let ignoredCache: { at: number; fingerprints: ReadonlySet<string> } | null = null
+
+/** Test hook: drops the cached ignore list. */
+export function resetIgnoredFingerprintsCacheForTests(): void {
+  ignoredCache = null
+}
+
+/** Accepts the stored value as a JSON array, or a string holding one. */
+function parseIgnoredFingerprints(value: unknown): ReadonlySet<string> {
+  let list = value
+  if (typeof list === 'string') {
+    try {
+      list = JSON.parse(list)
+    } catch {
+      return new Set()
+    }
+  }
+  if (!Array.isArray(list)) return new Set()
+  return new Set(
+    list
+      .filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+      .slice(0, MAX_IGNORED_FINGERPRINTS)
+  )
+}
+
+/**
+ * The admin-managed ignore list, cached for 60 seconds. Fails open to an empty
+ * list: a settings outage must never silence alerts it was not asked to silence.
+ */
+async function loadIgnoredFingerprints(
+  supabase: Awaited<ReturnType<typeof import('@/lib/supabase').createServiceRoleClient>>
+): Promise<ReadonlySet<string>> {
+  if (ignoredCache && Date.now() - ignoredCache.at < IGNORED_FINGERPRINTS_TTL_MS) {
+    return ignoredCache.fingerprints
+  }
+  try {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('value')
+      .eq('key', IGNORED_FINGERPRINTS_SETTING_KEY)
+      .maybeSingle()
+    if (error) return new Set()
+    const fingerprints = parseIgnoredFingerprints((data as { value?: unknown } | null)?.value)
+    // Only a successful read is cached, so a recovered database is honoured at once.
+    ignoredCache = { at: Date.now(), fingerprints }
+    return fingerprints
+  } catch {
+    return new Set()
+  }
 }
 
 interface PersistArgs {
@@ -148,52 +306,89 @@ async function persistIncident(args: PersistArgs): Promise<string | null> {
     }
 
     const supabase = createServiceRoleClient()
-    const nowIso = new Date().toISOString()
-    const windowStart = new Date(Date.now() - DEDUP_WINDOW_MS).toISOString()
+    const nowMs = Date.now()
+    const nowIso = new Date(nowMs).toISOString()
 
+    // The latest row for this fingerprint, by insert time (served by the
+    // (fingerprint, timestamp DESC) index). Not bounded by the window in SQL: a
+    // resolved row from last week still has to be seen, so a fixed bug that comes
+    // back is flagged as a regression rather than filed as a fresh incident.
     const { data: recentRows, error: lookupErr } = await supabase
       .from('system_errors')
-      .select('id, occurrence_count')
+      .select('id, occurrence_count, status, updated_at, timestamp')
       .eq('fingerprint', args.fingerprint)
-      .gte('timestamp', windowStart)
       .order('timestamp', { ascending: false })
       .limit(1)
 
+    let regression = false
     if (!lookupErr && recentRows && recentRows.length > 0) {
-      const existing = recentRows[0] as { id: string; occurrence_count?: number | null }
-      await supabase
-        .from('system_errors')
-        .update({
-          occurrence_count: (existing.occurrence_count ?? 1) + 1,
-          updated_at: nowIso,
-        })
-        .eq('id', existing.id)
-      return existing.id
+      const existing = recentRows[0] as {
+        id: string
+        occurrence_count?: number | null
+        status?: string | null
+        updated_at?: string | null
+        timestamp?: string | null
+      }
+
+      if (existing.status === 'resolved') {
+        // Resolved means someone said it was fixed. Counting the comeback onto that
+        // row would hide it; a new row puts it back in the "new" queue.
+        regression = true
+      } else {
+        // The window runs from when the incident was LAST SEEN, so a continuous
+        // outage stays one row however long it lasts.
+        const lastSeen = Date.parse(existing.updated_at ?? existing.timestamp ?? '')
+        if (Number.isFinite(lastSeen) && nowMs - lastSeen <= DEDUP_WINDOW_MS) {
+          await supabase
+            .from('system_errors')
+            .update({
+              occurrence_count: (existing.occurrence_count ?? 1) + 1,
+              updated_at: nowIso,
+            })
+            .eq('id', existing.id)
+          return existing.id
+        }
+      }
     }
 
-    const { data: inserted, error: insertErr } = await supabase
+    const details = regression ? { ...(args.details || {}), regression: true } : args.details
+    const userId = validUserId(args.userId)
+    const row = {
+      severity: args.severity,
+      category: args.category,
+      domain: args.domain,
+      kind: args.kind,
+      retryability: args.retryability,
+      next_action: args.nextAction,
+      operation: args.operation,
+      message: args.message,
+      template_key: args.templateKey || null,
+      queue_id: args.queueId || null,
+      resend_id: args.resendId || null,
+      user_id: userId || null,
+      fingerprint: args.fingerprint,
+      status: 'new',
+      occurrence_count: 1,
+      first_seen_at: nowIso,
+      details: (details as unknown as import('@/lib/supabase').Json) || null,
+    }
+
+    let { data: inserted, error: insertErr } = await supabase
       .from('system_errors')
-      .insert({
-        severity: args.severity,
-        category: args.category,
-        domain: args.domain,
-        kind: args.kind,
-        retryability: args.retryability,
-        next_action: args.nextAction,
-        operation: args.operation,
-        message: args.message,
-        template_key: args.templateKey || null,
-        queue_id: args.queueId || null,
-        resend_id: args.resendId || null,
-        user_id: args.userId || null,
-        fingerprint: args.fingerprint,
-        status: 'new',
-        occurrence_count: 1,
-        first_seen_at: nowIso,
-        details: (args.details as unknown as import('@/lib/supabase').Json) || null,
-      })
+      .insert(row)
       .select('id')
       .maybeSingle()
+
+    // `user_id` references public.users. An auth user whose profile row is missing
+    // (or was deleted) fails that foreign key; the incident matters more than the
+    // attribution, so it is written once more without it.
+    if (insertErr && userId && (insertErr as { code?: string }).code === '23503') {
+      ;({ data: inserted, error: insertErr } = await supabase
+        .from('system_errors')
+        .insert({ ...row, user_id: null })
+        .select('id')
+        .maybeSingle())
+    }
 
     if (insertErr) {
       console.warn('[logSystemError] DB insert failed (table may be pending migration):', insertErr.message)
@@ -203,7 +398,11 @@ async function persistIncident(args: PersistArgs): Promise<string | null> {
     const incidentId = (inserted as { id: string } | null)?.id || null
 
     if (args.severity === 'critical' && incidentId) {
-      await notifyAdminsOnce(supabase, args, incidentId)
+      // An ignored fingerprint is still recorded above; it only never alerts.
+      const ignored = await loadIgnoredFingerprints(supabase)
+      if (!ignored.has(args.fingerprint)) {
+        await notifyAdminsOnce(supabase, args, incidentId)
+      }
     }
 
     return incidentId
@@ -322,6 +521,7 @@ export async function logErrorReport(report: ErrorReport): Promise<string | null
     ...(resolved.subject?.broadcastId ? { broadcastId: resolved.subject.broadcastId } : {}),
     ...(resolved.allProvidersFailed ? { allProvidersFailed: true } : {}),
   }) as Record<string, unknown>
+  Object.assign(details, monitoringFields({ error: resolved.error }))
 
   console.error(
     `[SystemError:${resolved.severity.toUpperCase()}:${resolved.domain}/${resolved.kind}]` +
@@ -341,7 +541,7 @@ export async function logErrorReport(report: ErrorReport): Promise<string | null
     templateKey: resolved.subject?.templateKey,
     queueId: resolved.subject?.queueId,
     resendId: resolved.provider?.externalId,
-    userId: resolved.subject?.userId,
+    userId: resolved.userId ?? resolved.subject?.userId,
     details,
   })
 }
@@ -378,6 +578,14 @@ export async function logSystemError(options: LogSystemErrorOptions): Promise<st
     queueId: options.queueId,
     resendId: options.resendId,
     userId: options.userId,
-    details: sanitizeDetails(options.details) as Record<string, unknown> | undefined,
+    details: {
+      ...((sanitizeDetails(options.details) as Record<string, unknown> | undefined) || {}),
+      ...monitoringFields({
+        error: options.error,
+        stack: options.stack,
+        runtime: options.runtime,
+        release: options.release,
+      }),
+    },
   })
 }

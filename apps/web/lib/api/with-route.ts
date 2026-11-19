@@ -271,6 +271,10 @@ export function withRoute<
     // B9-C: publish the id as ambient context for the duration of the request, so
     // structured logs raised deep in a call chain (the queue processor, four calls
     // below a cron handler) carry it without every signature having to pass it.
+    // Set once the actor resolves, so an unexpected fault is attributed to the
+    // signed-in learner on its incident row. Server-resolved, never client-sent.
+    let actorUserId: string | undefined
+
     const response = await runWithRequestContext({ requestId }, async () => {
     try {
       // 1. Who is calling?
@@ -297,6 +301,7 @@ export function withRoute<
         })
       }
       const actor = resolution.actor
+      if (actor.kind === 'learner') actorUserId = actor.userId
 
       // 2. Input. The body is read only when a schema is declared, so a route
       //    that wants the raw stream still gets it.
@@ -406,6 +411,7 @@ export function withRoute<
         operation: config.operation,
         summary: config.summary ?? `Unhandled exception in ${config.operation}`,
         requestId,
+        ...(actorUserId ? { userId: actorUserId } : {}),
         ...(config.errorMessage ? { message: config.errorMessage } : {}),
         ...(config.errorCode ? { code: config.errorCode } : {}),
       })
