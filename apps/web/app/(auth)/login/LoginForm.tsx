@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -133,6 +134,7 @@ export default function LoginForm({ next, errorParam, verified, resetSuccess }: 
     authErrorFromParam(errorParam)
   )
   const [isPending, startTransition] = useTransition()
+  const [showPassword, setShowPassword] = useState(false)
 
   const signupHref = next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'
 
@@ -225,10 +227,10 @@ export default function LoginForm({ next, errorParam, verified, resetSuccess }: 
         </>
       )}
 
-      <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-5" noValidate>
         <div>
-          <label htmlFor="login-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-            Email Address
+          <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-foreground">
+            Email
           </label>
           <Input
             id="login-email"
@@ -249,27 +251,43 @@ export default function LoginForm({ next, errorParam, verified, resetSuccess }: 
         </div>
 
         <div>
-          <div className="flex justify-between items-center mb-1">
-            <label htmlFor="login-password" className="block text-xs font-semibold uppercase text-foreground/80">
+          <div className="mb-1.5 flex items-center justify-between">
+            <label htmlFor="login-password" className="block text-sm font-medium text-foreground">
               Password
             </label>
             <Link
               href="/reset-password"
-              className="text-xs text-primary font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
+              className="rounded text-sm font-medium text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
             >
-              Forgot?
+              Forgot password?
             </Link>
           </div>
-          <Input
-            id="login-password"
-            type="password"
-            autoComplete="current-password"
-            required
-            disabled={isLoading}
-            error={!!errors.password}
-            aria-describedby={errors.password ? 'password-error' : undefined}
-            {...register('password')}
-          />
+          <div className="relative">
+            <Input
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              disabled={isLoading}
+              error={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              className="pr-11"
+              {...register('password')}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setShowPassword((v) => !v)}
+              disabled={isLoading}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              aria-controls="login-password"
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+            </Button>
+          </div>
           {errors.password && (
             <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
               {errors.password.message}
@@ -279,15 +297,16 @@ export default function LoginForm({ next, errorParam, verified, resetSuccess }: 
 
         <Button
           type="submit"
+          size="lg"
           loading={isPending}
           disabled={isLoading}
           className="w-full"
         >
-          {isPending ? 'Logging in...' : 'Log In'}
+          {isPending ? 'Logging in...' : 'Log in'}
         </Button>
       </form>
 
-      <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">
+      <div className="mt-6 border-t border-border pt-4 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
         <Link
           href={signupHref}
