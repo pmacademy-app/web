@@ -516,7 +516,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx --yes vercel@65.16.0 deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
+          npx --yes vercel@65.16.0 deploy --prebuilt --prod --archive=tgz --token="${VERCEL_TOKEN}"
 
       - name: Verify Deployment Health
         run: |
