@@ -14,6 +14,15 @@ import * as supabaseModule from '../supabase'
 const governed = vi.fn()
 vi.mock('@/lib/email-governance', () => ({ sendGovernedEmail: (...args: unknown[]) => governed(...args) }))
 
+// The route logs failures through logSystemError, which writes incidents through its own
+// Supabase query chain. That write is asynchronous, so on a slow runner it can land on this
+// file's minimal fake and trip the console guard. These tests assert the HTTP behaviour, not
+// the incident write, so the logger is stubbed.
+vi.mock('@/lib/monitoring/logger', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/monitoring/logger')>()
+  return { ...actual, logSystemError: vi.fn(async () => undefined) }
+})
+
 import { POST, MAX_WEBHOOK_BODY_BYTES } from '../../app/api/email/webhooks/route'
 
 function buildSupabase(captured: { suppressions: Array<Record<string, unknown>>; messages: Array<Record<string, unknown>> }) {
