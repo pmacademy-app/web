@@ -1,6 +1,6 @@
 # Prodily Developer Handbook
 
-Welcome to the **Prodily** workspace. This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, testing, and deployment workflows.
+Welcome to  the **Prodily** workspace. This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, testing, and deployment workflows.
 
 Built by [Aditya Gangwani](https://adityagangwani.me)
 
