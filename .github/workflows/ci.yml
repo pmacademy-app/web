@@ -345,7 +345,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [deploy-supabase]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Explicit result check: build-and-validate is skipped on a push to main, and a
+    # plain `if` would treat that skipped ancestor as a reason to skip this job too.
+    if: ${{ !cancelled() && needs.deploy-supabase.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     permissions:
       contents: read
     steps:
