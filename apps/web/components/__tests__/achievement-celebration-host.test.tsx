@@ -13,7 +13,7 @@ import { createRoot, type Root } from 'react-dom/client'
 // A claim is consumed server-side, so the host only asks when it could show the answer, and a
 // claimed celebration is held until it has been shown — never dropped.
 
-const BELL_KEY = '/api/notifications?limit=1'
+const BELL_KEY = '/api/notifications?summary=1'
 
 const nav = vi.hoisted(() => ({ pathname: '/dashboard' }))
 const analytics = vi.hoisted(() => ({
@@ -65,6 +65,20 @@ vi.mock('@/components/celebration/AchievementCelebrationModal', () => ({
     ) : null
   },
 }))
+
+// The host mounts the modals through next/dynamic wrappers (perf plan item 5). Their lazy
+// loading has its own suite (lazy-modals.test.tsx); here they resolve synchronously to the
+// modules above, so these tests keep exercising the host logic only.
+vi.mock('@/components/layout/lazy-modals', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/layout/lazy-modals')>()
+  const { AchievementCelebrationModal } = await import('@/components/celebration/AchievementCelebrationModal')
+  const { ReferralShareModal } = await import('@/components/referral/ReferralShareModal')
+  return {
+    ...actual,
+    AchievementCelebrationModalLazy: AchievementCelebrationModal,
+    ReferralShareModalLazy: ReferralShareModal,
+  }
+})
 
 import { AchievementCelebrationHost } from '@/components/notifications/AchievementCelebrationHost'
 import { QuickStartProvider, useQuickStart } from '@/components/quick-start/QuickStartContext'

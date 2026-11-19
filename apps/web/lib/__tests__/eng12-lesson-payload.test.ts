@@ -84,7 +84,9 @@ describe('ENG-12 / AG-32: Lighter Lesson Pages & CI Build Reuse', () => {
 
       // Baseline recorded before AG-32 was 208. We removed 14 redundant client directives.
       expect(clientCount).toBeLessThan(208)
-      expect(clientCount).toBeLessThanOrEqual(194)
+      // 195: components/layout/lazy-modals.tsx is one small client boundary that keeps about
+      // 2,000 lines of modal code out of every app page until a modal opens (perf plan item 5).
+      expect(clientCount).toBeLessThanOrEqual(195)
     })
   })
 

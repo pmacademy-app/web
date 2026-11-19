@@ -182,6 +182,7 @@ export default function PrivacyPage() {
           <p className="text-xs font-bold text-foreground">Strictly necessary — always on</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li><strong className="text-foreground">Authentication session cookies</strong> (`sb-access-token`, `sb-refresh-token`): HTTP-only cookies required to keep you signed in. Without them the Service cannot function, so they are not subject to consent.</li>
+            <li><strong className="text-foreground">Signed-in hint cookie</strong> (`prodily_signed_in`): Holds only the value `1` while you are signed in, for up to 30 days, so public pages can show the right button without asking our server. It contains no account details and is removed when you sign out.</li>
             <li><strong className="text-foreground">Cookie preference cookie</strong> (`prodily_cookie_consent`): Records the choice you make in the cookie banner, for 180 days, so we do not ask again.</li>
             <li><strong className="text-foreground">Local storage preferences:</strong> UI theme selection (`dark`, `light`, `system`), active tab state, and a client-side curriculum search index cache. Stored in your browser only and never sent to us.</li>
           </ul>

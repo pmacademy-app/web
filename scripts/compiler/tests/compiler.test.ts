@@ -63,7 +63,8 @@ describe('PM Academy Content Compiler Test Suite', () => {
       assert.ok(typeof blocks[0].svg === 'string' && blocks[0].svg.length > 0, 'expected compiled svg');
       assert.ok(blocks[0].svg.includes('<svg'), 'expected svg markup');
       assert.ok(blocks[0].svg.includes('Problem Statement'), 'expected node label in svg');
-      assert.strictEqual(blocks[0].staticSvg, blocks[0].svg);
+      // The duplicate staticSvg copy is no longer emitted (performance plan item 1).
+      assert.strictEqual(blocks[0].staticSvg, undefined);
     });
 
     it('compiles top-level mental model / framework mermaid blocks to static SVG', async () => {

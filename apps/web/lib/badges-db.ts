@@ -6,6 +6,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { unstable_cache } from 'next/cache'
 import type { Selected } from '@/lib/db'
 import type { Database } from '@/lib/supabase'
 import { BADGE_DEFINITIONS, type BadgeDefinition } from '@/config/badges'
@@ -109,6 +110,45 @@ async function fetchUserStatsForBadges(
   }
 }
 
+export type BadgeCatalogEntry = Selected<'badges', 'id' | 'key'>
+
+/** Cache tag for the badge catalog. Anything that edits `public.badges` calls revalidateTag(BADGE_CATALOG_TAG, 'max'). */
+export const BADGE_CATALOG_TAG = 'badges'
+
+/**
+ * How long a cached catalog is served before Next refreshes it. The catalog changes only by
+ * migration (no app code writes `public.badges`), so a few hours of staleness is harmless.
+ */
+export const BADGE_CATALOG_REVALIDATE_SECONDS = 6 * 60 * 60
+
+async function readBadgeCatalog(supabase: SupabaseClient<Database>): Promise<BadgeCatalogEntry[]> {
+  const { data, error } = await supabase.from('badges').select('id, key')
+  // Thrown, so unstable_cache never stores a failed read as an empty catalog.
+  if (error) throw new Error(`[badges-db] badges catalog read failed: ${error.message}`, { cause: error })
+  return data ?? []
+}
+
+/**
+ * The badge catalog (id and key of every row in `public.badges`), cached across requests.
+ *
+ * Perf plan item 11: the catalog is the same for every learner, so it is read once per
+ * revalidate window instead of on every dashboard, badges page and badge evaluation. The
+ * closure's client is used only on a cache miss; the entry's identity is the key parts, so
+ * every caller shares one entry. A failed read degrades to an empty catalog, as it did before
+ * the cache (every badge then shows as not earned) and is not cached.
+ */
+export async function getBadgeCatalog(supabase: SupabaseClient<Database>): Promise<BadgeCatalogEntry[]> {
+  try {
+    return await unstable_cache(() => readBadgeCatalog(supabase), ['badges-catalog', 'v1'], {
+      tags: [BADGE_CATALOG_TAG],
+      revalidate: BADGE_CATALOG_REVALIDATE_SECONDS,
+    })()
+  } catch (err) {
+    console.warn('[badges-db] Badge catalog unavailable:', err)
+    return []
+  }
+}
+
 /**
  * Retrieves full badge gallery and progress for a user.
  */
@@ -117,26 +157,22 @@ export async function getUserBadgesData(
   userId: string,
   preloaded?: BadgeStatsPreloadedData
 ): Promise<UserBadgesSummaryPayload> {
-  const stats = await fetchUserStatsForBadges(supabase, userId, preloaded)
-
-  // Fetch all badges definitions from DB
-  const { data: dbBadges } = await supabase.from('badges').select('*')
+  // The learner's stats, the (cached) catalog and the learner's earned badges are
+  // independent reads, so they run together instead of one after another.
+  const [stats, dbBadges, { data: userBadges }] = await Promise.all([
+    fetchUserStatsForBadges(supabase, userId, preloaded),
+    getBadgeCatalog(supabase),
+    supabase
+      .from('user_badges')
+      .select('badge_id, earned_at')
+      .eq('user_id', userId)
+      .order('earned_at', { ascending: false }),
+  ])
 
   const badgeIdToKeyMap = new Map<string, string>()
-  const keyToBadgeIdMap = new Map<string, string>()
-  if (dbBadges) {
-    for (const b of dbBadges) {
-      badgeIdToKeyMap.set(b.id, b.key)
-      keyToBadgeIdMap.set(b.key, b.id)
-    }
+  for (const b of dbBadges) {
+    badgeIdToKeyMap.set(b.id, b.key)
   }
-
-  // Fetch user earned badges
-  const { data: userBadges } = await supabase
-    .from('user_badges')
-    .select('badge_id, earned_at')
-    .eq('user_id', userId)
-    .order('earned_at', { ascending: false })
 
   const earnedMap = new Map<string, string>() // key -> earned_at
   if (userBadges) {
@@ -187,25 +223,18 @@ export async function evaluateAndAwardBadges(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<BadgeDefinition[]> {
-  const stats = await fetchUserStatsForBadges(supabase, userId)
-
-  // Fetch db badges table map
-  const { data: dbBadges } = await supabase.from('badges').select('id, key')
+  const [stats, dbBadges, { data: userBadges }] = await Promise.all([
+    fetchUserStatsForBadges(supabase, userId),
+    getBadgeCatalog(supabase),
+    supabase.from('user_badges').select('badge_id').eq('user_id', userId),
+  ])
 
   const keyToIdMap = new Map<string, string>()
   const idToKeyMap = new Map<string, string>()
-  if (dbBadges) {
-    for (const b of dbBadges) {
-      keyToIdMap.set(b.key, b.id)
-      idToKeyMap.set(b.id, b.key)
-    }
+  for (const b of dbBadges) {
+    keyToIdMap.set(b.key, b.id)
+    idToKeyMap.set(b.id, b.key)
   }
-
-  // Fetch user already earned badge IDs
-  const { data: userBadges } = await supabase
-    .from('user_badges')
-    .select('badge_id')
-    .eq('user_id', userId)
 
   const earnedKeys = new Set<string>()
   if (userBadges) {

@@ -22,7 +22,8 @@ import { apiPost } from '@/lib/api/client'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { LessonContextProvider } from '@/contexts/lesson-context'
 import { dispatchClientNotificationEvent, showClientToast } from '@/lib/events/client-event-bus'
-import type { CompiledLesson, CompiledBlock } from '@/types'
+import type { CompiledBlock } from '@/types'
+import type { ClientLesson } from '@/lib/academy/client-lesson'
 import {
   BookOpen,
   CheckSquare,
@@ -49,8 +50,11 @@ import {
   trackQuizStarted,
   trackDeepDiveOpened,
 } from '@/lib/analytics'
-import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
-import { ReferralInviteLauncher } from '@/components/referral/ReferralInviteLauncher'
+import {
+  FirstSessionCelebrationModalLazy,
+  ReferralInviteLauncherLazy,
+  useOpenedOnce,
+} from '@/components/layout/lazy-modals'
 import { deferQuickStartToNextSession } from '@/lib/quick-start/deferred-launch'
 import { useQuickStartOptional } from '@/components/quick-start/QuickStartContext'
 import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
@@ -73,7 +77,7 @@ import type { RecutVariant } from '@/lib/academy/experiment'
 import type { LessonProgressV2 } from '@/hooks/use-lesson-progress-v2'
 
 interface LessonPageContentProps {
-  lesson: CompiledLesson
+  lesson: ClientLesson
   prevLessonUrl: string | null
   nextLessonUrl: string | null
   nextLessonTitle?: string | null   // title of the next lesson, for the completion CTA
@@ -224,7 +228,7 @@ function ReflectionForm({
   onSaveSuccess,
   onComplete,
 }: {
-  lesson: CompiledLesson
+  lesson: ClientLesson
   mainPrompt: string
   prompts: string[]
   initialContent?: string
@@ -343,7 +347,7 @@ function ReflectionTabContent({
   lesson,
   onComplete,
 }: {
-  lesson: CompiledLesson
+  lesson: ClientLesson
   onComplete: () => void
 }) {
   const reflectionBlock = lesson.blocks.find((b) => b.type === 'reflection')
@@ -353,7 +357,7 @@ function ReflectionTabContent({
   const { data: reflectionData, isLoading, mutate: mutateReflection } = useApiQuery<{
     content?: string
     is_public?: boolean
-  }>(lesson?.id ? `/api/reflections?lesson_id=${lesson.id}` : null)
+  }>(lesson?.id ? `/api/reflections?lesson_id=${lesson.id}` : null, { revalidateOnFocus: false })
 
   if (isLoading && !reflectionData) {
     return (
@@ -539,6 +543,9 @@ export default function LessonPageContent({
   const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
   // Growth R5 B11: the first-lesson celebration can hand off to the referral modal.
   const [firstLessonInviteOpen, setFirstLessonInviteOpen] = useState(false)
+  // Both dialogs' code downloads on first open and then stays mounted (perf plan item 5).
+  const firstSessionCelebrationMounted = useOpenedOnce(showFirstSessionCelebration)
+  const firstLessonInviteMounted = useOpenedOnce(firstLessonInviteOpen)
   const [celebrationXp, setCelebrationXp] = useState(50)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
@@ -1082,28 +1089,32 @@ export default function LessonPageContent({
         )}
       </div>
 
-      <FirstSessionCelebrationModal
-        isOpen={showFirstSessionCelebration}
-        onClose={() => {
-          setShowFirstSessionCelebration(false)
-          quickStart?.requestDeferredLaunch()
-        }}
-        lessonId={lesson.id}
-        xpEarned={celebrationXp}
-        nextLessonUrl={nextLessonUrl}
-        onInvitePeers={() => {
-          // Swap, never chain: the celebration closes, the referral modal opens, and Quick Start
-          // waits for the next session instead of following this dialog.
-          setShowFirstSessionCelebration(false)
-          deferQuickStartToNextSession()
-          setFirstLessonInviteOpen(true)
-        }}
-      />
-      <ReferralInviteLauncher
-        open={firstLessonInviteOpen}
-        onClose={() => setFirstLessonInviteOpen(false)}
-        source="first_lesson_celebration"
-      />
+      {firstSessionCelebrationMounted && (
+        <FirstSessionCelebrationModalLazy
+          isOpen={showFirstSessionCelebration}
+          onClose={() => {
+            setShowFirstSessionCelebration(false)
+            quickStart?.requestDeferredLaunch()
+          }}
+          lessonId={lesson.id}
+          xpEarned={celebrationXp}
+          nextLessonUrl={nextLessonUrl}
+          onInvitePeers={() => {
+            // Swap, never chain: the celebration closes, the referral modal opens, and Quick Start
+            // waits for the next session instead of following this dialog.
+            setShowFirstSessionCelebration(false)
+            deferQuickStartToNextSession()
+            setFirstLessonInviteOpen(true)
+          }}
+        />
+      )}
+      {firstLessonInviteMounted && (
+        <ReferralInviteLauncherLazy
+          open={firstLessonInviteOpen}
+          onClose={() => setFirstLessonInviteOpen(false)}
+          source="first_lesson_celebration"
+        />
+      )}
     </div>
   )
 }

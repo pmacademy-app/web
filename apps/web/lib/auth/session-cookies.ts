@@ -30,6 +30,26 @@ export const DEFAULT_ACCESS_TOKEN_MAX_AGE = 3600
 /** Thirty days. The refresh token is what survives a browser restart. */
 export const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30
 
+/**
+ * A readable "probably signed in" hint for the marketing pages (perf plan item 7).
+ *
+ * The session cookies are httpOnly and the marketing pages are ISR, so the navbar used to
+ * ask `/api/auth/session` on every view. This cookie holds only `1`, never a token or an id,
+ * so page JavaScript may read it. It is a hint, not a credential: nothing on the server
+ * trusts it, and `useSessionCta` still confirms with the session route when it is present.
+ * It lives as long as the refresh token, which is how long a session can last.
+ */
+export const SIGNED_IN_HINT_COOKIE = 'prodily_signed_in'
+
+function hintOptions() {
+  return {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/',
+  }
+}
+
 export interface SessionTokens {
   access_token: string
   refresh_token?: string | null
@@ -70,11 +90,13 @@ export function setSessionCookies(response: NextResponse, session: SessionTokens
     })
   }
 
+  response.cookies.set(SIGNED_IN_HINT_COOKIE, '1', { ...hintOptions(), maxAge: REFRESH_TOKEN_MAX_AGE })
+
   return response
 }
 
 /**
- * Clears both session cookies.
+ * Clears both session cookies and the signed-in hint.
  *
  * Written with the same `httpOnly`/`secure`/`sameSite`/`path` as when they were set: a
  * browser only replaces a cookie when the name, domain and path match, so a clear that
@@ -84,5 +106,6 @@ export function clearSessionCookies(response: NextResponse): NextResponse {
   for (const name of [ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE]) {
     response.cookies.set(name, '', { ...baseOptions(), maxAge: 0 })
   }
+  response.cookies.set(SIGNED_IN_HINT_COOKIE, '', { ...hintOptions(), maxAge: 0 })
   return response
 }

@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { after } from 'next/server'
-import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
+import { verifyTheoryReadEngagement, getRuntimeXpValues, type XpValuesConfig } from '../xp'
 import { getCoreReadingMinutes, sampleQuizQuestions } from './lesson-structure'
 import { getRecutVariant } from './experiment'
 import { isModuleEntryUnlockTreatment } from './module-entry-unlock'
@@ -12,7 +12,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
-import { resolveLessonAccessForUser } from '../lessons-completion-service'
+import { resolveLessonAccessFromRows, type LessonProgressStatusRow } from '../lessons-completion-service'
 import { fetchCurriculumData } from '../lesson-loader'
 import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
 import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
@@ -120,6 +120,31 @@ export async function assertLessonAccessible(
   userId: string,
   lessonId: string
 ): Promise<void> {
+  await checkLessonAccess(supabase, userId, lessonId)
+}
+
+/** The learner's name and email, for the notifications sent after a quiz. */
+interface LearnerContact {
+  email: string | null
+  name: string | null
+}
+
+/** What the access check loaded, so the quiz submit path does not read it again. */
+interface LessonAccessCheck {
+  /** The learner's progress rows before the write, or null when that read failed. */
+  progressRows: LessonProgressStatusRow[] | null
+  contact: LearnerContact
+}
+
+/**
+ * assertLessonAccessible, returning what it read. The users row (cohort date, override flag,
+ * contact) and the progress rows are read together in one round trip.
+ */
+async function checkLessonAccess(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string
+): Promise<LessonAccessCheck> {
   const curriculum = await fetchCurriculumData()
   if (!curriculum) {
     throw new Error('[lessons-db] curriculum.json is unavailable; cannot check lesson access')
@@ -128,17 +153,24 @@ export async function assertLessonAccessible(
     throw new PublicError(LESSON_NOT_FOUND_MESSAGE, { status: 404, code: 'NOT_FOUND' })
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('created_at')
-    .eq('id', userId)
-    .maybeSingle()
+  const [{ data: profile, error: profileError }, { data: progressRows, error: progressError }] =
+    await Promise.all([
+      supabase
+        .from('users')
+        .select('created_at, curriculum_access_override, email, name')
+        .eq('id', userId)
+        .maybeSingle(),
+      supabase.from('user_lesson_progress').select('lesson_id, status').eq('user_id', userId),
+    ])
   if (profileError) throw profileError
 
   const treatment = isModuleEntryUnlockTreatment({ id: userId, createdAt: profile?.created_at ?? null })
-  const access = await resolveLessonAccessForUser(supabase, userId, lessonId, {
+  // A failed progress read decides on no progress, as resolveLessonAccessForUser does.
+  const access = resolveLessonAccessFromRows(lessonId, {
     curriculum: curriculum.lessons,
     treatment,
+    override: Boolean(profile?.curriculum_access_override),
+    progressRows: progressRows ?? [],
   })
 
   if (!access.isAccessible) {
@@ -146,6 +178,11 @@ export async function assertLessonAccessible(
       status: 403,
       code: 'LESSON_LOCKED',
     })
+  }
+
+  return {
+    progressRows: progressError ? null : progressRows ?? [],
+    contact: { email: profile?.email ?? null, name: profile?.name ?? null },
   }
 }
 
@@ -371,8 +408,15 @@ export async function submitQuizAttempt(
   const scored = scoreQuizSubmission(pool, getServedQuizQuestions(pool, userId, lessonId), attempts, {
     requireComplete: true,
   })
-  await assertLessonAccessible(supabase, userId, lessonId)
-  return recordScoredQuizAttempt(supabase, userId, lessonId, lesson, scored)
+  // getRuntimeXpValues never rejects (it falls back to the last good values) and is usually a
+  // cache hit, so starting it beside the access check costs nothing when access is denied.
+  const xpConfig = getRuntimeXpValues(supabase)
+  const access = await checkLessonAccess(supabase, userId, lessonId)
+  return recordScoredQuizAttempt(supabase, userId, lessonId, lesson, scored, {
+    xpConfig,
+    progressRows: access.progressRows,
+    contact: access.contact,
+  })
 }
 
 /**
@@ -468,16 +512,59 @@ async function enqueueWrongAnswerFlashcards(
   }
 }
 
+/** Reads the quiz submit path already made, handed to recordScoredQuizAttempt. */
+interface QuizPrefetch {
+  xpConfig?: Promise<XpValuesConfig>
+  /** Progress rows read before the RPC, or null when that read failed. */
+  progressRows?: LessonProgressStatusRow[] | null
+  contact?: LearnerContact
+}
+
+/**
+ * The learner's completed lessons once the quiz RPC has written this attempt.
+ *
+ * With the rows read before the RPC, this lesson is added when the RPC left it completed: the
+ * original RPC writes 'completed' on every attempt and returns no status, the mastery RPC
+ * returns the status it wrote and never downgrades a completed lesson. That is the same set a
+ * read after the RPC returns. Without those rows (legacy path, or the earlier read failed) the
+ * progress is read now.
+ */
+async function completedLessonsAfterRpc(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  envelope: Record<string, unknown>,
+  rowsBeforeRpc: LessonProgressStatusRow[] | null
+): Promise<Set<string>> {
+  if (rowsBeforeRpc) {
+    const completed = new Set(rowsBeforeRpc.filter((p) => p.status === 'completed').map((p) => p.lesson_id))
+    const leftCompleted = typeof envelope.status === 'string' ? envelope.status === 'completed' : true
+    if (leftCompleted) completed.add(lessonId)
+    return completed
+  }
+
+  const { data: userProgress, error: progressError } = await supabase
+    .from('user_lesson_progress')
+    .select('lesson_id, status')
+    .eq('user_id', userId)
+  if (progressError) {
+    // Without it no module (or certificate) can be detected for this completion.
+    console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
+  }
+  return new Set((userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id))
+}
+
 async function recordScoredQuizAttempt(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonId: string,
   lesson: CompiledLesson,
-  { validatedAttempts, correctCount, totalQuestions }: ScoredQuizSubmission
+  { validatedAttempts, correctCount, totalQuestions }: ScoredQuizSubmission,
+  prefetched: QuizPrefetch = {}
 ) {
   const scorePercentage = Math.round((correctCount / totalQuestions) * 100)
 
-  const xpConfig = await getRuntimeXpValues(supabase)
+  const xpConfig = await (prefetched.xpConfig ?? getRuntimeXpValues(supabase))
 
   let totalXpToAward = 0
   let isFirstAttempt = false
@@ -524,41 +611,29 @@ async function recordScoredQuizAttempt(
       ? envelope.best_score
       : Math.max(scorePercentage, 0)
 
-  // Enqueue flashcards for wrong answers
-  const wrongAttempts = validatedAttempts.filter((a) => !a.is_correct)
-  if (wrongAttempts.length > 0) {
-    try {
-      await enqueueWrongAnswerFlashcards(
-        supabase,
-        userId,
-        lessonId,
-        wrongAttempts.map((a) => a.question_id),
-        lesson
-      )
-    } catch (fcErr) {
-      console.warn('[lessons-db] Flashcard enqueue warning:', fcErr)
-    }
-  }
-
   // The response reports isFirstLesson / totalCompletedLessons (the lesson page celebrates the
-  // first lesson), so this one read stays before the return. Every other hook runs after it.
-  const { data: userProgress, error: progressError } = await supabase
-    .from('user_lesson_progress')
-    .select('lesson_id, status')
-    .eq('user_id', userId)
-  if (progressError) {
-    // Without it no module (or certificate) can be detected for this completion.
-    console.warn('[lessons-db] Progress read for completion hooks failed:', progressError.message)
-  }
-
-  const completedLessonIds = new Set(
-    (userProgress ?? []).filter((p) => p.status === 'completed').map((p) => p.lesson_id),
+  // first lesson), so the completed set is known before the return.
+  const completedLessonIds = await completedLessonsAfterRpc(
+    supabase,
+    userId,
+    lessonId,
+    envelope,
+    prefetched.progressRows ?? null
   )
   const totalCompletedLessons = completedLessonIds.size
 
-  // Audit 2026-11-17 #8: streak, notifications, referral, module completion and certificate
-  // issuance run once the response is sent. Each step tolerates its own failure.
+  // Audit 2026-11-17 #8: flashcards, streak, notifications, referral, module completion and
+  // certificate issuance run once the response is sent. Each step tolerates its own failure.
+  // The response does not depend on the flashcard queue: the review hub reads it on its own load.
+  const wrongQuestionIds = validatedAttempts.filter((a) => !a.is_correct).map((a) => a.question_id)
   await runAfterResponse(async () => {
+    if (wrongQuestionIds.length > 0) {
+      try {
+        await enqueueWrongAnswerFlashcards(supabase, userId, lessonId, wrongQuestionIds, lesson)
+      } catch (fcErr) {
+        console.warn('[lessons-db] Flashcard enqueue warning:', fcErr)
+      }
+    }
     try {
       await updateUserStreak(supabase, userId)
     } catch (streakErr) {
@@ -572,6 +647,7 @@ async function recordScoredQuizAttempt(
       isNewlyCompleted,
       totalXpToAward,
       completedLessonIds,
+      contact: prefetched.contact,
     })
   })
 
@@ -615,6 +691,7 @@ async function runQuizCompletionHooks(
     isNewlyCompleted,
     totalXpToAward,
     completedLessonIds,
+    contact,
   }: {
     userId: string
     lessonId: string
@@ -623,15 +700,15 @@ async function runQuizCompletionHooks(
     isNewlyCompleted: boolean
     totalXpToAward: number
     completedLessonIds: Set<string>
+    /** Already read by the access check; read here only on the legacy path. */
+    contact?: LearnerContact
   }
 ): Promise<void> {
   const totalCompletedLessons = completedLessonIds.size
   try {
-    const { data: userRec } = await supabase
-      .from('users')
-      .select('email, name')
-      .eq('id', userId)
-      .maybeSingle()
+    const userRec =
+      contact ??
+      (await supabase.from('users').select('email, name').eq('id', userId).maybeSingle()).data
 
     const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
     const { initializeNotificationConnectors } = await import('../notifications/events/connectors')

@@ -70,38 +70,69 @@ export interface ReviewQueueData {
   stats: ReviewStats
 }
 
+type Awaitable<T> = T | PromiseLike<T>
+
+/** The SRS columns the review queue reads (CQ perf item 8: no more `select('*')`). */
+const REVIEW_QUEUE_SRS_COLUMNS = 'flashcard_id, lesson_id, ease_factor, next_review_at' as const
+type ReviewQueueSrsRow = Pick<SrsRow, 'flashcard_id' | 'lesson_id' | 'ease_factor' | 'next_review_at'>
+
+export interface ReviewQueueOptions {
+  /**
+   * The learner's profile row when the caller already loads it (the dashboard does); only
+   * `timezone` is read. `null` (no row yet) means UTC. A rejected promise throws (CQ-07).
+   * Omit it to read the timezone here.
+   */
+  profile?: Awaitable<Pick<Tables<'users'>, 'timezone'> | null>
+  /**
+   * The learner's lesson progress rows when the caller already loads them. A rejected
+   * promise throws (CQ-07). Omit it to read them here.
+   */
+  progressRows?: Awaitable<Array<Pick<Tables<'user_lesson_progress'>, 'lesson_id' | 'status'>>>
+}
+
+async function readProgressRows(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<Array<Pick<Tables<'user_lesson_progress'>, 'lesson_id' | 'status'>>> {
+  const { data, error } = await supabase.from('user_lesson_progress').select('lesson_id, status').eq('user_id', userId)
+  if (error) throw readFailed('user_lesson_progress', error)
+  return data ?? []
+}
+
 /**
  * Retrieves the review queue data for an authenticated user.
  * Loads unlocked flashcards from completed lessons and evaluates SM-2 due dates.
  */
 export async function getReviewQueueData(
   supabase: SupabaseClient<Database>,
-  userId: string
+  userId: string,
+  options?: ReviewQueueOptions
 ): Promise<ReviewQueueData> {
   const now = new Date()
 
   // 1. Fetch lesson progress, SRS records, the learner's timezone and the curriculum in
-  // parallel. Every read is checked: a failure throws instead of standing in as "no
-  // rows" (CQ-07).
-  const [progressRes, srsRes, timezone, curriculum] = await Promise.all([
-    supabase.from('user_lesson_progress').select('lesson_id, status').eq('user_id', userId),
-    supabase.from('user_flashcard_srs').select('*').eq('user_id', userId),
-    readUserTimezone(supabase, userId),
+  // parallel, reusing the rows the caller already loaded. Every read is checked: a failure
+  // throws instead of standing in as "no rows" (CQ-07).
+  const preloadedProfile = options?.profile
+  const [progressRows, srsRes, timezone, curriculum] = await Promise.all([
+    options?.progressRows !== undefined ? options.progressRows : readProgressRows(supabase, userId),
+    supabase.from('user_flashcard_srs').select(REVIEW_QUEUE_SRS_COLUMNS).eq('user_id', userId),
+    preloadedProfile !== undefined
+      ? Promise.resolve(preloadedProfile).then((profile) => profile?.timezone || 'UTC')
+      : readUserTimezone(supabase, userId),
     fetchCurriculumData(),
   ])
 
-  if (progressRes.error) throw readFailed('user_lesson_progress', progressRes.error)
   if (srsRes.error) throw readFailed('user_flashcard_srs', srsRes.error)
 
-  const progressRows = progressRes.data
-  const srsRows = srsRes.data
+  const srsRows: ReviewQueueSrsRow[] | null = srsRes.data
 
   // Today's completed reviews, counted in SQL and bounded to the learner's local day.
   // This used to fetch every flashcard XP event ever earned and filter in JS, which
   // PostgREST truncates past 1,000 rows (CQ-07).
   const todayCountPromise = countTodayFlashcardReviews(supabase, userId, timezone, now)
 
-  const srsRecordsMap = new Map<string, SrsRow>()
+  const srsRecordsMap = new Map<string, ReviewQueueSrsRow>()
   const srsLessonIds = new Set<string>()
   for (const row of srsRows || []) {
     srsRecordsMap.set(row.flashcard_id, row)

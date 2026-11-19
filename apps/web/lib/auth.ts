@@ -148,6 +148,11 @@ import { cache } from 'react'
 /**
  * Internal resolver to verify auth session directly from request cookies.
  * Extracts sb-access-token and returns the authenticated Supabase User or null.
+ *
+ * Perf plan item 2: the token is verified with getClaims() (the same check proxy.ts runs),
+ * not getUser(), so an app page render no longer waits on a GoTrue round trip. The returned
+ * User is built from the JWT claims (see userFromClaims). A caller that needs the fresh
+ * GoTrue record (account settings, email change) calls getAuthenticatedUser(supabase).
  */
 async function resolveServerUser(): Promise<User | null> {
   try {
@@ -160,8 +165,7 @@ async function resolveServerUser(): Promise<User | null> {
     const accessToken = cookieStore.get('sb-access-token')?.value
     if (!accessToken) return null
 
-    const authClient = createAuthenticatedServerClient(accessToken)
-    return await getAuthenticatedUser(authClient)
+    return await verifyAccessToken(accessToken)
   } catch (err) {
     const error = err as Error & { digest?: string }
     if (error && (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('Dynamic server usage'))) {
@@ -297,18 +301,8 @@ async function verifyAccessToken(token: string): Promise<User | null> {
   }
   if (typeof authWithClaims.getClaims === 'function') {
     const { data, error } = await authWithClaims.getClaims(token)
-    if (!error && data?.claims?.sub) {
-      const claims = data.claims
-      return {
-        id: claims.sub as string,
-        app_metadata: (claims.app_metadata as Record<string, unknown>) || {},
-        user_metadata: (claims.user_metadata as Record<string, unknown>) || {},
-        aud: (claims.aud as string) || 'authenticated',
-        created_at: new Date(claims.iat ? (claims.iat as number) * 1000 : Date.now()).toISOString(),
-        email: (claims.email as string) || undefined,
-        role: (claims.role as string) || 'authenticated',
-        is_anonymous: Boolean(claims.is_anonymous),
-      } as User
+    if (!error && typeof data?.claims?.sub === 'string' && data.claims.sub) {
+      return userFromClaims(data.claims)
     }
     return null
   }
@@ -322,6 +316,35 @@ async function verifyAccessToken(token: string): Promise<User | null> {
   }
 
   return null
+}
+
+/**
+ * Builds the User shape callers read from verified access-token claims.
+ *
+ * Provided: id, email, phone, app_metadata, user_metadata, aud, role, is_anonymous,
+ * email_confirmed_at, created_at. Two fields are derived, not read:
+ * - email_confirmed_at mirrors proxy.ts: a token that carries an email counts as confirmed,
+ *   because GoTrue does not issue a session to an unconfirmed email while confirmations are on.
+ * - created_at is the token issue time (claims carry no account creation date). Callers that
+ *   need the account age read users.created_at from the profile row instead.
+ * Not provided (absent from claims): last_sign_in_at, confirmed_at, identities, factors.
+ */
+function userFromClaims(claims: Record<string, unknown>): User {
+  const email = typeof claims.email === 'string' && claims.email ? claims.email : undefined
+  const issuedAt = new Date(typeof claims.iat === 'number' ? claims.iat * 1000 : Date.now()).toISOString()
+  return {
+    id: claims.sub as string,
+    app_metadata: (claims.app_metadata as User['app_metadata']) || {},
+    user_metadata: (claims.user_metadata as User['user_metadata']) || {},
+    aud: typeof claims.aud === 'string' ? claims.aud : 'authenticated',
+    created_at: issuedAt,
+    email,
+    phone: typeof claims.phone === 'string' && claims.phone ? claims.phone : undefined,
+    role: typeof claims.role === 'string' ? claims.role : 'authenticated',
+    is_anonymous: Boolean(claims.is_anonymous),
+    email_confirmed_at:
+      typeof claims.email_confirmed_at === 'string' ? claims.email_confirmed_at : email ? issuedAt : undefined,
+  }
 }
 
 /** The access token from next/headers cookies(), or null outside a request scope. */

@@ -59,7 +59,7 @@ describe('curriculum module slug → capstone slug mapping', () => {
     })
     const html = renderToString(React.createElement(LessonCapstonePreview, { moduleSlug: 'growth' }))
     expect(html).not.toBe('')
-    expect(mockUseApiQuery).toHaveBeenCalledWith('/api/capstones/metrics')
+    expect(mockUseApiQuery).toHaveBeenCalledWith('/api/capstones/metrics', { revalidateOnFocus: false })
     expect(read('components/capstones/LessonCapstonePreview.tsx')).toContain('`/capstones/${definition.moduleSlug}`')
   })
 

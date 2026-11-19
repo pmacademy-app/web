@@ -32,6 +32,9 @@ export interface UserFlashcardSRSRow {
   updated_at?: string
 }
 
+/** The SRS fields the due-card and stats helpers read. A full row satisfies it. */
+export type SRSScheduleFields = Pick<UserFlashcardSRSRow, 'ease_factor' | 'next_review_at'>
+
 export interface ReviewStats {
   dueTodayCount: number
   upcomingCount: number
@@ -127,7 +130,7 @@ export function calculateSM2(
  */
 export function getDueCards(
   allUnlockedCards: FlashcardItem[],
-  srsRecordsMap: Map<string, UserFlashcardSRSRow>,
+  srsRecordsMap: ReadonlyMap<string, SRSScheduleFields>,
   now: Date = new Date()
 ): FlashcardItem[] {
   const nowTime = now.getTime()
@@ -149,7 +152,7 @@ export function getDueCards(
  */
 export function getUpcomingReviewsCount(
   allUnlockedCards: FlashcardItem[],
-  srsRecordsMap: Map<string, UserFlashcardSRSRow>,
+  srsRecordsMap: ReadonlyMap<string, SRSScheduleFields>,
   now: Date = new Date()
 ): number {
   const nowTime = now.getTime()
@@ -167,7 +170,7 @@ export function getUpcomingReviewsCount(
  */
 export function calculateReviewStats(
   allUnlockedCards: FlashcardItem[],
-  srsRecordsMap: Map<string, UserFlashcardSRSRow>,
+  srsRecordsMap: ReadonlyMap<string, SRSScheduleFields>,
   completedTodayCount: number = 0,
   now: Date = new Date()
 ): ReviewStats {

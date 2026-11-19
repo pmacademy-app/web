@@ -43,7 +43,7 @@ const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 const DATES_PATH = path.join(ROOT_DIR, 'content/lesson-dates.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '18';
+const CACHE_VERSION = '19';
 
 export function loadLessonDates(): Record<string, string> {
   if (!fs.existsSync(DATES_PATH)) {
@@ -451,7 +451,6 @@ export async function compileLesson(
           normalized: mermaidNode.data?.mermaid?.normalized || mermaidNode.value,
           authorTheme: mermaidNode.data?.mermaid?.authorTheme,
           svg,
-          staticSvg: svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;
@@ -540,7 +539,6 @@ export async function compileLesson(
           normalized: mermaidNode.data?.mermaid?.normalized || mermaidNode.value,
           authorTheme: mermaidNode.data?.mermaid?.authorTheme,
           svg,
-          staticSvg: svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;

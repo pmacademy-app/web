@@ -6,7 +6,7 @@ import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
 import { QuickStartProvider } from '@/components/quick-start/QuickStartContext'
-import { QuickStartModal } from '@/components/quick-start/QuickStartModal'
+import { QuickStartModalHost } from '@/components/layout/lazy-modals'
 import { AchievementCelebrationHost } from '@/components/notifications/AchievementCelebrationHost'
 
 export const metadata: Metadata = {
@@ -73,7 +73,8 @@ export default async function AuthenticatedLayout({
         initialQuickStartCompleted={isQuickStartCompleted}
       >
         <AppShell userProfile={profile}>{children}</AppShell>
-        <QuickStartModal />
+        {/* The tour body downloads only when it first opens (perf plan item 5). */}
+        <QuickStartModalHost />
         <AchievementCelebrationHost quickStartCompleted={isQuickStartCompleted} />
       </QuickStartProvider>
     </BreadcrumbProvider>
