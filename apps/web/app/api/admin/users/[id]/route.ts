@@ -6,7 +6,9 @@ import { AdminConsoleService } from '@/lib/admin/service'
 import { requireAdmin } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
 import { deleteAccount, resetProgress } from '@/lib/settings/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 
@@ -59,7 +61,7 @@ export const DELETE = withRoute(
       // 2. Fetch target user to check existence and admin hierarchy
       const { data: targetUser, error: targetErr } = await supabase
         .from('users')
-        .select('id, email, is_admin')
+        .select('id, email, is_admin, username')
         .eq('id', id)
         .maybeSingle()
 
@@ -114,6 +116,9 @@ export const DELETE = withRoute(
       revalidatePath('/admin/users')
       revalidatePath('/academy', 'layout')
       revalidatePath('/dashboard', 'layout')
+      // The cached public portfolio and the weekly leaderboard must stop showing the learner.
+      revalidatePublicPortfolio(targetUser.username)
+      invalidateLeaderboardCache({ expire: 0 })
 
       return NextResponse.json({
         success: true,

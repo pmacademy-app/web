@@ -26,7 +26,12 @@ describe('Dynamic Portfolio OpenGraph Social Preview Card Test Suite', () => {
                   error: null,
                 })),
               })),
+              // Username lookup is an exact `.eq` on the lowercase name (perf plan item 13).
               eq: vi.fn(() => ({
+                limit: vi.fn(async () => ({
+                  data: userData ? [userData] : [],
+                  error: null,
+                })),
                 single: vi.fn(async () => ({
                   data: userData,
                   error: null,

@@ -1,17 +1,16 @@
 /**
- * V-OPT-2 — public portfolio and certificate page caching.
+ * V-OPT-2 and perf plan item 13: public portfolio and certificate page caching.
  *
- * Two different conclusions, for a reason that matters:
+ *  - Certificates are cached across requests (ISR). They carry no revocation or
+ *    status column and are not mutated after issuance.
  *
- *  - Certificates are cached ACROSS requests (ISR). They carry no revocation or
- *    status column and are not mutated after issuance, so there is no state whose
- *    staleness could mislead a verifier.
- *
- *  - Portfolios are deduplicated WITHIN a request only. A portfolio can be made
- *    private at any moment, so a cross-request cache would keep serving a payload
- *    that is no longer public until it was purged — and purging would have to be
- *    proven, not assumed. These tests pin the privacy invariants that any future
- *    cross-request attempt must still satisfy.
+ *  - Portfolios are cached across requests too (ISR, revalidate 3600), now that the
+ *    invalidation path exists: every write that changes what a portfolio shows,
+ *    making it private above all, purges its exact paths with revalidatePath
+ *    (lib/portfolio-revalidate.ts, pinned in portfolio-page-cache.test.ts). These
+ *    tests pin the privacy invariants the cached render relies on: a private or
+ *    missing portfolio resolves to null, the read performs no write, and the page
+ *    reads nothing per viewer.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
@@ -49,7 +48,7 @@ describe('V-OPT-2: public portfolio read', () => {
     const client = {
       from: () => ({
         select: () => ({
-          ilike: () => ({
+          eq: () => ({
             limit: async () => ({
               data: [{ id: 'u1', username: 'private-user', is_portfolio_public: false }],
               error: null,
@@ -67,7 +66,7 @@ describe('V-OPT-2: public portfolio read', () => {
     const db = await loadPortfolioDb()
     const client = {
       from: () => ({
-        select: () => ({ ilike: () => ({ limit: async () => ({ data: [], error: null }) }) }),
+        select: () => ({ eq: () => ({ limit: async () => ({ data: [], error: null }) }) }),
       }),
     } as never
 
@@ -87,19 +86,15 @@ describe('V-OPT-2: public portfolio read', () => {
     expect(body).not.toContain('incrementPortfolioViewCount(')
   })
 
-  it('9. view counting moved to the request path and is invoked exactly once', async () => {
+  it('9. view counting is not in the render: the cached page sends a client beacon instead', async () => {
     const page = await import('node:fs').then((fs) =>
       fs.readFileSync(new URL('../../app/(portfolio)/p/[username]/page.tsx', import.meta.url), 'utf-8')
     )
-    // Exactly one call site, in the component — not in generateMetadata, which is what
-    // used to double-count every view.
-    const calls = page.match(/incrementPortfolioViewCount\(/g) || []
-    expect(calls).toHaveLength(1)
-    const metadataBlock = page.slice(
-      page.indexOf('export async function generateMetadata'),
-      page.indexOf('export default async function')
-    )
-    expect(metadataBlock).not.toContain('incrementPortfolioViewCount(')
+    // A write during render would count cache regenerations, not views, and would make the
+    // page dynamic again.
+    expect(page).not.toContain('incrementPortfolioViewCount')
+    expect(page).not.toContain('recordPortfolioView')
+    expect(page).toContain('<PortfolioViewBeacon')
   })
 
   it('9b. the increment still re-checks visibility itself', async () => {
@@ -110,21 +105,35 @@ describe('V-OPT-2: public portfolio read', () => {
     expect(body).toContain('is_portfolio_public')
   })
 
-  it('deduplicates the read within a request instead of caching it across requests', async () => {
+  it('deduplicates the read within a render; the page itself is the cross-request cache', async () => {
     const src = await import('node:fs').then((fs) =>
       fs.readFileSync(new URL('../portfolio-db.ts', import.meta.url), 'utf-8')
     )
     expect(src).toContain("import { cache } from 'react'")
-    // A cross-request cache here would outlive a visibility change.
+    // One cache layer, purged by path. A second data-cache layer under the page would outlive
+    // a revalidatePath of the page and serve a private portfolio again.
     expect(src).not.toContain('unstable_cache')
   })
 
-  it('the page stays dynamic, so a private toggle takes effect on the very next request', async () => {
-    const page = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../../app/(portfolio)/p/[username]/page.tsx', import.meta.url), 'utf-8')
-    )
-    expect(page).not.toMatch(/export const revalidate/)
-    expect(page).not.toMatch(/export const dynamic\s*=\s*'force-static'/)
+  it('the page is ISR, so it renders once per regeneration instead of once per view', async () => {
+    const mod = await import('../../app/(portfolio)/p/[username]/page')
+    expect((mod as { revalidate?: number }).revalidate).toBe(3600)
+    expect((mod as { dynamic?: string }).dynamic).toBeUndefined()
+    expect((mod as { dynamicParams?: boolean }).dynamicParams).toBe(true)
+    const gsp = (mod as { generateStaticParams?: () => Promise<unknown[]> }).generateStaticParams
+    expect(typeof gsp).toBe('function')
+    await expect(gsp!()).resolves.toEqual([])
+  })
+
+  it('the page reads no cookies, headers or search params, so nothing per viewer enters the cache', async () => {
+    const fs = await import('node:fs')
+    for (const rel of ['../../app/(portfolio)/p/[username]/page.tsx', '../../app/(portfolio)/p/[username]/capstones/[moduleSlug]/page.tsx']) {
+      const page = fs.readFileSync(new URL(rel, import.meta.url), 'utf-8')
+      expect(page).not.toContain('cookies()')
+      expect(page).not.toContain('headers()')
+      expect(page).not.toContain('searchParams')
+      expect(page).not.toContain('getServerUser')
+    }
   })
 })
 

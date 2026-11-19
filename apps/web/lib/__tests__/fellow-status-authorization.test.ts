@@ -38,7 +38,7 @@ describe('Unit 2: Fellow Identity & Admin Control Test Suite', () => {
           if (table === 'users') {
             return {
               select: vi.fn(() => ({
-                ilike: vi.fn(() => ({
+                eq: vi.fn(() => ({
                   limit: vi.fn(async () => ({
                     data: [
                       {
@@ -84,7 +84,7 @@ describe('Unit 2: Fellow Identity & Admin Control Test Suite', () => {
           if (table === 'users') {
             return {
               select: vi.fn(() => ({
-                ilike: vi.fn(() => ({
+                eq: vi.fn(() => ({
                   limit: vi.fn(async () => ({
                     data: [
                       {

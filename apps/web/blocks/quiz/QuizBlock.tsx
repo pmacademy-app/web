@@ -6,15 +6,33 @@ import { Button } from '@/components/ui/button';
 import QuizOption from '@/components/quiz/QuizOption';
 import { BlockProps } from '../../renderer/registry';
 import { useLessonContextSafe } from '@/contexts/lesson-context';
+import { checkQuizAnswer, createQuizAttemptId, QUIZ_CHECK_OFFLINE_MESSAGE } from './check-answer';
 
+/**
+ * A quiz question as the block receives it. On the learner lesson page the answer fields are
+ * absent (lib/academy/client-lesson.ts strips them) and each answer is checked by the server
+ * after the learner commits it. Where they are present (the admin preview renders the full
+ * compiled lesson) the block checks locally, since the answers are already on the page.
+ */
 interface QuizQuestion {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number;
-  explanation: string;
-  difficulty?: 'easy' | 'medium' | 'medium-hard' | 'hard';
+  correctAnswer?: number;
+  explanation?: string;
+  difficulty?: string;
   objectivesTested?: number[];
+}
+
+/**
+ * The result of one confirmed answer. `correct` and `correctAnswer` are null when the server
+ * reports the question was already checked in this attempt: the answer is kept and scored at
+ * submit, but nothing is revealed.
+ */
+interface AnswerResult {
+  correct: boolean | null;
+  correctAnswer: number | null;
+  explanation: string;
 }
 
 // Elements that already act on Enter / Space themselves.
@@ -46,13 +64,33 @@ function readServerXp(result: unknown): { xpEarned: number; isFirstAttempt: bool
   return { xpEarned: Math.floor(xpEarned), isFirstAttempt: isFirstAttempt === true };
 }
 
-export default function QuizBlock({ block }: BlockProps) {
+/** Reads the server's score from the quiz API result, which is the authoritative one. */
+function readServerScore(result: unknown): { correctCount: number; totalQuestions: number } | null {
+  if (!result || typeof result !== 'object') return null;
+  const { correctCount, totalQuestions } = result as { correctCount?: unknown; totalQuestions?: unknown };
+  if (typeof correctCount !== 'number' || typeof totalQuestions !== 'number') return null;
+  if (!Number.isInteger(correctCount) || !Number.isInteger(totalQuestions)) return null;
+  if (totalQuestions <= 0 || correctCount < 0 || correctCount > totalQuestions) return null;
+  return { correctCount, totalQuestions };
+}
+
+export default function QuizBlock({ block, lessonId }: BlockProps) {
   const totalQuestions = (block.questions || []).length;
   const lessonCtx = useLessonContextSafe();
+  const checkLessonId = lessonCtx?.lessonId ?? lessonId;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null);
+  const isConfirmed = answerResult !== null;
+  // A server check in flight, and the copy to show when one failed (nothing is revealed).
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+  const answerLocked = isConfirmed || checking;
+  // One random id per attempt; the check route allows one check per (attempt, question).
+  const attemptIdRef = useRef<string | null>(null);
+  // Bumped on every check and on reset, so a late response for an old question is ignored.
+  const checkSeqRef = useRef(0);
   const [correctCount, setCorrectCount] = useState(0);
   // Ref mirrors attempts state for reliable access in async callbacks
   const attemptsRef = useRef<{ question_id: string; selected_option: number; is_correct: boolean }[]>([]);
@@ -69,6 +107,9 @@ export default function QuizBlock({ block }: BlockProps) {
   // XP as reported by the quiz API for this attempt. Null until the server answers (or when it
   // does not report a figure), so the summary never shows a client-side guess.
   const [serverXp, setServerXp] = useState<{ xpEarned: number; isFirstAttempt: boolean } | null>(null);
+  // The server's score for the submitted attempt. Preferred over the local tally, which
+  // cannot count a question whose result was not revealed.
+  const [serverScore, setServerScore] = useState<{ correctCount: number; totalQuestions: number } | null>(null);
 
   const [shuffledQuestions] = useState<(QuizQuestion & { shuffledOptions: { text: string; originalIndex: number }[] })[]>(() => {
     const questions = block.questions || [];
@@ -89,47 +130,102 @@ export default function QuizBlock({ block }: BlockProps) {
   const currentQuestion = shuffledQuestions[currentIndex];
 
   const handleReset = () => {
+    checkSeqRef.current += 1;
+    attemptIdRef.current = null;
     setCurrentIndex(0);
     setSelectedOption(null);
-    setIsConfirmed(false);
+    setAnswerResult(null);
+    setChecking(false);
+    setCheckError(null);
     setCorrectCount(0);
     attemptsRef.current = [];
     pendingFocusRef.current = 'question';
     setQuizFinished(false);
     setSubmitting(false);
     setServerXp(null);
+    setServerScore(null);
   };
 
   const handleOptionClick = (idx: number) => {
-    if (isConfirmed) return;
+    if (answerLocked) return;
     setSelectedOption(idx);
+    setCheckError(null);
   };
 
   const handleConfirm = useCallback(() => {
-    if (selectedOption === null || isConfirmed || !currentQuestion) return;
+    if (selectedOption === null || isConfirmed || checking || !currentQuestion) return;
 
-    const chosenOriginalIndex = currentQuestion.shuffledOptions[selectedOption].originalIndex;
-    const isCorrect = chosenOriginalIndex === currentQuestion.correctAnswer;
-    if (isCorrect) {
-      setCorrectCount((c) => c + 1);
-    }
+    const question = currentQuestion;
+    const chosenOriginalIndex = question.shuffledOptions[selectedOption].originalIndex;
 
-    const newAttempt = {
-      question_id: currentQuestion.id,
-      selected_option: chosenOriginalIndex,
-      is_correct: isCorrect,
+    // Records the answer and shows its result. The focused option or Confirm button is
+    // about to be disabled or relabelled; hand focus to the action button (now "Next
+    // Question" / "Finish Quiz") so Enter keeps working.
+    const applyResult = (result: AnswerResult, moveFocus: boolean) => {
+      if (result.correct === true) {
+        setCorrectCount((c) => c + 1);
+      }
+      attemptsRef.current = [
+        ...attemptsRef.current,
+        {
+          question_id: question.id,
+          selected_option: chosenOriginalIndex,
+          // Informational only: the submit route rescores every answer on the server.
+          is_correct: result.correct === true,
+        },
+      ];
+      if (moveFocus) pendingFocusRef.current = 'action';
+      setCheckError(null);
+      setAnswerResult(result);
     };
 
-    attemptsRef.current = [...attemptsRef.current, newAttempt];
-
-    // The focused option is about to be disabled; hand focus to the action
-    // button (now "Next Question" / "Finish Quiz") so Enter keeps working.
     const active = typeof document !== 'undefined' ? document.activeElement : null;
-    if (active && active.getAttribute('role') === 'radio' && quizRootRef.current?.contains(active)) {
-      pendingFocusRef.current = 'action';
+    const focusOnOption = Boolean(
+      active && active.getAttribute('role') === 'radio' && quizRootRef.current?.contains(active)
+    );
+
+    // Answers already on the page (admin preview): check locally.
+    if (typeof question.correctAnswer === 'number') {
+      applyResult(
+        {
+          correct: chosenOriginalIndex === question.correctAnswer,
+          correctAnswer: question.correctAnswer,
+          explanation: question.explanation ?? '',
+        },
+        focusOnOption
+      );
+      return;
     }
-    setIsConfirmed(true);
-  }, [selectedOption, isConfirmed, currentQuestion]);
+
+    // Learner lesson page: the server checks the answer and reveals the result.
+    const focusWasInside = focusIsInside(quizRootRef.current);
+    if (!attemptIdRef.current) attemptIdRef.current = createQuizAttemptId();
+    const seq = ++checkSeqRef.current;
+    setChecking(true);
+    setCheckError(null);
+    checkQuizAnswer({
+      lessonId: checkLessonId,
+      questionId: question.id,
+      answer: chosenOriginalIndex,
+      attemptId: attemptIdRef.current,
+      optionCount: question.options.length,
+    })
+      .catch(() => ({ kind: 'error' as const, status: 0, message: QUIZ_CHECK_OFFLINE_MESSAGE }))
+      .then((outcome) => {
+        if (seq !== checkSeqRef.current) return;
+        setChecking(false);
+        if (outcome.kind === 'error') {
+          setCheckError(outcome.message);
+          return;
+        }
+        const moveFocus = focusWasInside || focusIsInside(quizRootRef.current);
+        if (outcome.kind === 'revealed') {
+          applyResult(outcome.reveal, moveFocus);
+        } else {
+          applyResult({ correct: null, correctAnswer: null, explanation: '' }, moveFocus);
+        }
+      });
+  }, [selectedOption, isConfirmed, checking, currentQuestion, checkLessonId]);
 
   const handleNext = useCallback(() => {
     if (!isConfirmed) return;
@@ -138,7 +234,7 @@ export default function QuizBlock({ block }: BlockProps) {
       if (focusIsInside(quizRootRef.current)) pendingFocusRef.current = 'question';
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
-      setIsConfirmed(false);
+      setAnswerResult(null);
     } else {
       pendingFocusRef.current = 'summary';
       setQuizFinished(true);
@@ -147,9 +243,13 @@ export default function QuizBlock({ block }: BlockProps) {
       if (lessonCtx?.onQuizComplete && attemptsRef.current.length > 0) {
         setSubmitting(true);
         setServerXp(null);
+        setServerScore(null);
         lessonCtx
           .onQuizComplete(attemptsRef.current)
-          .then((result) => setServerXp(readServerXp(result)))
+          .then((result) => {
+            setServerXp(readServerXp(result));
+            setServerScore(readServerScore(result));
+          })
           .catch((err) => console.error('[QuizBlock] Failed to submit quiz:', err))
           .finally(() => setSubmitting(false));
       }
@@ -196,7 +296,7 @@ export default function QuizBlock({ block }: BlockProps) {
     };
 
     // Hotkeys: '1', '2', '3', '4' for options
-    if (!isConfirmed && ['1', '2', '3', '4'].includes(e.key)) {
+    if (!answerLocked && ['1', '2', '3', '4'].includes(e.key)) {
       const idx = parseInt(e.key, 10) - 1;
       if (idx < optionCount) {
         e.preventDefault();
@@ -208,7 +308,7 @@ export default function QuizBlock({ block }: BlockProps) {
     // Hotkey: Arrow keys move through the options
     const isNextKey = e.key === 'ArrowDown' || e.key === 'ArrowRight';
     const isPrevKey = e.key === 'ArrowUp' || e.key === 'ArrowLeft';
-    if (!isConfirmed && (isNextKey || isPrevKey)) {
+    if (!answerLocked && (isNextKey || isPrevKey)) {
       e.preventDefault();
       const from = focusedOptionIndex >= 0 ? focusedOptionIndex : selectedOption;
       const idx =
@@ -231,7 +331,7 @@ export default function QuizBlock({ block }: BlockProps) {
     // Enter on a focused option confirms it once it is the selected one, the
     // way Enter submits a form from a radio button. Space keeps its native
     // behaviour of picking the option.
-    if (e.key === 'Enter' && focusedOptionIndex >= 0 && !isConfirmed) {
+    if (e.key === 'Enter' && focusedOptionIndex >= 0 && !answerLocked) {
       e.preventDefault();
       if (selectedOption === focusedOptionIndex) {
         handleConfirm();
@@ -267,8 +367,11 @@ export default function QuizBlock({ block }: BlockProps) {
 
   // Summary screen
   if (quizFinished) {
-    const percentage = Math.round((correctCount / totalQuestions) * 100);
-    const isPerfect = correctCount === totalQuestions;
+    // The server's score once it answers; the local tally until then (or without a server).
+    const finalCorrect = serverScore?.correctCount ?? correctCount;
+    const finalTotal = serverScore?.totalQuestions ?? totalQuestions;
+    const percentage = Math.round((finalCorrect / finalTotal) * 100);
+    const isPerfect = finalCorrect === finalTotal;
     const isPassed = percentage >= 70;
 
     return (
@@ -302,13 +405,13 @@ export default function QuizBlock({ block }: BlockProps) {
           <p id={summaryScoreId} role="status" className="text-muted-foreground text-sm">
             {isPassed ? (
               <>
-                You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
-                <span className="font-semibold">{totalQuestions}</span> correct answers ({percentage}%).
+                You scored <span className="font-bold text-foreground">{finalCorrect}</span> out of{' '}
+                <span className="font-semibold">{finalTotal}</span> correct answers ({percentage}%).
               </>
             ) : (
               <>
-                Attempted, {percentage}%. You scored <span className="font-bold text-foreground">{correctCount}</span> out of{' '}
-                <span className="font-semibold">{totalQuestions}</span> correct answers. Retake to complete (70% required).
+                Attempted, {percentage}%. You scored <span className="font-bold text-foreground">{finalCorrect}</span> out of{' '}
+                <span className="font-semibold">{finalTotal}</span> correct answers. Retake to complete (70% required).
               </>
             )}
           </p>
@@ -374,14 +477,19 @@ export default function QuizBlock({ block }: BlockProps) {
 
   const optionLetters: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
 
+  const revealedAnswer = answerResult?.correctAnswer ?? null;
   let resultAnnouncement = '';
-  if (isConfirmed && selectedOption !== null) {
-    const answeredCorrectly =
-      currentQuestion.shuffledOptions[selectedOption]?.originalIndex === currentQuestion.correctAnswer;
-    const correctText = currentQuestion.options[currentQuestion.correctAnswer] ?? '';
-    resultAnnouncement = answeredCorrectly
-      ? 'Correct'
-      : `Incorrect. The correct answer is ${correctText}.`;
+  if (answerResult && selectedOption !== null) {
+    if (answerResult.correct === true) {
+      resultAnnouncement = 'Correct';
+    } else if (answerResult.correct === false) {
+      const correctText = revealedAnswer !== null ? currentQuestion.options[revealedAnswer] ?? '' : '';
+      resultAnnouncement = correctText
+        ? `Incorrect. The correct answer is ${correctText}.`
+        : 'Incorrect.';
+    } else {
+      resultAnnouncement = 'Answer saved. Your score will show at the end.';
+    }
   }
 
   return (
@@ -442,14 +550,17 @@ export default function QuizBlock({ block }: BlockProps) {
             const isTabStop = selectedOption === null ? idx === 0 : idx === selectedOption;
             let optionState: 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled' = 'default';
 
-            if (isConfirmed) {
-              if (optionObj.originalIndex === currentQuestion.correctAnswer) {
+            if (isConfirmed && revealedAnswer !== null) {
+              if (optionObj.originalIndex === revealedAnswer) {
                 optionState = 'correct';
               } else if (idx === selectedOption) {
                 optionState = 'incorrect';
               } else {
                 optionState = 'disabled';
               }
+            } else if (isConfirmed) {
+              // Already checked in this attempt: keep the pick visible, reveal nothing.
+              optionState = idx === selectedOption ? 'selected' : 'disabled';
             } else if (idx === selectedOption) {
               optionState = 'selected';
             }
@@ -473,15 +584,34 @@ export default function QuizBlock({ block }: BlockProps) {
 
         {/* Action Button & Explanation */}
         <div className="pt-4 border-t border-border flex flex-col gap-4">
+          {/* A failed check reveals nothing; the learner can try again. */}
+          {checkError && !isConfirmed && (
+            <p role="alert" className="text-sm text-destructive">
+              {checkError}
+            </p>
+          )}
           <div ref={actionRowRef} className="flex justify-end">
             {!isConfirmed ? (
               <Button
-                disabled={selectedOption === null}
+                disabled={selectedOption === null || checking}
+                aria-busy={checking || undefined}
                 onClick={handleConfirm}
                 size="lg"
                 className="w-full sm:w-auto font-bold px-8"
               >
-                Confirm Answer
+                {checking ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Checking...
+                  </>
+                ) : checkError ? (
+                  <>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Try Again
+                  </>
+                ) : (
+                  'Confirm Answer'
+                )}
               </Button>
             ) : (
               <Button onClick={handleNext} disabled={submitting} size="lg" className="w-full sm:w-auto font-bold px-8">
@@ -501,10 +631,18 @@ export default function QuizBlock({ block }: BlockProps) {
           </div>
 
           {/* Explanation panel */}
-          {isConfirmed && currentQuestion.explanation && (
+          {answerResult && answerResult.correct === null && (
+            <div className="p-5 rounded-xl border border-border bg-muted/30 space-y-2 animate-slide-down">
+              <p className="text-sm font-bold text-foreground">Answer saved</p>
+              <p className="text-sm text-foreground/80 leading-relaxed font-sans">
+                This question was already checked in this attempt. Your answer counts toward the score at the end.
+              </p>
+            </div>
+          )}
+          {answerResult && answerResult.correct !== null && answerResult.explanation && (
             <div className="p-5 rounded-xl border border-border bg-muted/30 space-y-2 animate-slide-down">
               <div className="flex items-center gap-2 text-sm font-bold">
-                {currentQuestion.shuffledOptions[selectedOption!]?.originalIndex === currentQuestion.correctAnswer ? (
+                {answerResult.correct ? (
                   <>
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                       <Check className="h-3 w-3" />
@@ -521,7 +659,7 @@ export default function QuizBlock({ block }: BlockProps) {
                 )}
               </div>
               <p className="text-sm text-foreground/80 leading-relaxed font-sans">
-                {currentQuestion.explanation}
+                {answerResult.explanation}
               </p>
             </div>
           )}

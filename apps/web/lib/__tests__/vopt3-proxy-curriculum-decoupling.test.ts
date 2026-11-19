@@ -155,9 +155,9 @@ describe('V-OPT-3: V-OPT-1 proxy exclusions and auth routing are intact', () => 
   it.each(['/api/cron/process-email-queue', '/api/health', '/api/og/portfolio/x', '/api/email/webhooks'])(
     'still excludes %s from the matcher',
     async (path) => {
-      const { config } = await import('../../proxy')
-      const enters = config.matcher.some((p) => new RegExp(`^${p}$`).test(path))
-      expect(enters).toBe(false)
+      const { entersProxy, SIGNED_IN } = await import('./helpers/proxy-matcher')
+      expect(entersProxy(path)).toBe(false)
+      expect(entersProxy(path, SIGNED_IN)).toBe(false)
     }
   )
 

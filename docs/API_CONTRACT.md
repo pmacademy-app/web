@@ -16,12 +16,13 @@ and a version prefix on four routes out of 128.
 
 ### `/api/v2` is not a version boundary
 
-Four routes sit under `/api/v2/`:
+Five routes sit under `/api/v2/`:
 
 ```
 app/api/v2/lessons/[lessonId]/feedback/route.ts
 app/api/v2/lessons/[lessonId]/progress/route.ts
 app/api/v2/lessons/[lessonId]/quiz/route.ts
+app/api/v2/lessons/[lessonId]/quiz/check/route.ts
 app/api/v2/lessons/[lessonId]/theory-read/route.ts
 ```
 
@@ -30,6 +31,10 @@ They are an artifact of a **data** migration, not an API version. Migration
 stable `les_XXXXXX` identifiers; the routes that read the new column were written
 alongside the old slug-based ones and marked `v2` to tell the pair apart during the
 cutover. The cutover finished and the v1 routes were deleted.
+
+`quiz/check` was added later as a sub-resource of the existing quiz route (it reveals one
+quiz answer after the learner commits it, so the lesson payload carries no answers). It
+extends the quiz resource, not the `/v2` prefix as a version.
 
 **There is no `/api/lessons/[slug]/*` any more.** `/v2` is therefore a version of
 nothing — a label that outlived the thing it distinguished.

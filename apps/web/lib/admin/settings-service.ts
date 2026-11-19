@@ -1,3 +1,4 @@
+import { revalidateTag, unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import type {
@@ -172,6 +173,24 @@ function getDefaultSettings<T>(section: SettingsSectionKey): T {
   }
 }
 
+/**
+ * Cache tag of every settings section in the Next data cache (perf plan item 19). A save calls
+ * `revalidateTag(SYSTEM_SETTINGS_TAG, 'max')`, which reaches every server instance.
+ */
+export const SYSTEM_SETTINGS_TAG = 'system_settings'
+
+/** How long a cached section is served before Next re-reads it, in seconds. */
+export const SYSTEM_SETTINGS_REVALIDATE_SECONDS = 60
+
+/**
+ * unstable_cache needs Next's incremental cache. Outside a request, route handler or render (the
+ * proxy may be one such place, and scripts and some test harnesses are) it throws this invariant
+ * before running the function, and the section is then read directly.
+ */
+function isMissingIncrementalCache(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('incrementalCache missing')
+}
+
 /** A settings section could not be read. Not the same as "no record yet", which reads as the defaults. */
 export class SettingsReadError extends Error {
   constructor(public readonly section: SettingsSectionKey) {
@@ -206,51 +225,95 @@ export interface AdminWorkspaceSettings {
 }
 
 export class SettingsService {
-  private static sectionCache = new Map<string, { value: unknown; timestamp: number }>()
-  private static readonly CACHE_TTL_MS = 60_000 // 60 seconds L1 in-memory TTL
-
   /**
-   * Generic fetch for a settings section with in-memory caching.
-   * Returns defaults if no record exists. On a read error it returns defaults too (uncached),
-   * unless `strict`, which throws SettingsReadError.
+   * Short per-instance layer in front of the shared data cache.
+   *
+   * The proxy reads the product settings on every learner request, and the data cache is a network
+   * round trip on a serverless host, so a few seconds in memory still pays for itself. Kept short
+   * because revalidateTag cannot reach another instance's memory: this TTL is how long a save can
+   * take to reach the proxy on other instances. The saving instance clears its own at once.
    */
-  private static async getSettings<T>(section: SettingsSectionKey, { strict = false }: SettingsReadOptions = {}): Promise<T> {
-    const now = Date.now()
-    const cached = this.sectionCache.get(section)
-    if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
-      return cached.value as T
-    }
+  private static sectionCache = new Map<string, { value: unknown; timestamp: number }>()
+  private static readonly MEMORY_TTL_MS = 10_000
 
+  /** Reads one section from the database, merged over its defaults. Throws on a read error. */
+  private static async readSection<T>(section: SettingsSectionKey): Promise<T> {
     const supabase = createServiceRoleClient()
     const key = SETTINGS_KEYS[section]
 
-    try {
-      type DBSelect = {
-        select: (cols: string) => {
-          eq: (col: string, val: string) => {
-            maybeSingle: () => Promise<{ data: { value: unknown } | null; error: { message: string } | null }>
-          }
+    type DBSelect = {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          maybeSingle: () => Promise<{ data: { value: unknown } | null; error: { message: string } | null }>
         }
       }
-      const { data, error } = await (supabase.from('system_settings') as unknown as DBSelect)
-        .select('value')
-        .eq('key', key)
-        .maybeSingle()
+    }
+    const { data, error } = await (supabase.from('system_settings') as unknown as DBSelect)
+      .select('value')
+      .eq('key', key)
+      .maybeSingle()
 
-      if (error) throw new Error(error.message)
+    if (error) throw new Error(error.message)
 
-      let result: T = getDefaultSettings<T>(section)
-      const rawValue = data?.value
-      if (rawValue && typeof rawValue === 'object') {
-        // Merge with defaults to ensure all keys exist
-        result = { ...getDefaultSettings<T>(section), ...(rawValue as T) }
+    const rawValue = data?.value
+    if (rawValue && typeof rawValue === 'object') {
+      // Merge with defaults to ensure all keys exist
+      return { ...getDefaultSettings<T>(section), ...(rawValue as T) }
+    }
+    return getDefaultSettings<T>(section)
+  }
+
+  /**
+   * One section through the shared data cache (tag `system_settings`, 60 seconds), so every
+   * instance sees a save as soon as it is made instead of after its own in-memory TTL.
+   * A failed read throws, and unstable_cache never stores a rejection, so defaults standing in
+   * for an outage are never cached. Values are plain JSON objects, safe for the data cache.
+   */
+  private static async readSectionShared<T>(section: SettingsSectionKey): Promise<T> {
+    try {
+      return await unstable_cache(() => SettingsService.readSection<T>(section), ['system-settings', 'v1', section], {
+        tags: [SYSTEM_SETTINGS_TAG],
+        revalidate: SYSTEM_SETTINGS_REVALIDATE_SECONDS,
+      })()
+    } catch (error) {
+      if (!isMissingIncrementalCache(error)) throw error
+      return SettingsService.readSection<T>(section)
+    }
+  }
+
+  /**
+   * Generic fetch for a settings section.
+   *
+   * Runtime reads go memory (10s) -> shared data cache (tag `system_settings`) -> database, and
+   * get the defaults (uncached) when the read fails.
+   *
+   * `strict` reads (the admin screen and the update functions' read-modify-write) skip both
+   * caches and read the database: right after a save the shared entry is only marked stale, and a
+   * stale read there would show the admin the old values or write them back over the new ones.
+   * A failed strict read throws SettingsReadError.
+   */
+  private static async getSettings<T>(section: SettingsSectionKey, { strict = false }: SettingsReadOptions = {}): Promise<T> {
+    if (strict) {
+      try {
+        return await this.readSection<T>(section)
+      } catch (err) {
+        console.warn(`[SettingsService] getSettings(${section}) failed:`, err)
+        throw new SettingsReadError(section)
       }
+    }
 
+    const now = Date.now()
+    const cached = this.sectionCache.get(section)
+    if (cached && now - cached.timestamp < this.MEMORY_TTL_MS) {
+      return cached.value as T
+    }
+
+    try {
+      const result = await this.readSectionShared<T>(section)
       this.sectionCache.set(section, { value: result, timestamp: now })
       return result
     } catch (err) {
       console.warn(`[SettingsService] getSettings(${section}) failed:`, err)
-      if (strict) throw new SettingsReadError(section)
       return getDefaultSettings<T>(section)
     }
   }
@@ -295,25 +358,20 @@ export class SettingsService {
   }
 
   /**
-   * Manually invalidate settings cache (e.g. after Admin Panel save or in unit tests).
+   * Drops the settings caches after a save (or in unit tests): this instance's in-memory layer at
+   * once, and the shared data-cache entries on every instance through the `system_settings` tag.
+   *
+   * `'max'` marks the entries stale: the next read anywhere still gets the old value once while
+   * the refresh runs, and every read after it the new one. Best-effort: revalidateTag throws
+   * outside a request scope (unit tests, scripts), and a failed purge must never fail a save that
+   * already succeeded. Other instances' in-memory layers expire within MEMORY_TTL_MS.
    */
   public static invalidateCache(): void {
     this.sectionCache.clear()
     try {
-      // Revalidate Next.js Data Cache tag across serverless instances
-      import('next/cache').then(({ revalidateTag }) => {
-        if (typeof revalidateTag === 'function') {
-          try {
-            ;(revalidateTag as (tag: string, profile?: string) => void)('system_settings')
-          } catch {
-            ;(revalidateTag as (tag: string, profile?: string) => void)('system_settings', 'max')
-          }
-        }
-      }).catch(() => {
-        // Non-fatal if next/cache is unavailable in execution runtime
-      })
+      revalidateTag(SYSTEM_SETTINGS_TAG, 'max')
     } catch {
-      // Non-fatal
+      // Non-fatal, see above.
     }
   }
 

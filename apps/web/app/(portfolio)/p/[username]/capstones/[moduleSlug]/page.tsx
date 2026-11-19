@@ -13,7 +13,7 @@ import { CapstoneShare } from '@/components/portfolio/CapstoneShare'
 /**
  * One public capstone as its own shareable page (Growth R5 / B13a).
  *
- * Reads the same request-deduped public portfolio data as /p/[username], so it inherits every
+ * Reads the same render-deduped public portfolio data as /p/[username], so it inherits every
  * privacy rule there and shows nothing the portfolio does not. Any miss (unknown or private
  * portfolio, unknown slug, opted-out or unsubmitted capstone) is the same 404.
  */
@@ -23,6 +23,18 @@ interface PageProps {
 }
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
+
+/**
+ * Cached per path (ISR, perf plan item 13), on the same terms as /p/[username]: the render
+ * reads no cookies or headers and is the same for every viewer. A miss (the 404) is cached
+ * too; every write that can publish, unpublish or hide a capstone purges these paths for
+ * every capstone slug (lib/portfolio-revalidate.ts).
+ */
+export const revalidate = 3600
+export const dynamicParams = true
+export async function generateStaticParams(): Promise<Array<{ username: string; moduleSlug: string }>> {
+  return []
+}
 
 async function load(params: PageProps['params']) {
   const { username, moduleSlug } = await params

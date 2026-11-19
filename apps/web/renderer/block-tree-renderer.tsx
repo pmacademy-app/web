@@ -1,8 +1,12 @@
-'use client';
+// Client block tree used by the admin lesson preview. No 'use client' directive: its only
+// importer (components/admin/AdminLessonPreview.tsx) is already a client module. Learner
+// lesson pages use renderer/block-tree-server.tsx instead, so this registry (and the
+// markdown blocks it pulls in) stays out of their browser bundle.
 
 import React from 'react';
 import { useBlockComponent } from './registry';
 import '@/blocks/index';
+import { BlockErrorBoundary } from './block-error-boundary';
 
 interface Block {
   blockId: string;
@@ -18,55 +22,12 @@ interface BlockTreeRendererProps {
   previewMode?: boolean;
 }
 
-class BlockErrorBoundary extends React.Component<{
-  block: Block;
-  lessonId: string;
-  children: React.ReactNode;
-}, { hasError: boolean; error: Error | null }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(
-      `[BlockTreeRenderer] Error in block ${this.props.block.blockId} (type: ${this.props.block.type}) in lesson ${this.props.lessonId}:`,
-      error,
-      errorInfo
-    );
-  }
-
-  render() {
-    if (this.state.hasError) {
-      // Never surface raw Mermaid source to the browser, even on render failure.
-      if (this.props.block.type === 'mermaid') {
-        return (
-          <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl my-6">
-            <p className="text-xs font-semibold text-destructive mb-2">This diagram couldn&apos;t be rendered, skip to the next section.</p>
-          </div>
-        );
-      }
-      return (
-        <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl text-center text-xs text-destructive my-4">
-          This content section couldn&apos;t load, skip to the next one.
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export const BlockTreeRenderer = React.memo(function BlockTreeRenderer({ blocks, lessonId, previewMode }: BlockTreeRendererProps) {
   if (!blocks || !Array.isArray(blocks)) return null;
   return (
     <>
       {blocks.map((block) => (
-        <BlockErrorBoundary key={block.blockId} block={block} lessonId={lessonId}>
+        <BlockErrorBoundary key={block.blockId} blockId={block.blockId} blockType={block.type} lessonId={lessonId}>
           <BlockRenderer block={block} lessonId={lessonId} previewMode={previewMode} />
         </BlockErrorBoundary>
       ))}

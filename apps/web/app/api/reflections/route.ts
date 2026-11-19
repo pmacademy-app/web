@@ -14,6 +14,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { recordReflectionAction } from '@/lib/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 const reflectionPostSchema = z.object({
@@ -63,6 +64,9 @@ export const GET = withRoute(
   }
 )
 
+/** Lesson id prefix of a capstone reflection, the only kind the public portfolio shows. */
+const CAPSTONE_REFLECTION_PREFIX = 'capstone-'
+
 export const POST = withRoute(
   {
     actor: { allow: ['learner'] },
@@ -105,6 +109,14 @@ export const POST = withRoute(
       content,
       is_public
     )
+
+    // Only capstone reflections (`capstone-<slug>`) appear on the cached public portfolio, so
+    // only they purge it, public or not: a reflection made private must leave the page too.
+    if (lesson_id.startsWith(CAPSTONE_REFLECTION_PREFIX)) {
+      await revalidatePublicPortfolioForUser(serviceSupabase, requireUserId(actor), [
+        lesson_id.slice(CAPSTONE_REFLECTION_PREFIX.length),
+      ])
+    }
 
     return Response.json(result)
   }

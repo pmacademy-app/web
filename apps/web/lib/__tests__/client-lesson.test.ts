@@ -106,11 +106,70 @@ describe('toClientLesson', () => {
     }
   })
 
-  it('keeps quiz, flashcard, reflection and other block data intact', () => {
+  it('sends quiz questions without correctAnswer or explanation, keeping text, options and ids', () => {
+    const client = toClientLesson(makeLesson())
+    const quiz = client.blocks.find((b) => b.type === 'quiz')!
+    expect(quiz.blockId).toBe('b-3')
+    expect(quiz.id).toBe('quiz-1')
+    expect(quiz.questions).toEqual([
+      {
+        id: 'q1',
+        question: 'What?',
+        options: ['A', 'B', 'C', 'D'],
+        objectivesTested: [0],
+        difficulty: 'easy',
+      },
+    ])
+    const serialized = JSON.stringify(client)
+    expect(serialized).not.toContain('correctAnswer')
+    expect(serialized).not.toContain('explanation')
+    expect(serialized).not.toContain('Because C.')
+  })
+
+  it('drops any unknown question key (allowlist), including per-option answer flags', () => {
+    const lesson = makeLesson()
+    const quiz = lesson.blocks.find((b) => b.type === 'quiz')!
+    quiz.questions = [
+      {
+        ...quiz.questions![0],
+        hint: 'It is C',
+        correctOption: 'C',
+        isCorrect: [false, false, true, false],
+      } as unknown as NonNullable<typeof quiz.questions>[number],
+    ]
+    const question = toClientLesson(lesson).blocks.find((b) => b.type === 'quiz')!.questions![0]
+    expect(Object.keys(question).sort()).toEqual(
+      ['difficulty', 'id', 'objectivesTested', 'options', 'question'].sort()
+    )
+  })
+
+  it('strips quiz answers from a nested quiz block and from every compiled lesson', () => {
+    const lesson = makeLesson()
+    const quiz = lesson.blocks.find((b) => b.type === 'quiz')!
+    lesson.blocks.push({ blockId: 'b-7', type: 'section', children: [quiz] } as CompiledBlock)
+    expect(JSON.stringify(toClientLesson(lesson))).not.toContain('correctAnswer')
+
+    const distDir = path.resolve(__dirname, '../../../../content/dist/lessons')
+    const files = fs.readdirSync(distDir).filter((f) => f.endsWith('.json'))
+    expect(files.length).toBeGreaterThan(0)
+    for (const file of files) {
+      const compiled = JSON.parse(fs.readFileSync(path.join(distDir, file), 'utf-8')) as CompiledLesson
+      const client = toClientLesson(compiled)
+      const quizBlock = client.blocks.find((b) => b.type === 'quiz')
+      expect(quizBlock?.questions?.length, file).toBeGreaterThan(0)
+      for (const q of quizBlock?.questions ?? []) {
+        expect(q, file).not.toHaveProperty('correctAnswer')
+        expect(q, file).not.toHaveProperty('explanation')
+        expect(q.options.length, file).toBeGreaterThan(1)
+      }
+      expect(JSON.stringify(client).includes('"correctAnswer"'), file).toBe(false)
+    }
+  })
+
+  it('keeps flashcard, reflection and other block data intact', () => {
     const lesson = makeLesson()
     const client = toClientLesson(lesson)
     const byType = (t: string) => client.blocks.find((b) => b.type === t)
-    expect(byType('quiz')).toEqual(lesson.blocks.find((b) => b.type === 'quiz'))
     expect(byType('flashcardDeck')).toEqual(lesson.blocks.find((b) => b.type === 'flashcardDeck'))
     expect(byType('reflection')).toEqual(lesson.blocks.find((b) => b.type === 'reflection'))
     expect(byType('resources')?.source).toBe('Book title')

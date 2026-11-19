@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { revalidateCapstoneOgCards, revalidatePortfolioOgCard } from '@/lib/og/revalidate-capstone-cards'
+import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
@@ -46,16 +48,17 @@ export const POST = withRoute(
       const body = await request.json()
       const result = await updatePortfolioSettings(supabase, userId, body)
 
-      if (result.settings.username) {
-        revalidatePath(`/p/${result.settings.username}`)
-      }
-      // Cards are cached per handle. On a username change the old handle's cards would otherwise
-      // keep the learner's name and capstone titles until they expire, so purge both.
+      // The public pages and cards are cached per handle. On a username change the old handle's
+      // pages and cards would otherwise keep the learner's name and capstones until they expire,
+      // and a visibility change must take effect on the next request, so purge both handles.
       for (const handle of new Set([result.previousUsername, result.settings.username])) {
         if (!handle) continue
+        revalidatePublicPortfolio(handle)
         revalidatePortfolioOgCard(handle)
         revalidateCapstoneOgCards(handle)
       }
+      // The weekly leaderboard shows the name, username and avatar saved here.
+      invalidateLeaderboardCache()
       revalidatePath('/settings')
 
       return NextResponse.json({ success: true, settings: result.settings })

@@ -21,6 +21,7 @@ const h = vi.hoisted(() => ({
   deleteUser: vi.fn(),
   deleteFresh: vi.fn(),
   rateLimit: vi.fn(),
+  updateUserById: vi.fn(),
 }))
 
 vi.mock('@/lib/auth', () => ({
@@ -33,7 +34,14 @@ vi.mock('@/lib/admin/guard', () => ({ requireAdminUser: vi.fn() }))
 
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: () => ({
-    auth: { admin: { getUserById: h.getUserById, signOut: h.adminSignOut, deleteUser: h.deleteUser } },
+    auth: {
+      admin: {
+        getUserById: h.getUserById,
+        signOut: h.adminSignOut,
+        deleteUser: h.deleteUser,
+        updateUserById: h.updateUserById,
+      },
+    },
     from: () => ({
       update: (payload: Record<string, unknown>) => ({
         eq: (eqCol: string, eqVal: string) => ({
@@ -105,6 +113,7 @@ describe('POST /api/auth/complete-consent', () => {
     h.deleteFresh.mockResolvedValue({ deleted: true })
     h.ensureUserProfile.mockResolvedValue({ id: 'usr_g1' })
     h.rateLimit.mockResolvedValue({ success: true, remaining: 9, resetInMs: 0 })
+    h.updateUserById.mockResolvedValue({ data: { user: AUTH_USER }, error: null })
   })
 
   it('anonymous caller -> 401, nothing written', async () => {
@@ -267,5 +276,38 @@ describe('POST /api/auth/complete-consent', () => {
     )
     expect(source).not.toMatch(/\.deleteUser\s*\(/)
     expect(source).toContain('deleteFreshGoogleUserIfSafe')
+  })
+  // Perf plan item 16: the signed claim lets the proxy skip its per-request profile read.
+  it('accept sets app_metadata.terms_accepted for the caller via the admin API', async () => {
+    const res = await POST(consentRequest({ decision: 'accept' }))
+    expect(res.status).toBe(200)
+    expect(h.updateUserById).toHaveBeenCalledTimes(1)
+    expect(h.updateUserById).toHaveBeenCalledWith('usr_g1', { app_metadata: { terms_accepted: true } })
+  })
+
+  it('accept on an already-consented account still sets the claim (idempotent)', async () => {
+    h.updateResult.mockResolvedValue({ data: [], error: null })
+    const res = await POST(consentRequest({ decision: 'accept' }))
+    expect(res.status).toBe(200)
+    expect(h.updateUserById).toHaveBeenCalledWith('usr_g1', { app_metadata: { terms_accepted: true } })
+  })
+
+  it('accept still succeeds when the claim update fails or throws', async () => {
+    h.updateUserById.mockResolvedValueOnce({ data: null, error: { message: 'boom' } })
+    expect((await POST(consentRequest({ decision: 'accept' }))).status).toBe(200)
+    h.updateUserById.mockRejectedValueOnce(new Error('network'))
+    expect((await POST(consentRequest({ decision: 'accept' }))).status).toBe(200)
+  })
+
+  it('accept does not set the claim when the consent write fails', async () => {
+    h.updateResult.mockResolvedValue({ data: null, error: { message: 'db down' } })
+    const res = await POST(consentRequest({ decision: 'accept' }))
+    expect(res.status).toBe(500)
+    expect(h.updateUserById).not.toHaveBeenCalled()
+  })
+
+  it('decline never sets the claim', async () => {
+    await POST(consentRequest({ decision: 'decline' }))
+    expect(h.updateUserById).not.toHaveBeenCalled()
   })
 })

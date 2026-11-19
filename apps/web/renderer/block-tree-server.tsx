@@ -7,7 +7,15 @@ import ConnectionsBlock from '@/blocks/connections/ConnectionsBlock';
 import GlossaryBlock from '@/blocks/glossary/GlossaryBlock';
 import QuizBlock from '@/blocks/quiz/QuizBlock';
 import FlashcardDeckBlock from '@/blocks/flashcards/FlashcardDeckBlock';
+import { BlockErrorBoundary } from './block-error-boundary';
 
+/**
+ * Server Component block tree. Renders lesson blocks to HTML on the server: markdown is
+ * parsed and sanitized here (MarkdownRenderer: marked + DOMPurify), so neither library is
+ * shipped to the browser. Interactive pieces (InlineConceptCheck, quiz, flashcards) stay
+ * client components inside this tree. Each block is wrapped in a client error boundary that
+ * receives only primitives, so a failing block degrades alone without serializing block data.
+ */
 interface BlockTreeServerProps {
   blocks: CompiledBlock[];
   lessonId: string;
@@ -84,12 +92,14 @@ export function BlockTreeServerRenderer({ blocks, lessonId, previewMode }: Block
   return (
     <>
       {blocks.map((block) => (
-        <ServerBlockRenderer
+        <BlockErrorBoundary
           key={block.blockId}
-          block={block}
+          blockId={block.blockId}
+          blockType={block.type}
           lessonId={lessonId}
-          previewMode={previewMode}
-        />
+        >
+          <ServerBlockRenderer block={block} lessonId={lessonId} previewMode={previewMode} />
+        </BlockErrorBoundary>
       ))}
     </>
   );

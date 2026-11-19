@@ -21,13 +21,20 @@ import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { resolveLessonAccessForUser } from '@/lib/lessons-completion-service'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { getRecutVariant } from '@/lib/academy/experiment'
-import { withSampledQuiz } from '@/lib/academy/lesson-structure'
+import {
+  getDeepDiveBlocks,
+  getCoreReadingMinutes,
+  getDeepDiveReadingMinutes,
+  withSampledQuiz,
+} from '@/lib/academy/lesson-structure'
 import { toClientLesson } from '@/lib/academy/client-lesson'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
+import { BlockTreeServerRenderer } from '@/renderer/block-tree-server'
 import LessonPageContent from './lesson-content'
+import { getBlocksForTab, withInteractiveBlocksOnly } from './lesson-tabs'
 
 interface PageProps {
   params: Promise<{ moduleSlug: string; lessonId: string }>
@@ -293,10 +300,25 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   //    the full 15-question pool stays on disk and the quiz route still validates every
   //    submitted answer against it. Sample lessons (no user) stay control / full pool.
   const recutVariant = getRecutVariant(user?.id ?? null)
-  const renderedLesson =
+  const sampledLesson =
     recutVariant === 'treatment'
       ? withSampledQuiz(lesson, `${user?.id ?? 'anon'}:${lessonId}`)
       : lesson
+
+  // Performance plan item 12: the Theory tab (and the treatment Deep-dive) is rendered here on
+  // the server. Markdown is parsed and sanitized server-side (MarkdownRenderer), so marked and
+  // DOMPurify never reach the browser, and the prose blocks are not serialized as props. The
+  // client shell receives the rendered nodes as slots and keeps tabs, progress and tracking.
+  const theoryBlocks = getBlocksForTab(lesson.blocks, 'theory', recutVariant)
+  const deepDiveBlocks = recutVariant === 'treatment' ? getDeepDiveBlocks(lesson.blocks) : []
+  const theory = <BlockTreeServerRenderer blocks={theoryBlocks} lessonId={lesson.id} />
+  const deepDive =
+    deepDiveBlocks.length > 0 ? (
+      <BlockTreeServerRenderer blocks={deepDiveBlocks} lessonId={lesson.id} />
+    ) : null
+
+  // The client only needs the blocks its interactive tabs read (quiz, flashcards, reflection).
+  const renderedLesson = withInteractiveBlocksOnly(sampledLesson)
   // Performance plan item 1: drop server-only fields (Mermaid source, duplicate staticSvg,
   // search text, source path) so they are not serialized into the client payload.
   const clientLesson = toClientLesson(renderedLesson)
@@ -353,6 +375,10 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         moduleName={position.moduleTitle}
         initialProgress={initialProgress}
         recutVariant={recutVariant}
+        theory={theory}
+        deepDive={deepDive}
+        coreReadingMinutes={getCoreReadingMinutes(lesson)}
+        deepDiveReadingMinutes={getDeepDiveReadingMinutes(lesson)}
       />
     </>
   )

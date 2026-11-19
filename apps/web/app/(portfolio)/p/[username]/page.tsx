@@ -1,12 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase'
-import {
-  getDedupedPublicPortfolioData,
-  incrementPortfolioViewCount,
-  DEFAULT_PORTFOLIO_LAYOUT,
-} from '@/lib/portfolio-db'
+import { getDedupedPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
 import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { portfolioOgCardPath } from '@/lib/og/card-paths'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
@@ -15,6 +10,7 @@ import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
 import { PortfolioCapstones } from '@/components/portfolio/PortfolioCapstones'
 import { PortfolioAchievements } from '@/components/portfolio/PortfolioAchievements'
 import { FeaturedCapstoneCard } from '@/components/portfolio/FeaturedCapstoneCard'
+import { PortfolioViewBeacon } from '@/components/portfolio/PortfolioViewBeacon'
 import { Lock, ArrowLeft } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 
@@ -25,6 +21,29 @@ interface PageProps {
 }
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
+
+/**
+ * Cached per username (ISR, perf plan item 13), like /verify/[certificateId].
+ *
+ * The render is the same for every viewer: it reads no cookies, headers or search params,
+ * and nothing in it depends on who is looking. The view counter, the one per-visit part,
+ * runs from a client beacon (PortfolioViewBeacon) instead of during render.
+ *
+ * Privacy: a private or unknown portfolio renders the "unavailable" state and that is
+ * cached too. Every write that changes what this page shows purges its exact path through
+ * lib/portfolio-revalidate.ts (visibility and profile saves, username changes old and new,
+ * capstone submit and review, capstone reflections, account deletion), so going private
+ * takes effect on the next request. The hour only bounds drift in numbers no write purges
+ * for, such as XP, streak and lesson progress.
+ *
+ * `generateStaticParams` returning [] with `dynamicParams` prerenders nothing at build and
+ * caches each portfolio on its first request.
+ */
+export const revalidate = 3600
+export const dynamicParams = true
+export async function generateStaticParams(): Promise<Array<{ username: string }>> {
+  return []
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
@@ -94,17 +113,6 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
     redirect(`/p/${username.toLowerCase()}`)
   }
   const portfolio = await getDedupedPublicPortfolioData(username.toLowerCase())
-
-  // Counted here and ONLY here. It used to live inside the data fetch, which both
-  // `generateMetadata()` and this component call — so every view was counted twice.
-  // Keeping it on the request path (rather than inside the cached read) is what lets
-  // the expensive query be cached without turning the counter into a cache-miss
-  // counter. `incrementPortfolioViewCount` re-checks `is_portfolio_public` itself and
-  // never throws.
-  if (portfolio) {
-    const supabase = createServiceRoleClient()
-    void incrementPortfolioViewCount(supabase, portfolio.user.id).catch(() => {})
-  }
 
   // Private or non-existent profile state
   if (!portfolio) {
@@ -180,6 +188,8 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(profilePageJsonLd) }}
       />
+
+      <PortfolioViewBeacon username={user.username} />
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Portfolio Hero */}

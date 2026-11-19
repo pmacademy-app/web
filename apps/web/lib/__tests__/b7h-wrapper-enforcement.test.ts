@@ -205,9 +205,13 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // routes in PR #79, which kept the count at 133.)
   // 132 since the post-Phase 3 cleanup removed `waitlist/route.ts` (it was on `withRoute`).
   // 134 since AG-29 added `settings/goal/route.ts` (learner weekly goals, on `withRoute`).
-  it('accounts for all 134 routes', () => {
-    expect(files).toHaveLength(134)
-    expect(migrated).toHaveLength(131)
+  // 135 since the quiz answer fix added `v2/lessons/[lessonId]/quiz/check/route.ts` (checks one
+  // answer and reveals it after the learner commits, on `withRoute`).
+  // 136 since perf plan item 13 added `portfolio/[username]/view/route.ts` (the public portfolio
+  // view beacon, moved out of the cached page render, on `withRoute`).
+  it('accounts for all 136 routes', () => {
+    expect(files).toHaveLength(136)
+    expect(migrated).toHaveLength(133)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
