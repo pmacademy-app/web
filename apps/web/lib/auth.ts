@@ -303,8 +303,8 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
     if (user) return user
   }
 
-  // CQ-10: no token refresh here. The proxy owns refresh and cookie writes (for pages, learner
-  // APIs and /api/admin/*; /api/auth/* manages its own session): when it refreshes
+  // CQ-10: no token refresh here. The proxy owns refresh and cookie writes (for pages and
+  // learner APIs; /api/auth/* manages its own session): when it refreshes
   // a request it sets the new pair on the response, and Next merges those cookies into
   // cookies() for this same request. The raw request still carries the token the browser
   // sent, so if that one was rejected, retry once with the proxy-refreshed token.

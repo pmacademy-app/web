@@ -40,7 +40,6 @@ vi.mock('@/lib/api/with-route', () => ({
 }))
 vi.mock('@/lib/api/actor', () => ({
   requireUserId: () => 'u1',
-  requireAdmin: () => ({ userId: 'admin-1', email: 'admin@prodily.app' }),
 }))
 vi.mock('@/lib/capstones-db', () => ({ submitCapstoneAction: mocks.submitCapstoneAction }))
 vi.mock('@/lib/xp-service', () => ({ hasXpEvent: vi.fn(async () => false) }))
@@ -49,7 +48,6 @@ vi.mock('@/lib/events/product-events', () => ({ trackProductEvent: vi.fn() }))
 vi.mock('@/lib/lessons-db', () => ({ recordReflectionAction: mocks.recordReflectionAction }))
 vi.mock('@/lib/settings/destructive-reauth', () => ({ verifyDestructiveReauth: mocks.verifyDestructiveReauth }))
 vi.mock('@/lib/settings/settings-service', () => ({ deleteAccount: mocks.deleteAccount, resetProgress: vi.fn() }))
-vi.mock('@/lib/admin/guard', () => ({ logAdminAction: vi.fn() }))
 vi.mock('@/lib/monitoring/logger', () => ({ logSystemError: vi.fn(), logErrorReport: vi.fn() }))
 
 type Op = [string, unknown[]]
@@ -423,27 +421,5 @@ describe('writes purge the cached public pages', () => {
     expect(fake.client.auth.admin.deleteUser).toHaveBeenCalledWith('u1')
     expect(purged()).toEqual(expect.arrayContaining(allPagesOf('ada')))
     expect(mocks.revalidateTag).toHaveBeenCalledWith('leaderboard', { expire: 0 })
-  })
-
-  it('admin account deletion: purges the learner pages and expires the leaderboard', async () => {
-    const fake = fakeClient({ users: { data: { id: 'u2', email: 'x@y.z', is_admin: false, username: 'bob' } } })
-    mocks.client = fake.client
-    mocks.deleteAccount.mockResolvedValue(undefined)
-    const { DELETE } = await import('../../app/api/admin/users/[id]/route')
-    const handler = DELETE as unknown as (ctx: { actor: unknown; params: Record<string, string> }) => Promise<Response>
-
-    const res = await handler({ actor: { kind: 'admin', userId: 'admin-1', email: 'a@b.c' }, params: { id: 'u2' } })
-
-    expect(res.status).toBe(200)
-    const lookup = fake.log.find((q) => q.table === 'users')!
-    expect(String(lookup.ops.find(([op]) => op === 'select')![1][0])).toContain('username')
-    expect(purged()).toEqual(expect.arrayContaining(allPagesOf('bob')))
-    expect(mocks.revalidateTag).toHaveBeenCalledWith('leaderboard', { expire: 0 })
-  })
-
-  it('capstone review (publish or unpublish): purges the portfolio and that capstone page', () => {
-    const src = readFileSync(new URL('../admin/moderation-service.ts', import.meta.url), 'utf-8')
-    const review = src.slice(src.indexOf('public static async reviewCapstone'))
-    expect(review).toContain('revalidatePublicPortfolio(owner.username, [current.module_slug])')
   })
 })

@@ -7,7 +7,7 @@
  * rewrites `*` to `%` in like/ilike values and a backslash does not stop that, so
  * `*` becomes a space, which no username, email or certificate code contains.
  *
- * Same rules as `escapeIlikeTerm` in `lib/admin/search-filter.ts`, which builds the
+ * Same rules as `escapeIlikeTerm` in `lib/db/search-filter.ts`, which builds the
  * quoted `.or()` substring filters for admin search.
  */
 export function escapeLike(value: string): string {

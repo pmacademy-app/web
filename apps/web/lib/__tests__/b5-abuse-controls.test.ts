@@ -18,7 +18,7 @@ const mockSettings = {
   }),
 }
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     isEmailVerificationRequired: () => mockSettings.isEmailVerificationRequired(),
     getProductSettings: () => mockSettings.getProductSettings(),

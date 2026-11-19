@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 
+import { adminSiteUrlFor } from '@/lib/admin-site'
 import { sanitizeErrorMessage as redactText, sanitizeStructuredPayload } from './redaction'
 import {
   categoryForReport,
@@ -275,7 +276,9 @@ async function notifyAdminsOnce(
           category: 'security',
           title,
           body,
-          actionUrl: '/admin/system',
+          // The console lives on its own host. The relative fallback still works there
+          // (and the learner proxy 308s /admin/* to ADMIN_SITE_URL once it is set).
+          actionUrl: adminSiteUrlFor('/admin/system') ?? '/admin/system',
         }).catch(() => {})
       )
     )

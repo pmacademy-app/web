@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
-import { resolveFilteredUserIds } from '../admin/user-filter-query'
+import { resolveFilteredUserIds } from '../broadcasts/user-filter-query'
 
 /**
  * Verifies the new `userIds` filter (Individual audience mode for email

@@ -86,7 +86,9 @@ describe('ENG-12 / AG-32: Lighter Lesson Pages & CI Build Reuse', () => {
       expect(clientCount).toBeLessThan(208)
       // 195: components/layout/lazy-modals.tsx is one small client boundary that keeps about
       // 2,000 lines of modal code out of every app page until a modal opens (perf plan item 5).
-      expect(clientCount).toBeLessThanOrEqual(195)
+      // 105: the admin console (about 90 client components under components/admin and
+      // app/admin) moved to its own repository, so the learner app's cap drops with it.
+      expect(clientCount).toBeLessThanOrEqual(105)
     })
   })
 

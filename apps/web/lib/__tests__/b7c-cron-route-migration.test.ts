@@ -2,12 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 
-const requireAdminUser = vi.fn()
+const getAuthenticatedUserFromRequest = vi.fn()
 const logSystemError = vi.fn()
 
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: (req: Request) => requireAdminUser(req),
-  logAdminAction: vi.fn(),
+// A signed-in session (admin or not) must never authorize a cron route: the admin
+// console calls these from its server with the cron secret.
+vi.mock('@/lib/auth', () => ({
+  getAuthenticatedUserFromRequest: (req: Request) => getAuthenticatedUserFromRequest(req),
 }))
 
 vi.mock('@/lib/monitoring/logger', () => ({
@@ -20,11 +21,11 @@ vi.mock('@/lib/notifications/queue/processor', () => ({
   enqueueNotificationItem: vi.fn(async () => ({ success: true })),
 }))
 
-vi.mock('@/lib/admin/broadcast-service', () => ({
+vi.mock('@/lib/broadcasts/broadcast-service', () => ({
   BroadcastService: { processScheduledBroadcasts: vi.fn(async () => ({ processed: 1, errors: 0 })) },
 }))
 
-vi.mock('@/lib/admin/in-app-manager-service', () => ({
+vi.mock('@/lib/broadcasts/in-app-manager-service', () => ({
   InAppManagerService: { processScheduledInAppBroadcasts: vi.fn(async () => ({ processed: 2, errors: 0 })) },
 }))
 
@@ -67,11 +68,7 @@ function schedulerRequest(url: string, secret = CRON_SECRET): Request {
 }
 
 beforeEach(() => {
-  requireAdminUser.mockReset().mockResolvedValue({
-    authorized: false,
-    error: 'Authentication required',
-    statusCode: 401,
-  })
+  getAuthenticatedUserFromRequest.mockReset().mockResolvedValue(null)
   logSystemError.mockReset().mockResolvedValue(undefined)
   process.env.CRON_SECRET = CRON_SECRET
 })
@@ -108,20 +105,16 @@ describe('B7-C — a wrong secret is rejected', () => {
   }
 })
 
-describe('B7-C — an admin session is still accepted', () => {
+describe('B7-C: a session never authorizes a cron route', () => {
   for (const route of ROUTES) {
-    it(`${route.name} accepts an authenticated admin with no cron secret configured`, async () => {
+    it(`${route.name} refuses a signed-in admin session with no cron secret`, async () => {
       delete process.env.CRON_SECRET
-      requireAdminUser.mockResolvedValue({
-        authorized: true,
-        userId: 'admin_123',
-        email: 'admin@prodily.app',
-      })
+      getAuthenticatedUserFromRequest.mockResolvedValue({ id: 'admin_123', email: 'admin@prodily.app' })
 
       const res = await route.handler(new Request(route.url, { method: 'POST' }))
 
-      expect(res.status).toBe(200)
-      expect((await res.json()).success).toBe(true)
+      expect(res.status).toBe(401)
+      expect(getAuthenticatedUserFromRequest).not.toHaveBeenCalled()
     })
   }
 })
@@ -138,30 +131,21 @@ describe('B7-C — authorization was not widened', () => {
   }
 
   for (const route of ROUTES) {
-    it(`${route.name} rejects an authenticated non-admin with 403`, async () => {
-      requireAdminUser.mockResolvedValue({
-        authorized: false,
-        error: 'Access denied: Admin privileges required',
-        statusCode: 403,
-      })
+    it(`${route.name} rejects a signed-in learner with a wrong secret with 401`, async () => {
+      getAuthenticatedUserFromRequest.mockResolvedValue({ id: 'user_1', email: 'learner@prodily.app' })
 
       const res = await route.handler(schedulerRequest(route.url, 'wrong'))
 
-      expect(res.status).toBe(403)
-      expect((await res.json()).code).toBe('FORBIDDEN')
+      expect(res.status).toBe(401)
+      expect((await res.json()).code).toBe('UNAUTHORIZED')
     })
   }
 
   it('no cron route leaks the internal denial reason', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
 
     for (const route of ROUTES) {
       const res = await route.handler(schedulerRequest(route.url, 'wrong'))
-      expect(JSON.stringify(await res.json())).not.toContain('Admin privileges required')
+      expect(JSON.stringify(await res.json())).not.toContain('no allowed actor kind matched')
     }
   })
 })

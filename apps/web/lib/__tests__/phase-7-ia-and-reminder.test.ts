@@ -33,12 +33,6 @@ describe('Phase 7 (7.4) — route consolidation', () => {
 })
 
 describe('Phase 7 (7.4) — reminder due count is real, not hardcoded', () => {
-  it('the admin run-now reminder path uses the SRS due count and no longer hardcodes dueCount: 5', () => {
-    const src = read('app/api/admin/emails/automations/run-now/route.ts')
-    expect(src).toContain('getDueCardsCount')
-    expect(src).not.toMatch(/dueCount:\s*5/)
-  })
-
   it('the cron daily-reminder path uses the SRS due count and suppresses at zero', () => {
     const src = read('app/api/cron/daily-reminder/route.ts')
     expect(src).toContain('getDueCardsCounts')

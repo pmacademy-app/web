@@ -29,7 +29,7 @@ const forceQuerySchema = z.object({
  */
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.lifecycle',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/lifecycle',
@@ -40,7 +40,7 @@ export const POST = withRoute(
         severity: 'warning',
         category: 'cron',
         operation: 'cron_lifecycle_auth',
-        message: 'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/lifecycle',
+        message: 'Unauthorized cron request: CRON_SECRET required on /api/cron/lifecycle',
       })
     },
   },

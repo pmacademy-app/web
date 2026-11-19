@@ -84,25 +84,6 @@ describe('R4-A0 privileged user column guard', () => {
   })
 })
 
-describe('R4-A0 assumption: only the service role writes privileged columns', () => {
-  const webRoot = path.resolve(__dirname, '../..')
-  const service = read(webRoot, 'lib/admin/service.ts')
-
-  it.each([
-    ['toggleUserAdminRole', 'is_admin'],
-    ['toggleUserFellowStatus', 'is_fellow'],
-  ])('%s writes %s through createServiceRoleClient', (method, column) => {
-    const start = service.indexOf(`public static async ${method}(`)
-    expect(start).toBeGreaterThan(-1)
-    const body = service.slice(start, service.indexOf('public static async', start + 1))
-    expect(body).toContain('createServiceRoleClient()')
-    expect(body).toContain(`${column}:`)
-  })
-
-  it('writes portfolio_verification_override through createServiceRoleClient', () => {
-    const at = service.indexOf('.update({ portfolio_verification_override')
-    expect(at).toBeGreaterThan(-1)
-    const methodStart = service.lastIndexOf('public static async', at)
-    expect(service.slice(methodStart, at)).toContain('createServiceRoleClient()')
-  })
-})
+// The service-role writers of is_admin, is_fellow and portfolio_verification_override
+// (toggleUserAdminRole, toggleUserFellowStatus, the verification toggle) moved to the
+// admin console repository with the console; their source assertions moved with them.

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
 import { getAuthenticatedUserFromRequest } from '../auth'
@@ -52,17 +52,50 @@ vi.mock('@supabase/supabase-js', () => {
 })
 
 describe('Phase 2 Middleware & Auth Security Test Suite', () => {
-  it('1. Privilege Escalation Guard (FIND-01): Reject spoofed user_metadata.is_admin', async () => {
-    const req = new NextRequest('https://prodily.app/admin', {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('1. Privilege Escalation Guard (FIND-01): spoofed user_metadata.is_admin is not an admin', async () => {
+    // The client-writable user_metadata claim is ignored: the learner login routes this
+    // user to the learner dashboard like everyone else.
+    const req = new NextRequest('https://prodily.app/login', {
       headers: {
         cookie: 'sb-access-token=mock-user-token',
       },
     })
 
     const res = await proxy(req)
-    expect(res).toBeDefined()
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/admin/access-denied')
+    expect(res.headers.get('location')).toBe('https://prodily.app/dashboard')
+  })
+
+  it('1b. Admin console moved: /admin passes through to a 404 when ADMIN_SITE_URL is unset', async () => {
+    vi.stubEnv('ADMIN_SITE_URL', '')
+    for (const path of ['/admin', '/admin/users', '/admin/login']) {
+      const res = await proxy(new NextRequest(`https://prodily.app${path}`, { headers: { cookie: 'sb-access-token=mock-user-token' } }))
+      // NextResponse.next(): no redirect to any login, and no route answers here, so Next 404s.
+      expect(res.status, path).toBe(200)
+      expect(res.headers.get('location'), path).toBeNull()
+      expect(res.headers.get('x-request-id'), path).toBeTruthy()
+    }
+  })
+
+  it('1c. Admin console moved: /admin 308s to ADMIN_SITE_URL with path and query kept', async () => {
+    vi.stubEnv('ADMIN_SITE_URL', 'https://admin.example.com/')
+    const res = await proxy(new NextRequest('https://prodily.app/admin/moderation?tab=capstones'))
+    expect(res.status).toBe(308)
+    expect(res.headers.get('location')).toBe('https://admin.example.com/admin/moderation?tab=capstones')
+
+    const root = await proxy(new NextRequest('https://prodily.app/admin'))
+    expect(root.status).toBe(308)
+    expect(root.headers.get('location')).toBe('https://admin.example.com/admin')
+  })
+
+  it('1d. Only the /admin segment is redirected, not lookalike paths', async () => {
+    vi.stubEnv('ADMIN_SITE_URL', 'https://admin.example.com')
+    const res = await proxy(new NextRequest('https://prodily.app/administrator'))
+    expect(res.status).not.toBe(308)
   })
 
   it('2. Public Route Protection: Unauthenticated visitors can view /login', async () => {
@@ -80,11 +113,11 @@ describe('Phase 2 Middleware & Auth Security Test Suite', () => {
     expect(res.headers.get('location')).toContain('/login')
   })
 
-  it('4. Admin Login Route: Visitors can view /admin/login', async () => {
-    const req = new NextRequest('https://prodily.app/admin/login')
-    const res = await proxy(req)
-    expect(res).toBeDefined()
-    expect(res.status).toBe(200)
+  it('4. Admin Login Route: /admin/login is not served by the learner host', async () => {
+    vi.stubEnv('ADMIN_SITE_URL', 'https://admin.example.com')
+    const res = await proxy(new NextRequest('https://prodily.app/admin/login'))
+    expect(res.status).toBe(308)
+    expect(res.headers.get('location')).toBe('https://admin.example.com/admin/login')
   })
 
   it('5. API Route Token Extractor: getAuthenticatedUserFromRequest returns null without token', async () => {
@@ -124,8 +157,8 @@ describe('Phase 2 Middleware & Auth Security Test Suite', () => {
     const res = await proxy(req)
     expect(res).toBeDefined()
     expect(res.status).toBe(307)
-    // Admin mock user routes to /admin
-    expect(res.headers.get('location')).toMatch(/\/(admin|dashboard)/)
+    // Everyone, admins included, goes to the learner dashboard.
+    expect(res.headers.get('location')).toContain('/dashboard')
   })
 
   it('9. Curriculum Route: Authenticated learner visiting /curriculum is redirected to /academy', async () => {

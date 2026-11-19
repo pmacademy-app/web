@@ -31,9 +31,6 @@ import { apiPost } from '@/lib/api/client'
 /** Learner-facing destination after logout. */
 export const LEARNER_LOGIN_PATH = '/login'
 
-/** Admin-console destination after logout. */
-export const ADMIN_LOGIN_PATH = '/admin/login'
-
 /** The subset of the Next.js router this helper needs, so it stays testable. */
 export interface LogoutRouter {
   push: (href: string) => void

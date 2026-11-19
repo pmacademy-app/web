@@ -57,7 +57,7 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: { getProductSettings: mockGetProductSettings },
 }))
 

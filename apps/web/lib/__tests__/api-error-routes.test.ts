@@ -14,7 +14,7 @@ vi.mock('@/lib/rate-limit', () => ({
 }))
 
 const productSettings = { maintenanceMode: false, allowSignups: true, requireEmailVerification: true }
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     getProductSettings: vi.fn(async () => ({ ...productSettings })),
     isEmailVerificationRequired: vi.fn(async () => true),

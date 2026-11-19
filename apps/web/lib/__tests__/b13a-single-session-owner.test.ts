@@ -153,15 +153,6 @@ describe('B13-A — the browser-session consumer sweep is complete', () => {
     expect(code(read('app/(auth)/reset-password/page.tsx'))).toContain('resetPasswordForEmail')
   }, SCAN_TIMEOUT_MS)
 
-  it('the admin console authenticates server-side, not in the browser', () => {
-    const source = code(read('app/admin/login/page.tsx'))
-
-    expect(source).not.toContain('signInWithPassword')
-    expect(source).toContain("apiPost('/api/auth/login'")
-    // Authentication is not authorization: the RBAC guard still runs before entry.
-    expect(source).toContain('/api/admin/verify')
-  })
-
   it('quick-start completion is written by the server from the cookie actor', () => {
     const client = code(read('components/quick-start/QuickStartContext.tsx'))
     expect(client).not.toContain('auth.updateUser')

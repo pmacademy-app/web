@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { buildInAppContentFromEvent } from '../notifications/in-app/service'
-import { SettingsService } from '../admin/settings-service'
+import { SettingsService } from '../settings/system-settings-service'
 import { getFriendLeaderboard } from '../leaderboard-db'
 import type { LeaderboardEntry } from '../leaderboard'
 

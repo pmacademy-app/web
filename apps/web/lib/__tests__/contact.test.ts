@@ -2,23 +2,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { POST as contactPOST } from '../../app/api/contact/route'
-import { GET as adminContactGET, PATCH as adminContactPATCH } from '../../app/api/admin/contact/route'
 import { POST as webhookPOST } from '../../app/api/email/webhooks/route'
 
 // Mock state storage
 let mockContactMessages: any[] = []
-let mockAuthAdmin: {
-  authorized: boolean
-  userId?: string
-  email?: string
-  error?: string
-  statusCode?: number
-} = {
-  authorized: false,
-  error: 'Unauthorized',
-  statusCode: 401,
-}
-
 let mockRateLimitResult: { success: boolean; limit: number; remaining: number; reset: number } = {
   success: true,
   limit: 3,
@@ -32,8 +19,6 @@ const mockSendEmail = vi.fn().mockResolvedValue({
   provider: 'simulated',
   statusCode: 200,
 })
-
-const mockLogAdminAction = vi.fn().mockResolvedValue(undefined)
 
 const createTableChain = (table: string) => {
   const chain: any = {
@@ -135,20 +120,10 @@ vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn().mockResolvedValue(null),
 }))
 
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: vi.fn(() => Promise.resolve(mockAuthAdmin)),
-  logAdminAction: (...args: any[]) => mockLogAdminAction(...args),
-}))
-
 describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockContactMessages = []
-    mockAuthAdmin = {
-      authorized: false,
-      error: 'Unauthorized',
-      statusCode: 401,
-    }
     mockRateLimitResult = {
       success: true,
       limit: 3,
@@ -246,78 +221,6 @@ describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
     expect(data.error).toContain('Too many requests')
     expect(mockContactMessages.length).toBe(0)
     expect(mockSendEmail).not.toHaveBeenCalled()
-  })
-
-  it('/api/admin/contact rejects unauthenticated requests with 401 or 403', async () => {
-    mockAuthAdmin = { authorized: false, error: 'Unauthorized', statusCode: 401 }
-    const req = new NextRequest('http://localhost:3000/api/admin/contact')
-    const res = await adminContactGET(req)
-    expect([401, 403].includes(res.status)).toBe(true)
-  })
-
-  it('/api/admin/contact returns contact messages for authorized admin', async () => {
-    mockAuthAdmin = { authorized: true, userId: 'admin_1', email: 'admin@prodily.app' }
-    mockContactMessages = [
-      {
-        id: 'msg_1',
-        name: 'Bob',
-        email: 'bob@example.com',
-        subject: 'Hello',
-        message: 'Test msg',
-        status: 'new',
-        created_at: new Date().toISOString(),
-      },
-    ]
-
-    const req = new NextRequest('http://localhost:3000/api/admin/contact')
-    const res = await adminContactGET(req)
-    expect(res.status).toBe(200)
-    const data = await res.json()
-    expect(data.messages).toHaveLength(1)
-    expect(data.messages[0].name).toBe('Bob')
-  })
-
-  it('/api/admin/contact PATCH rejects unauthenticated requests with 401 or 403', async () => {
-    mockAuthAdmin = { authorized: false, error: 'Unauthorized', statusCode: 401 }
-    const req = new NextRequest('http://localhost:3000/api/admin/contact', {
-      method: 'PATCH',
-      body: JSON.stringify({ messageId: 'msg-123', status: 'replied' }),
-    })
-    const res = await adminContactPATCH(req)
-    expect([401, 403].includes(res.status)).toBe(true)
-  })
-
-  it('/api/admin/contact PATCH updates message status for authorized admin and logs action', async () => {
-    mockAuthAdmin = { authorized: true, userId: 'admin_1', email: 'admin@prodily.app' }
-    mockContactMessages = [
-      {
-        id: 'msg-123',
-        name: 'Charlie',
-        email: 'charlie@example.com',
-        subject: 'Inquiry',
-        status: 'new',
-      },
-    ]
-
-    const req = new NextRequest('http://localhost:3000/api/admin/contact', {
-      method: 'PATCH',
-      body: JSON.stringify({ messageId: 'msg-123', status: 'replied', adminNotes: 'Replied via support' }),
-    })
-
-    const res = await adminContactPATCH(req)
-    expect(res.status).toBe(200)
-    const data = await res.json()
-    expect(data.success).toBe(true)
-    expect(data.messageId).toBe('msg-123')
-
-    expect(mockLogAdminAction).toHaveBeenCalledWith(
-      'admin_1',
-      'admin@prodily.app',
-      'contact_message_replied',
-      'contact_message',
-      'msg-123',
-      expect.objectContaining({ status: 'replied', adminNotes: true })
-    )
   })
 
   it('/api/email/webhooks processes email.received event payload with mocked dependencies', async () => {

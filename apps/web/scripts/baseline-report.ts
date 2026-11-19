@@ -48,7 +48,7 @@ import {
   type BaselineCapstoneRow,
   type BaselineEmailQueueRow,
   type BaselineNotificationEventRow,
-} from '../lib/admin/baseline-aggregation'
+} from '../lib/baseline/baseline-aggregation'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -212,7 +212,7 @@ async function main() {
   lines.push('')
   lines.push(`**Generated:** ${generatedAt.toISOString()}`)
   lines.push('**Source:** production database, server-side rows only. No GA4.')
-  lines.push('**Method:** `npm run baseline:report` → `lib/admin/baseline-aggregation.ts`')
+  lines.push('**Method:** `npm run baseline:report` → `lib/baseline/baseline-aggregation.ts`')
   lines.push('')
   lines.push(
     '> Every number below is measured. Where the schema cannot answer a question it is ' +

@@ -9,7 +9,7 @@
  *
  * A follow-up trace of all 201 `'use client'` entry points found one more instance
  * of the same shape: two client components importing pure onboarding defaults from
- * `lib/admin/settings-service`, which imports `createServiceRoleClient`. The build
+ * `lib/settings/system-settings-service`, which imports `createServiceRoleClient`. The build
  * output confirmed `getOnboardingSettings` and the `system_settings` query code
  * were being shipped to browsers that cannot use them.
  *
@@ -40,13 +40,8 @@ const BOUNDARIES: Array<{ client: string; forbidden: string; allowed: string }> 
   },
   {
     client: 'app/onboarding/OnboardingWizard.tsx',
-    forbidden: '@/lib/admin/settings-service',
-    allowed: '@/lib/admin/onboarding-defaults',
-  },
-  {
-    client: 'components/admin/OnboardingSettingsSection.tsx',
-    forbidden: '@/lib/admin/settings-service',
-    allowed: '@/lib/admin/onboarding-defaults',
+    forbidden: '@/lib/settings/system-settings-service',
+    allowed: '@/lib/onboarding/onboarding-defaults',
   },
 ]
 
@@ -76,7 +71,7 @@ describe('client components do not import server data-layer modules', () => {
 })
 
 describe('the client-safe modules stay client-safe', () => {
-  const CLIENT_SAFE = ['lib/portfolio.ts', 'lib/admin/onboarding-defaults.ts']
+  const CLIENT_SAFE = ['lib/portfolio.ts', 'lib/onboarding/onboarding-defaults.ts']
 
   for (const clientSafe of CLIENT_SAFE) {
     it(`${clientSafe} pulls in no server-only dependency`, () => {
@@ -105,7 +100,7 @@ describe('server call sites are unchanged by the moves', () => {
   })
 
   it('settings-service still re-exports the onboarding defaults', () => {
-    const source = read('lib/admin/settings-service.ts')
+    const source = read('lib/settings/system-settings-service.ts')
 
     // Phase 4C: DEFAULT_ONBOARDING_STEPS was removed with the 4-step wizard model. The
     // goal/experience/topic/preference option constants remain re-exported for server
@@ -118,12 +113,12 @@ describe('server call sites are unchanged by the moves', () => {
     ]) {
       expect(source, name).toContain(name)
     }
-    expect(source).toContain("from './onboarding-defaults'")
+    expect(source).toContain("from '@/lib/onboarding/onboarding-defaults'")
   })
 
   it('the moved constants are still the same data', async () => {
-    const defaults = await import('../admin/onboarding-defaults')
-    const service = await import('../admin/settings-service')
+    const defaults = await import('../onboarding/onboarding-defaults')
+    const service = await import('../settings/system-settings-service')
 
     // Re-export, not a copy: a duplicate would drift.
     expect(service.DEFAULT_GOAL_OPTIONS).toBe(defaults.DEFAULT_GOAL_OPTIONS)

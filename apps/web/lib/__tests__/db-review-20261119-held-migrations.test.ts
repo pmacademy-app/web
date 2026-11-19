@@ -106,7 +106,7 @@ describe('M3 system_announcements', () => {
     expect(sql).toContain('REVOKE ALL ON public.system_announcements FROM PUBLIC, anon, authenticated;')
   })
   it('matches the app: announcements are only read through the service role', () => {
-    const service = read(path.join(repoRoot, 'apps/web/lib/admin/announcements-service.ts'))
+    const service = read(path.join(repoRoot, 'apps/web/lib/announcements/announcements-service.ts'))
     expect(service).not.toMatch(/createAuthenticatedServerClient|createBrowserSupabaseClient/)
   })
 })

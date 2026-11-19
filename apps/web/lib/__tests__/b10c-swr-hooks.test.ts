@@ -19,7 +19,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { mutate } from 'swr'
 
@@ -299,20 +299,5 @@ describe('B10-C — Client/Server Architectural Boundaries', () => {
       )
       expect(offending, `${rel} has forbidden value-import of -db`).toEqual([])
     }
-  })
-
-  it('components/admin adopts lib/api/hooks in B10-D', () => {
-    const adminDir = path.join(ROOT, 'components/admin')
-    const files = readdirSync(adminDir).filter((f) => statSync(path.join(adminDir, f)).isFile())
-
-    const swrHits = files.filter((file) => {
-      const source = readFileSync(path.join(adminDir, file), 'utf8')
-      return source.includes('@/lib/api/hooks')
-    })
-    expect(swrHits).toContain('AdminSystemAlertsView.tsx')
-    expect(swrHits).toContain('AdminSystemErrorsView.tsx')
-    expect(swrHits).toContain('AdminSystemAuditView.tsx')
-    expect(swrHits).toContain('AdminAnnouncementsView.tsx')
-    expect(swrHits).toContain('AdminBroadcastsView.tsx')
   })
 })

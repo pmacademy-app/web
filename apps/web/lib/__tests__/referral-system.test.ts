@@ -25,8 +25,8 @@ import {
   getUserReferralStats,
   REFERRAL_ACTIVATION_XP,
 } from '../referral/referral-service'
-import { SettingsService } from '../admin/settings-service'
-import type { LearningSettings } from '../admin/types'
+import { SettingsService } from '../settings/system-settings-service'
+import type { LearningSettings } from '../settings/types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 

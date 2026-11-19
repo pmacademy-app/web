@@ -744,7 +744,7 @@ async function processSingleBatch(
   // workspace and previously had no runtime consumer — the backoff base was hardcoded.
   let retryDelayMinutes = DEFAULT_RETRY_DELAY_MINUTES
   try {
-    const { SettingsService } = await import('@/lib/admin/settings-service')
+    const { SettingsService } = await import('@/lib/settings/system-settings-service')
     const emailSettings = await SettingsService.getEmailSettings()
     if (Number.isFinite(emailSettings.retryDelayMinutes) && emailSettings.retryDelayMinutes > 0) {
       retryDelayMinutes = emailSettings.retryDelayMinutes

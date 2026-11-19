@@ -161,7 +161,7 @@ function failureResponse(isJson: boolean, err: unknown): Response {
 
 export const GET = withRoute(
   {
-    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    actor: { allow: ['anonymous', 'learner'] },
     operation: 'email.unsubscribe',
     domain: 'email',
     summary: 'Unexpected failure processing an unsubscribe link',
@@ -204,7 +204,7 @@ export const GET = withRoute(
 
 export const POST = withRoute(
   {
-    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    actor: { allow: ['anonymous', 'learner'] },
     operation: 'email.unsubscribe.confirm',
     domain: 'email',
     summary: 'Unexpected failure confirming an unsubscribe',

@@ -88,7 +88,7 @@ const mockSettings = {
   requireEmailVerification: false,
 }
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     getProductSettings: vi.fn(async () => ({ ...mockSettings })),
     isEmailVerificationRequired: vi.fn(async () => mockSettings.requireEmailVerification),
@@ -346,12 +346,12 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
   })
 })
 
-describe('Proxy admin RBAC ignores ADMIN_EMAILS', () => {
+describe('Proxy ignores ADMIN_EMAILS and the users.is_admin row', () => {
   const originalEnv = process.env.ADMIN_EMAILS
 
   beforeEach(() => {
     mockUsersRow = null
-    mockSettings.maintenanceMode = false
+    mockSettings.maintenanceMode = true
     mockSettings.allowSignups = true
     mockSettings.requireEmailVerification = false
   })
@@ -360,30 +360,23 @@ describe('Proxy admin RBAC ignores ADMIN_EMAILS', () => {
     if (originalEnv === undefined) delete process.env.ADMIN_EMAILS
     else process.env.ADMIN_EMAILS = originalEnv
     mockUsersRow = null
+    mockSettings.maintenanceMode = false
   })
 
-  it('redirects a former env-admin to access-denied when the claim is absent and users.is_admin is false', async () => {
+  // Only the signed app_metadata.is_admin claim bypasses maintenance mode on the learner
+  // host. A former env-admin, or a users.is_admin row without the claim, is a learner here.
+  it('keeps a former env-admin without the claim behind maintenance mode, whatever users.is_admin says', async () => {
     process.env.ADMIN_EMAILS = 'admin@prodily.app'
-    mockUsersRow = { is_admin: false, curriculum_access_override: false }
+    for (const isAdmin of [false, true]) {
+      mockUsersRow = { is_admin: isAdmin, curriculum_access_override: false }
 
-    const req = new NextRequest('https://prodily.app/admin', {
-      headers: { cookie: 'sb-access-token=mock-former-env-admin-token' },
-    })
-    const res = await proxy(req)
+      const req = new NextRequest('https://prodily.app/dashboard', {
+        headers: { cookie: 'sb-access-token=mock-former-env-admin-token' },
+      })
+      const res = await proxy(req)
 
-    expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/admin/access-denied')
-  })
-
-  it('lets the same user in once users.is_admin is true', async () => {
-    process.env.ADMIN_EMAILS = 'admin@prodily.app'
-    mockUsersRow = { is_admin: true, curriculum_access_override: false }
-
-    const req = new NextRequest('https://prodily.app/admin', {
-      headers: { cookie: 'sb-access-token=mock-former-env-admin-token' },
-    })
-    const res = await proxy(req)
-
-    expect(res.headers.get('location') ?? '').not.toContain('/admin/access-denied')
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toContain('/maintenance')
+    }
   })
 })

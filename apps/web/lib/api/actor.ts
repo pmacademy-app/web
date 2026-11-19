@@ -1,23 +1,18 @@
-import { requireAdminUser } from '@/lib/admin/guard'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { secretsMatch } from '@/lib/security/constant-time'
 
 /**
  * Canonical actor resolution (B7-A).
  *
- * Who is making this request? Today that question is answered in three unrelated
- * places — `getAuthenticatedUserFromRequest`, `requireAdminUser`, and six
- * hand-copied `CRON_SECRET` comparisons in `app/api/cron/*` — so there is nowhere
- * to add a policy and no way to be sure every route answers it the same way.
+ * Who is making this request? This module is the one place that answers it. It
+ * **delegates** to `getAuthenticatedUserFromRequest` for bearer/cookie/refresh
+ * resolution and adds a declarative policy, a fail-closed precedence order, and a
+ * constant-time cron secret comparison. `withRoute` (B7-B) is its consumer.
  *
- * This module is that one place. It **delegates** to the existing helpers rather
- * than reimplementing them: `requireAdminUser` keeps its database re-read of
- * `is_admin` and its audit logging, and `getAuthenticatedUserFromRequest` keeps
- * its bearer/cookie/refresh resolution. What is added here is a declarative
- * policy, a fail-closed precedence order, and a constant-time secret comparison.
- *
- * Nothing imports this yet. `withRoute` (B7-B) is its first consumer, and route
- * migration happens in B7-C onwards.
+ * **No admin kind.** The admin console moved to its own repository and host. An
+ * admin who uses the learner app is resolved as a `learner` like anyone else, and
+ * the admin app reaches learner-host endpoints with `CRON_SECRET` (cron routes) or
+ * `INTERNAL_REVALIDATE_SECRET` (POST /api/internal/revalidate), never a session.
  *
  * **Deliberately not modelled: `webhook`.** The roadmap lists it, but the only
  * webhook surfaces (`app/api/auth/send-email-hook`, `app/api/email/webhooks`)
@@ -27,18 +22,17 @@ import { secretsMatch } from '@/lib/security/constant-time'
  * routes keep their own verification until a body-aware policy is designed.
  */
 
-export const ACTOR_KINDS = ['anonymous', 'learner', 'admin', 'cron'] as const
+export const ACTOR_KINDS = ['anonymous', 'learner', 'cron'] as const
 
 export type ActorKind = (typeof ACTOR_KINDS)[number]
 
 /**
  * The resolved caller. A discriminated union so a handler that has narrowed to
- * `admin` can reach `userId` without a cast, and one that has not cannot.
+ * `learner` can reach `userId` without a cast, and one that has not cannot.
  */
 export type Actor =
   | { kind: 'anonymous' }
   | { kind: 'learner'; userId: string; email: string | null }
-  | { kind: 'admin'; userId: string; email: string }
   | { kind: 'cron' }
 
 export interface ActorPolicy {
@@ -110,25 +104,6 @@ async function resolve(request: Request, allow: ReadonlySet<ActorKind>): Promise
     return { ok: true, actor: { kind: 'cron' } }
   }
 
-  if (allow.has('admin')) {
-    // If the route strictly requires admin (neither learner nor anonymous is allowed),
-    // an unauthorized attempt is a genuine access denial on an admin endpoint and must be audited.
-    // If the route allows other roles (dual-role: learner + admin), testing for admin is merely
-    // role discovery; non-admins are permitted and must not produce false-positive access_denied audit logs.
-    const isStrictlyAdminRoute = !allow.has('learner') && !allow.has('anonymous')
-    const admin = await requireAdminUser(request, { silent: !isStrictlyAdminRoute })
-    if (admin.authorized && admin.userId) {
-      return { ok: true, actor: { kind: 'admin', userId: admin.userId, email: admin.email ?? '' } }
-    }
-
-    // Only refuse here if there is nothing weaker left to try. A policy of
-    // `['admin', 'learner']` must still resolve an authenticated non-admin as a
-    // learner rather than rejecting them.
-    if (!allow.has('learner') && !allow.has('anonymous')) {
-      return deny(admin.statusCode === 403 ? 403 : 401, admin.error ?? 'admin check failed')
-    }
-  }
-
   if (allow.has('learner')) {
     const user = await getAuthenticatedUserFromRequest(request)
     if (user?.id) {
@@ -146,7 +121,7 @@ async function resolve(request: Request, allow: ReadonlySet<ActorKind>): Promise
 /**
  * Per-request, per-policy memoization.
  *
- * `getAuthenticatedUserFromRequest` and `requireAdminUser` already memoize on the
+ * `getAuthenticatedUserFromRequest` already memoizes on the
  * `Request` instance; this keeps that property at the layer above, so a route and
  * its wrapper asking the same question twice costs one resolution. Keyed on the
  * Request object, so it is collected with the request.
@@ -190,11 +165,11 @@ export function resolveActor(request: Request, policy: ActorPolicy): Promise<Act
 }
 
 /**
- * The user id behind a `learner` or `admin` actor.
+ * The user id behind a `learner` actor.
  *
- * Every route whose policy is learner- or admin-only needs this id, and the
- * discriminated union means reading `actor.userId` requires narrowing at each
- * call site. This does the narrowing once.
+ * Every route whose policy is learner-only needs this id, and the discriminated
+ * union means reading `actor.userId` requires narrowing at each call site. This
+ * does the narrowing once.
  *
  * It throws for `anonymous` and `cron`, which is unreachable under such a policy.
  * The throw exists so that a route which later widens its policy without updating
@@ -202,24 +177,6 @@ export function resolveActor(request: Request, policy: ActorPolicy): Promise<Act
  * empty id.
  */
 export function requireUserId(actor: Actor): string {
-  if (actor.kind === 'learner' || actor.kind === 'admin') return actor.userId
+  if (actor.kind === 'learner') return actor.userId
   throw new Error(`requireUserId: actor kind '${actor.kind}' carries no user id`)
-}
-
-/**
- * The identity behind an `admin` actor.
- *
- * The admin routes need both fields — `userId` and `email` are what
- * `logAdminAction` records in `admin_audit_logs` — and reading them off the union
- * requires narrowing at every call site.
- *
- * It throws for any other kind, which is unreachable under an admin-only policy.
- * The throw is what stops a widened policy from silently writing an audit row
- * attributed to the wrong actor.
- */
-export function requireAdmin(actor: Actor): { userId: string; email: string } {
-  if (actor.kind !== 'admin') {
-    throw new Error(`requireAdmin: actor kind '${actor.kind}' is not an admin`)
-  }
-  return { userId: actor.userId, email: actor.email }
 }

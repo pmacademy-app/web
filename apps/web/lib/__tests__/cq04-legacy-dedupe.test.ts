@@ -142,7 +142,7 @@ vi.mock('@/lib/notifications/preferences/defaults', () => ({
   getResolvedUserNotificationPreferences: vi.fn(async () => ({})),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: { getEmailSettings: vi.fn(async () => ({ retryDelayMinutes: 5 })) },
 }))
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { BroadcastService } from '../admin/broadcast-service'
-import type { AdminUserFilters } from '../admin/types'
+import { BroadcastService } from '../broadcasts/broadcast-service'
+import type { AudienceFilters as AdminUserFilters } from '../broadcasts/types'
 
 // Mock supabase client for unit testing BroadcastService logic
 vi.mock('@/lib/supabase', () => {

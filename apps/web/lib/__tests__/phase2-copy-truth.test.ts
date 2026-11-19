@@ -166,7 +166,6 @@ describe('no em-dash in user-facing copy (D6)', () => {
       'components/layout/Topbar.tsx',
       'lib/certificates/presentation.ts',
       'lib/frameworks.ts',
-      'components/admin/ExperimentReadoutView.tsx',
       HOME_PORTFOLIO,
       HOME_FAQ,
       HOME_HERO,

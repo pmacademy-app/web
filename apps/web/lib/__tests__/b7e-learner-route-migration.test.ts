@@ -28,7 +28,7 @@ vi.mock('@/lib/auth', () => ({
 const dismissAnnouncement = vi.fn()
 const getActiveAnnouncementsForUser = vi.fn()
 
-vi.mock('@/lib/admin/announcements-service', () => ({
+vi.mock('@/lib/announcements/announcements-service', () => ({
   AnnouncementsService: {
     dismissAnnouncement: (id: string, userId: string) => dismissAnnouncement(id, userId),
     getActiveAnnouncementsForUser: (userId: string, cohortId?: string) =>

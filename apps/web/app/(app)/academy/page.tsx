@@ -28,7 +28,7 @@ import {
 } from '@/lib/curriculum-access'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
-import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+import { CURRICULUM_MODULE_META } from '@/lib/curriculum/curriculum-meta'
 import { getModuleMeta } from '@/lib/curriculum/module-meta'
 import { formatLessonPosition, getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'

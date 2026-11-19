@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
-import { SettingsService } from '../admin/settings-service'
+import { SettingsService } from '../settings/system-settings-service'
 
 const mockProductSettings = {
   siteName: 'Prodily',
@@ -175,48 +175,49 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
     })
   })
 
-  describe('2. Admin Route Protection & RBAC Routing', () => {
-    it('allows verified admin with app_metadata.is_admin into /admin', async () => {
+  // The admin console moved to its own host. On this host the signed is_admin claim only
+  // lets an admin who uses the learner app past maintenance mode.
+  describe('2. Admin claim on the learner host', () => {
+    it('lets a signed is_admin claim past maintenance mode on a learner page', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        maintenanceMode: true,
+        requireEmailVerification: false,
+      })
       const futureExp = Math.floor(Date.now() / 1000) + 3600
       const adminToken = createMockJwt({
         sub: 'usr_admin_456',
         email: 'admin_role@prodily.app',
-        app_metadata: { is_admin: true },
-        user_metadata: { onboarding_complete: true },
+        app_metadata: { is_admin: true, onboarding_complete: true },
         exp: futureExp,
       })
 
-      const req = new NextRequest('https://prodily.app/admin', {
-        headers: {
-          cookie: `sb-access-token=${adminToken}`,
-        },
-      })
-
-      const res = await proxy(req)
-      expect(res).toBeDefined()
+      const res = await proxy(
+        new NextRequest('https://prodily.app/dashboard', { headers: { cookie: `sb-access-token=${adminToken}` } })
+      )
       expect(res.status).toBe(200)
     })
 
-    it('rejects regular learner attempting to access /admin and redirects to /admin/access-denied', async () => {
+    it('sends a learner without the claim to /maintenance', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        maintenanceMode: true,
+        requireEmailVerification: false,
+      })
       const futureExp = Math.floor(Date.now() / 1000) + 3600
       const learnerToken = createMockJwt({
         sub: 'usr_learner_999',
         email: 'regular_learner@gmail.com',
-        user_metadata: { onboarding_complete: true },
-        email_confirmed_at: '2026-01-01T00:00:00Z',
+        app_metadata: { onboarding_complete: true },
+        user_metadata: { is_admin: true },
         exp: futureExp,
       })
 
-      const req = new NextRequest('https://prodily.app/admin', {
-        headers: {
-          cookie: `sb-access-token=${learnerToken}`,
-        },
-      })
-
-      const res = await proxy(req)
-      expect(res).toBeDefined()
+      const res = await proxy(
+        new NextRequest('https://prodily.app/dashboard', { headers: { cookie: `sb-access-token=${learnerToken}` } })
+      )
       expect(res.status).toBe(307)
-      expect(res.headers.get('location')).toContain('/admin/access-denied')
+      expect(res.headers.get('location')).toContain('/maintenance')
     })
   })
 

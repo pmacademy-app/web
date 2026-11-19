@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { TestimonialsService } from '@/lib/feedback/published-testimonials'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 /** Published testimonials are marketing copy on the public site. */
@@ -14,7 +14,7 @@ export const GET = withRoute(
     errorMessage: 'Failed to fetch testimonials.',
   },
   async () => {
-    const testimonials = await FeedbackAdminService.getPublishedTestimonials()
+    const testimonials = await TestimonialsService.getPublishedTestimonials()
     return NextResponse.json({ testimonials })
   }
 )

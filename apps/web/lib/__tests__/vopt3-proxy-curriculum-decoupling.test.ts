@@ -167,14 +167,14 @@ describe('V-OPT-3: V-OPT-1 proxy exclusions and auth routing are intact', () => 
     expect(res.headers.get('location')).toContain('/login')
   })
 
-  it('an unauthenticated visitor to the admin area is still redirected to admin login', async () => {
+  it('the admin area is no longer served here: no login redirect for /admin', async () => {
+    // The admin console moved to its own host; without ADMIN_SITE_URL the path 404s.
     const res = await run('https://prodily.app/admin/users')
-    expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/admin/login')
+    expect(res.headers.get('location')).toBeNull()
   })
 
   it('public auth pages remain reachable', async () => {
-    for (const p of ['/login', '/signup', '/reset-password', '/admin/login']) {
+    for (const p of ['/login', '/signup', '/reset-password']) {
       const res = await run(`https://prodily.app${p}`)
       expect(res.status).toBe(200)
     }

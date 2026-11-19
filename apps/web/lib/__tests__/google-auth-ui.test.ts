@@ -175,10 +175,4 @@ describe('auth pages wire Google sign-in behind the flag', () => {
       expect(read(rel)).not.toContain('—')
     }
   })
-
-  it('admin login does not offer Google sign-in', () => {
-    const adminLoginSrc = read('app/admin/login/page.tsx')
-    expect(adminLoginSrc).not.toContain('GoogleButton')
-    expect(adminLoginSrc).not.toContain('google-auth')
-  })
 })

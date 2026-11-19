@@ -136,7 +136,6 @@ export const POST = withRoute(
       revalidatePath(`/capstones/${moduleSlug}`)
       revalidatePath('/progress')
       revalidatePath('/dashboard')
-      revalidatePath('/admin/moderation')
     } catch {
       // Revalidation warning is non-fatal
     }

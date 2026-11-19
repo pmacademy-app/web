@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { z } from 'zod'
 
 const getAuthenticatedUserFromRequest = vi.fn()
-const requireAdminUser = vi.fn()
 const evaluatePersistentRateLimit = vi.fn()
 const logErrorReport = vi.fn()
 
@@ -10,9 +9,6 @@ vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: (req: Request) => getAuthenticatedUserFromRequest(req),
 }))
 
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: (req: Request) => requireAdminUser(req),
-}))
 
 vi.mock('@/lib/rate-limit', () => ({
   evaluatePersistentRateLimit: (key: string, opts: unknown) => evaluatePersistentRateLimit(key, opts),
@@ -52,11 +48,6 @@ function get(headers: Record<string, string> = {}): Request {
 
 beforeEach(() => {
   getAuthenticatedUserFromRequest.mockReset().mockResolvedValue(null)
-  requireAdminUser.mockReset().mockResolvedValue({
-    authorized: false,
-    error: 'Authentication required',
-    statusCode: 401,
-  })
   evaluatePersistentRateLimit.mockReset().mockResolvedValue({ success: true, remaining: 9, resetInMs: 1000 })
   logErrorReport.mockReset().mockResolvedValue(undefined)
   process.env.CRON_SECRET = CRON_SECRET
@@ -92,41 +83,19 @@ describe('B7-B — withRoute: actor policy', () => {
     expect(handler).not.toHaveBeenCalled()
   })
 
-  it('refuses an authenticated non-admin with 403 on an admin-only route', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
-    const handler = makeHandler()
-
-    const route = withRoute({ actor: { allow: ['admin'] }, operation: 'admin.thing' }, handler)
-    const res = await route(get())
-
-    expect(res.status).toBe(403)
-    expect((await res.json()).code).toBe('FORBIDDEN')
-    expect(handler).not.toHaveBeenCalled()
-  })
-
   it('does not leak the internal denial reason to the client', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
-
-    const route = withRoute({ actor: { allow: ['admin'] }, operation: 'admin.thing' }, async () =>
+    const route = withRoute({ actor: { allow: ['learner'] }, operation: 'learner.thing' }, async () =>
       Response.json({ success: true })
     )
     const body = await (await route(get())).json()
 
-    expect(JSON.stringify(body)).not.toContain('Admin privileges required')
+    expect(JSON.stringify(body)).not.toContain('no allowed actor kind matched')
   })
 
   it('composes with resolveActor for the cron policy', async () => {
     const handler = makeHandler()
 
-    const route = withRoute({ actor: { allow: ['cron', 'admin'] }, operation: 'cron.thing' }, handler)
+    const route = withRoute({ actor: { allow: ['cron'] }, operation: 'cron.thing' }, handler)
     const res = await route(get({ authorization: `Bearer ${CRON_SECRET}` }))
 
     expect(res.status).toBe(200)
@@ -686,23 +655,6 @@ describe('B7-B — withRoute: onDenied hook', () => {
     expect(onDenied.mock.calls[0][0].request).toBeInstanceOf(Request)
   })
 
-  it('runs on a 403 actor denial', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
-    const onDenied = vi.fn()
-
-    const route = withRoute(
-      { actor: { allow: ['admin'] }, operation: 'admin.thing', onDenied },
-      async () => Response.json({ success: true })
-    )
-    await route(get())
-
-    expect(onDenied.mock.calls[0][0].denial).toMatchObject({ status: 403, code: 'FORBIDDEN' })
-  })
-
   it('does not run when the actor resolves', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
     const onDenied = vi.fn()
@@ -805,22 +757,17 @@ describe('B7-B — withRoute: onDenied hook', () => {
   })
 
   it('keeps the internal denial reason out of the client response', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
     const onDenied = vi.fn()
 
     const route = withRoute(
-      { actor: { allow: ['admin'] }, operation: 'admin.thing', onDenied },
+      { actor: { allow: ['learner'] }, operation: 'learner.thing', onDenied },
       async () => Response.json({ success: true })
     )
     const res = await route(get())
 
     // The hook sees the reason; the client never does.
-    expect(onDenied.mock.calls[0][0].denial.reason).toContain('Admin privileges required')
-    expect(JSON.stringify(await res.json())).not.toContain('Admin privileges required')
+    expect(onDenied.mock.calls[0][0].denial.reason).toContain('no allowed actor kind matched')
+    expect(JSON.stringify(await res.json())).not.toContain('no allowed actor kind matched')
   })
 })
 

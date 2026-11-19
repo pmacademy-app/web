@@ -10,8 +10,8 @@ import { reportClientError } from '@/lib/monitoring/client-error-beacon'
  * hydration (F-COR-5). The document-shell version lives in
  * `app/global-error.tsx`, which only runs when the root layout itself fails.
  *
- * Route groups carry their own boundaries (`app/(app)/error.tsx`,
- * `app/admin/(console)/error.tsx`); this one catches everything outside them.
+ * Route groups carry their own boundaries (`app/(app)/error.tsx`); this one catches
+ * everything outside them.
  */
 export default function RootSegmentError({
   error,

@@ -5,7 +5,6 @@ import { POST as sessionPost, GET as sessionGet } from '../../app/api/auth/sessi
 import { POST as refreshPost } from '../../app/api/auth/refresh/route'
 import { POST as logoutPost } from '../../app/api/auth/logout/route'
 import { getAuthenticatedUserFromRequest } from '../auth'
-import { requireAdminUser } from '../admin/guard'
 
 // In-memory mock tokens & sessions
 const VALID_LEARNER_TOKEN = 'mock-valid-learner-jwt'
@@ -144,16 +143,17 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
     })
 
     it('4. Attacker-crafted JWT with forged admin claim -> rejected by GoTrue verification', async () => {
-      // Attacker attempts to access /admin with a forged unverified JWT claiming is_admin: true
-      const req = new NextRequest('https://prodily.app/admin', {
+      // Attacker attempts to reach a protected page with a forged unverified JWT claiming
+      // is_admin: true (the claim would otherwise skip the maintenance and consent gates).
+      const req = new NextRequest('https://prodily.app/dashboard', {
         headers: {
           cookie: `sb-access-token=${FORGED_ADMIN_TOKEN}`,
         },
       })
       const res = await proxy(req)
-      // Because getUser rejects FORGED_ADMIN_TOKEN, user is null and visitor is sent to admin login
+      // Because verification rejects FORGED_ADMIN_TOKEN, user is null and the visitor is sent to login
       expect(res.status).toBe(307)
-      expect(res.headers.get('location')).toContain('/admin/login')
+      expect(res.headers.get('location')).toContain('/login')
     })
 
     it('5. Missing session cookie -> redirected to /login on protected route', async () => {
@@ -364,7 +364,7 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
     })
   })
 
-  describe('Invariant 6: Authenticated Route Helpers & Admin Guard', () => {
+  describe('Invariant 6: Authenticated Route Helpers', () => {
     it('19. getAuthenticatedUserFromRequest resolves user from Bearer header', async () => {
       const req = new Request('https://prodily.app/api/profile', {
         headers: {
@@ -384,28 +384,6 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
       })
       const user = await getAuthenticatedUserFromRequest(req)
       expect(user).toBeNull()
-    })
-
-    it('21. requireAdminUser rejects non-admin learner even with valid session', async () => {
-      const req = new Request('https://prodily.app/api/admin/settings', {
-        headers: {
-          Authorization: `Bearer ${VALID_LEARNER_TOKEN}`,
-        },
-      })
-      const result = await requireAdminUser(req)
-      expect(result.authorized).toBe(false)
-      expect(result.statusCode).toBe(403)
-    })
-
-    it('22. requireAdminUser grants access to verified admin', async () => {
-      const req = new Request('https://prodily.app/api/admin/settings', {
-        headers: {
-          Authorization: `Bearer ${VALID_ADMIN_TOKEN}`,
-        },
-      })
-      const result = await requireAdminUser(req)
-      expect(result.authorized).toBe(true)
-      expect(result.userId).toBe('usr_admin_1')
     })
   })
 })

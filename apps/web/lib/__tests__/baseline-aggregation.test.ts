@@ -17,7 +17,7 @@ import {
   type BaselineUserRow,
   type BaselineProgressRow,
   type BaselineXpEventRow,
-} from '@/lib/admin/baseline-aggregation'
+} from '@/lib/baseline/baseline-aggregation'
 
 /**
  * Phase 0.B aggregation tests.

@@ -14,7 +14,7 @@ import { processEmailQueue } from '@/lib/notifications/queue/processor'
  */
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.retry_failed',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/retry-failed',
@@ -24,7 +24,7 @@ export const POST = withRoute(
         severity: 'warning',
         category: 'cron',
         operation: 'cron_retry_failed_auth',
-        message: 'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/retry-failed',
+        message: 'Unauthorized cron request: CRON_SECRET required on /api/cron/retry-failed',
       })
     },
   },

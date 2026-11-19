@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { BUTTON_PRIMARY, BUTTON_SECONDARY } from '@/components/marketing/styles'
 import { BRAND } from '@/lib/brand'
 import { ReviewsExplorer, type PublishedTestimonial } from '@/components/marketing/reviews-explorer'
-import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { TestimonialsService } from '@/lib/feedback/published-testimonials'
 import { ArrowRight } from 'lucide-react'
 
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
@@ -53,7 +53,7 @@ export const revalidate = 1800
 export default async function ReviewsPage() {
   let initialReviews: PublishedTestimonial[] = []
   try {
-    initialReviews = await FeedbackAdminService.getPublishedTestimonials()
+    initialReviews = await TestimonialsService.getPublishedTestimonials()
   } catch {
     initialReviews = []
   }

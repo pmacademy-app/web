@@ -5,7 +5,7 @@
  * - #1  /api/portfolio/share: learners only, rate limited per user.
  * - #4  /verify/<code>: `%`, `_` and prefixes never resolve a certificate.
  * - #10 username lookups: `_` matches only a literal underscore.
- * - #14 admin search: a comma in the query stays inside one quoted value.
+ * - #14 admin search moved to the admin console repository with its test.
  * - #15 avatar upload: the stored type comes from the file bytes.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -13,7 +13,6 @@ import { NextRequest } from 'next/server'
 
 const mocks = vi.hoisted(() => ({
   authUser: null as { id: string; email: string } | null,
-  isAdmin: false,
   buckets: new Map<string, number>(),
   trackProductEvent: vi.fn(async () => undefined),
   uploadAvatar: vi.fn(async (params: { mimeType: string }) => ({
@@ -39,18 +38,6 @@ vi.mock('@/lib/auth', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return { ...actual, getAuthenticatedUserFromRequest: vi.fn(async () => mocks.authUser) }
 })
-vi.mock('@/lib/admin/guard', async (importOriginal) => {
-  const actual = await importOriginal<Record<string, unknown>>()
-  return {
-    ...actual,
-    requireAdminUser: vi.fn(async () =>
-      mocks.isAdmin
-        ? { authorized: true, userId: 'admin-1', email: 'admin@example.com' }
-        : { authorized: false, statusCode: 401, error: 'no' }
-    ),
-    logAdminAction: vi.fn(),
-  }
-})
 vi.mock('@/lib/events/product-events', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return { ...actual, trackProductEvent: mocks.trackProductEvent }
@@ -74,7 +61,6 @@ import { resolveReferralCode } from '@/lib/referral/referral-service'
 import { updatePortfolioSettings } from '@/lib/portfolio-db'
 import { POST as sharePOST } from '@/app/api/portfolio/share/route'
 import { POST as avatarPOST } from '@/app/api/user/avatar/route'
-import { GET as adminSearchGET } from '@/app/api/admin/search/route'
 
 // ─── A fake table store with real LIKE semantics ─────────────────────────────
 
@@ -128,7 +114,6 @@ function fakeDb(tables: Record<string, Array<Record<string, any>>>) {
 
 beforeEach(() => {
   mocks.authUser = null
-  mocks.isAdmin = false
   mocks.buckets.clear()
   mocks.trackProductEvent.mockClear()
   mocks.uploadAvatar.mockClear()
@@ -262,45 +247,6 @@ describe('#1 /api/portfolio/share', () => {
     }
     expect((await sharePOST(shareRequest())).status).toBe(429)
     expect(mocks.trackProductEvent).toHaveBeenCalledTimes(20)
-  })
-})
-
-// ─── #14 admin search ────────────────────────────────────────────────────────
-
-describe('#14 admin search with a comma', () => {
-  it('keeps "Smith, John" as one quoted value per column and returns the match', async () => {
-    mocks.isAdmin = true
-    const orFilters: string[] = []
-    mocks.serviceDb = {
-      from(table: string) {
-        const chain: any = {
-          select: () => chain,
-          or: (filter: string) => {
-            orFilters.push(filter)
-            return chain
-          },
-          limit: async () => ({
-            data:
-              table === 'users'
-                ? [{ id: 'u1', name: 'Smith, John', email: 'js@example.com', username: 'js', is_admin: false }]
-                : [],
-            error: null,
-          }),
-        }
-        return chain
-      },
-    }
-
-    const res = await adminSearchGET(new NextRequest('http://localhost:3000/api/admin/search?q=Smith%2C%20John'))
-    const body = await res.json()
-
-    expect(res.status).toBe(200)
-    expect(body.results.users).toHaveLength(1)
-    expect(orFilters).toContain(
-      'name.ilike."%Smith, John%",email.ilike."%Smith, John%",username.ilike."%Smith, John%"'
-    )
-    // No raw, unquoted term left in any filter.
-    for (const filter of orFilters) expect(filter).not.toMatch(/ilike\.%/)
   })
 })
 

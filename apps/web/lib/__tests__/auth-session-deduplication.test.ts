@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { User, SupabaseClient } from '@supabase/supabase-js'
 import { getAuthenticatedUserFromRequest } from '../auth'
-import { requireAdminUser } from '../admin/guard'
 import * as supabaseModule from '../supabase'
 import type { Database } from '@/lib/supabase'
 
@@ -104,105 +103,6 @@ describe('Authentication & Session Lookup Deduplication', () => {
       const req = new Request('https://prodily.app/api/profile')
       const user = await getAuthenticatedUserFromRequest(req)
       expect(user).toBeNull()
-    })
-  })
-
-  describe('2. Admin Guard Authorization Deduplication', () => {
-    it('deduplicates requireAdminUser calls on the same Request instance', async () => {
-      const mockAdminUser: User = {
-        id: 'admin_user_1',
-        email: 'admin@prodily.app',
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      }
-
-      let dbLookupCount = 0
-      vi.spyOn(supabaseModule, 'createAuthenticatedServerClient').mockReturnValue({
-        auth: {
-          getUser: async () => ({ data: { user: mockAdminUser }, error: null }),
-        },
-      } as unknown as SupabaseClient<Database>)
-
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue({
-        from: () => ({
-          select: () => ({
-            eq: () => ({
-              single: async () => {
-                dbLookupCount++
-                return {
-                  data: { is_admin: true, email: 'admin@prodily.app' },
-                  error: null,
-                }
-              },
-            }),
-          }),
-        }),
-      } as unknown as SupabaseClient<Database>)
-
-      const request = new Request('https://prodily.app/api/admin/summary', {
-        headers: { Authorization: 'Bearer admin_token_999' },
-      })
-
-      const res1 = await requireAdminUser(request)
-      const res2 = await requireAdminUser(request)
-      const res3 = await requireAdminUser(request)
-
-      expect(res1.authorized).toBe(true)
-      expect(res2.authorized).toBe(true)
-      expect(res3.authorized).toBe(true)
-      expect(res1.userId).toBe('admin_user_1')
-      // Database query for is_admin executed only once!
-      expect(dbLookupCount).toBe(1)
-    })
-
-    it('denies non-admin authenticated users with 403', async () => {
-      const mockLearner: User = {
-        id: 'learner_99',
-        email: 'learner@example.com',
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      }
-
-      vi.spyOn(supabaseModule, 'createAuthenticatedServerClient').mockReturnValue({
-        auth: {
-          getUser: async () => ({ data: { user: mockLearner }, error: null }),
-        },
-      } as unknown as SupabaseClient<Database>)
-
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue({
-        from: () => ({
-          select: () => ({
-            eq: () => ({
-              single: async () => ({
-                data: { is_admin: false, email: 'learner@example.com' },
-                error: null,
-              }),
-            }),
-          }),
-          insert: async () => ({ error: null }),
-        }),
-      } as unknown as SupabaseClient<Database>)
-
-      const request = new Request('https://prodily.app/api/admin/feature-flags', {
-        headers: { Authorization: 'Bearer learner_token' },
-      })
-
-      const res = await requireAdminUser(request)
-      expect(res.authorized).toBe(false)
-      expect(res.statusCode).toBe(403)
-      expect(res.error).toContain('Admin privileges required')
-    })
-
-    it('denies unauthenticated requests with 401', async () => {
-      const request = new Request('https://prodily.app/api/admin/users')
-      const res = await requireAdminUser(request)
-      expect(res.authorized).toBe(false)
-      expect(res.statusCode).toBe(401)
-      expect(res.error).toBe('Authentication required')
     })
   })
 })

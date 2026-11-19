@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { findNewlyCompletedModule, moduleCompletedEventId } from '@/lib/academy/module-completion'
 import { MODULE_LESSON_MAP, getLessonIdsForModule } from '@/lib/curriculum-registry'
-import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+import { CURRICULUM_MODULE_META } from '@/lib/curriculum/curriculum-meta'
 
 // Growth R4 / A1: `module.completed` fires when a real module's last lesson is completed, not on
 // every 10th lesson. The registry is the source of truth for which lessons make up a module.

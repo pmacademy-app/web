@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { submitOnboarding, checkUsernameAvailability, OnboardingData } from '@/app/onboarding/actions'
 import { proxy } from '@/proxy'
 import { NextRequest } from 'next/server'
-import { SettingsService } from '@/lib/admin/settings-service'
+import { SettingsService } from '@/lib/settings/system-settings-service'
 
 // Helper to create mock JWTs for tests
 function createMockJwt(payload: Record<string, unknown>): string {

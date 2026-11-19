@@ -22,7 +22,7 @@ vi.mock('@/lib/security/turnstile', () => ({
   evaluateSiteverifyBudget: vi.fn(async () => ({ success: true, remaining: 10, resetInMs: 60_000 })),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     getProductSettings: vi.fn(async () => ({ maintenanceMode: false, allowSignups: true, requireEmailVerification: false })),
     isEmailVerificationRequired: vi.fn(async () => false),

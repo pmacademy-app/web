@@ -61,7 +61,7 @@ vi.mock('@/lib/referral/referral-service', async (importOriginal) => {
   }
 })
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: { getProductSettings: h.getProductSettings },
 }))
 

@@ -22,8 +22,8 @@ import {
   DEFAULT_GOAL_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
-} from '@/lib/admin/onboarding-defaults'
-import type { OnboardingFieldOption } from '@/lib/admin/types'
+} from '@/lib/onboarding/onboarding-defaults'
+import type { OnboardingFieldOption } from '@/lib/settings/types'
 import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
@@ -94,7 +94,7 @@ async function allowedOptionIds(): Promise<{
   topic: Set<string>
 } | null> {
   try {
-    const { SettingsService } = await import('@/lib/admin/settings-service')
+    const { SettingsService } = await import('@/lib/settings/system-settings-service')
     const settings = await SettingsService.getOnboardingSettings()
     const options = settings?.fieldOptions ?? {}
     return {

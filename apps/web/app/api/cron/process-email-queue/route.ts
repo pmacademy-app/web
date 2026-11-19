@@ -7,8 +7,8 @@ import { checkStaleHeartbeats, recordCronHeartbeat } from '@/lib/monitoring/cron
 /**
  * POST|GET /api/cron/process-email-queue
  *
- * Accepts the scheduler's `CRON_SECRET` bearer token or an authenticated admin
- * session. The unauthorized-attempt record is preserved through `onDenied`, and
+ * Accepts only the `CRON_SECRET` bearer token (the scheduler, or the admin console
+ * calling from its server). The unauthorized-attempt record is preserved through `onDenied`, and
  * the durable scheduler heartbeat is still written on both outcomes.
  *
  * ENG-01: this five-minute run is also the watchdog for every other cron job. After its own
@@ -16,7 +16,7 @@ import { checkStaleHeartbeats, recordCronHeartbeat } from '@/lib/monitoring/cron
  */
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.process_email_queue',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/process-email-queue',
@@ -27,7 +27,7 @@ export const POST = withRoute(
         category: 'cron',
         operation: 'cron_process_queue_auth',
         message:
-          'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/process-email-queue',
+          'Unauthorized cron request: CRON_SECRET required on /api/cron/process-email-queue',
       })
     },
   },

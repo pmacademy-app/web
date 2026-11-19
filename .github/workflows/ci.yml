@@ -26,7 +26,7 @@ jobs:
     #   - Unit tests: vitest.setup.ts forces mock Supabase values and a test cron
     #     secret, and suites that need the email secrets set their own.
     #   - next build: a CI build is never served. The build-time readers of the
-    #     service-role key (app/sitemap.ts, FeedbackAdminService) fall back to an
+    #     service-role key (app/sitemap.ts, TestimonialsService) fall back to an
     #     empty list when it is absent, and the email and cron secrets are only read
     #     by request handlers at runtime.
     # The two NEXT_PUBLIC_ Supabase values are inlined into the client bundle, so
@@ -194,7 +194,7 @@ jobs:
           git fetch --no-tags --depth=0 origin "${GITHUB_BASE_REF}" >/dev/null 2>&1 || true
           changed="$(git diff --name-only "${base}...HEAD" || true)"
           echo "Changed files:"; echo "${changed}"
-          if echo "${changed}" | grep -qE '^apps/web/(app/\(auth\)/|app/api/auth/|app/api/user/|lib/auth/|lib/api/actor|proxy\.ts|e2e/|playwright\.config\.ts|package-lock\.json)'; then
+          if echo "${changed}" | grep -qE '^apps/web/(app/\(auth\)/|app/api/auth/|app/api/user/|lib/auth/|lib/api/actor|lib/admin-site\.ts|app/api/internal/|lib/security/origin-check|proxy\.ts|e2e/|playwright\.config\.ts|package-lock\.json)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "Auth-relevant paths changed — running the critical paths."
           else

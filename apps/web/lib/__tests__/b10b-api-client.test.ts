@@ -433,9 +433,8 @@ describe('B10-B/B10-C — adoption boundary', () => {
       }
     }
 
-    // Admin call sites migrated in B10-D
-    const adminHits = hits.filter((h) => h.includes('components/admin'))
-    expect(adminHits.length).toBeGreaterThanOrEqual(30)
+    // The admin call sites (B10-D) moved to the admin console repository with the console.
+    expect(hits.filter((h) => h.includes('components/admin'))).toEqual([])
 
     // Every hit belongs to the B10-C / B10-D / AG-11 typed client adoption scope
     for (const hit of hits) {

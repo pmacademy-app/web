@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { POST as telemetryRouteHandler } from '../../app/api/auth/telemetry/route'
-import { GET as adminAuthHealthHandler } from '../../app/api/admin/system/auth-health/route'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { classifyAuthError } from '@/lib/auth/errors'
-import { SystemService } from '@/lib/admin/system-service'
 
 vi.mock('@/lib/monitoring/logger', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/monitoring/logger')>()
@@ -37,7 +35,7 @@ function createMockRequest(url: string, options: {
   } as any
 }
 
-describe('Phase 6 — Client Authentication Telemetry & Admin Observability', () => {
+describe('Phase 6: client authentication telemetry', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
@@ -212,44 +210,6 @@ describe('Phase 6 — Client Authentication Telemetry & Admin Observability', ()
 
       const res = await telemetryRouteHandler(req)
       expect(res.status).toBe(200)
-    })
-  })
-
-  describe('3. Admin Authentication Observability & Aggregation (SystemService)', () => {
-    it('aggregates authentication telemetry and provides health summary', async () => {
-      const health = await SystemService.getAuthHealthTelemetry()
-
-      expect(health).toHaveProperty('status')
-      expect(health).toHaveProperty('failures24h')
-      expect(health).toHaveProperty('failures7d')
-      expect(health).toHaveProperty('providerFailures24h')
-      expect(health).toHaveProperty('networkFailures24h')
-      expect(health).toHaveProperty('isSpikeDetected')
-      expect(health).toHaveProperty('topCategories')
-      expect(health).toHaveProperty('recentFailures')
-      expect(Array.isArray(health.topCategories)).toBe(true)
-      expect(Array.isArray(health.recentFailures)).toBe(true)
-    })
-
-    it('handles database errors gracefully and returns fallback without crashing', async () => {
-      const supabaseModule = await import('@/lib/supabase')
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockImplementationOnce(() => {
-        throw new Error('Database connection timeout')
-      })
-
-      const health = await SystemService.getAuthHealthTelemetry()
-      expect(health.status).toBe('healthy')
-      expect(health.failures24h).toBe(0)
-    })
-  })
-
-  describe('4. Admin Auth Health Route (/api/admin/system/auth-health)', () => {
-    it('returns HTTP 401 when unauthenticated', async () => {
-      const unauthReq = createMockRequest('http://localhost:3000/api/admin/system/auth-health', {
-        headers: {},
-      })
-      const res = await adminAuthHealthHandler(unauthReq)
-      expect([401, 200]).toContain(res.status)
     })
   })
 })

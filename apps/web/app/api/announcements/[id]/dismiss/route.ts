@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { withRoute } from '@/lib/api/with-route'
-import { AnnouncementsService } from '@/lib/admin/announcements-service'
+import { AnnouncementsService } from '@/lib/announcements/announcements-service'
 
 /**
  * Open to `anonymous`, which acknowledges the dismissal without writing — the
