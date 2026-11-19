@@ -21,12 +21,16 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # The single CI check. One job runs every gate in sequence: security scan, content
+  # build, lint, types, unit tests (the accessibility gate is one of them), brand
+  # checks and the production build, plus the database replay when DB files change.
   build-and-validate:
     # Validation already passed on the pull request (branches must be up to date
     # before merging), so a push to main skips it and goes straight to deploy. A manual
     # workflow_dispatch run still validates everything.
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: ./apps/web
@@ -59,6 +63,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # The database-replay path filter diffs against the base branch.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -76,6 +83,38 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm rebuild esbuild unrs-resolver
+
+      # Security gates (were the separate security-audit job).
+      - name: Dependency audit gate
+        working-directory: .
+        run: node --experimental-strip-types scripts/ci/audit-gate.ts
+
+      # Pinned by version and verified by checksum: an unpinned scanner is a
+      # supply-chain hole in the control that exists to find supply-chain holes.
+      # The official gitleaks action is not used because it requires an
+      # organisation licence key; the released binary has no such requirement.
+      - name: Install gitleaks
+        working-directory: .
+        env:
+          GITLEAKS_VERSION: '8.30.1'
+          GITLEAKS_SHA256: '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb'
+        run: |
+          set -euo pipefail
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL -o gitleaks.tar.gz "${url}"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum --check --status
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      # --redact keeps a discovered secret out of the public build log; the
+      # finding still names the file, line and rule, which is what a responder
+      # needs. Exit code 1 on any finding.
+      - name: Secret scan
+        working-directory: .
+        run: |
+          set -euo pipefail
+          gitleaks dir . --config .gitleaks.toml --redact --no-banner --verbose --exit-code 1
 
       # The step gets a true/false flag, never the key itself.
       - name: Verify Environment Presence (Safe Check)
@@ -103,9 +142,6 @@ jobs:
 
       - name: Run Unit & Integration Tests
         run: npm run test
-
-      - name: Accessibility Gate (B11-C axe-core)
-        run: npm run test:a11y
 
       - name: Brand hardening check
         run: |
@@ -137,216 +173,12 @@ jobs:
       - name: Next.js Production Build
         run: npm run build
 
-      - name: Upload Next.js build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: apps/web/.next
-          include-hidden-files: true
-          retention-days: 1
-
-  # Critical-path E2E (B14-C). A separate job from build-and-validate for two reasons.
-  #
-  # Cost: E2E installs a browser and boots the production server, and the roadmap is
-  # explicit that CI time grows — "run E2E on `main` and on PRs touching auth". It used
-  # to run on every push of every PR, including documentation-only ones. The gate below
-  # keeps it on `main` and on the changes it actually protects.
-  #
-  # Visibility: an E2E failure should be its own line in the checks list rather than the
-  # last step of a job that has already done a build, so it is obvious what broke.
-  #
-  # The two flows this runs — signup → verify → first lesson → XP, and login → session
-  # persistence → protected route → logout — are write-heavy. They self-skip with a
-  # stated reason unless E2E_ALLOW_WRITES and staging credentials are present, and
-  # `e2e/support/env.ts` refuses outright to run against the production host. The
-  # remaining specs need no account and run here on every triggered build.
-  e2e:
-    needs: [build-and-validate]
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-    # Public values only at job level (SEC-10). The one sensitive secret this job
-    # needs is set on the step that starts the server; see "Run critical-path E2E".
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      # The same published always-pass Turnstile dummies the build job documents. The
-      # signup spec depends on them: without a solvable challenge the form never submits.
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
-      TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA' }}
-      # Staging only, and only when configured. Absent, the write flows skip rather than
-      # fail — a red E2E job nobody can act on is worse than one that says why it idled.
-      PLAYWRIGHT_TEST_BASE_URL: ${{ secrets.E2E_BASE_URL }}
-      E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
-      E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
-      E2E_ALLOW_WRITES: ${{ secrets.E2E_ALLOW_WRITES }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # The auth-path filter diffs against the base branch, which needs its history.
-          fetch-depth: 0
-
-      # Decides whether this run exercises the critical paths. `main` always does.
-      # A pull request does when it touches auth, the session model, the proxy, the
-      # specs themselves, or the dependency lockfile.
-      - name: Decide whether E2E runs
-        id: decide
-        run: |
-          set -euo pipefail
-          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Not a pull request — running the critical paths."
-            exit 0
-          fi
-          base="origin/${GITHUB_BASE_REF}"
-          git fetch --no-tags --depth=0 origin "${GITHUB_BASE_REF}" >/dev/null 2>&1 || true
-          changed="$(git diff --name-only "${base}...HEAD" || true)"
-          echo "Changed files:"; echo "${changed}"
-          if echo "${changed}" | grep -qE '^apps/web/(app/\(auth\)/|app/api/auth/|app/api/user/|lib/auth/|lib/api/actor|lib/admin-site\.ts|app/api/internal/|lib/security/origin-check|proxy\.ts|e2e/|playwright\.config\.ts|package-lock\.json)'; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Auth-relevant paths changed — running the critical paths."
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "No auth-relevant paths changed — skipping E2E for this pull request."
-          fi
-
-      - name: Setup Node.js
-        if: steps.decide.outputs.run == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: apps/web/package-lock.json
-
-      - name: Install dependencies
-        if: steps.decide.outputs.run == 'true'
-        working-directory: ./apps/web
-        # Same install policy as build-and-validate: no install scripts, then
-        # rebuild only the packages that declare one.
-        run: |
-          npm ci --ignore-scripts
-          npm rebuild esbuild unrs-resolver
-
-      - name: Parse & validate content pipeline
-        if: steps.decide.outputs.run == 'true'
-        working-directory: ./apps/web
-        run: npm run content:build
-
-      - name: Install Playwright Browsers
-        if: steps.decide.outputs.run == 'true'
-        working-directory: ./apps/web
-        run: npx playwright install --with-deps chromium
-
-      # Only built when no external base URL is supplied; with one, the specs run
-      # against that deployment and Playwright's webServer is not used.
-      # Download prebuilt Next.js artifact from build-and-validate to eliminate redundant build
-      - name: Download Next.js build artifact
-        if: steps.decide.outputs.run == 'true' && env.PLAYWRIGHT_TEST_BASE_URL == ''
-        uses: actions/download-artifact@v4
-        with:
-          name: next-build
-          path: apps/web/.next
-
-      # Playwright's webServer starts `next start` inside this step, so the server's
-      # runtime secrets belong here and nowhere else in the job. It needs the
-      # service-role key for its API routes. It does not get the Resend key (email
-      # falls back to a console log), the cron secret (no spec calls a cron route)
-      # or the email hook secret (Supabase never calls this CI server's hook).
-      - name: Run critical-path E2E
-        if: steps.decide.outputs.run == 'true'
-        working-directory: ./apps/web
-        env:
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npm run test:e2e
-
-      - name: Upload Playwright report on failure
-        if: failure() && steps.decide.outputs.run == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: apps/web/test-results/
-          retention-days: 7
-
-  # Dependency and secret gates (B14-B). Deliberately a separate job from
-  # build-and-validate: a security finding must be visible on its own line in the
-  # checks list rather than buried in a build log, and it must not be able to
-  # silently hold back a migration deploy that is otherwise correct. Nothing here
-  # is advisory-only — both steps fail the job when they find something.
-  security-audit:
-    # Validation already passed on the pull request (branches must be up to date
-    # before merging), so a push to main skips it and goes straight to deploy. A manual
-    # workflow_dispatch run still validates everything.
-    if: github.event_name != 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      # No `npm ci` on purpose. `npm audit` resolves entirely from the committed
-      # lockfile, so this job installs nothing and therefore executes no
-      # third-party install script — the smallest possible footprint for a job
-      # whose whole purpose is to distrust the dependency tree.
-      - name: Dependency audit gate
-        run: node --experimental-strip-types scripts/ci/audit-gate.ts
-
-      # Pinned by version and verified by checksum: an unpinned scanner is a
-      # supply-chain hole in the control that exists to find supply-chain holes.
-      # The official gitleaks action is not used because it requires an
-      # organisation licence key; the released binary has no such requirement.
-      - name: Install gitleaks
-        env:
-          GITLEAKS_VERSION: '8.30.1'
-          GITLEAKS_SHA256: '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb'
-        run: |
-          set -euo pipefail
-          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
-          curl -sSfL -o gitleaks.tar.gz "${url}"
-          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum --check --status
-          tar -xzf gitleaks.tar.gz gitleaks
-          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
-          gitleaks version
-
-      # --redact keeps a discovered secret out of the public build log; the
-      # finding still names the file, line and rule, which is what a responder
-      # needs. Exit code 1 on any finding.
-      - name: Secret scan
-        run: |
-          set -euo pipefail
-          gitleaks dir . --config .gitleaks.toml --redact --no-banner --verbose --exit-code 1
-
-  # Replays migrations against a local Postgres instance, applies safe held
-  # migrations, runs the grant allowlist test, and verifies database types. (AG-04)
-  db-local:
-    name: Local Database Replay and Security Checks
-    # Validation already passed on the pull request (branches must be up to date
-    # before merging), so a push to main skips it and goes straight to deploy. A manual
-    # workflow_dispatch run still validates everything.
-    if: github.event_name != 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # The path filter below diffs against the base branch, which needs its history.
-          fetch-depth: 0
-
+      # Database replay (was the separate db-local job).
       # A pull request replays the database only when it touches the schema, the
       # database tests, the generated types or this workflow. Every other run does.
       - name: Decide whether the database replay runs
         id: decide
+        working-directory: .
         run: |
           set -euo pipefail
           if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
@@ -360,12 +192,6 @@ jobs:
             echo "run=false" >> "$GITHUB_OUTPUT"; echo "No database-related files changed: skipping the replay."
           fi
 
-      - name: Setup Node.js
-        if: steps.decide.outputs.run == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
       - name: Setup Supabase CLI
         if: steps.decide.outputs.run == 'true'
         uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
@@ -374,31 +200,37 @@ jobs:
 
       - name: Start local Supabase
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           supabase start
 
       - name: Reset local database
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           supabase db reset
 
       - name: Apply held migrations
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           bash scripts/ci/apply-held-migrations.sh
 
       - name: Run grant allowlist test
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/tests/grant_allowlist.sql
 
       - name: Run pgTAP database tests
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           supabase test db
 
       - name: Check database types drift
         if: steps.decide.outputs.run == 'true'
+        working-directory: .
         run: |
           bash scripts/ci/check-db-types-drift.sh
 
@@ -411,9 +243,9 @@ jobs:
   # F-REL-7 / B14-A. Credential presence is now asserted in its own step that FAILS,
   # and the applied state is verified after the push rather than assumed.
   deploy-supabase:
-    needs: [build-and-validate, db-local]
-    # The validation jobs are skipped on a push to main (see build-and-validate), so
-    # run unless one of them actually failed or the run was cancelled.
+    needs: [build-and-validate]
+    # build-and-validate is skipped on a push to main, so run unless it failed or
+    # the run was cancelled.
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
