@@ -99,7 +99,7 @@
     "axe-core": "^4.14.1",
     "babel-plugin-react-compiler": "1.0.0",
     "cross-env": "^10.1.0",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.4.6",
     "jsdom": "^31.0.1",
     "mermaid": "^11.16.1",
