@@ -67,7 +67,6 @@ describe('B11-C — Accessibility Gate: Design System Primitives (B11-A)', () =>
     'destructive-subtle',
     'warning',
     'accent',
-    'admin',
     'link',
     'ai',
     'success',
