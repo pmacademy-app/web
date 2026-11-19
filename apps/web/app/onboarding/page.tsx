@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { SettingsService } from '@/lib/admin/settings-service'
+import { SettingsService } from '@/lib/settings/system-settings-service'
 import { getServerUser } from '@/lib/auth'
 import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
 import OnboardingWizard from './OnboardingWizard'

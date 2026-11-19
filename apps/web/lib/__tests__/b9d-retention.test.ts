@@ -417,7 +417,7 @@ describe('B9-D — the cron route gates deletion behind two independent switches
   const routeSource = readFileSync(path.join(ROOT, 'app/api/cron/cleanup/route.ts'), 'utf8')
 
   it('keeps the canonical cron authorization', () => {
-    expect(routeSource).toContain("actor: { allow: ['cron', 'admin'] }")
+    expect(routeSource).toContain("actor: { allow: ['cron'] }")
     expect(routeSource).toContain('withRoute')
   })
 

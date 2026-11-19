@@ -1,8 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, prefer-const, @typescript-eslint/no-unused-vars */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AnnouncementsService, type AnnouncementCreateInput } from '../admin/announcements-service'
-import { DashboardService } from '../admin/dashboard-service'
-import { AdminConsoleService } from '../admin/service'
+import { AnnouncementsService } from '../announcements/announcements-service'
+
+/**
+ * Authoring moved to the admin console repository, so rows are seeded straight into the
+ * fake table in the shape the admin console writes them.
+ */
+interface SeedInput {
+  title: string
+  content: string
+  status: string
+  targetAudience: string
+  targetCohortId?: string
+  targetUserId?: string
+  scheduledAt?: string
+  expiresAt?: string
+  linkUrl?: string
+  dismissible?: boolean
+  priority?: number
+}
 
 let idCounter = 0
 
@@ -23,7 +39,28 @@ const mockStore: {
   auditLogs: [],
 }
 
-vi.mock('../supabase', () => {
+function seed(input: SeedInput): { id: string } {
+  const id = `mock-system_announcements-${++idCounter}`
+  mockStore.announcements.push({
+    id,
+    title: input.title,
+    content: input.content,
+    status: input.status,
+    target_audience: input.targetAudience,
+    target_cohort_id: input.targetCohortId ?? null,
+    target_user_id: input.targetUserId ?? null,
+    scheduled_at: input.scheduledAt ?? null,
+    expires_at: input.expiresAt ?? null,
+    link_url: input.linkUrl ?? null,
+    dismissible: input.dismissible ?? true,
+    priority: input.priority ?? 1,
+    created_at: new Date(Date.now() + idCounter).toISOString(),
+    updated_at: new Date().toISOString(),
+  })
+  return { id }
+}
+
+vi.mock('@/lib/supabase', () => {
   return {
     createServiceRoleClient: () => {
       const createBuilder = (table: string) => {
@@ -214,7 +251,7 @@ vi.mock('../supabase', () => {
   }
 })
 
-describe('Phase 2 — System Announcements & Dashboard Performance', () => {
+describe('Phase 2: System Announcements (learner reads and dismissals)', () => {
   beforeEach(() => {
     idCounter = 0
     mockStore.announcements = []
@@ -234,89 +271,21 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
   })
 
   describe('AnnouncementsService Lifecycle & Audience Targeting', () => {
-    it('creates a draft announcement and records audit log', async () => {
-      const input: AnnouncementCreateInput = {
-        title: 'Platform Maintenance Notice',
-        content: 'We will be undergoing scheduled maintenance tonight from 2am to 3am UTC.',
-        type: 'warning',
-        status: 'draft',
-        targetAudience: 'all',
-        dismissible: true,
-        priority: 2,
-      }
-
-      const created = await AnnouncementsService.createAnnouncement(input, 'admin-1', 'admin@prodily.app')
-      expect(created.id).toBeDefined()
-      expect(created.title).toBe('Platform Maintenance Notice')
-      expect(created.status).toBe('draft')
-      expect(created.type).toBe('warning')
-
-      // Verify stored
-      expect(mockStore.announcements.length).toBe(1)
-      expect(mockStore.announcements[0].title).toBe('Platform Maintenance Notice')
-    })
-
-    it('publishes an announcement immediately with published_at timestamp', async () => {
-      const created = await AnnouncementsService.createAnnouncement(
-        { title: 'New Capstone Released', content: 'Check out the new Product Strategy capstone!', type: 'success' },
-        'admin-1',
-        'admin@prodily.app'
-      )
-
-      const published = await AnnouncementsService.publishAnnouncement(created.id, 'admin-1', 'admin@prodily.app')
-      expect(published.status).toBe('active')
-      expect(published.publishedAt).toBeDefined()
-    })
-
-    it('pauses and resumes an announcement', async () => {
-      const created = await AnnouncementsService.createAnnouncement(
-        { title: 'Flash Challenge', content: 'Double XP weekend!', status: 'active' },
-        'admin-1',
-        'admin@prodily.app'
-      )
-
-      const paused = await AnnouncementsService.togglePauseAnnouncement(created.id, true, 'admin-1', 'admin@prodily.app')
-      expect(paused.status).toBe('paused')
-
-      const resumed = await AnnouncementsService.togglePauseAnnouncement(created.id, false, 'admin-1', 'admin@prodily.app')
-      expect(resumed.status).toBe('active')
-    })
-
     it('strictly enforces lifecycle states: draft, scheduled, expired, and paused are hidden', async () => {
       const now = new Date()
       const futureDate = new Date(now.getTime() + 86400000).toISOString() // +1 day
       const pastDate = new Date(now.getTime() - 86400000).toISOString() // -1 day
 
       // 1. Draft announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Draft Announcement', content: 'Not published yet', status: 'draft', targetAudience: 'all' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Draft Announcement', content: 'Not published yet', status: 'draft', targetAudience: 'all' })
       // 2. Future scheduled announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Future Scheduled', content: 'Starts tomorrow', status: 'scheduled', scheduledAt: futureDate, targetAudience: 'all' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Future Scheduled', content: 'Starts tomorrow', status: 'scheduled', scheduledAt: futureDate, targetAudience: 'all' })
       // 3. Expired announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Expired Promo', content: 'Ended yesterday', status: 'active', expiresAt: pastDate, targetAudience: 'all' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Expired Promo', content: 'Ended yesterday', status: 'active', expiresAt: pastDate, targetAudience: 'all' })
       // 4. Paused announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Paused Announcement', content: 'Temporarily paused', status: 'paused', targetAudience: 'all' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Paused Announcement', content: 'Temporarily paused', status: 'paused', targetAudience: 'all' })
       // 5. Active announcement within window
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Welcome to Prodily 🚀', content: 'Start learning product management', status: 'active', targetAudience: 'all', linkUrl: '/academy' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Welcome to Prodily 🚀', content: 'Start learning product management', status: 'active', targetAudience: 'all', linkUrl: '/academy' })
 
       const activeAnnouncements = await AnnouncementsService.getActiveAnnouncementsForUser('u-1')
       expect(activeAnnouncements.length).toBe(1)
@@ -326,29 +295,13 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
 
     it('enforces targeted audiences: individual user vs cohort vs all learners', async () => {
       // 1. All Learners announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Welcome to Prodily 🚀', content: 'All learners announcement', status: 'active', targetAudience: 'all' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Welcome to Prodily 🚀', content: 'All learners announcement', status: 'active', targetAudience: 'all' })
       // 2. Cohort specific announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Cohort 2026A Exclusive', content: 'Meetup tomorrow', status: 'active', targetAudience: 'cohort', targetCohortId: 'cohort-2026a' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Cohort 2026A Exclusive', content: 'Meetup tomorrow', status: 'active', targetAudience: 'cohort', targetCohortId: 'cohort-2026a' })
       // 3. Individual user announcement
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Special Welcome for Alice', content: '1-on-1 mentor session available', status: 'active', targetAudience: 'individual', targetUserId: 'u-1' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Special Welcome for Alice', content: '1-on-1 mentor session available', status: 'active', targetAudience: 'individual', targetUserId: 'u-1' })
       // 4. Individual user announcement for someone else
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Private Notice for Bob', content: 'Admin message', status: 'active', targetAudience: 'individual', targetUserId: 'u-2' },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Private Notice for Bob', content: 'Admin message', status: 'active', targetAudience: 'individual', targetUserId: 'u-2' })
 
       // Alice (u-1 in cohort-2026a) should see: All + Cohort + Alice's Private (3 announcements)
       const aliceList = await AnnouncementsService.getActiveAnnouncementsForUser('u-1', 'cohort-2026a')
@@ -370,16 +323,8 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
     })
 
     it('persists dismissals independently per user', async () => {
-      const a1 = await AnnouncementsService.createAnnouncement(
-        { title: 'Announcement 1', content: 'Dismissible notice 1', status: 'active', targetAudience: 'all', dismissible: true },
-        'admin-1',
-        'admin@prodily.app'
-      )
-      const a2 = await AnnouncementsService.createAnnouncement(
-        { title: 'Announcement 2', content: 'Dismissible notice 2', status: 'active', targetAudience: 'all', dismissible: true },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      const a1 = seed({ title: 'Announcement 1', content: 'Dismissible notice 1', status: 'active', targetAudience: 'all', dismissible: true })
+      const a2 = seed({ title: 'Announcement 2', content: 'Dismissible notice 2', status: 'active', targetAudience: 'all', dismissible: true })
 
       // Alice dismisses announcement 1
       await AnnouncementsService.dismissAnnouncement(a1.id, 'u-1')
@@ -395,48 +340,13 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
     })
 
     it('orders multiple announcements by priority descending', async () => {
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Normal Announcement', content: 'Priority 1', status: 'active', targetAudience: 'all', priority: 1 },
-        'admin-1',
-        'admin@prodily.app'
-      )
-      await AnnouncementsService.createAnnouncement(
-        { title: 'Urgent Announcement', content: 'Priority 10', status: 'active', targetAudience: 'all', priority: 10 },
-        'admin-1',
-        'admin@prodily.app'
-      )
+      seed({ title: 'Normal Announcement', content: 'Priority 1', status: 'active', targetAudience: 'all', priority: 1 })
+      seed({ title: 'Urgent Announcement', content: 'Priority 10', status: 'active', targetAudience: 'all', priority: 10 })
 
       const list = await AnnouncementsService.getActiveAnnouncementsForUser('u-1')
       expect(list.length).toBe(2)
       expect(list[0].title).toBe('Urgent Announcement')
       expect(list[1].title).toBe('Normal Announcement')
-    })
-  })
-
-  describe('Dashboard & Performance Aggregations', () => {
-    it('executes getDashboardSummary with fast aggregation RPC / query', async () => {
-      const summary = await DashboardService.getDashboardSummary()
-      expect(summary.totalUsers).toBeGreaterThanOrEqual(2)
-      expect(summary.totalXpAwarded).toBeGreaterThanOrEqual(150)
-      expect(summary.activeLearners7d).toBeGreaterThanOrEqual(1)
-    })
-
-    it('executes getDashboardData without unbounded table scans', async () => {
-      const data = await DashboardService.getDashboardData('30d', null, null)
-      expect(data.kpis).toBeDefined()
-      expect(data.kpis.totalUsers).toBeGreaterThanOrEqual(2)
-      expect(data.funnel).toBeDefined()
-      expect(data.funnel.length).toBe(7)
-      expect(data.series.length).toBeGreaterThan(0)
-    })
-
-    it('executes getUsersOverview with server-side pagination and page-scoped enrichment', async () => {
-      const result = await AdminConsoleService.getUsersOverview(10, '', {}, 1)
-      expect(result.users).toBeDefined()
-      expect(result.users.length).toBe(2)
-      expect(result.total).toBe(2)
-      expect(result.users[0].fullName).toBeDefined()
-      expect(result.users[0].totalXp).toBeDefined()
     })
   })
 })

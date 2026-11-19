@@ -5,8 +5,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 
 import { MAX_REFERRAL_REWARD_XP, REFERRAL_REWARD_XP, normalizeReferralRewardXp } from '@/lib/referral/reward'
 import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
-import { SettingsService } from '@/lib/admin/settings-service'
-import type { LearningSettings } from '@/lib/admin/types'
+import { SettingsService } from '@/lib/settings/system-settings-service'
+import type { LearningSettings } from '@/lib/settings/types'
 
 afterEach(() => vi.restoreAllMocks())
 

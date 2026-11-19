@@ -4,6 +4,10 @@
 **Scope:** Admin Console Workspaces, APIs, Navigation, RBAC, Services, and State Architecture  
 **Last Updated:** September 6, 2026  
 
+> **Moved.** The admin console now lives in its own repository and deploys to its own host.
+> This document describes it as it was in this repository; the admin repository owns the
+> current version. See `docs/DEPLOYMENT.md` section 2.0 for how the two apps connect.
+
 ---
 
 ## 1. Admin Panel Overview

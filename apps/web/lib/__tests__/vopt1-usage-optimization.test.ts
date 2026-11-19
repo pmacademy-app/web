@@ -114,9 +114,9 @@ describe('V-OPT-1: route caching configuration', () => {
     // Next takes the minimum of a page's revalidate and any nested cache it awaits,
     // so this must not drop back below the /reviews page value.
     const src = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../admin/feedback-service.ts', import.meta.url), 'utf-8')
+      fs.readFileSync(new URL('../feedback/published-testimonials.ts', import.meta.url), 'utf-8')
     )
-    const match = src.match(/\['published-testimonials-v1'\],[\s\S]*?\{ revalidate: (\d+), tags: \['testimonials'\] \}/)
+    const match = src.match(/\['published-testimonials-v1'\],[\s\S]*?\{ revalidate: (\d+), tags: \[TESTIMONIALS_CACHE_TAG\] \}/)
     expect(match).not.toBeNull()
     expect(Number(match![1])).toBeGreaterThanOrEqual(1800)
   })

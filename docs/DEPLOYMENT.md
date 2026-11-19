@@ -42,6 +42,8 @@
 | `CRON_SECRET` | **Server Only** | Bearer secret authorizing the `/api/cron/*` routes. Sent by GitHub Actions and, once applied, by Supabase pg_cron, which reads the same value from the Vault secret `cron_secret` (see §7). Rotate both together |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public (Client + Server) | Cloudflare Turnstile site key. **Required for a production build** — it is inlined into the client bundle at build time, so `next.config.ts` fails the build when it is absent (see [`SECURITY.md`](SECURITY.md)) |
 | `TURNSTILE_SECRET_KEY` | **Server Only** | Cloudflare Turnstile secret used for the server-side Siteverify call. Never prefix with `NEXT_PUBLIC_`; when missing in production the signup and resend-verification routes fail closed |
+| `INTERNAL_REVALIDATE_SECRET` | **Server Only** | Bearer secret the admin console (separate repository) sends to `POST /api/internal/revalidate` to drop learner caches after an admin write. Set the same value on both apps. Unset in production means the endpoint refuses every call |
+| `ADMIN_SITE_URL` | **Server Only** | Optional. Base URL of the admin console host (for example `https://admin.prodily.app`). `/admin` paths on the learner host 308 there, and admin alert links point there. Unset: `/admin` returns 404 |
 | `DEV_TURNSTILE_BYPASS` | **Server Only** (local dev) | Optional. `true` skips Turnstile verification. Ignored whenever `NODE_ENV=production`, so it cannot weaken a deployed environment. Do **not** set it in Vercel |
 | `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Public (Client + Server) | Google sign-in flag. Only the exact string `true` enables it; default `false`. **Inlined at build time**, so a change needs a redeploy, not a restart. While off, the button is hidden and `/api/auth/google` returns 404. See §5 |
 | `OAUTH_STATE_SECRET` | **Server Only** | At least 32 random characters (`openssl rand -base64 48`). HMAC key for the signed Google intent cookie. Never prefix with `NEXT_PUBLIC_`. With the flag on and this missing or short, Google sign-in fails closed (`/login?error=oauth_unavailable`). See §5 |
@@ -79,6 +81,24 @@ The required-for-production variables (the first 16 rows, through `TURNSTILE_SEC
 > verification build that is never served, so it does not need the real keys — but the
 > guard still applies to it, which is why the fallback exists rather than an exemption.
 > If you add the real values as repository secrets they take precedence automatically.
+
+### 2.0 Admin console moved
+
+The admin console (the `/admin` pages, `/api/admin/*` and their components and services) now
+lives in its own repository and deploys to its own host. This learner app keeps no admin UI or
+admin API. What connects the two:
+
+- The admin app calls the learner cron routes with `Authorization: Bearer <CRON_SECRET>`
+  (`POST /api/cron/<name>`); those routes accept only the cron secret now.
+- The admin app calls `POST /api/internal/revalidate` with
+  `Authorization: Bearer <INTERNAL_REVALIDATE_SECRET>` to invalidate learner caches. Only the
+  tags `system_settings`, `leaderboard`, `testimonials` and the learner paths listed in
+  `apps/web/lib/internal/revalidate-allowlist.ts` are accepted.
+- `ADMIN_SITE_URL` sends stale `/admin` bookmarks to the admin host.
+
+Both apps share the same Supabase project, so no migration is involved. The steps below that
+mention `/admin` now happen on the admin host. `ADMIN_TIMEZONE`, `VERCEL_API_TOKEN` and
+`SUPABASE_MANAGEMENT_API_KEY` are read only by the admin console.
 
 ### 2.1 Admin access (database flag, not an env var)
 

@@ -11,7 +11,6 @@ import {
   submitCapstoneAction,
   getModuleCapstonesOverview,
 } from '@/lib/capstones-db'
-import { ModerationService } from '@/lib/admin/moderation-service'
 import { POST as submitPostHandler } from '../../app/api/capstones/[module]/submit/route'
 import { POST as draftPostHandler } from '../../app/api/capstones/[module]/draft/route'
 
@@ -425,41 +424,6 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
       await expect(
         submitCapstoneAction(mockSupabase, 'usr-aditya', 'design', validLongContent)
       ).rejects.toThrow('You must complete at least 8 lessons in this module first')
-    })
-  })
-
-  describe('6. Admin Moderation & Review (ModerationService.reviewCapstone)', () => {
-    // Phase 8.2: reviewCapstone now reads the row first (to detect the first review and resolve the
-    // learner), then updates. The mock supports select→eq→maybeSingle (read) and update→eq→select
-    // (write). A null user_id keeps these focused on the status/visibility mapping without exercising
-    // the notification path (covered in capstone-review-loop.test.ts).
-    const reviewMockClient = (id: string) => ({
-      from: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            maybeSingle: vi.fn().mockResolvedValue({
-              data: { id, user_id: null, module_slug: 'foundations', status: 'submitted', reviewed_at: null },
-              error: null,
-            }),
-          }),
-        }),
-        update: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: [{ id }], error: null }),
-          }),
-        }),
-        insert: vi.fn().mockResolvedValue({ data: [], error: null }),
-      }),
-    }) as any
-
-    it('approving a capstone sets status to reviewed and is_public to true', async () => {
-      const success = await ModerationService.reviewCapstone('admin-1', 'admin@prodily.app', 'sub-123', 'approve', reviewMockClient('sub-123'))
-      expect(success).toBe(true)
-    })
-
-    it('rejecting a capstone sets status to reviewed and is_public to false', async () => {
-      const success = await ModerationService.reviewCapstone('admin-1', 'admin@prodily.app', 'sub-456', 'reject', reviewMockClient('sub-456'))
-      expect(success).toBe(true)
     })
   })
 

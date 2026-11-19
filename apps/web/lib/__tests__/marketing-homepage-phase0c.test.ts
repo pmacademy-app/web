@@ -256,7 +256,7 @@ describe('Phase 0.C — testimonials are real or absent', () => {
   const source = code(read('components/marketing/sections/published-testimonials.tsx'))
 
   it('reads approved rows from the feedback service instead of a literal array', () => {
-    expect(source).toContain('FeedbackAdminService.getPublishedTestimonials')
+    expect(source).toContain('TestimonialsService.getPublishedTestimonials')
     // A hardcoded quote array is exactly what the claims policy forbids.
     expect(source).not.toMatch(/quote:\s*['"]/)
     expect(source).not.toMatch(/author:\s*['"][A-Z]/)

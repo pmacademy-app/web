@@ -8,7 +8,7 @@
  */
 
 import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '@/lib/referral/reward'
-import { SettingsService } from '@/lib/admin/settings-service'
+import { SettingsService } from '@/lib/settings/system-settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'

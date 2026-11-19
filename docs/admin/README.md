@@ -1,3 +1,6 @@
+> **Moved.** The admin console now lives in its own repository and deploys to its own host.
+> These pages describe it as it was in this repository. See `docs/DEPLOYMENT.md` section 2.0.
+
 # Prodily Admin Panel — Operator's Manual & Navigation Hub
 
 Welcome to the **Prodily Admin Operating Manual**.

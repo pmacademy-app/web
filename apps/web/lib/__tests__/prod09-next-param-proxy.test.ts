@@ -45,7 +45,7 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: { getProductSettings: mockGetProductSettings },
 }))
 
@@ -109,10 +109,10 @@ describe('signed-out redirect to /login carries next', () => {
     expect(loc.searchParams.get('next')).toBe('/signup/complete-consent?next=%2Facademy')
   })
 
-  it('the admin area still goes to /admin/login without next', async () => {
-    const loc = location(await proxy(req('/admin/users')))
-    expect(loc.pathname).toBe('/admin/login')
-    expect(loc.searchParams.has('next')).toBe(false)
+  it('the admin area is not a learner page: no login redirect and no next', async () => {
+    // The admin console moved to its own host (see lib/admin-site.ts).
+    const res = await proxy(req('/admin/users'))
+    expect(res.headers.get('location')).toBeNull()
   })
 })
 

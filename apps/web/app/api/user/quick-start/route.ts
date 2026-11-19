@@ -29,7 +29,7 @@ export const runtime = 'nodejs'
  */
 export const POST = withRoute(
   {
-    actor: { allow: ['learner', 'admin'] },
+    actor: { allow: ['learner'] },
     operation: 'user.quick_start.complete',
     domain: 'auth',
     summary: 'Unhandled exception completing the quick start tour',

@@ -21,7 +21,7 @@ vi.mock('@/lib/rate-limit', () => ({
   evaluatePersistentRateLimit: vi.fn(async () => ({ success: true, remaining: 4, resetInMs: 60_000 })),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     getProductSettings: vi.fn(async () => ({ ...mockSettings })),
   },

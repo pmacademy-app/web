@@ -29,11 +29,11 @@ describe('capstone OG card invalidation', () => {
     expect(cache.revalidatePath.mock.calls).toEqual([['/api/og/portfolio/ada/capstones/strategy']])
   })
 
-  it('runs wherever the portfolio card is invalidated, and when a review changes visibility', () => {
-    // Old and new handle; the behaviour is covered in og-card-canonical-path.test.ts.
+  it('runs wherever the portfolio card is invalidated', () => {
+    // Old and new handle; the behaviour is covered in og-card-canonical-path.test.ts. Admin
+    // writes (user edits, capstone review) moved to the admin console, which asks this app
+    // to drop the card paths through POST /api/internal/revalidate.
     expect(source('app/api/settings/portfolio/route.ts')).toContain('revalidateCapstoneOgCards(handle)')
-    expect(source('lib/admin/service.ts').match(/revalidateCapstoneOgCards\(userRow\.username\)/g)).toHaveLength(2)
-    expect(source('lib/admin/moderation-service.ts')).toContain('revalidateCapstoneOgCards(owner.username, [current.module_slug])')
   })
 
   it('keeps the stale window short on the capstone card', () => {

@@ -174,10 +174,8 @@ describe('B13-B — list endpoints conform', () => {
    */
   const MIGRATED = [
     'notifications/route.ts',
-    'admin/contact/route.ts',
-    'admin/emails/broadcasts/route.ts',
-    'admin/fellow-requests/route.ts',
-    'admin/system/alerts/route.ts',
+    // The four admin list routes this batch also migrated moved to the admin console
+    // repository with the console.
     'announcements/active/route.ts',
   ]
 

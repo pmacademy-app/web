@@ -8,7 +8,6 @@ import { metadata as curriculumMetadata } from '../../app/(marketing)/curriculum
 import { metadata as privacyMetadata } from '../../app/(marketing)/privacy/page'
 import { metadata as termsMetadata } from '../../app/(marketing)/terms/page'
 import { metadata as authLayoutMetadata } from '../../app/(auth)/layout'
-import { metadata as adminLayoutMetadata } from '../../app/admin/(console)/layout'
 import robots from '../../app/robots'
 import sitemap from '../../app/sitemap'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -114,10 +113,6 @@ describe('Phase 1 Technical SEO Foundation Unit Test Suite', () => {
 
   it('/signup and (auth) pages inherit noindex, follow', () => {
     expect(authLayoutMetadata.robots).toEqual({ index: false, follow: true })
-  })
-
-  it('Admin console layout specifies noindex, nofollow', () => {
-    expect(adminLayoutMetadata.robots).toEqual({ index: false, follow: false })
   })
 
   it('Public support email is standardized to BRAND.supportEmail', () => {

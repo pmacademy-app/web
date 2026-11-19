@@ -30,7 +30,7 @@ vi.mock('@/lib/rate-limit', () => ({
 }))
 
 const mockGetProductSettings = vi.fn()
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     isEmailVerificationRequired: () => mockGetProductSettings().then((s: { requireEmailVerification: boolean }) => s.requireEmailVerification),
     getProductSettings: () => mockGetProductSettings(),

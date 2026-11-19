@@ -9,7 +9,6 @@ import { createRoot, type Root } from 'react-dom/client'
 
 import { ConfirmDestructiveAction } from '../settings/ConfirmDestructiveAction'
 import { NotificationCenterDrawer } from '../notifications/NotificationCenterDrawer'
-import { AdminModal } from '../admin/AdminModal'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -84,29 +83,5 @@ describe('UX-13 / AG-20: Accessible Dialogs and Drawers via base-ui', () => {
     expect(dialog).not.toBeNull()
     expect(dialog?.getAttribute('aria-modal')).toBe('true')
     expect(dialog?.textContent).toContain('Notifications')
-  })
-
-  it('renders an admin modal (AdminModal) with accessible name and role="dialog"', async () => {
-    const handleClose = vi.fn()
-
-    await act(async () => {
-      root.render(
-        <AdminModal
-          open={true}
-          onClose={handleClose}
-          title="Module Archive Warning"
-          description="Archiving will hide this module."
-        >
-          <div data-testid="admin-child">Module content to archive</div>
-        </AdminModal>
-      )
-    })
-
-    const dialog = document.body.querySelector<HTMLElement>('[role="dialog"]')
-    expect(dialog).not.toBeNull()
-    expect(dialog?.getAttribute('aria-modal')).toBe('true')
-    expect(dialog?.textContent).toContain('Module Archive Warning')
-    expect(dialog?.textContent).toContain('Archiving will hide this module.')
-    expect(dialog?.textContent).toContain('Module content to archive')
   })
 })

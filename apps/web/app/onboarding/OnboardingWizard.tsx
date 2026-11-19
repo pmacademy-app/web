@@ -23,10 +23,10 @@ import {
 } from './onboarding-destinations'
 import { Button } from '@/components/ui/button'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
-import { CURRICULUM_MODULE_META, CurriculumModuleMeta } from '@/lib/admin/curriculum-meta'
+import { CURRICULUM_MODULE_META, CurriculumModuleMeta } from '@/lib/curriculum/curriculum-meta'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
-import { DEFAULT_GOAL_OPTIONS, DEFAULT_EXPERIENCE_OPTIONS } from '@/lib/admin/onboarding-defaults'
-import type { OnboardingSettings, OnboardingFieldOption } from '@/lib/admin/types'
+import { DEFAULT_GOAL_OPTIONS, DEFAULT_EXPERIENCE_OPTIONS } from '@/lib/onboarding/onboarding-defaults'
+import type { OnboardingSettings, OnboardingFieldOption } from '@/lib/settings/types'
 
 interface OnboardingUser {
   id: string

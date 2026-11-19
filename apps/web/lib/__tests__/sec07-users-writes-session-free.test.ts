@@ -112,7 +112,7 @@ vi.mock('@/lib/rate-limit', () => ({
   evaluateInMemoryRateLimit: vi.fn(),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     isEmailVerificationRequired: vi.fn().mockResolvedValue(false),
     getProductSettings: vi.fn().mockResolvedValue({ allowSignups: true }),

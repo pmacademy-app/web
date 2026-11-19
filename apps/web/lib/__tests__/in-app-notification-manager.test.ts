@@ -4,7 +4,7 @@ import {
   InAppManagerService,
   mapPriorityLevelToNumber,
   mapNumberToPriorityLevel,
-} from '../admin/in-app-manager-service'
+} from '../broadcasts/in-app-manager-service'
 import { buildInAppContentFromEvent } from '../notifications/in-app/service'
 
 const mockDb: {
@@ -181,7 +181,7 @@ vi.mock('@/lib/supabase', () => {
   }
 })
 
-vi.mock('../admin/user-filter-query', () => {
+vi.mock('../broadcasts/user-filter-query', () => {
   return {
     queryUserIds: vi.fn().mockImplementation((filters: any) => {
       let matching = [...mockDb.users]

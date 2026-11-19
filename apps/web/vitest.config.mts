@@ -24,7 +24,7 @@ export default defineConfig({
     exclude: ['e2e/**/*', 'node_modules/**/*'],
     // CI stability (F-REL-11). The suite is large (190+ files) and several hot paths
     // — notably the notification queue (`enqueueNotificationItem` → dynamic
-    // `import('@/lib/admin/settings-service')`, `@/lib/monitoring/logger`) — defer
+    // `import('@/lib/settings/system-settings-service')`, `@/lib/monitoring/logger`), defer
     // heavy module graphs behind the first `await import(...)`. That import cost is
     // paid lazily *inside* the running test, so it counts against the per-test clock.
     //

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { SettingsService } from '../admin/settings-service'
+import { SettingsService } from '../settings/system-settings-service'
 import { NextRequest, NextResponse } from 'next/server'
 import { POST as handleSignup } from '@/app/api/auth/signup/route'
 import { POST as handleLogin } from '@/app/api/auth/login/route'

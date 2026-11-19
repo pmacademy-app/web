@@ -8,6 +8,7 @@ import { isAllowedApiOrigin } from '@/lib/security/origin-check'
 // PROD-09: the one open-redirect guard for `next`. Its only runtime dependency is
 // `node:crypto`, which the proxy's Node.js runtime provides.
 import { sanitizeNextPath } from '@/lib/auth/oauth-intent'
+import { adminSiteUrlFor, isAdminConsolePath } from '@/lib/admin-site'
 // Phase 6: pure, dependency-light access resolver (types only — safe in the edge proxy bundle).
 import { resolveLessonAccess } from '@/lib/curriculum-access'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
@@ -31,9 +32,6 @@ import { resolveLessonAccess } from '@/lib/curriculum-access'
 import curriculum from '../../content/dist/curriculum.json'
 
 const AUTH_PAGE_TARGET_LEARNER = '/dashboard'
-const AUTH_PAGE_TARGET_ADMIN = '/admin'
-const ADMIN_LOGIN_PAGE = '/admin/login'
-const ACCESS_DENIED_PAGE = '/admin/access-denied'
 // Google sign-ups who have not yet accepted the Terms and confirmed their age land here.
 const CONSENT_GATE_PAGE = '/signup/complete-consent'
 const LEARNER_LOGIN_PAGE = '/login'
@@ -165,6 +163,16 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
 
+  // ── Admin console: moved to its own host ────────────────────────────────
+  // A stale /admin bookmark is sent to the same path on ADMIN_SITE_URL with a 308. With
+  // no admin host configured it passes through, and since this app has no /admin route
+  // Next answers with the not-found page and a 404. No session work happens either way.
+  if (isAdminConsolePath(path)) {
+    const target = adminSiteUrlFor(`${path}${request.nextUrl.search}`)
+    if (target) return NextResponse.redirect(target, 308)
+    return passThrough(request, requestId)
+  }
+
   // Route classification ----------------------------------------------------
   // The consent gate sits under /signup but is only for signed-in users, so it is
   // handled before the general auth-page bounce below.
@@ -173,16 +181,6 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   // Auth pages are public and route authenticated users away.
   const isGeneralAuthPage =
     path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/reset-password')
-
-  // The admin console has its own public login page. It must ALWAYS be
-  // reachable by guests; authenticated visitors are routed by authorization.
-  const isAdminLoginPage = path === ADMIN_LOGIN_PAGE
-
-  // Access denied is informational and must always render — never redirect.
-  const isAccessDeniedPage = path === ACCESS_DENIED_PAGE
-
-  const isAdminArea = path.startsWith('/admin')
-  const isAdminProtectedPage = isAdminArea && !isAdminLoginPage && !isAccessDeniedPage
 
   // L1: badges, capstones and notifications (all under app/(app)) were missing, so
   // maintenance mode, onboarding and the Google consent gate skipped them.
@@ -196,17 +194,17 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     path.startsWith('/settings') ||
     path.startsWith('/onboarding') ||
     path.startsWith('/academy') ||
-    isAdminProtectedPage ||
     (path.startsWith('/curriculum/') && path !== '/curriculum')
 
-  const isPublicPage = isGeneralAuthPage || isAdminLoginPage || isAccessDeniedPage
+  const isPublicPage = isGeneralAuthPage
 
   // Learner APIs that must be protected against maintenance mode & unverified bypass
   const isApiRoute = path.startsWith('/api/')
   const isExemptApi =
     path.startsWith('/api/auth/') ||
-    path.startsWith('/api/admin/') ||
     path.startsWith('/api/cron/') ||
+    // Server-to-server calls from the admin console, authenticated by a shared secret.
+    path.startsWith('/api/internal/') ||
     path.startsWith('/api/email/') ||
     path === '/api/contact' ||
     // ENG-11: the error-boundary beacon. It reads no session, so verifying one here
@@ -227,13 +225,6 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
       { status: 403, headers: { [REQUEST_ID_HEADER]: requestId } }
     )
   }
-
-  // CQ-10: admin console APIs stay exempt from the learner gates above (maintenance mode,
-  // email verification, consent), but they still get their session refreshed here. Since
-  // CQ-10 the request-side auth helpers only read the access token, so without this an admin
-  // who stays on one console page past the one-hour token lifetime gets 401s from every
-  // console call. /api/auth routes keeps its fast path: those routes manage the session themselves.
-  const isAdminApi = path.startsWith('/api/admin/')
 
   // Maintenance page must always be reachable so learners see the correct message
   if (path === '/maintenance') {
@@ -339,7 +330,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   // Fast path for non-guarded public routes
-  if (!isPublicPage && !isAppPage && !isProtectedLearnerApi && !isAdminApi) {
+  if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
     return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
@@ -419,7 +410,6 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   type ProfileData = {
-    is_admin?: boolean
     curriculum_access_override?: boolean
     auth_provider?: string
     terms_accepted_at?: string | null
@@ -442,7 +432,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
       const { data, error } = await authorizedClient
         .from('users')
-        .select('is_admin, curriculum_access_override, auth_provider, terms_accepted_at, onboarding_completed, goal')
+        .select('curriculum_access_override, auth_provider, terms_accepted_at, onboarding_completed, goal')
         .eq('id', user.id)
         .maybeSingle()
       if (error) {
@@ -460,21 +450,13 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   }
 
   /**
-   * Resolves admin authorization for the current user. Email addresses never grant admin:
-   * 1. user.app_metadata.is_admin signed JWT claim (0 DB calls)
-   * 2. Lazy fallback to users.is_admin (only when accessing the /admin area and the claim is absent)
+   * True when the signed `app_metadata.is_admin` JWT claim is set. Email addresses never
+   * grant admin, and there is no database fallback: the console lives on its own host,
+   * and on this host the flag only lets an admin who uses the learner app past
+   * maintenance mode, the email-verification gate and the consent gate (0 DB calls).
    */
-  async function isAdmin(): Promise<boolean> {
-    if (!user) return false
-    if (user.app_metadata?.is_admin === true) return true
-
-    // For non-admin learner paths, skip DB query — downstream learner components handle authorization
-    if (!isAdminArea && !isAdminLoginPage) {
-      return false
-    }
-
-    const profileData = await loadUserProfileData()
-    return Boolean(profileData?.is_admin)
+  function isAdmin(): boolean {
+    return user?.app_metadata?.is_admin === true
   }
 
   async function hasCurriculumAccessOverride(): Promise<boolean> {
@@ -550,48 +532,20 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   if (isGeneralAuthPage) {
     if (!user) return withReferralCookie(passThrough(request, requestId), refParam)
 
-    // Authenticated users are routed away. Admins go straight to the console;
-    // learners continue to their dashboard. This prevents onboarding from
-    // hijacking an admin who merely visited the learner login.
-    const target = (await isAdmin()) ? AUTH_PAGE_TARGET_ADMIN : AUTH_PAGE_TARGET_LEARNER
-    const response = NextResponse.redirect(new URL(target, request.url))
+    // Authenticated users are routed away to the learner dashboard, admins included:
+    // the admin console is on its own host (ADMIN_SITE_URL) with its own login.
+    const response = NextResponse.redirect(new URL(AUTH_PAGE_TARGET_LEARNER, request.url))
     const sessionRes = newSession ? withSessionCookies(response, newSession) : response
     return withReferralCookie(sessionRes, refParam)
-  }
-
-  // ── Admin login: guests see the form; authenticated users are routed by ──
-  //    authorization (never to the learner dashboard).
-  if (isAdminLoginPage) {
-    if (!user) return withReferralCookie(passThrough(request, requestId), refParam)
-
-    const authorized = await isAdmin()
-    const target = authorized ? '/admin' : ACCESS_DENIED_PAGE
-    const response = NextResponse.redirect(new URL(target, request.url))
-    const sessionRes = newSession ? withSessionCookies(response, newSession) : response
-    return withReferralCookie(sessionRes, refParam)
-  }
-
-  // ── Access denied: always renderable ─────────────────────────────────────
-  if (isAccessDeniedPage) {
-    return withReferralCookie(passThrough(request, requestId), refParam)
-  }
-
-  // ── Admin console APIs: session refresh only ────────────────────────────
-  // No gate and no redirect here. Each admin route authorizes the caller itself, and a
-  // request with no valid session passes through to answer its own 401. All this branch
-  // does is persist a refreshed token pair, which the route then reads through cookies().
-  if (isAdminApi) {
-    const response = passThrough(request, requestId)
-    return withReferralCookie(newSession ? withSessionCookies(response, newSession) : response, refParam)
   }
 
   // ── Protected learner API routes (maintenance & email verification) ─────
   if (isProtectedLearnerApi) {
-    const { SettingsService } = await import('@/lib/admin/settings-service')
+    const { SettingsService } = await import('@/lib/settings/system-settings-service')
     const productSettings = await SettingsService.getProductSettings()
 
     // 1. Maintenance mode enforcement on APIs: 503 Service Unavailable for non-admins
-    if (productSettings.maintenanceMode && !(await isAdmin())) {
+    if (productSettings.maintenanceMode && !isAdmin()) {
       return NextResponse.json(
         {
           error: 'The platform is currently undergoing scheduled maintenance. Please check back shortly.',
@@ -602,7 +556,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
 
     // 2. Email verification enforcement on APIs: 403 Forbidden for unverified learners
-    if (productSettings.requireEmailVerification && user && !user.email_confirmed_at && !(await isAdmin())) {
+    if (productSettings.requireEmailVerification && user && !user.email_confirmed_at && !isAdmin()) {
       return NextResponse.json(
         {
           error: 'Please verify your email address before accessing platform features.',
@@ -613,7 +567,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
 
     // 3. Google sign-ups must accept the Terms before using learner APIs.
-    if (!(await isAdmin()) && (await needsConsent())) {
+    if (!isAdmin() && (await needsConsent())) {
       const response = NextResponse.json(
         {
           error: 'Please accept the Terms and confirm your age before continuing.',
@@ -633,26 +587,16 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   // ── Protected application routes ─────────────────────────────────────────
   if (isAppPage) {
     if (!user) {
-      // Learners come back to the page they asked for after signing in. The admin login
-      // takes no `next`: it always lands on the console.
-      const response = isAdminArea
-        ? NextResponse.redirect(new URL(ADMIN_LOGIN_PAGE, request.url))
-        : redirectWithNext(LEARNER_LOGIN_PAGE, returnPathOf(request), request)
+      // Learners come back to the page they asked for after signing in.
+      const response = redirectWithNext(LEARNER_LOGIN_PAGE, returnPathOf(request), request)
       response.cookies.delete('sb-access-token')
       response.cookies.delete('sb-refresh-token')
       return withReferralCookie(response, refParam)
     }
 
-    // RBAC for admin routes
-    if (isAdminProtectedPage && !(await isAdmin())) {
-      const response = NextResponse.redirect(new URL(ACCESS_DENIED_PAGE, request.url))
-      const sessionRes = newSession ? withSessionCookies(response, newSession) : response
-      return withReferralCookie(sessionRes, refParam)
-    }
-
     // ── Email verification check for learner protected routes ────────────────
-    if (!isAdminArea && !(await isAdmin())) {
-      const { SettingsService } = await import('@/lib/admin/settings-service')
+    if (!isAdmin()) {
+      const { SettingsService } = await import('@/lib/settings/system-settings-service')
       const productSettings = await SettingsService.getProductSettings()
 
       // Maintenance mode — block all non-admin learners from the app
@@ -702,8 +646,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     }
     const isOnboardingPage = path === ONBOARDING_PAGE
 
-    if (!isOnboardingComplete && !onboardingStateUnknown && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
-      // Force onboarding goal selection for learners (admins & override users are unaffected).
+    if (!isOnboardingComplete && !onboardingStateUnknown && !isOnboardingPage && !(await hasCurriculumAccessOverride())) {
+      // Force onboarding goal selection for learners (override users are unaffected).
       // The page they asked for rides along as `next` so onboarding can finish there. The
       // dashboard is onboarding's default anyway, and an /onboarding path as `next` would
       // only send the learner back to onboarding, so neither is carried.
@@ -743,15 +687,14 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
  *
  * This narrows only which paths enter: it does not change what the proxy does for
  * anything that still enters. Verified getClaims(), refresh-session handling, cookie
- * clearing, protected-page redirects and admin authorization are all untouched (B3).
+ * clearing and protected-page redirects are all untouched (B3).
  *
  * Excluded paths, each verified route-by-route rather than by pathname assumption:
  *
- *   api/cron/*              CRON_SECRET bearer, else `requireAdminUser(request)`.
- *                           That fallback resolves the user from the request itself
- *                           (`getAuthenticatedUserFromRequest` reads the cookie and
- *                           verifies the token), so admin access still
- *                           works without the proxy having run.
+ *   api/cron/*              CRON_SECRET bearer only (the scheduler, or the admin
+ *                           console calling from its server).
+ *   api/internal/*          Shared-secret bearer (INTERNAL_REVALIDATE_SECRET) from the
+ *                           admin console's server. No session, no cookies.
  *   api/health              No auth of any kind; returns a liveness probe. A health
  *                           check should also answer during maintenance mode.
  *   api/og/*                Deliberately public: social crawlers must fetch it
@@ -786,7 +729,8 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
  * enforces it only on app pages and learner APIs, never on these public pages. Static
  * security headers (CSP and friends) come from next.config.ts, not from here.
  *
- * Everything else still matches unconditionally: app pages, admin, /curriculum/<module>,
+ * Everything else still matches unconditionally: app pages, /admin (redirected or 404),
+ * /curriculum/<module>,
  * auth pages, and every API route outside the exclusions above (SEC-12 origin check).
  */
 export const config = {
@@ -800,7 +744,7 @@ export const config = {
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!(?:_next/static|_next/image|content|brand|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist)(?:/|$)|(?:favicon\\.ico|robots\\.txt|sitemap\\.xml|maintenance|curriculum)$|verify/|p/|lessons/|$|[^/]*\\.[^/]*$).*)',
+    '/((?!(?:_next/static|_next/image|content|brand|api/auth/callback|api/cron|api/internal|api/health|api/og|api/email/webhooks|api/email/unsubscribe|about|contact|faq|frameworks|glossary|privacy|reviews|terms|waitlist)(?:/|$)|(?:favicon\\.ico|robots\\.txt|sitemap\\.xml|maintenance|curriculum)$|verify/|p/|lessons/|$|[^/]*\\.[^/]*$).*)',
     { source: '/', has: [{ type: 'cookie', key: 'sb-access-token' }] },
     { source: '/', has: [{ type: 'cookie', key: 'sb-refresh-token' }] },
     {

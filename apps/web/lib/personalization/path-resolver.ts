@@ -1,9 +1,9 @@
-import { CURRICULUM_MODULE_META, type CurriculumModuleMeta } from '@/lib/admin/curriculum-meta'
+import { CURRICULUM_MODULE_META, type CurriculumModuleMeta } from '@/lib/curriculum/curriculum-meta'
 import {
   DEFAULT_GOAL_OPTIONS,
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
-} from '@/lib/admin/settings-service'
+} from '@/lib/settings/system-settings-service'
 import {
   getFirstActionableLessonIndex,
   resolveLessonAccess,

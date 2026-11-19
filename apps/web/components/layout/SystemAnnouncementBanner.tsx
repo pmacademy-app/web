@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Info, AlertTriangle, ShieldAlert, CheckCircle2, X, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { SystemAnnouncementItem } from '@/lib/admin/announcements-service'
+import type { SystemAnnouncementItem } from '@/lib/announcements/announcements-service'
 import { apiGet, apiPost } from '@/lib/api/client'
 
 interface SystemAnnouncementBannerProps {

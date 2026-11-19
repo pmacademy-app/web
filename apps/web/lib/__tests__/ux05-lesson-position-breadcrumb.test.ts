@@ -16,7 +16,7 @@ import {
   getLessonPosition,
   lessonBreadcrumbLabels,
 } from '@/lib/curriculum/lesson-position'
-import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+import { CURRICULUM_MODULE_META } from '@/lib/curriculum/curriculum-meta'
 
 interface Entry {
   id: string

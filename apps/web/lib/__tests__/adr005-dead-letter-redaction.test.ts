@@ -6,10 +6,10 @@
  * `template_variables` are replaced by a `{ _scrubbed: ... }` marker, on every path that
  * writes `dead_letter`: the processor's permanent-failure handler, the stale-lease
  * fallback and the reclaim RPC. Non-auth templates keep their variables so an admin
- * retry can still re-render them, and an admin retry of a scrubbed auth row is refused.
+ * retry can still re-render them. The admin retry routes (which refuse a scrubbed auth row)
+ * moved to the admin console repository with their tests.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import * as supabaseModule from '../supabase'
@@ -39,27 +39,12 @@ vi.mock('../monitoring/logger', () => ({
   logSystemError: vi.fn(),
 }))
 
-const requireAdminUser = vi.fn()
-const logAdminAction = vi.fn()
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: (req: Request) => requireAdminUser(req),
-  logAdminAction: (...args: unknown[]) => logAdminAction(...args),
-}))
-
-vi.mock('@/lib/admin/cache-tags', () => ({
-  revalidateAdminShell: vi.fn(),
-}))
-
 const {
-  AUTH_EMAIL_EXPIRED_RETRY_MESSAGE,
   isAuthTemplateKey,
   isExpiredAuthQueueRow,
   scrubTemplateVariablesForDeadLetter,
 } = await import('../notifications/queue/helpers')
 const { processEmailQueue, reclaimStaleProcessingItems } = await import('../notifications/queue/processor')
-const { POST: retryOnePost } = await import('../../app/api/admin/emails/queue/[id]/retry/route')
-const { POST: retrySelectedPost } = await import('../../app/api/admin/emails/queue/retry-selected/route')
-const { POST: retryAllPost } = await import('../../app/api/admin/emails/queue/retry-all/route')
 
 const RESET_VARS = {
   userName: 'Learner',
@@ -70,8 +55,6 @@ const VERIFY_VARS = {
   verificationUrl: 'https://example.test/auth/confirm?token=live-verify-token',
 }
 const MODULE_VARS = { userName: 'Learner', moduleName: 'Foundations', moduleSlug: 'foundations' }
-
-const ADMIN = { authorized: true, userId: 'admin-1', email: 'admin@example.test' }
 
 // ─── Fakes ────────────────────────────────────────────────────────────────────
 
@@ -142,50 +125,6 @@ async function deadLetterViaRenderFailure(templateKey: string, vars: Record<stri
   return { result, deadLetter }
 }
 
-/**
- * Fake client for an admin retry route. `rows` answers the route's select; every
- * `email_queue` update payload is recorded.
- */
-function buildRouteSupabase(rows: Array<Record<string, unknown>>) {
-  const updates: Record<string, unknown>[] = []
-
-  const chain = (result: () => unknown): Record<string, unknown> => {
-    const node: Record<string, unknown> = {}
-    for (const method of ['select', 'eq', 'in', 'or', 'lte', 'order', 'limit']) {
-      node[method] = () => chain(result)
-    }
-    node.maybeSingle = async () => {
-      const value = result() as { data: unknown }
-      return { data: Array.isArray(value.data) ? value.data[0] ?? null : value.data, error: null }
-    }
-    node.then = (resolve: (v: unknown) => unknown) => Promise.resolve(result()).then(resolve)
-    return node
-  }
-
-  const from = (table: string) => {
-    if (table === 'email_queue') {
-      return {
-        ...chain(() => ({ data: rows, error: null })),
-        update: (payload: Record<string, unknown>) => {
-          updates.push(payload)
-          return chain(() => ({ data: { id: 'x', status: 'pending' }, error: null, count: 1 }))
-        },
-      }
-    }
-    return chain(() => ({ data: [], error: null }))
-  }
-
-  return { client: { from } as unknown as SupabaseClient<Database>, updates }
-}
-
-function jsonRequest(url: string, body: unknown) {
-  return new NextRequest(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-}
-
 beforeEach(() => {
   vi.restoreAllMocks()
   renderEmailTemplate.mockReset().mockImplementation(async (key: string) => ({
@@ -193,8 +132,6 @@ beforeEach(() => {
     text: key,
     subject: `Subject: ${key}`,
   }))
-  requireAdminUser.mockReset().mockResolvedValue(ADMIN)
-  logAdminAction.mockReset().mockResolvedValue(undefined)
 })
 
 // ─── Pure helpers ─────────────────────────────────────────────────────────────
@@ -379,103 +316,5 @@ describe('ADR-005: stale-lease dead letters', () => {
     await reclaimStaleProcessingItems(client as never)
 
     expect(from).not.toHaveBeenCalled()
-  })
-})
-
-// ─── Admin retry routes ───────────────────────────────────────────────────────
-
-describe('ADR-005: admin retry refuses scrubbed auth rows', () => {
-  const scrubbedAuthRow = {
-    id: 'auth-row',
-    to_email: 'learner@example.test',
-    template_key: 'auth.password_reset',
-    template_variables: { _scrubbed: 'dead_letter' },
-    status: 'dead_letter',
-    attempt_count: 3,
-    processing_at: null,
-  }
-  const moduleRow = {
-    id: 'module-row',
-    to_email: 'learner@example.test',
-    template_key: 'learning.module_complete',
-    template_variables: MODULE_VARS,
-    status: 'dead_letter',
-    attempt_count: 3,
-    processing_at: null,
-  }
-
-  it('POST /queue/[id]/retry refuses with the expired-link message and does not requeue', async () => {
-    const { client, updates } = buildRouteSupabase([scrubbedAuthRow])
-    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(client)
-
-    const res = await retryOnePost(
-      new NextRequest('https://example.test/api/admin/emails/queue/auth-row/retry', { method: 'POST' }),
-      { params: Promise.resolve({ id: 'auth-row' }) }
-    )
-    const body = await res.json()
-
-    expect(res.status).toBe(409)
-    expect(body.error).toBe(AUTH_EMAIL_EXPIRED_RETRY_MESSAGE)
-    expect(updates.some((u) => u.status === 'pending')).toBe(false)
-  })
-
-  it('POST /queue/[id]/retry still requeues a non-auth dead letter', async () => {
-    const { client, updates } = buildRouteSupabase([moduleRow])
-    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(client)
-
-    const res = await retryOnePost(
-      new NextRequest('https://example.test/api/admin/emails/queue/module-row/retry', { method: 'POST' }),
-      { params: Promise.resolve({ id: 'module-row' }) }
-    )
-
-    expect(res.status).toBe(200)
-    expect(updates.some((u) => u.status === 'pending')).toBe(true)
-  })
-
-  it('POST /queue/retry-selected refuses when every selected row is an expired auth email', async () => {
-    const { client, updates } = buildRouteSupabase([scrubbedAuthRow])
-    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(client)
-
-    const res = await retrySelectedPost(
-      jsonRequest('https://example.test/api/admin/emails/queue/retry-selected', { ids: ['auth-row'] }),
-      { params: Promise.resolve({}) }
-    )
-    const body = await res.json()
-
-    expect(res.status).toBe(409)
-    expect(body.error).toBe(AUTH_EMAIL_EXPIRED_RETRY_MESSAGE)
-    expect(body.expired).toBe(1)
-    expect(updates.some((u) => u.status === 'pending')).toBe(false)
-  })
-
-  it('POST /queue/retry-selected requeues the rest and reports the expired auth email', async () => {
-    const { client } = buildRouteSupabase([scrubbedAuthRow, moduleRow])
-    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(client)
-
-    const res = await retrySelectedPost(
-      jsonRequest('https://example.test/api/admin/emails/queue/retry-selected', { ids: ['auth-row', 'module-row'] }),
-      { params: Promise.resolve({}) }
-    )
-    const body = await res.json()
-
-    expect(res.status).toBe(200)
-    expect(body.retried).toBe(1)
-    expect(body.expired).toBe(1)
-    expect(body.message).toContain('Ask the learner to request a new one.')
-  })
-
-  it('POST /queue/retry-all refuses when every match is an expired auth email', async () => {
-    const { client, updates } = buildRouteSupabase([scrubbedAuthRow])
-    vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(client)
-
-    const res = await retryAllPost(
-      jsonRequest('https://example.test/api/admin/emails/queue/retry-all', { statusFilter: 'dead_letter' }),
-      { params: Promise.resolve({}) }
-    )
-    const body = await res.json()
-
-    expect(res.status).toBe(409)
-    expect(body.error).toBe(AUTH_EMAIL_EXPIRED_RETRY_MESSAGE)
-    expect(updates.some((u) => u.status === 'pending')).toBe(false)
   })
 })

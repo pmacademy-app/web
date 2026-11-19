@@ -32,8 +32,8 @@ import { getCapstoneForModule, getModuleTitle, isCanonicalModuleSlug } from '@/l
 
 /**
  * Event-id prefixes written by the emitters: `certificate.generated`
- * (lib/certificates/issue-flow.ts), `capstone.reviewed` (lib/admin/moderation-service.ts),
- * `fellow.granted` (lib/admin/service.ts) and `module.completed` (lib/academy/module-completion.ts). Restated rather than imported because
+ * (lib/certificates/issue-flow.ts), `capstone.reviewed` (admin console repository, moderation service),
+ * `fellow.granted` (admin console repository, user service) and `module.completed` (lib/academy/module-completion.ts). Restated rather than imported because
  * those modules pull in the notification dispatcher; a test pins them to the sources.
  */
 export const ACHIEVEMENT_CELEBRATION_KEY_PREFIXES: Record<AchievementCelebrationKind, string> = {
@@ -60,7 +60,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 /**
  * A re-review that publishes a capstone the first review left unpublished has its own event id,
- * `capstone-reviewed-<submission id>-published` (lib/admin/moderation-service.ts), so one
+ * `capstone-reviewed-<submission id>-published` (admin console moderation service), so one
  * submission can own two rows.
  */
 const CAPSTONE_PUBLISHED_SUFFIX = '-published'

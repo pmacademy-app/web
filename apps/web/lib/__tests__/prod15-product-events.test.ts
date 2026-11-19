@@ -2,15 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 
-// PROD-15 base: server-side product events and the north-star tile. The helper must never throw
-// and must refuse names the DB would refuse; the migration must keep the table and views out of
-// learner reach; the north-star summary must pick the right UTC ISO weeks.
+// PROD-15 base: server-side product events. The helper must never throw and must refuse names the
+// DB would refuse; the migration must keep the table and views out of learner reach. The north-star
+// tile that reads the views moved to the admin console repository with its tests.
 
 const insertMock = vi.fn()
-const inMock = vi.fn()
 const fromMock = vi.fn((table: string) => {
   if (table === 'product_events') return { insert: insertMock }
-  return { select: () => ({ in: inMock }) }
+  return {}
 })
 const createServiceRoleClientMock = vi.fn(() => ({ from: fromMock }))
 
@@ -23,18 +22,12 @@ vi.mock('@/lib/monitoring/logger', () => ({
   logSystemError: (...args: unknown[]) => logSystemErrorMock(...args),
 }))
 
-// unstable_cache needs a Next request context; run the computation directly.
-vi.mock('@/lib/admin/bounded-cache', () => ({
-  cacheWithMaxAge: <T,>(compute: () => Promise<T>) => compute,
-}))
-
 import {
   PRODUCT_EVENT_NAMES,
   MAX_PRODUCT_EVENT_PROPERTIES_BYTES,
   trackProductEvent,
   type ProductEventName,
 } from '@/lib/events/product-events'
-import { isoWeekStartUtc, loadNorthStar, summarizeNorthStar } from '@/lib/admin/north-star-service'
 
 const USER_ID = '11111111-2222-4333-8444-555555555555'
 
@@ -178,67 +171,5 @@ describe(`${NAME} migration`, () => {
     expect(down).toMatch(/DROP VIEW IF EXISTS public\.weekly_cohort_retention;/)
     const validation = read(migrationsDir, 'validation', `${NAME}_validation.sql`)
     expect(validation).toMatch(/ROLLBACK;\s*$/)
-  })
-})
-
-describe('north-star summary', () => {
-  // Wednesday 2026-10-21 is in the ISO week starting Monday 2026-10-19.
-  const wednesday = new Date('2026-10-21T15:00:00Z')
-
-  it('finds the UTC Monday for any day of the week, Sunday included', () => {
-    expect(isoWeekStartUtc(new Date('2026-10-19T00:00:00Z'))).toBe('2026-10-19')
-    expect(isoWeekStartUtc(wednesday)).toBe('2026-10-19')
-    expect(isoWeekStartUtc(new Date('2026-10-25T23:59:59Z'))).toBe('2026-10-19')
-    expect(isoWeekStartUtc(new Date('2026-10-26T00:00:00Z'))).toBe('2026-10-26')
-  })
-
-  it('reports this week, last week and the percent trend', () => {
-    const summary = summarizeNorthStar(
-      [
-        { week_start: '2026-10-19', mastering_learners: 15 },
-        { week_start: '2026-10-12', mastering_learners: '10' },
-        { week_start: '2026-10-05', mastering_learners: 99 },
-      ],
-      wednesday
-    )
-    expect(summary).toEqual({
-      thisWeekStart: '2026-10-19',
-      lastWeekStart: '2026-10-12',
-      thisWeek: 15,
-      lastWeek: 10,
-      delta: 5,
-      trendPct: 50,
-    })
-  })
-
-  it('has no percent trend when last week was zero', () => {
-    const summary = summarizeNorthStar([{ week_start: '2026-10-19', mastering_learners: 3 }], wednesday)
-    expect(summary.lastWeek).toBe(0)
-    expect(summary.delta).toBe(3)
-    expect(summary.trendPct).toBeNull()
-  })
-
-  it('reads the two weeks from the view', async () => {
-    inMock.mockResolvedValue({
-      data: [
-        { week_start: '2026-10-19', mastering_learners: 4 },
-        { week_start: '2026-10-12', mastering_learners: 8 },
-      ],
-      error: null,
-    })
-
-    const slice = await loadNorthStar(wednesday)
-
-    expect(fromMock).toHaveBeenCalledWith('weekly_mastering_learners')
-    expect(inMock).toHaveBeenCalledWith('week_start', ['2026-10-12', '2026-10-19'])
-    expect(slice).toMatchObject({ thisWeek: 4, lastWeek: 8, delta: -4, trendPct: -50, failed: false })
-  })
-
-  it('returns zeros with failed: true instead of throwing on a query error', async () => {
-    inMock.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
-
-    const slice = await loadNorthStar(wednesday)
-
-    expect(slice).toMatchObject({ thisWeek: 0, lastWeek: 0, trendPct: null, failed: true })
   })
 })

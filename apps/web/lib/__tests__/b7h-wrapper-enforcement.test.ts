@@ -211,9 +211,12 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // view beacon, moved out of the cached page render, on `withRoute`).
   // 135 since the security pass removed the unused `auth/update-password/route.ts` (the reset
   // page uses a server action; the route was on `withRoute`).
-  it('accounts for all 135 routes', () => {
-    expect(files).toHaveLength(135)
-    expect(migrated).toHaveLength(132)
+  // 74 since the admin console moved to its own repository: its 62 `admin/*` routes (all on
+  // `withRoute`) left with it, and `internal/revalidate/route.ts` (the admin console's cache
+  // invalidation call into this app, on `withRoute`) was added.
+  it('accounts for all 74 routes', () => {
+    expect(files).toHaveLength(74)
+    expect(migrated).toHaveLength(71)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
@@ -234,7 +237,9 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     // the unused auth/update-password route was removed.
     expect(inGroup('auth/')).toBe(9)
     expect(inGroup('settings/')).toBe(12)
-    expect(inGroup('admin/')).toBe(62)
+    // 0 since the admin routes moved to the admin console repository.
+    expect(inGroup('admin/')).toBe(0)
+    expect(inGroup('internal/')).toBe(1)
   })
 
   it('leaves no route resolving admin authorization by hand', () => {

@@ -36,10 +36,6 @@ vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: (req: Request) => getAuthenticatedUserFromRequest(req),
 }))
 
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: vi.fn().mockResolvedValue({ authorized: false, statusCode: 401 }),
-  logAdminAction: vi.fn(),
-}))
 
 const { withRoute, RouteError } = await import('@/lib/api/with-route')
 
@@ -300,7 +296,7 @@ describe('B9-B — traffic the proxy never sees still gets an id', () => {
     let seen: string | undefined
 
     const route = withRoute(
-      { actor: { allow: ['cron', 'admin'] }, operation: 'cron.thing' },
+      { actor: { allow: ['cron'] }, operation: 'cron.thing' },
       async (ctx) => {
         seen = ctx.requestId
         return Response.json({ ok: true })

@@ -4,8 +4,8 @@ import {
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
-} from '@/lib/admin/settings-service'
-import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
+} from '@/lib/settings/system-settings-service'
+import { CURRICULUM_MODULE_META } from '@/lib/curriculum/curriculum-meta'
 
 describe('Onboarding Architecture & Recommendation Engine', () => {
   describe('Default Configuration Invariants', () => {

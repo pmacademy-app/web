@@ -501,7 +501,7 @@ describe('claimNextAchievementCelebration — capstones', () => {
   })
 
   // A re-review that publishes a previously rejected capstone writes a second bell row keyed
-  // `capstone-reviewed-<id>-published` (lib/admin/moderation-service.ts). The two rows are one
+  // `capstone-reviewed-<id>-published` (admin console moderation service). The two rows are one
   // capstone: it celebrates once, through the published notice when there is one, and the other
   // row is retired with it (as superseded Fellow grants are).
   it('offers exactly one celebration for a capstone that was rejected and then published', async () => {
@@ -1344,11 +1344,11 @@ describe('POST /api/notifications/celebrations', () => {
 describe('achievement celebration wiring', () => {
   it('uses the same id prefixes the emitters write', () => {
     // The notification row has no event-type column: the idempotency key (the event id) is
-    // the only type signal. If an emitter renames its id, this is where it shows up.
-    const emitters: Record<keyof typeof ACHIEVEMENT_CELEBRATION_KEY_PREFIXES, string> = {
+    // the only type signal. If an emitter renames its id, this is where it shows up. The
+    // capstone and fellow emitters live in the admin console repository, so only the
+    // emitters in this app are pinned to their sources.
+    const emitters: Partial<Record<keyof typeof ACHIEVEMENT_CELEBRATION_KEY_PREFIXES, string>> = {
       certificate: 'lib/certificates/issue-flow.ts',
-      capstone: 'lib/admin/moderation-service.ts',
-      fellow: 'lib/admin/service.ts',
       module: 'lib/academy/module-completion.ts',
     }
 
@@ -1359,8 +1359,8 @@ describe('achievement celebration wiring', () => {
       module: 'module-completed-',
     })
     for (const [kind, file] of Object.entries(emitters)) {
-      const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind as keyof typeof emitters]
-      expect(readSource(file), `${file} should build an id from \`${prefix}\${...}\``).toContain(
+      const prefix = ACHIEVEMENT_CELEBRATION_KEY_PREFIXES[kind as keyof typeof ACHIEVEMENT_CELEBRATION_KEY_PREFIXES]
+      expect(readSource(file as string), `${file} should build an id from \`${prefix}\${...}\``).toContain(
         '`' + prefix + '${'
       )
     }
@@ -1383,23 +1383,6 @@ describe('achievement celebration wiring', () => {
   it('ships the kill switch enabled by default', () => {
     expect(DEFAULT_FEATURE_FLAGS.ACHIEVEMENT_CELEBRATIONS_ENABLED).toBe(true)
     expect(readSource('lib/notifications/feature-flags/types.ts')).toContain("'ACHIEVEMENT_CELEBRATIONS_ENABLED'")
-  })
-
-  it('gives every default flag a category on the admin flags page', () => {
-    // An uncategorised key used to crash the page (`FLAG_CATEGORIES[key].icon` on undefined),
-    // so a default and its category entry have to land together.
-    const section = readSource('components/admin/FeatureFlagsSection.tsx')
-
-    for (const key of Object.keys(DEFAULT_FEATURE_FLAGS)) {
-      expect(section, key).toMatch(new RegExp(`^\\s*${key}: \\{`, 'm'))
-    }
-  })
-
-  it('falls back to a default category instead of dereferencing a missing one', () => {
-    const section = readSource('components/admin/FeatureFlagsSection.tsx')
-
-    expect(section).not.toMatch(/flags\[0\] \? FLAG_CATEGORIES\[flags\[0\]\.key\] :/)
-    expect(section).toMatch(/FLAG_CATEGORIES\[flags\[0\]\.key\] \?\? FALLBACK_CATEGORY/)
   })
 })
 

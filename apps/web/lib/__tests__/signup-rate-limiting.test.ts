@@ -24,7 +24,7 @@ const mockSettings = {
   allowSignups: true,
   requireEmailVerification: true,
 }
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: {
     getProductSettings: vi.fn(async () => ({ ...mockSettings })),
   },

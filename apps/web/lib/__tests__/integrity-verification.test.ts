@@ -6,11 +6,6 @@ import {
   getFirstActionableLessonIndex,
   resolveModuleCtaTarget,
 } from '../curriculum-access'
-import { FeedbackAdminService } from '../admin/feedback-service'
-import { logAdminAction } from '../admin/guard'
-import * as supabaseModule from '../supabase'
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
 import type { CurriculumEntry } from '@/types'
 
 describe('Integrity Verification', () => {
@@ -83,85 +78,6 @@ describe('Integrity Verification', () => {
 
       expect(parsed.framework).toBe('nextjs')
       expect(parsed.crons).toBeUndefined()
-    })
-  })
-
-  // ===========================================================================
-  // 3. P1-C & P2-A: Admin Audit Log & Feedback Schema Alignment
-  // ===========================================================================
-  describe('P2-A: Feedback Database Schema Alignment', () => {
-    it('updateFeedbackStatus updates { status } without sending non-existent updated_at column', async () => {
-      let feedbackUpdatePayload: Record<string, unknown> | null = null
-
-      const mockSupabase = {
-        from: (table: string) => {
-          if (table === 'user_feedback') {
-            return {
-              update: (payload: Record<string, unknown>) => {
-                feedbackUpdatePayload = payload
-                return {
-                  eq: () => Promise.resolve({ error: null }),
-                }
-              },
-            }
-          }
-          return {
-            insert: () => Promise.resolve({ error: null }),
-            update: () => ({ eq: () => Promise.resolve({ error: null }) }),
-          }
-        },
-      } as unknown as SupabaseClient<Database>
-
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
-
-      const result = await FeedbackAdminService.updateFeedbackStatus(
-        'admin-uuid-1',
-        'admin@prodily.app',
-        'fb-uuid-123',
-        'reviewed'
-      )
-
-      expect(result.success).toBe(true)
-      expect(feedbackUpdatePayload).toEqual({ status: 'reviewed' })
-      expect((feedbackUpdatePayload as Record<string, unknown> | null)?.updated_at).toBeUndefined()
-    })
-
-    it('logAdminAction writes audit records to admin_audit_logs with full metadata', async () => {
-      let insertedRow: Record<string, unknown> | null = null
-      let targetTable: string | null = null
-
-      const mockSupabase = {
-        from: (table: string) => {
-          targetTable = table
-          return {
-            insert: (row: Record<string, unknown>) => {
-              insertedRow = row
-              return Promise.resolve({ error: null })
-            },
-          }
-        },
-      } as unknown as SupabaseClient<Database>
-
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
-
-      await logAdminAction(
-        'admin-uuid-1',
-        'admin@prodily.app',
-        'feedback_status_reviewed',
-        'feedback',
-        'fb-123',
-        { status: 'reviewed' }
-      )
-
-      expect(targetTable).toBe('admin_audit_logs')
-      expect(insertedRow).toEqual({
-        admin_user_id: 'admin-uuid-1',
-        admin_email: 'admin@prodily.app',
-        action: 'feedback_status_reviewed',
-        target_resource: 'feedback',
-        target_id: 'fb-123',
-        metadata: { status: 'reviewed' },
-      })
     })
   })
 

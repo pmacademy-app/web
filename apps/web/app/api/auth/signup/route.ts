@@ -1,7 +1,7 @@
 import { after, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withRoute } from '@/lib/api/with-route'
-import { SettingsService } from '@/lib/admin/settings-service'
+import { SettingsService } from '@/lib/settings/system-settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, SIGNUP_CONSENT_APP_METADATA_KEY } from '@/lib/auth'
 import { createReferralAttribution, isPlausibleReferralCode } from '@/lib/referral/referral-service'

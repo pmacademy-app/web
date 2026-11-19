@@ -17,8 +17,7 @@ function signOutResponse(revocation: 'revoked' | 'failed' | 'skipped' = 'revoked
   })
 }
 
-const { logout, LEARNER_LOGIN_PATH, ADMIN_LOGIN_PATH } = await import('@/lib/auth/logout')
-const { signOutAdmin } = await import('@/lib/admin/session')
+const { logout, LEARNER_LOGIN_PATH } = await import('@/lib/auth/logout')
 
 function createRouter() {
   return { push: vi.fn(), refresh: vi.fn() }
@@ -44,7 +43,7 @@ describe('B10-A — error boundary structure', () => {
   })
 
   it('the nested segment boundaries still emit no document shell', () => {
-    for (const relative of ['(app)/error.tsx', 'admin/(console)/error.tsx']) {
+    for (const relative of ['(app)/error.tsx']) {
       const source = readFileSync(path.join(APP_DIR, relative), 'utf8')
       expect(source).not.toContain('<html')
       expect(source).not.toContain('<body')
@@ -166,38 +165,11 @@ describe('B10-A — logout', () => {
     const router = createRouter()
 
     await logout(router, { redirectTo: LEARNER_LOGIN_PATH })
-    await logout(router, { redirectTo: ADMIN_LOGIN_PATH })
+    await logout(router, { redirectTo: '//evil.example/login' })
 
     for (const [destination] of router.push.mock.calls) {
       expect(String(destination).startsWith('/')).toBe(true)
       expect(String(destination).startsWith('//')).toBe(false)
     }
-  })
-})
-
-describe('B10-A — signOutAdmin delegates to the canonical helper', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn(async () => signOutResponse('revoked')) as typeof global.fetch
-  })
-
-  it('navigates to the admin login page', async () => {
-    const router = createRouter()
-
-    await signOutAdmin(router)
-
-    expect(router.push).toHaveBeenCalledWith('/admin/login')
-    expect(router.refresh).toHaveBeenCalledTimes(1)
-  })
-
-  it('navigates even when every network step fails', async () => {
-    global.fetch = vi.fn(async () => signOutResponse('failed')) as typeof global.fetch
-    global.fetch = vi.fn(async () => {
-      throw new TypeError('Failed to fetch')
-    }) as typeof global.fetch
-    const router = createRouter()
-
-    await signOutAdmin(router)
-
-    expect(router.push).toHaveBeenCalledWith('/admin/login')
   })
 })

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { BroadcastService } from '@/lib/admin/broadcast-service'
-import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
+import { BroadcastService } from '@/lib/broadcasts/broadcast-service'
+import { InAppManagerService } from '@/lib/broadcasts/in-app-manager-service'
 import { withRoute } from '@/lib/api/with-route'
 import { withCronHeartbeat } from '@/lib/monitoring/cron-heartbeat'
 
@@ -14,14 +14,14 @@ export const runtime = 'nodejs'
  * Finds scheduled email and in-app broadcasts past their `scheduled_at` time and
  * executes their delivery.
  *
- * Authentication accepts the scheduler's `CRON_SECRET` bearer token or an
- * authenticated admin session; anything else is rejected. Before B7-C the secret
+ * Authentication accepts only the `CRON_SECRET` bearer token (the scheduler, or the
+ * admin console calling from its server); anything else is rejected. Before B7-C the secret
  * was compared with `===` in this file, which is now a constant-time comparison
  * inside `resolveActor`.
  */
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.process_broadcasts',
     domain: 'cron',
     summary: 'Unexpected failure while processing scheduled broadcasts',

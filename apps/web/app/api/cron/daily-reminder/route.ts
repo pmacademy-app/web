@@ -28,7 +28,7 @@ const forceQuerySchema = z.object({ force: z.string().optional() })
 
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.daily_reminder',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/daily-reminder',
@@ -39,7 +39,7 @@ export const POST = withRoute(
         severity: 'warning',
         category: 'cron',
         operation: 'cron_daily_reminder_auth',
-        message: 'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/daily-reminder',
+        message: 'Unauthorized cron request: CRON_SECRET required on /api/cron/daily-reminder',
       })
     },
   },

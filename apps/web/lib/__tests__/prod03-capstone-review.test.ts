@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   capstoneReviewSchema,
@@ -8,7 +8,6 @@ import {
   getLatestReviewAction,
   validateCapstoneTransition,
 } from '@/lib/capstones'
-import { ModerationService } from '@/lib/admin/moderation-service'
 
 describe('PROD-03 / AG-26 Capstone Review and Resubmission', () => {
   describe('1. Rubric Score Validation (validateRubricScores)', () => {
@@ -242,79 +241,4 @@ describe('PROD-03 / AG-26 Capstone Review and Resubmission', () => {
     })
   })
 
-  describe('5. ModerationService.reviewCapstone with Rubric and History', () => {
-    it('appends review record to review_history and stores scores and feedback', async () => {
-      const mockUpdatedRows: unknown[] = []
-      let updatedPayload: {
-        status?: string
-        is_public?: boolean
-        review_scores?: unknown
-        review_feedback?: string | null
-        review_history?: unknown
-      } | null = null
-
-      const fakeClient = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              maybeSingle: vi.fn(async () => ({
-                data: {
-                  id: 'sub-test-1',
-                  user_id: 'user-test-1',
-                  module_slug: 'foundations',
-                  status: 'submitted',
-                  is_public: false,
-                  reviewed_at: null,
-                  revision_count: 0,
-                  review_history: [],
-                  review_scores: null,
-                  review_feedback: null,
-                },
-                error: null,
-              })),
-            })),
-          })),
-          update: vi.fn((payload: Record<string, unknown>) => {
-            updatedPayload = payload
-            return {
-              eq: vi.fn(() => ({
-                select: vi.fn(async () => ({
-                  data: [{ id: 'sub-test-1' }],
-                  error: null,
-                })),
-              })),
-            }
-          }),
-        })),
-      }
-
-      const scores = { req_problem: 3, req_jtbd: 2, req_personas: 3, req_metrics: 2 }
-      const feedback = 'Well thought out problem statement. Please add more detail on metrics.'
-
-      const success = await ModerationService.reviewCapstone(
-        'admin-user-1',
-        'admin@example.com',
-        'sub-test-1',
-        'request_changes',
-        { scores, feedback },
-        fakeClient
-      )
-
-      expect(success).toBe(true)
-      expect(updatedPayload).not.toBeNull()
-      const payload = updatedPayload as unknown as Record<string, unknown>
-      expect(payload.status).toBe('reviewed')
-      expect(payload.is_public).toBe(false)
-      expect(payload.review_scores).toEqual(scores)
-      expect(payload.review_feedback).toBe(feedback)
-
-      const history = payload.review_history as Array<Record<string, unknown>>
-      expect(Array.isArray(history)).toBe(true)
-      expect(history.length).toBe(1)
-      expect(history[0].action).toBe('request_changes')
-      expect(history[0].scores).toEqual(scores)
-      expect(history[0].feedback).toBe(feedback)
-      expect(history[0].reviewed_by).toBe('admin-user-1')
-    })
-  })
 })

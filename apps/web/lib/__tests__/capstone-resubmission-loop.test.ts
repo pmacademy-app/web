@@ -2,12 +2,12 @@
 /**
  * Audit 2026-11-17 #2: the "request changes" loop must not go silent after the first round.
  *
- * One in-memory capstone row goes through the real submit and review code:
- * submit, request changes, resubmit, request changes again. The learner must get one
- * notification per reviewed revision, and the resubmission must sit in the admin
- * "awaiting review" segment (status 'submitted' AND reviewed_at IS NULL) until reviewed.
+ * One in-memory capstone row goes through the real submit code: submit, a review that
+ * requests changes, resubmit. The resubmission must sit in the admin "awaiting review"
+ * segment (status 'submitted' AND reviewed_at IS NULL) until reviewed. The review side and
+ * its per-revision notifications are tested in the admin console repository.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 const dispatchMock = vi.hoisted(() =>
   vi.fn<(event: unknown) => Promise<{ dispatched: boolean }>>(async () => ({ dispatched: true }))
@@ -16,7 +16,6 @@ vi.mock('@/lib/notifications/dispatcher', () => ({
   globalNotificationDispatcher: { dispatch: (e: unknown) => dispatchMock(e) },
 }))
 vi.mock('@/lib/notifications/events/connectors', () => ({ initializeNotificationConnectors: vi.fn() }))
-vi.mock('@/lib/admin/guard', () => ({ logAdminAction: vi.fn(async () => {}) }))
 vi.mock('@/lib/events/product-events', () => ({ trackProductEvent: vi.fn(async () => {}) }))
 vi.mock('@/lib/xp-service', () => ({ awardXp: vi.fn(async () => {}), hasXpEvent: vi.fn(async () => true) }))
 vi.mock('@/lib/xp', async (importOriginal) => ({
@@ -27,7 +26,6 @@ vi.mock('@/lib/streaks-db', () => ({ updateUserStreak: vi.fn(async () => {}) }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
 import { submitCapstoneAction } from '@/lib/capstones-db'
-import { ModerationService } from '@/lib/admin/moderation-service'
 
 const CONTENT = `
 # Product Opportunity Brief: Customer Activation & Retention Improvement
@@ -67,7 +65,7 @@ function chain(result: Result, singleResult: Result = result): any {
   return c
 }
 
-/** One capstone row shared by the learner submit path and the admin review path. */
+/** One capstone row for the learner submit path. */
 function createDb(initial: Record<string, unknown>) {
   const row: Record<string, unknown> = { ...initial }
   const client: any = {
@@ -96,13 +94,20 @@ function createDb(initial: Record<string, unknown>) {
   return { client, row }
 }
 
-/** The admin queue's awaiting segment, as moderation-service filters it. */
+/** The admin queue's awaiting segment (status submitted and not yet reviewed). */
 const isAwaiting = (row: Record<string, unknown>) => row.status === 'submitted' && row.reviewed_at == null
 
-describe('capstone resubmission loop (audit #2)', () => {
-  beforeEach(() => dispatchMock.mockClear())
+/** Stands in for an admin review (the review service lives in the admin console repository). */
+function applyReview(row: Record<string, unknown>, action: 'request_changes' | 'reject') {
+  const reviewedAt = new Date().toISOString()
+  row.status = 'reviewed'
+  row.reviewed_at = reviewedAt
+  row.reviewed_by = 'admin-1'
+  row.review_history = [...((row.review_history as unknown[]) ?? []), { action, reviewed_at: reviewedAt }]
+}
 
-  it('notifies on every reviewed revision and puts the resubmission back in the awaiting queue', async () => {
+describe('capstone resubmission loop (audit #2)', () => {
+  it('puts a resubmission after a review back in the awaiting queue, keeping the history', async () => {
     const { client, row } = createDb({
       id: 'sub-1',
       user_id: 'learner-1',
@@ -118,16 +123,13 @@ describe('capstone resubmission loop (audit #2)', () => {
       review_scores: null,
       review_feedback: null,
     })
-    const changes = { feedback: 'Tighten the success metrics.' }
 
     // Submit.
     expect((await submitCapstoneAction(client, 'learner-1', 'foundations', CONTENT)).success).toBe(true)
     expect(isAwaiting(row)).toBe(true)
 
     // Request changes (first review).
-    expect(await ModerationService.reviewCapstone('admin-1', 'admin@x.test', 'sub-1', 'request_changes', changes, client)).toBe(true)
-    expect(row.status).toBe('reviewed')
-    expect(row.reviewed_at).toEqual(expect.any(String))
+    applyReview(row, 'request_changes')
     expect(isAwaiting(row)).toBe(false)
 
     // Resubmit: back in the awaiting queue, previous review kept in history.
@@ -138,52 +140,5 @@ describe('capstone resubmission loop (audit #2)', () => {
     expect(row.reviewed_by).toBeNull()
     expect(isAwaiting(row)).toBe(true)
     expect((row.review_history as unknown[]).length).toBe(1)
-
-    // Request changes again.
-    expect(await ModerationService.reviewCapstone('admin-1', 'admin@x.test', 'sub-1', 'request_changes', changes, client)).toBe(true)
-    expect(row.reviewed_at).toEqual(expect.any(String))
-    expect(isAwaiting(row)).toBe(false)
-
-    const reviewed = dispatchMock.mock.calls
-      .map((call) => call[0] as any)
-      .filter((event) => event.event === 'capstone.reviewed')
-    expect(reviewed).toHaveLength(2)
-    expect(reviewed.map((event) => event.id)).toEqual(['capstone-reviewed-sub-1', 'capstone-reviewed-sub-1-r1'])
-    expect(reviewed.map((event) => event.payload.revisionCount)).toEqual([0, 1])
-    expect(reviewed.every((event) => event.payload.action === 'request_changes')).toBe(true)
-  })
-
-  it('still notifies a resubmission saved before the resubmit path cleared reviewed_at', async () => {
-    const { client } = createDb({
-      id: 'sub-2',
-      user_id: 'learner-1',
-      module_slug: 'foundations',
-      status: 'submitted',
-      is_public: false,
-      reviewed_at: '2026-11-02T00:00:00Z',
-      revision_count: 1,
-      review_history: [{ action: 'request_changes', reviewed_at: '2026-11-02T00:00:00Z' }],
-    })
-
-    expect(await ModerationService.reviewCapstone('admin-1', 'admin@x.test', 'sub-2', 'reject', { feedback: 'No.' }, client)).toBe(true)
-    expect(dispatchMock).toHaveBeenCalledTimes(1)
-    expect((dispatchMock.mock.calls[0][0] as any).id).toBe('capstone-reviewed-sub-2-r1')
-  })
-
-  it('a resubmission that is approved uses the published notice id', async () => {
-    const { client } = createDb({
-      id: 'sub-3',
-      user_id: 'learner-1',
-      module_slug: 'foundations',
-      status: 'submitted',
-      is_public: false,
-      reviewed_at: null,
-      revision_count: 1,
-      review_history: [{ action: 'request_changes', reviewed_at: '2026-11-02T00:00:00Z' }],
-    })
-
-    expect(await ModerationService.reviewCapstone('admin-1', 'admin@x.test', 'sub-3', 'approve', {}, client)).toBe(true)
-    expect(dispatchMock).toHaveBeenCalledTimes(1)
-    expect((dispatchMock.mock.calls[0][0] as any).id).toBe('capstone-reviewed-sub-3-published')
   })
 })

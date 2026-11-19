@@ -8,8 +8,9 @@ import { NextRequest } from 'next/server'
 // duplicate-email lookup on it runs as `authenticated` under RLS, sees no other account's row,
 // and the 409 can never fire. The lookup must run on a service-role client that never signed in.
 //
-// W6 / CQ-10: the proxy refreshes the session for /api/admin/* (still exempt from maintenance
-// mode), and leaves /api/auth/* on its fast path with no session work at all.
+// W6 / CQ-10: the proxy refreshes the session for learner APIs, and leaves /api/auth/* and
+// /api/internal/* on its fast path with no session work at all. (The /api/admin/* branch left
+// with the admin console, which now runs on its own host.)
 
 const h = vi.hoisted(() => {
   const state = {
@@ -105,7 +106,7 @@ vi.mock('@/lib/monitoring/logger', () => ({
   logErrorReport: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock('@/lib/admin/settings-service', () => ({
+vi.mock('@/lib/settings/system-settings-service', () => ({
   SettingsService: { getProductSettings: h.getProductSettings },
 }))
 
@@ -173,7 +174,7 @@ describe('POST /api/settings/security/change-email duplicate check', () => {
   })
 })
 
-// ── W6 / CQ-10: proxy session refresh for admin APIs ──────────────────────
+// ── W6 / CQ-10: proxy session refresh for learner APIs ────────────────────
 
 function apiRequest(path: string, cookies: string) {
   return new NextRequest(`https://prodily.app${path}`, { headers: { cookie: cookies } })
@@ -181,9 +182,9 @@ function apiRequest(path: string, cookies: string) {
 
 const EXPIRED = 'sb-access-token=expired-access; sb-refresh-token=admin-refresh'
 
-describe('proxy session handling for /api/admin/* and /api/auth/*', () => {
-  it('refreshes an expired admin session on /api/admin/* and writes the new pair back', async () => {
-    const res = await proxy(apiRequest('/api/admin/users', EXPIRED))
+describe('proxy session handling for learner APIs, /api/auth/* and /api/internal/*', () => {
+  it('refreshes an expired session on a learner API and writes the new pair back', async () => {
+    const res = await proxy(apiRequest('/api/notifications', EXPIRED))
 
     expect(res.status).toBe(200)
     expect(h.refreshSession).toHaveBeenCalledTimes(1)
@@ -193,8 +194,16 @@ describe('proxy session handling for /api/admin/* and /api/auth/*', () => {
     expect(cookies.get('sb-refresh-token')?.value).toBe('fresh-refresh')
   })
 
-  it('keeps /api/admin/* exempt from maintenance mode', async () => {
-    h.getProductSettings.mockResolvedValue({ maintenanceMode: true, requireEmailVerification: true })
+  it('lets a signed is_admin claim past maintenance mode on a learner API', async () => {
+    h.getProductSettings.mockResolvedValue({ maintenanceMode: true, requireEmailVerification: false })
+
+    const res = await proxy(apiRequest('/api/notifications', EXPIRED))
+
+    expect(res.status).toBe(200)
+  })
+
+  it('answers 503 to a learner without the claim during maintenance mode', async () => {
+    h.getProductSettings.mockResolvedValue({ maintenanceMode: true, requireEmailVerification: false })
     h.refreshSession.mockResolvedValue({
       data: {
         user: { id: 'usr_learner', email: 'l@example.com', app_metadata: {}, user_metadata: {} },
@@ -203,15 +212,13 @@ describe('proxy session handling for /api/admin/* and /api/auth/*', () => {
       error: null,
     })
 
-    const res = await proxy(apiRequest('/api/admin/settings', EXPIRED))
+    const res = await proxy(apiRequest('/api/notifications', EXPIRED))
 
-    expect(res.status).toBe(200)
-    expect(h.getProductSettings).not.toHaveBeenCalled()
-    expect(h.refreshSession).toHaveBeenCalledTimes(1)
+    expect(res.status).toBe(503)
   })
 
-  it('does not refresh a still-valid admin token and sets no cookies', async () => {
-    const res = await proxy(apiRequest('/api/admin/users', 'sb-access-token=valid-access; sb-refresh-token=admin-refresh'))
+  it('does not refresh a still-valid token and sets no cookies', async () => {
+    const res = await proxy(apiRequest('/api/notifications', 'sb-access-token=valid-access; sb-refresh-token=admin-refresh'))
 
     expect(res.status).toBe(200)
     expect(h.getUser).toHaveBeenCalledWith('valid-access')
@@ -220,12 +227,14 @@ describe('proxy session handling for /api/admin/* and /api/auth/*', () => {
     expect(cookies.getAll()).toEqual([])
   })
 
-  it('passes a signed-out /api/admin/* request through for the route to answer 401', async () => {
-    const res = await proxy(apiRequest('/api/admin/users', ''))
+  it('leaves /api/internal/* on the fast path: no verification, no refresh, no maintenance gate', async () => {
+    h.getProductSettings.mockResolvedValue({ maintenanceMode: true, requireEmailVerification: true })
+    const res = await proxy(apiRequest('/api/internal/revalidate', EXPIRED))
 
     expect(res.status).toBe(200)
     expect(h.getUser).not.toHaveBeenCalled()
     expect(h.refreshSession).not.toHaveBeenCalled()
+    expect(h.getProductSettings).not.toHaveBeenCalled()
   })
 
   it('leaves /api/auth/* on the fast path: no verification and no refresh', async () => {

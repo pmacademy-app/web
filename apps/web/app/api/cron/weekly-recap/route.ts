@@ -35,7 +35,7 @@ const forceQuerySchema = z.object({ force: z.string().optional() })
 
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.weekly_recap',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/weekly-recap',
@@ -46,7 +46,7 @@ export const POST = withRoute(
         severity: 'warning',
         category: 'cron',
         operation: 'cron_weekly_recap_auth',
-        message: 'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/weekly-recap',
+        message: 'Unauthorized cron request: CRON_SECRET required on /api/cron/weekly-recap',
       })
     },
   },

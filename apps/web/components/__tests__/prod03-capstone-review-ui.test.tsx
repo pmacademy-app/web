@@ -8,31 +8,13 @@ import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { CapstoneReviewDrawer } from '@/components/admin/CapstoneReviewDrawer'
 import { CapstoneReviewedEmail } from '@/emails/templates/learning/CapstoneReviewed'
-import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const ROOT = path.resolve(import.meta.dirname, '../../')
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
-}))
-
-vi.mock('@/components/admin/admin-toast', () => ({
-  useAdminToast: () => ({ toast: vi.fn() }),
-}))
-
-vi.mock('@/components/admin/AdminDrawer', () => ({
-  AdminDrawer: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
-    open ? <div data-testid="admin-drawer">{children}</div> : null,
-}))
-
-vi.mock('@/components/admin/AdminConfirmDialog', () => ({
-  AdminConfirmDialog: () => null,
-}))
-
+// The review drawer moved to the admin console repository with its test.
 describe('PROD-03 (AG-27): Capstone Review UI & Notifications', () => {
   let container: HTMLDivElement | null = null
   let root: Root | null = null
@@ -53,45 +35,6 @@ describe('PROD-03 (AG-27): Capstone Review UI & Notifications', () => {
     container = null
     root = null
     vi.restoreAllMocks()
-  })
-
-  const mockCapstone: AdminCapstoneRow = {
-    id: 'sub-123',
-    userId: 'user-456',
-    learnerName: 'Alex Learner',
-    username: 'alex',
-    moduleSlug: 'foundations',
-    moduleTitle: 'Foundations of Product Management',
-    capstoneTitle: 'Product Opportunity Assessment',
-    content: 'Comprehensive problem exploration and customer interviews.',
-    wordCount: 1200,
-    status: 'submitted',
-    isPublic: false,
-    portfolioPublic: false,
-    publicPath: null,
-    submittedAt: '2026-11-14T10:00:00.000Z',
-    reviewedAt: null,
-  }
-
-  it('renders rubric requirements in CapstoneReviewDrawer with score options', () => {
-    act(() => {
-      root?.render(
-        <CapstoneReviewDrawer
-          capstoneId="sub-123"
-          capstone={mockCapstone}
-          isOpen={true}
-          onClose={vi.fn()}
-        />
-      )
-    })
-
-    const drawer = container?.querySelector('[data-testid="admin-drawer"]')
-    expect(drawer).not.toBeNull()
-    expect(drawer?.textContent).toContain('Rubric Scoring (0 to 3)')
-    expect(drawer?.textContent).toContain('Written Feedback')
-    expect(drawer?.textContent).toContain('Approve & Publish')
-    expect(drawer?.textContent).toContain('Request Changes')
-    expect(drawer?.textContent).toContain('Reject')
   })
 
   it('renders CapstoneReviewedEmail correctly for approved action with feedback', () => {

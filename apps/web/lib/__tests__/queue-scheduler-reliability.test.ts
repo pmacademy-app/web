@@ -5,7 +5,7 @@
  * 1. Stale processing item reclamation (>15m threshold, max attempts, fresh item protection)
  * 2. Bounded email dispatch concurrency (worker pool, non-blocking slow jobs, failure isolation)
  * 3. Exponential backoff with bounded jitter, max delay ceiling, and direct permanent failure routing
- * 4. Scheduler failure detection, durable heartbeat recording, and admin health reporting
+ * 4. (Scheduler health reporting moved to the admin console repository with SystemService.)
  * 5. Retry-failed / manual retry race prevention and duplicate send protection
  * 6. Queue state machine valid/invalid transitions
  */
@@ -22,7 +22,6 @@ import {
   MAX_BATCH_EXECUTION_MS,
 } from '../notifications/queue/processor'
 import { classifyProviderFailure } from '../notifications/providers/failure-classification'
-import { SystemService } from '../admin/system-service'
 
 // Mocks for processor dependencies
 vi.mock('../notifications/feature-flags/service', () => ({
@@ -322,142 +321,6 @@ describe('Queue & Scheduler Reliability', () => {
       expect(classifyProviderFailure(429, 'rate_limit_exceeded')).toBe('failover')
       expect(classifyProviderFailure(402, 'not_enough_credits')).toBe('failover')
       expect(classifyProviderFailure(500, 'Internal server error')).toBe('failover')
-    })
-  })
-
-  // ==========================================================================
-  // 4. SCHEDULER FAILURE DETECTION & HEARTBEAT
-  // ==========================================================================
-  describe('4. Scheduler Failure Detection & Heartbeat', () => {
-    it('evaluates healthy scheduler status when heartbeat is within 15 minutes', async () => {
-      const recentIso = new Date(Date.now() - 4 * 60 * 1000).toISOString() // 4m ago (< 15m)
-      const mockSupabase = {
-        from: vi.fn((table: string) => {
-          if (table === 'system_settings') {
-            return {
-              select: vi.fn().mockReturnThis(),
-              eq: vi.fn().mockReturnThis(),
-              maybeSingle: vi.fn().mockResolvedValue({
-                data: {
-                  value: {
-                    job: 'process-email-queue',
-                    status: 'healthy',
-                    last_run_at: recentIso,
-                    last_success_at: recentIso,
-                    last_duration_ms: 1200,
-                  },
-                },
-              }),
-            }
-          }
-          // Default mock chain for other tables in getBaseTelemetry
-          return {
-            select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            gte: vi.fn().mockReturnThis(),
-            in: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockResolvedValue({ data: [], count: 0 }),
-            maybeSingle: vi.fn().mockResolvedValue({ data: null }),
-          }
-        }),
-      }
-
-      vi.spyOn(await import('../supabase'), 'createServiceRoleClient').mockReturnValue(mockSupabase as never)
-
-      const health = await SystemService.getHealthOverview()
-      const schedulerService = health.services.find((s) => s.id === 'scheduler')
-
-      expect(schedulerService).toBeDefined()
-      expect(schedulerService?.status).toBe('healthy')
-      expect(schedulerService?.summary).toContain('Operational')
-    })
-
-    it('evaluates degraded status when scheduler heartbeat is stale (>15 minutes)', async () => {
-      const staleIso = new Date(Date.now() - 25 * 60 * 1000).toISOString() // 25m ago (> 15m)
-      const mockSupabase = {
-        from: vi.fn((table: string) => {
-          if (table === 'system_settings') {
-            return {
-              select: vi.fn().mockReturnThis(),
-              eq: vi.fn().mockReturnThis(),
-              maybeSingle: vi.fn().mockResolvedValue({
-                data: {
-                  value: {
-                    job: 'process-email-queue',
-                    status: 'healthy',
-                    last_run_at: staleIso,
-                    last_success_at: staleIso,
-                    last_duration_ms: 850,
-                  },
-                },
-              }),
-            }
-          }
-          return {
-            select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            gte: vi.fn().mockReturnThis(),
-            in: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockResolvedValue({ data: [], count: 0 }),
-            maybeSingle: vi.fn().mockResolvedValue({ data: null }),
-          }
-        }),
-      }
-
-      vi.spyOn(await import('../supabase'), 'createServiceRoleClient').mockReturnValue(mockSupabase as never)
-
-      const health = await SystemService.getHealthOverview()
-      const schedulerService = health.services.find((s) => s.id === 'scheduler')
-
-      expect(schedulerService).toBeDefined()
-      expect(schedulerService?.status).toBe('degraded')
-      expect(schedulerService?.summary).toContain('Stale')
-    })
-
-    it('evaluates degraded status when scheduler heartbeat indicates execution failure', async () => {
-      const recentIso = new Date(Date.now() - 2 * 60 * 1000).toISOString()
-      const mockSupabase = {
-        from: vi.fn((table: string) => {
-          if (table === 'system_settings') {
-            return {
-              select: vi.fn().mockReturnThis(),
-              eq: vi.fn().mockReturnThis(),
-              maybeSingle: vi.fn().mockResolvedValue({
-                data: {
-                  value: {
-                    job: 'process-email-queue',
-                    status: 'failed',
-                    error: 'Database connection timeout',
-                    last_run_at: recentIso,
-                    last_duration_ms: 5000,
-                  },
-                },
-              }),
-            }
-          }
-          return {
-            select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            gte: vi.fn().mockReturnThis(),
-            in: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockResolvedValue({ data: [], count: 0 }),
-            maybeSingle: vi.fn().mockResolvedValue({ data: null }),
-          }
-        }),
-      }
-
-      vi.spyOn(await import('../supabase'), 'createServiceRoleClient').mockReturnValue(mockSupabase as never)
-
-      const health = await SystemService.getHealthOverview()
-      const schedulerService = health.services.find((s) => s.id === 'scheduler')
-
-      expect(schedulerService).toBeDefined()
-      expect(schedulerService?.status).toBe('degraded')
-      expect(schedulerService?.summary).toContain('Last run failed')
-      expect(schedulerService?.detail).toContain('Database connection timeout')
     })
   })
 

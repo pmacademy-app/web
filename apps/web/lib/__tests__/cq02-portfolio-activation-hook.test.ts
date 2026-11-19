@@ -25,41 +25,11 @@ vi.mock('@/lib/campaigns/portfolio-activation-runner', () => ({
   executePortfolioActivationCampaign: executeCampaignMock,
 }))
 
-const { logAdminActionMock } = vi.hoisted(() => ({ logAdminActionMock: vi.fn(async () => undefined) }))
-
-vi.mock('@/lib/admin/guard', () => ({ logAdminAction: logAdminActionMock }))
-
-vi.mock('@/lib/api/actor', () => ({
-  requireAdmin: () => ({ userId: 'admin-1', email: 'admin@example.test' }),
-}))
-
-// Pass-through: the route's own auth wrapper is covered elsewhere; here we only
-// care how the handler maps the service's refusal.
-vi.mock('@/lib/api/with-route', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/api/with-route')>()
-  return {
-    ...actual,
-    withRoute:
-      (_config: unknown, handler: (ctx: { actor: unknown; params: Record<string, string> }) => Promise<Response>) =>
-      async (_req: unknown, ctx: { params: Record<string, string> }) => {
-        try {
-          return await handler({ actor: { kind: 'admin' }, params: ctx.params })
-        } catch (err) {
-          if (err instanceof actual.RouteError) {
-            return Response.json({ success: false, error: err.message }, { status: err.status })
-          }
-          throw err
-        }
-      },
-  }
-})
-
 import {
   BroadcastService,
   BroadcastRefusedError,
   isPortfolioActivationBroadcast,
-} from '../admin/broadcast-service'
-import { POST as executeRoute } from '@/app/api/admin/emails/broadcasts/[id]/execute/route'
+} from '../broadcasts/broadcast-service'
 
 type DueRow = {
   id: string
@@ -192,6 +162,8 @@ describe('CQ-02 portfolio activation hook in processScheduledBroadcasts', () => 
   })
 })
 
+// The manual execute route is in the admin console repository; the service refusal it maps
+// to a 409 is still owned here.
 describe('CQ-02 manual execute path', () => {
   const campaignRecord = {
     id: 'b-manual',
@@ -227,21 +199,5 @@ describe('CQ-02 manual execute path', () => {
     await expect(BroadcastService.executeBroadcastBatch('b-manual')).rejects.toBeInstanceOf(BroadcastRefusedError)
     expect(updates).toHaveLength(0)
     expect(executeCampaignMock).not.toHaveBeenCalled()
-  })
-
-  it('the execute route answers 409 and logs no admin action', async () => {
-    const { client, updates } = makeSupabase([], { record: campaignRecord })
-    createServiceRoleClientMock.mockReturnValue(client)
-
-    const res = await (executeRoute as unknown as (req: unknown, ctx: { params: Record<string, string> }) => Promise<Response>)(
-      new Request('http://localhost/api/admin/emails/broadcasts/b-manual/execute', { method: 'POST' }),
-      { params: { id: 'b-manual' } }
-    )
-
-    expect(res.status).toBe(409)
-    const body = (await res.json()) as { error: string }
-    expect(body.error).toContain('Portfolio activation campaign b-manual cannot be sent')
-    expect(updates).toHaveLength(0)
-    expect(logAdminActionMock).not.toHaveBeenCalled()
   })
 })

@@ -20,7 +20,8 @@ import { logSystemError } from '@/lib/monitoring/logger'
  * Cache entirely. That also silently broke the invalidation the product already
  * performs: `revalidatePath('/api/og/portfolio/<username>')` is called when a learner
  * saves portfolio settings (app/api/settings/portfolio/route.ts) and when an admin
- * changes a profile (lib/admin/service.ts) — with no cache entry to invalidate, those
+ * changes a profile (the admin console, through POST /api/internal/revalidate): with no
+ * cache entry to invalidate, those
  * calls did nothing. Caching here is what makes them meaningful.
  *
  * One hour matches the `s-maxage=3600` the success path already sends, so the CDN and

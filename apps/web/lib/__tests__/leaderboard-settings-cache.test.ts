@@ -207,7 +207,7 @@ describe('weekly leaderboard: invalidation', () => {
 describe('admin settings: tag cache', () => {
   async function loadSettings() {
     vi.resetModules()
-    const mod = await import('../admin/settings-service')
+    const mod = await import('../settings/system-settings-service')
     const fake = await installDataCacheFake()
     const nextCache = await import('next/cache')
     mod.SettingsService.invalidateCache()

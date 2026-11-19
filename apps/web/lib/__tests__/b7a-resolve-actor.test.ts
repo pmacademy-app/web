@@ -1,14 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const getAuthenticatedUserFromRequest = vi.fn()
-const requireAdminUser = vi.fn()
 
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: (req: Request) => getAuthenticatedUserFromRequest(req),
-}))
-
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: (req: Request) => requireAdminUser(req),
 }))
 
 const { resolveActor, ACTOR_KINDS } = await import('@/lib/api/actor')
@@ -23,9 +18,7 @@ const LEARNER = { id: 'user-1', email: 'learner@prodily.app' }
 
 beforeEach(() => {
   getAuthenticatedUserFromRequest.mockReset()
-  requireAdminUser.mockReset()
   getAuthenticatedUserFromRequest.mockResolvedValue(null)
-  requireAdminUser.mockResolvedValue({ authorized: false, error: 'Authentication required', statusCode: 401 })
   process.env.CRON_SECRET = CRON_SECRET
 })
 
@@ -54,20 +47,6 @@ describe('B7-A — resolveActor: actor kinds', () => {
     })
   })
 
-  it('resolves an admin through the existing guard, keeping its database re-read', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
-
-    const result = await resolveActor(req(), { allow: ['admin'] })
-
-    expect(requireAdminUser).toHaveBeenCalledTimes(1)
-    expect(result.ok).toBe(true)
-    expect(result.ok && result.actor).toEqual({
-      kind: 'admin',
-      userId: 'admin-1',
-      email: 'admin@prodily.app',
-    })
-  })
-
   it('resolves a cron actor from a matching bearer secret', async () => {
     const result = await resolveActor(req({ authorization: `Bearer ${CRON_SECRET}` }), { allow: ['cron'] })
 
@@ -83,7 +62,8 @@ describe('B7-A — resolveActor: actor kinds', () => {
   })
 
   it('exposes the full set of actor kinds', () => {
-    expect([...ACTOR_KINDS].sort()).toEqual(['admin', 'anonymous', 'cron', 'learner'])
+    // No admin kind: the admin console moved to its own repository and host.
+    expect([...ACTOR_KINDS].sort()).toEqual(['anonymous', 'cron', 'learner'])
   })
 })
 
@@ -96,23 +76,9 @@ describe('B7-A — resolveActor: fail-closed behaviour', () => {
     expect(!result.ok && result.code).toBe('UNAUTHORIZED')
   })
 
-  it('denies with 403 when an authenticated non-admin hits an admin-only policy', async () => {
-    requireAdminUser.mockResolvedValue({
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
-    })
-
-    const result = await resolveActor(req(), { allow: ['admin'] })
-
-    expect(result.ok).toBe(false)
-    expect(!result.ok && result.status).toBe(403)
-    expect(!result.ok && result.code).toBe('FORBIDDEN')
-  })
-
-  it('never falls back to admin for an unrecognised credential', async () => {
+  it('never escalates an unrecognised credential', async () => {
     const result = await resolveActor(req({ authorization: 'Bearer not-the-cron-secret' }), {
-      allow: ['cron', 'admin', 'learner', 'anonymous'],
+      allow: ['cron', 'learner', 'anonymous'],
     })
 
     expect(result.ok).toBe(true)
@@ -149,7 +115,6 @@ describe('B7-A — resolveActor: fail-closed behaviour', () => {
   it('does not consult the auth helpers for a policy that does not allow those kinds', async () => {
     await resolveActor(req({ authorization: `Bearer ${CRON_SECRET}` }), { allow: ['cron'] })
 
-    expect(requireAdminUser).not.toHaveBeenCalled()
     expect(getAuthenticatedUserFromRequest).not.toHaveBeenCalled()
   })
 })
@@ -165,45 +130,28 @@ describe('B7-A — resolveActor: policy precedence', () => {
     expect(result.ok && result.actor.kind).toBe('cron')
   })
 
-  it('falls through to learner when the admin check fails but learner is also allowed', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: false, statusCode: 403, error: 'not admin' })
+  it('resolves a cron-only policy without consulting the session', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
 
-    const result = await resolveActor(req(), { allow: ['admin', 'learner'] })
+    const denied = await resolveActor(req(), { allow: ['cron'] })
 
-    expect(result.ok).toBe(true)
-    expect(result.ok && result.actor.kind).toBe('learner')
-  })
-
-  it('prefers admin over learner when both are allowed and the user is an admin', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
-    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-
-    const result = await resolveActor(req(), { allow: ['admin', 'learner'] })
-
-    expect(result.ok && result.actor.kind).toBe('admin')
-  })
-
-  it('reproduces the cron-or-admin policy the six cron routes hand-roll today', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
-
-    const result = await resolveActor(req(), { allow: ['cron', 'admin'] })
-
-    expect(result.ok && result.actor.kind).toBe('admin')
+    expect(denied.ok).toBe(false)
+    expect(!denied.ok && denied.status).toBe(401)
+    expect(getAuthenticatedUserFromRequest).not.toHaveBeenCalled()
   })
 })
 
 describe('B7-A — resolveActor: memoization', () => {
   it('resolves once per request instance for the same policy', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
     const request = req()
 
     const [a, b] = await Promise.all([
-      resolveActor(request, { allow: ['admin'] }),
-      resolveActor(request, { allow: ['admin'] }),
+      resolveActor(request, { allow: ['learner'] }),
+      resolveActor(request, { allow: ['learner'] }),
     ])
 
-    expect(requireAdminUser).toHaveBeenCalledTimes(1)
+    expect(getAuthenticatedUserFromRequest).toHaveBeenCalledTimes(1)
     expect(a).toEqual(b)
   })
 
@@ -219,22 +167,22 @@ describe('B7-A — resolveActor: memoization', () => {
   })
 
   it('treats allow-list order as irrelevant to the memoization key', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
     const request = req()
 
-    await resolveActor(request, { allow: ['admin', 'learner'] })
-    await resolveActor(request, { allow: ['learner', 'admin'] })
+    await resolveActor(request, { allow: ['anonymous', 'learner'] })
+    await resolveActor(request, { allow: ['learner', 'anonymous'] })
 
-    expect(requireAdminUser).toHaveBeenCalledTimes(1)
+    expect(getAuthenticatedUserFromRequest).toHaveBeenCalledTimes(1)
   })
 
   it('does not share resolution between two different requests', async () => {
-    requireAdminUser.mockResolvedValue({ authorized: true, userId: 'admin-1', email: 'admin@prodily.app' })
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
 
-    await resolveActor(req(), { allow: ['admin'] })
-    await resolveActor(req(), { allow: ['admin'] })
+    await resolveActor(req(), { allow: ['learner'] })
+    await resolveActor(req(), { allow: ['learner'] })
 
-    expect(requireAdminUser).toHaveBeenCalledTimes(2)
+    expect(getAuthenticatedUserFromRequest).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -279,40 +227,20 @@ describe('B7-A — resolveActor: cron secret comparison', () => {
 })
 
 describe('B7-A — requireUserId', () => {
-  it('returns the id for the two actor kinds that carry one', async () => {
+  it('returns the id for the learner kind, the only one that carries one', async () => {
     const { requireUserId } = await import('@/lib/api/actor')
 
     expect(requireUserId({ kind: 'learner', userId: 'u1', email: null })).toBe('u1')
-    expect(requireUserId({ kind: 'admin', userId: 'a1', email: 'a@b.c' })).toBe('a1')
   })
 
   it('throws for an actor kind that has no user id', async () => {
     const { requireUserId } = await import('@/lib/api/actor')
 
-    // Unreachable under a learner- or admin-only policy; it exists so a route that
+    // Unreachable under a learner-only policy; it exists so a route that
     // widens its policy without updating its handler fails loudly rather than
     // silently querying for an empty id.
     expect(() => requireUserId({ kind: 'anonymous' })).toThrow(/anonymous/)
     expect(() => requireUserId({ kind: 'cron' })).toThrow(/cron/)
-  })
-})
-
-describe('B7-A — requireAdmin', () => {
-  it('returns the id and email of an admin actor', async () => {
-    const { requireAdmin } = await import('@/lib/api/actor')
-
-    expect(requireAdmin({ kind: 'admin', userId: 'a1', email: 'a@b.c' })).toEqual({
-      userId: 'a1',
-      email: 'a@b.c',
-    })
-  })
-
-  it('throws for any non-admin actor', async () => {
-    const { requireAdmin } = await import('@/lib/api/actor')
-
-    expect(() => requireAdmin({ kind: 'learner', userId: 'u1', email: 'u@b.c' })).toThrow(/learner/)
-    expect(() => requireAdmin({ kind: 'anonymous' })).toThrow(/anonymous/)
-    expect(() => requireAdmin({ kind: 'cron' })).toThrow(/cron/)
   })
 })
 

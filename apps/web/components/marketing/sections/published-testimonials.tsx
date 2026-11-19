@@ -1,6 +1,6 @@
 import { Reveal } from '@/components/marketing/motion/reveal'
 import { BAND_PLAIN, CARD, CONTAINER, SECTION_TITLE, SECTION_Y } from '../styles'
-import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { TestimonialsService } from '@/lib/feedback/published-testimonials'
 
 /**
  * Published learner testimonials (Phase 0.C).
@@ -10,7 +10,7 @@ import { FeedbackAdminService } from '@/lib/admin/feedback-service'
  * `docs/IMPLEMENTATION_PLAN.md` §Phase 0.C sets a binding claims policy: no invented
  * testimonials, statistics or outcomes. Prodily does have a real source: testimonials
  * a learner submitted and an admin approved and published, served by
- * `FeedbackAdminService.getPublishedTestimonials()`, and the homepage was not using it.
+ * `TestimonialsService.getPublishedTestimonials()`, and the homepage was not using it.
  *
  * So this renders real rows or nothing at all. The `MINIMUM_TO_RENDER` threshold is the
  * important part: one or two approved quotes on a landing page reads as "we found
@@ -36,7 +36,7 @@ const MINIMUM_TO_RENDER = 3
 const MAXIMUM_TO_RENDER = 6
 
 export async function PublishedTestimonialsSection() {
-  const testimonials = await FeedbackAdminService.getPublishedTestimonials()
+  const testimonials = await TestimonialsService.getPublishedTestimonials()
 
   if (!testimonials || testimonials.length < MINIMUM_TO_RENDER) return null
 

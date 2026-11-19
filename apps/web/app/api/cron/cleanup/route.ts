@@ -10,9 +10,10 @@ import { createServiceRoleClient } from '@/lib/supabase'
 /**
  * POST|GET /api/cron/cleanup — the retention sweep (B9-D).
  *
- * Accepts the scheduler's `CRON_SECRET` bearer token or an authenticated admin
- * session — the same two callers as before B7-C, resolved once by `resolveActor`
- * with a constant-time secret comparison.
+ * Accepts only the `CRON_SECRET` bearer token, resolved by `resolveActor` with a
+ * constant-time secret comparison. The scheduler and the admin console (separate
+ * repository, server side) both present it. A caller that wants a dry run sends
+ * `{ "dryRun": true }` explicitly.
  *
  * ## This route deletes nothing until a human turns it on
  *
@@ -47,7 +48,7 @@ async function readRequestedDryRun(request: Request, actorKind: string): Promise
   // Safe default handling (ENG-09, AG-31):
   // 1. An explicit boolean in the body always wins.
   // 2. When actor is 'cron' and RETENTION_DELETE_ENABLED === 'true', no body defaults to false.
-  // 3. Admin calls with no body, or any caller when deletion is disabled, stay in safe dry-run mode.
+  // 3. Any caller when deletion is disabled stays in safe dry-run mode.
   const body = (await request.json().catch(() => ({}))) as { dryRun?: unknown }
   if (typeof body.dryRun === 'boolean') {
     return body.dryRun
@@ -60,7 +61,7 @@ async function readRequestedDryRun(request: Request, actorKind: string): Promise
 
 export const POST = withRoute(
   {
-    actor: { allow: ['cron', 'admin'] },
+    actor: { allow: ['cron'] },
     operation: 'cron.cleanup',
     domain: 'cron',
     summary: 'Unhandled exception in /api/cron/cleanup',

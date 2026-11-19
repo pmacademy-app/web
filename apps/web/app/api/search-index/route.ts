@@ -24,7 +24,7 @@ const getCachedSearchIndex = unstable_cache(
  */
 export const GET = withRoute(
   {
-    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    actor: { allow: ['anonymous', 'learner'] },
     operation: 'search_index.read',
     summary: 'Unexpected failure serving the search index',
   },

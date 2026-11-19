@@ -1,14 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { NextRequest } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { issueCertificate } from '../certificates-db'
 import { getLessonIdsForModule } from '../curriculum-registry'
-import * as adminGuardLib from '../admin/guard'
-import * as supabaseLib from '../supabase'
-import { allowConsoleErrors } from './helpers/console-guard-allowlist'
 
 // Mock external auth and database dependencies for route execution
 vi.mock('@/lib/auth', () => ({
@@ -16,18 +12,10 @@ vi.mock('@/lib/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }))
 
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: vi.fn(),
-  logAdminAction: vi.fn().mockResolvedValue(undefined),
-}))
-
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(),
   createAuthenticatedServerClient: vi.fn(),
 }))
-
-// Import route handlers
-import { DELETE as adminUserDelete } from '../../app/api/admin/users/[id]/route'
 
 // ─── T1.1: Certificate Prerequisites & Integrity Tests ───────────────────────
 
@@ -350,184 +338,6 @@ describe('T1.1 — Certificate Security & Prerequisite Integrity', () => {
     const sql = fs.readFileSync(migrationPath, 'utf8')
     expect(sql).toContain('DROP POLICY IF EXISTS "Users can insert own certificates" ON public.certificates')
     expect(sql).toContain('ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY')
-  })
-})
-
-// ─── T1.2: Admin Account Deletion Tests ──────────────────────────────────────
-
-describe('T1.2 — Admin User Deletion Security & Hierarchy', () => {
-  const originalEnv = process.env
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-    process.env = { ...originalEnv }
-  })
-
-  afterEach(() => {
-    process.env = originalEnv
-  })
-
-  it('blocks admin self-deletion with 400 status', async () => {
-    const adminId = 'admin-user-1'
-    vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
-      authorized: true,
-      userId: adminId,
-      email: 'admin@prodily.app',
-    })
-
-    const req = new NextRequest(`http://localhost:3000/api/admin/users/${adminId}`, {
-      method: 'DELETE',
-    })
-
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: adminId }) })
-    expect(res.status).toBe(400)
-    const json = await res.json()
-    expect(json.error).toContain('Admins cannot delete their own account')
-  })
-
-  it.each([
-    { label: 'a long-standing admin', target: { id: 'target-owner-id', email: 'owner@prodily.app', is_admin: true } },
-    { label: 'a promoted admin', target: { id: 'target-admin-id', email: 'targetadmin@prodily.app', is_admin: true } },
-  ])('refuses to delete $label (users.is_admin = true) with 403', async ({ target }) => {
-    vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
-      authorized: true,
-      userId: 'acting-admin-id',
-      email: 'acting-admin@prodily.app',
-    })
-
-    const mockDeleteUser = vi.fn().mockResolvedValue({ data: { user: null }, error: null })
-    const mockSupabase = {
-      from: (table: string) => {
-        if (table === 'users') {
-          return {
-            select: () => ({
-              eq: () => ({
-                maybeSingle: () => Promise.resolve({ data: target, error: null }),
-              }),
-            }),
-          }
-        }
-        return { select: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }) }
-      },
-      auth: { admin: { deleteUser: mockDeleteUser } },
-    }
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(mockSupabase as unknown as SupabaseClient<Database>)
-
-    const req = new NextRequest(`http://localhost:3000/api/admin/users/${target.id}`, {
-      method: 'DELETE',
-    })
-
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: target.id }) })
-    expect(res.status).toBe(403)
-    const json = await res.json()
-    expect(json.error).toContain('Administrators cannot be deleted')
-    expect(mockDeleteUser).not.toHaveBeenCalled()
-  })
-
-  it('deletes both application data and Supabase Auth user when admin deletes a learner', async () => {
-    vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
-      authorized: true,
-      userId: 'superadmin-id',
-      email: 'superadmin@prodily.app',
-    })
-
-    const mockDeleteUser = vi.fn().mockResolvedValue({ data: { user: null }, error: null })
-
-    const mockSupabase = {
-      from: (table: string) => {
-        if (table === 'users') {
-          return {
-            select: () => ({
-              eq: () => ({
-                maybeSingle: () =>
-                  Promise.resolve({
-                    data: { id: 'target-learner-id', email: 'learner@example.com', is_admin: false },
-                    error: null,
-                  }),
-              }),
-            }),
-            delete: () => ({
-              eq: () => Promise.resolve({ error: null }),
-            }),
-          }
-        }
-        return {
-          select: () => ({
-            eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }),
-          }),
-          delete: () => ({
-            eq: () => Promise.resolve({ error: null }),
-          }),
-          update: () => ({
-            eq: () => Promise.resolve({ error: null }),
-          }),
-          insert: () => Promise.resolve({ error: null }),
-        }
-      },
-      storage: {
-        from: () => ({
-          list: () => Promise.resolve({ data: [], error: null }),
-          remove: () => Promise.resolve({ data: [], error: null }),
-        }),
-      },
-      auth: {
-        admin: {
-          deleteUser: mockDeleteUser,
-        },
-      },
-    }
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(mockSupabase as unknown as SupabaseClient<Database>)
-
-    const req = new NextRequest('http://localhost:3000/api/admin/users/target-learner-id', {
-      method: 'DELETE',
-    })
-
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: 'target-learner-id' }) })
-    expect(res.status).toBe(200)
-    const json = await res.json()
-    expect(json.success).toBe(true)
-    expect(json.deletedUserId).toBe('target-learner-id')
-    expect(json.authDeleted).toBe(true)
-
-    // Critical assertion: permanently removes the GoTrue user to eliminate zombie accounts (CRIT-03)
-    expect(mockDeleteUser).toHaveBeenCalledWith('target-learner-id')
-  })
-
-  it('fails with 500 and touches no data when the auth user delete fails', async () => {
-    // The route logs the auth failure; the logger's incident write hits this minimal mock.
-    allowConsoleErrors()
-    vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValueOnce({
-      authorized: true,
-      userId: 'superadmin-id',
-      email: 'superadmin@prodily.app',
-    })
-
-    const mockDeleteUser = vi.fn().mockResolvedValue({ data: null, error: { message: 'gotrue down' } })
-    const deleteCalls: string[] = []
-    const mockSupabase = {
-      from: (table: string) => ({
-        select: () => ({
-          eq: () => ({
-            maybeSingle: () =>
-              Promise.resolve({
-                data: table === 'users' ? { id: 'target-learner-id', email: 'learner@example.com', is_admin: false } : null,
-                error: null,
-              }),
-          }),
-        }),
-        delete: () => {
-          deleteCalls.push(table)
-          return { eq: () => Promise.resolve({ error: null }) }
-        },
-      }),
-      auth: { admin: { deleteUser: mockDeleteUser } },
-    }
-    vi.mocked(supabaseLib.createServiceRoleClient).mockReturnValue(mockSupabase as unknown as SupabaseClient<Database>)
-
-    const req = new NextRequest('http://localhost:3000/api/admin/users/target-learner-id', { method: 'DELETE' })
-    const res = await adminUserDelete(req, { params: Promise.resolve({ id: 'target-learner-id' }) })
-    expect(res.status).toBe(500)
-    expect(deleteCalls).toEqual([])
   })
 })
 

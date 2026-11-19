@@ -26,7 +26,7 @@ const CACHE_TTL_MS = 30_000
 /** After a failed settings read the cached values are served this long before the next attempt. */
 const ERROR_RETRY_MS = 5_000
 
-/** The admin learning-settings key, written by Settings → Learning (lib/admin/settings-service.ts). */
+/** The admin learning-settings key, written by Settings → Learning (lib/settings/system-settings-service.ts). */
 export const LEARNING_SETTINGS_KEY = 'learning_settings'
 /** The key this reader used before the admin and runtime keys were reconciled. Still honoured. */
 export const LEGACY_LEARNING_SETTINGS_KEY = 'learning'

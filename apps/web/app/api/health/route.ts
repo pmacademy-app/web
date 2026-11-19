@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
  */
 export const GET = withRoute(
   {
-    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    actor: { allow: ['anonymous', 'learner'] },
     operation: 'health.check',
     domain: 'api',
     summary: 'Unexpected failure serving the health check',

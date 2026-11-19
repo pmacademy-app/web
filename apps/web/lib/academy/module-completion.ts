@@ -1,5 +1,5 @@
 import { getLessonIdsForModule, getModuleSlugForLessonId } from '../curriculum-registry'
-import { CURRICULUM_MODULE_META } from '../admin/curriculum-meta'
+import { CURRICULUM_MODULE_META } from '../curriculum/curriculum-meta'
 import { getCapstoneForModule as getCapstoneDefinitionForModule } from '@/config/capstones'
 
 export interface CompletedModule {

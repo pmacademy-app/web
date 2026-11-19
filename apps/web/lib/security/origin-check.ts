@@ -9,6 +9,8 @@ const EXEMPT_PATHS = [
   '/api/auth/send-email-hook',
   '/api/email/webhooks',
   '/api/email/unsubscribe',
+  // Server-to-server: the admin console's server, shared-secret bearer, no cookies.
+  '/api/internal/revalidate',
 ]
 
 export function isOriginExempt(pathname: string): boolean {

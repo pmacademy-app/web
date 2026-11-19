@@ -10,11 +10,10 @@ import { POST as reviewCompletePost } from '../../app/api/review/complete/route'
 import { deleteAccount } from '../settings/settings-service'
 import { onFirstLessonCompletedReferralCheck } from '../referral/referral-service'
 import * as authLib from '../auth'
-import * as adminGuardLib from '../admin/guard'
 import * as supabaseLib from '../supabase'
 import * as flashcardsService from '../flashcards-service'
 import * as xpService from '../xp-service'
-import { SettingsService } from '../admin/settings-service'
+import { SettingsService } from '../settings/system-settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 
@@ -27,11 +26,6 @@ vi.mock('@/lib/xp-service', async (importOriginal) => {
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn(),
   getAuthenticatedUser: vi.fn(),
-}))
-
-vi.mock('@/lib/admin/guard', () => ({
-  requireAdminUser: vi.fn(),
-  logAdminAction: vi.fn(),
 }))
 
 vi.mock('@/lib/supabase', () => ({
@@ -116,13 +110,8 @@ describe('Platform Hardening, Security & Production Reliability', () => {
   })
 
   describe('2. Security: CRON Endpoint Protection Hardening', () => {
-    it('rejects /api/cron/process-email-queue when CRON_SECRET is unset and no admin session exists', async () => {
+    it('rejects /api/cron/process-email-queue when CRON_SECRET is unset', async () => {
       delete process.env.CRON_SECRET
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: false,
-        error: 'Authentication required',
-        statusCode: 401,
-      })
 
       const req = new Request('https://prodily.app/api/cron/process-email-queue', { method: 'POST' })
       const res = await cronProcessEmailQueuePost(req)
@@ -152,11 +141,6 @@ describe('Platform Hardening, Security & Production Reliability', () => {
 
     it('rejects /api/cron/daily-reminder when unauthorized', async () => {
       process.env.CRON_SECRET = 'expected-secret'
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: false,
-        error: 'Authentication required',
-        statusCode: 401,
-      })
 
       const req = new Request('https://prodily.app/api/cron/daily-reminder', {
         method: 'POST',
@@ -169,30 +153,17 @@ describe('Platform Hardening, Security & Production Reliability', () => {
 
     it('rejects /api/cron/weekly-recap when unauthorized', async () => {
       delete process.env.CRON_SECRET
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: false,
-        error: 'Access denied: Admin privileges required',
-        statusCode: 403,
-      })
 
       const req = new Request('https://prodily.app/api/cron/weekly-recap', { method: 'POST' })
       const res = await cronWeeklyRecapPost(req)
-      // B7-C behaviour change, deliberate: an authenticated caller who is not an
-      // admin now gets 403 rather than 401. Before migration every cron route
-      // hardcoded 401 even when the admin guard had already answered 403, which
-      // reported an authenticated user as unauthenticated. Both are refusals and
-      // no client consumes these endpoints, so the canonical status wins.
-      expect(res.status).toBe(403)
-      expect((await res.json()).code).toBe('FORBIDDEN')
+      // Cron routes accept only CRON_SECRET (the admin console calls them with it), so
+      // any other caller is unauthenticated: 401.
+      expect(res.status).toBe(401)
+      expect((await res.json()).code).toBe('UNAUTHORIZED')
     })
 
     it('rejects /api/cron/retry-failed when unauthorized', async () => {
       delete process.env.CRON_SECRET
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: false,
-        error: 'Authentication required',
-        statusCode: 401,
-      })
 
       const req = new Request('https://prodily.app/api/cron/retry-failed', { method: 'POST' })
       const res = await cronRetryFailedPost(req)
@@ -201,26 +172,20 @@ describe('Platform Hardening, Security & Production Reliability', () => {
 
     it('rejects /api/cron/cleanup when unauthorized', async () => {
       delete process.env.CRON_SECRET
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: false,
-        error: 'Authentication required',
-        statusCode: 401,
-      })
 
       const req = new Request('https://prodily.app/api/cron/cleanup', { method: 'POST' })
       const res = await cronCleanupPost(req)
       expect(res.status).toBe(401)
     })
 
-    it('allows /api/cron/cleanup when authenticated as Admin user', async () => {
-      delete process.env.CRON_SECRET
-      vi.mocked(adminGuardLib.requireAdminUser).mockResolvedValue({
-        authorized: true,
-        userId: 'admin_123',
-        email: 'admin@prodily.app',
-      })
+    it('allows /api/cron/cleanup with a valid CRON_SECRET bearer token (how the admin console calls it)', async () => {
+      process.env.CRON_SECRET = 'cleanup-cron-secret'
 
-      const req = new Request('https://prodily.app/api/cron/cleanup', { method: 'POST' })
+      const req = new Request('https://prodily.app/api/cron/cleanup', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer cleanup-cron-secret' },
+        body: JSON.stringify({ dryRun: true }),
+      })
       const res = await cronCleanupPost(req)
       expect(res.status).toBe(200)
       const json = await res.json()

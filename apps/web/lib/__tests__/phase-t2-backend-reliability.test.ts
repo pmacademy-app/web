@@ -36,7 +36,6 @@ import {
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { synchronizeProgressBadges, PROGRESS_DERIVED_BADGE_KEYS } from '@/lib/settings/settings-service'
 import { recordQuizAttemptAction } from '@/lib/academy/lessons-db'
-import { requireAdminUser } from '@/lib/admin/guard'
 import { resolveActor } from '@/lib/api/actor'
 
 // Reusable chainable query builder mock
@@ -484,75 +483,20 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
   })
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // T2.5 — Admin Audit Log False Positives
+  // T2.5: no audit noise from learner routes. The admin actor kind and its guard moved
+  // to the admin console repository, so a learner route never writes admin_audit_logs.
   // ─────────────────────────────────────────────────────────────────────────────
-  describe('T2.5: Admin Audit Log False Positives', () => {
-    it('legitimate learner on dual-role route (learner + admin) does NOT write access_denied audit log', async () => {
-      const req = new Request('http://localhost:3000/api/learner-or-admin', {
+  describe('T2.5: learner routes write no admin audit log', () => {
+    it('a learner resolves as a learner and records no access_denied audit log', async () => {
+      const req = new Request('http://localhost:3000/api/learner-thing', {
         headers: { cookie: 'sb-token=valid-learner' },
       })
 
-      // Resolve actor for dual-role route
-      const resolution = await resolveActor(req, { allow: ['admin', 'learner'] })
+      const resolution = await resolveActor(req, { allow: ['learner'] })
       expect(resolution.ok).toBe(true)
       if (resolution.ok) {
         expect(resolution.actor.kind).toBe('learner')
       }
-
-      // VERIFY: No audit log was created for learner on dual-role route
-      expect(loggedAuditActions.length).toBe(0)
-    })
-
-    it('legitimate admin on dual-role route succeeds as admin', async () => {
-      mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'users') {
-          return createChainableBuilder({
-            is_admin: true,
-            email: 'admin@prodily.app',
-          })
-        }
-        return createChainableBuilder()
-      })
-
-      const req = new Request('http://localhost:3000/api/dual-role-admin', {
-        headers: { cookie: 'sb-token=valid-admin' },
-      })
-
-      const resolution = await resolveActor(req, { allow: ['admin', 'learner'] })
-      expect(resolution.ok).toBe(true)
-      if (resolution.ok) {
-        expect(resolution.actor.kind).toBe('admin')
-      }
-      expect(loggedAuditActions.length).toBe(0)
-    })
-
-    it('unauthorized learner on strictly admin route DOES write access_denied audit log', async () => {
-      const req = new Request('http://localhost:3000/api/admin/strictly-admin', {
-        headers: { cookie: 'sb-token=valid-learner' },
-      })
-
-      // Call requireAdminUser with silent: false (default for admin-only routes)
-      const adminResult = await requireAdminUser(req, { silent: false })
-      expect(adminResult.authorized).toBe(false)
-      expect(adminResult.statusCode).toBe(403)
-
-      // VERIFY: Genuine unauthorized admin attempt IS audited
-      expect(loggedAuditActions.length).toBe(1)
-      expect(loggedAuditActions[0]).toEqual(expect.objectContaining({
-        action: 'access_denied',
-        admin_email: 'learner@example.com',
-      }))
-    })
-
-    it('unauthenticated caller on admin route returns 401 without recording access_denied log', async () => {
-      const req = new Request('http://localhost:3000/api/admin/strictly-admin')
-
-      // Mock unauthenticated
-      mockAuthUser.current = null
-
-      const result = await requireAdminUser(req)
-      expect(result.authorized).toBe(false)
-      expect(result.statusCode).toBe(401)
       expect(loggedAuditActions.length).toBe(0)
     })
   })
