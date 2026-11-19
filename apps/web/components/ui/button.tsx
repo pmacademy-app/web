@@ -26,8 +26,6 @@ const buttonVariants = cva(
           "border border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20",
         accent:
           "bg-accent text-accent-foreground hover:bg-accent/90 shadow-xs",
-        admin:
-          "bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 shadow-xs",
         link: "text-primary underline-offset-4 hover:underline p-0 h-auto font-semibold",
         ai: "bg-ai text-white hover:bg-ai/90 border-ai/20 shadow-glow-accent",
         success: "bg-success text-white hover:bg-success/90 border-success/20",

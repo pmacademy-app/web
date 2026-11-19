@@ -116,42 +116,6 @@
   --sidebar-ring:      #2F80ED;
 }
 
-/* ─── Admin Panel Brand Tokens ───────────────────────────────────────────────
-   Clean, modern Prodily SaaS palette scoped to the Admin Panel shell (.admin-console).
-   Aligns directly with the core Prodily identity: clean light canvas (#F8FAFC / #FFFFFF),
-   crisp neutral borders (#E2E8F0), slate typography (#0F172A), and Prodily green (#019E75).
----------------------------------------------------------------------------- */
-
-.admin-console {
-  /* Foundation */
-  --admin-bg:               #F8FAFC;
-  --admin-surface:          #FFFFFF;
-  --admin-surface-raised:   #F1F5F9;
-  --admin-border:           #E2E8F0;
-  --admin-border-strong:    #CBD5E1;
-
-  /* Text */
-  --admin-fg:               #0F172A;
-  --admin-fg-muted:         #475569;
-  --admin-fg-subtle:        #94A3B8;
-
-  /* Accent (Prodily brand green) */
-  --admin-accent:           #019E75;
-  --admin-accent-fg:        #FFFFFF;
-  --admin-accent-soft:      rgba(1, 158, 117, 0.08);
-
-  /* Semantic */
-  --admin-success:          #16A34A;
-  --admin-success-soft:     rgba(22, 163, 74, 0.1);
-  --admin-warning:          #D97706;
-  --admin-warning-soft:     rgba(217, 119, 6, 0.1);
-  --admin-danger:           #DC2626;
-  --admin-danger-soft:      rgba(220, 38, 38, 0.1);
-  --admin-info:             #2563EB;
-  --admin-info-soft:        rgba(37, 99, 235, 0.1);
-  --admin-neutral:          #64748B;
-}
-
 /* ─── Tailwind v4 Theme ──────────────────────────────────────────────────────
    Maps every CSS variable to a Tailwind utility class.
    Usage: bg-background, text-primary, border-border-strong, etc.
@@ -166,27 +130,6 @@
   --font-heading: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif:   var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Admin Panel (scoped: values live on .admin-console) */
-  --color-admin-bg:              var(--admin-bg);
-  --color-admin-surface:         var(--admin-surface);
-  --color-admin-surface-raised:  var(--admin-surface-raised);
-  --color-admin-border:          var(--admin-border);
-  --color-admin-border-strong:   var(--admin-border-strong);
-  --color-admin-fg:              var(--admin-fg);
-  --color-admin-fg-muted:        var(--admin-fg-muted);
-  --color-admin-fg-subtle:       var(--admin-fg-subtle);
-  --color-admin-accent:          var(--admin-accent);
-  --color-admin-accent-fg:       var(--admin-accent-fg);
-  --color-admin-accent-soft:     var(--admin-accent-soft);
-  --color-admin-success:         var(--admin-success);
-  --color-admin-success-soft:    var(--admin-success-soft);
-  --color-admin-warning:         var(--admin-warning);
-  --color-admin-warning-soft:    var(--admin-warning-soft);
-  --color-admin-danger:          var(--admin-danger);
-  --color-admin-danger-soft:     var(--admin-danger-soft);
-  --color-admin-info:            var(--admin-info);
-  --color-admin-info-soft:       var(--admin-info-soft);
-  --color-admin-neutral:         var(--admin-neutral);
 
   /* Colors — Core */
   --color-background:        var(--color-background);
@@ -830,14 +773,3 @@ body {
   }
 }
 
-/* Admin console: no motion at all when the user asks for reduced motion.
-   Covers skeleton pulses, spinners, the alert counter and every transition. */
-@media (prefers-reduced-motion: reduce) {
-  .admin-console,
-  .admin-console *,
-  .admin-console *::before,
-  .admin-console *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}

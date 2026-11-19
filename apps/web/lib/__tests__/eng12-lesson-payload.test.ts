@@ -101,13 +101,12 @@ describe('ENG-12 / AG-32: Lighter Lesson Pages & CI Build Reuse', () => {
       expect(matches?.length).toBe(1)
     })
 
-    it('e2e job depends on build-and-validate and downloads next-build artifact', () => {
+    it('runs as a single CI job that deploys only after it passes', () => {
       const ciPath = path.resolve(rootDir, '../../.github/workflows/ci.yml')
       const ciContent = fs.readFileSync(ciPath, 'utf-8')
-      expect(ciContent).toContain('needs: [build-and-validate]')
-      expect(ciContent).toContain('actions/upload-artifact@v4')
-      expect(ciContent).toContain('actions/download-artifact@v4')
-      expect(ciContent).toContain('name: next-build')
+      // One check: no separate e2e, security-audit or db-local job.
+      expect(ciContent).not.toMatch(/^  (e2e|security-audit|db-local):/m)
+      expect(ciContent).toMatch(/deploy-supabase:[\s\S]*?needs: \[build-and-validate\]/)
     })
   })
 })

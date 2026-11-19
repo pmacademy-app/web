@@ -18,7 +18,6 @@ describe('B11-A — Design System Foundation: buttonVariants & Button', () => {
     'destructive-subtle',
     'warning',
     'accent',
-    'admin',
     'link',
     'ai',
     'success',

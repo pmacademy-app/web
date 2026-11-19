@@ -75,20 +75,8 @@ updates:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
 
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 3
-    # SEC-20: wait 3 days after a release before proposing it, so a compromised
-    # publish has time to be caught and pulled. Security updates are not delayed.
-    cooldown:
-      default-days: 3
-    labels:
-      - "dependencies"
-    commit-message:
-      prefix: "chore(deps)"
+  # No root "/" npm entry: the root package.json has no dependencies, so it only
+  # ever produced empty update runs.
 
   - package-ecosystem: "github-actions"
     directory: "/"
