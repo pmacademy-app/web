@@ -16,8 +16,9 @@ import type { Instrumentation } from 'next'
  *                             revalidateReason, renderType })
  *
  * What is recorded: the route file pattern, the method, the route type, the request
- * id when the caller sent a well-formed one, and the error's name, digest and
- * redacted message. What is never recorded: the query string (reset and verification
+ * id when the caller sent a well-formed one, the error's name, digest and
+ * redacted message, its redacted stack, and the release (commit) that served the
+ * request. What is never recorded: the query string (reset and verification
  * links carry tokens there), request bodies, cookies, the Authorization header or any
  * other header.
  */
@@ -84,6 +85,9 @@ export const onRequestError: Instrumentation.onRequestError = async (error, requ
       operation: `next.${context.routeType}`,
       summary: `Unhandled ${context.routeType} error in ${context.routePath}`,
       requestId: readRequestId(request.headers),
+      // The logger stores a redacted stack (at most 30 frames, 4000 characters) and
+      // the release tag beside the fields below.
+      error,
       details: {
         method: request.method,
         path: pathOnly(request.path),

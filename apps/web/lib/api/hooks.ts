@@ -35,6 +35,7 @@ import {
   type ApiEndpoint,
   type ApiError,
 } from '@/lib/api/client'
+import { installGlobalErrorListeners } from '@/lib/monitoring/client-error-beacon'
 
 export { ApiRequestError, type ApiError }
 
@@ -106,8 +107,17 @@ export interface ApiClientProviderProps {
  *
  * Establishes global deduplication, failure retry boundaries, and no focus revalidation
  * unless a call site asks for it.
+ *
+ * Also the one place the window `error` and `unhandledrejection` listeners are
+ * installed: the root layout renders this provider on every page, and it is
+ * already a client module, so the capture costs no extra client boundary.
+ * `installGlobalErrorListeners` is idempotent.
  */
 export function ApiClientProvider({ children, value }: ApiClientProviderProps) {
+  React.useEffect(() => {
+    installGlobalErrorListeners()
+  }, [])
+
   return React.createElement(
     SWRConfig,
     {

@@ -214,6 +214,17 @@ export interface ErrorReport {
    * same failure mode `stabilizeForFingerprint` exists to prevent.
    */
   requestId?: string
+  /**
+   * The caught value. Never serialized as-is: when it is an Error with a stack,
+   * the logger stores a redacted, bounded copy in `details.stack`.
+   */
+  error?: unknown
+  /**
+   * The signed-in user the failure happened to, written to `system_errors.user_id`.
+   * Only a server-resolved id (the route's actor), never one a client sent.
+   * Takes precedence over `subject.userId`.
+   */
+  userId?: string
 }
 
 /** An `ErrorReport` with every derived field filled in. */
