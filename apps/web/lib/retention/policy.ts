@@ -48,6 +48,12 @@ export interface RetentionRule {
   categoryNotIn?: string[]
   /** False for tables with no hold column (see the migration for why). */
   supportsHold: boolean
+  /**
+   * The table comes from a held migration that may not be applied yet. A missing
+   * table is then reported as skipped instead of failed, so the sweep stays quiet
+   * until the owner applies it.
+   */
+  tableMayBeMissing?: boolean
 }
 
 /**
@@ -152,6 +158,34 @@ export const RETENTION_RULES: readonly RetentionRule[] = [
     reason: 'L-11: operational telemetry 30d',
     // No retention_hold column on this table (20261024000001_product_events.sql).
     supportsHold: false,
+  },
+  {
+    id: 'security_event_counts',
+    table: 'security_event_counts',
+    // `day` is the IST calendar day of the counter. There is no single-column key, so
+    // the sweep selects expired days and deletes every row of those days; each of them
+    // is past the window, because a row's day never changes.
+    timestampColumn: 'day',
+    idColumn: 'day',
+    days: 30,
+    // Aggregated counters (hashed subject, network-prefix IP) that feed the daily
+    // summary; the summary itself is kept in security_digests.
+    reason: 'L-11: operational telemetry 30d (security event counters, summarised daily into security_digests)',
+    // No retention_hold column (held 20261119000007_security_events.sql).
+    supportsHold: false,
+    tableMayBeMissing: true,
+  },
+  {
+    id: 'security_digests',
+    table: 'security_digests',
+    timestampColumn: 'day',
+    idColumn: 'day',
+    days: 365,
+    // One non-PII summary row per day. L-11 allows aggregate analytics long-term;
+    // the security digest decision caps it at a year.
+    reason: 'L-11: aggregate non-PII analytics long-term (daily security digests, capped at 365d)',
+    supportsHold: false,
+    tableMayBeMissing: true,
   },
 ]
 

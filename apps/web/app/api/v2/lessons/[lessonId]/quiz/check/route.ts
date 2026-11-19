@@ -41,6 +41,7 @@ import {
 } from '@/lib/academy/quiz-receipts'
 import { fetchCompiledLesson } from '@/lib/lesson-loader'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 import { createServiceRoleClient } from '@/lib/supabase'
 import type { CompiledQuizQuestion } from '@/types'
 
@@ -92,6 +93,7 @@ export const POST = withRoute(
         windowMs: 60 * 60 * 1000,
       },
     ],
+    onRateLimited: ({ request, actor }) => recordSecurityEvent('quiz_check_rate_limited', { subject: learnerId(actor), path: request.url }),
   },
   async ({ actor, body, params }) => {
     const lessonId = params.lessonId

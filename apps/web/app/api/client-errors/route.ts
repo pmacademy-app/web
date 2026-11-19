@@ -17,6 +17,7 @@ import {
 import { logSystemError } from '@/lib/monitoring/logger'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 
 export const runtime = 'nodejs'
 
@@ -133,6 +134,7 @@ export const POST = withRoute(
   async ({ request, requestId }) => {
     const global = await evaluatePersistentRateLimit(CLIENT_ERROR_GLOBAL_KEY, CLIENT_ERROR_GLOBAL_LIMIT)
     if (!global.success) {
+      recordSecurityEvent('client_errors_flood', { ipBucket: getClientIpBucket(request), path: '/api/client-errors' })
       throw new RouteError(429, 'RATE_LIMITED', 'Too many requests. Please wait a while before trying again.', {
         resetInMs: global.resetInMs,
       })

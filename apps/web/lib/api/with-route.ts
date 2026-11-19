@@ -156,6 +156,12 @@ export interface WithRouteConfig<TBody, TQuery> {
    * instrumentation must never change the decision it is observing.
    */
   onDenied?: (context: { request: Request; denial: ActorDenial }) => void | Promise<void>
+  /**
+   * Side effect to run when a declared `rateLimit` rule refuses the request, and only
+   * then. Used to count the refusal for the daily security summary. Like `onDenied`
+   * it cannot change the response: it is not awaited and a throw is swallowed.
+   */
+  onRateLimited?: (context: { request: Request; actor: Actor }) => void
 }
 
 /** Next.js passes dynamic params as the second argument; in 15+ they are a promise. */
@@ -352,6 +358,11 @@ export function withRoute<
       if (config.rateLimit?.length) {
         const verdict = await enforceRateLimits(config.rateLimit, { request, actor, body, query })
         if (!verdict.ok) {
+          try {
+            config.onRateLimited?.({ request, actor })
+          } catch {
+            // Instrumentation must never change the refusal it observes.
+          }
           return apiError({
             status: 429,
             code: 'RATE_LIMITED',

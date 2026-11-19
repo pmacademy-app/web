@@ -8,6 +8,7 @@ import { ensureUserProfile } from '@/lib/auth'
 import { AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 import { log } from '@/lib/monitoring/log'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
@@ -70,6 +71,7 @@ export const POST = withRoute(
       ])
 
       if (!ipLimit.success || !emailLimit.success) {
+        recordSecurityEvent('login_rate_limited', { ipBucket: clientIp, subject: email, path: '/api/auth/login' })
         const resetInMs = Math.max(ipLimit.resetInMs, emailLimit.resetInMs)
         // Generic non-enumerating message so attacker cannot distinguish whether IP or email hit limit
         return NextResponse.json(
@@ -182,6 +184,7 @@ export const POST = withRoute(
       }
 
       if (authError || !authData?.session || !authData?.user) {
+        recordSecurityEvent('login_failed', { ipBucket: clientIp, subject: email, path: '/api/auth/login' })
         return NextResponse.json(
           {
             success: false,

@@ -217,7 +217,9 @@ SELECT g, 'TABLE', t.object_name, p, t.kind, t.removed_by, t.note
   CROSS JOIN LATERAL unnest(t.privs) AS p;
 
 -- Not listed on purpose (no anon or authenticated grant in the replay): email_broadcasts,
--- fellow_requests (20261018000001), product_events and the weekly_* views (20261024000001).
+-- fellow_requests (20261018000001), product_events and the weekly_* views (20261024000001),
+-- security_event_counts and security_digests (held 20261119000007, in CI replay). The function
+-- record_security_event from the same migration has no anon or authenticated EXECUTE either.
 
 -- ---------------------------------------------------------------------------------------------
 -- 2. Column-level grants

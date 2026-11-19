@@ -43,6 +43,10 @@ describe('B9-D — the windows come from L-11', () => {
     'system_errors.security': 180,
     notification_events: 30,
     rate_limits: 30,
+    // Held migration 20261119000007 (security digest). Counters are telemetry, digests are
+    // the long-term non-PII summary.
+    security_event_counts: 30,
+    security_digests: 365,
   }
 
   for (const [id, days] of Object.entries(EXPECTED)) {
@@ -407,6 +411,8 @@ describe('B9-D — an unapplied migration fails closed rather than deleting', ()
     // hold, which is why neither has a hold column. Both are expired operational
     // telemetry, so sweeping them without the migration loses nothing retainable.
     // product_events (audit 2026-11-17 #1) has no hold column either.
+    // security_event_counts and security_digests have none either; this fake returns rows
+    // without a `day`, so they match nothing here.
     expect(swept).toEqual(['product_events', 'rate_limits', 'system_settings.daily_counters'])
   })
 })

@@ -8,6 +8,7 @@ import { createReferralAttribution, isPlausibleReferralCode } from '@/lib/referr
 import { apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { log } from '@/lib/monitoring/log'
@@ -137,6 +138,7 @@ export const POST = withRoute(
       // Backend enforcement of Allow Signups setting.
       // Do NOT rely only on hiding the signup form — the API must reject directly too.
       if (!productSettings.allowSignups) {
+        recordSecurityEvent('signup_blocked', { ipBucket: getClientIpBucket(request), subject: email, path: '/api/auth/signup' })
         return NextResponse.json(
           {
             error: 'New learner registrations are currently closed. Please check back later.',
@@ -151,6 +153,7 @@ export const POST = withRoute(
       // Phase 1 Rate Limiting: IP-level throttle protects Cloudflare Siteverify from single-IP floods
       const ipLimit = await evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT)
       if (!ipLimit.success) {
+        recordSecurityEvent('signup_blocked', { ipBucket: getClientIpBucket(request), subject: email, path: '/api/auth/signup' })
         return NextResponse.json(
           {
             error: 'Too many registration attempts. Please wait a while before trying again.',
@@ -168,6 +171,7 @@ export const POST = withRoute(
       if (!siteverifyBudget.success) {
         // Same undifferentiated 429 as the other limiters — which ceiling was hit is not
         // the caller's business, and the response contract is identical either way.
+        recordSecurityEvent('signup_blocked', { ipBucket: getClientIpBucket(request), subject: email, path: '/api/auth/signup' })
         return NextResponse.json(
           {
             error: 'Too many registration attempts. Please wait a while before trying again.',
@@ -192,6 +196,7 @@ export const POST = withRoute(
             { status: 503 }
           )
         }
+        recordSecurityEvent('turnstile_failed', { ipBucket: getClientIpBucket(request), subject: email, path: '/api/auth/signup' })
         return NextResponse.json(
           {
             error: 'Security verification failed. Please try again.',
@@ -225,6 +230,7 @@ export const POST = withRoute(
         // they hit would confirm whether the address is known to us and would let an
         // attacker measure the aggregate ceiling; the response contract is the same
         // 429 either way.
+        recordSecurityEvent('signup_blocked', { ipBucket: getClientIpBucket(request), subject: email, path: '/api/auth/signup' })
         return NextResponse.json(
           {
             error: 'Too many registration attempts. Please wait a while before trying again.',

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { withRoute } from '@/lib/api/with-route'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
+import { recordSecurityEvent } from '@/lib/security/security-events'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -95,6 +96,7 @@ export const POST = withRoute(
       // Every refusal below is identical regardless of whether an account exists for the
       // address, so the challenge cannot be used as an existence oracle.
       if (typeof turnstileToken !== 'string' || !turnstileToken.trim()) {
+        recordSecurityEvent('turnstile_failed', { ipBucket, subject: targetEmail, path: '/api/auth/resend-verification' })
         return NextResponse.json(
           {
             success: false,
@@ -131,6 +133,7 @@ export const POST = withRoute(
             { status: 503 }
           )
         }
+        recordSecurityEvent('turnstile_failed', { ipBucket, subject: targetEmail, path: '/api/auth/resend-verification' })
         return NextResponse.json(
           {
             success: false,

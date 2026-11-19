@@ -147,6 +147,49 @@ could have reached an authenticated learner (N-3).
 
 ---
 
+## 4c. Security Event Recording (daily security summary, added 2026-11-19)
+
+Refusal and failure paths count themselves in `public.security_event_counts` through
+`recordSecurityEvent()` in `apps/web/lib/security/security-events.ts`, which calls the
+`record_security_event` RPC with the service role. The admin console (separate repository)
+reads the counts and writes one rule-based summary per day to `public.security_digests`. No AI
+is involved. Both tables come from the held migration
+`supabase/migrations/pending-approval/20261119000007_security_events.sql`.
+
+What is stored: one row per IST calendar day, event type, app, IP bucket and subject, with a
+count, first and last time seen, and one sample path. The subject (email or user id) is stored
+as the first 16 hex characters of its sha256 plus a masked hint for emails (`j***@gmail.com`).
+The IP is reduced to its network (`/24` for IPv4, `/48` for IPv6). Paths lose their query
+string. A day stops taking new keys at 50000 rows; existing keys keep counting.
+
+Behaviour: the call never throws and never delays the response (`after()` inside a request,
+a detached promise outside one). Until the migration is applied the RPC is missing (PostgREST
+`PGRST202`); the helper then pauses itself for 10 minutes per process instead of logging every
+event. Retention: counters 30 days, digests 365 days (`lib/retention/policy.ts`).
+
+| Event type | Recorded when | Where |
+|---|---|---|
+| `login_failed` | Wrong password or unknown account (401) | `app/api/auth/login/route.ts` |
+| `login_rate_limited` | The per-IP or per-email login limit refuses (429) | `app/api/auth/login/route.ts` |
+| `signup_blocked` | Signups are closed (403), or the per-IP, Siteverify budget, per-email or aggregate limit refuses (429) | `app/api/auth/signup/route.ts` |
+| `turnstile_failed` | A Turnstile token is missing or rejected (400). Not when Cloudflare is unavailable (503) | `app/api/auth/signup/route.ts`, `app/api/auth/resend-verification/route.ts` |
+| `password_reset_requested` | Supabase Auth asks the send-email hook for a recovery email (subject: the hook's user email) | `app/api/auth/send-email-hook/route.ts` |
+| `password_reset_rate_limited` | Email governance refuses a recovery email (429, not a deduplicated redelivery) | `app/api/auth/send-email-hook/route.ts` |
+| `origin_rejected` | A cookie-carrying API write fails the same-origin check (403) | `proxy.ts` |
+| `webhook_auth_failed` | A provider webhook has a bad Resend signature, a wrong Brevo secret or no authentication headers (401) | `app/api/email/webhooks/route.ts` |
+| `email_hook_auth_failed` | The send-email hook signature does not verify (401) | `app/api/auth/send-email-hook/route.ts` |
+| `cron_auth_failed` | A cron route is called with a wrong or missing `CRON_SECRET` bearer (401) | `lib/api/actor.ts` (shared actor resolution) |
+| `internal_revalidate_auth_failed` | `/api/internal/revalidate` is called without the right bearer (401) | `app/api/internal/revalidate/route.ts` |
+| `client_errors_flood` | The platform-wide `/api/client-errors` cap is hit (429) | `app/api/client-errors/route.ts` |
+| `quiz_check_rate_limited` | The quiz answer check limiter refuses (429; subject: learner id) | `app/api/v2/lessons/[lessonId]/quiz/check/route.ts` via `withRoute` `onRateLimited` |
+| `admin_login_failed`, `admin_login_rate_limited`, `admin_login_non_admin` | Recorded by the admin console with `app = 'admin'` | admin repository |
+
+Not recorded in this repository: rate limits Supabase Auth applies itself before calling the
+hook (the reset-password page calls `resetPasswordForEmail` from the browser, so no learner
+route sees that refusal), and the contact form, which has no Turnstile check.
+
+---
+
 ## 5. CI Supply-Chain & Secret-Scanning Gates
 
 Two gates run on every push and pull request, in the `security-audit` job of
