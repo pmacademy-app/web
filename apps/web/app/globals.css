@@ -65,7 +65,7 @@
   --color-skill-design:      #DB2777;
   --color-skill-execution:   #7C3AED;
   --color-skill-growth:      #16A34A;
-  --color-skill-leadership:  #D97706;
+  --color-skill-leadership:  #B45309; /* was #D97706 (3.2:1 on white); #B45309 is 5:1, WCAG AA for text */
   --color-skill-technical:   #475569;
 
   /* Shadows (Sprint 1 §9) */
