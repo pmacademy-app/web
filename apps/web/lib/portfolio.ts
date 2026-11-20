@@ -193,7 +193,7 @@ export function buildPortfolioShareIntents(
 /** Where a learner turns their portfolio public (Settings → Portfolio tab). */
 export const PORTFOLIO_SETTINGS_HREF = '/settings?tab=portfolio'
 
-export type PortfolioNavState = 'public' | 'private'
+export type PortfolioNavState = 'public' | 'private' | 'none'
 
 export interface PortfolioNavItem {
   label: string
@@ -219,7 +219,10 @@ export function getPortfolioNavItem({
   isPortfolioPublic?: boolean | null
 }): PortfolioNavItem | null {
   const trimmed = typeof username === 'string' ? username.trim() : ''
-  if (!trimmed) return null
+  // No username yet: the menu still offers the portfolio, pointing at the settings tab where one is chosen.
+  if (!trimmed) {
+    return { label: 'Set up portfolio', href: PORTFOLIO_SETTINGS_HREF, external: false, state: 'none' }
+  }
 
   if (isPortfolioPublic === true) {
     return {

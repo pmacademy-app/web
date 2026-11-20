@@ -139,10 +139,11 @@ describe('Sidebar — portfolio nav item', () => {
     ['null', null],
     ['empty', ''],
     ['whitespace', '   '],
-  ])('hides the item when the username is %s', (_name, username) => {
+  ])('offers "Set up portfolio" in settings when the username is %s', (_name, username) => {
     const el = renderSidebar({ username, isPortfolioPublic: true })
-    expect(el.querySelector('a[data-portfolio-nav]')).toBeNull()
-    expect(navHrefs(desktopAside(el))).not.toContain('/settings?tab=portfolio')
+    const link = el.querySelector('a[data-portfolio-nav="none"]')
+    expect(link?.textContent).toContain('Set up portfolio')
+    expect(navHrefs(desktopAside(el))).toContain('/settings?tab=portfolio')
   })
 
   it('keeps the quick-start targets unchanged (no portfolio target)', () => {

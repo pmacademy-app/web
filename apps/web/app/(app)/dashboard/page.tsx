@@ -382,7 +382,8 @@ export default async function DashboardPage() {
 
       <RecentXpStrip items={recentXp} />
 
-      {/* Portfolio & Proof: primitives only, never the profile row */}
+      {/* Portfolio & Proof: desktop only. On phones it lives in the More menu (approved mobile design). */}
+      <div className="hidden lg:block">
       <PortfolioProofCard
         username={profile.username ?? null}
         isPortfolioPublic={profile.is_portfolio_public === true}
@@ -397,6 +398,7 @@ export default async function DashboardPage() {
           />
         </Suspense>
       </PortfolioProofCard>
+      </div>
     </div>
   )
 }

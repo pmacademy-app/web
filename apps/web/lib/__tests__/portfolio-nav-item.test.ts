@@ -32,9 +32,10 @@ describe('getPortfolioNavItem', () => {
     ['undefined', undefined],
     ['empty', ''],
     ['whitespace', '   '],
-  ])('returns null when the username is %s, whatever the visibility', (_name, username) => {
-    expect(getPortfolioNavItem({ username, isPortfolioPublic: true })).toBeNull()
-    expect(getPortfolioNavItem({ username, isPortfolioPublic: false })).toBeNull()
+  ])('offers "Set up portfolio" in settings when the username is %s, whatever the visibility', (_name, username) => {
+    const expected = { label: 'Set up portfolio', href: PORTFOLIO_SETTINGS_HREF, external: false, state: 'none' }
+    expect(getPortfolioNavItem({ username, isPortfolioPublic: true })).toEqual(expected)
+    expect(getPortfolioNavItem({ username, isPortfolioPublic: false })).toEqual(expected)
   })
 
   it('URL-encodes the username in the public href', () => {
