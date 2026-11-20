@@ -363,6 +363,14 @@ Undo: `rollback/20261119000007_security_events.down.sql` drops the function and 
 counters are 30-day telemetry, so no export is needed; export `security_digests` first only to keep
 past summaries).
 
+### `20261120000001_align_xp_levels.sql` (stored XP level matches the app)
+
+Replaces the one-level-per-500-XP formula in `update_user_xp_and_level`, `sync_user_xp_and_level_on_update`
+and `sync_user_xp` with `public.xp_level_for_total(int)`, which encodes `LEVEL_THRESHOLDS` from
+`apps/web/lib/xp/xp.ts`, then recomputes `users.level` once. Additive, no data loss. Until it is applied the
+top bar (stored level) and the level-up notification (app thresholds) can disagree.
+`lib/__tests__/xp-level-sql-parity.test.ts` keeps the two threshold lists identical.
+
 ### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
 
 Twelve SELECT-only queries that look for use of the holes these and earlier migrations closed:

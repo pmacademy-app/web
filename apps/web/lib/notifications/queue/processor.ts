@@ -35,8 +35,12 @@ export const STALE_PROCESSING_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 /** Default bounded concurrency for email queue dispatch. */
 export const DEFAULT_DISPATCH_CONCURRENCY = 5
 
-/** Maximum execution duration per batch invocation to guarantee completion within serverless bounds. */
-export const MAX_BATCH_EXECUTION_MS = 90_000 // 90 seconds
+/**
+ * Maximum time one batch keeps starting new sends. Kept under the 60 s function
+ * limit the cron routes declare (and pg_net's 60 s request timeout), so a run ends
+ * on its own instead of being killed mid-send.
+ */
+export const MAX_BATCH_EXECUTION_MS = 40_000 // 40 seconds
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -578,21 +582,28 @@ async function scrubReclaimedAuthDeadLetters(
 
 /**
  * Executes async tasks over an array of items with bounded concurrency and deadline.
+ *
+ * Returns the items it never started as `unstarted`, so the caller can hand them
+ * back to the queue. Those rows were already claimed (status 'processing', attempt
+ * counted); left alone they would sit until the 15 minute lease expired and could be
+ * dead-lettered without a single send attempt.
  */
 async function mapConcurrent<T, R>(
   items: T[],
   limit: number,
   deadlineMs: number,
   fn: (item: T) => Promise<R>
-): Promise<R[]> {
+): Promise<{ results: R[]; unstarted: T[] }> {
   const results: R[] = []
   let nextIndex = 0
+  let deadlineHit = false
   const startTime = Date.now()
 
   async function worker() {
     while (nextIndex < items.length) {
-      if (Date.now() - startTime > deadlineMs) {
-        log.warn('queue.dispatch_deadline_exceeded', { deadlineMs, dispatched: results.length })
+      if (deadlineHit || Date.now() - startTime > deadlineMs) {
+        if (!deadlineHit) log.warn('queue.dispatch_deadline_exceeded', { deadlineMs, dispatched: results.length })
+        deadlineHit = true
         break
       }
       const currentIndex = nextIndex++
@@ -609,7 +620,7 @@ async function mapConcurrent<T, R>(
   const workerCount = Math.min(Math.max(1, limit), items.length)
   const workers = Array.from({ length: workerCount }, () => worker())
   await Promise.all(workers)
-  return results
+  return { results, unstarted: items.slice(nextIndex) }
 }
 
 /**
@@ -636,7 +647,8 @@ export type ProcessEmailQueueResult = {
  */
 async function processSingleBatch(
   batchSize: number = 50,
-  shouldReclaim: boolean = true
+  shouldReclaim: boolean = true,
+  dispatchDeadlineMs: number = MAX_BATCH_EXECUTION_MS
 ): Promise<ProcessEmailQueueResult> {
   // Check Global Queue Processing Feature Flag (persisted, not per-process default)
   const processingEnabled = await globalFeatureFlagService.isEnabledAsync('QUEUE_PROCESSING_ENABLED')
@@ -769,10 +781,10 @@ async function processSingleBatch(
   // deferred without calling it again.
   let quotaGateUnavailable = false
 
-  const outcomes = await mapConcurrent(
+  const { results: outcomes, unstarted } = await mapConcurrent(
     claimedRows,
     concurrency,
-    MAX_BATCH_EXECUTION_MS,
+    dispatchDeadlineMs,
     async (rawItem): Promise<'delivered' | 'failed' | 'suppressed' | 'skipped'> => {
       const queueId = String(rawItem.id)
       const userId = String(rawItem.user_id)
@@ -1018,6 +1030,23 @@ async function processSingleBatch(
     else if (outcome === 'skipped') skippedCount++
   }
 
+  // Rows claimed but never started because the deadline hit: give the attempt back
+  // and retry them shortly, rather than letting the lease reclaim dead-letter them.
+  for (const row of unstarted) {
+    try {
+      await deferQueueItem(
+        supabase,
+        String(row.id),
+        Number(row.attempt_count || 1),
+        'Batch deadline reached before dispatch',
+        60_000
+      )
+      skippedCount++
+    } catch (err) {
+      log.exception('queue.defer_unstarted_failed', err, { queueId: String(row.id) })
+    }
+  }
+
   // Operational Alert: repeated provider failures in a single batch
   if (failedCount >= 5) {
     try {
@@ -1077,7 +1106,11 @@ export async function processEmailQueue(
       break
     }
 
-    const batchResult = await processSingleBatch(batchSize, batchIndex === 0)
+    // Each batch may only use what is left of the run's budget, so a late batch
+    // cannot push the whole run past the function limit.
+    const remainingMs = maxExecutionMs - (Date.now() - startTime)
+    const batchDeadlineMs = Math.max(5_000, Math.min(MAX_BATCH_EXECUTION_MS, remainingMs))
+    const batchResult = await processSingleBatch(batchSize, batchIndex === 0, batchDeadlineMs)
     totalProcessed += batchResult.processed
     totalDelivered += batchResult.delivered
     totalFailed += batchResult.failed

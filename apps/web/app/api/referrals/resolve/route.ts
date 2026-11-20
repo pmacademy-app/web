@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { resolveReferralCode } from '@/lib/referral/referral-service'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 export const runtime = 'nodejs'
 
@@ -23,6 +24,15 @@ export const GET = withRoute(
     summary: 'Unexpected failure resolving a referral code',
     errorMessage: 'Failed to resolve referral code',
     errorCode: 'SERVER_ERROR',
+    // Open to anonymous callers, so cap it per IP: without a limit it could be used
+    // to enumerate usernames.
+    rateLimit: [
+      {
+        key: ({ request }) => `referral_resolve_${getClientIpBucket(request)}`,
+        limit: 30,
+        windowMs: 10 * 60 * 1000,
+      },
+    ],
   },
   async ({ request }) => {
     // Validated in the handler rather than by a declared query schema so that both
@@ -39,11 +49,10 @@ export const GET = withRoute(
       throw new RouteError(404, 'NOT_FOUND', 'Referral code not found', { valid: false })
     }
 
-    // Do not return sensitive fields
+    // Public identity only. The internal user id is not needed to show the badge.
     return NextResponse.json({
       valid: true,
       referrer: {
-        id: referrer.id,
         username: referrer.username,
         name: referrer.name,
       },

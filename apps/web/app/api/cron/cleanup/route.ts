@@ -59,6 +59,10 @@ async function readRequestedDryRun(request: Request, actorKind: string): Promise
   return typeof body.dryRun === 'boolean' ? body.dryRun : true
 }
 
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },

@@ -27,6 +27,10 @@ const forceQuerySchema = z.object({
  * learner is due from their preferred local hour until 22:00 local (ENG-01), so a missed run
  * is caught by the next one; the idempotency keys keep it to one email per sequence episode.
  */
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },

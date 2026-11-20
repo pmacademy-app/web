@@ -5,7 +5,6 @@ import { Gift, CheckCircle } from 'lucide-react'
 import { apiGet } from '@/lib/api/client'
 
 interface ReferrerData {
-  id: string
   username: string | null
   name: string | null
 }

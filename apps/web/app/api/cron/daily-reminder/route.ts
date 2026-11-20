@@ -26,6 +26,10 @@ const MAX_EXECUTION_MS = 50_000
  */
 const forceQuerySchema = z.object({ force: z.string().optional() })
 
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },

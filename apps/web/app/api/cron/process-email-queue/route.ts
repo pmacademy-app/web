@@ -14,6 +14,10 @@ import { checkStaleHeartbeats, recordCronHeartbeat } from '@/lib/monitoring/cron
  * ENG-01: this five-minute run is also the watchdog for every other cron job. After its own
  * heartbeat it checks all of them and raises one out-of-band alert per stale episode.
  */
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },

@@ -135,6 +135,37 @@ export interface NotificationPreferencesData {
   marketing_email?: boolean
 }
 
+/**
+ * The only fields a learner may write through PATCH /api/settings/notifications.
+ * Strict, so an unknown key (user_id, unsubscribe_token, ...) is a 400 rather than
+ * a column write. The row's owner always comes from the session, never the body.
+ */
+export const notificationPreferencesUpdateSchema = z
+  .object({
+    in_app_enabled: z.boolean(),
+    email_enabled: z.boolean(),
+    all_notifications: z.boolean(),
+    preferred_reminder_hour: z.number().int().min(0).max(23),
+    learning_in_app: z.boolean(),
+    learning_email: z.boolean(),
+    achievements_in_app: z.boolean(),
+    achievements_email: z.boolean(),
+    certificates_in_app: z.boolean(),
+    certificates_email: z.boolean(),
+    portfolio_in_app: z.boolean(),
+    portfolio_email: z.boolean(),
+    product_updates_in_app: z.boolean(),
+    product_updates_email: z.boolean(),
+    security_in_app: z.boolean(),
+    security_email: z.boolean(),
+    marketing_in_app: z.boolean(),
+    marketing_email: z.boolean(),
+  })
+  .partial()
+  .strict()
+
+export type NotificationPreferencesUpdateInput = z.infer<typeof notificationPreferencesUpdateSchema>
+
 export interface NotificationPreferencesResponse {
   success: boolean
   preferences: NotificationPreferencesData

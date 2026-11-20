@@ -194,7 +194,7 @@ describe('Queue & Scheduler Reliability', () => {
   describe('2. Bounded Dispatch Concurrency', () => {
     it('defines sensible defaults for bounded concurrency and timeout deadlines', () => {
       expect(DEFAULT_DISPATCH_CONCURRENCY).toBe(5)
-      expect(MAX_BATCH_EXECUTION_MS).toBe(90_000) // 90s << 5m GitHub Actions timeout
+      expect(MAX_BATCH_EXECUTION_MS).toBe(40_000) // under the 60s cron function limit
       expect(STALE_PROCESSING_THRESHOLD_MS).toBe(15 * 60 * 1000) // 15m
     })
 

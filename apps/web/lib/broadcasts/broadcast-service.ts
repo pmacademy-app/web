@@ -512,13 +512,30 @@ export class BroadcastService {
     let errors = 0
     // Reason for try/catch: top-level scheduled broadcast runner catches DB query errors to return error totals to scheduler.
     try {
-      const { data: due } = await supabase
+      const { data: scheduled } = await supabase
         .from('email_broadcasts')
         .select('id, name, template_key, recipient_filters')
         .eq('status', 'scheduled')
         .lte('scheduled_at', new Date().toISOString())
 
-      for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: Record<string, unknown> }>) {
+      // A broadcast larger than one batch is left in 'sending' after its first batch.
+      // Without this second read nothing ever sent the remaining batches. The batch
+      // claim in executeBroadcastBatch is a compare-and-swap on last_batch_index, so
+      // picking these up again cannot send a batch twice.
+      const { data: inFlight } = await supabase
+        .from('email_broadcasts')
+        .select('id, name, template_key, recipient_filters')
+        .eq('status', 'sending')
+
+      const seen = new Set<string>()
+      const due = [...(scheduled || []), ...(inFlight || [])].filter((row) => {
+        const id = (row as { id: string }).id
+        if (seen.has(id)) return false
+        seen.add(id)
+        return true
+      })
+
+      for (const b of due as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: Record<string, unknown> }>) {
         // Reason for try/catch: individual broadcast batch execution failure marks that broadcast failed and continues with remaining due broadcasts.
         try {
           if (isPortfolioActivationBroadcast(b)) {

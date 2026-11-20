@@ -13,6 +13,7 @@ These come from the code on `main` and the held migrations, not from a productio
 #### ISSUE-33: No cron scheduler may be running in production
 - **Status**: 🟠 Probable gap, not verified in production
 - **Description**: AG-15 (PR #83) removed the GitHub `schedule:` block from `.github/workflows/notification-scheduler.yml`; it is now `workflow_dispatch` only. `apps/web/vercel.json` has no `crons`. The replacement, pg_cron from `pending-approval/20261024000003_schedule_cron_jobs_pg_cron.sql`, is run by hand, and its self-check failed in the Supabase SQL editor (`42P01 relation "v_job" does not exist`). If it was never applied, the email queue, broadcasts, daily reminder, weekly recap, lifecycle and cleanup jobs do not run.
+- **Update 2026-11-20**: the GitHub Actions `schedule:` block is restored as a stopgap (last scheduled run before this was 2026-11-16). All endpoints tolerate overlapping callers, so it can run alongside pg_cron; remove it once pg_cron is confirmed.
 - **Required Action**: in the SQL editor run `SELECT jobname, schedule, active FROM cron.job;`. If the six `prodily-*` jobs are missing, merge `vanshdev-fix-cron-selfcheck` and apply `20261024000003`, then `20261030000001` (ROADMAP section 2.1 and 2.3).
 
 #### ISSUE-34: Learners can still write their own `public.users` row

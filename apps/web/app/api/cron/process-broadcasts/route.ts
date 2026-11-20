@@ -19,6 +19,10 @@ export const runtime = 'nodejs'
  * was compared with `===` in this file, which is now a constant-time comparison
  * inside `resolveActor`.
  */
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },

@@ -63,10 +63,13 @@ describe('Integrity Verification', () => {
       // Authentication via CRON_SECRET Bearer header
       expect(content).toContain('Authorization: Bearer ${{ secrets.CRON_SECRET }}')
 
-      // In AG-15, the GitHub Actions schedule was removed in favor of pg_cron.
-      // The workflow retains workflow_dispatch for manual invocations.
+      // AG-15 removed the GitHub schedule in favour of pg_cron, but that migration is
+      // still held, so the schedule was restored on 2026-11-20 (ISSUE-33) as the
+      // scheduler of record until pg_cron is applied. Manual dispatch stays available.
       expect(content).toContain('workflow_dispatch:')
-      expect(content).not.toContain('schedule:')
+      expect(content).toContain('schedule:')
+      expect(content).toContain("- cron: '*/5 * * * *'")
+      expect(content).toContain("- cron: '30 * * * *'")
     })
 
     it('vercel.json is clean and does not contain duplicate Vercel Cron definitions', () => {

@@ -4,6 +4,7 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { notificationPreferencesUpdateSchema } from '@/lib/api/contracts/settings'
 
 export const GET = withRoute(
   {
@@ -78,12 +79,12 @@ export const PATCH = withRoute(
     operation: 'settings.notifications.update',
     domain: 'api',
     summary: 'Unexpected failure updating notification preferences',
+    body: notificationPreferencesUpdateSchema,
   },
-  async ({ request, actor }) => {
+  async ({ actor, body }) => {
     const authUserId = requireUserId(actor)
 
   try {
-    const body = await request.json()
     const supabase = createServiceRoleClient()
 
     // Normalize field names between UI form contract and database schema
@@ -93,9 +94,11 @@ export const PATCH = withRoute(
       ...rest
     } = body
 
+    // The schema is strict, so `rest` holds only preference columns. user_id is
+    // still set last so nothing in the body can ever point the write at another row.
     const updatePayload: Record<string, unknown> = {
-      user_id: authUserId,
       ...rest,
+      user_id: authUserId,
       updated_at: new Date().toISOString(),
     }
 

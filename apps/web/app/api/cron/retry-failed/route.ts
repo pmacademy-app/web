@@ -12,6 +12,10 @@ import { processEmailQueue } from '@/lib/notifications/queue/processor'
  * with exponential backoff and reclaims stale processing leases every 5 minutes.
  * Retained for backwards compatibility with external schedulers.
  */
+// Vercel Hobby allows up to 60 s. Without this the default is much lower, and a
+// run cut off mid-batch leaves claimed rows half done.
+export const maxDuration = 60
+
 export const POST = withRoute(
   {
     actor: { allow: ['cron'] },
