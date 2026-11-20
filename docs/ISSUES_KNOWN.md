@@ -2,7 +2,28 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Current Branch:** `main`  
-**Last Updated:** October 17, 2026  
+**Last Updated:** November 20, 2026 (new entries ISSUE-33 to ISSUE-35 and ISSUE-03; older entries were last checked 2026-10-17 and may be closed by work since then, see [`CHANGELOG.md`](CHANGELOG.md))  
+
+---
+
+## 0. Open as of 2026-11-20
+
+These come from the code on `main` and the held migrations, not from a production check. Each needs the owner to confirm the production state.
+
+#### ISSUE-33: No cron scheduler may be running in production
+- **Status**: 🟠 Probable gap, not verified in production
+- **Description**: AG-15 (PR #83) removed the GitHub `schedule:` block from `.github/workflows/notification-scheduler.yml`; it is now `workflow_dispatch` only. `apps/web/vercel.json` has no `crons`. The replacement, pg_cron from `pending-approval/20261024000003_schedule_cron_jobs_pg_cron.sql`, is run by hand, and its self-check failed in the Supabase SQL editor (`42P01 relation "v_job" does not exist`). If it was never applied, the email queue, broadcasts, daily reminder, weekly recap, lifecycle and cleanup jobs do not run.
+- **Required Action**: in the SQL editor run `SELECT jobname, schedule, active FROM cron.job;`. If the six `prodily-*` jobs are missing, merge `vanshdev-fix-cron-selfcheck` and apply `20261024000003`, then `20261030000001` (ROADMAP section 2.1 and 2.3).
+
+#### ISSUE-34: Learners can still write their own `public.users` row
+- **Status**: 🟠 Fixed in a held migration, not applied
+- **Description**: until `pending-approval/20261027000002_lock_public_users.sql` runs, a learner session can PATCH its own `users` row through PostgREST, including `current_streak`, `longest_streak`, `streak_freezes_available` and the onboarding columns, which the column guard does not cover. The code precondition (no learner-session writes to `public.users`) is on `main`.
+- **Required Action**: confirm production runs current `main`, apply the migration, then confirm a learner-token `PATCH /rest/v1/users` is refused.
+
+#### ISSUE-35: Merged features wait on held migrations
+- **Status**: 🟡 Code on `main`, database not applied
+- **Description**: capstone review feedback (AG-26, AG-27), lesson mastery (AG-28), weekly goal (AG-29), the weekly leaderboard RPC (AG-31), the signup hook (AG-12) and the security summary (PR #105) need their held migrations. The November database review hardening (`20261119000001` to `20261119000006`) is also held.
+- **Required Action**: apply in the order of ROADMAP section 2.3.
 
 ---
 
@@ -239,6 +260,7 @@ Every item below was audited against the code on 2026-09-08. Two were fixed, one
 - **Status**: ⚠️ Production Behavior / Integration Requiring Real-World Verification
 - **Description**: Background scheduler (`.github/workflows/notification-scheduler.yml`) runs queue processing and maintenance cron triggers.
 - **Required Verification**: Requires setting `CRON_SECRET` and `APP_URL` in GitHub Repository Secrets.
+- **Update 2026-11-20**: superseded. AG-15 removed the GitHub schedule; the workflow is manual (`workflow_dispatch`) only. Scheduling moved to Supabase pg_cron. See ISSUE-33.
 
 ---
 

@@ -1,8 +1,15 @@
 # Prodily roadmap: what is left
 
-**Updated:** 2026-11-13
+**Updated:** 2026-11-20
 **Source plan:** [`08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md) (PR and finding IDs) and the audit reports in [`audit/`](../audit/).
 **Task briefs:** [`tasks/antigravity/`](../tasks/antigravity/README.md), one file per task (AG-01 to AG-34).
+
+## Where things stand (2026-11-20)
+
+- **Code: done.** AG-01 to AG-34 are all on `main` (PR #83, merged 2026-11-16, plus `622bcd2` for AG-01). Follow-up work since then is also merged: the 2026-11-17 code audit fixes, performance phases 1 and 2, the 2026-11-19 security review fixes, error monitoring, the security event digest, the login page redesign, the admin console split into its own repository, the Node 24 runtime, and the single `build-and-validate` CI check (PRs #95 to #118). See [`CHANGELOG.md`](CHANGELOG.md).
+- **Database: mostly not applied.** 21 migrations wait in `supabase/migrations/pending-approval/`. Features merged in code (capstone feedback, mastery, weekly goal, weekly leaderboard RPC, security events) need their held migration before they work in production. Order is in section 2.3.
+- **Cron: check this first.** AG-15 removed the GitHub `schedule:` block, so the only scheduler left is pg_cron from the held `20261024000003`. If that file has not been run in the SQL editor, no cron job runs in production (email queue, broadcasts, reminders, recap, lifecycle, cleanup). Its self-check failed in the SQL editor (`42P01 relation "v_job" does not exist`); the fix is on the local branch `vanshdev-fix-cron-selfcheck` (`6d3b91b`), not yet on `main`.
+- **Owner steps: open.** Sections 2.2 to 2.6 are still to do.
 
 This file is the single list of remaining work. It applies the owner decisions below to the original plan. Anything the plan asked for that those decisions rule out is in "Dropped or deferred", with the reason.
 
@@ -28,12 +35,20 @@ This file is the single list of remaining work. It applies the owner decisions b
 | Phase 2, PR-05 to PR-13 (trust and correctness) | Done in code. Owner steps not applied yet | `002fb0f`, PR #73; [`docs/ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md) |
 | Dead-code cleanup ("Phase 3" batches 3-A to 3-D) | Done | PR #79: `35dfe84`, `306853e`, `ce95199`, `710c174`, `6876fb7` |
 | CI fixes after cleanup | Done | `18e0e0b`; PR #82 (`777c36a`, merge `41ce885`) |
-| Post-cleanup branch `chore/post-phase3-cleanup` | In review, not merged | Removes `/api/waitlist` and unused components; retires `ACHIEVEMENT_EMAIL_ENABLED` and `PORTFOLIO_EMAILS_ENABLED`; adds `rollback/20261031000001_phase3_drop_unused_tables.down.sql`; holds two cleanup migrations |
-| Plan Phase 3, PR-14 to PR-20 (platform safety) | Mostly not started | Milestone M1 below |
-| Plan Phase 4, PR-21 to PR-30 (growth foundations) | Not started | Milestone M2 below |
-| Plan Phase 5 (scale and strategy) | Not started, later | Milestone M3 below |
-
-Partial work already in place for M1: admin access comes only from `users.is_admin` (PR-18 first bullet); `after()` is used in signup, capstone submit and daily reminder (PR-19 part); the braces advisory is resolved and the audit allowlist is empty (PR-14 last bullet); `deploy-supabase` pushes and verifies migrations (PR-16 part).
+| Post-cleanup branch `chore/post-phase3-cleanup` | Merged 2026-11-13 | `e9eeff5`. Its two held migrations (waitlist drop, retired flags) are still in `pending-approval/` |
+| Plan Phase 3, PR-14 to PR-20 (platform safety), AG-01 to AG-21 | Done in code | PR #83 (`34232d7`), AG-01 `622bcd2`. Held migrations and owner steps open |
+| Plan Phase 4, PR-21 to PR-30 (growth foundations), AG-22 to AG-32 | Done in code | PR #83. Held migrations for AG-26, AG-28, AG-29, AG-31 open |
+| Plan Phase 5 backlogs, AG-33 and AG-34 | Done in code | PR #83 (`752c09b`, `726e41d`). Product and market bets stay with the owner (section 5) |
+| CI and test fixes after PR #83 | Done | PRs #95, #96 |
+| 2026-11-17 code audit (19 backend bugs) | Done | PR #98 (`5a3738c`) |
+| Performance plan phases 1 and 2 | Done | PRs #99, #100 |
+| 2026-11-19 security review | Done in code | PR #102 (`cb8a265`, `f6a72ca`). Seven held migrations `20261119000001` to `20261119000007` |
+| Admin console moved to its own repository | Done | PR #103 (`f47138a`) |
+| Error monitoring, security event digest | Done | PRs #104, #105 |
+| Node 24 runtime, isomorphic-dompurify pin | Done | PRs #107, #110; Dependabot ignores isomorphic-dompurify (`d4dbd95`) |
+| Learner login redesign | Done | PR #106 |
+| CI: one `build-and-validate` check, archive upload, deploy fix | Done | PRs #108, #112, #114 |
+| Cron self-check fix for the SQL editor | Local branch only | `vanshdev-fix-cron-selfcheck` (`6d3b91b`), not pushed |
 
 ---
 
@@ -41,9 +56,11 @@ Partial work already in place for M1: admin access comes only from `users.is_adm
 
 Do these yourself. Agents must never run them.
 
-### 2.1 Merge the cleanup branch
-1. Let CI finish on `chore/post-phase3-cleanup`, review, merge.
-2. Check the `deploy-supabase` job on `main` is green, and that `20261031000001_phase3_drop_unused_tables` shows as applied in its "Migration state AFTER push" log.
+### 2.1 Merge the cron self-check fix
+1. Push `vanshdev-fix-cron-selfcheck`, open a PR, merge. It only touches two files in `pending-approval/`, so nothing is auto-applied.
+2. Then run `20261024000003` and `20261030000001` from `main` (section 2.3 rows 4 and 5).
+
+The cleanup branch `chore/post-phase3-cleanup` is merged (`e9eeff5`). If not yet done, confirm `20261031000001_phase3_drop_unused_tables` shows as applied.
 
 ### 2.2 Phase 2 runbook
 Follow [`docs/ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md) in this order:
@@ -57,28 +74,39 @@ Follow [`docs/ops/phase2-owner-runbook.md`](ops/phase2-owner-runbook.md) in this
 8. (h) Confirm CI applied `20261024000001` and `20261024000002`.
 
 ### 2.3 Held migrations, in run order
-All live in `supabase/migrations/pending-approval/`. Run each in the Supabase SQL editor, then its validation file. Rollbacks are in `pending-approval/rollback/`.
+All live in `supabase/migrations/pending-approval/`. Run each in the Supabase SQL editor, then its validation file. Rollbacks are in `pending-approval/rollback/`; every file below has one. Full preconditions per file are in [`pending-approval/README.md`](../supabase/migrations/pending-approval/README.md), which wins if this table disagrees.
 
 | # | File | Preconditions | Undo |
 |---|---|---|---|
 | 1 | `admin_backfill_from_admin_emails.sql` (ops snippet) | Only if an admin lost access after Phase 1. Promote by user id, never by email. | Demote with an `UPDATE` |
-| 2 | `20261027000001_users_username_check.sql` | Pre-check query returns no rows (runbook f) | `.down.sql` |
-| 3 | `20261027000002_lock_public_users.sql` | Phase 2 code is live in production (PR #73 deployed) | `.down.sql` |
-| 4 | `20261024000003_schedule_cron_jobs_pg_cron.sql` | Capacity check done; Vault `cron_secret` and `site_url` exist. Re-run once after AG-14 merges (process-broadcasts switches to POST) | `.down.sql` |
-| 5 | `20261030000001_cron_heartbeat_deadman.sql` | #4 applied; Vault `cron_alert_webhook_url` exists; **AG-01 merged** (its rollback and validation files do not exist yet) | AG-01 adds it |
-| 6 | `20261112000001_drop_waitlist_table.sql` | Cleanup branch deployed; waitlist rows exported (2.4) | `.down.sql` (empty table, no rows) |
-| 7 | `20261112000002_remove_retired_notification_flags.sql` | Cleanup branch deployed | `.down.sql` (puts both keys back as `true`) |
+| 2 | `20261027000002_lock_public_users.sql` | **Apply first.** Current `main` build is the one in production. Until applied, a learner can PATCH their own streak and onboarding columns | `.down.sql` |
+| 3 | `20261027000001_users_username_check.sql` | Pre-check query returns no rows (runbook f) | `.down.sql` |
+| 4 | `20261024000003_schedule_cron_jobs_pg_cron.sql` | Run the version from `vanshdev-fix-cron-selfcheck` (2.1). Capacity check done; Vault `cron_secret` and `site_url` exist | `.down.sql` |
+| 5 | `20261030000001_cron_heartbeat_deadman.sql` | #4 applied; Vault `cron_alert_webhook_url` exists | `.down.sql` |
+| 6 | `20261119000001` to `20261119000006` (November database review) | Independent hardening. Apply `000005_drop_anon_portfolio_policies` before #9 | `.down.sql` each |
+| 7 | `20261119000007_security_events.sql` | Needed by the daily security summary (PR #105) | `.down.sql` |
+| 8 | `20261113000001_scrub_dead_letter_auth_links.sql` (AG-02) | One-off scrub, AG-02 code deployed | `.down.sql` |
+| 9 | `20261113000004_capstone_review_feedback.sql` (AG-26) | #6 `000005` applied | `.down.sql` |
+| 10 | `20261113000005_lesson_mastery.sql` (AG-28) | Product sign-off on the mastery rule | `.down.sql` |
+| 11 | `20261113000006_weekly_goal.sql` (AG-29) | Sign-off on the nudge email | `.down.sql` |
+| 12 | `20261113000007_leaderboard_weekly_rpc.sql`, `20261113000008_drop_duplicate_indexes.sql` (AG-31) | None beyond the README | `.down.sql` each |
+| 13 | `20261113000002_before_user_created_allow_signups.sql` (AG-12) | Then select the hook in Auth > Hooks, if the free plan offers it | `.down.sql` |
+| 14 | `20261113000003_backfill_onboarding_completed.sql` (AG-13) | Only if the owner onboarding count is non-zero | `.down.sql` |
+| 15 | `20261112000001_drop_waitlist_table.sql` | Waitlist rows exported (2.4) | `.down.sql` (empty table, no rows) |
+| 16 | `20261112000002_remove_retired_notification_flags.sql` | None (cleanup branch is deployed) | `.down.sql` (puts both keys back as `true`) |
 
-Rows 6 and 7 are independent of each other and of rows 2 to 5. Held migrations from AG tasks join this list when they merge, with fixed names: `20261113000001_scrub_dead_letter_auth_links` (AG-02), `20261113000002_before_user_created_allow_signups` (AG-12), `20261113000003_backfill_onboarding_completed` (AG-13, only if the owner count is non-zero; apply before AG-13 deploys), `20261113000004_capstone_review_feedback` (AG-26), `20261113000005_lesson_mastery` (AG-28), `20261113000006_weekly_goal` (AG-29), `20261113000007_leaderboard_weekly_rpc` and `20261113000008_drop_duplicate_indexes` (AG-31), `20261113000010_tighten_contact_friends_policies` (AG-33).
+After the 20261119 files, run the read-only `validation/20261119_past_exposure_audit.sql` once. Rows 8 to 16 are independent of each other unless the precondition says otherwise. AG-33's planned `20261113000010_tighten_contact_friends_policies` was never created: `20261119000001_contact_messages_service_only` and `20261119000004_cohort_members_and_friends_lockdown` cover those tables.
 
 ### 2.4 Waitlist export decision
 Before running row 6: export `public.waitlist` to CSV outside the repository and note the row count. Decide what happens to it: contact those people once (only if their sign-up consented to that), or delete the export after a fixed date. It is personal data. Never commit it, never put it in `backups/` inside the repo tree.
 
 ### 2.5 Dashboard settings
+Every AG task named below is merged, so each "After AG-xx" step is now due.
+
 - **Supabase Auth:** keep Confirm email OFF. After AG-12: minimum password length 10, Secure password change ON, and the Before User Created hook (if the free plan offers it). After AG-16: switch to asymmetric JWT signing keys. Confirm Turnstile CAPTCHA is on.
 - **Supabase:** check `system_settings` `contactEmail`, `replyToEmail`, `fromEmail` use `prodily.app` (Ops-1.7).
 - **Vercel:** env cleanup from runbook (c). After AG-07: create a token and add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` to GitHub secrets. Keep 308 redirects from the old `prodily.adityagangwani.me` host so certificate links keep working.
-- **GitHub:** branch protection on `main` requires a review and the CI checks (PR-14). After AG-08: add `BACKUP_ENCRYPTION_KEY`.
+- **GitHub:** branch protection on `main` requires a review and the `build-and-validate` check (PR-14; CI runs as one check since PR #112). After AG-08: add `BACKUP_ENCRYPTION_KEY`.
 - **Resend:** rotate the API key if it was not rotated after SEC-18 (its prefix is in git history).
 - **Search:** verify Google Search Console and Bing Webmaster Tools (free), submit the sitemap after AG-22.
 - **Monitoring:** optional free external uptime check on `/api/health` (for example a free uptime monitor). Only if it stays free. After AG-15 removes the GitHub schedule, this is the only alert that still works if pg_cron or the database stops.
