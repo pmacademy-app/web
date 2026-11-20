@@ -186,7 +186,6 @@ SELECT cron.schedule('prodily-cleanup', '30 20 * * *', $cmd$SELECT private.invok
 DO $$
 DECLARE
   v_expected record;
-  v_job      record;
   v_fn       oid := to_regprocedure('private.invoke_cron_endpoint(text, text)');
   v_role     text;
 BEGIN
@@ -205,19 +204,16 @@ BEGIN
       RAISE EXCEPTION '20261024000003 FAILED: expected exactly one job named %', v_expected.jobname;
     END IF;
 
-    SELECT schedule, command, active INTO v_job FROM cron.job WHERE jobname = v_expected.jobname;
-
-    IF v_job.schedule <> v_expected.schedule THEN
-      RAISE EXCEPTION '20261024000003 FAILED: % has schedule %, expected %',
-        v_expected.jobname, v_job.schedule, v_expected.schedule;
-    END IF;
-
-    IF v_job.command <> format('SELECT private.invoke_cron_endpoint(%L, %L)', v_expected.path, v_expected.method) THEN
-      RAISE EXCEPTION '20261024000003 FAILED: % has an unexpected command', v_expected.jobname;
-    END IF;
-
-    IF NOT v_job.active THEN
-      RAISE EXCEPTION '20261024000003 FAILED: % is not active', v_expected.jobname;
+    -- One EXISTS query, no record variable: the Supabase SQL editor rejected
+    -- "SELECT ... INTO v_job" here with 42P01 relation "v_job" does not exist.
+    IF NOT EXISTS (
+      SELECT 1 FROM cron.job j
+      WHERE j.jobname = v_expected.jobname
+        AND j.schedule = v_expected.schedule
+        AND j.command = format('SELECT private.invoke_cron_endpoint(%L, %L)', v_expected.path, v_expected.method)
+        AND j.active
+    ) THEN
+      RAISE EXCEPTION '20261024000003 FAILED: % has the wrong schedule or command, or is not active', v_expected.jobname;
     END IF;
   END LOOP;
 

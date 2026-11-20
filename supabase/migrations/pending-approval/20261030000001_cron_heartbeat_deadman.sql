@@ -265,7 +265,6 @@ SELECT cron.schedule(
 
 DO $$
 DECLARE
-  v_job  record;
   v_fn   oid := to_regprocedure('private.check_cron_heartbeats_deadman()');
   v_role text;
 BEGIN
@@ -273,18 +272,15 @@ BEGIN
     RAISE EXCEPTION '20261030000001 FAILED: expected exactly one job named prodily-deadman-cron-heartbeats';
   END IF;
 
-  SELECT schedule, command, active INTO v_job FROM cron.job WHERE jobname = 'prodily-deadman-cron-heartbeats';
-
-  IF v_job.schedule <> '*/15 * * * *' THEN
-    RAISE EXCEPTION '20261030000001 FAILED: dead-man job has schedule %, expected */15 * * * *', v_job.schedule;
-  END IF;
-
-  IF v_job.command <> 'SELECT private.check_cron_heartbeats_deadman()' THEN
-    RAISE EXCEPTION '20261030000001 FAILED: dead-man job has an unexpected command';
-  END IF;
-
-  IF NOT v_job.active THEN
-    RAISE EXCEPTION '20261030000001 FAILED: dead-man job is not active';
+  -- One EXISTS query, no record variable (the Supabase SQL editor rejects SELECT ... INTO v_job).
+  IF NOT EXISTS (
+    SELECT 1 FROM cron.job j
+    WHERE j.jobname = 'prodily-deadman-cron-heartbeats'
+      AND j.schedule = '*/15 * * * *'
+      AND j.command = 'SELECT private.check_cron_heartbeats_deadman()'
+      AND j.active
+  ) THEN
+    RAISE EXCEPTION '20261030000001 FAILED: dead-man job has the wrong schedule or command, or is not active';
   END IF;
 
   IF v_fn IS NULL THEN
