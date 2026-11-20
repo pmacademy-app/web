@@ -853,3 +853,35 @@ body {
   }
   .dg .dg-node[data-state="todo"] { opacity: 0.45; }
 }
+
+/* ─── Dashboard (components/dashboard/home) ─────────────────────────────────
+   On load: the career ladder fills from the left, the weekly goal ring draws,
+   and this week's streak days pop in one after another. Off under reduced motion.
+---------------------------------------------------------------------------- */
+
+@keyframes dash-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes dash-ring {
+  from { stroke-dashoffset: var(--ring-len); }
+}
+@keyframes dash-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  70%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.dash-fill { transform-origin: left; animation: dash-fill 900ms var(--ease-out-quint) 150ms backwards; }
+.dash-ring { animation: dash-ring 1100ms var(--ease-out-quint) 250ms backwards; }
+.dash-day { animation: dash-pop 420ms var(--ease-spring-soft) backwards; }
+li:nth-child(2) > .dash-day { animation-delay: 50ms; }
+li:nth-child(3) > .dash-day { animation-delay: 100ms; }
+li:nth-child(4) > .dash-day { animation-delay: 150ms; }
+li:nth-child(5) > .dash-day { animation-delay: 200ms; }
+li:nth-child(6) > .dash-day { animation-delay: 250ms; }
+li:nth-child(7) > .dash-day { animation-delay: 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-fill, .dash-ring, .dash-day { animation: none !important; }
+}
