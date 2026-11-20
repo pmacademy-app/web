@@ -773,3 +773,83 @@ body {
   }
 }
 
+
+/* ─── Lesson diagrams (components/diagrams) ─────────────────────────────────
+   Native diagrams animate in once, the first time they scroll into view:
+   boxes rise in order (--i), connectors grow, ring arcs draw. Walk-through
+   state changes ease between styles. Transform, opacity and stroke only;
+   everything is off under prefers-reduced-motion.
+---------------------------------------------------------------------------- */
+
+@keyframes dg-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes dg-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes dg-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes dg-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes dg-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-primary) 30%, transparent); }
+  100% { box-shadow: 0 0 0 12px transparent; }
+}
+@keyframes dg-turn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Hidden only until the figure scrolls into view, and only when scripts run. */
+@media (scripting: enabled) {
+  .dg[data-inview="false"] .dg-item,
+  .dg[data-inview="false"] .dg-line { opacity: 0; }
+}
+
+.dg[data-inview="true"] .dg-item {
+  /* backwards, not both: once done, walk-through opacity classes apply again */
+  animation: dg-rise 520ms var(--ease-out-quint) backwards;
+  animation-delay: calc(var(--i, 0) * 75ms);
+}
+.dg[data-inview="true"] .dg-line {
+  transform-origin: top;
+  animation: dg-grow 360ms var(--ease-out-quint) backwards;
+  animation-delay: calc(var(--i, 0) * 75ms + 120ms);
+}
+.dg .dg-arc { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.dg[data-inview="true"] .dg-arc {
+  animation: dg-draw 560ms ease-out both;
+  animation-delay: calc(var(--i, 0) * 75ms + 160ms);
+}
+.dg .dg-arc-loop { stroke-dasharray: 0.035 0.03; stroke-dashoffset: 0; opacity: 0; }
+.dg[data-inview="true"] .dg-arc-loop {
+  animation: dg-fade 500ms ease-out both;
+  animation-delay: calc(var(--i, 0) * 75ms + 200ms);
+}
+.dg[data-inview="true"] .dg-spin { animation: dg-rise 520ms var(--ease-out-quint) backwards, dg-turn 900ms var(--ease-out-quint) backwards; animation-delay: calc(var(--i, 0) * 75ms); }
+
+.dg-node { transition: opacity 260ms ease, box-shadow 260ms ease, border-color 260ms ease, background-color 260ms ease; }
+.dg[data-walking="true"] .dg-node[data-state="now"] { animation: dg-pulse 900ms ease-out 1; }
+
+/* Lane accents (left edge), from the skill palette */
+.dg-lane-0 { border-left: 4px solid var(--color-skill-strategy); }
+.dg-lane-1 { border-left: 4px solid var(--color-accent); }
+.dg-lane-2 { border-left: 4px solid var(--color-primary); }
+.dg-lane-3 { border-left: 4px solid var(--color-skill-execution); }
+.dg-lane-4 { border-left: 4px solid var(--color-danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dg .dg-item, .dg .dg-line, .dg .dg-arc, .dg .dg-arc-loop, .dg .dg-spin, .dg .dg-node {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  .dg .dg-node[data-state="todo"] { opacity: 0.45; }
+}
