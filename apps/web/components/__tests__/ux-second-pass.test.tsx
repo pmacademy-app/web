@@ -20,9 +20,9 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-import { ContinueLearningCard, type NextLessonData } from '@/components/dashboard/ContinueLearningCard'
-import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
-import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
+import { NextLessonPanel, type NextLessonPanelData } from '@/components/dashboard/home/NextLessonPanel'
+import { TodaysPlan } from '@/components/dashboard/home/TodaysPlan'
+import { calculateLevel } from '@/lib/xp/xp'
 
 describe('AG-30: App UX Second Pass', () => {
   const lessonContentPath = path.resolve(
@@ -75,50 +75,40 @@ describe('AG-30: App UX Second Pass', () => {
   })
 
   describe('Dashboard CTAs', () => {
-    const dummyNextLesson: NextLessonData = {
+    const dummyNextLesson: NextLessonPanelData = {
       id: 'lesson-1',
       positionLabel: 'Module 1 · Lesson 1',
       title: 'First Lesson',
       module: 'foundations',
       moduleTitle: 'Foundations of Product Management',
       estimatedTime: '10 min',
+      moduleDone: 0,
+      moduleTotal: 10,
+      started: true,
     }
 
-    it('renders ContinueLearningCard with primary Up Next action', () => {
+    it('renders the next-lesson panel with one primary Resume action', () => {
       const html = renderToString(
-        React.createElement(ContinueLearningCard, {
-          nextLesson: dummyNextLesson,
-          totalLessonsCompleted: 3,
-        })
+        React.createElement(NextLessonPanel, { lesson: dummyNextLesson, level: calculateLevel(120), totalXp: 120 })
       )
-      expect(html).toContain('Up Next')
-      expect(html).toContain('Continue Lesson')
-      expect(html).toContain('bg-primary')
+      expect(html).toContain('Resume lesson')
+      expect(html).toContain('/academy/foundations/lesson-1')
+      expect(html.match(/bg-primary text-primary-foreground/g)?.length).toBe(1)
     })
 
-    it('renders secondary prompt cards with understated links rather than competing buttons', () => {
-      const flashcardHtml = renderToString(
-        React.createElement(FlashcardReviewPromptCard, {
-          dueCount: 5,
-          totalUnlocked: 10,
+    it("gives only the first item in Today's plan a primary button", () => {
+      const html = renderToString(
+        React.createElement(TodaysPlan, {
+          items: [
+            { key: 'lesson', icon: 'lesson', title: 'Finish First Lesson', detail: 'x', reward: 'y', action: 'Resume', href: '/academy/foundations/lesson-1', primary: true },
+            { key: 'review', icon: 'review', title: 'Review 5 flashcards', detail: 'x', reward: '+10 XP', action: 'Start review', href: '/review' },
+            { key: 'capstone', icon: 'capstone', title: 'Start the Module 1 capstone', detail: 'x', reward: '+150 XP', action: 'Open brief', href: '/capstones/foundations' },
+          ],
         })
       )
-      expect(flashcardHtml).toContain('/review')
-      expect(flashcardHtml).not.toContain('bg-primary text-primary-foreground')
-
-      const capstoneHtml = renderToString(
-        React.createElement(NextCapstonePromptCard, {
-          prompt: {
-            moduleSlug: 'foundations',
-            moduleNumber: 1,
-            title: 'Foundations Capstone',
-            deliverableType: 'PRD Document',
-          },
-          submittedCount: 0,
-        })
-      )
-      expect(capstoneHtml).toContain('/capstones/foundations')
-      expect(capstoneHtml).not.toContain('bg-primary text-primary-foreground')
+      expect(html).toContain('/review')
+      expect(html).toContain('/capstones/foundations')
+      expect(html.match(/bg-primary text-primary-foreground/g)?.length).toBe(1)
     })
   })
 

@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import type { LevelInfo } from '@/lib/xp/xp'
 import { getLevelTitle } from '@/lib/xp/xp'
 import { CareerLadder } from './CareerLadder'
+import { StartLessonLink } from './StartLessonLink'
 
 export interface NextLessonPanelData {
   id: string
@@ -18,10 +19,23 @@ export interface NextLessonPanelData {
   /** e.g. 4 of 10 lessons done in this module */
   moduleDone: number
   moduleTotal: number
+  /** True once the learner has opened this lesson; the button then says Resume */
+  started: boolean
 }
 
 /** The main card: the next lesson, how close it gets you to the next level, and the ladder. */
-export function NextLessonPanel({ lesson, level, totalXp }: { lesson: NextLessonPanelData | null; level: LevelInfo; totalXp: number }) {
+export function NextLessonPanel({
+  lesson,
+  level,
+  totalXp,
+  firstSession = false,
+}: {
+  lesson: NextLessonPanelData | null
+  level: LevelInfo
+  totalXp: number
+  /** No lesson finished or opened yet: the button starts the first lesson and records it */
+  firstSession?: boolean
+}) {
   const nextTitle = level.xpRemaining > 0 ? getLevelTitle(level.level + 1) : null
   return (
     <section aria-labelledby="next-lesson-title" className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
@@ -50,10 +64,16 @@ export function NextLessonPanel({ lesson, level, totalXp }: { lesson: NextLesson
             </p>
           )}
           <div className="mt-4 grid grid-cols-2 gap-2.5 sm:flex">
-            <Link href={`/academy/${lesson.module}/${lesson.id}`} className={cn(buttonVariants({ size: 'lg' }), 'h-11 rounded-xl px-5')}>
-              Resume lesson
+            <StartLessonLink
+              href={`/academy/${lesson.module}/${lesson.id}`}
+              firstSession={firstSession}
+              lessonId={lesson.id}
+              moduleSlug={lesson.module}
+              className={cn(buttonVariants({ size: 'lg' }), 'h-11 rounded-xl px-5')}
+            >
+              {lesson.started ? 'Resume lesson' : firstSession ? 'Start your first lesson' : 'Start lesson'}
               <ArrowRight />
-            </Link>
+            </StartLessonLink>
             <Link href="/academy" className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'h-11 rounded-xl px-5')}>
               Open module map
             </Link>

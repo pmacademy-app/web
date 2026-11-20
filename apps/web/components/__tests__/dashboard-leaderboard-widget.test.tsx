@@ -54,46 +54,71 @@ function render(node: React.ReactNode) {
   })
 }
 
-function valueFor(term: string): HTMLElement | null {
-  const dt = Array.from(container.querySelectorAll('dt')).find((el) => el.textContent === term)
-  return (dt?.nextElementSibling as HTMLElement | null) ?? null
+function you(): HTMLElement | null {
+  return container.querySelector('[data-you="true"]')
 }
 
-/** The text a sighted user sees (drops sr-only spans). */
-function visibleText(el: HTMLElement | null) {
+/** The learner's rank as a sighted user sees it ("4", or "–" when unranked). */
+function yourRank() {
+  const el = you()?.querySelector('[data-rank]') as HTMLElement | null
   if (!el) return null
   const clone = el.cloneNode(true) as HTMLElement
   clone.querySelectorAll('.sr-only').forEach((n) => n.remove())
   return clone.textContent
 }
 
-/** The text a screen reader announces (drops aria-hidden spans). */
-function spokenText(el: HTMLElement | null) {
+/** The learner's rank as a screen reader announces it. */
+function spokenRank() {
+  const el = you()?.querySelector('[data-rank]') as HTMLElement | null
   if (!el) return null
   const clone = el.cloneNode(true) as HTMLElement
   clone.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove())
   return clone.textContent
 }
 
+/** Filled day dots in the learner's row. */
+function yourDays() {
+  return you()?.querySelector('[data-days]')?.getAttribute('data-days') ?? null
+}
+
+const ROWS = [
+  { key: 'a', rank: 1, name: 'Meera Iyer', daysStudied: 5, isYou: false },
+  { key: 'b', rank: 2, name: 'Daniel Okafor', daysStudied: 4, isYou: false },
+  { key: 'c', rank: 3, name: 'Sofia Marquez', daysStudied: 4, isYou: false },
+]
+
 describe('DashboardLeaderboardWidget', () => {
-  it('shows the weekly rank as #N', () => {
-    render(<DashboardLeaderboardWidget rank={3} daysStudied={4} />)
-    expect(valueFor('Weekly Rank')?.textContent).toBe('#3')
-    expect(visibleText(valueFor('Days Studied'))).toBe('4 / 7')
+  it('lists the top learners and then the learner as You', () => {
+    render(<DashboardLeaderboardWidget rank={4} daysStudied={3} rows={ROWS} />)
+    const names = Array.from(container.querySelectorAll('li')).map((li) => li.querySelectorAll('span')[2]?.textContent)
+    expect(container.querySelectorAll('li')).toHaveLength(4)
+    expect(container.textContent).toContain('Meera Iyer')
+    expect(names.length).toBe(4)
+    expect(you()?.textContent).toContain('You')
+    expect(yourRank()).toBe('4')
+    expect(yourDays()).toBe('3')
   })
 
-  it('announces days as "N of 7" and hides the visual slash from screen readers', () => {
-    render(<DashboardLeaderboardWidget rank={3} daysStudied={4} />)
-    expect(spokenText(valueFor('Days Studied'))).toBe('4 of 7')
+  it('does not list the learner twice when they are in the top rows', () => {
+    render(<DashboardLeaderboardWidget rank={1} daysStudied={5} rows={[{ ...ROWS[0], isYou: true, name: 'You' }, ROWS[1]]} />)
+    expect(container.querySelectorAll('[data-you="true"]')).toHaveLength(1)
+    expect(container.querySelectorAll('li')).toHaveLength(2)
   })
 
-  it.each([null, 0])('shows "Unranked" when rank is %s', (rank) => {
+  it('announces days as "N of 7 days" and hides the dots from screen readers', () => {
+    render(<DashboardLeaderboardWidget rank={3} daysStudied={4} />)
+    const days = you()?.querySelector('[data-days]') as HTMLElement
+    expect(days.querySelector('.sr-only')?.textContent).toBe('4 of 7 days')
+    expect(days.querySelector('[aria-hidden="true"]')?.children).toHaveLength(7)
+  })
+
+  it.each([null, 0])('shows the learner as Unranked when rank is %s', (rank) => {
     render(<DashboardLeaderboardWidget rank={rank} daysStudied={0} />)
-    expect(valueFor('Weekly Rank')?.textContent).toBe('Unranked')
-    expect(container.textContent).not.toContain('#')
+    expect(spokenRank()).toBe('Unranked')
+    expect(yourRank()).toBe('–')
   })
 
-  it('shows the nudge under "Unranked" when a hint is given', () => {
+  it('shows the nudge under an Unranked learner when a hint is given', () => {
     render(<DashboardLeaderboardWidget rank={null} daysStudied={0} hint={NO_ACTIVITY_HINT} />)
     expect(container.textContent).toContain('Complete a lesson this week to get ranked.')
   })
@@ -104,49 +129,41 @@ describe('DashboardLeaderboardWidget', () => {
   })
 
   it.each([
-    [-2, '0 / 7'],
-    [9, '7 / 7'],
-    [Number.NaN, '0 / 7'],
-    [2.6, '2 / 7'],
+    [-2, '0'],
+    [9, '7'],
+    [Number.NaN, '0'],
+    [2.6, '2'],
   ])('clamps daysStudied %s to the 0–7 range', (days, expected) => {
     render(<DashboardLeaderboardWidget rank={1} daysStudied={days} />)
-    expect(visibleText(valueFor('Days Studied'))).toBe(expected)
+    expect(yourDays()).toBe(expected)
   })
 
-  it('clarifies what "Days Studied" counts', () => {
+  it('says how the list is ranked', () => {
     render(<DashboardLeaderboardWidget rank={1} daysStudied={2} />)
-    expect(container.textContent).toContain('days you completed a lesson this week')
+    expect(container.textContent).toContain('Ranked by days studied, then lessons')
   })
 
   it('titles the card with an h3', () => {
     render(<DashboardLeaderboardWidget rank={1} daysStudied={2} />)
-    expect(container.querySelector('h3')?.textContent).toBe('Weekly Leaderboard')
+    expect(container.querySelector('h3')?.textContent).toBe("This week's leaderboard")
     expect(container.querySelector('h1, h2')).toBeNull()
   })
 
-  it('links "View All" to /leaderboard with screen-reader context', () => {
+  it('links "View all" to /leaderboard with screen-reader context', () => {
     render(<DashboardLeaderboardWidget rank={1} daysStudied={2} />)
     const link = container.querySelector('a')
     expect(link?.getAttribute('href')).toBe('/leaderboard')
-    expect(link?.textContent).toBe('View All leaderboard')
+    expect(link?.textContent).toBe('View all leaderboard')
     expect(link?.querySelector('.sr-only')?.textContent).toBe(' leaderboard')
-  })
-
-  it('hides decorative icons from assistive tech', () => {
-    render(<DashboardLeaderboardWidget rank={1} daysStudied={2} />)
-    const icons = Array.from(container.querySelectorAll('svg'))
-    expect(icons.length).toBeGreaterThan(0)
-    for (const icon of icons) expect(icon.getAttribute('aria-hidden')).toBe('true')
   })
 
   it('shows an unavailable state with no numbers, keeping the heading and link', () => {
     render(<DashboardLeaderboardWidget unavailable />)
     expect(container.textContent).toContain('Leaderboard unavailable right now')
-    expect(container.querySelector('h3')?.textContent).toBe('Weekly Leaderboard')
+    expect(container.querySelector('h3')?.textContent).toBe("This week's leaderboard")
     expect(container.querySelector('a')?.getAttribute('href')).toBe('/leaderboard')
-    expect(container.querySelector('dl')).toBeNull()
+    expect(container.querySelector('ol')).toBeNull()
     expect(container.textContent).not.toContain('Unranked')
-    expect(container.textContent).not.toMatch(/\d\s*\/\s*7/)
   })
 })
 
@@ -175,7 +192,7 @@ describe('LeaderboardWidgetSkeleton', () => {
     const skeletonClass = container.firstElementChild?.className ?? ''
     act(() => root.render(<DashboardLeaderboardWidget rank={1} daysStudied={1} />))
     const widgetClass = container.firstElementChild?.className ?? ''
-    for (const cls of ['md:w-[calc((100%_-_3rem)/3)]', 'md:shrink-0']) {
+    for (const cls of ['lg:w-[22rem]', 'lg:shrink-0']) {
       expect(skeletonClass.split(' ')).toContain(cls)
       expect(widgetClass.split(' ')).toContain(cls)
     }
@@ -211,8 +228,8 @@ describe('LeaderboardWidgetSlot', () => {
 
   it('renders the learner rank and days from the weekly payload', async () => {
     await renderSlot(Promise.resolve(payload()))
-    expect(valueFor('Weekly Rank')?.textContent).toBe('#4')
-    expect(visibleText(valueFor('Days Studied'))).toBe('5 / 7')
+    expect(yourRank()).toBe('4')
+    expect(yourDays()).toBe('5')
   })
 
   it('renders nothing when the learner opted out', async () => {
@@ -223,8 +240,8 @@ describe('LeaderboardWidgetSlot', () => {
 
   it('renders Unranked with the nudge, not a tie-break rank, when there is no activity this week', async () => {
     await renderSlot(Promise.resolve(payload({ personalEntry: { ...personalEntry, rank: 212, daysStudied: 0 } })))
-    expect(valueFor('Weekly Rank')?.textContent).toBe('Unranked')
-    expect(container.textContent).not.toContain('#212')
+    expect(spokenRank()).toBe('Unranked')
+    expect(container.textContent).not.toContain('212')
     expect(container.textContent).toContain(NO_ACTIVITY_HINT)
   })
 

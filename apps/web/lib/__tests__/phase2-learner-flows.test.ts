@@ -6,11 +6,8 @@ import { deriveProofState, type ProofStateInput } from '@/lib/growth/proof-state
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { MODULE_SLUGS } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
-import {
-  ContinueLearningCard,
-  FirstSessionKickoffCard,
-  type NextLessonData,
-} from '@/components/dashboard/ContinueLearningCard'
+import { NextLessonPanel, type NextLessonPanelData } from '@/components/dashboard/home/NextLessonPanel'
+import { calculateLevel } from '@/lib/xp/xp'
 import VerifiedPage from '@/app/(auth)/verified/page'
 
 // Phase 2 learner flows (T8): capstones in curriculum order (W3), module-local lesson
@@ -73,13 +70,16 @@ describe('W1 dashboard uses module-local lesson numbers', () => {
   // The third lesson of Module 2: global position 13, module-local "Module 2 · Lesson 3".
   const lesson = curriculum.lessons.filter((l) => l.module === 'discovery')[2]
   const position = getLessonPosition(lesson, curriculum)
-  const nextLesson: NextLessonData = {
+  const nextLesson: NextLessonPanelData = {
     id: lesson.id,
     positionLabel: position.label,
     title: 'Customer Interviews',
     module: lesson.module,
     moduleTitle: position.moduleTitle,
     estimatedTime: '20 min',
+    moduleDone: 2,
+    moduleTotal: 10,
+    started: false,
   }
 
   it('resolves the module-local label for a lesson deep in the curriculum', () => {
@@ -87,19 +87,21 @@ describe('W1 dashboard uses module-local lesson numbers', () => {
     expect(position.label).toBe('Module 2 · Lesson 3')
   })
 
-  it('ContinueLearningCard headlines "{label}: {title}" with the module title, never the slug or global index', () => {
-    const markup = html(React.createElement(ContinueLearningCard, { nextLesson, totalLessonsCompleted: 12 }))
-    expect(markup).toContain('Module 2 · Lesson 3: Customer Interviews')
-    expect(markup).toContain('Module: Users, Problems &amp; Discovery')
+  it('the next-lesson panel shows "{label} · {module title}" and the title, never the slug or global index', () => {
+    const markup = html(React.createElement(NextLessonPanel, { lesson: nextLesson, level: calculateLevel(300), totalXp: 300 }))
+    expect(markup).toContain('Module 2 · Lesson 3 · Users, Problems &amp; Discovery')
+    expect(markup).toContain('Customer Interviews')
     expect(markup).not.toContain('Lesson 13')
-    expect(markup).not.toMatch(/Module: discovery/i)
+    expect(markup).not.toMatch(/discovery ·/i)
   })
 
-  it('FirstSessionKickoffCard CTA reads "Start {label}" with the module title', () => {
-    const markup = html(React.createElement(FirstSessionKickoffCard, { nextLesson }))
-    expect(markup).toContain('Start Module 2 · Lesson 3')
-    expect(markup).toContain('Module: Users, Problems &amp; Discovery')
-    expect(markup).not.toContain('Lesson 13')
+  it('a first session says "Start your first lesson"; a started lesson says Resume', () => {
+    const first = html(React.createElement(NextLessonPanel, { lesson: nextLesson, level: calculateLevel(0), totalXp: 0, firstSession: true }))
+    expect(first).toContain('Start your first lesson')
+    const started = html(React.createElement(NextLessonPanel, { lesson: { ...nextLesson, started: true }, level: calculateLevel(300), totalXp: 300 }))
+    expect(started).toContain('Resume lesson')
+    const notYet = html(React.createElement(NextLessonPanel, { lesson: nextLesson, level: calculateLevel(300), totalXp: 300 }))
+    expect(notYet).toContain('Start lesson')
   })
 })
 

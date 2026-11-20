@@ -1,5 +1,5 @@
 import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard-db'
-import { toLeaderboardWidgetView } from '@/lib/dashboard/leaderboard-widget'
+import { toLeaderboardRows, toLeaderboardWidgetView } from '@/lib/dashboard/leaderboard-widget'
 import { DashboardLeaderboardWidget } from '@/components/dashboard/DashboardLeaderboardWidget'
 
 /**
@@ -29,5 +29,5 @@ export async function LeaderboardWidgetSlot({
     return <DashboardLeaderboardWidget unavailable />
   }
 
-  return <DashboardLeaderboardWidget rank={view.rank} daysStudied={view.daysStudied} hint={view.hint} />
+  return <DashboardLeaderboardWidget rank={view.rank} daysStudied={view.daysStudied} hint={view.hint} rows={toLeaderboardRows(payload)} />
 }

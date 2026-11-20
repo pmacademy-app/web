@@ -2,7 +2,7 @@
  * Post-onboarding destinations (Phase 3, 3.1).
  *
  * The dominant "Start Learning" CTA lands on /dashboard, which renders the
- * FirstSessionKickoffCard ("Start Your First Lesson") — the lowest-friction path to a
+ * next-lesson panel ("Start your first lesson"), the lowest-friction path to a
  * meaningful first learning action. Browsing the full curriculum at /academy (nine
  * collapsed modules) is the secondary, exploratory choice.
  *

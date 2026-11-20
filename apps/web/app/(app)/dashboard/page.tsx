@@ -199,6 +199,7 @@ export default async function DashboardPage() {
       estimatedTime: `${activeNext.estimatedReadingTime} min`,
       moduleDone: curriculumLessons.filter((l) => l.module === activeNext.module && completedLessonIds.has(l.id)).length,
       moduleTotal: curriculumLessons.filter((l) => l.module === activeNext.module).length,
+      started: progressRows.some((p) => p.lesson_id === activeNext.id && p.status !== 'not_started'),
     }
   } else if (curriculumLessons.length > 0) {
     const activeNextIndex = curriculumLessons.findIndex((l) => !completedLessonIds.has(l.id))
@@ -215,6 +216,7 @@ export default async function DashboardPage() {
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
         moduleDone: curriculumLessons.filter((l) => l.module === activeNext.module && completedLessonIds.has(l.id)).length,
         moduleTotal: curriculumLessons.filter((l) => l.module === activeNext.module).length,
+        started: progressRows.some((p) => p.lesson_id === activeNext.id && p.status !== 'not_started'),
       }
     }
   }
@@ -287,10 +289,10 @@ export default async function DashboardPage() {
     plan.push({
       key: 'lesson',
       icon: 'lesson',
-      title: `Finish ${nextLesson.title}`,
+      title: `${nextLesson.started ? 'Finish' : 'Start'} ${nextLesson.title}`,
       detail: `${nextLesson.positionLabel} · ${nextLesson.estimatedTime}`,
       reward: level.xpRemaining > 0 ? `Toward Level ${level.level + 1}` : 'Keeps your streak',
-      action: 'Resume',
+      action: nextLesson.started ? 'Resume' : 'Start',
       href: `/academy/${nextLesson.module}/${nextLesson.id}`,
       primary: true,
     })
@@ -353,7 +355,7 @@ export default async function DashboardPage() {
       </header>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <NextLessonPanel lesson={nextLesson} level={level} totalXp={totalXp} />
+        <NextLessonPanel lesson={nextLesson} level={level} totalXp={totalXp} firstSession={completedLessonsCount === 0 && nextLesson?.started === false} />
         <StreakGoalPanel
           streak={streakStatus.effectiveCurrentStreak}
           best={streakStatus.longestStreak}
