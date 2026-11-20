@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { feedbackSubmitBodySchema } from '@/lib/api/contracts/public-forms'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { getClientIpBucket } from '@/lib/security/client-ip'
@@ -33,8 +35,10 @@ export const POST = withRoute(
   async ({ request, actor }) => {
     const userId = actor.kind === 'learner' ? actor.userId : null
 
-    const body = (await request.json()) as Record<string, unknown>
-    const { content, category, sourceEvent, rating, pageUrl, promptKey, action } = body
+    // Parsed after the limiter (see above). Malformed JSON is a 400, not an incident.
+    const parsed = parseBody(feedbackSubmitBodySchema, await request.json().catch(() => null))
+    if (!parsed.ok) throw new RouteError(400, 'VALIDATION', parsed.message)
+    const { content, category, sourceEvent, rating, pageUrl, promptKey, action } = parsed.data
 
     const supabase = createServiceRoleClient()
 

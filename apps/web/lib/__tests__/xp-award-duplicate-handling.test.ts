@@ -57,7 +57,7 @@ beforeEach(() => {
 describe('awardXp duplicate handling (SQLSTATE 23505)', () => {
   it('resolves without throwing when the insert hits a unique violation', async () => {
     const { supabase } = makeSupabase({ code: '23505', message: 'duplicate key value' })
-    await expect(awardXp(supabase, 'user-1', 'theory_read', 10, 'les_1')).resolves.toBeUndefined()
+    await expect(awardXp(supabase, 'user-1', 'theory_read', 10, 'les_1')).resolves.toBe(false)
   })
 
   it('does not fire a level-up notification for an award that did not land', async () => {
@@ -111,6 +111,6 @@ describe('awardXp duplicate handling (SQLSTATE 23505)', () => {
     // quiz_correct is excluded from the index, so it can never raise 23505 — but if it
     // somehow did, treating it as already-awarded is still the safe outcome.
     const { supabase } = makeSupabase({ code: '23505' })
-    await expect(awardXp(supabase, 'user-1', 'quiz_correct', 30, 'les_1')).resolves.toBeUndefined()
+    await expect(awardXp(supabase, 'user-1', 'quiz_correct', 30, 'les_1')).resolves.toBe(false)
   })
 })

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { CRON_JOB_DEFINITIONS, evaluateHeartbeat, readCronHeartbeats } from '@/lib/monitoring/cron-heartbeat'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,8 +36,28 @@ export const GET = withRoute(
       dbStatus = 'unreachable'
     }
 
+    // Scheduled jobs. The heartbeat check used to run only inside the email-queue job,
+    // so a stopped scheduler could never report itself. Here an outside uptime monitor
+    // sees it: a job past twice its interval turns this endpoint into a 503. A job with
+    // no heartbeat yet (fresh environment) or an unreadable heartbeat is reported but
+    // does not fail the check.
+    let jobsStatus: 'healthy' | 'stale' | 'unknown' = 'unknown'
+    let staleJobs: string[] = []
+    if (dbStatus === 'connected') {
+      try {
+        const heartbeats = await readCronHeartbeats(createServiceRoleClient())
+        const now = new Date()
+        staleJobs = CRON_JOB_DEFINITIONS.filter(
+          (j) => evaluateHeartbeat(heartbeats.get(j.job) ?? null, j.intervalMinutes, now).state === 'stale'
+        ).map((j) => j.job)
+        jobsStatus = staleJobs.length > 0 ? 'stale' : 'healthy'
+      } catch {
+        jobsStatus = 'unknown'
+      }
+    }
+
     const responseTimeMs = Date.now() - startTime
-    const isHealthy = dbStatus === 'connected'
+    const isHealthy = dbStatus === 'connected' && jobsStatus !== 'stale'
 
     if (!isHealthy) {
       try {
@@ -45,8 +66,11 @@ export const GET = withRoute(
           domain: 'db',
           kind: 'db_unavailable',
           operation: 'health.check_failure',
-          summary: `System health check failed: database connectivity is ${dbStatus}`,
-          details: { dbStatus, latencyMs: responseTimeMs },
+          summary:
+            dbStatus === 'connected'
+              ? 'System health check failed: scheduled jobs are stale'
+              : `System health check failed: database connectivity is ${dbStatus}`,
+          details: { dbStatus, staleJobs, latencyMs: responseTimeMs },
         })
       } catch {
         // Non-fatal logging fallback
@@ -66,8 +90,12 @@ export const GET = withRoute(
             uptime: process.uptime ? Math.floor(process.uptime()) : null,
           },
           database: {
-            status: isHealthy ? 'healthy' : 'unhealthy',
+            status: dbStatus === 'connected' ? 'healthy' : 'unhealthy',
             latencyMs: dbLatencyMs,
+          },
+          jobs: {
+            status: jobsStatus,
+            stale: staleJobs,
           },
         },
         environment: process.env.NODE_ENV || 'production',

@@ -313,35 +313,32 @@ export async function markTheoryRead(
   const xpConfig = await getRuntimeXpValues(supabase)
   const now = new Date().toISOString()
   const newStatus = progress?.status === 'completed' ? 'completed' : 'in_progress'
-  const newXpEarned = (progress?.xp_earned ?? 0) + xpConfig.THEORY_READ
+
+  // XP first, then progress. The XP ledger has a unique index on theory_read per
+  // lesson, so the award is the single point that decides who earned it:
+  //  - an XP failure throws before progress is marked, so the learner can retry
+  //    instead of being left with "read" but no XP (the old order swallowed it);
+  //  - a concurrent second request gets awarded = false and does not add the XP to
+  //    the progress row a second time.
+  const awarded = await awardXp(supabase, userId, 'theory_read', xpConfig.THEORY_READ, lessonId)
+
+  const progressRow: Database['public']['Tables']['user_lesson_progress']['Insert'] = {
+    user_id: userId,
+    lesson_id: lessonId,
+    status: newStatus,
+    theory_read_at: now,
+  }
+  if (awarded) progressRow.xp_earned = (progress?.xp_earned ?? 0) + xpConfig.THEORY_READ
 
   const { error: progressError } = await supabase
     .from('user_lesson_progress')
-    .upsert({
-      user_id: userId,
-      lesson_id: lessonId,
-      status: newStatus,
-      theory_read_at: now,
-      xp_earned: newXpEarned,
-    }, { onConflict: 'user_id,lesson_id' })
+    .upsert(progressRow, { onConflict: 'user_id,lesson_id' })
 
   if (progressError) throw progressError
 
-  try {
-    await awardXp(
-      supabase,
-      userId,
-      'theory_read',
-      xpConfig.THEORY_READ,
-      lessonId
-    )
-  } catch (xpError) {
-    console.error(`[lessons-db] Error creating theory_read XP event:`, xpError)
-  }
-
   await updateUserStreak(supabase, userId)
 
-  return { success: true, xpEarned: xpConfig.THEORY_READ }
+  return { success: true, xpEarned: awarded ? xpConfig.THEORY_READ : 0 }
 }
 
 export async function recordTheoryReadAction(

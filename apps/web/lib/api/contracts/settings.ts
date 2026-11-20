@@ -170,3 +170,71 @@ export interface NotificationPreferencesResponse {
   success: boolean
   preferences: NotificationPreferencesData
 }
+
+// ─── POST /api/settings/portfolio (components/settings/PortfolioSettingsForm.tsx)
+
+/**
+ * The form posts its whole `PortfolioSettingsData` state, including the read-only
+ * `portfolioViewCount` and `verificationOverride` it got from GET. Those two are
+ * accepted so the save keeps working and are never written: the route's data layer
+ * builds the update from the editable fields only. Username, URL and avatar rules
+ * stay in that layer, which owns the copy the form shows; the schema only checks
+ * types and outer size caps. Strict, so no other column can be named.
+ */
+export const portfolioSettingsUpdateSchema = z
+  .object({
+    username: z.string().max(100),
+    name: z.string().max(200, 'Name must be 200 characters or fewer.'),
+    bio: z.string().max(5000, 'Bio must be 5,000 characters or fewer.'),
+    avatarUrl: z.string().max(2000),
+    linkedinUrl: z.string().max(2000),
+    githubUrl: z.string().max(2000),
+    websiteUrl: z.string().max(2000),
+    isPortfolioPublic: z.boolean(),
+    // Any short id, not the enum: GET returns the stored layout unfiltered, so a row
+    // holding a retired section id would otherwise block every save. updatePortfolioSettings
+    // drops unknown ids before writing.
+    portfolioLayout: z.array(z.string().max(40)).max(20).optional(),
+    featuredCapstoneId: z.string().max(100).nullable().optional(),
+    portfolioViewCount: z.number().optional(),
+    verificationOverride: z.enum(['verified', 'rejected']).nullable().optional(),
+  })
+  .strict()
+
+export type PortfolioSettingsUpdateInput = z.infer<typeof portfolioSettingsUpdateSchema>
+
+// ─── Destructive actions: /api/settings/delete-account, /api/settings/reset/* ──
+
+/**
+ * Read in the handler, not declared on the wrapper: an empty body has to reach the
+ * re-auth helper so the dialog shows "Current password is required." and the
+ * destructive limiter is charged as before. Not strict, because only these fields
+ * are read and the body is never written anywhere.
+ */
+export const destructiveReauthBodySchema = z.object({
+  currentPassword: z.string().max(1024).optional(),
+  confirmationPhrase: z.string().max(64).optional(),
+})
+
+/** `module_slug` is the module picker value: a module slug, or 'all'. */
+export const resetProgressBodySchema = destructiveReauthBodySchema.extend({
+  module_slug: z.string().max(100).optional(),
+})
+
+// ─── POST /api/settings/security, /api/settings/security/change-email ─────────
+
+/**
+ * Checked after the routes' own JSON parse, which keeps their 415 and 400 copy. A
+ * wrong-typed field used to reach `.trim()` and surface as a 500.
+ */
+export const changeEmailBodySchema = z.object({
+  currentPassword: z.string().max(1024).optional(),
+  newEmail: z.string().max(320).optional(),
+})
+
+export const changePasswordBodySchema = z.object({
+  currentPassword: z.string().max(1024).optional(),
+  newPassword: z.string().max(1024).optional(),
+  confirmPassword: z.string().max(1024).optional(),
+  password: z.string().max(1024).optional(),
+})

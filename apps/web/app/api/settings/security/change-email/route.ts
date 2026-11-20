@@ -5,6 +5,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { hasPasswordIdentity, type ServiceClient } from '@/lib/auth/oauth-account-guard'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { changeEmailBodySchema } from '@/lib/api/contracts/settings'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 import { BRAND } from '@/lib/brand'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -133,12 +135,20 @@ export const POST = withRoute(
       )
     }
 
-    let body: { currentPassword?: string; newEmail?: string }
+    // Hand-parsed on purpose: the 415, the "Invalid JSON payload" 400 and the
+    // password-not-set reply are copy the security tab shows. A parsed body is still
+    // type-checked, so a non-string field is a 400 rather than a crash at `.trim()`.
+    let raw: unknown
     try {
-      body = await request.json()
+      raw = await request.json()
     } catch {
       return NextResponse.json({ success: false, error: 'Invalid JSON payload' }, { status: 400 })
     }
+    const parsed = parseBody(changeEmailBodySchema, raw)
+    if (!parsed.ok) {
+      return NextResponse.json({ success: false, error: 'Invalid JSON payload' }, { status: 400 })
+    }
+    const body = parsed.data
 
     const currentPassword = body.currentPassword
     const newEmail = (body.newEmail || '').trim().toLowerCase()

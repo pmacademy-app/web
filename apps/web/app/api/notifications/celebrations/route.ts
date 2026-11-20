@@ -32,6 +32,16 @@ export const POST = withRoute(
     operation: 'notifications.celebrations.claim',
     summary: 'Unexpected failure claiming an achievement celebration',
     errorMessage: 'Failed to check for achievement celebrations',
+    // The host asks once on load and again only when the unread count changes, so
+    // 60 per 10 minutes is never reached in real use. A refused claim reads as
+    // "nothing to celebrate" on the client, which is safe.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `celebrations_claim_${actor.userId}` : null),
+        limit: 60,
+        windowMs: 10 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor }) => {
     const userId = requireUserId(actor)

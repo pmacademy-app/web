@@ -1,5 +1,7 @@
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { avatarJsonUploadBodySchema } from '@/lib/api/contracts/learner-writes'
 import { AvatarService, MAX_AVATAR_SIZE_BYTES, ALLOWED_AVATAR_MIME_TYPES } from '@/lib/avatar/avatar-service'
 import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
 import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
@@ -66,12 +68,12 @@ export const POST = withRoute(
       fileBuffer = Buffer.from(arrayBuffer)
     } else {
       // JSON payload support (e.g. base64)
-      const body = (await request.json().catch(() => ({}))) as {
-        base64?: unknown
-        mimeType?: string
-        fileName?: string
-      }
-      if (!body.base64 || typeof body.base64 !== 'string') {
+      // Hand-parsed because the multipart branch above owns the stream. An absent
+      // body keeps its existing copy; a parsed one must be the three string fields.
+      const parsed = parseBody(avatarJsonUploadBodySchema, await request.json().catch(() => ({})))
+      if (!parsed.ok) throw new RouteError(400, 'VALIDATION', parsed.message)
+      const body = parsed.data
+      if (!body.base64) {
         throw new RouteError(400, 'VALIDATION', 'Image data or multipart file is required.')
       }
 

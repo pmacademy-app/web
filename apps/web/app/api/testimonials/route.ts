@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { testimonialSubmitBodySchema } from '@/lib/api/contracts/public-forms'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { TestimonialsService } from '@/lib/feedback/published-testimonials'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -36,8 +38,10 @@ export const POST = withRoute(
     ],
   },
   async ({ request, actor }) => {
-    const body = (await request.json()) as Record<string, unknown>
-    const { content, rating, headline, authorName, authorRole, allowPublicFeature } = body
+    // Parsed after the limiter (see above). Malformed JSON is a 400, not an incident.
+    const parsed = parseBody(testimonialSubmitBodySchema, await request.json().catch(() => null))
+    if (!parsed.ok) throw new RouteError(400, 'VALIDATION', parsed.message)
+    const { content, rating, headline, authorName, authorRole, allowPublicFeature } = parsed.data
 
     if (!allowPublicFeature) {
       throw new RouteError(400, 'VALIDATION', 'Explicit opt-in permission is required for public testimonial submissions.')

@@ -129,9 +129,16 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
           }),
           order: vi.fn().mockReturnThis(),
           limit: vi.fn().mockReturnThis(),
-          update: vi.fn().mockImplementation(() => ({
-            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
-          })),
+          update: vi.fn().mockImplementation(() => {
+            // Chainable like PostgREST: the streak update is a compare-and-swap
+            // (.eq / .is filters, then .select to see whether it applied).
+            const result = { data: null, error: null }
+            const chain: Record<string, unknown> = { then: (r: (v: typeof result) => unknown) => r(result) }
+            chain.eq = vi.fn(() => chain)
+            chain.is = vi.fn(() => chain)
+            chain.select = vi.fn(async () => result)
+            return chain
+          }),
           insert: vi.fn().mockImplementation(async (payload: Record<string, unknown>) => {
             if (currentFilterTable === 'xp_events') {
               const item = payload as Partial<(typeof mockStore.xpEvents)[number]>

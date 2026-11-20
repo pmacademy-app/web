@@ -40,9 +40,9 @@ export async function awardXp(
   sourceType: XpSourceType,
   xpAmount: number,
   sourceId: string
-): Promise<void> {
+): Promise<boolean> {
   if (xpAmount <= 0) {
-    return
+    return false
   }
 
   const oldTotalXp = await getTotalXp(supabase, userId)
@@ -71,14 +71,22 @@ export async function awardXp(
     // which PostgREST cannot express. Handling the error keeps this correct whether or
     // not the index exists, so it carries no deploy-ordering hazard.
     if (isUniqueViolation(error)) {
-      return
+      return false
     }
 
     console.error(`[xp-service] Error inserting XP event for user ${userId}:`, error)
     throw new Error('Failed to record XP event')
   }
 
-  const newTotalXp = oldTotalXp + xpAmount
+  // Read the total again after the insert (the trigger has already applied it) rather
+  // than adding xpAmount to the earlier read. With two awards in flight, each one's
+  // pre-insert read misses the other's XP, so the old sum could skip a level boundary
+  // entirely and no level-up would be sent. Comparing the pre-insert read with the
+  // post-insert total always spans this award, so a crossing is never missed. Two
+  // requests may both see the same crossing; the dispatch id (level-up-<user>-<level>)
+  // is the notification's idempotency key, so only one is delivered.
+  const { row: afterRow } = await selectAuthoritativeTotalXp(supabase, userId)
+  const newTotalXp = Math.max(oldTotalXp + xpAmount, Number(afterRow?.total_xp ?? 0))
   const newLevelInfo = calculateLevel(newTotalXp)
 
   if (newLevelInfo.level > oldLevelInfo.level) {
@@ -110,6 +118,8 @@ export async function awardXp(
       console.warn('[xp-service] Level up notification dispatch warning:', lvlErr)
     }
   }
+
+  return true
 }
 
 export async function hasXpEvent(

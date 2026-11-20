@@ -11,6 +11,7 @@ import { daysSinceLastActivity, shouldSendReminder } from '@/lib/notifications/r
 import { findQueuedIdempotencyKeys, isInSendWindow } from '@/lib/notifications/send-window'
 import { getStreakStatusSummary } from '@/lib/streaks/streaks'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { readRunCursor, writeRunCursor } from '@/lib/notifications/run-cursor'
 
 /** Keyset pagination batch size for daily reminder processing */
 const BATCH_SIZE = 100
@@ -80,8 +81,13 @@ export const POST = withRoute(
     // response is a 500 and withCronHeartbeat records the run as failed (audit #3).
     let failure: string | null = null
 
+    // Set when this run reached the last user, so the saved cursor is cleared.
+    let reachedEnd = false
+    let lastSeenId: string | null = null
+
     try {
-      let lastSeenId: string | null = null
+      // Carry on from where the previous run stopped (see lib/notifications/run-cursor).
+      lastSeenId = await readRunCursor(supabase, 'daily-reminder')
 
       for (let page = 0; page < MAX_PAGES; page++) {
         // Enforce execution budget to guarantee return before serverless deadline
@@ -131,7 +137,10 @@ export const POST = withRoute(
           last_streak_date?: string | null
           timezone?: string | null
         }>
-        if (users.length === 0) break
+        if (users.length === 0) {
+          reachedEnd = true
+          break
+        }
 
         const userIds = users.map((u) => u.id)
         // Batch resolve notification preferences for this entire page (anti-N+1).
@@ -150,7 +159,10 @@ export const POST = withRoute(
             message: `Notification preferences read failed in /api/cron/daily-reminder; page skipped: ${prefErr instanceof Error ? prefErr.message : String(prefErr)}`,
           }))
           lastSeenId = users[users.length - 1].id
-          if (users.length < BATCH_SIZE) break
+          if (users.length < BATCH_SIZE) {
+            reachedEnd = true
+            break
+          }
           continue
         }
 
@@ -292,10 +304,16 @@ export const POST = withRoute(
         }
 
         lastSeenId = users[users.length - 1].id
-        if (users.length < BATCH_SIZE) break
+        if (users.length < BATCH_SIZE) {
+          reachedEnd = true
+          break
+        }
       }
 
-      if (!failure) await EmailAutomationsService.recordDigestRun('dailyReminder')
+      if (!failure) {
+        await writeRunCursor(supabase, 'daily-reminder', reachedEnd ? null : lastSeenId)
+        await EmailAutomationsService.recordDigestRun('dailyReminder')
+      }
     } catch (err) {
       failure = 'unhandled exception'
       const { logSystemError } = await import('@/lib/monitoring/logger')
@@ -318,6 +336,8 @@ export const POST = withRoute(
       remindersSkippedAlreadyQueued,
       remindersSkippedCadence,
       skippedPages,
+      // false means the time budget ran out; the next run continues from the saved cursor.
+      reachedEnd,
     }, { status: failure ? 500 : 200 })
   })
 )

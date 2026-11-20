@@ -41,7 +41,7 @@ import { resolveActor } from '@/lib/api/actor'
 // Reusable chainable query builder mock
 function createChainableBuilder(resolvedData: unknown = null, resolvedError: unknown = null) {
   const builder: Record<string, unknown> = {}
-  const chainMethods = ['select', 'eq', 'in', 'order', 'limit', 'range', 'ilike', 'filter']
+  const chainMethods = ['select', 'eq', 'is', 'in', 'order', 'limit', 'range', 'ilike', 'filter']
   chainMethods.forEach((m) => {
     builder[m] = vi.fn().mockReturnValue(builder)
   })

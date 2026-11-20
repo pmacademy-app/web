@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { notificationsPatchBodySchema } from '@/lib/api/contracts/learner-writes'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
@@ -150,14 +151,12 @@ export const PATCH = withRoute(
     operation: 'notifications.mark_read',
     summary: 'Unexpected failure updating notification read state',
     errorMessage: 'Failed to update notification',
+    // Strict and capped: the batch is at most 200 ids, and the rows are always
+    // filtered by the session learner below, never by anything in the body.
+    body: notificationsPatchBodySchema,
   },
-  async ({ request, actor }) => {
+  async ({ body, actor }) => {
     const userId = requireUserId(actor)
-    const body = (await request.json().catch(() => ({}))) as {
-      action?: unknown
-      notificationId?: unknown
-      notificationIds?: unknown
-    }
     const { action, notificationId, notificationIds } = body
     const supabase = createServiceRoleClient()
 

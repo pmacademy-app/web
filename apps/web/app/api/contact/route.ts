@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { contactSubmitBodySchema } from '@/lib/api/contracts/public-forms'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sendGovernedEmail } from '@/lib/email-governance'
 import { getClientIpBucket } from '@/lib/security/client-ip'
@@ -44,8 +46,11 @@ export const POST = withRoute(
     const user = actor.kind === 'learner' ? { id: actor.userId } : null
     const clientIp = getClientIpBucket(request)
 
-    const body = (await request.json()) as Record<string, unknown>
-    const { name, email, subject, category, message } = body
+    // Parsed here, after the limiter, so the throttle-first order is kept. A malformed
+    // body is a 400 rather than an incident; the required-field copy below is unchanged.
+    const parsed = parseBody(contactSubmitBodySchema, await request.json().catch(() => null))
+    if (!parsed.ok) throw new RouteError(400, 'VALIDATION', parsed.message)
+    const { name, email, subject, category, message } = parsed.data
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       throw new RouteError(400, 'VALIDATION', 'Name is required.')

@@ -6,6 +6,7 @@ import { EmailAutomationsService } from '@/lib/notifications/automations/service
 import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { readRunCursor, writeRunCursor } from '@/lib/notifications/run-cursor'
 import { loadProofStates } from '@/lib/growth/proof-state-db'
 import { fetchAllRows } from '@/lib/db/pagination'
 import { selectProofNextStep } from '@/lib/growth/proof-state'
@@ -90,8 +91,13 @@ export const POST = withRoute(
     // response is a 500 and withCronHeartbeat records the run as failed (audit #3).
     let failure: string | null = null
 
+    // Set when this run reached the last user, so the saved cursor is cleared.
+    let reachedEnd = false
+    let lastSeenId: string | null = null
+
     try {
-      let lastSeenId: string | null = null
+      // Carry on from where the previous run stopped (see lib/notifications/run-cursor).
+      lastSeenId = await readRunCursor(supabase, 'weekly-recap')
 
       for (let page = 0; page < MAX_PAGES; page++) {
         // Enforce execution budget to guarantee return before serverless deadline
@@ -126,7 +132,10 @@ export const POST = withRoute(
         }
 
         const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number; timezone?: string | null }>
-        if (users.length === 0) break
+        if (users.length === 0) {
+          reachedEnd = true
+          break
+        }
 
         const userIds = users.map((u) => u.id)
 
@@ -180,7 +189,10 @@ export const POST = withRoute(
             message: `Notification preferences read failed in /api/cron/weekly-recap; page skipped: ${reason}`,
           })
           lastSeenId = users[users.length - 1].id
-          if (users.length < BATCH_SIZE) break
+          if (users.length < BATCH_SIZE) {
+            reachedEnd = true
+            break
+          }
           continue
         }
         const prefMap = prefRead.map
@@ -199,7 +211,10 @@ export const POST = withRoute(
             message: `Weekly activity read failed in /api/cron/weekly-recap; page skipped: ${reason}`,
           })
           lastSeenId = users[users.length - 1].id
-          if (users.length < BATCH_SIZE) break
+          if (users.length < BATCH_SIZE) {
+            reachedEnd = true
+            break
+          }
           continue
         }
 
@@ -324,10 +339,16 @@ export const POST = withRoute(
         }
 
         lastSeenId = users[users.length - 1].id
-        if (users.length < BATCH_SIZE) break
+        if (users.length < BATCH_SIZE) {
+          reachedEnd = true
+          break
+        }
       }
 
-      if (!failure) await EmailAutomationsService.recordDigestRun('weeklyRecap')
+      if (!failure) {
+        await writeRunCursor(supabase, 'weekly-recap', reachedEnd ? null : lastSeenId)
+        await EmailAutomationsService.recordDigestRun('weeklyRecap')
+      }
     } catch (err) {
       failure = 'unhandled exception'
       const { logSystemError } = await import('@/lib/monitoring/logger')
@@ -348,6 +369,8 @@ export const POST = withRoute(
       recapsSkippedNoActivity,
       recapsSkippedAlreadyQueued,
       skippedPages,
+      // false means the time budget ran out; the next run continues from the saved cursor.
+      reachedEnd,
     }, { status: failure ? 500 : 200 })
   })
 )

@@ -17,22 +17,14 @@
  */
 
 import { after } from 'next/server'
-import { z } from 'zod'
 
 import { isLessonIdFormat } from '@/lib/academy/lesson-ids'
 import { assertLessonAccessible } from '@/lib/academy/lessons-db'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { lessonProgressPatchBodySchema } from '@/lib/api/contracts/learner-writes'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { createServiceRoleClient, type Database } from '@/lib/supabase'
-
-// Two mutually-exclusive PATCH shapes: the existing "mark in progress", and the Phase 4
-// (§4.4) idempotent "deep dive opened" marker. Kept as a union so each call declares its
-// intent explicitly and neither can smuggle the other's field.
-const patchSchema = z.union([
-  z.object({ status: z.literal('in_progress') }),
-  z.object({ deep_dive_opened: z.literal(true) }),
-])
 
 type ProgressTable = Database['public']['Tables']['user_lesson_progress']
 type ProgressRow = ProgressTable['Row']
@@ -160,7 +152,8 @@ export const PATCH = withRoute(
     } catch {
       throw new RouteError(400, 'VALIDATION', 'Invalid request body. JSON object expected.')
     }
-    const parsed = patchSchema.safeParse(raw)
+    // Each shape is strict, so a body carrying both fields matches neither.
+    const parsed = lessonProgressPatchBodySchema.safeParse(raw)
     if (!parsed.success) {
       throw new RouteError(400, 'VALIDATION', 'Body must be {status:"in_progress"} or {deep_dive_opened:true}.')
     }

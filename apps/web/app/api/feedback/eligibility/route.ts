@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
+import { feedbackEligibilitySyncSchema } from '@/lib/api/contracts/learner-writes'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 /**
@@ -55,11 +56,13 @@ export const POST = withRoute(
     actor: { allow: ['learner'] },
     operation: 'feedback.eligibility.sync',
     summary: 'Unexpected failure syncing learner usage time',
+    // Both callers (the tracker's fetch and its unload beacon) always send
+    // `{ incrementSeconds }`, so a declared schema refuses nothing they send.
+    body: feedbackEligibilitySyncSchema,
   },
-  async ({ request, actor }) => {
+  async ({ body, actor }) => {
     const userId = requireUserId(actor)
 
-    const body = (await request.json().catch(() => ({}))) as { incrementSeconds?: unknown }
     const rawIncrement =
       typeof body.incrementSeconds === 'number' &&
       Number.isFinite(body.incrementSeconds) &&

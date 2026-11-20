@@ -71,7 +71,11 @@ export async function updateUserStreak(
     const result = recordActivityStreak(currentStreakData, timezone, now)
 
     if (result.streakIncremented || lastActivityDate !== result.todayStr) {
-      const { error: updateError } = await supabase
+      // Compare-and-swap on the stored last_streak_date. Two activities finishing at
+      // once (theory read and quiz, say) both read the same row; without the guard the
+      // later write could overwrite the earlier one's freeze or count. Only the request
+      // whose read is still current applies the update and runs the follow-ups.
+      const updateQuery = supabase
         .from('users')
         .update({
           current_streak: result.currentStreak,
@@ -80,9 +84,16 @@ export async function updateUserStreak(
           last_streak_date: result.todayStr,
         })
         .eq('id', userId)
+      const guarded = last_streak_date
+        ? updateQuery.eq('last_streak_date', last_streak_date)
+        : updateQuery.is('last_streak_date', null)
+      const { data: updatedRows, error: updateError } = await guarded.select('id')
 
       if (updateError) {
         console.error('[streaks-db] Error updating user streak fields:', updateError)
+      } else if (Array.isArray(updatedRows) && updatedRows.length === 0) {
+        // Another request already moved the streak on for this activity.
+        return
       }
 
       if (result.streakIncremented) {

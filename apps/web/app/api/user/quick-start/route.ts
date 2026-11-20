@@ -33,6 +33,15 @@ export const POST = withRoute(
     operation: 'user.quick_start.complete',
     domain: 'auth',
     summary: 'Unhandled exception completing the quick start tour',
+    // One write per finished tour; each call is an auth admin update, so it is
+    // bounded. 60 per 10 minutes is never reached in real use.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `quick_start_${actor.userId}` : null),
+        limit: 60,
+        windowMs: 10 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor }) => {
     const userId = requireUserId(actor)

@@ -34,6 +34,15 @@ export const POST = withRoute(
     operation: 'friends.add',
     summary: 'Unexpected failure adding a study friend',
     body: addFriendSchema,
+    // Each add looks another learner up by username, so an unbounded loop could
+    // probe handles. 30 per 10 minutes is far past anyone adding friends by hand.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `friends_add_${actor.userId}` : null),
+        limit: 30,
+        windowMs: 10 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor, body }) => {
     const supabase = createServiceRoleClient()

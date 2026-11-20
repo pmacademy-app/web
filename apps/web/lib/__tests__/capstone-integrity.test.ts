@@ -212,8 +212,17 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
               eq: vi.fn().mockReturnThis(),
               single: vi.fn().mockResolvedValue({ data: { total_xp: 500 } }),
               maybeSingle: vi.fn().mockResolvedValue({ data: { total_xp: 500 } }),
-              update: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+              // Chainable like PostgREST: the streak update is a compare-and-swap
+              // (.eq / .is filters, then .select to see whether it applied).
+              update: vi.fn().mockImplementation(() => {
+                const result = { data: [{ id: 'user-1' }], error: null }
+                const chain: Record<string, unknown> = {
+                  then: (resolve: (v: typeof result) => unknown) => resolve(result),
+                }
+                chain.eq = vi.fn(() => chain)
+                chain.is = vi.fn(() => chain)
+                chain.select = vi.fn(async () => result)
+                return chain
               }),
             }
           }

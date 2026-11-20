@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
-import { withRoute } from '@/lib/api/with-route'
+import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { certificateIssueBodySchema } from '@/lib/api/contracts/learner-writes'
 import { issueCertificateWithStatus, getUserCertificates } from '@/lib/certificates-db'
 import { dispatchCertificateGenerated } from '@/lib/certificates/issue-flow'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
@@ -33,8 +35,11 @@ export const POST = withRoute(
 
     // Read here rather than via a declared schema: the pre-migration route used
     // `request.json().catch(() => ({}))`, so an absent or malformed body fell back
-    // to a full-curriculum certificate instead of returning 400.
-    const body = (await request.json().catch(() => ({}))) as { type?: string; moduleSlug?: string | null }
+    // to a full-curriculum certificate instead of returning 400. A body that does
+    // parse is still type-checked, and an unknown key is refused.
+    const parsed = parseBody(certificateIssueBodySchema, await request.json().catch(() => ({})))
+    if (!parsed.ok) throw new RouteError(400, 'VALIDATION', parsed.message)
+    const body = parsed.data
     const type = body.type || 'full_curriculum'
     const moduleSlug = body.moduleSlug || null
 

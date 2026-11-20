@@ -89,8 +89,15 @@ Our primary user is the Early Career Product Manager and Senior PM transitioning
               ],
               error: null,
             }),
-            update: vi.fn().mockReturnValue({
-              eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+            update: vi.fn().mockImplementation(() => {
+              // Chainable like PostgREST: the streak update is a compare-and-swap
+              // (.eq / .is filters, then .select to see whether it applied).
+              const result = { data: [{ id: 'row' }], error: null }
+              const chain: Record<string, unknown> = { then: (r: (v: typeof result) => unknown) => r(result) }
+              chain.eq = vi.fn(() => chain)
+              chain.is = vi.fn(() => chain)
+              chain.select = vi.fn(async () => result)
+              return chain
             }),
           }
         }

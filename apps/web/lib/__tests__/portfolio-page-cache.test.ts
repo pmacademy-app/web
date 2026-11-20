@@ -10,6 +10,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 
 const mocks = vi.hoisted(() => ({
@@ -317,13 +318,11 @@ describe('writes purge the cached public pages', () => {
     }))
     vi.resetModules()
     const { POST } = await import('../../app/api/settings/portfolio/route')
-    const handler = POST as unknown as (ctx: { request: Request; actor: unknown }) => Promise<Response>
+    // The body is a declared schema now, so the (mocked-away) wrapper hands it over parsed.
+    const handler = POST as unknown as (ctx: { actor: unknown; body: unknown }) => Promise<Response>
 
     const res = await handler({
-      request: new Request('https://prodily.app/api/settings/portfolio', {
-        method: 'POST',
-        body: JSON.stringify({ username: 'ada-new', isPortfolioPublic: false }),
-      }),
+      body: { username: 'ada-new', isPortfolioPublic: false },
       actor: { kind: 'learner', userId: 'u1' },
     })
 
@@ -367,13 +366,11 @@ describe('writes purge the cached public pages', () => {
     mocks.client = fakeClient({ users: { data: { username: 'ada' } } }).client
     mocks.recordReflectionAction.mockResolvedValue({ success: true })
     const { POST } = await import('../../app/api/reflections/route')
-    const handler = POST as unknown as (ctx: { request: Request; actor: unknown }) => Promise<Response>
+    // The body is a declared schema now, so the (mocked-away) wrapper hands it over parsed.
+    const handler = POST as unknown as (ctx: { actor: unknown; body: unknown }) => Promise<Response>
     const post = (lesson_id: string) =>
       handler({
-        request: new Request('https://prodily.app/api/reflections', {
-          method: 'POST',
-          body: JSON.stringify({ lesson_id, content: 'thoughts', is_public: true }),
-        }),
+        body: { lesson_id, content: 'thoughts', is_public: true },
         actor: { kind: 'learner', userId: 'u1' },
       })
 
@@ -385,20 +382,14 @@ describe('writes purge the cached public pages', () => {
   })
 
   it('reflections (L9): content over 10,000 characters is refused before any write', async () => {
-    mocks.client = fakeClient({ users: { data: { username: 'ada' } } }).client
-    mocks.recordReflectionAction.mockClear()
-    const { POST } = await import('../../app/api/reflections/route')
-    const handler = POST as unknown as (ctx: { request: Request; actor: unknown }) => Promise<Response>
-    await expect(
-      handler({
-        request: new Request('https://prodily.app/api/reflections', {
-          method: 'POST',
-          body: JSON.stringify({ lesson_id: 'les_000001', content: 'x'.repeat(10_001) }),
-        }),
-        actor: { kind: 'learner', userId: 'u1' },
-      })
-    ).rejects.toThrow()
-    expect(mocks.recordReflectionAction).not.toHaveBeenCalled()
+    // The ceiling lives in the declared body schema, which the wrapper applies before
+    // the handler runs (the wrapper is mocked away in this file).
+    const { reflectionWriteBodySchema } = await import('../api/contracts/learner-writes')
+    const parsed = reflectionWriteBodySchema.safeParse({ lesson_id: 'les_000001', content: 'x'.repeat(10_001) })
+    expect(parsed.success).toBe(false)
+    expect(readFileSync(path.join(process.cwd(), 'app/api/reflections/route.ts'), 'utf8')).toContain(
+      'body: reflectionWriteBodySchema'
+    )
   })
 
   it('account deletion: purges the deleted learner pages and expires the leaderboard', async () => {

@@ -31,6 +31,14 @@ export const POST = withRoute(
     operation: 'cohorts.membership.update',
     summary: 'Unexpected failure updating cohort membership',
     body: membershipSchema,
+    // Joining or leaving a cohort is a deliberate click; 10 per 10 minutes is plenty.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `cohorts_membership_${actor.userId}` : null),
+        limit: 10,
+        windowMs: 10 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor, body }) => {
     const supabase = createServiceRoleClient()

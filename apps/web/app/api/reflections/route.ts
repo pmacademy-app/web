@@ -8,27 +8,13 @@
  * Accepts both stable les_XXXXXX IDs (v2) and legacy slug strings (v1 backward compat).
  */
 
-import { z } from 'zod'
-
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { reflectionWriteBodySchema } from '@/lib/api/contracts/learner-writes'
 import { recordReflectionAction } from '@/lib/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
 import { logSystemError } from '@/lib/monitoring/logger'
-
-// L9: far above any real reflection, low enough that a scripted write cannot store
-// megabytes per row. Capstone reflections share the 10k ceiling with the submit route.
-const MAX_REFLECTION_CHARS = 10_000
-
-const reflectionPostSchema = z.object({
-  lesson_id: z.string().max(200),  // accepts stable les_XXXXXX IDs or legacy slugs
-  content: z
-    .string()
-    .min(1, 'Reflection content cannot be empty')
-    .max(MAX_REFLECTION_CHARS, `Reflection must be ${MAX_REFLECTION_CHARS.toLocaleString('en-US')} characters or fewer.`),
-  is_public: z.boolean().default(false),
-})
 
 export const GET = withRoute(
   {
@@ -88,25 +74,12 @@ export const POST = withRoute(
         windowMs: 60 * 60 * 1000,
       },
     ],
+    // Strict (it is written into a row); a legacy `lesson_slug` is folded into
+    // `lesson_id` by the schema, so v1 clients keep working.
+    body: reflectionWriteBodySchema,
   },
-  async ({ request, actor }) => {
-    const body = await request.json().catch(() => null)
-
-    // Support both v2 (lesson_id) and legacy (lesson_slug) clients during transition
-    const raw = (body ?? {}) as Record<string, unknown>
-    const normalizedBody: Record<string, unknown> = { ...raw, lesson_id: raw.lesson_id ?? raw.lesson_slug }
-    delete normalizedBody.lesson_slug
-
-    const parsed = reflectionPostSchema.safeParse(normalizedBody)
-    if (!parsed.success) {
-      throw new RouteError(
-        400,
-        'VALIDATION',
-        parsed.error.issues[0]?.message || 'Invalid reflection.'
-      )
-    }
-
-    const { lesson_id, content, is_public } = parsed.data
+  async ({ body, actor }) => {
+    const { lesson_id, content, is_public } = body
     const serviceSupabase = createServiceRoleClient()
 
     const result = await recordReflectionAction(

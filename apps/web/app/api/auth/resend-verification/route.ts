@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { withRoute } from '@/lib/api/with-route'
+import { resendVerificationBodySchema } from '@/lib/api/contracts/public-forms'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { recordSecurityEvent } from '@/lib/security/security-events'
@@ -34,9 +35,14 @@ export const POST = withRoute(
       let email: string | undefined
       let turnstileToken: unknown
       try {
-        const body = await request.json()
-        email = body.email
-        turnstileToken = body.turnstileToken
+        const raw: unknown = await request.json()
+        // Type-checked so a non-string email cannot reach `.trim()` as a 500. A
+        // body that fails the check is treated like a missing one.
+        const parsed = resendVerificationBodySchema.safeParse(raw)
+        if (parsed.success) {
+          email = parsed.data.email
+          turnstileToken = parsed.data.turnstileToken
+        }
       } catch {
         // Body optional if authenticated
       }

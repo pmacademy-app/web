@@ -125,7 +125,8 @@ function fakeSupabase(opts: {
       }
       b.maybeSingle = async () => ({ data: null, error: null })
       b.upsert = async (row: { key: string; value: { status: string } }) => {
-        if (table === 'system_settings') opts.heartbeats.push(row)
+        // cron_cursor:* rows are the paging cursor (lib/notifications/run-cursor), not heartbeats.
+        if (table === 'system_settings' && !row.key.startsWith('cron_cursor:')) opts.heartbeats.push(row)
         return { data: null, error: null }
       }
       b.then = (resolve: (v: unknown) => unknown, reject?: (e: unknown) => unknown) => {

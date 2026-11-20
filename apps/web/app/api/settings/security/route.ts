@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { parseBody } from '@/lib/api/contracts/body'
+import { changePasswordBodySchema } from '@/lib/api/contracts/settings'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { hasPasswordIdentity, type ServiceClient } from '@/lib/auth/oauth-account-guard'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -100,21 +102,26 @@ export const POST = withRoute(
       throw new RouteError(401, 'UNAUTHORIZED', 'Authentication required.')
     }
 
-    let body: {
-      currentPassword?: string
-      newPassword?: string
-      confirmPassword?: string
-      password?: string
-    }
-
+    // Hand-parsed on purpose: the 415, the "Invalid JSON payload" 400 and each
+    // password message are copy the security tab shows. A parsed body is still
+    // type-checked, so a null or wrong-typed body is a 400 rather than a crash.
+    let raw: unknown
     try {
-      body = await request.json()
+      raw = await request.json()
     } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON payload' },
         { status: 400 }
       )
     }
+    const parsed = parseBody(changePasswordBodySchema, raw)
+    if (!parsed.ok) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid JSON payload' },
+        { status: 400 }
+      )
+    }
+    const body = parsed.data
 
     const currentPassword = body.currentPassword
     const newPassword = body.newPassword || body.password
