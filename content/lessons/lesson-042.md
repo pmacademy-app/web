@@ -95,8 +95,8 @@ graph TD
     A[North Star Metric] --> B[Input Metric 1: Owned by Team A]
     A --> C[Input Metric 2: Owned by Team B]
     A --> D[Input Metric 3: Owned by Team C]
-    B --> E[Sub-metric Owned by a Specific Squad]
-    C --> F[Sub-metric Owned by a Specific Squad]
+    B --> E[Sub-metric: Owned by Squad A1]
+    C --> F[Sub-metric: Owned by Squad B1]
 ```
 
 The critical design property of a well-built metric tree is that each branch represents a genuine, quantifiable contribution to the level above it, not just a metric that feels thematically related. A metric tree built loosely, where branches are only vaguely connected to the NSM above them, gives teams a false sense that their local metric improvements are contributing to the organization's actual goal, when the connection was never rigorously established.

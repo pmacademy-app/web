@@ -16,11 +16,14 @@ import {
   getCapstoneThresholdVariant,
   getRequiredLessonsForVariant,
 } from '@/lib/capstone-threshold-experiment'
-import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
-import { StreakCard } from '@/components/dashboard/StreakCard'
-import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
-import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
-import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
+import { NextLessonPanel, type NextLessonPanelData } from '@/components/dashboard/home/NextLessonPanel'
+import { StreakGoalPanel } from '@/components/dashboard/home/StreakGoalPanel'
+import { TodaysPlan, type PlanItem } from '@/components/dashboard/home/TodaysPlan'
+import { RecentXpStrip, type XpStripItem } from '@/components/dashboard/home/RecentXpStrip'
+import { calculateLevel, XP_VALUES } from '@/lib/xp/xp'
+import { STREAK_RULES } from '@/lib/streaks/streaks'
+import { getUserLocalTime } from '@/lib/notifications/timezone'
+import { firstName, greetingFor, nextFreezeDay, relativeDayLabel, weekStrip, xpSourceLabel } from '@/lib/dashboard/home'
 import { PortfolioProofCard } from '@/components/dashboard/PortfolioProofCard'
 import { hasFullCurriculumCertificate } from '@/lib/dashboard/proof-card'
 import { derivePortfolioState } from '@/lib/dashboard/proof-card'
@@ -29,11 +32,9 @@ import { ProofExtrasSkeleton } from '@/components/dashboard/ProofExtrasRow'
 import { ProofExtrasSlot } from './ProofExtrasSlot'
 import {
   resolvePersonalizedPath,
-  resolveNextRecommendedMilestone,
   resolveStartLearningTarget,
 } from '@/lib/personalization/path-resolver'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
-import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
 import { LeaderboardWidgetSlot } from './LeaderboardWidgetSlot'
 
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
   const progressPromise = Promise.resolve(
     supabase
       .from('user_lesson_progress')
-      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .select('lesson_id, status, quiz_score, quiz_attempts, completed_at')
       .eq('user_id', authUser.id),
   ).then(({ data, error }) => {
     if (error) throw new Error(`[dashboard] user_lesson_progress read failed: ${error.message}`, { cause: error })
@@ -171,11 +172,6 @@ export default async function DashboardPage() {
   // 3. Resolve Goal-Driven Personalization & Next Lesson CTA
   // Uses the identical resolver onboarding uses (resolveStartLearningTarget)
   const personalizedPath = resolvePersonalizedPath(profile)
-  const recommendedMilestone = resolveNextRecommendedMilestone(
-    personalizedPath,
-    completedLessonIds,
-    curriculumLessons
-  )
 
   const accessContext = {
     completedIds: completedLessonIds,
@@ -190,7 +186,7 @@ export default async function DashboardPage() {
     accessContext
   )
 
-  let nextLesson: NextLessonData | null = null
+  let nextLesson: NextLessonPanelData | null = null
   if (startLearningTarget) {
     const activeNext = startLearningTarget.lesson
     const position = getLessonPosition(activeNext, curriculum)
@@ -201,6 +197,9 @@ export default async function DashboardPage() {
       module: activeNext.module,
       moduleTitle: position.moduleTitle,
       estimatedTime: `${activeNext.estimatedReadingTime} min`,
+      moduleDone: curriculumLessons.filter((l) => l.module === activeNext.module && completedLessonIds.has(l.id)).length,
+      moduleTotal: curriculumLessons.filter((l) => l.module === activeNext.module).length,
+      started: progressRows.some((p) => p.lesson_id === activeNext.id && p.status !== 'not_started'),
     }
   } else if (curriculumLessons.length > 0) {
     const activeNextIndex = curriculumLessons.findIndex((l) => !completedLessonIds.has(l.id))
@@ -215,6 +214,9 @@ export default async function DashboardPage() {
         module: activeNext.module,
         moduleTitle: position.moduleTitle,
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
+        moduleDone: curriculumLessons.filter((l) => l.module === activeNext.module && completedLessonIds.has(l.id)).length,
+        moduleTotal: curriculumLessons.filter((l) => l.module === activeNext.module).length,
+        started: progressRows.some((p) => p.lesson_id === activeNext.id && p.status !== 'not_started'),
       }
     }
   }
@@ -272,65 +274,115 @@ export default async function DashboardPage() {
     }
   }
 
-  // 5. Map recent XP activity items for small ticker
-  const recentActivities: ActivityItem[] = (recentXpEvents || []).map((event) => {
-    let title = 'XP Earned'
-    let description = `Earned ${event.xp_amount} XP`
-    let type: ActivityItem['type'] = 'xp_earned'
+  // 5. Learner-local time, level and this week's lessons
+  const local = getUserLocalTime(profile.timezone)
+  const totalXp = Math.max(0, profile.total_xp ?? 0)
+  const level = calculateLevel(totalXp)
+  const weekStartIso = weekStrip(local.localDate, 0, null)[0].date
+  const lessonsThisWeek = progressRows.filter(
+    (p) => p.status === 'completed' && typeof p.completed_at === 'string' && localDateOf(p.completed_at, profile.timezone) >= weekStartIso,
+  ).length
 
-    if (event.source_type === 'theory_read') {
-      title = 'Lesson Theory Read'
-      description = 'Completed engaged theory reading'
-      type = 'lesson_completed'
-    } else if (event.source_type === 'quiz_correct') {
-      title = 'Quiz Score Awarded'
-      description = 'Passed practice quiz question'
-      type = 'quiz_completed'
-    } else if (event.source_type === 'streak') {
-      title = 'Streak Milestone'
-      description = 'Maintained active daily study streak'
-      type = 'streak_maintained'
-    }
+  // 6. Today's plan: the next lesson, due flashcards, an open capstone
+  const plan: PlanItem[] = []
+  if (nextLesson) {
+    plan.push({
+      key: 'lesson',
+      icon: 'lesson',
+      title: `${nextLesson.started ? 'Finish' : 'Start'} ${nextLesson.title}`,
+      detail: `${nextLesson.positionLabel} · ${nextLesson.estimatedTime}`,
+      reward: level.xpRemaining > 0 ? `Toward Level ${level.level + 1}` : 'Keeps your streak',
+      action: nextLesson.started ? 'Resume' : 'Start',
+      href: `/academy/${nextLesson.module}/${nextLesson.id}`,
+      primary: true,
+    })
+  }
+  const due = reviewQueue.dueCards.length
+  if (due > 0) {
+    plan.push({
+      key: 'review',
+      icon: 'review',
+      title: `Review ${due} flashcard${due === 1 ? '' : 's'}`,
+      detail: 'Spaced review keeps earlier lessons fresh',
+      reward: `+${due * XP_VALUES.FLASHCARD_REVIEW} XP`,
+      action: 'Start review',
+      href: '/review',
+    })
+  }
+  if (nextCapstonePrompt) {
+    plan.push({
+      key: 'capstone',
+      icon: 'capstone',
+      title: `Start the Module ${nextCapstonePrompt.moduleNumber} capstone`,
+      detail: nextCapstonePrompt.title,
+      reward: `+${XP_VALUES.CAPSTONE_SUBMITTED} XP`,
+      action: 'Open brief',
+      href: `/capstones/${nextCapstonePrompt.moduleSlug}`,
+    })
+  }
 
+  // 7. Recent XP, every source labelled
+  const zone = safeZone(profile.timezone)
+  const recentXp: XpStripItem[] = (recentXpEvents || []).map((event) => {
+    const time = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: zone }).format(new Date(event.created_at))
     return {
       id: event.id,
-      title,
-      description,
-      timestamp: event.created_at,
-      type,
+      when: relativeDayLabel(localDateOf(event.created_at, zone), local.localDate, time),
+      label: xpSourceLabel(event.source_type),
+      amount: event.xp_amount,
     }
   })
 
+  const dateLabel = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: zone }).format(new Date())
+
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      <h1 className="sr-only">Dashboard</h1>
+    <div className="mx-auto max-w-7xl space-y-5 pb-12">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{dateLabel}</p>
+          <h1 className="mt-1 text-[28px] font-bold leading-tight tracking-tight">
+            {greetingFor(local.localHour)}, {firstName(profile.name, profile.username)}
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="rounded-full border border-border bg-surface px-3 py-1 tabular-nums text-ink-muted">
+            {completedLessonsCount} of {curriculumLessons.length} lessons
+          </span>
+          <span className="rounded-full border border-border bg-surface px-3 py-1 tabular-nums text-ink-muted">
+            {submittedCapstonesCount} of {capstoneDefs.length} capstones
+          </span>
+        </div>
+      </header>
 
-      {/* 0. Personalized Goal Header (Phase 3) */}
-      <PersonalizedGoalBanner
-        path={personalizedPath}
-        milestone={recommendedMilestone}
-      />
-
-      {/* 1. Continue Learning Header CTA */}
-      <ContinueLearningCard
-        nextLesson={nextLesson}
-        totalLessonsCompleted={completedLessonsCount}
-      />
-
-      {/* 2. Action Prompts Grid: "What should I do next?" */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FlashcardReviewPromptCard
-          dueCount={reviewQueue.dueCards.length}
-          totalUnlocked={reviewQueue.allUnlockedCards.length}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <NextLessonPanel lesson={nextLesson} level={level} totalXp={totalXp} firstSession={completedLessonsCount === 0 && nextLesson?.started === false} />
+        <StreakGoalPanel
+          streak={streakStatus.effectiveCurrentStreak}
+          best={streakStatus.longestStreak}
+          studiedToday={streakStatus.isTodayCompleted}
+          week={weekStrip(local.localDate, streakStatus.effectiveCurrentStreak, streakStatus.lastActivityDate || null)}
+          freezes={streakStatus.streakFreezesAvailable}
+          maxFreezes={STREAK_RULES.MAX_FREEZES}
+          nextFreezeDay={nextFreezeDay(streakStatus.effectiveCurrentStreak)}
+          weeklyGoal={profile.weekly_goal_lessons ?? null}
+          lessonsThisWeek={lessonsThisWeek}
         />
-        <NextCapstonePromptCard
-          prompt={nextCapstonePrompt}
-          submittedCount={submittedCapstonesCount}
-        />
-        <StreakCard streakStatus={streakStatus} />
       </div>
 
-      {/* 3. Portfolio & Proof: primitives only, never the profile row */}
+      {/* Flex, not grid: if the leaderboard widget renders nothing (opted out), the plan fills the row. */}
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
+          <TodaysPlan items={plan} />
+        </div>
+        {/* Streamed: the roster-wide leaderboard aggregation must not block the page. */}
+        <Suspense fallback={<LeaderboardWidgetSkeleton />}>
+          <LeaderboardWidgetSlot payloadPromise={leaderboardPromise} />
+        </Suspense>
+      </div>
+
+      <RecentXpStrip items={recentXp} />
+
+      {/* Portfolio & Proof: primitives only, never the profile row */}
       <PortfolioProofCard
         username={profile.username ?? null}
         isPortfolioPublic={profile.is_portfolio_public === true}
@@ -345,18 +397,20 @@ export default async function DashboardPage() {
           />
         </Suspense>
       </PortfolioProofCard>
-
-      {/* 4. Recent-XP Activity Ticker + weekly leaderboard summary */}
-      {/* Flex, not grid: if the widget renders nothing (opted out), the activity card fills the row. */}
-      <div className="flex flex-col md:flex-row gap-6 md:items-start">
-        <div className="min-w-0 flex-1">
-          <RecentActivityCard activities={recentActivities} />
-        </div>
-        {/* Streamed: the roster-wide leaderboard aggregation must not block the page. */}
-        <Suspense fallback={<LeaderboardWidgetSkeleton />}>
-          <LeaderboardWidgetSlot payloadPromise={leaderboardPromise} />
-        </Suspense>
-      </div>
     </div>
   )
+}
+
+function safeZone(tz: string | null | undefined): string {
+  try {
+    new Intl.DateTimeFormat('en-GB', { timeZone: tz || 'UTC' })
+    return tz || 'UTC'
+  } catch {
+    return 'UTC'
+  }
+}
+
+/** YYYY-MM-DD of an instant in the learner's time zone. */
+function localDateOf(iso: string, tz: string | null | undefined): string {
+  return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: safeZone(tz) }).format(new Date(iso))
 }

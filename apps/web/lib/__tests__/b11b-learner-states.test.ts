@@ -182,13 +182,6 @@ describe('B11-B — Learner States: Adoption Across Target Surfaces', () => {
     expect(content).toContain('<EmptyState')
   })
 
-  it('RecentActivityCard uses EmptyState', () => {
-    const file = path.join(webRoot, 'components/dashboard/RecentActivityCard.tsx')
-    const content = readFileSync(file, 'utf8')
-    expect(content).toContain("import { EmptyState } from '@/components/ui/empty-state'")
-    expect(content).toContain('<EmptyState')
-  })
-
   it('Review EmptyState delegates to @/components/ui/empty-state and Button variants', () => {
     const file = path.join(webRoot, 'components/review/EmptyState.tsx')
     const content = readFileSync(file, 'utf8')

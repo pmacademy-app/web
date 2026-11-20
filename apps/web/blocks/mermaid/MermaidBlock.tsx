@@ -1,12 +1,18 @@
 import React from 'react';
 import { BlockProps } from '../../renderer/registry';
+import DiagramFigure from '@/components/diagrams/DiagramFigure';
+import { isDiagramPlan } from '@/lib/diagrams/plan';
 
 export default function MermaidBlock({ block }: BlockProps) {
-  // The compiler emits only `svg`; the lesson page strips the legacy `staticSvg` duplicate.
-  const svg = typeof block.svg === 'string' ? block.svg : '';
+  // Preferred: the native diagram plan the compiler builds from the flowchart
+  // (scripts/compiler/diagram-graph.ts). It covers about 93% of lesson diagrams.
+  if (isDiagramPlan(block.graph)) {
+    return <DiagramFigure plan={block.graph} title={block.graph.title} />;
+  }
 
-  // Diagrams are pre-rendered to static SVG at content:compile time. Raw Mermaid
-  // source must never reach the browser, so there is no source-fallback path here.
+  // Fallback: the static SVG the compiler renders. Raw Mermaid source never reaches the
+  // browser, so there is no source-fallback path here.
+  const svg = typeof block.svg === 'string' ? block.svg : '';
   if (!svg) {
     return null;
   }

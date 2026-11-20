@@ -195,6 +195,8 @@ const mermaidBlockSchema = z.object({
   normalized: z.string(),
   authorTheme: z.record(z.string()).optional(),
   svg: z.string().optional(),
+  /** Native diagram layout (scripts/compiler/diagram-graph.ts). Absent when no layout fits. */
+  graph: z.record(z.unknown()).optional(),
 });
 
 // Future block types

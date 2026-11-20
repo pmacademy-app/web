@@ -38,3 +38,41 @@ export function toLeaderboardWidgetView(
 
   return { status: 'available', rank, daysStudied, hint: null }
 }
+
+/** One line of the dashboard leaderboard list. */
+export interface LeaderboardWidgetRow {
+  key: string
+  rank: number
+  /** "You" for the learner, else their name or @username */
+  name: string
+  daysStudied: number
+  isYou: boolean
+}
+
+/**
+ * The top learners this week (only people who studied at least one day), followed by the
+ * learner's own row when it is not already among them. A learner with no lesson-days is left
+ * out here; the widget shows them an Unranked row instead of a tie-break rank.
+ */
+export function toLeaderboardRows(
+  payload: Pick<WeeklyLeaderboardPayload, 'entries' | 'personalEntry'> | null,
+  top = 3,
+): LeaderboardWidgetRow[] {
+  if (!payload) return []
+  const youId = payload.personalEntry?.userId ?? null
+  const isYou = (e: { userId: string; isCurrentUser: boolean }) => e.isCurrentUser || (youId !== null && e.userId === youId)
+  const row = (e: WeeklyLeaderboardPayload['entries'][number]): LeaderboardWidgetRow => ({
+    key: e.userId,
+    rank: e.rank,
+    name: isYou(e) ? 'You' : e.name?.trim() || `@${e.username || 'learner'}`,
+    daysStudied: Math.max(0, e.daysStudied),
+    isYou: isYou(e),
+  })
+  const active = (payload.entries ?? [])
+    .filter((e) => Number.isFinite(e.rank) && e.rank > 0 && e.daysStudied > 0)
+    .sort((a, b) => a.rank - b.rank)
+  const rows = active.slice(0, top).map(row)
+  const me = payload.personalEntry
+  if (me && me.rank > 0 && me.daysStudied > 0 && !rows.some((r) => r.isYou)) rows.push(row({ ...me, isCurrentUser: true }))
+  return rows
+}

@@ -97,10 +97,10 @@ Discovery exists to reduce four categories of risk, extending the Accountability
   }
 }}%%
 graph TD
-    A[Proposed Solution] --> B[Value Risk Will People Want?]
-    A --> C[Usability Risk Can Build?]
-    A --> D[Feasibility Risk Can Build?]
-    A --> E[Viability Risk Works for Business?]
+    A[Proposed Solution] --> B[Value Risk: Will People Want It?]
+    A --> C[Usability Risk: Can People Use It?]
+    A --> D[Feasibility Risk: Can We Build It?]
+    A --> E[Viability Risk: Works for the Business?]
     B --> F[Discovery Tests Each Risk<br/>Before Full Delivery Investment]
     C --> F
     D --> F

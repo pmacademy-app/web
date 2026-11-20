@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toLeaderboardWidgetView, NO_ACTIVITY_HINT } from '@/lib/dashboard/leaderboard-widget'
+import { toLeaderboardRows, toLeaderboardWidgetView, NO_ACTIVITY_HINT } from '@/lib/dashboard/leaderboard-widget'
 import type { LeaderboardEntry } from '@/lib/leaderboard'
 
 function entry(overrides: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
@@ -101,5 +101,42 @@ describe('toLeaderboardWidgetView', () => {
 
   it('uses the agreed nudge copy', () => {
     expect(NO_ACTIVITY_HINT).toBe('Complete a lesson this week to get ranked.')
+  })
+})
+
+describe('toLeaderboardRows', () => {
+  const other = (id: string, rank: number, days: number, name: string | null = `Name ${id}`) =>
+    entry({ userId: id, rank, daysStudied: days, name, username: id, isCurrentUser: false })
+
+  it('takes the top three learners who studied, in rank order', () => {
+    const rows = toLeaderboardRows({ entries: [other('c', 3, 2), other('a', 1, 5), other('b', 2, 4), other('d', 4, 1)], personalEntry: null })
+    expect(rows.map((r) => r.rank)).toEqual([1, 2, 3])
+    expect(rows[0].name).toBe('Name a')
+  })
+
+  it('leaves out learners with no days studied', () => {
+    expect(toLeaderboardRows({ entries: [other('a', 1, 0)], personalEntry: null })).toEqual([])
+  })
+
+  it('appends the learner as You when outside the top three', () => {
+    const me = entry({ userId: 'me', rank: 9, daysStudied: 2 })
+    const rows = toLeaderboardRows({ entries: [other('a', 1, 5), other('b', 2, 4), other('c', 3, 3), me], personalEntry: me })
+    expect(rows).toHaveLength(4)
+    expect(rows[3]).toMatchObject({ name: 'You', rank: 9, isYou: true })
+  })
+
+  it('marks the learner as You inside the top three without a duplicate', () => {
+    const me = entry({ userId: 'me', rank: 2, daysStudied: 4 })
+    const rows = toLeaderboardRows({ entries: [other('a', 1, 5), me, other('c', 3, 3)], personalEntry: me })
+    expect(rows.filter((r) => r.isYou)).toHaveLength(1)
+    expect(rows).toHaveLength(3)
+  })
+
+  it('falls back to @username when there is no name', () => {
+    expect(toLeaderboardRows({ entries: [other('zed', 1, 3, null)], personalEntry: null })[0].name).toBe('@zed')
+  })
+
+  it('returns no rows for a missing payload', () => {
+    expect(toLeaderboardRows(null)).toEqual([])
   })
 })

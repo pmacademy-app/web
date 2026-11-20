@@ -34,6 +34,7 @@ import { getOrCreateLessonId, loadRegistry, normalizePath, generateBlockId } fro
 import { validateCompiledLesson } from './validation';
 import { RawLearningPathMetadataSchema, ParsedLessonMetadataSchema } from './schema/lesson-metadata.schema';
 import { compileMermaidToSvg } from './mermaid-svg';
+import { planDiagram } from './diagram-graph';
 
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const SOURCE_DIR = path.join(ROOT_DIR, 'content/lessons');
@@ -43,7 +44,7 @@ const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 const DATES_PATH = path.join(ROOT_DIR, 'content/lesson-dates.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '19';
+const CACHE_VERSION = '20';
 
 export function loadLessonDates(): Record<string, string> {
   if (!fs.existsSync(DATES_PATH)) {
@@ -453,6 +454,9 @@ export async function compileLesson(
           svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
+        // Set after the id so existing block ids stay stable.
+        const graph = planDiagram(mermaidNode.value, mmTitle);
+        if (graph) mBlock.graph = graph;
         mBlock.id = mBlock.blockId;
         diagram.blockId = mBlock.blockId;
         mBlockToPush = mBlock;
@@ -541,6 +545,9 @@ export async function compileLesson(
           svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
+        // Set after the id so existing block ids stay stable.
+        const graph = planDiagram(mermaidNode.value, fwTitle);
+        if (graph) mBlock.graph = graph;
         mBlock.id = mBlock.blockId;
         diagram.blockId = mBlock.blockId;
         mBlockToPush = mBlock;

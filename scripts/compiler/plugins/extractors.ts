@@ -2,6 +2,7 @@ import { Block, GlossaryEntrySchema, FlashcardSchema, QuizQuestionSchema } from 
 import { CompilerContext, ValidationIssue } from './remark-plugins';
 import { generateBlockId } from '../registry';
 import { compileMermaidToSvg } from '../mermaid-svg';
+import { planDiagram } from '../diagram-graph';
 import { z } from 'zod';
 
 export function toMarkdown(node: any): string {
@@ -102,6 +103,9 @@ export async function mdastToBlocks(nodes: any[], lessonId: string): Promise<any
         block.blockId = generateBlockId(lessonId, block);
         // Sync ID of mermaid block
         block.id = block.blockId;
+        // Set after the id so existing block ids stay stable.
+        const graph = planDiagram(source);
+        if (graph) block.graph = graph;
         blocks.push(block);
       } else {
         const block: any = {

@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { Trophy, ArrowRight } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+import type { LeaderboardWidgetRow } from '@/lib/dashboard/leaderboard-widget'
 
 type DashboardLeaderboardWidgetProps =
   | {
@@ -13,20 +14,16 @@ type DashboardLeaderboardWidgetProps =
       rank: number | null
       /** Distinct days with a completed lesson this week (Monday-start, UTC). */
       daysStudied: number
-      /** Optional nudge shown under "Unranked" (e.g. no activity yet this week). */
+      /** Optional nudge shown under the learner's Unranked row (e.g. no activity yet this week). */
       hint?: string | null
+      /** Top learners this week, plus the learner's own row. */
+      rows?: LeaderboardWidgetRow[]
     }
 
 const DAYS_IN_WEEK = 7
 
-// The width matches one column of the 3-column dashboard grid above (gap-6 = 1.5rem), so
-// the card lines up with it while the activity card can still fill the row on its own.
-const CARD =
-  'rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4 md:w-[calc((100%_-_3rem)/3)] md:shrink-0'
-const STATS = 'rounded-xl border border-border/50 bg-secondary/30 divide-y divide-border/50'
-const STAT_ROW = 'flex flex-wrap items-baseline justify-between gap-x-3 px-3.5 py-3'
-const STAT_LABEL = 'text-[11px] font-semibold text-muted-foreground uppercase tracking-wider'
-const STAT_NOTE = 'basis-full text-[11px] leading-tight text-muted-foreground'
+// Same column width as the streak panel above it, so the two right-hand cards line up.
+const CARD = 'rounded-2xl border border-border bg-surface px-5 py-4 lg:w-[22rem] lg:shrink-0'
 
 /** Clamps to a whole number of days within a single week (0–7). */
 export function clampDaysStudied(days: number): number {
@@ -36,73 +33,92 @@ export function clampDaysStudied(days: number): number {
 
 function WidgetHeader() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-      <div className="flex items-center gap-2">
-        <Trophy className="w-5 h-5 text-primary" aria-hidden="true" />
-        <h3 className="text-sm font-bold font-serif text-foreground">Weekly Leaderboard</h3>
-      </div>
-
+    <div className="flex items-baseline justify-between gap-3">
+      <h3 id="leaderboard-widget-title" className="text-base font-semibold">
+        This week&apos;s leaderboard
+      </h3>
       <Link
         href="/leaderboard"
-        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+        className="shrink-0 rounded-sm text-xs font-semibold text-ink-muted outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-ring/50"
       >
-        View All<span className="sr-only"> leaderboard</span>
-        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+        View all<span className="sr-only"> leaderboard</span>
       </Link>
     </div>
   )
 }
 
+/** Seven dots, one per day of the week, filled for each day studied. */
+function DayDots({ days }: { days: number }) {
+  const n = clampDaysStudied(days)
+  return (
+    <span className="flex shrink-0 items-center gap-1" data-days={n}>
+      <span aria-hidden="true" className="flex gap-1">
+        {Array.from({ length: DAYS_IN_WEEK }, (_, k) => (
+          <span key={k} className={cn('size-1.5 rounded-full', k < n ? 'bg-primary' : 'bg-border')} />
+        ))}
+      </span>
+      <span className="sr-only">{`${n} of ${DAYS_IN_WEEK} days`}</span>
+    </span>
+  )
+}
+
+function Row({ rank, name, days, isYou }: { rank: number | null; name: string; days: number; isYou: boolean }) {
+  return (
+    <li
+      data-you={isYou ? 'true' : undefined}
+      className={cn('-mx-2 flex items-center gap-3 rounded-lg px-2 py-2', isYou && 'bg-primary-soft')}
+    >
+      <span className="w-6 shrink-0 text-sm font-semibold tabular-nums text-ink-muted" data-rank>
+        {rank ? (
+          rank
+        ) : (
+          <>
+            <span aria-hidden="true">–</span>
+            <span className="sr-only">Unranked</span>
+          </>
+        )}
+      </span>
+      <span className={cn('min-w-0 flex-1 truncate text-sm', isYou ? 'font-semibold' : 'font-medium')}>{name}</span>
+      <DayDots days={days} />
+    </li>
+  )
+}
+
 /**
- * Compact dashboard summary of the learner's weekly consistency ranking.
- * Server-renderable: no client state, just a link through to the full leaderboard.
+ * Dashboard summary of this week's consistency leaderboard: the top learners and the
+ * learner's own place. Server-renderable; links through to the full leaderboard.
  */
 export function DashboardLeaderboardWidget(props: DashboardLeaderboardWidgetProps) {
   if (props.unavailable) {
     return (
-      <div className={CARD}>
+      <section aria-labelledby="leaderboard-widget-title" className={CARD}>
         <WidgetHeader />
-        {/* Same height as the stats block so the fallback-to-content swap does not shift. */}
-        <div className={`${STATS} flex min-h-32 flex-col items-center justify-center gap-1 px-3.5 py-3 text-center`}>
-          <p className="text-sm font-semibold text-foreground">Leaderboard unavailable right now</p>
-          <p className="text-[11px] leading-tight text-muted-foreground">Check back in a moment.</p>
+        {/* Roughly the list's height so the fallback-to-content swap does not shift. */}
+        <div className="flex min-h-40 flex-col items-center justify-center gap-1 text-center">
+          <p className="text-sm font-semibold">Leaderboard unavailable right now</p>
+          <p className="text-xs text-ink-muted">Check back in a moment.</p>
         </div>
-      </div>
+      </section>
     )
   }
 
   const { rank, daysStudied, hint } = props
   const isRanked = typeof rank === 'number' && Number.isFinite(rank) && rank > 0
-  const days = clampDaysStudied(daysStudied)
+  const rows = (props.rows ?? []).filter((r) => !r.isYou)
+  const shown = rows.slice(0, 3)
 
   return (
-    <div className={CARD}>
+    <section aria-labelledby="leaderboard-widget-title" className={CARD}>
       <WidgetHeader />
-
-      <dl className={STATS}>
-        <div className={STAT_ROW}>
-          <dt className={STAT_LABEL}>Weekly Rank</dt>
-          <dd className="ml-auto leading-8">
-            {isRanked ? (
-              <span className="text-2xl font-extrabold font-mono text-foreground">#{rank}</span>
-            ) : (
-              <span className="text-base font-bold text-muted-foreground">Unranked</span>
-            )}
-          </dd>
-          {!isRanked && hint ? <dd className={STAT_NOTE}>{hint}</dd> : null}
-        </div>
-
-        <div className={STAT_ROW}>
-          <dt className={STAT_LABEL}>Days Studied</dt>
-          <dd className="ml-auto leading-8">
-            <span className="text-2xl font-extrabold font-mono text-success">{days}</span>
-            <span aria-hidden="true" className="text-xs font-medium text-muted-foreground">{` / ${DAYS_IN_WEEK}`}</span>
-            <span className="sr-only">{` of ${DAYS_IN_WEEK}`}</span>
-          </dd>
-          <dd className={STAT_NOTE}>days you completed a lesson this week</dd>
-        </div>
-      </dl>
-    </div>
+      <p className="mt-0.5 text-xs text-ink-muted">Ranked by days studied, then lessons</p>
+      <ol className="mt-3 space-y-0.5">
+        {shown.map((r) => (
+          <Row key={r.key} rank={r.rank} name={r.name} days={r.daysStudied} isYou={false} />
+        ))}
+        <Row rank={isRanked ? rank : null} name="You" days={daysStudied} isYou />
+      </ol>
+      {!isRanked && hint ? <p className="mt-2 text-xs text-ink-muted">{hint}</p> : null}
+    </section>
   )
 }
 
@@ -111,25 +127,18 @@ export function LeaderboardWidgetSkeleton() {
   return (
     <div aria-hidden="true" data-testid="leaderboard-widget-skeleton" className={CARD}>
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Skeleton className="size-5 rounded-md" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-        <Skeleton className="h-3.5 w-14" />
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-3 w-12" />
       </div>
-
-      <div className={STATS}>
-        <div className="flex items-center justify-between gap-3 px-3.5 py-3">
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-8 w-12" />
-        </div>
-        <div className="space-y-1 px-3.5 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-8 w-14" />
+      <Skeleton className="mt-2 h-3 w-48 max-w-full" />
+      <div className="mt-3 space-y-0.5">
+        {[0, 1, 2, 3].map((k) => (
+          <div key={k} className="flex items-center gap-3 py-2">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-1.5 w-16" />
           </div>
-          <Skeleton className="h-3 w-36 max-w-full" />
-        </div>
+        ))}
       </div>
     </div>
   )
