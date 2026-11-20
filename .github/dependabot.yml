@@ -73,12 +73,11 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
-    # isomorphic-dompurify 3+ pulls jsdom 30+, whose ESM-only @exodus/bytes crashes
-    # every lesson page on Vercel (ERR_REQUIRE_ESM). Stay on 2.x (jsdom 26) until that
-    # chain works under require(). PR #119 was this bump.
+    # isomorphic-dompurify is pinned at 2.26.0 (jsdom 26). Later releases (2.36+ and
+    # every major) move to newer jsdom, whose ESM-only @exodus/bytes crashes every
+    # lesson page on Vercel (ERR_REQUIRE_ESM). PRs #119 and #121 were these bumps.
     ignore:
       - dependency-name: "isomorphic-dompurify"
-        update-types: ["version-update:semver-major"]
 
   # No root "/" npm entry: the root package.json has no dependencies, so it only
   # ever produced empty update runs.
