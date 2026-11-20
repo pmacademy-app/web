@@ -8,6 +8,7 @@ import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
 import { QuickStartProvider } from '@/components/quick-start/QuickStartContext'
 import { QuickStartModalHost } from '@/components/layout/lazy-modals'
 import { AchievementCelebrationHost } from '@/components/notifications/AchievementCelebrationHost'
+import TimezoneSync from '@/components/layout/TimezoneSync'
 
 export const metadata: Metadata = {
   robots: {
@@ -76,6 +77,7 @@ export default async function AuthenticatedLayout({
         {/* The tour body downloads only when it first opens (perf plan item 5). */}
         <QuickStartModalHost />
         <AchievementCelebrationHost quickStartCompleted={isQuickStartCompleted} />
+        <TimezoneSync storedTimezone={profile?.timezone} />
       </QuickStartProvider>
     </BreadcrumbProvider>
   )

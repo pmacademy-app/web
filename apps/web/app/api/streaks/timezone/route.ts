@@ -20,6 +20,14 @@ export const POST = withRoute(
     operation: 'streaks.timezone.update',
     summary: 'Unexpected failure updating the learner timezone',
     body: timezoneSchema,
+    // Called by TimezoneSync only when the browser zone differs from the stored one.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `timezone_update_${actor.userId}` : null),
+        limit: 20,
+        windowMs: 60 * 60 * 1000,
+      },
+    ],
   },
   async ({ actor, body }) => {
     const { timezone } = body
