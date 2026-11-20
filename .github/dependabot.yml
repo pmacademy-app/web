@@ -2,9 +2,8 @@
 # audit gate (scripts/ci/audit-gate.ts) has something to converge on rather than an
 # allowlist that only ever grows.
 #
-# Three ecosystems, matching the three things that are actually installed:
+# Two ecosystems, matching the two things that are actually installed:
 #   - apps/web         the application dependency tree and its lockfile
-#   - /                the monorepo root manifest (scripts only, no lockfile of its own)
 #   - github-actions   the action versions pinned in .github/workflows/
 version: 2
 
@@ -74,6 +73,12 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
+    # isomorphic-dompurify 3+ pulls jsdom 30+, whose ESM-only @exodus/bytes crashes
+    # every lesson page on Vercel (ERR_REQUIRE_ESM). Stay on 2.x (jsdom 26) until that
+    # chain works under require(). PR #119 was this bump.
+    ignore:
+      - dependency-name: "isomorphic-dompurify"
+        update-types: ["version-update:semver-major"]
 
   # No root "/" npm entry: the root package.json has no dependencies, so it only
   # ever produced empty update runs.
