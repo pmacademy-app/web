@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
-import { getWeeklyLeaderboard, getCohortLeaderboard } from '../leaderboard-db'
+import { getWeeklyLeaderboard, getCohortLeaderboard } from '../leaderboard/leaderboard-db'
 
 type TableResult = { data: unknown; error?: unknown; single?: { data: unknown; error?: unknown } }
 

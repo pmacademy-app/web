@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 import { BrandMarkProdily, BrandIcon } from '@/components/brand/BrandLogo'
 import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
-import { getPortfolioNavItem, type PortfolioNavItem } from '@/lib/portfolio'
+import { getPortfolioNavItem, type PortfolioNavItem } from '@/lib/portfolio/portfolio'
 import { trackNavPortfolioClicked, type NavPortfolioClickedParams } from '@/lib/analytics'
 
 interface SidebarProps {

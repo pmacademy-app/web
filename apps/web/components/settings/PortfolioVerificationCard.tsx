@@ -1,6 +1,6 @@
 import React from 'react'
 import { ShieldCheck, ShieldX, CheckCircle2, Circle } from 'lucide-react'
-import type { PortfolioVerificationStatus } from '@/lib/portfolio-readiness'
+import type { PortfolioVerificationStatus } from '@/lib/portfolio/portfolio-readiness'
 import { cn } from '@/lib/utils'
 
 interface PortfolioVerificationCardProps {

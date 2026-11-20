@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getDedupedPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
-import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
+import { getDedupedPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio/portfolio-db'
+import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio/portfolio'
 import { portfolioOgCardPath } from '@/lib/og/card-paths'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
 import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
@@ -31,7 +31,7 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
  *
  * Privacy: a private or unknown portfolio renders the "unavailable" state and that is
  * cached too. Every write that changes what this page shows purges its exact path through
- * lib/portfolio-revalidate.ts (visibility and profile saves, username changes old and new,
+ * lib/portfolio/portfolio-revalidate.ts (visibility and profile saves, username changes old and new,
  * capstone submit and review, capstone reflections, account deletion), so going private
  * takes effect on the next request. The hour only bounds drift in numbers no write purges
  * for, such as XP, streak and lesson progress.

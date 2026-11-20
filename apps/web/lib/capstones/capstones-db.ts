@@ -15,10 +15,10 @@ import {
   validateCapstoneSubmission,
   validateCapstoneTransition,
   type CapstoneStatus,
-} from '@/lib/capstones'
-import { awardXp, hasXpEvent } from '@/lib/xp-service'
-import { getRuntimeXpValues } from '@/lib/xp'
-import { updateUserStreak } from '@/lib/streaks-db'
+} from '@/lib/capstones/capstones'
+import { awardXp, hasXpEvent } from '@/lib/xp/xp-service'
+import { getRuntimeXpValues } from '@/lib/xp/xp'
+import { updateUserStreak } from '@/lib/streaks/streaks-db'
 
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
@@ -592,8 +592,8 @@ export async function submitCapstoneAction(
 
   // 8. Dispatch capstone.submitted notification
   try {
-    const { globalNotificationDispatcher } = await import('./notifications/dispatcher')
-    const { initializeNotificationConnectors } = await import('./notifications/events/connectors')
+    const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
+    const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
     initializeNotificationConnectors()
 
     const def = getCapstoneDefinition(moduleSlug)

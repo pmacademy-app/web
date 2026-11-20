@@ -1,8 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 import { ShieldCheck, Award, AlertCircle, CheckCircle2 } from 'lucide-react'
-import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
-import { generateQrCodeSvg } from '@/lib/certificates'
+import type { VerifiedCertificatePayload } from '@/lib/certificates/certificates-db'
+import { generateQrCodeSvg } from '@/lib/certificates/certificates'
 import {
   CERTIFICATE_COMPLETION_STATEMENT,
   CERTIFICATE_RECIPIENT_LEAD_IN,

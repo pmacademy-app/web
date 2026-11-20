@@ -4,7 +4,7 @@ import { getCapstoneDefinition } from '@/config/capstones'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { capstoneDraftBodySchema } from '@/lib/api/contracts/learner-writes'
-import { saveDraftAction } from '@/lib/capstones-db'
+import { saveDraftAction } from '@/lib/capstones/capstones-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const POST = withRoute(

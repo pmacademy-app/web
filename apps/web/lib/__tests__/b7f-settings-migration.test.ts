@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 
-import { validateOptionalUrl, validateWritableUrl } from '@/lib/portfolio'
+import { validateOptionalUrl, validateWritableUrl } from '@/lib/portfolio/portfolio'
 
 const getAuthenticatedUserFromRequest = vi.fn()
 const updateChain = vi.fn()

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
-import { validateUsername } from '@/lib/portfolio'
+import { validateUsername } from '@/lib/portfolio/portfolio'
 
 // Growth R5 / B0: the optional second action on an in-app notification. The column is free-form
 // jsonb, so the parser is the only gate between a stored value and a rendered link.
@@ -76,7 +76,7 @@ describe('parseNotificationSecondaryAction', () => {
     expect(parseNotificationSecondaryAction(value)).toBeNull()
   })
 
-  // The share username follows the portfolio rule (validateUsername in lib/portfolio.ts).
+  // The share username follows the portfolio rule (validateUsername in lib/portfolio/portfolio.ts).
   it.each(['ada', 'Ada-L_9', 'a'.repeat(30)])('accepts the portfolio username %s', (username) => {
     expect(validateUsername(username).isValid).toBe(true)
     expect(parseNotificationSecondaryAction({ kind: 'share_portfolio', label: 'Share', username })).toMatchObject({ username })

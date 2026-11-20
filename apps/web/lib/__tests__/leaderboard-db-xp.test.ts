@@ -73,7 +73,7 @@ const supabase: any = { from: vi.fn((table: string) => createChain(table)) }
 /** Re-imported per test so the in-flight and failure maps start empty. */
 async function loadModule() {
   vi.resetModules()
-  return import('../leaderboard-db')
+  return import('../leaderboard/leaderboard-db')
 }
 
 const WEEK_START = '2026-09-07'

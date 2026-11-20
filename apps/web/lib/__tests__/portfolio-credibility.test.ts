@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { generatePersonJsonLd } from '../portfolio'
-import { LEVEL_THRESHOLDS } from '../xp'
+import { generatePersonJsonLd } from '../portfolio/portfolio'
+import { LEVEL_THRESHOLDS } from '../xp/xp'
 import { generateMetadata } from '@/app/(portfolio)/p/[username]/page'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -264,7 +264,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
       const mockSupabase = createMockSupabaseWithUser({}, mockSubmissions)
       vi.mocked(createServiceRoleClient).mockReturnValue(mockSupabase)
 
-      const { getPublicPortfolioData } = await import('../portfolio-db')
+      const { getPublicPortfolioData } = await import('../portfolio/portfolio-db')
       const data = await getPublicPortfolioData(mockSupabase, 'pmcandidate')
 
       expect(data).not.toBeNull()

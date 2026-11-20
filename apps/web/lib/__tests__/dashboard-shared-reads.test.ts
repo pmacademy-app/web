@@ -23,7 +23,7 @@ vi.mock('@/lib/lesson-loader', () => ({
   })),
 }))
 
-import { getUserStreakStatus } from '../streaks-db'
+import { getUserStreakStatus } from '../streaks/streaks-db'
 import { getReviewQueueData } from '../flashcards-service'
 
 type Row = Record<string, unknown>

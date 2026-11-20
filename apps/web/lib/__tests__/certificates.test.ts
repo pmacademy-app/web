@@ -3,7 +3,7 @@ import {
   generateCertificateCode,
   generateCredentialJsonLd,
   generateQrCodeSvg,
-} from '../certificates'
+} from '../certificates/certificates'
 import { buildLinkedInCertificationUrl } from '../certificates/linkedin-url'
 
 describe('Certificates & Credentials System 2.0 Unit Test Suite', () => {

@@ -1,4 +1,4 @@
-import { evaluateAndAwardBadges } from '@/lib/badges-db'
+import { evaluateAndAwardBadges } from '@/lib/badges/badges-db'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { createServiceRoleClient } from '@/lib/supabase'
 

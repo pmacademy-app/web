@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Users, Loader2, LogIn, LogOut, Check } from 'lucide-react'
-import type { CohortItemPayload } from '@/lib/leaderboard-db'
+import type { CohortItemPayload } from '@/lib/leaderboard/leaderboard-db'
 
 import { cn } from '@/lib/utils'
 import { apiPost } from '@/lib/api/client'

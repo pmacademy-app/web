@@ -1,4 +1,4 @@
-import type { PublicCapstoneItem, PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicCapstoneItem, PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 
 /**
  * Single-capstone public page (Growth R5 / B13a). Pure helpers, kept apart from the route so the

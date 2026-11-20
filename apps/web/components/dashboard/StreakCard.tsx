@@ -1,5 +1,5 @@
 import { Flame, Shield, AlertTriangle } from 'lucide-react'
-import type { StreakStatusSummary } from '@/lib/streaks'
+import type { StreakStatusSummary } from '@/lib/streaks/streaks'
 
 interface StreakCardProps {
   streakStatus: StreakStatusSummary

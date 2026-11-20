@@ -1,4 +1,4 @@
-import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard-db'
+import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard/leaderboard-db'
 
 /** Shown under "Unranked" when the learner has no lesson-days yet this week. */
 export const NO_ACTIVITY_HINT = 'Complete a lesson this week to get ranked.'

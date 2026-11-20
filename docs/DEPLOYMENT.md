@@ -53,7 +53,7 @@
 | `MODULE_ENTRY_UNLOCK_ENABLED` | **Server Only** | Phase 6 module-entry unlock kill switch (`lib/academy/module-entry-unlock.ts`). **ON when unset** (owner decision D5, not an experiment). Set to `false` to restore the global-sequential lock for everyone |
 | `MODULE_ENTRY_UNLOCK_TREATMENT_PCT` | **Server Only** | Optional treatment share 0-100 (default 100, everyone). Leave unset |
 | `MODULE_ENTRY_UNLOCK_COHORT_START` | **Server Only** | Optional ISO date; only learners created on/after it get the unlock. Leave unset so it applies to everyone |
-| `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` | **Server Only** | Phase 7 cohort flag (`lib/capstone-threshold-experiment.ts`), enforced server-side in `lib/capstones-db.ts`. **Defaults to control (8-of-10)** when unset/`false`. Enabling needs product sign-off (ADR-009). Leave unset to keep OFF |
+| `CAPSTONE_THRESHOLD_EXPERIMENT_ENABLED` | **Server Only** | Phase 7 cohort flag (`lib/capstone-threshold-experiment.ts`), enforced server-side in `lib/capstones/capstones-db.ts`. **Defaults to control (8-of-10)** when unset/`false`. Enabling needs product sign-off (ADR-009). Leave unset to keep OFF |
 | `CAPSTONE_THRESHOLD_TREATMENT_PCT` | **Server Only** | Optional treatment share within the cohort, 0–100 (default 100). No effect while off |
 | `CAPSTONE_THRESHOLD_TREATMENT_LESSONS` | **Server Only** | Optional treatment gate, clamped 1–8 (default 4). A value above 8 is refused. No effect while off |
 | `CAPSTONE_THRESHOLD_COHORT_START` | **Server Only** | Optional ISO date; new-signup cohort gate. Unset = no gate. Set before enabling |

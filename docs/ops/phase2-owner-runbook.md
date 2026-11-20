@@ -99,7 +99,7 @@ WHERE q.event_type = 'marketing.pm_fellow'
 
 ## (f) Username rule (CQ-24)
 
-`pending-approval/20261027000001_users_username_check.sql` adds a CHECK on `public.users.username`. The constraint fails to apply if any existing username breaks it, so check first. If the migration file ships its own pre-check query, use that one: it matches the constraint exactly. Otherwise this query mirrors `validateUsername` in `apps/web/lib/portfolio.ts` (3 to 30 characters; letters, digits, `_` and `-`; not a reserved word):
+`pending-approval/20261027000001_users_username_check.sql` adds a CHECK on `public.users.username`. The constraint fails to apply if any existing username breaks it, so check first. If the migration file ships its own pre-check query, use that one: it matches the constraint exactly. Otherwise this query mirrors `validateUsername` in `apps/web/lib/portfolio/portfolio.ts` (3 to 30 characters; letters, digits, `_` and `-`; not a reserved word):
 
 ```sql
 SELECT id, username, created_at

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { getModuleCapstonesOverview } from '@/lib/capstones-db'
+import { getModuleCapstonesOverview } from '@/lib/capstones/capstones-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(

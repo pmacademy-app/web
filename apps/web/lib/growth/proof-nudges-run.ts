@@ -6,7 +6,7 @@ import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { isLifecycleHoldout } from '@/lib/notifications/lifecycle/holdout'
 import { BRAND } from '@/lib/brand'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio/portfolio'
 import type { ProofState } from './proof-state'
 import { loadProofStates } from './proof-state-db'
 import {

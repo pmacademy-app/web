@@ -7,7 +7,7 @@
  * - All wrappers are null-safe: no-ops if GA is not loaded.
  */
 
-import type { PortfolioNavState } from '@/lib/portfolio'
+import type { PortfolioNavState } from '@/lib/portfolio/portfolio'
 import type { AchievementCelebrationKind } from '@/lib/api/contracts/achievement-celebration'
 
 // Extend Window type so TypeScript knows about gtag

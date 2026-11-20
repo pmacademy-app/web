@@ -6,11 +6,11 @@ import { getCapstoneDefinition } from '@/config/capstones'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { evaluateBadgesAfterXp } from '@/lib/badges/evaluate-after-xp'
-import { submitCapstoneAction } from '@/lib/capstones-db'
-import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
+import { submitCapstoneAction } from '@/lib/capstones/capstones-db'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio/portfolio-revalidate'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { hasXpEvent } from '@/lib/xp-service'
+import { hasXpEvent } from '@/lib/xp/xp-service'
 
 // CQ-12: declared on the wrapper, so a malformed or mistyped body is a clean 400 rather
 // than a hand-parsed cast (or a 500 incident on invalid JSON).

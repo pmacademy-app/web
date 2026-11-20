@@ -7,8 +7,8 @@ import {
   StreakData,
   StreakStatusSummary,
 } from './streaks'
-import { getRuntimeXpValues } from '../xp'
-import { awardXp, hasXpEvent } from '../xp-service'
+import { getRuntimeXpValues } from '../xp/xp'
+import { awardXp, hasXpEvent } from '../xp/xp-service'
 import { MS_PER_DAY } from '../time'
 
 export interface WeeklySummaryData {

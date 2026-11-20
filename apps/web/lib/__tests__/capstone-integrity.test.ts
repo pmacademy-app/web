@@ -5,12 +5,12 @@ import {
   validateCapstoneSubmission,
   deriveCapstoneStatus,
   calculateCapstoneWordCount,
-} from '@/lib/capstones'
+} from '@/lib/capstones/capstones'
 import {
   saveDraftAction,
   submitCapstoneAction,
   getModuleCapstonesOverview,
-} from '@/lib/capstones-db'
+} from '@/lib/capstones/capstones-db'
 import { POST as submitPostHandler } from '../../app/api/capstones/[module]/submit/route'
 import { POST as draftPostHandler } from '../../app/api/capstones/[module]/draft/route'
 

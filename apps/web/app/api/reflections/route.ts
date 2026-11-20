@@ -11,9 +11,9 @@
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { reflectionWriteBodySchema } from '@/lib/api/contracts/learner-writes'
-import { recordReflectionAction } from '@/lib/lessons-db'
+import { recordReflectionAction } from '@/lib/academy/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio/portfolio-revalidate'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 export const GET = withRoute(

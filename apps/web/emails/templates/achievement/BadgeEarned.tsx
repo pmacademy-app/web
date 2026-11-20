@@ -3,7 +3,7 @@ import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
 import { BRAND } from '@/lib/brand'
 import { BadgeDisplay } from '../../components/BadgeDisplay'
-import { badgeShareText, buildPortfolioShareIntents } from '@/lib/portfolio'
+import { badgeShareText, buildPortfolioShareIntents } from '@/lib/portfolio/portfolio'
 
 export interface BadgeEarnedEmailProps {
   userName?: string

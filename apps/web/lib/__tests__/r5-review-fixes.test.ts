@@ -78,7 +78,7 @@ describe('public portfolio lookup', () => {
   // Perf plan item 13: an exact match on the lowercased handle replaced the escaped ILIKE. `eq`
   // has no wildcards, so /p/a_b can never resolve to another learner, and the unique index serves it.
   it('matches the username exactly, so `_` and `%` are never wildcards', () => {
-    const code = source('lib/portfolio-db.ts')
+    const code = source('lib/portfolio/portfolio-db.ts')
     const body = code.slice(
       code.indexOf('export async function getPublicPortfolioData'),
       code.indexOf('export const getDedupedPublicPortfolioData')

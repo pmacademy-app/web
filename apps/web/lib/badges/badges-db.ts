@@ -16,7 +16,7 @@ import {
   evaluateEligibleBadges,
   type BadgeProgressItem,
   type UserStatsForBadges,
-} from '@/lib/badges'
+} from '@/lib/badges/badges'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 

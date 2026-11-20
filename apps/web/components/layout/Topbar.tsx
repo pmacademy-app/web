@@ -7,7 +7,7 @@ import { Menu, User, LogOut, ChevronRight, Sparkles, Pencil, Search } from 'luci
 import { BrandIcon } from '@/components/brand/BrandLogo'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
 import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
-import { getLevelTitle } from '@/lib/xp'
+import { getLevelTitle } from '@/lib/xp/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { NotificationToast } from '@/components/notifications/NotificationToast'

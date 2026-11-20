@@ -4,7 +4,7 @@ import { STATIC_PAGE_DATES } from '@/config/content'
 import { FRAMEWORK_DETAILS } from '@/config/frameworks'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getPublicPortfolioSitemapEntries } from '@/lib/portfolio-db'
+import { getPublicPortfolioSitemapEntries } from '@/lib/portfolio/portfolio-db'
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl).replace(/\/$/, '')
 

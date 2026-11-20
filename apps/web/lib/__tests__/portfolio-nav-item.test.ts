@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { getPortfolioNavItem, PORTFOLIO_SETTINGS_HREF } from '../portfolio'
+import { getPortfolioNavItem, PORTFOLIO_SETTINGS_HREF } from '../portfolio/portfolio'
 import { trackNavPortfolioClicked } from '../analytics'
 
 describe('getPortfolioNavItem', () => {

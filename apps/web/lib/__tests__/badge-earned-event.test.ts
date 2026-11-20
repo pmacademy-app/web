@@ -12,12 +12,12 @@ vi.mock('@/lib/notifications/dispatcher', () => ({
 vi.mock('@/lib/notifications/events/connectors', () => ({
   initializeNotificationConnectors: vi.fn(),
 }))
-vi.mock('@/lib/badges', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/badges')>()),
+vi.mock('@/lib/badges/badges', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/badges/badges')>()),
   evaluateEligibleBadges: vi.fn(() => [BADGE_DEFINITIONS[0]]),
 }))
 
-import { evaluateAndAwardBadges } from '@/lib/badges-db'
+import { evaluateAndAwardBadges } from '@/lib/badges/badges-db'
 
 /** Every read resolves empty except the `badges` lookup; every insert succeeds. */
 function fakeSupabase() {

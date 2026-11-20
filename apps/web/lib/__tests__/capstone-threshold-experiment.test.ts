@@ -10,8 +10,8 @@ import {
   DEFAULT_TREATMENT_REQUIRED_LESSONS,
   type CapstoneThresholdConfig,
 } from '../capstone-threshold-experiment'
-import { deriveCapstoneStatus } from '../capstones'
-import { saveDraftAction, submitCapstoneAction, resolveCapstoneThreshold } from '../capstones-db'
+import { deriveCapstoneStatus } from '../capstones/capstones'
+import { saveDraftAction, submitCapstoneAction, resolveCapstoneThreshold } from '../capstones/capstones-db'
 
 const validLongContent = `
 # Product Opportunity Brief: Customer Onboarding Improvement

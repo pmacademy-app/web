@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { PublicCapstoneItem, PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicCapstoneItem, PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 
 // Growth R5 / B13a: one public capstone as its own page. It exists only for a capstone the public
 // portfolio already shows; every other case is the same 404, so nothing private leaks.
 
 const loader = vi.hoisted(() => ({ getDedupedPublicPortfolioData: vi.fn() }))
-vi.mock('@/lib/portfolio-db', () => loader)
+vi.mock('@/lib/portfolio/portfolio-db', () => loader)
 // The real loader (used by the visibility tests below) reads the skill radar; it is not under test.
 vi.mock('@/lib/skillRadar', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/skillRadar')>()),
   getSkillRadarSummary: vi.fn().mockResolvedValue(null),
 }))
 
-import { buildCapstoneJsonLd, findPublicCapstone } from '@/lib/portfolio-capstone-page'
+import { buildCapstoneJsonLd, findPublicCapstone } from '@/lib/portfolio/portfolio-capstone-page'
 import PublicCapstonePage, { generateMetadata } from '../../app/(portfolio)/p/[username]/capstones/[moduleSlug]/page'
 
 const capstone: PublicCapstoneItem = {
@@ -155,7 +155,7 @@ describe('capstone visibility through the real portfolio loader', () => {
   })
 
   async function serve(tables: Record<string, Row[]>) {
-    const actual = await vi.importActual<typeof import('@/lib/portfolio-db')>('@/lib/portfolio-db')
+    const actual = await vi.importActual<typeof import('@/lib/portfolio/portfolio-db')>('@/lib/portfolio/portfolio-db')
     loader.getDedupedPublicPortfolioData.mockImplementation((username: string) =>
       actual.getPublicPortfolioData(fakeClient(tables) as never, username),
     )

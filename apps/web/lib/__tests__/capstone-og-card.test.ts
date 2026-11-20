@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 
 // Growth R5 / B13b: the capstone OG card renders only for a capstone the public portfolio shows.
 
 const mocks = vi.hoisted(() => ({ getPublicPortfolioData: vi.fn(), createServiceRoleClient: vi.fn(() => ({})) }))
-vi.mock('@/lib/portfolio-db', () => ({ getPublicPortfolioData: mocks.getPublicPortfolioData }))
+vi.mock('@/lib/portfolio/portfolio-db', () => ({ getPublicPortfolioData: mocks.getPublicPortfolioData }))
 vi.mock('@/lib/supabase', () => ({ createServiceRoleClient: mocks.createServiceRoleClient }))
 
 import { GET } from '../../app/api/og/portfolio/[username]/capstones/[moduleSlug]/route'

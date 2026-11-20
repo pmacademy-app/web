@@ -1,5 +1,5 @@
 import { TESTIMONIALS_CACHE_TAG } from '@/lib/feedback/published-testimonials'
-import { LEADERBOARD_CACHE_TAG } from '@/lib/leaderboard-db'
+import { LEADERBOARD_CACHE_TAG } from '@/lib/leaderboard/leaderboard-db'
 
 /**
  * What the admin console may invalidate on the learner host through
@@ -37,7 +37,7 @@ const ENCODED = '(?:[A-Za-z0-9_.~-]|%[0-9A-Fa-f]{2}){1,192}'
 
 /**
  * Literal per-learner pages: the public portfolio and its capstone pages
- * (lib/portfolio-revalidate.ts), with the username in stored case or lowercased. The
+ * (lib/portfolio/portfolio-revalidate.ts), with the username in stored case or lowercased. The
  * character classes leave no room for `.`, `:`, `\`, `?`, `#` or `%`.
  */
 export const PAGE_PATH_PATTERNS: readonly RegExp[] = Object.freeze([

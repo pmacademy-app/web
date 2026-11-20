@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { Trophy, Calendar, BookOpen, Eye, EyeOff, Users, Shield, ChevronDown } from 'lucide-react'
-import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
-import type { CohortItemPayload } from '@/lib/leaderboard-db'
+import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard/leaderboard'
+import type { CohortItemPayload } from '@/lib/leaderboard/leaderboard-db'
 import { cn } from '@/lib/utils'
 import { LeaderboardPopoverModal } from './LeaderboardPopoverModal'
 import { CohortsSection } from './CohortsSection'

@@ -60,12 +60,12 @@ vi.mock('@/lib/notifications/in-app/service', async (importOriginal) => {
   return { ...actual, createInAppNotification: (...args: unknown[]) => createInAppSpy(...args) }
 })
 
-import { issueCertificate, issueCertificateWithStatus } from '@/lib/certificates-db'
+import { issueCertificate, issueCertificateWithStatus } from '@/lib/certificates/certificates-db'
 import {
   dispatchCertificateGenerated,
   issueFullCurriculumCertificateIfEligible,
 } from '@/lib/certificates/issue-flow'
-import { generateCertificateCode } from '@/lib/certificates'
+import { generateCertificateCode } from '@/lib/certificates/certificates'
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'

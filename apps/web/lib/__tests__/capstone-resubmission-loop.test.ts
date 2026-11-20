@@ -17,15 +17,15 @@ vi.mock('@/lib/notifications/dispatcher', () => ({
 }))
 vi.mock('@/lib/notifications/events/connectors', () => ({ initializeNotificationConnectors: vi.fn() }))
 vi.mock('@/lib/events/product-events', () => ({ trackProductEvent: vi.fn(async () => {}) }))
-vi.mock('@/lib/xp-service', () => ({ awardXp: vi.fn(async () => {}), hasXpEvent: vi.fn(async () => true) }))
-vi.mock('@/lib/xp', async (importOriginal) => ({
+vi.mock('@/lib/xp/xp-service', () => ({ awardXp: vi.fn(async () => {}), hasXpEvent: vi.fn(async () => true) }))
+vi.mock('@/lib/xp/xp', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   getRuntimeXpValues: vi.fn(async () => ({ CAPSTONE_SUBMITTED: 150 })),
 }))
-vi.mock('@/lib/streaks-db', () => ({ updateUserStreak: vi.fn(async () => {}) }))
+vi.mock('@/lib/streaks/streaks-db', () => ({ updateUserStreak: vi.fn(async () => {}) }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { submitCapstoneAction } from '@/lib/capstones-db'
+import { submitCapstoneAction } from '@/lib/capstones/capstones-db'
 
 const CONTENT = `
 # Product Opportunity Brief: Customer Activation & Retention Improvement

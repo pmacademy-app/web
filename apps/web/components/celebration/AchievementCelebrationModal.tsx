@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { ShareButton } from '@/components/portfolio/ShareButton'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio/portfolio'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
 import {
   trackAchievementCelebrationViewed,

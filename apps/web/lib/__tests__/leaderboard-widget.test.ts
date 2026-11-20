@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { toLeaderboardRows, toLeaderboardWidgetView, NO_ACTIVITY_HINT } from '@/lib/dashboard/leaderboard-widget'
-import type { LeaderboardEntry } from '@/lib/leaderboard'
+import type { LeaderboardEntry } from '@/lib/leaderboard/leaderboard'
 
 function entry(overrides: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
   return {

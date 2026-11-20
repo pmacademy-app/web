@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { getModuleCapstonesOverview } from '@/lib/capstones-db'
+import { getModuleCapstonesOverview } from '@/lib/capstones/capstones-db'
 import { CapstoneCard } from '@/components/capstones/CapstoneCard'
 import { Award, BookOpen, Layers, CheckCircle } from 'lucide-react'
 

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { getUserBadgesData, evaluateAndAwardBadges } from '@/lib/badges-db'
+import { getUserBadgesData, evaluateAndAwardBadges } from '@/lib/badges/badges-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(

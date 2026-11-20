@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   calculatePortfolioReadiness,
   type PortfolioReadinessInput,
-} from '../portfolio-readiness'
+} from '../portfolio/portfolio-readiness'
 
 describe('Unit 4: Portfolio Completeness & Sharing Readiness Test Suite', () => {
   describe('1. Baseline Readiness & Proof-of-Work Invariant', () => {

@@ -2,7 +2,7 @@ import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
 import { BRAND } from '@/lib/brand'
-import { buildPortfolioShareIntents, portfolioShareText } from '@/lib/portfolio'
+import { buildPortfolioShareIntents, portfolioShareText } from '@/lib/portfolio/portfolio'
 
 export interface PortfolioPublishedProps {
   userName?: string

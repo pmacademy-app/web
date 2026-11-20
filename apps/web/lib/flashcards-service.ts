@@ -8,9 +8,9 @@ import {
   getDueCards,
   calculateReviewStats,
 } from '@/lib/srs'
-import { awardXp } from '@/lib/xp-service'
-import { getRuntimeXpValues } from '@/lib/xp'
-import { updateUserStreak } from '@/lib/streaks-db'
+import { awardXp } from '@/lib/xp/xp-service'
+import { getRuntimeXpValues } from '@/lib/xp/xp'
+import { updateUserStreak } from '@/lib/streaks/streaks-db'
 import { fetchCurriculumData, fetchCompiledLesson } from '@/lib/lesson-loader'
 import { startOfDay } from '@/lib/time'
 import { lessonIdFromFlashcardId } from '@/lib/academy/lesson-ids'

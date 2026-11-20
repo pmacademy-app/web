@@ -31,7 +31,7 @@ const supabase = {} as SupabaseClient<Database>
 
 async function loadModule() {
   vi.resetModules()
-  return import('../leaderboard-db')
+  return import('../leaderboard/leaderboard-db')
 }
 
 function seedHealthy() {

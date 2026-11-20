@@ -46,11 +46,11 @@ vi.mock('@/lib/badges/evaluate-after-xp', () => ({
   evaluateBadgesAfterXp: (...args: unknown[]) => evaluateBadgesAfterXp(...args),
 }))
 
-vi.mock('@/lib/xp-service', () => ({
+vi.mock('@/lib/xp/xp-service', () => ({
   hasXpEvent: (...args: unknown[]) => hasXpEvent(...args),
 }))
 
-vi.mock('@/lib/capstones-db', () => ({
+vi.mock('@/lib/capstones/capstones-db', () => ({
   submitCapstoneAction: (...args: unknown[]) => submitCapstoneAction(...args),
   loadCapstoneSubmission: (...args: unknown[]) => loadCapstoneSubmission(...args),
 }))

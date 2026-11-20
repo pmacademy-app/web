@@ -11,7 +11,7 @@
  *
  * VISIBILITY ≠ ELIGIBILITY. This component only *shows* the destination and links to the capstone
  * page. It never unlocks submission: the draft/submit endpoints re-derive and enforce the
- * eligibility threshold server-side (`lib/capstones-db.ts`). The values here are display-only and
+ * eligibility threshold server-side (`lib/capstones/capstones-db.ts`). The values here are display-only and
  * come from the same server source, so they cannot be used to bypass the gate.
  */
 
@@ -20,7 +20,7 @@ import Link from 'next/link'
 import { Award, ArrowRight, CheckCircle2, Lock } from 'lucide-react'
 import { getCapstoneForModule } from '@/config/capstones'
 import { useApiQuery } from '@/lib/api/hooks'
-import type { CapstoneStatus } from '@/lib/capstones'
+import type { CapstoneStatus } from '@/lib/capstones/capstones'
 
 interface LessonCapstonePreviewProps {
   moduleSlug: string

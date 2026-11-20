@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-"Leaderboard 2.0" ranks learners across three scopes — **Global**, **Cohort**, and **Friends** — sharing one cached weekly dataset and one ranking algorithm. Core logic: `lib/leaderboard-db.ts` (data access) and `lib/leaderboard.ts` (pure ranking/tier functions). UI: `app/(app)/leaderboard/page.tsx`.
+"Leaderboard 2.0" ranks learners across three scopes (**Global**, **Cohort**, and **Friends**), sharing one cached weekly dataset and one ranking algorithm. Core logic: `lib/leaderboard/leaderboard-db.ts` (data access) and `lib/leaderboard/leaderboard.ts` (pure ranking/tier functions). UI: `app/(app)/leaderboard/page.tsx`.
 
 > **Note on product policy:** an earlier version of `docs/PRD.md` listed "No Global Leaderboard" as a non-negotiable invariant. The Global mode described below exists and is live in the current codebase — see the correction note in `PRD.md`.
 
@@ -15,7 +15,7 @@
 
 ## 2. Ranking Algorithm
 
-`calculateRankings()` (`lib/leaderboard.ts`) is **consistency-first**, not XP-first. Sort order:
+`calculateRankings()` (`lib/leaderboard/leaderboard.ts`) is **consistency-first**, not XP-first. Sort order:
 1. Days studied this week (desc)
 2. Lessons completed this week (desc)
 3. Weekly XP earned (desc — tie-break)
@@ -32,7 +32,7 @@ The week boundary is UTC Monday (`calculateWeekStart()`). Tier badges (`Bronze`,
 - **Friends** (`getFriendLeaderboard()`): filters to `user_friends` rows involving the viewer, also re-ranked locally.
 
 ### Caching
-A single in-memory `Map` keyed by week-start, 45-second TTL, shared across all three scopes (`lib/leaderboard-db.ts`). This is **process-local** — on a multi-instance deployment, cache state isn't shared across instances (a scaling caveat, not currently a correctness bug at Prodily's traffic).
+A single in-memory `Map` keyed by week-start, 45-second TTL, shared across all three scopes (`lib/leaderboard/leaderboard-db.ts`). This is **process-local**: on a multi-instance deployment, cache state isn't shared across instances (a scaling caveat, not currently a correctness bug at Prodily's traffic).
 
 ---
 
@@ -61,8 +61,8 @@ A single in-memory `Map` keyed by week-start, 45-second TTL, shared across all t
 | Component / Feature | Location |
 |---|---|
 | **Leaderboard Page** | `app/(app)/leaderboard/page.tsx` |
-| **Ranking Data Access** | `lib/leaderboard-db.ts` |
-| **Ranking Algorithm & Tiers** | `lib/leaderboard.ts` |
+| **Ranking Data Access** | `lib/leaderboard/leaderboard-db.ts` |
+| **Ranking Algorithm & Tiers** | `lib/leaderboard/leaderboard.ts` |
 | **Leaderboard API** | `app/api/leaderboard/route.ts` |
 | **Cohorts API** | `app/api/cohorts/route.ts` |
 | **Friends API** | `app/api/friends/route.ts` |

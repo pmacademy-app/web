@@ -7,7 +7,7 @@
  * 2. Certificate: the exported sample render, labelled as a sample. It deliberately
  *    has no verification link, because a sample has nothing to verify.
  * 3. PM Fellow: a distinction a person on the team grants on request. Not an
- *    automated score; the copy says only what lib/fellow.ts does.
+ *    automated score; the copy says only what lib/fellow/fellow.ts does.
  *
  * ## Layout and depth (round 2)
  *

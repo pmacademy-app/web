@@ -6,10 +6,10 @@ import type {
   PortfolioSettingsData,
   PortfolioSectionId,
   LearnerSubmittedCapstoneSummary,
-} from '@/lib/portfolio-db'
-import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio'
+} from '@/lib/portfolio/portfolio-db'
+import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio/portfolio'
 import { portfolioOgCardPath } from '@/lib/og/card-paths'
-import { calculatePortfolioReadiness, calculatePortfolioVerification } from '@/lib/portfolio-readiness'
+import { calculatePortfolioReadiness, calculatePortfolioVerification } from '@/lib/portfolio/portfolio-readiness'
 import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
 import { PortfolioVerificationCard } from '@/components/settings/PortfolioVerificationCard'
 import { FellowRequestCard } from '@/components/settings/FellowRequestCard'

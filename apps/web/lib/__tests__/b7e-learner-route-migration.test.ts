@@ -38,7 +38,7 @@ vi.mock('@/lib/announcements/announcements-service', () => ({
 
 const addFriend = vi.fn()
 
-vi.mock('@/lib/leaderboard-db', () => ({
+vi.mock('@/lib/leaderboard/leaderboard-db', () => ({
   addFriend: (...args: unknown[]) => addFriend(...args),
   removeFriend: vi.fn(),
   getFriendLeaderboard: vi.fn().mockResolvedValue([]),

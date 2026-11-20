@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ISSUE-23: evaluateBadgesAfterXp runs the badge evaluator with a service-role client and never
 // lets a failure reach the caller (it is meant to run inside after()).
 
-vi.mock('@/lib/badges-db', () => ({
+vi.mock('@/lib/badges/badges-db', () => ({
   evaluateAndAwardBadges: vi.fn(async () => []),
 }))
 
@@ -12,7 +12,7 @@ vi.mock('@/lib/monitoring/logger', () => ({
 }))
 
 import * as supabaseModule from '@/lib/supabase'
-import { evaluateAndAwardBadges } from '@/lib/badges-db'
+import { evaluateAndAwardBadges } from '@/lib/badges/badges-db'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { evaluateBadgesAfterXp } from '../badges/evaluate-after-xp'
 

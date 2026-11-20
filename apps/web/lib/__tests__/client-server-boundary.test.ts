@@ -35,8 +35,8 @@ const read = (rel: string) => readFileSync(path.join(ROOT, rel), 'utf8')
 const BOUNDARIES: Array<{ client: string; forbidden: string; allowed: string }> = [
   {
     client: 'components/settings/PortfolioSettingsForm.tsx',
-    forbidden: '@/lib/portfolio-db',
-    allowed: '@/lib/portfolio',
+    forbidden: '@/lib/portfolio/portfolio-db',
+    allowed: '@/lib/portfolio/portfolio',
   },
   {
     client: 'app/onboarding/OnboardingWizard.tsx',
@@ -55,7 +55,7 @@ describe('client components do not import server data-layer modules', () => {
       // Only a VALUE import of the server module is the defect. A type-only import
       // is erased by the compiler and cannot drag anything into a bundle —
       // `PortfolioSettingsForm` legitimately keeps `import type { ... } from
-      // '@/lib/portfolio-db'` for its prop shapes.
+      // '@/lib/portfolio/portfolio-db'` for its prop shapes.
       //
       // Matched against whole import statements rather than with a newline-spanning
       // pattern: a multi-line `import React, { ... }` above would otherwise run on
@@ -71,12 +71,12 @@ describe('client components do not import server data-layer modules', () => {
 })
 
 describe('the client-safe modules stay client-safe', () => {
-  const CLIENT_SAFE = ['lib/portfolio.ts', 'lib/onboarding/onboarding-defaults.ts']
+  const CLIENT_SAFE = ['lib/portfolio/portfolio.ts', 'lib/onboarding/onboarding-defaults.ts']
 
   for (const clientSafe of CLIENT_SAFE) {
     it(`${clientSafe} pulls in no server-only dependency`, () => {
       const source = read(clientSafe)
-      // Comments stripped: `lib/portfolio.ts` documents the B9-C chain by name.
+      // Comments stripped: `lib/portfolio/portfolio.ts` documents the B9-C chain by name.
       const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
 
       expect(code, clientSafe).not.toContain('createServiceRoleClient')
@@ -93,7 +93,7 @@ describe('the client-safe modules stay client-safe', () => {
 
 describe('server call sites are unchanged by the moves', () => {
   it('portfolio-db still re-exports the layout constants', () => {
-    const source = read('lib/portfolio-db.ts')
+    const source = read('lib/portfolio/portfolio-db.ts')
 
     expect(source).toContain('VALID_PORTFOLIO_SECTIONS')
     expect(source).toContain('DEFAULT_PORTFOLIO_LAYOUT')

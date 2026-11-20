@@ -4,7 +4,7 @@ import {
   validateOptionalUrl,
   generatePersonJsonLd,
   formatPortfolioShareUrl,
-} from '../portfolio'
+} from '../portfolio/portfolio'
 
 describe('Public Portfolio Unit Test Suite', () => {
   describe('Username Validation', () => {

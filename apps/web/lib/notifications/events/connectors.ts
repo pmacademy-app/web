@@ -3,7 +3,7 @@ import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
-import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio/portfolio'
 import { getCapstoneDefinition } from '@/config/capstones'
 
 let isConnectorsInitialized = false

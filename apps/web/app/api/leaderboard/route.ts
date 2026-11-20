@@ -5,7 +5,7 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { parseBody } from '@/lib/api/contracts/body'
 import { leaderboardOptInBodySchema } from '@/lib/api/contracts/learner-writes'
-import { getWeeklyLeaderboard, getCohortLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard-db'
+import { getWeeklyLeaderboard, getCohortLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard/leaderboard-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 const leaderboardQuerySchema = z.object({

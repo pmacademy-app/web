@@ -16,7 +16,7 @@ import { z } from 'zod'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { isLessonIdFormat } from '@/lib/academy/lesson-ids'
-import { recordTheoryReadAction } from '@/lib/lessons-db'
+import { recordTheoryReadAction } from '@/lib/academy/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 const theoryReadSchema = z.object({

@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { deriveCapstoneStatus } from '@/lib/capstones'
+import { deriveCapstoneStatus } from '@/lib/capstones/capstones'
 import { buildCurriculumModuleIndex, resolveLessonAccess } from '@/lib/curriculum-access'
 import type { CurriculumEntry } from '@/types'
 

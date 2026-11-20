@@ -7,8 +7,8 @@ import {
   calculateCapstoneWordCount,
   validateCapstoneSubmission,
   deriveCapstoneStatus,
-} from '../capstones'
-import { XP_VALUES } from '../xp'
+} from '../capstones/capstones'
+import { XP_VALUES } from '../xp/xp'
 
 describe('Capstones Unit Test Suite', () => {
   describe('Capstone Definitions', () => {

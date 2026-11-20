@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { renderEmailTemplate } from '@/emails'
-import { buildPortfolioShareIntents, portfolioShareText } from '@/lib/portfolio'
+import { buildPortfolioShareIntents, portfolioShareText } from '@/lib/portfolio/portfolio'
 
 // Growth R5 / B3: the portfolio-published email offers one-click LinkedIn and X shares, tagged
 // so visits from those posts can be attributed.

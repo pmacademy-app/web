@@ -91,6 +91,6 @@ A genuinely separate, unrelated signal (`isPortfolioVerified` / `users.portfolio
 | **Legacy Fellow Queue** | `components/admin/PortfoliosView.tsx` | 🟢 Verified in Production |
 | **Fellow Status API** | `app/api/admin/users/[id]/fellow-status/route.ts` | 🟢 Verified in Production |
 | **Fellow Requests (learner-initiated)** | `app/api/fellow-requests/route.ts`, `components/settings/FellowRequestCard.tsx` | 🟢 Verified in Production |
-| **Portfolio Verification (automatic)** | `lib/portfolio-readiness.ts` (`calculatePortfolioVerification`) | 🟢 Verified in Production |
+| **Portfolio Verification (automatic)** | `lib/portfolio/portfolio-readiness.ts` (`calculatePortfolioVerification`) | 🟢 Verified in Production |
 | **Portfolio Verification Admin Override** | `app/api/admin/users/[id]/portfolio-verification/route.ts`, `components/admin/UserPortfolioVerificationToggle.tsx` | 🟢 Verified in Production |
 | **Certificate Verification** | `app/verify/[certificateId]/page.tsx` | 🟢 Verified in Production |

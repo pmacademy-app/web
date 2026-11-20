@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { AlertTriangle, Award, CheckCircle2, Clock, Globe, Lock, X } from 'lucide-react'
-import { CAPSTONE_REVIEW_EXPECTATION, type CapstoneValidationResult } from '@/lib/capstones'
+import { CAPSTONE_REVIEW_EXPECTATION, type CapstoneValidationResult } from '@/lib/capstones/capstones'
 
 interface SubmitConfirmationModalProps {
   isOpen: boolean

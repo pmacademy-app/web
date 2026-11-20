@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { getPublicPortfolioData, updatePortfolioSettings } from '../portfolio-db'
-import { generatePersonJsonLd } from '../portfolio'
+import { getPublicPortfolioData, updatePortfolioSettings } from '../portfolio/portfolio-db'
+import { generatePersonJsonLd } from '../portfolio/portfolio'
 // The admin grant/revoke routes and their authorization tests moved to the admin console
 // repository. This suite keeps the learner-side Fellow guarantees.
 describe('Unit 2: Fellow Identity Test Suite', () => {

@@ -16,7 +16,7 @@ import {
   BADGE_CATALOG_TAG,
   getBadgeCatalog,
   getUserBadgesData,
-} from '../badges-db'
+} from '../badges/badges-db'
 import { BADGE_DEFINITIONS } from '@/config/badges'
 
 type Row = Record<string, unknown>

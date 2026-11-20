@@ -7,8 +7,8 @@
  * the card hides that cell rather than guessing.
  */
 import { calculateLevel } from '@/lib/xp/xp'
-import type { FellowRequestUiState } from '@/lib/fellow'
-import type { PortfolioReadinessSummary } from '@/lib/portfolio-readiness'
+import type { FellowRequestUiState } from '@/lib/fellow/fellow'
+import type { PortfolioReadinessSummary } from '@/lib/portfolio/portfolio-readiness'
 
 export interface FellowSummary {
   state: FellowRequestUiState

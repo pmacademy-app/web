@@ -7,7 +7,7 @@ import {
 import {
   getLatestReviewAction,
   validateCapstoneTransition,
-} from '@/lib/capstones'
+} from '@/lib/capstones/capstones'
 
 describe('PROD-03 / AG-26 Capstone Review and Resubmission', () => {
   describe('1. Rubric Score Validation (validateRubricScores)', () => {

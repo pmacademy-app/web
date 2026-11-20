@@ -31,11 +31,11 @@ const code = (rel: string) =>
 const MIGRATED = [
   'lib/academy/lessons-db.ts',
   'lib/lessons-completion-service.ts',
-  'lib/capstones-db.ts',
-  'lib/certificates-db.ts',
-  'lib/badges-db.ts',
+  'lib/capstones/capstones-db.ts',
+  'lib/certificates/certificates-db.ts',
+  'lib/badges/badges-db.ts',
   'lib/streaks/streaks-db.ts',
-  'lib/portfolio-db.ts',
+  'lib/portfolio/portfolio-db.ts',
   'lib/settings/settings-service.ts',
   'app/api/settings/profile/route.ts',
   'app/api/settings/notifications/route.ts',
@@ -52,11 +52,11 @@ describe('B8-G — the escape hatch is gone from the named aggregates', () => {
   }
 
   it('leaves no hand-written result cast in the migrated aggregates', () => {
-    // `lib/portfolio-db.ts` keeps exactly one, for an RPC the generated types do not
+    // `lib/portfolio/portfolio-db.ts` keeps exactly one, for an RPC the generated types do not
     // know about. It is pinned to one occurrence, and its shape and justification
     // are asserted separately below — an exemption that is itself checked, rather
     // than a hole in this assertion.
-    const EXEMPT = new Set(['lib/portfolio-db.ts'])
+    const EXEMPT = new Set(['lib/portfolio/portfolio-db.ts'])
 
     for (const file of MIGRATED) {
       if (EXEMPT.has(file)) continue
@@ -95,7 +95,7 @@ describe('B8-G — user_lesson_progress no longer carries a drifted row shape', 
 
 describe('B8-G — the portfolio settings write is checked against the schema', () => {
   it('types the update payload as a users update rather than an open record', () => {
-    const source = read('lib/portfolio-db.ts')
+    const source = read('lib/portfolio/portfolio-db.ts')
 
     expect(source).toContain("const updatePayload: TablesUpdate<'users'>")
     expect(source).not.toContain('const updatePayload: Record<string, unknown>')
@@ -104,8 +104,8 @@ describe('B8-G — the portfolio settings write is checked against the schema', 
 
 describe('B8-G — the one unavoidable cast is narrow and explained', () => {
   it('confines it to the RPC missing from the generated types', () => {
-    const source = read('lib/portfolio-db.ts')
-    const casts = code('lib/portfolio-db.ts').match(/as unknown as/g) ?? []
+    const source = read('lib/portfolio/portfolio-db.ts')
+    const casts = code('lib/portfolio/portfolio-db.ts').match(/as unknown as/g) ?? []
 
     // Exactly one, and it is the increment_portfolio_view_count RPC.
     expect(casts).toHaveLength(1)
@@ -113,7 +113,7 @@ describe('B8-G — the one unavoidable cast is narrow and explained', () => {
     expect(source).toContain('absent from the')
     // Narrowed to the rpc method with a named argument shape, not `any`.
     expect(source).toContain('args: { target_user_id: string }')
-    expect(code('lib/portfolio-db.ts')).not.toContain('as any')
+    expect(code('lib/portfolio/portfolio-db.ts')).not.toContain('as any')
   })
 })
 
@@ -205,7 +205,7 @@ describe('B8-G — badge stats still aggregate from the same rows', () => {
     }
     const supabase: any = { from: vi.fn((t: string) => makeChain(t)) }
 
-    const { getUserBadgesData } = await import('../badges-db')
+    const { getUserBadgesData } = await import('../badges/badges-db')
     const summary = await getUserBadgesData(supabase, 'u1')
 
     expect(summary.totalAvailable).toBeGreaterThan(0)

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { ArrowLeft, Award, Calendar, FileText, MessageSquare } from 'lucide-react'
-import { getDedupedPublicPortfolioData } from '@/lib/portfolio-db'
-import { formatCapstoneShareUrl, formatPortfolioShareUrl } from '@/lib/portfolio'
-import { buildCapstoneJsonLd, findPublicCapstone } from '@/lib/portfolio-capstone-page'
+import { getDedupedPublicPortfolioData } from '@/lib/portfolio/portfolio-db'
+import { formatCapstoneShareUrl, formatPortfolioShareUrl } from '@/lib/portfolio/portfolio'
+import { buildCapstoneJsonLd, findPublicCapstone } from '@/lib/portfolio/portfolio-capstone-page'
 import { capstoneOgCardPath } from '@/lib/og/card-paths'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { BRAND } from '@/lib/brand'
@@ -28,7 +28,7 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
  * Cached per path (ISR, perf plan item 13), on the same terms as /p/[username]: the render
  * reads no cookies or headers and is the same for every viewer. A miss (the 404) is cached
  * too; every write that can publish, unpublish or hide a capstone purges these paths for
- * every capstone slug (lib/portfolio-revalidate.ts).
+ * every capstone slug (lib/portfolio/portfolio-revalidate.ts).
  */
 export const revalidate = 3600
 export const dynamicParams = true

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { submitCapstoneAction } from '../capstones-db'
-import { getPublicPortfolioData } from '../portfolio-db'
+import { submitCapstoneAction } from '../capstones/capstones-db'
+import { getPublicPortfolioData } from '../portfolio/portfolio-db'
 import {
   trackCapstoneSubmitted,
   trackPortfolioArtifactCreated,

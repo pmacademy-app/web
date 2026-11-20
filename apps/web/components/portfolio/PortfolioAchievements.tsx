@@ -1,6 +1,6 @@
 import React from 'react'
 import { Trophy, Award, Flame, Zap, Shield, CheckCircle2 } from 'lucide-react'
-import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 import { BADGE_DEFINITIONS } from '@/config/badges'
 
 interface PortfolioAchievementsProps {

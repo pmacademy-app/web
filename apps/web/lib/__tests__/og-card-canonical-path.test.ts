@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 
 // OG cards are cached per URL path while the username lookup ignores case, so every card must live
 // under one path per learner (the lowercase one) and every purge must target it. Otherwise a card
@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }))
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath, revalidateTag: vi.fn() }))
 vi.mock('@/lib/supabase', () => ({ createServiceRoleClient: vi.fn(() => ({})) }))
-vi.mock('@/lib/portfolio-db', () => ({
+vi.mock('@/lib/portfolio/portfolio-db', () => ({
   getPublicPortfolioData: mocks.getPublicPortfolioData,
   getDedupedPublicPortfolioData: mocks.getDedupedPublicPortfolioData,
   updatePortfolioSettings: mocks.updatePortfolioSettings,

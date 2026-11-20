@@ -42,11 +42,11 @@ vi.mock('@/lib/api/with-route', () => ({
 vi.mock('@/lib/api/actor', () => ({
   requireUserId: () => 'u1',
 }))
-vi.mock('@/lib/capstones-db', () => ({ submitCapstoneAction: mocks.submitCapstoneAction }))
-vi.mock('@/lib/xp-service', () => ({ hasXpEvent: vi.fn(async () => false) }))
+vi.mock('@/lib/capstones/capstones-db', () => ({ submitCapstoneAction: mocks.submitCapstoneAction }))
+vi.mock('@/lib/xp/xp-service', () => ({ hasXpEvent: vi.fn(async () => false) }))
 vi.mock('@/lib/badges/evaluate-after-xp', () => ({ evaluateBadgesAfterXp: vi.fn() }))
 vi.mock('@/lib/events/product-events', () => ({ trackProductEvent: vi.fn() }))
-vi.mock('@/lib/lessons-db', () => ({ recordReflectionAction: mocks.recordReflectionAction }))
+vi.mock('@/lib/academy/lessons-db', () => ({ recordReflectionAction: mocks.recordReflectionAction }))
 vi.mock('@/lib/settings/destructive-reauth', () => ({ verifyDestructiveReauth: mocks.verifyDestructiveReauth }))
 vi.mock('@/lib/settings/settings-service', () => ({ deleteAccount: mocks.deleteAccount, resetProgress: vi.fn() }))
 vi.mock('@/lib/monitoring/logger', () => ({ logSystemError: vi.fn(), logErrorReport: vi.fn() }))
@@ -145,7 +145,7 @@ beforeEach(() => {
 
 describe('public portfolio read', () => {
   it('matches the lowercased username exactly, over named columns, never ILIKE or select *', async () => {
-    const { getPublicPortfolioData } = await import('../portfolio-db')
+    const { getPublicPortfolioData } = await import('../portfolio/portfolio-db')
     const fake = fakeClient({ users: { data: [PUBLIC_USER] } })
 
     await getPublicPortfolioData(fake.client as never, '  Ada ')
@@ -159,7 +159,7 @@ describe('public portfolio read', () => {
   })
 
   it('issues the progress, capstone and reflection reads together, and reads progress once', async () => {
-    const { getPublicPortfolioData } = await import('../portfolio-db')
+    const { getPublicPortfolioData } = await import('../portfolio/portfolio-db')
     const fake = fakeClient(
       {
         users: { data: [PUBLIC_USER] },
@@ -191,7 +191,7 @@ describe('public portfolio read', () => {
   })
 
   it('resolves a private portfolio to null without reading anything else', async () => {
-    const { getPublicPortfolioData } = await import('../portfolio-db')
+    const { getPublicPortfolioData } = await import('../portfolio/portfolio-db')
     const fake = fakeClient({ users: { data: [{ ...PUBLIC_USER, is_portfolio_public: false }] } })
 
     expect(await getPublicPortfolioData(fake.client as never, 'ada')).toBeNull()
@@ -199,7 +199,7 @@ describe('public portfolio read', () => {
   })
 
   it('performs no write, so the cached render cannot count or change anything', () => {
-    const src = readFileSync(new URL('../portfolio-db.ts', import.meta.url), 'utf-8')
+    const src = readFileSync(new URL('../portfolio/portfolio-db.ts', import.meta.url), 'utf-8')
     const body = src.slice(
       src.indexOf('export async function getPublicPortfolioData'),
       src.indexOf('export const getDedupedPublicPortfolioData')
@@ -291,7 +291,7 @@ describe('POST /api/portfolio/[username]/view', () => {
 
 describe('writes purge the cached public pages', () => {
   it('lists the portfolio and every capstone page under the lowercase handle', async () => {
-    const { publicPortfolioPaths, revalidatePublicPortfolio } = await import('../portfolio-revalidate')
+    const { publicPortfolioPaths, revalidatePublicPortfolio } = await import('../portfolio/portfolio-revalidate')
     expect(publicPortfolioPaths(' Ada ')).toEqual(allPagesOf('ada'))
     revalidatePublicPortfolio(null)
     revalidatePublicPortfolio('')
@@ -299,7 +299,7 @@ describe('writes purge the cached public pages', () => {
   })
 
   it('never lets a failed purge escape', async () => {
-    const { revalidatePublicPortfolio } = await import('../portfolio-revalidate')
+    const { revalidatePublicPortfolio } = await import('../portfolio/portfolio-revalidate')
     mocks.revalidatePath.mockImplementation(() => {
       throw new Error('outside a request')
     })
@@ -312,8 +312,8 @@ describe('writes purge the cached public pages', () => {
       previousUsername: 'ada',
       settings: { username: 'ada-new' },
     })
-    vi.doMock('@/lib/portfolio-db', async (importOriginal) => ({
-      ...(await importOriginal<typeof import('../portfolio-db')>()),
+    vi.doMock('@/lib/portfolio/portfolio-db', async (importOriginal) => ({
+      ...(await importOriginal<typeof import('../portfolio/portfolio-db')>()),
       updatePortfolioSettings: mocks.updatePortfolioSettings,
     }))
     vi.resetModules()
@@ -331,7 +331,7 @@ describe('writes purge the cached public pages', () => {
       expect(purged()).toContain(path)
     }
     expect(mocks.revalidateTag).toHaveBeenCalledWith('leaderboard', 'max')
-    vi.doUnmock('@/lib/portfolio-db')
+    vi.doUnmock('@/lib/portfolio/portfolio-db')
   })
 
   it('profile save: purges the learner portfolio and the leaderboard', async () => {

@@ -1,9 +1,9 @@
 import React from 'react'
 import Image from 'next/image'
 import { Flame, Zap, Award, GraduationCap, Globe, UserCheck } from 'lucide-react'
-import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
+import type { PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 import { ShareButton } from '@/components/portfolio/ShareButton'
-import { validateOptionalUrl } from '@/lib/portfolio'
+import { validateOptionalUrl } from '@/lib/portfolio/portfolio'
 
 interface PortfolioHeroProps {
   user: PublicPortfolioPayload['user']

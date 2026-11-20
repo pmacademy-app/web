@@ -11,7 +11,7 @@ import {
   formatCapstoneShareUrl,
   formatPortfolioShareUrl,
   portfolioShareText,
-} from '@/lib/portfolio'
+} from '@/lib/portfolio/portfolio'
 import { trackPortfolioShareClicked } from '@/lib/analytics'
 import { apiPost } from '@/lib/api/client'
 

@@ -2,7 +2,7 @@
 /**
  * The `badge.earned` and `xp.level_up` emails (`achievement.badge_earned`, `achievement.level_up`).
  *
- * Both events carry a stable id per learner per badge / per level (lib/badges-db.ts,
+ * Both events carry a stable id per learner per badge / per level (lib/badges/badges-db.ts,
  * lib/xp/xp-service.ts). The email must follow it: one per badge, one per level, none for a
  * replay. Without an idempotency key the queue's fallback lookup is (user, template, event type),
  * so the first badge or level email suppressed every later one.
@@ -128,7 +128,7 @@ function envelope(id: string, event: string, userId: string, payload: Record<str
   } as any
 }
 
-// Ids as the producers build them: lib/badges-db.ts and lib/xp/xp-service.ts. The badge payload
+// Ids as the producers build them: lib/badges/badges-db.ts and lib/xp/xp-service.ts. The badge payload
 // carries `badgeKey`, which the event registry's validator requires before any handler runs.
 const badgeEarned = (userId: string, badgeKey: string) =>
   envelope(`badge-${userId}-${badgeKey}`, 'badge.earned', userId, {

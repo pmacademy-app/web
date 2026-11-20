@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { issueCertificate } from '../certificates-db'
+import { issueCertificate } from '../certificates/certificates-db'
 import { getLessonIdsForModule } from '../curriculum-registry'
 
 // Mock external auth and database dependencies for route execution

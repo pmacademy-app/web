@@ -7,7 +7,7 @@ import {
   recordActivityStreak,
   getStreakStatusSummary,
   StreakData,
-} from '../streaks'
+} from '../streaks/streaks'
 
 describe('Prodily Streak Engine Test Suite', () => {
   describe('Timezone Date Utilities & Boundary Math', () => {

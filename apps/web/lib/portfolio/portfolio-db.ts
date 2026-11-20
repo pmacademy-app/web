@@ -12,7 +12,7 @@ import { BRAND } from '@/lib/brand'
 import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, TablesUpdate } from '@/lib/supabase'
-import { calculateLevel, type LevelInfo } from '@/lib/xp'
+import { calculateLevel, type LevelInfo } from '@/lib/xp/xp'
 import { getSkillRadarSummary, type SkillRadarPreloadedData, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { escapeLike } from '@/lib/db/escape-like'
@@ -22,13 +22,13 @@ import {
   DEFAULT_PORTFOLIO_LAYOUT,
   VALID_PORTFOLIO_SECTIONS,
   type PortfolioSectionId,
-} from '@/lib/portfolio'
+} from '@/lib/portfolio/portfolio'
 import {
   calculatePortfolioReadiness,
   calculatePortfolioVerification,
   type PortfolioVerificationOverride,
   portfolioFallbackUsername as portfolioFallbackUsernameFor,
-} from '@/lib/portfolio-readiness'
+} from '@/lib/portfolio/portfolio-readiness'
 import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
@@ -63,8 +63,8 @@ export interface PublicCapstoneItem {
 // Re-exported from the dependency-free module so server call sites are unchanged.
 // A browser consumer must import them from `@/lib/portfolio` directly — importing
 // them from here pulls the whole server data layer into the client bundle.
-export { VALID_PORTFOLIO_SECTIONS, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio'
-export type { PortfolioSectionId } from '@/lib/portfolio'
+export { VALID_PORTFOLIO_SECTIONS, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio/portfolio'
+export type { PortfolioSectionId } from '@/lib/portfolio/portfolio'
 
 export interface PublicPortfolioPayload {
   user: {
@@ -331,7 +331,7 @@ export async function getPublicPortfolioData(
  * capstone pages are ISR with `revalidate = 3600`, so this runs once per regeneration, not
  * once per view. A private or missing portfolio renders as "unavailable" and that result is
  * cached too, which is safe because every write that changes what the page shows purges the
- * exact paths (lib/portfolio-revalidate.ts): the portfolio settings save (visibility,
+ * exact paths (lib/portfolio/portfolio-revalidate.ts): the portfolio settings save (visibility,
  * profile, username old and new), profile edits, capstone submit and review, capstone
  * reflections, and account deletion. Nothing here reads cookies or headers, and the payload
  * is the same for every viewer.
@@ -489,7 +489,7 @@ export class PortfolioValidationError extends Error {
 }
 
 // Pure helpers, re-exported for existing callers; they live with the readiness model.
-export { portfolioFallbackUsername, portfolioReadinessInputFromUserRow } from '@/lib/portfolio-readiness'
+export { portfolioFallbackUsername, portfolioReadinessInputFromUserRow } from '@/lib/portfolio/portfolio-readiness'
 
 export async function getPortfolioSettings(
   supabase: SupabaseClient<Database>,

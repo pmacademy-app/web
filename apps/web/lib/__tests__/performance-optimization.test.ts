@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { hasXpEvent, getTotalXp } from '@/lib/xp-service'
+import { hasXpEvent, getTotalXp } from '@/lib/xp/xp-service'
 
 describe('Phase 9 — Database, Query & Application Performance Optimization', () => {
   beforeEach(() => {

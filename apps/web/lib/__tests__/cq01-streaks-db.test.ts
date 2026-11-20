@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
-import { getUserStreakStatus, getWeeklySummary, notStartedStreakStatus } from '../streaks-db'
+import { getUserStreakStatus, getWeeklySummary, notStartedStreakStatus } from '../streaks/streaks-db'
 import { MS_PER_DAY } from '../time'
 
 type Result = { data: unknown; error: { message: string } | null }

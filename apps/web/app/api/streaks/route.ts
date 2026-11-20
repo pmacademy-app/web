@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { getUserStreakStatus, getWeeklySummary } from '@/lib/streaks-db'
+import { getUserStreakStatus, getWeeklySummary } from '@/lib/streaks/streaks-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(

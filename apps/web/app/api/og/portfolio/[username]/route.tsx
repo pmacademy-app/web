@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from 'next/og'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getPublicPortfolioData } from '@/lib/portfolio-db'
+import { getPublicPortfolioData } from '@/lib/portfolio/portfolio-db'
 import { BRAND } from '@/lib/brand'
 import { OG, ProdilyLogoMark } from '@/lib/og/brand'
 import { needsCanonicalOgRedirect, portfolioOgCardPath, redirectToOgCardPath } from '@/lib/og/card-paths'

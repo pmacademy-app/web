@@ -8,8 +8,8 @@ import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
 import { CertificateCard } from '@/components/certificates/CertificateCard'
-import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
-import { calculateLevel } from '@/lib/xp'
+import type { VerifiedCertificatePayload } from '@/lib/certificates/certificates-db'
+import { calculateLevel } from '@/lib/xp/xp'
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean

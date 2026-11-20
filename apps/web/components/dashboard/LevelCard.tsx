@@ -1,5 +1,5 @@
 import { Award, Zap, ChevronRight } from 'lucide-react'
-import { calculateLevel } from '@/lib/xp'
+import { calculateLevel } from '@/lib/xp/xp'
 
 interface LevelCardProps {
   level: number

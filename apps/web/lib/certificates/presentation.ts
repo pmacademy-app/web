@@ -7,7 +7,7 @@
  * credential.
  */
 import { BRAND } from '@/lib/brand'
-import { isTestCertificateCode } from '@/lib/certificates'
+import { isTestCertificateCode } from '@/lib/certificates/certificates'
 import { CURRICULUM_MODULE_META } from '@/lib/curriculum/curriculum-meta'
 
 export const VERIFIED_CREDENTIAL_LABEL = 'Verified Credential'

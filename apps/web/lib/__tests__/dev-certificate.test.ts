@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { generateCertificateCode } from '../certificates'
-import { buildTestCertificateCode, isTestCertificateCode } from '../certificates-db'
+import { generateCertificateCode } from '../certificates/certificates'
+import { buildTestCertificateCode, isTestCertificateCode } from '../certificates/certificates-db'
 
 describe('Developer Certificate Testing Suite', () => {
   it('generateCertificateCode produces valid deterministic PMA code format', () => {

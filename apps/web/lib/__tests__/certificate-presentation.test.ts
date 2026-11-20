@@ -5,9 +5,9 @@
  */
 import { describe, it, expect } from 'vitest'
 import { BRAND } from '@/lib/brand'
-import { TEST_CERTIFICATE_PREFIX, generateCredentialJsonLd, isTestCertificateCode } from '@/lib/certificates'
+import { TEST_CERTIFICATE_PREFIX, generateCredentialJsonLd, isTestCertificateCode } from '@/lib/certificates/certificates'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
-import * as certificatesDb from '@/lib/certificates-db'
+import * as certificatesDb from '@/lib/certificates/certificates-db'
 import {
   CERTIFICATE_COMPLETION_STATEMENT,
   CERTIFICATE_RECIPIENT_LEAD_IN,

@@ -26,7 +26,7 @@ vi.mock('next/dynamic', () => ({
 }))
 
 import { BadgeCard } from '@/components/badges/BadgeCard'
-import type { BadgeProgressItem } from '@/lib/badges'
+import type { BadgeProgressItem } from '@/lib/badges/badges'
 
 const badge = (isEarned: boolean): BadgeProgressItem =>
   ({

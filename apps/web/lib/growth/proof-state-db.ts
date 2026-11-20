@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import type { FellowRequestRowStatus } from '@/lib/fellow'
+import type { FellowRequestRowStatus } from '@/lib/fellow/fellow'
 import { deriveProofState, type ProofState, type ProofUserRow } from './proof-state'
 import { fetchAllRows, type PageResult } from '@/lib/db/pagination'
 

@@ -21,7 +21,7 @@ vi.mock('next/link', () => ({
 }))
 
 import { CertificatesCard } from '@/components/progress/CertificatesCard'
-import type { CertificateRow } from '@/lib/certificates-db'
+import type { CertificateRow } from '@/lib/certificates/certificates-db'
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean

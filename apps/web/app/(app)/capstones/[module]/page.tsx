@@ -23,7 +23,7 @@ import {
   validateCapstoneSubmission,
   CAPSTONE_REVIEW_EXPECTATION,
   type CapstoneStatus,
-} from '@/lib/capstones'
+} from '@/lib/capstones/capstones'
 import { useCapstoneAutosave } from '@/hooks/useCapstoneAutosave'
 import { RichEditor } from '@/components/capstones/RichEditor'
 import { CapstoneReflection } from '@/components/capstones/CapstoneReflection'

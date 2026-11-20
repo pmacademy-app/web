@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getUserXpSummary } from '@/lib/xp-service'
+import { getUserXpSummary } from '@/lib/xp/xp-service'
 
 export const GET = withRoute(
   {

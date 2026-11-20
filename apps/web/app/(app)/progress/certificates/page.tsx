@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { getUserCertificates, isTestCertificateCode } from '@/lib/certificates-db'
+import { getUserCertificates, isTestCertificateCode } from '@/lib/certificates/certificates-db'
 import {
   FULL_CURRICULUM_LESSON_COUNT,
   issueFullCurriculumCertificateIfEligible,

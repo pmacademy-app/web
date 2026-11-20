@@ -24,7 +24,7 @@ import type {
   ModuleCelebration,
 } from '@/lib/api/contracts/achievement-celebration'
 import { BRAND } from '@/lib/brand'
-import { isTestCertificateCode } from '@/lib/certificates-db'
+import { isTestCertificateCode } from '@/lib/certificates/certificates-db'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { describeDbError } from '@/lib/monitoring/db-error'
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'

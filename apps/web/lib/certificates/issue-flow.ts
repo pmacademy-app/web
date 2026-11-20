@@ -16,13 +16,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
-import { issueCertificateWithStatus, type CertificateRow } from '@/lib/certificates-db'
+import { issueCertificateWithStatus, type CertificateRow } from '@/lib/certificates/certificates-db'
 import { PublicError } from '@/lib/errors/public-error'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
 // Defined in certificates-db (this module imports it, not the other way round).
-export { FULL_CURRICULUM_LESSON_COUNT } from '@/lib/certificates-db'
+export { FULL_CURRICULUM_LESSON_COUNT } from '@/lib/certificates/certificates-db'
 
 export interface CertificateRecipientMeta {
   email?: string | null

@@ -10,7 +10,7 @@ import type { Database } from '@/lib/supabase'
 
 import { summarizeBadges, summarizeFellow, summarizeLevel } from '@/lib/dashboard/proof-extras'
 import { loadProofExtras } from '@/lib/dashboard/proof-extras-db'
-import { getPortfolioSettings, portfolioReadinessInputFromUserRow } from '@/lib/portfolio-db'
+import { getPortfolioSettings, portfolioReadinessInputFromUserRow } from '@/lib/portfolio/portfolio-db'
 
 
 describe('summarizeFellow', () => {

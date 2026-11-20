@@ -8,7 +8,7 @@
  * for a Fellow distinction.
  */
 
-import type { PortfolioReadinessSummary } from './portfolio-readiness'
+import type { PortfolioReadinessSummary } from '../portfolio/portfolio-readiness'
 
 export type FellowRequestRowStatus = 'pending' | 'approved' | 'rejected'
 

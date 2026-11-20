@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Trophy, Flame, Zap, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react'
-import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
+import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard/leaderboard'
 import { cn } from '@/lib/utils'
 
 interface LeaderboardTableProps {

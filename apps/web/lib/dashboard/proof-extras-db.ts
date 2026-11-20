@@ -1,10 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import type { Selected } from '@/lib/db'
-import { getUserBadgesData } from '@/lib/badges-db'
-import { deriveFellowRequestState, type FellowRequestRowStatus } from '@/lib/fellow'
-import { calculatePortfolioReadiness } from '@/lib/portfolio-readiness'
-import { portfolioReadinessInputFromUserRow } from '@/lib/portfolio-db'
+import { getUserBadgesData } from '@/lib/badges/badges-db'
+import { deriveFellowRequestState, type FellowRequestRowStatus } from '@/lib/fellow/fellow'
+import { calculatePortfolioReadiness } from '@/lib/portfolio/portfolio-readiness'
+import { portfolioReadinessInputFromUserRow } from '@/lib/portfolio/portfolio-db'
 import { resolveReferralRewardXp } from '@/lib/referral/referral-service'
 import {
   summarizeBadges,

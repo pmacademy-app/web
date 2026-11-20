@@ -20,8 +20,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import type { BadgeProgressItem } from '@/lib/badges'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import type { BadgeProgressItem } from '@/lib/badges/badges'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio/portfolio'
 import { cn } from '@/lib/utils'
 
 interface BadgeCardProps {

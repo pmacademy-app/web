@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
-import { isFellowEligible, deriveFellowRequestState } from '../fellow'
-import { calculatePortfolioReadiness } from '../portfolio-readiness'
-import { getUserFellowState, submitFellowRequest } from '../fellow-requests-db'
+import { isFellowEligible, deriveFellowRequestState } from '../fellow/fellow'
+import { calculatePortfolioReadiness } from '../portfolio/portfolio-readiness'
+import { getUserFellowState, submitFellowRequest } from '../fellow/fellow-requests-db'
 
 const fullyCompleteInput = {
   name: 'Jordan PM',

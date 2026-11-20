@@ -74,7 +74,7 @@ function seedBoard() {
 
 async function loadLeaderboard() {
   vi.resetModules()
-  const mod = await import('../leaderboard-db')
+  const mod = await import('../leaderboard/leaderboard-db')
   const fake = await installDataCacheFake()
   const nextCache = await import('next/cache')
   return { ...mod, fake, nextCache }

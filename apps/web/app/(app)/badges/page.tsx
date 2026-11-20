@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getCurrentUserProfile, getServerUser } from '@/lib/auth'
-import { getUserBadgesData } from '@/lib/badges-db'
+import { getUserBadgesData } from '@/lib/badges/badges-db'
 import { BadgeCard } from '@/components/badges/BadgeCard'
 import { Trophy, Award, Sparkles } from 'lucide-react'
 

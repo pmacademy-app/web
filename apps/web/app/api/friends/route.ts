@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { getFriendLeaderboard, addFriend, removeFriend } from '@/lib/leaderboard-db'
+import { getFriendLeaderboard, addFriend, removeFriend } from '@/lib/leaderboard/leaderboard-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 const addFriendSchema = z.object({

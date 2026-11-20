@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Award, Lock, CheckCircle, Clock, ChevronRight, Edit3 } from 'lucide-react'
-import type { ModuleCapstoneOverviewItem } from '@/lib/capstones-db'
+import type { ModuleCapstoneOverviewItem } from '@/lib/capstones/capstones-db'
 import { cn } from '@/lib/utils'
 
 interface CapstoneCardProps {

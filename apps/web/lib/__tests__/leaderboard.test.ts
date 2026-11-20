@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateWeekStart, calculateRankings, type RawLeaderboardUserMetric } from '../leaderboard'
+import { calculateWeekStart, calculateRankings, type RawLeaderboardUserMetric } from '../leaderboard/leaderboard'
 
 describe('Leaderboard & Consistency Ranking Unit Test Suite', () => {
   describe('Monday Date Calculation', () => {

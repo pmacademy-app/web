@@ -7,8 +7,8 @@ import { destructiveReauthBodySchema } from '@/lib/api/contracts/settings'
 import { deleteAccount } from '@/lib/settings/settings-service'
 import { verifyDestructiveReauth } from '@/lib/settings/destructive-reauth'
 import { logSystemError } from '@/lib/monitoring/logger'
-import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
-import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
+import { revalidatePublicPortfolio } from '@/lib/portfolio/portfolio-revalidate'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard/leaderboard-db'
 
 export const POST = withRoute(
   {

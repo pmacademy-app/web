@@ -12,11 +12,11 @@ vi.mock('next/server', async (importOriginal) => ({
   },
 }))
 
-vi.mock('@/lib/streaks-db', () => ({
+vi.mock('@/lib/streaks/streaks-db', () => ({
   updateUserStreak: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock('@/lib/xp', () => ({
+vi.mock('@/lib/xp/xp', () => ({
   verifyTheoryReadEngagement: vi.fn(),
   getRuntimeXpValues: vi.fn().mockResolvedValue({
     QUIZ_CORRECT: 10,

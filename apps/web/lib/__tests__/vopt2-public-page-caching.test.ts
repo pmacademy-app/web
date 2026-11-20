@@ -7,7 +7,7 @@
  *  - Portfolios are cached across requests too (ISR, revalidate 3600), now that the
  *    invalidation path exists: every write that changes what a portfolio shows,
  *    making it private above all, purges its exact paths with revalidatePath
- *    (lib/portfolio-revalidate.ts, pinned in portfolio-page-cache.test.ts). These
+ *    (lib/portfolio/portfolio-revalidate.ts, pinned in portfolio-page-cache.test.ts). These
  *    tests pin the privacy invariants the cached render relies on: a private or
  *    missing portfolio resolves to null, the read performs no write, and the page
  *    reads nothing per viewer.
@@ -29,7 +29,7 @@ describe('V-OPT-2: public portfolio read', () => {
   })
 
   async function loadPortfolioDb() {
-    return import('../portfolio-db')
+    return import('../portfolio/portfolio-db')
   }
 
   it('1. a public portfolio renders its payload', async () => {
@@ -77,7 +77,7 @@ describe('V-OPT-2: public portfolio read', () => {
     // This is the property that made the previous arrangement unsafe to cache: the
     // view-count increment used to live inside this function.
     const src = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../portfolio-db.ts', import.meta.url), 'utf-8')
+      fs.readFileSync(new URL('../portfolio/portfolio-db.ts', import.meta.url), 'utf-8')
     )
     const body = src.slice(
       src.indexOf('export async function getPublicPortfolioData'),
@@ -99,7 +99,7 @@ describe('V-OPT-2: public portfolio read', () => {
 
   it('9b. the increment still re-checks visibility itself', async () => {
     const src = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../portfolio-db.ts', import.meta.url), 'utf-8')
+      fs.readFileSync(new URL('../portfolio/portfolio-db.ts', import.meta.url), 'utf-8')
     )
     const body = src.slice(src.indexOf('export async function incrementPortfolioViewCount'))
     expect(body).toContain('is_portfolio_public')
@@ -107,7 +107,7 @@ describe('V-OPT-2: public portfolio read', () => {
 
   it('deduplicates the read within a render; the page itself is the cross-request cache', async () => {
     const src = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../portfolio-db.ts', import.meta.url), 'utf-8')
+      fs.readFileSync(new URL('../portfolio/portfolio-db.ts', import.meta.url), 'utf-8')
     )
     expect(src).toContain("import { cache } from 'react'")
     // One cache layer, purged by path. A second data-cache layer under the page would outlive
@@ -172,7 +172,7 @@ describe('V-OPT-2: certificate verification caching', () => {
   })
 
   it('2/8. an unknown certificate resolves to null rather than another certificate', async () => {
-    const db = await import('../certificates-db')
+    const db = await import('../certificates/certificates-db')
     const client = {
       from: () => ({
         select: () => ({
@@ -186,7 +186,7 @@ describe('V-OPT-2: certificate verification caching', () => {
   })
 
   it('8. the looked-up code is the one returned — no cross-certificate bleed', async () => {
-    const db = await import('../certificates-db')
+    const db = await import('../certificates/certificates-db')
     let asked = ''
     const client = {
       from: (t: string) => {
@@ -231,7 +231,7 @@ describe('V-OPT-2: certificate verification caching', () => {
 
   it('the certificate lookup performs no mutation and no view counting', async () => {
     const src = await import('node:fs').then((fs) =>
-      fs.readFileSync(new URL('../certificates-db.ts', import.meta.url), 'utf-8')
+      fs.readFileSync(new URL('../certificates/certificates-db.ts', import.meta.url), 'utf-8')
     )
     const body = src.slice(src.indexOf('export async function verifyCertificate'))
     const fn = body.slice(0, body.indexOf('\nexport '))

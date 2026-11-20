@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { getSkillRadarSummary } from '../skillRadar'
-import { getUserBadgesData } from '../badges-db'
+import { getUserBadgesData } from '../badges/badges-db'
 
 /**
  * Verifies the Progress-page query consolidation: when a caller already has

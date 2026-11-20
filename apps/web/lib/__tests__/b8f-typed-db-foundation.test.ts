@@ -26,7 +26,7 @@ vi.mock('@/lib/monitoring/logger', () => ({
 // ─── The escape hatch is gone where it mattered ──────────────────────────────
 
 const MIGRATED = [
-  'lib/leaderboard-db.ts',
+  'lib/leaderboard/leaderboard-db.ts',
   'lib/xp/xp-service.ts',
   'lib/db/index.ts',
   'lib/db/xp.ts',

@@ -1,5 +1,5 @@
 import { withRoute } from '@/lib/api/with-route'
-import { recordPortfolioView } from '@/lib/portfolio-db'
+import { recordPortfolioView } from '@/lib/portfolio/portfolio-db'
 import { evaluateInMemoryRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 import { createServiceRoleClient } from '@/lib/supabase'

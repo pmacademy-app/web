@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { getUserFellowState, submitFellowRequest } from '@/lib/fellow-requests-db'
+import { getUserFellowState, submitFellowRequest } from '@/lib/fellow/fellow-requests-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(

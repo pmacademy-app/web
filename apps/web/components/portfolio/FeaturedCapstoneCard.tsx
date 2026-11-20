@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { PublicCapstoneItem } from '@/lib/portfolio-db'
+import type { PublicCapstoneItem } from '@/lib/portfolio/portfolio-db'
 import {
   Sparkles,
   CheckCircle2,

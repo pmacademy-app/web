@@ -56,9 +56,9 @@ vi.mock('@/lib/supabase', async (importOriginal) => {
 vi.mock('@/lib/lesson-loader', () => ({ fetchCurriculumData: vi.fn(async () => ({ lessons: [] })) }))
 
 import { escapeLike } from '@/lib/db/escape-like'
-import { verifyCertificate } from '@/lib/certificates-db'
+import { verifyCertificate } from '@/lib/certificates/certificates-db'
 import { resolveReferralCode } from '@/lib/referral/referral-service'
-import { updatePortfolioSettings } from '@/lib/portfolio-db'
+import { updatePortfolioSettings } from '@/lib/portfolio/portfolio-db'
 import { POST as sharePOST } from '@/app/api/portfolio/share/route'
 import { POST as avatarPOST } from '@/app/api/user/avatar/route'
 

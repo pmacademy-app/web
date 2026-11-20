@@ -7,7 +7,7 @@ import {
   getLearnerSubmittedCapstones,
   DEFAULT_PORTFOLIO_LAYOUT,
   type PortfolioSectionId,
-} from '../portfolio-db'
+} from '../portfolio/portfolio-db'
 import {
   trackPortfolioLayoutUpdated,
   trackPortfolioFeaturedCapstoneSet,

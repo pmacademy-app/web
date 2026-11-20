@@ -11,7 +11,7 @@ import { normalizeReferralRewardXp, REFERRAL_REWARD_XP } from '@/lib/referral/re
 import { SettingsService } from '@/lib/settings/system-settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { awardXp, hasXpEvent } from '@/lib/xp-service'
+import { awardXp, hasXpEvent } from '@/lib/xp/xp-service'
 import { escapeLike } from '@/lib/db/escape-like'
 import { createInAppNotification } from '@/lib/notifications/in-app/service'
 import { BRAND } from '@/lib/brand'

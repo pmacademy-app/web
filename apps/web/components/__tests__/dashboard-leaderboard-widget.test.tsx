@@ -27,7 +27,7 @@ import {
 } from '@/components/dashboard/DashboardLeaderboardWidget'
 import { LeaderboardWidgetSlot } from '@/app/(app)/dashboard/LeaderboardWidgetSlot'
 import { NO_ACTIVITY_HINT } from '@/lib/dashboard/leaderboard-widget'
-import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard-db'
+import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard/leaderboard-db'
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean

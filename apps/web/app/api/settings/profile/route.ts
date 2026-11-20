@@ -5,8 +5,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { profileUpdateSchema } from '@/lib/api/contracts/settings'
 import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
 import { logSystemError } from '@/lib/monitoring/logger'
-import { revalidatePublicPortfolioForUser } from '@/lib/portfolio-revalidate'
-import { invalidateLeaderboardCache } from '@/lib/leaderboard-db'
+import { revalidatePublicPortfolioForUser } from '@/lib/portfolio/portfolio-revalidate'
+import { invalidateLeaderboardCache } from '@/lib/leaderboard/leaderboard-db'
 
 export { profileUpdateSchema }
 

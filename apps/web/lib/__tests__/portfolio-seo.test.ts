@@ -6,8 +6,8 @@ import { createServiceRoleClient } from '../supabase'
 import {
   generatePersonJsonLd,
   generateProfilePageJsonLd,
-} from '../portfolio'
-import { getPublicPortfolioSitemapEntries } from '../portfolio-db'
+} from '../portfolio/portfolio'
+import { getPublicPortfolioSitemapEntries } from '../portfolio/portfolio-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 
@@ -21,7 +21,7 @@ vi.mock('../supabase', () => ({
  * The portfolio title and description assertions below used to expect an em dash
  * (`Elena Rostova — Product Management Fellow at Prodily | Portfolio`). Commit 4525e85
  * changed both producers — `generateMetadata` in `app/(portfolio)/p/[username]/page.tsx`
- * and `generateProfilePageJsonLd` in `lib/portfolio.ts` — to a pipe in titles and a comma
+ * and `generateProfilePageJsonLd` in `lib/portfolio/portfolio.ts`, to a pipe in titles and a comma
  * in descriptions, under the stated intent "Remove emojis and AI em-dashes". That commit
  * removed 64 em-dash lines across the product and added one back, so this is a deliberate
  * house style for user-facing copy, not an accident.

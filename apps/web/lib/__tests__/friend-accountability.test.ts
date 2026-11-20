@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
-import { addFriend, removeFriend } from '../leaderboard-db'
+import { addFriend, removeFriend } from '../leaderboard/leaderboard-db'
 
 /**
  * Root-cause regression test for the broken "Add Friend" action.

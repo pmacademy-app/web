@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Award as CertIcon, ExternalLink } from 'lucide-react'
-import type { CertificateRow } from '@/lib/certificates-db'
+import type { CertificateRow } from '@/lib/certificates/certificates-db'
 import {
   TEST_CERTIFICATE_EXPLANATION,
   getCertificatePresentation,

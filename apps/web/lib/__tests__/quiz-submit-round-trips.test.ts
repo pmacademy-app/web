@@ -30,13 +30,13 @@ vi.mock('next/server', async (importOriginal) => ({
     mocks.afterTasks.push(task)
   },
 }))
-vi.mock('@/lib/streaks-db', () => ({ updateUserStreak: mocks.streak }))
+vi.mock('@/lib/streaks/streaks-db', () => ({ updateUserStreak: mocks.streak }))
 vi.mock('@/lib/referral/referral-service', () => ({ onFirstLessonCompletedReferralCheck: mocks.referralCheck }))
 vi.mock('@/lib/notifications/dispatcher', () => ({ globalNotificationDispatcher: { dispatch: mocks.dispatch } }))
 vi.mock('@/lib/notifications/events/connectors', () => ({ initializeNotificationConnectors: vi.fn() }))
 
 import { getServedQuizQuestions, submitQuizAttempt } from '@/lib/academy/lessons-db'
-import { getRuntimeXpValues, invalidateRuntimeXpCache } from '@/lib/xp'
+import { getRuntimeXpValues, invalidateRuntimeXpCache } from '@/lib/xp/xp'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 

@@ -16,7 +16,7 @@ import {
   Eye,
   Edit3,
 } from 'lucide-react'
-import { calculateCapstoneWordCount } from '@/lib/capstones'
+import { calculateCapstoneWordCount } from '@/lib/capstones/capstones'
 import { marked } from 'marked'
 import DOMPurify from 'isomorphic-dompurify'
 import { cn } from '@/lib/utils'

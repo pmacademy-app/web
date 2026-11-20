@@ -15,8 +15,8 @@ import {
   Check,
 } from 'lucide-react'
 import Link from 'next/link'
-import type { PublicCapstoneItem } from '@/lib/portfolio-db'
-import { capstoneSharePath } from '@/lib/portfolio'
+import type { PublicCapstoneItem } from '@/lib/portfolio/portfolio-db'
+import { capstoneSharePath } from '@/lib/portfolio/portfolio'
 
 interface PortfolioCapstonesProps {
   capstones: PublicCapstoneItem[]

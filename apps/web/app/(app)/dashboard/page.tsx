@@ -6,9 +6,9 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
-import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks-db'
+import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks/streaks-db'
 import { logSystemError } from '@/lib/monitoring/logger'
-import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
+import { getWeeklyLeaderboard } from '@/lib/leaderboard/leaderboard-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
 import { getAllCapstoneDefinitions, getCurriculumModuleForCapstone } from '@/config/capstones'
 import {
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
     deliverableType: string
   } | null = null
 
-  // The prompt uses the same unlock rule the server enforces (lib/capstones-db.ts
+  // The prompt uses the same unlock rule the server enforces (lib/capstones/capstones-db.ts
   // resolveCapstoneThreshold): N completed module lessons, where N comes from the Phase 7
   // threshold experiment (8 by default). The profile row already carries users.created_at.
   const thresholdConfig = getCapstoneThresholdConfig()

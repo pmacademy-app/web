@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { safeJsonLd, safeJsonStringify } from '../seo/safe-json-ld'
 import { profileUpdateSchema } from '../../app/api/settings/profile/route'
-import { generatePersonJsonLd, generateProfilePageJsonLd, validateOptionalUrl } from '../portfolio'
+import { generatePersonJsonLd, generateProfilePageJsonLd, validateOptionalUrl } from '../portfolio/portfolio'
 
 describe('B2: Public Portfolio XSS & Untrusted JSON-LD Serialization Security Suite', () => {
   describe('Safe JSON Serialization (safeJsonLd / safeJsonStringify)', () => {

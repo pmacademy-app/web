@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { CAPSTONE_REVIEW_EXPECTATION } from '../capstones'
+import { CAPSTONE_REVIEW_EXPECTATION } from '../capstones/capstones'
 
 const webRoot = path.resolve(import.meta.dirname, '../..')
 const read = (rel: string) => readFileSync(path.join(webRoot, rel), 'utf8')

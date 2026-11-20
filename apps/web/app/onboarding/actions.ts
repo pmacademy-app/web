@@ -14,7 +14,7 @@ import {
 } from '@/lib/personalization/path-resolver'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
-import { validateUsername } from '@/lib/portfolio'
+import { validateUsername } from '@/lib/portfolio/portfolio'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { profileUpdateSchema } from '@/lib/api/contracts/settings'
 import {
@@ -24,7 +24,7 @@ import {
   DEFAULT_TOPIC_OPTIONS,
 } from '@/lib/onboarding/onboarding-defaults'
 import type { OnboardingFieldOption } from '@/lib/settings/types'
-import { revalidatePublicPortfolio } from '@/lib/portfolio-revalidate'
+import { revalidatePublicPortfolio } from '@/lib/portfolio/portfolio-revalidate'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 
@@ -34,7 +34,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export interface OnboardingData {
   // Phase 4 (Collapse the Entrance): the critical onboarding path is now goal + experience.
   // Identity/portfolio fields below are DEFERRED — optional at onboarding and collected later
-  // in Settings → Portfolio, which validates them identically (lib/portfolio.ts:validateUsername).
+  // in Settings → Portfolio, which validates them identically (lib/portfolio/portfolio.ts:validateUsername).
   // They remain in the payload for backward compatibility with any client that still sends them.
   goal: string // Primary goal — REQUIRED (drives completion + the recommended starting module)
   career_role: string // Experience level / Role — REQUIRED
@@ -134,7 +134,7 @@ export async function checkUsernameAvailability(rawUsername: string, currentUser
       return { available: false, error: 'Too many username checks. Please wait a minute and try again.' }
     }
 
-    // CQ-24: the same rule as Settings > Portfolio (lib/portfolio.ts), reserved words included.
+    // CQ-24: the same rule as Settings > Portfolio (lib/portfolio/portfolio.ts), reserved words included.
     // Handles are stored lowercase by both writers.
     const username = (typeof rawUsername === 'string' ? rawUsername : '').trim().toLowerCase()
     const check = validateUsername(username)
@@ -361,7 +361,7 @@ export async function submitOnboarding(data: OnboardingData) {
       typeof existingProfile?.username === 'string' ? existingProfile.username : null
 
     // Deferred identity fields. Optional at onboarding, but a supplied value must be
-    // well-formed. CQ-24: validateUsername (lib/portfolio.ts) is the rule Settings >
+    // well-formed. CQ-24: validateUsername (lib/portfolio/portfolio.ts) is the rule Settings >
     // Portfolio uses, so a reserved handle such as `admin` is refused here too. Stored
     // lowercase, like Settings.
     const username = identityLocked ? '' : (input.username || '').trim().toLowerCase()

@@ -41,7 +41,7 @@ vi.mock('@/lib/certificates/linkedin-url', async (importOriginal) => {
 
 import { AchievementCelebrationModal } from '@/components/celebration/AchievementCelebrationModal'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
-import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio'
+import { PORTFOLIO_SETTINGS_HREF } from '@/lib/portfolio/portfolio'
 import type {
   AchievementCelebration,
   CapstoneCelebration,

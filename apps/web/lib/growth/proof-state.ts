@@ -5,8 +5,8 @@
  * all phrase their next step from `selectProofNextStep`, so the copy logic lives in one place.
  * Loaders that read the inputs live in `proof-state-db.ts`.
  */
-import { calculatePortfolioReadiness, portfolioReadinessInputFromUserRow } from '@/lib/portfolio-readiness'
-import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow'
+import { calculatePortfolioReadiness, portfolioReadinessInputFromUserRow } from '@/lib/portfolio/portfolio-readiness'
+import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow/fellow'
 import { getAllCapstoneDefinitions, getCurriculumModuleForCapstone, getCapstoneHref } from '@/config/capstones'
 import { CURRICULUM_LESSON_COUNT, getLessonIdsForModule } from '@/lib/curriculum-registry'
 

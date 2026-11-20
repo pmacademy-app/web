@@ -22,7 +22,7 @@ const MAX_LABEL = 40
 const MAX_BADGE_NAME = 60
 const MAX_CAPSTONE_TITLE = 120
 const SLUG = /^[a-z0-9_-]{1,64}$/
-// The portfolio username rule (validateUsername in lib/portfolio.ts); kept inline so this file stays import-free.
+// The portfolio username rule (validateUsername in lib/portfolio/portfolio.ts); kept inline so this file stays import-free.
 const USERNAME = /^[a-z0-9_-]{3,30}$/i
 
 const isLabel = (value: unknown): value is string =>

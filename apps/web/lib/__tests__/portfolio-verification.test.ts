@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { calculatePortfolioReadiness } from '../portfolio-readiness'
-import { calculatePortfolioVerification } from '../portfolio-readiness'
+import { calculatePortfolioReadiness } from '../portfolio/portfolio-readiness'
+import { calculatePortfolioVerification } from '../portfolio/portfolio-readiness'
 
 const fullProfile = {
   name: 'Jordan PM',

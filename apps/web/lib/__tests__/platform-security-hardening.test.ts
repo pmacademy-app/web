@@ -12,14 +12,14 @@ import { onFirstLessonCompletedReferralCheck } from '../referral/referral-servic
 import * as authLib from '../auth'
 import * as supabaseLib from '../supabase'
 import * as flashcardsService from '../flashcards-service'
-import * as xpService from '../xp-service'
+import * as xpService from '../xp/xp-service'
 import { SettingsService } from '../settings/system-settings-service'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 
 // The referral check reads the ledger before paying; the real functions stay in place unless a test overrides them.
-vi.mock('@/lib/xp-service', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../xp-service')>()
+vi.mock('@/lib/xp/xp-service', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../xp/xp-service')>()
   return { ...actual, hasXpEvent: vi.fn(actual.hasXpEvent), awardXp: vi.fn(actual.awardXp) }
 })
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { BADGE_DEFINITIONS, getBadgeDefinition } from '../../config/badges'
-import { calculateBadgeProgress, evaluateEligibleBadges } from '../badges'
+import { calculateBadgeProgress, evaluateEligibleBadges } from '../badges/badges'
 
 describe('Badge & Achievement System Unit Test Suite', () => {
   describe('Badge Definitions Structure', () => {

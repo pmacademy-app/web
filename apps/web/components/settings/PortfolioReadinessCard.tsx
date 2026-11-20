@@ -9,7 +9,7 @@ import {
   ExternalLink,
   ShieldCheck,
 } from 'lucide-react'
-import type { PortfolioReadinessSummary } from '@/lib/portfolio-readiness'
+import type { PortfolioReadinessSummary } from '@/lib/portfolio/portfolio-readiness'
 
 interface PortfolioReadinessCardProps {
   readiness: PortfolioReadinessSummary

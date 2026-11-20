@@ -1,4 +1,4 @@
-import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard-db'
+import type { WeeklyLeaderboardPayload } from '@/lib/leaderboard/leaderboard-db'
 import { toLeaderboardRows, toLeaderboardWidgetView } from '@/lib/dashboard/leaderboard-widget'
 import { DashboardLeaderboardWidget } from '@/components/dashboard/DashboardLeaderboardWidget'
 

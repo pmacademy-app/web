@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { XP_VALUES, getRuntimeXpValues, getXpAmountForSource, calculateQuizXp } from '../xp'
+import { XP_VALUES, getRuntimeXpValues, getXpAmountForSource, calculateQuizXp } from '../xp/xp'
 
 describe('Phase 1 — Learning Settings / Runtime XP Integrity', () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Shield, UserPlus, Trash2, Loader2, Check, AlertCircle } from 'lucide-react'
-import type { LeaderboardEntry } from '@/lib/leaderboard'
+import type { LeaderboardEntry } from '@/lib/leaderboard/leaderboard'
 import { cn } from '@/lib/utils'
 import { apiGet, apiPost, apiDelete } from '@/lib/api/client'
 

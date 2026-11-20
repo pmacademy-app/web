@@ -6,7 +6,7 @@ import {
   getXpAmountForSource,
   LEVEL_THRESHOLDS,
   XP_VALUES,
-} from '../xp'
+} from '../xp/xp'
 
 describe('Prodily XP & Level Engine Test Suite', () => {
   describe('calculateLevel (Level & Career Title Computation)', () => {

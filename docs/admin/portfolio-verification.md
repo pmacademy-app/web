@@ -16,7 +16,7 @@ Unlike PM Fellow, Portfolio Verification is **automatic by default** — no admi
 
 ## 2. Automatic Eligibility Rule
 
-A portfolio is auto-verified when **all** of the following are true (`calculatePortfolioVerification()` in `lib/portfolio-readiness.ts`):
+A portfolio is auto-verified when **all** of the following are true (`calculatePortfolioVerification()` in `lib/portfolio/portfolio-readiness.ts`):
 - Profile has an **avatar** image.
 - Profile has a **bio** (reuses the same "has bio" signal as the Portfolio Readiness checklist).
 - At least **2 of 3** professional links are present: LinkedIn, GitHub, personal website.

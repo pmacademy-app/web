@@ -6,7 +6,7 @@
  * service-role client, notifications queue, DB models) into the browser bundle.
  */
 import { z } from 'zod'
-import { validateWritableUrl } from '@/lib/portfolio'
+import { validateWritableUrl } from '@/lib/portfolio/portfolio'
 
 const urlField = (label: string) =>
   z

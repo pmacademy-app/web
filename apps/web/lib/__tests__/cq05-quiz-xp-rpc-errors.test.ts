@@ -18,13 +18,13 @@ const { db } = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('@/lib/xp', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/xp')>()
+vi.mock('@/lib/xp/xp', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/xp/xp')>()
   // No client: the static defaults, so the test never depends on a settings read.
   return { ...actual, getRuntimeXpValues: vi.fn(() => actual.getRuntimeXpValues()) }
 })
 
-vi.mock('@/lib/streaks-db', () => ({ updateUserStreak: vi.fn(async () => undefined) }))
+vi.mock('@/lib/streaks/streaks-db', () => ({ updateUserStreak: vi.fn(async () => undefined) }))
 
 vi.mock('@/lib/notifications/dispatcher', () => ({
   globalNotificationDispatcher: { dispatch: vi.fn(async () => undefined) },

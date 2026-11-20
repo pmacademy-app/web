@@ -8,10 +8,10 @@ const { awardXpMock, hasXpEventMock, xpValuesMock } = vi.hoisted(() => ({
   xpValuesMock: vi.fn(async () => ({ THEORY_READ: 20, DAILY_STREAK_BASE: 5 })),
 }))
 
-vi.mock('../xp-service', () => ({ awardXp: awardXpMock, hasXpEvent: hasXpEventMock }))
-vi.mock('../xp', async (orig) => ({ ...(await orig<typeof import('../xp')>()), getRuntimeXpValues: xpValuesMock }))
+vi.mock('../xp/xp-service', () => ({ awardXp: awardXpMock, hasXpEvent: hasXpEventMock }))
+vi.mock('../xp/xp', async (orig) => ({ ...(await orig<typeof import('../xp/xp')>()), getRuntimeXpValues: xpValuesMock }))
 
-import { updateUserStreak } from '../streaks-db'
+import { updateUserStreak } from '../streaks/streaks-db'
 import { readRunCursor, writeRunCursor } from '../notifications/run-cursor'
 
 const root = path.resolve(__dirname, '../..')

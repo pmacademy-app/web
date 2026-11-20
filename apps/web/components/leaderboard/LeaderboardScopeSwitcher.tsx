@@ -3,8 +3,8 @@
 import React, { useState, useCallback } from 'react'
 import { Globe2, Users, Shield, Loader2, AlertTriangle, RotateCw } from 'lucide-react'
 import { LeaderboardTable } from './LeaderboardTable'
-import type { LeaderboardEntry } from '@/lib/leaderboard'
-import type { CohortItemPayload } from '@/lib/leaderboard-db'
+import type { LeaderboardEntry } from '@/lib/leaderboard/leaderboard'
+import type { CohortItemPayload } from '@/lib/leaderboard/leaderboard-db'
 import { cn } from '@/lib/utils'
 import { apiGet } from '@/lib/api/client'
 

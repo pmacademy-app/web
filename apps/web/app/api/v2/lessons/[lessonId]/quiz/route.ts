@@ -36,7 +36,7 @@ import {
   QUIZ_ATTEMPT_ID_PATTERN,
   QUIZ_RECEIPT_MAX_LENGTH,
 } from '@/lib/academy/quiz-receipts'
-import { submitQuizAttempt } from '@/lib/lessons-db'
+import { submitQuizAttempt } from '@/lib/academy/lessons-db'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { createServiceRoleClient } from '@/lib/supabase'
 

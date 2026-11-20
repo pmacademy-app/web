@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { Award, Loader2, CheckCircle2, Clock, XCircle, AlertCircle, Sparkles } from 'lucide-react'
-import type { PortfolioReadinessSummary } from '@/lib/portfolio-readiness'
-import type { FellowRequestUiState } from '@/lib/fellow'
+import type { PortfolioReadinessSummary } from '@/lib/portfolio/portfolio-readiness'
+import type { FellowRequestUiState } from '@/lib/fellow/fellow'
 
 interface FellowStatePayload {
   state: FellowRequestUiState

@@ -8,9 +8,9 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { getPortfolioSettings, getLearnerSubmittedCapstones } from '@/lib/portfolio-db'
-import { calculatePortfolioReadiness, type PortfolioReadinessSummary } from '@/lib/portfolio-readiness'
-import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow'
+import { getPortfolioSettings, getLearnerSubmittedCapstones } from '@/lib/portfolio/portfolio-db'
+import { calculatePortfolioReadiness, type PortfolioReadinessSummary } from '@/lib/portfolio/portfolio-readiness'
+import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow/fellow'
 import { PublicError } from '@/lib/errors/public-error'
 
 interface DBChain {
