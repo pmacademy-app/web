@@ -17,7 +17,7 @@ These come from the code on `main` and the held migrations, not from a productio
 - **Required Action**: in the SQL editor run `SELECT jobname, schedule, active FROM cron.job;`. If the six `prodily-*` jobs are missing, merge `vanshdev-fix-cron-selfcheck` and apply `20261024000003`, then `20261030000001` (ROADMAP section 2.1 and 2.3).
 
 #### ISSUE-34: Learners can still write their own `public.users` row
-- **Status**: 🟠 Fixed in a held migration, not applied
+- **Status**: ✅ Resolved 2026-11-21: `20261027000002_lock_public_users.sql` applied by hand in the production SQL editor; its built-in checks passed.
 - **Description**: until `pending-approval/20261027000002_lock_public_users.sql` runs, a learner session can PATCH its own `users` row through PostgREST, including `current_streak`, `longest_streak`, `streak_freezes_available` and the onboarding columns, which the column guard does not cover. The code precondition (no learner-session writes to `public.users`) is on `main`.
 - **Required Action**: confirm production runs current `main`, apply the migration, then confirm a learner-token `PATCH /rest/v1/users` is refused.
 

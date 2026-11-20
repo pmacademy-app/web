@@ -16,8 +16,7 @@ import {
   Check,
   Lock,
 } from 'lucide-react'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { getServerUser, getCurrentUserProfile, getLearnerDb } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
 import {
@@ -71,10 +70,11 @@ export default async function AcademyPage() {
   let treatment = false
   let override = false
   if (user) {
-    const supabase = createServiceRoleClient()
+    // Own-row read under RLS (see getLearnerDb).
+    const learnerDb = await getLearnerDb()
     // dbUser reuses the layout's memoized users SELECT rather than re-querying it.
     const [{ data: rows }, dbUser] = await Promise.all([
-      supabase
+      learnerDb
         .from('user_lesson_progress')
         .select('lesson_id, status')
         .eq('user_id', user.id),

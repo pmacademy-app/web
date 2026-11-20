@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getServerUser, getLearnerDb } from '@/lib/auth'
 import { getSkillRadarSummary } from '@/lib/skillRadar'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
@@ -24,9 +24,11 @@ export default async function SkillRadarProgressPage() {
   }
 
   const supabase = createServiceRoleClient()
+  // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
+  const learnerDb = await getLearnerDb()
 
   const [{ data: progressRows }, curriculum] = await Promise.all([
-    (supabase
+    (learnerDb
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status, quiz_score, quiz_attempts')
       .eq('user_id', user.id) as unknown as Promise<{

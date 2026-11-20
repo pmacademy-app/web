@@ -17,7 +17,7 @@ import {
   getLessonMeta,
 } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { getServerUser, getCurrentUserProfile, getLearnerDb } from '@/lib/auth'
 import { resolveLessonAccessForUser } from '@/lib/lessons-completion-service'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { getRecutVariant } from '@/lib/academy/experiment'
@@ -152,6 +152,8 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   if (user) {
     const serviceSupabase = createServiceRoleClient()
+    // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
+    const learnerDb = await getLearnerDb()
 
     // Phase 6: resolve the experiment variant (control unless the flag is enabled for this
     // learner's new-signup cohort) and the access decision under the module-entry unlock model.
@@ -165,7 +167,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         curriculum: lessons,
         treatment,
       }),
-      serviceSupabase
+      learnerDb
         .from('user_lesson_progress')
         .select('status, theory_read_at, quiz_score, quiz_attempts, xp_earned, completed_at')
         .eq('user_id', user.id)

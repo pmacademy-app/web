@@ -61,7 +61,7 @@ Undo: `rollback/20261024000003_schedule_cron_jobs_pg_cron.down.sql`.
 Adds a CHECK constraint on `public.users.username`. Run its pre-check first: the constraint
 fails to apply if any existing username breaks the rule. Steps in the runbook, step (f).
 
-### `20261027000002_lock_public_users.sql` (Q1, SEC-07 part 2)
+### `20261027000002_lock_public_users.sql` (Q1, SEC-07 part 2, applied by hand 2026-11-21, never moved)
 
 Revokes learner writes to `public.users` through PostgREST. Apply only **after** the code that
 stops writing `public.users` with a learner session is deployed, then confirm a learner-token

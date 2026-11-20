@@ -222,15 +222,30 @@ export const getServerUser = cache(resolveServerUser)
  * Throws ProfileReadError when the query itself fails, so a transient error is
  * never mistaken for a missing row.
  */
+/**
+ * The database client for reading the signed-in learner's OWN rows in a server
+ * component: it carries the learner's access token, so Row Level Security scopes
+ * every read to that learner even if a query forgets its user_id filter.
+ *
+ * Use it only for tables whose policies let a learner select their own rows
+ * (docs/ops/backend-phase3-plan.md, Plan A step 1). Never for writes, for other
+ * users' rows, or for settings tables: those have no learner policy, and a read
+ * there returns no rows instead of failing, which would silently drop data.
+ *
+ * Falls back to the service-role client when there is no access token, the same
+ * rule getCurrentUserProfile has always used. Memoized per request.
+ */
+export const getLearnerDb = cache(async () => {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+  return accessToken ? createAuthenticatedServerClient(accessToken) : createServiceRoleClient()
+})
+
 export const getCurrentUserProfile = cache(async (): Promise<UserProfile | null> => {
   const authUser = await getServerUser()
   if (!authUser) return null
 
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  const supabase = accessToken
-    ? createAuthenticatedServerClient(accessToken)
-    : createServiceRoleClient()
+  const supabase = await getLearnerDb()
 
   const { data, error } = await supabase
     .from('users')

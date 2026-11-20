@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getServerUser, getLearnerDb } from '@/lib/auth'
 import { getUserCertificates, isTestCertificateCode } from '@/lib/certificates/certificates-db'
 import {
   FULL_CURRICULUM_LESSON_COUNT,
@@ -27,12 +27,14 @@ export default async function CertificatesProgressPage() {
   }
 
   const supabase = createServiceRoleClient()
+  // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
+  const learnerDb = await getLearnerDb()
 
   const [
     { data: progressRows },
     userCertificates,
   ] = await Promise.all([
-    (supabase
+    (learnerDb
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status')
       .eq('user_id', user.id) as unknown as Promise<{

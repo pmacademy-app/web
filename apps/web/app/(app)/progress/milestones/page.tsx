@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { getServerUser, getCurrentUserProfile, getLearnerDb } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { RecommendedActionCard } from '@/components/progress/RecommendedActionCard'
@@ -23,14 +22,15 @@ export default async function MilestoneProgressPage() {
     redirect('/login')
   }
 
-  const supabase = createServiceRoleClient()
+  // Own-row read under RLS (see getLearnerDb).
+  const learnerDb = await getLearnerDb()
 
   const [
     { data: progressRows },
     personalizationRow,
     curriculum,
   ] = await Promise.all([
-    (supabase
+    (learnerDb
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status')
       .eq('user_id', user.id) as unknown as Promise<{
