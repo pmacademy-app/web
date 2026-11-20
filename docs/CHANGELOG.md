@@ -2,9 +2,75 @@
 
 All notable changes to **Prodily** (`prodily-monorepo`) are documented in this file, newest first. Hashes are short SHAs on `main` unless an entry says otherwise. Plan IDs (PR-01, SEC-07 and so on) refer to [`../08-IMPLEMENTATION-PLAN.md`](../08-IMPLEMENTATION-PLAN.md) and the audit in [`../audit/00-INDEX.md`](../audit/00-INDEX.md). Remaining work is in [`ROADMAP.md`](ROADMAP.md).
 
-## [Unreleased: post-Phase 3 cleanup] (branch `chore/post-phase3-cleanup`)
+## [Unreleased] (local branch `vanshdev-fix-cron-selfcheck`)
 
-Not merged yet. Follows the dead-code "Phase 3" (PR #79) with the removals it deferred, a `knip` sweep and a documentation refresh.
+Not pushed yet. `6d3b91b`: the self-check blocks in the held `20261024000003_schedule_cron_jobs_pg_cron.sql` and `20261030000001_cron_heartbeat_deadman.sql` failed in the Supabase SQL editor with `42P01 relation "v_job" does not exist`, which rolled back the whole run. Each job is now checked with one `EXISTS` query on `cron.job` (name, schedule, command, active) and no record variable. Same checks, same failure behaviour.
+
+## [Dependencies and Dependabot] (2026-11-19 to 2026-11-20)
+
+PRs #115 to #118 and `6b71a03`, `d4dbd95`.
+
+- Production and development minor and patch groups bumped (#115, #116); `jsdom` 31.0.1 (#118); `eslint` 10.15.0 (#117).
+- `isomorphic-dompurify` stays pinned at 2.26.0 (see PR #110) and Dependabot now ignores every bump for it.
+
+## [CI: one check, archive upload, deploy fix] (2026-11-19 to 2026-11-20)
+
+PRs #108, #112, #114.
+
+- The production build is uploaded as one archive (`ca7f992`).
+- All validation runs as a single `build-and-validate` check; validation no longer re-runs on `main`, and the local DB replay is skipped when no database files changed (`515f5e0`, `3746ea5`).
+- The Vercel deploy runs when `build-and-validate` was skipped (`9b484cf`).
+- Unused code, admin leftovers and `recharts` removed from `apps/web` (`b787c98`).
+
+## [Runtime hotfixes] (2026-11-19)
+
+- PR #107 (`5ae5258`): run on Node 24 so lesson pages stop crashing. Root `package.json` engines is `24.x`.
+- PR #110 (`085a2c6`): pin `isomorphic-dompurify` 2.26.0 so lesson pages render again.
+
+## [Learner login redesign] (2026-11-19)
+
+PR #106: new learner login page (`3a7696b`); brand panel text contrast raised to pass WCAG AA (`bd22b34`).
+
+## [Monitoring and security digest] (2026-11-19)
+
+- PR #104 (`ef6e21e`): error monitoring records stack traces, release, browser errors, regressions and an ignore list.
+- PR #105 (`0a0c785`): suspicious events are recorded for a daily security summary. Needs the held `20261119000007_security_events.sql`.
+
+## [Admin console split] (2026-11-19)
+
+PR #103 (`f47138a`): the admin console moved to its own repository. `docs/ADMIN_PANEL.md` and `docs/admin/` describe the old in-repo console.
+
+## [Security review, performance phases 1 and 2] (2026-11-18 to 2026-11-19)
+
+PRs #99, #100, #102.
+
+- Performance plan phase 1 (`cf78887`) and phase 2 backend changes (`7432d77`).
+- Signed quiz receipts, avatar cache purge, Vercel Speed Insights (`f6a72ca`).
+- Fixes for the 2026-11-19 security review findings, plus speed and cleanup items (`cb8a265`). Database parts are held as `20261119000001` to `20261119000006`.
+- Leadership skill colour darkened to meet WCAG AA (`7877740`); test fixes (`ce26c1e`, `f5605fe`, `981d777`).
+
+## [2026-11-17 code audit] (2026-11-17 to 2026-11-18)
+
+- PR #97: the onboarding gate in `proxy.ts` fails open when the profile read errors (`2270470`); `updated_at` dropped from the onboarding backfill and its rollback (`73ef503`).
+- PR #98 (`5a3738c`): fixes for the 19 backend bugs from the 2026-11-17 code audit.
+
+## [CI fixes after Phase 4] (2026-11-16)
+
+- PR #95 (`d473f1f`): `users_rls` pgTAP test grants anon SELECT so its UPDATE matches the row.
+- PR #96 (`35f4934`): pinned Vercel CLI bumped to 65.16.0 for Next 16 builds.
+
+## [PR #83: roadmap tasks AG-02 to AG-34] (merged 2026-11-16)
+
+Merged as `34232d7`. AG-01 landed separately as `622bcd2`. Every task in [`ROADMAP.md`](ROADMAP.md) section 4 is now in code; their held migrations are listed in its section 2.3.
+
+- **Platform safety (M1):** dark mode removed (AG-17); supply-chain hardening (AG-03); real-Postgres replay and grant allowlist (AG-04); pgTAP suite (AG-05); shared Supabase fake (AG-06); migrations applied before production goes live (AG-07); nightly encrypted dump and restore drill (AG-08); request error hook and client beacon (AG-09); admin handlers throw to `withRoute` (AG-10); one error envelope (AG-11); password rules, signup hook, re-auth (AG-12); email hook signatures, `app_metadata`, Origin check (AG-13); cron callers use POST (AG-14); cron GET aliases and the GitHub `schedule:` removed (AG-15); `getClaims` and a narrower proxy (AG-16); colour tokens (AG-18); landmarks and headings (AG-19); base-ui dialogs (AG-20); axe E2E audits (AG-21).
+- **Growth foundations (M2):** sitemap and schema (AG-22); search-shaped lesson titles (AG-23); glossary hub (AG-24); bylines, `llms.txt`, AI crawler policy (AG-25); capstone rubric, feedback and resubmission (AG-26, AG-27); mastery at 70 percent (AG-28); weekly goal and recap (AG-29); app UX second pass (AG-30); leaderboard RPC, retention, size alert (AG-31); lighter lesson pages and one CI build (AG-32).
+- **Backlogs:** security (AG-33) and code health (AG-34).
+- Follow-up CI fixes in the same PR: `996cb03`, `2c7103a`, `dfdddfe`, `5bf00e2`, `bea98e5`, `60c4e68`, `7be6860`.
+
+## [Post-Phase 3 cleanup] (branch `chore/post-phase3-cleanup`, merged 2026-11-13)
+
+Merged as `e9eeff5`. Follows the dead-code "Phase 3" (PR #79) with the removals it deferred, a `knip` sweep and a documentation refresh.
 
 ### Removed
 - **Waitlist**: the `/api/waitlist` route and its `proxy.ts` entries, the `waitlist_signup` analytics event and `trackWaitlistSignup()`, `buildWaitlistConfirmationEmail()` in `lib/email.ts`, and the waitlist types (`ROLE_OPTIONS`, `RoleOption`, `WaitlistFormValues`, `WaitlistPayload`). No UI posted to the route. The `public.waitlist` table is **not** dropped yet: the drop is held in `supabase/migrations/pending-approval/20261112000001_drop_waitlist_table.sql` (with rollback and validation) until the owner exports the rows.

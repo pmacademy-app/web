@@ -3,7 +3,7 @@
 Always-on project guide for any coding agent (Antigravity, Claude Code, others).
 
 ## Stack and layout
-- App: `apps/web` (Next 16.4.3, React 19, Supabase, zod 4, vitest 4, Playwright, ESLint 9 with rules in `apps/web/eslint-rules/`). The root `package.json` only proxies scripts.
+- App: `apps/web` (Next 16.4.6, React 19, Supabase, zod 4, vitest 4, Playwright, ESLint 10 with rules in `apps/web/eslint-rules/`). The root `package.json` only proxies scripts.
 - Next 16 differs from your training data. Read the guide in `apps/web/node_modules/next/dist/docs/` before writing Next code.
 - Database: `supabase/migrations/` plus `rollback/`, `validation/`, `pending-approval/`.
 - Content: `content/` (lessons, glossary) compiled by `scripts/compiler`.
