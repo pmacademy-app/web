@@ -9,6 +9,7 @@ import { getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { getLessonSchema, getBreadcrumbSchema } from '@/lib/schema'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 export const revalidate = 3600
 
@@ -116,7 +117,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
 
   // Signup carries the learner back to this exact lesson in the app (through the
   // one-screen onboarding). A locked lesson shows its own gate there.
-  const appLessonPath = `/academy/${lesson.module}/${lesson.id}`
+  const appLessonPath = lessonPath(lesson.module, lesson.id)
   const signupHref = `/signup?next=${encodeURIComponent(appLessonPath)}`
 
   // Slice first 8 theory-related blocks to construct a preview

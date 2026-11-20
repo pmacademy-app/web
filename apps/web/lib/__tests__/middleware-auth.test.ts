@@ -189,7 +189,7 @@ describe('Phase 2 Middleware & Auth Security Test Suite', () => {
     const res = await proxy(req)
     expect(res).toBeDefined()
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/academy/foundations/les_zoyq8a')
+    expect(res.headers.get('location')).toContain('/academy/foundations/what-is-product-management')
   })
 
   it('12. Public Lesson Route: Unauthenticated visitor visiting /lessons/lesson-001 passes through to static page', async () => {

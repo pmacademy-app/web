@@ -35,6 +35,7 @@ import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { BlockTreeServerRenderer } from '@/renderer/block-tree-server'
 import LessonPageContent from './lesson-content'
 import { getBlocksForTab, withInteractiveBlocksOnly } from './lesson-tabs'
+import { lessonIdFromSegment, lessonPath, lessonSlug } from '@/lib/curriculum/lesson-url'
 
 interface PageProps {
   params: Promise<{ moduleSlug: string; lessonId: string }>
@@ -43,7 +44,9 @@ interface PageProps {
 const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih']
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lessonId } = await params
+  const { lessonId: segment } = await params
+  // The URL carries the title slug; old links carry the les_ ID. Both resolve to the ID.
+  const lessonId = lessonIdFromSegment(segment) ?? segment
   const [lesson, curriculum] = await Promise.all([
     fetchCompiledLesson(lessonId),
     fetchCurriculumData(),
@@ -53,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
   const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
   const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
-  const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
+  const lessonUrl = `${siteUrl}${lessonPath(lesson.module, lesson.id)}`
   const description = `Lesson ${globalOrder}: ${lesson.title}, part of the ${getModuleTitle(lesson.module)} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
   const isSample = SAMPLE_LESSON_IDS.includes(lessonId)
 
@@ -84,15 +87,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function AcademyLessonPage({ params }: PageProps) {
-  const { moduleSlug, lessonId } = await params
+  const { moduleSlug, lessonId: segment } = await params
+  const lessonId = lessonIdFromSegment(segment) ?? segment
 
   // 1. Load compiled lesson data
   const lesson = await fetchCompiledLesson(lessonId)
   if (!lesson) notFound()
 
   // 2. Redirect to canonical URL if the moduleSlug parameter doesn't match the lesson's actual module
-  if (lesson.module !== moduleSlug) {
-    redirect(`/academy/${lesson.module}/${lesson.id}`)
+  // Also sends old /academy/<module>/les_xxxxxx links to the title address.
+  if (lesson.module !== moduleSlug || segment !== lessonSlug(lesson.id)) {
+    redirect(lessonPath(lesson.module, lesson.id))
   }
 
   // 3. Auth verification & sample lesson handling
@@ -100,7 +105,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const isSampleLesson = SAMPLE_LESSON_IDS.includes(lessonId)
 
   if (!user && !isSampleLesson) {
-    redirect(`/login?next=${encodeURIComponent(`/academy/${lesson.module}/${lesson.id}`)}`)
+    redirect(`/login?next=${encodeURIComponent(lessonPath(lesson.module, lesson.id))}`)
   }
 
   // 4. Sequential unlock check using stable IDs from global curriculum array
@@ -112,8 +117,8 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     fetchCurriculumData(),
   ])
 
-  const prevLessonUrl = prevMeta ? `/academy/${prevMeta.module}/${prevMeta.id}` : null
-  const nextLessonUrl = nextMeta ? `/academy/${nextMeta.module}/${nextMeta.id}` : null
+  const prevLessonUrl = prevMeta ? lessonPath(prevMeta.module, prevMeta.id) : null
+  const nextLessonUrl = nextMeta ? lessonPath(nextMeta.module, nextMeta.id) : null
 
   // Compute the global 1-indexed lesson numbers for display (not module-scoped order)
   const lessons = curriculum?.lessons ?? []
@@ -182,7 +187,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         firstIncompletePrereqMeta = await getLessonMeta(prereqId)
         firstIncompletePrereqGlobalOrder = prereqGlobalIdx >= 0 ? prereqGlobalIdx + 1 : null
         firstIncompletePrereqUrl = firstIncompletePrereqMeta
-          ? `/academy/${firstIncompletePrereqMeta.module}/${firstIncompletePrereqMeta.id}`
+          ? lessonPath(firstIncompletePrereqMeta.module, firstIncompletePrereqMeta.id)
           : null
       } else {
         // No specific prerequisite id (defensive) — fall back to the previous global lesson.
@@ -325,7 +330,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   // 7. Render lesson content via the v2 client shell
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
-  const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
+  const lessonUrl = `${siteUrl}${lessonPath(lesson.module, lesson.id)}`
 
   const articleJsonLd = isSampleLesson ? {
     '@context': 'https://schema.org',

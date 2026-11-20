@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Compass, Target, Sparkles } from 'lucide-react'
 import type { PersonalizedPath, RecommendedMilestone } from '@/lib/personalization/path-resolver'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 interface RecommendedActionCardProps {
   personalizedPath: PersonalizedPath
@@ -76,7 +77,7 @@ export function RecommendedActionCard({ personalizedPath, milestone }: Recommend
         </div>
       </div>
       <Link
-        href={`/academy/${lesson.module}/${lesson.id}`}
+        href={lessonPath(lesson.module, lesson.id)}
         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all shrink-0"
       >
         <span>Continue Lesson {order}</span>

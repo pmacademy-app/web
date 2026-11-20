@@ -47,15 +47,16 @@ describe('V-OPT-3: /lessons routing behaviour is unchanged', () => {
     // statically imported data diverged from what the loader read, this would fail.
     const res = await run('https://prodily.app/lessons/lesson-001', AUTHED)
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/academy/foundations/les_zoyq8a')
+    expect(res.headers.get('location')).toContain('/academy/foundations/what-is-product-management')
   })
 
   it('a second known slug resolves to its own module and id, not a fixed one', async () => {
     const res = await run('https://prodily.app/lessons/lesson-002', AUTHED)
     expect(res.status).toBe(307)
     const location = res.headers.get('location') || ''
-    expect(location).toMatch(/\/academy\/[a-z0-9-]+\/les_[a-z0-9]+$/)
-    expect(location).not.toContain('les_zoyq8a')
+    expect(location).toMatch(/\/academy\/[a-z0-9-]+\/[a-z0-9-]+$/)
+    expect(location).not.toMatch(/les_/)
+    expect(location).not.toContain('what-is-product-management')
   })
 
   it('an unknown slug falls back to /academy rather than 404ing or leaking', async () => {
@@ -68,7 +69,7 @@ describe('V-OPT-3: /lessons routing behaviour is unchanged', () => {
   it('a trailing path segment still resolves on the first segment only', async () => {
     const res = await run('https://prodily.app/lessons/lesson-001/anything', AUTHED)
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toContain('/academy/foundations/les_zoyq8a')
+    expect(res.headers.get('location')).toContain('/academy/foundations/what-is-product-management')
   })
 
   it('an unauthenticated visitor passes through to the static public lesson page', async () => {

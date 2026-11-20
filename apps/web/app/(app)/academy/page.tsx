@@ -33,6 +33,7 @@ import { getModuleMeta } from '@/lib/curriculum/module-meta'
 import { formatLessonPosition, getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 import { AcademyNavigationRetention } from '@/components/curriculum/AcademyNavigationRetention'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -195,7 +196,7 @@ export default async function AcademyPage() {
             <Link
               href={
                 nextIncompleteLesson
-                  ? `/academy/${nextIncompleteLesson.module}/${nextIncompleteLesson.id}`
+                  ? lessonPath(nextIncompleteLesson.module, nextIncompleteLesson.id)
                   : '/academy'
               }
               title={
@@ -523,7 +524,7 @@ export default async function AcademyPage() {
                       ) : (
                         <Link
                           key={lesson.id}
-                          href={`/academy/${lesson.module}/${lesson.id}`}
+                          href={lessonPath(lesson.module, lesson.id)}
                           id={`lesson-link-${lesson.id}`}
                           data-locked="false"
                           aria-label={`${lessonLabel}: ${lesson.title}. ${statusLabel}.`}
@@ -547,10 +548,10 @@ export default async function AcademyPage() {
                       <Link
                         href={
                           targetAccessible || isModuleFullyCompleted
-                            ? `/academy/${targetLesson.module}/${targetLesson.id}`
+                            ? lessonPath(targetLesson.module, targetLesson.id)
                             : globalFirstActionable
-                              ? `/academy/${globalFirstActionable.module}/${globalFirstActionable.id}`
-                              : `/academy/${targetLesson.module}/${targetLesson.id}`
+                              ? lessonPath(globalFirstActionable.module, globalFirstActionable.id)
+                              : lessonPath(targetLesson.module, targetLesson.id)
                         }
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 shadow-xs active:scale-[0.98] transition-all sm:ml-auto"
                       >

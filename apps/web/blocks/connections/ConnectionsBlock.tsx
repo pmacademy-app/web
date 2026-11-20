@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Lock, Key } from 'lucide-react';
 import { BlockProps } from '../../renderer/registry';
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 export default function ConnectionsBlock({ block }: BlockProps) {
   const { previous, next, unlocks } = block;
@@ -16,7 +17,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {previous ? (
           <Link
-            href={`/academy/${previous.module || 'foundations'}/${previous.id}`}
+            href={lessonPath(previous.module || 'foundations', previous.id)}
             className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card text-left transition-all hover:bg-accent/30 hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ArrowLeft className="h-5 w-5 text-primary shrink-0" />
@@ -45,7 +46,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
 
         {next ? (
           <Link
-            href={`/academy/${next.module || 'foundations'}/${next.id}`}
+            href={lessonPath(next.module || 'foundations', next.id)}
             className="flex items-center justify-between gap-4 p-4 rounded-xl border border-border bg-card text-right transition-all hover:bg-accent/30 hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <div className="flex-1 text-left">
@@ -86,7 +87,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
                 <span className="inline-flex shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
                 <div>
                   <Link
-                    href={`/academy/${u.lesson.module || 'foundations'}/${u.lesson.id}`}
+                    href={lessonPath(u.lesson.module || 'foundations', u.lesson.id)}
                     className="font-bold text-primary hover:underline"
                   >
                     {u.lesson.title}

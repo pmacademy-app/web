@@ -28,6 +28,7 @@ import {
 import { getModuleMeta, getModuleTitle } from '@/lib/curriculum/module-meta'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { apiGet } from '@/lib/api/client'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -338,7 +339,7 @@ export function SearchOverlay() {
   const navigateTo = useCallback(
     (entry: SearchEntry) => {
       closeSearch()
-      router.push(`/academy/${entry.moduleName}/${entry.lessonId}`)
+      router.push(lessonPath(entry.moduleName, entry.lessonId))
     },
     [closeSearch, router]
   )

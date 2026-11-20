@@ -13,6 +13,7 @@ import { PORTFOLIO_SETTINGS_HREF, capstoneSharePath } from '@/lib/portfolio'
 import { isTestCertificateCode } from '@/lib/certificates'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
 import { getCapstoneDefinition, getCapstoneForModule, getCapstoneHref } from '@/config/capstones'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 /** Spreads a second action into in-app content only when there is a valid one (Growth R5 B2). */
 function withAction(action: NotificationSecondaryAction | null): { secondaryAction?: NotificationSecondaryAction } {
@@ -200,7 +201,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       const cleanTitle = rawTitle && !/^les_[a-z0-9]+$/i.test(rawTitle) ? rawTitle : 'Lesson'
       const actionUrl =
         payload.moduleSlug && payload.lessonId
-          ? `/academy/${String(payload.moduleSlug)}/${String(payload.lessonId)}`
+          ? lessonPath(String(payload.moduleSlug), String(payload.lessonId))
           : '/academy'
       return { title: 'Quiz complete', body: `You scored ${payload.score || 0} on the ${cleanTitle} quiz.`, actionUrl }
     }

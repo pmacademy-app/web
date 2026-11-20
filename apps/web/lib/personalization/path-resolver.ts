@@ -10,6 +10,7 @@ import {
   type LessonAccessContext,
 } from '@/lib/curriculum-access'
 import type { CurriculumEntry } from '@/types'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 export interface LearnerPersonalizationInput {
   goal?: string | null
@@ -290,5 +291,5 @@ export function resolveStartLearningTarget(
 
 /** Builds the canonical Academy URL for a lesson. */
 export function academyLessonPath(lesson: Pick<CurriculumEntry, 'id' | 'module'>): string {
-  return `/academy/${lesson.module}/${lesson.id}`
+  return lessonPath(lesson.module, lesson.id)
 }

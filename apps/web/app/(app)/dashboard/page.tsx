@@ -37,6 +37,7 @@ import {
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 import { LeaderboardWidgetSkeleton } from '@/components/dashboard/DashboardLeaderboardWidget'
 import { LeaderboardWidgetSlot } from './LeaderboardWidgetSlot'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -293,7 +294,7 @@ export default async function DashboardPage() {
       detail: `${nextLesson.positionLabel} · ${nextLesson.estimatedTime}`,
       reward: level.xpRemaining > 0 ? `Toward Level ${level.level + 1}` : 'Keeps your streak',
       action: nextLesson.started ? 'Resume' : 'Start',
-      href: `/academy/${nextLesson.module}/${nextLesson.id}`,
+      href: lessonPath(nextLesson.module, nextLesson.id),
       primary: true,
     })
   }

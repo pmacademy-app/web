@@ -6,6 +6,7 @@ import type { LevelInfo } from '@/lib/xp/xp'
 import { getLevelTitle } from '@/lib/xp/xp'
 import { CareerLadder } from './CareerLadder'
 import { StartLessonLink } from './StartLessonLink'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 export interface NextLessonPanelData {
   id: string
@@ -65,7 +66,7 @@ export function NextLessonPanel({
           )}
           <div className="mt-4 grid grid-cols-2 gap-2.5 sm:flex">
             <StartLessonLink
-              href={`/academy/${lesson.module}/${lesson.id}`}
+              href={lessonPath(lesson.module, lesson.id)}
               firstSession={firstSession}
               lessonId={lesson.id}
               moduleSlug={lesson.module}

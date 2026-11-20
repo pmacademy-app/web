@@ -7,6 +7,7 @@
 
 import { notFound, redirect } from 'next/navigation'
 import { fetchCompiledLesson } from '@/lib/lesson-loader'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 
 interface PageProps {
   params: Promise<{ lessonId: string }>
@@ -17,5 +18,5 @@ export default async function LegacyLessonRedirectPage({ params }: PageProps) {
   const lesson = await fetchCompiledLesson(lessonId)
   if (!lesson) notFound()
 
-  redirect(`/academy/${lesson.module}/${lesson.id}`)
+  redirect(lessonPath(lesson.module, lesson.id))
 }

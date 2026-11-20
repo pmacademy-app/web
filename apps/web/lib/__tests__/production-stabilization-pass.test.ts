@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { lessonPath } from '@/lib/curriculum/lesson-url'
 import { buildInAppContentFromEvent } from '../notifications/in-app/service'
 import { SettingsService } from '../settings/system-settings-service'
 import { getFriendLeaderboard } from '../leaderboard-db'
@@ -91,7 +92,7 @@ describe('Production Stabilization Pass — 4 Core Issues Verification', () => {
         expect(content.title).toBe('Quiz complete')
         expect(content.body).toBe(`You scored 100 on the ${l.title} quiz.`)
         expect(content.body).not.toContain(l.id)
-        expect(content.actionUrl).toBe(`/academy/${l.module}/${l.id}`)
+        expect(content.actionUrl).toBe(lessonPath(l.module, l.id))
       }
     })
 
@@ -116,7 +117,7 @@ describe('Production Stabilization Pass — 4 Core Issues Verification', () => {
 
       expect(content.title).toBe('Quiz complete')
       expect(content.body).toBe('You scored 95 on the User Research quiz.')
-      expect(content.actionUrl).toBe('/academy/discovery/les_4kpbq6')
+      expect(content.actionUrl).toBe('/academy/discovery/user-research')
     })
   })
 
