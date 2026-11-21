@@ -373,6 +373,12 @@ Applied in the production SQL editor on 2026-11-20; the validation checks return
 CLI does not apply it a second time.
 `lib/__tests__/xp-level-sql-parity.test.ts` keeps the two threshold lists identical.
 
+### `20261121000001_reflections_and_prefs_policies.sql` (Plan A step 3, applied by hand 2026-11-21, never moved)
+
+Reflections become select-only for learners (every write is server-side) and the
+`user_notification_preferences` update policy gets WITH CHECK. Applied in the production SQL
+editor on 2026-11-21; its built-in checks passed. Kept here so the CLI does not apply it again.
+
 ### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
 
 Twelve SELECT-only queries that look for use of the holes these and earlier migrations closed:
