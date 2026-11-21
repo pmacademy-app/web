@@ -193,7 +193,10 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Portfolio Hero */}
-        <PortfolioHero user={user} />
+        <PortfolioHero
+          user={user}
+          hasFullCertificate={progress.totalLessonsCount > 0 && progress.completedLessonsCount >= progress.totalLessonsCount}
+        />
 
         {/* Featured Deliverable Spotlight Card (if set and public) */}
         {featuredCapstone && (

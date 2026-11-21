@@ -4,9 +4,15 @@ import { Flame, Zap, Award, GraduationCap, Globe, UserCheck } from 'lucide-react
 import type { PublicPortfolioPayload } from '@/lib/portfolio/portfolio-db'
 import { ShareButton } from '@/components/portfolio/ShareButton'
 import { validateOptionalUrl } from '@/lib/portfolio/portfolio'
+import { AvatarFrame } from '@/components/avatar/AvatarFrame'
+import { resolveFrame } from '@/lib/avatar/frames'
 
 interface PortfolioHeroProps {
   user: PublicPortfolioPayload['user']
+  /** Every lesson finished, the condition for the full-curriculum certificate. */
+  hasFullCertificate?: boolean
+  /** The learner's chosen frame, when they picked one in Settings. */
+  avatarFrame?: string | null
 }
 
 function LinkedInIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -25,7 +31,7 @@ function GitHubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   )
 }
 
-export function PortfolioHero({ user }: PortfolioHeroProps) {
+export function PortfolioHero({ user, hasFullCertificate = false, avatarFrame = null }: PortfolioHeroProps) {
   const {
     name,
     username,
@@ -58,8 +64,22 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Left: Avatar + Details */}
         <div className="flex items-start gap-4 md:gap-5 min-w-0 md:flex-1">
-          {/* Avatar Image or Initials Circle */}
-          <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/20 bg-primary/10 flex items-center justify-center shrink-0 shadow-sm">
+          {/* Avatar inside its earned frame (lib/avatar/frames.ts) */}
+          <AvatarFrame
+            size={96}
+            motion="full"
+            frame={resolveFrame(
+              {
+                totalXp: user.totalXp,
+                currentStreak: user.currentStreak,
+                isFellow: user.isFellow,
+                isPortfolioVerified: user.isPortfolioVerified,
+                hasFullCertificate,
+              },
+              avatarFrame
+            )}
+          >
+          <div className="relative w-full h-full rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
@@ -67,7 +87,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
                 fill
                 unoptimized
                 className="object-cover"
-                sizes="(max-width: 768px) 80px, 96px"
+                sizes="76px"
               />
             ) : (
               <span className="text-2xl md:text-3xl font-bold font-serif text-primary">
@@ -75,6 +95,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               </span>
             )}
           </div>
+          </AvatarFrame>
 
           <div className="space-y-1.5 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">

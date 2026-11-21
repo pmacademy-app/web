@@ -20,6 +20,12 @@ interface AppShellProps {
     avatar_url?: string | null
     username?: string | null
     is_portfolio_public?: boolean
+    total_xp?: number | null
+    current_streak?: number | null
+    last_streak_date?: string | null
+    timezone?: string | null
+    is_fellow?: boolean | null
+    avatar_frame?: string | null
   }
 }
 

@@ -1,0 +1,127 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* moment: plays once */
+.fill {
+  animation: fill 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* idle: rare frames only */
+.spin {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: spin 16s linear infinite;
+}
+.orbit {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: spin 7s linear infinite;
+}
+.sweep {
+  animation: sweep 3.6s ease-in-out infinite;
+}
+
+/* live */
+.breathe {
+  animation: breathe 1.6s ease-in-out infinite;
+}
+.pulse {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: pulse 1.8s ease-out infinite;
+}
+
+@keyframes fill {
+  from {
+    stroke-dashoffset: var(--circ);
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes sweep {
+  0% {
+    stroke-dashoffset: var(--circ);
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: calc(var(--circ) * -1);
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .pop,
+  .spin,
+  .orbit,
+  .sweep,
+  .breathe,
+  .pulse {
+    animation: none;
+  }
+  .pulse {
+    opacity: 0;
+  }
+}

@@ -13,6 +13,9 @@ import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { NotificationToast } from '@/components/notifications/NotificationToast'
 import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 import { TopbarAvatar } from '@/components/layout/TopbarAvatar'
+import { AvatarFrame } from '@/components/avatar/AvatarFrame'
+import { resolveFrame } from '@/lib/avatar/frames'
+import { getLocalDateString } from '@/lib/streaks/streaks'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -23,6 +26,12 @@ interface TopbarProps {
     email: string
     level: number
     avatar_url?: string | null
+    total_xp?: number | null
+    current_streak?: number | null
+    last_streak_date?: string | null
+    timezone?: string | null
+    is_fellow?: boolean | null
+    avatar_frame?: string | null
   }
 }
 
@@ -91,6 +100,19 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
   }, [])
 
   const levelTitle = getLevelTitle(userProfile.level)
+  // Live pulse while a lesson is open: /academy/<module>/<lesson>.
+  const isInLesson = /^\/academy\/[^/]+\/[^/]+\/?$/.test(pathname)
+  const avatarFrame = resolveFrame(
+    {
+      totalXp: userProfile.total_xp,
+      currentStreak: userProfile.current_streak,
+      studiedToday:
+        Boolean(userProfile.last_streak_date) &&
+        userProfile.last_streak_date === getLocalDateString(userProfile.timezone || 'UTC'),
+      isFellow: Boolean(userProfile.is_fellow),
+    },
+    userProfile.avatar_frame
+  )
 
   return (
     <header className="h-16 sticky top-0 bg-background/90 backdrop-blur-md border-b border-border z-20 px-3 sm:px-4 md:px-6 flex items-center justify-between gap-2">
@@ -207,39 +229,11 @@ export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarC
             aria-label="Open user profile menu"
             className="relative flex items-center justify-center p-1 min-w-[44px] min-h-[44px] rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform cursor-pointer group"
           >
-            {/* Precision circulating animated green orbital ring */}
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              {/* Ultra-crisp vector rotating gradient ring */}
-              <svg
-                className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] motion-reduce:animate-none pointer-events-none drop-shadow-[0_0_6px_rgba(31,107,78,0.5)]"
-                viewBox="0 0 40 40"
-              >
-                <defs>
-                  {/* The two endpoint stops read the brand primary from the design
-                      tokens rather than repeating its hex. CI blocks the brand
-                      literals outside theme/tokens.ts, and the variable also keeps
-                      the ring correct if the token is ever retuned. The two interior
-                      stops are shades specific to this gradient and have no token. */}
-                  <linearGradient id="topbarGreenAura" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--color-primary)" />
-                    <stop offset="35%" stopColor="#2E8B67" />
-                    <stop offset="70%" stopColor="#16543D" />
-                    <stop offset="100%" stopColor="var(--color-primary)" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  cx="20"
-                  cy="20"
-                  r="18"
-                  fill="none"
-                  stroke="url(#topbarGreenAura)"
-                  strokeWidth="2.5"
-                />
-              </svg>
-
-              {/* Circular Avatar */}
+            {/* Earned avatar frame (lib/avatar/frames.ts): the ring shows the learner's level,
+                streak or status instead of a decorative spinner. */}
+            <AvatarFrame frame={avatarFrame} size={40} motion="full" live={isInLesson}>
               <TopbarAvatar name={userProfile.name} avatarUrl={userProfile.avatar_url} />
-            </div>
+            </AvatarFrame>
           </button>
 
           {dropdownOpen && (
