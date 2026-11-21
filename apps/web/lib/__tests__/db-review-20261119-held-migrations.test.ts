@@ -211,9 +211,20 @@ describe('L3 strict grant allowlist', () => {
     expect(sql.trimEnd().endsWith('ROLLBACK;')).toBe(true)
   })
   it('names a held migration that exists for every grant it expects to disappear', () => {
+    // Every removed_by row is deleted once its migration is in held-migrations.txt, so the
+    // list may be empty; any row that remains must still name a real held file.
     const removedBy = [...code(sql).matchAll(/'(2026\d{10}_[a-z0-9_]+\.sql)'/g)].map((m) => m[1])
-    expect(removedBy.length).toBeGreaterThan(0)
     for (const file of new Set(removedBy)) expect(fs.existsSync(path.join(pendingDir, file))).toBe(true)
+  })
+
+  it('keeps no removed_by row for a migration that is already in the CI replay', () => {
+    const held = fs
+      .readFileSync(path.join(pendingDir, '../../tests/held-migrations.txt'), 'utf8')
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith('#'))
+    const removedBy = [...code(sql).matchAll(/'(2026\d{10}_[a-z0-9_]+\.sql)'/g)].map((m) => m[1])
+    expect(removedBy.filter((file) => held.includes(file))).toEqual([])
   })
   it('carries no em-dashes', () => {
     expect(sql).not.toContain(EM_DASH)
