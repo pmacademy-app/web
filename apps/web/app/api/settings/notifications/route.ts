@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { getLearnerDbForRequest } from '@/lib/auth'
+import { learnerFirst } from '@/lib/db/learner-first'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { notificationPreferencesUpdateSchema } from '@/lib/api/contracts/settings'
@@ -81,11 +83,14 @@ export const PATCH = withRoute(
     summary: 'Unexpected failure updating notification preferences',
     body: notificationPreferencesUpdateSchema,
   },
-  async ({ actor, body }) => {
+  async ({ actor, body, request }) => {
     const authUserId = requireUserId(actor)
 
   try {
     const supabase = createServiceRoleClient()
+    // Own-row insert/update policies exist on user_notification_preferences, so the
+    // write runs under RLS first (service role as fallback, see learnerFirst).
+    const learnerDb = await getLearnerDbForRequest(request)
 
     // Normalize field names between UI form contract and database schema
     const {
@@ -109,9 +114,11 @@ export const PATCH = withRoute(
       updatePayload.all_email = email_enabled
     }
 
-    const { error } = await supabase
-      .from('user_notification_preferences')
-      .upsert(updatePayload as never, { onConflict: 'user_id' })
+    const { error } = await learnerFirst('settings.notifications.update', learnerDb, supabase, (db: typeof supabase) =>
+      db
+        .from('user_notification_preferences')
+        .upsert(updatePayload as never, { onConflict: 'user_id' })
+    )
 
     if (error) {
       void logSystemError({

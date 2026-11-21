@@ -3,6 +3,8 @@ import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
 import { notificationsPatchBodySchema } from '@/lib/api/contracts/learner-writes'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { getLearnerDbForRequest } from '@/lib/auth'
+import { learnerFirst } from '@/lib/db/learner-first'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
 import { isSafeNotificationLink, parseNotificationSecondaryAction } from '@/lib/notifications/in-app/secondary-action'
@@ -155,17 +157,22 @@ export const PATCH = withRoute(
     // filtered by the session learner below, never by anything in the body.
     body: notificationsPatchBodySchema,
   },
-  async ({ body, actor }) => {
+  async ({ body, actor, request }) => {
     const userId = requireUserId(actor)
     const { action, notificationId, notificationIds } = body
+    // Read state is learner-writable by policy (20261013000002: own rows, is_read and
+    // read_at only), so these updates run under RLS with the service role as fallback.
     const supabase = createServiceRoleClient()
+    const learnerDb = await getLearnerDbForRequest(request)
 
     if (action === 'mark_all_read') {
-      const { error } = await (supabase
-        .from('in_app_notifications') as unknown as DBChain)
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .eq('is_read', false)
+      const { error } = await learnerFirst('notifications.mark_all_read', learnerDb, supabase, (db) =>
+        (db as unknown as { from: (t: string) => DBChain })
+          .from('in_app_notifications')
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .eq('user_id', userId)
+          .eq('is_read', false) as unknown as Promise<{ error: unknown }>
+      )
 
       // Thrown, not logged and answered as success: the badge would come back on
       // reload. withRoute records the incident and returns 500.
@@ -178,12 +185,14 @@ export const PATCH = withRoute(
     if (Array.isArray(notificationIds) && notificationIds.length > 0) {
       const idsToMark = notificationIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0)
       if (idsToMark.length > 0) {
-        const { error } = await (supabase
-          .from('in_app_notifications') as unknown as DBChain)
-          .update({ is_read: true, read_at: new Date().toISOString() })
-          .in('id', idsToMark)
-          .eq('user_id', userId)
-          .eq('is_read', false)
+        const { error } = await learnerFirst('notifications.mark_batch_read', learnerDb, supabase, (db) =>
+          (db as unknown as { from: (t: string) => DBChain })
+            .from('in_app_notifications')
+            .update({ is_read: true, read_at: new Date().toISOString() })
+            .in('id', idsToMark)
+            .eq('user_id', userId)
+            .eq('is_read', false) as unknown as Promise<{ error: unknown }>
+        )
 
         if (error) throw new Error(`notifications.mark_batch_read failed: ${describeDbError(error)}`)
 
@@ -198,11 +207,13 @@ export const PATCH = withRoute(
     const isRead = action === 'mark_read'
     const readAt = isRead ? new Date().toISOString() : null
 
-    const { error } = await (supabase
-      .from('in_app_notifications') as unknown as DBChain)
-      .update({ is_read: isRead, read_at: readAt })
-      .eq('id', notificationId)
-      .eq('user_id', userId)
+    const { error } = await learnerFirst('notifications.update_read_state', learnerDb, supabase, (db) =>
+      (db as unknown as { from: (t: string) => DBChain })
+        .from('in_app_notifications')
+        .update({ is_read: isRead, read_at: readAt })
+        .eq('id', notificationId)
+        .eq('user_id', userId) as unknown as Promise<{ error: unknown }>
+    )
 
     if (error) throw new Error(`notifications.update_read_state failed: ${describeDbError(error)}`)
 

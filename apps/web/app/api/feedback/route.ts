@@ -4,6 +4,8 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { parseBody } from '@/lib/api/contracts/body'
 import { feedbackSubmitBodySchema } from '@/lib/api/contracts/public-forms'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { getLearnerDbForRequest } from '@/lib/auth'
+import { learnerFirst } from '@/lib/db/learner-first'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 
@@ -41,15 +43,20 @@ export const POST = withRoute(
     const { content, category, sourceEvent, rating, pageUrl, promptKey, action } = parsed.data
 
     const supabase = createServiceRoleClient()
+    // user_feedback and user_feedback_prompts have own-row policies, so a signed-in
+    // learner's writes run under RLS first. Anonymous feedback has no token and
+    // stays on the service role.
+    const learnerDb = userId ? await getLearnerDbForRequest(request) : supabase
 
     // Handle prompt dismissal without content
     if (action === 'dismiss' && promptKey && userId) {
-      await supabase.from('user_feedback_prompts')
-        .upsert({
+      await learnerFirst('feedback.prompt_dismiss', learnerDb, supabase, (db: typeof supabase) =>
+        db.from('user_feedback_prompts').upsert({
           user_id: userId,
           prompt_key: String(promptKey),
           action: 'dismissed',
         })
+      )
 
       return NextResponse.json({ success: true, dismissed: true })
     }
@@ -64,19 +71,21 @@ export const POST = withRoute(
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : null
     const cleanUrl = typeof pageUrl === 'string' ? pageUrl.trim().substring(0, 200) : null
 
-    const { data, error } = await supabase
-      .from('user_feedback')
-      .insert({
-        user_id: userId,
-        category: cleanCategory,
-        source_event: cleanSource,
-        content: cleanContent,
-        rating: cleanRating,
-        page_url: cleanUrl,
-        status: 'new',
-      })
-      .select('id, created_at')
-      .single()
+    const { data, error } = await learnerFirst('feedback.insert', learnerDb, supabase, (db: typeof supabase) =>
+      db
+        .from('user_feedback')
+        .insert({
+          user_id: userId,
+          category: cleanCategory,
+          source_event: cleanSource,
+          content: cleanContent,
+          rating: cleanRating,
+          page_url: cleanUrl,
+          status: 'new',
+        })
+        .select('id, created_at')
+        .single()
+    )
 
     if (error || !data) {
       void logSystemError({
@@ -92,12 +101,13 @@ export const POST = withRoute(
 
     // Record prompt key submission if prompted
     if (promptKey && userId) {
-      await supabase.from('user_feedback_prompts')
-        .upsert({
+      await learnerFirst('feedback.prompt_submitted', learnerDb, supabase, (db: typeof supabase) =>
+        db.from('user_feedback_prompts').upsert({
           user_id: userId,
           prompt_key: String(promptKey),
           action: 'submitted',
         })
+      )
     }
 
     return NextResponse.json({ success: true, feedbackId: data.id })

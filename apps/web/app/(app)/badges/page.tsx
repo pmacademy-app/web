@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getCurrentUserProfile, getServerUser } from '@/lib/auth'
+import { getCurrentUserProfile, getServerUser, getLearnerDb } from '@/lib/auth'
 import { getUserBadgesData } from '@/lib/badges/badges-db'
 import { BadgeCard } from '@/components/badges/BadgeCard'
 import { Trophy, Award, Sparkles } from 'lucide-react'
@@ -18,7 +17,8 @@ export default async function BadgesGalleryPage() {
     redirect('/login')
   }
 
-  const supabase = createServiceRoleClient()
+  // Own-row reads under RLS (getLearnerDb); audited in docs/ops/backend-phase3-plan.md.
+  const supabase = await getLearnerDb()
   const [{ totalEarned, totalAvailable, completionPercentage, allBadges, recentBadge }, profile] = await Promise.all([
     getUserBadgesData(supabase, user.id),
     // Request-memoized: reuses the (app) layout's users read.

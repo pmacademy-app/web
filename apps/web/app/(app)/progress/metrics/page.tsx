@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser, getLearnerDb } from '@/lib/auth'
 import { getUserXpSummary } from '@/lib/xp/xp-service'
 import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks/streaks-db'
@@ -26,7 +25,6 @@ export default async function MetricsProgressPage() {
     redirect('/login')
   }
 
-  const supabase = createServiceRoleClient()
   // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
   const learnerDb = await getLearnerDb()
 
@@ -41,9 +39,9 @@ export default async function MetricsProgressPage() {
       .eq('user_id', user.id) as unknown as Promise<{
       data: Array<{ lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' }> | null
     }>,
-    getUserXpSummary(supabase, user.id),
+    getUserXpSummary(learnerDb, user.id),
     // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
-    getUserStreakStatus(supabase, user.id).catch((err) => {
+    getUserStreakStatus(learnerDb, user.id).catch((err) => {
       void logSystemError({
         severity: 'error',
         category: 'db',

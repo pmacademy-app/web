@@ -278,6 +278,25 @@ export class ProfileReadError extends Error {
 
 const requestAuthCache = new WeakMap<Request, Promise<User | null>>()
 
+/** The access token that authenticated each request, recorded only after it verified. */
+const verifiedTokenByRequest = new WeakMap<Request, string>()
+
+/**
+ * The API-route counterpart of getLearnerDb(): a client carrying the token that
+ * authenticated this request (Bearer or cookie, including a proxy-refreshed one),
+ * so Row Level Security scopes the query to the caller. Same rules as
+ * getLearnerDb: own-row access on tables with a learner policy only.
+ *
+ * Call it after the route's actor is resolved (withRoute does this before the
+ * handler runs). Without a verified token it falls back to the service role, which
+ * is what the route used before.
+ */
+export async function getLearnerDbForRequest(request: Request) {
+  await getAuthenticatedUserFromRequest(request)
+  const token = verifiedTokenByRequest.get(request)
+  return token ? createAuthenticatedServerClient(token) : createServiceRoleClient()
+}
+
 /**
  * Internal resolver for API route authentication helper.
  */
@@ -315,7 +334,10 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
 
   if (token) {
     const user = await verifyAccessToken(token)
-    if (user) return user
+    if (user) {
+      verifiedTokenByRequest.set(request, token)
+      return user
+    }
   }
 
   // CQ-10: no token refresh here. The proxy owns refresh and cookie writes (for pages and
@@ -326,7 +348,9 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
   if (tokenFromRequest) {
     const refreshed = await readAccessTokenFromCookieStore()
     if (refreshed && refreshed !== token) {
-      return verifyAccessToken(refreshed)
+      const user = await verifyAccessToken(refreshed)
+      if (user) verifiedTokenByRequest.set(request, refreshed)
+      return user
     }
   }
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser, getLearnerDb } from '@/lib/auth'
 import { getSkillRadarSummary } from '@/lib/skillRadar'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
@@ -23,7 +22,6 @@ export default async function SkillRadarProgressPage() {
     redirect('/login')
   }
 
-  const supabase = createServiceRoleClient()
   // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
   const learnerDb = await getLearnerDb()
 
@@ -41,7 +39,7 @@ export default async function SkillRadarProgressPage() {
     (curriculum?.lessons || []).map((l) => [l.id, l.module])
   )
 
-  const radarSummary = await getSkillRadarSummary(supabase, user.id, {
+  const radarSummary = await getSkillRadarSummary(learnerDb, user.id, {
     progressRows: progressRows || undefined,
     lessonModuleMap,
   })

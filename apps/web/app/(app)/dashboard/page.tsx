@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { after } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
+import { ensureUserProfile, getServerUser, getCurrentUserProfile, getLearnerDb } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getLessonPosition } from '@/lib/curriculum/lesson-position'
 import { getUserStreakStatus, notStartedStreakStatus } from '@/lib/streaks/streaks-db'
@@ -55,6 +55,11 @@ export default async function DashboardPage() {
   }
 
   const supabase = createServiceRoleClient()
+  // The learner's own rows are read under RLS. The service role stays for the
+  // roster-wide leaderboard (its result is cached for everyone, so it must never be
+  // built from one learner's view), the Fellow status (no learner policy) and
+  // first-visit profile creation (learners cannot insert into users).
+  const learnerDb = await getLearnerDb()
 
   // Started now so it runs alongside the page's own data, but awaited only inside the
   // widget's <Suspense> boundary below: the roster-wide aggregation never blocks the page.
@@ -72,7 +77,7 @@ export default async function DashboardPage() {
   // A failed progress read throws (CQ-07) instead of standing in as "no lessons": the review
   // queue reuses these rows, and it must never show every card as locked on a DB blip.
   const progressPromise = Promise.resolve(
-    supabase
+    learnerDb
       .from('user_lesson_progress')
       .select('lesson_id, status, quiz_score, quiz_attempts, completed_at')
       .eq('user_id', authUser.id),
@@ -81,7 +86,7 @@ export default async function DashboardPage() {
     return data ?? []
   })
   const capstonesPromise = Promise.resolve(
-    supabase.from('capstone_submissions').select('id, module_slug, status, is_public').eq('user_id', authUser.id),
+    learnerDb.from('capstone_submissions').select('id, module_slug, status, is_public').eq('user_id', authUser.id),
   ).then(({ data }) => data ?? [])
 
   // Streamed like the leaderboard: started now, awaited only inside its <Suspense> boundary, so
@@ -114,7 +119,7 @@ export default async function DashboardPage() {
     // CQ-01: a failed streak read degrades to the not-started card instead of a 500.
     // Perf item 8: the streak and review loaders reuse the profile and progress rows read above
     // instead of re-reading `users` (twice) and `user_lesson_progress`.
-    getUserStreakStatus(supabase, authUser.id, { profile: profilePromise }).catch((err) => {
+    getUserStreakStatus(learnerDb, authUser.id, { profile: profilePromise }).catch((err) => {
       after(() =>
         logSystemError({
           severity: 'error',
@@ -126,9 +131,9 @@ export default async function DashboardPage() {
       )
       return notStartedStreakStatus()
     }),
-    getReviewQueueData(supabase, authUser.id, { profile: profilePromise, progressRows: progressPromise }),
+    getReviewQueueData(learnerDb, authUser.id, { profile: profilePromise, progressRows: progressPromise }),
     capstonesPromise,
-    (supabase
+    (learnerDb
       .from('xp_events') as unknown as DBChain)
       .select('id, source_type, xp_amount, source_id, created_at')
       .eq('user_id', authUser.id)
@@ -138,7 +143,7 @@ export default async function DashboardPage() {
     }>,
     // Read-only existence check for the full-curriculum certificate (never issues one).
     // Admin-generated TEST- rows are not credentials and must not count as earned.
-    (supabase
+    (learnerDb
       .from('certificates') as unknown as DBChain)
       .select('id')
       .eq('user_id', authUser.id)

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getServerUser, getLearnerDb } from '@/lib/auth'
 import { getModuleCapstonesOverview } from '@/lib/capstones/capstones-db'
 import { CapstoneCard } from '@/components/capstones/CapstoneCard'
 import { Award, BookOpen, Layers, CheckCircle } from 'lucide-react'
@@ -12,7 +11,8 @@ export const metadata: Metadata = {
 
 export default async function CapstonesOverviewPage() {
   const user = await getServerUser()
-  const supabase = createServiceRoleClient()
+  // Own-row reads under RLS (getLearnerDb); audited in docs/ops/backend-phase3-plan.md.
+  const supabase = await getLearnerDb()
 
   const userId = user?.id ?? ''
   const overviewItems = userId ? await getModuleCapstonesOverview(supabase, userId) : []

@@ -15,6 +15,8 @@ vi.mock('@/lib/supabase', async (importOriginal) => ({
 
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn(async () => ({ id: 'usr_n', email: 'n@example.com' })),
+  // No learner token in this test, so the route uses the same fake for its RLS-first writes.
+  getLearnerDbForRequest: vi.fn(async () => fake),
 }))
 
 vi.mock('@/lib/notifications/feature-flags/service', () => ({

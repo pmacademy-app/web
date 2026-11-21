@@ -2,6 +2,11 @@
 
 Written 2026-11-21 from a read-only review of every top-level migration and every learner data path. Done so far in Phase 3: domain folders in `apps/web/lib` (68de7a0) and the timezone sync (badf7e8).
 
+## Progress
+
+- 2026-11-21: Step 0 applied (users lockdown). Step 1 done for the curriculum, lesson, progress (metrics, milestones, radar, certificates), badges, capstones, review and dashboard pages via `getLearnerDb()`. Step 2 done for notification read state, notification settings and feedback via `getLearnerDbForRequest()` and `learnerFirst()`, which falls back to the service role on a permission error and logs `db.learner_write_fallback`. Stays on the service role: the dashboard leaderboard (its cache is shared by every learner), Fellow status, first-visit profile creation and certificate issuing.
+- Next: watch the logs for `db.learner_write_fallback`; when they stay empty, remove the fallback. Then the remaining learner API routes and Step 3.
+
 ## Why
 
 Learner pages and API routes read and write with the service-role client (`createServiceRoleClient`), so Row Level Security never applies to learner traffic. Keeping one learner's data away from another depends on every query filtering by `user_id`. The notification-settings cross-user write fixed in 6b22e4b was this failure mode.

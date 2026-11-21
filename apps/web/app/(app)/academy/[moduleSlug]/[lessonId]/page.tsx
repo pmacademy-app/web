@@ -16,7 +16,6 @@ import {
   getAdjacentLessons,
   getLessonMeta,
 } from '@/lib/lesson-loader'
-import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser, getCurrentUserProfile, getLearnerDb } from '@/lib/auth'
 import { resolveLessonAccessForUser } from '@/lib/lessons-completion-service'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
@@ -151,7 +150,6 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   } | null = null
 
   if (user) {
-    const serviceSupabase = createServiceRoleClient()
     // Own-row read under RLS (getLearnerDb); library calls below stay on the service role.
     const learnerDb = await getLearnerDb()
 
@@ -163,7 +161,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     const treatment = isModuleEntryUnlockTreatment({ id: user.id, createdAt: profile?.created_at })
 
     const [access, progressResult] = await Promise.all([
-      resolveLessonAccessForUser(serviceSupabase, user.id, lessonId, {
+      resolveLessonAccessForUser(learnerDb, user.id, lessonId, {
         curriculum: lessons,
         treatment,
       }),

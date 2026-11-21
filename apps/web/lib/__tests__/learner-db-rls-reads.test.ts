@@ -54,3 +54,31 @@ describe('learner pages read their own progress under RLS', () => {
     expect(src).not.toMatch(/(?:supabase|serviceSupabase)\n\s*\.from\('user_lesson_progress'\)/)
   })
 })
+
+describe('audited library reads and the dashboard', () => {
+  it('moves audited own-row reads to the learner client', () => {
+    expect(read('app/(app)/progress/metrics/page.tsx')).toMatch(/getUserXpSummary\(learnerDb,[\s\S]*getUserStreakStatus\(learnerDb,/)
+    expect(read('app/(app)/progress/radar/page.tsx')).toContain('getSkillRadarSummary(learnerDb,')
+    expect(read('app/(app)/progress/certificates/page.tsx')).toContain('getUserCertificates(learnerDb,')
+    for (const page of ['app/(app)/badges/page.tsx', 'app/(app)/capstones/page.tsx', 'app/(app)/review/page.tsx']) {
+      expect(read(page), page).toContain('const supabase = await getLearnerDb()')
+    }
+    expect(read('app/(app)/academy/[moduleSlug]/[lessonId]/page.tsx')).toContain('resolveLessonAccessForUser(learnerDb,')
+  })
+
+  it('keeps the certificate issue (a write) on the service role', () => {
+    expect(read('app/(app)/progress/certificates/page.tsx')).toContain('issueFullCurriculumCertificateIfEligible(supabase,')
+  })
+
+  it('keeps the shared-cache leaderboard, Fellow status and profile creation on the service role', () => {
+    // The weekly board is cached for every learner; built under one learner's RLS it
+    // would contain only that learner and be served to everyone.
+    const src = read('app/(app)/dashboard/page.tsx')
+    expect(src).toContain('const supabase = createServiceRoleClient()')
+    expect(src).toContain('getWeeklyLeaderboard(supabase,')
+    expect(src).toContain('loadProofExtras(supabase,')
+    expect(src).toContain('ensureUserProfile(supabase,')
+    expect(src).toContain('getUserStreakStatus(learnerDb,')
+    expect(src).toContain('getReviewQueueData(learnerDb,')
+  })
+})

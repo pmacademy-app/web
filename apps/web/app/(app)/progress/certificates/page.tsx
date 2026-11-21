@@ -40,7 +40,7 @@ export default async function CertificatesProgressPage() {
       .eq('user_id', user.id) as unknown as Promise<{
       data: Array<{ lesson_id: string; status: string }> | null
     }>,
-    getUserCertificates(supabase, user.id),
+    getUserCertificates(learnerDb, user.id),
   ])
 
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0

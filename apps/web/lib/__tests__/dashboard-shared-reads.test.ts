@@ -183,9 +183,9 @@ describe('dashboard wiring', () => {
   const page = readFileSync(path.resolve(__dirname, '../../app/(app)/dashboard/page.tsx'), 'utf8')
 
   it('passes the shared profile and progress promises to the streak and review loaders', () => {
-    expect(page).toMatch(/getUserStreakStatus\(supabase, authUser\.id, \{ profile: profilePromise \}\)/)
+    expect(page).toMatch(/getUserStreakStatus\(learnerDb, authUser\.id, \{ profile: profilePromise \}\)/)
     expect(page).toMatch(
-      /getReviewQueueData\(supabase, authUser\.id, \{ profile: profilePromise, progressRows: progressPromise \}\)/,
+      /getReviewQueueData\(learnerDb, authUser\.id, \{ profile: profilePromise, progressRows: progressPromise \}\)/,
     )
   })
 
