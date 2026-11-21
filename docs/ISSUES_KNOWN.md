@@ -23,7 +23,7 @@ These come from the code on `main` and the held migrations, not from a productio
 
 #### ISSUE-35: Merged features wait on held migrations
 - **Status**: 🟡 Code on `main`, database not applied
-- **Description**: capstone review feedback (AG-26, AG-27), lesson mastery (AG-28), weekly goal (AG-29), the weekly leaderboard RPC (AG-31), the signup hook (AG-12) and the security summary (PR #105) need their held migrations. The November database review hardening (`20261119000001` to `20261119000006`) is also held.
+- **Description**: capstone review feedback (AG-26, AG-27), lesson mastery (AG-28), weekly goal (AG-29), the weekly leaderboard RPC (AG-31), the signup hook (AG-12) and the security summary (PR #105) need their held migrations. The November database review hardening (`20261119000001` to `20261119000007`) was applied by hand on 2026-11-21.
 - **Required Action**: apply in the order of ROADMAP section 2.3.
 
 ---

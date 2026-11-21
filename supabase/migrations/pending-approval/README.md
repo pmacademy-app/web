@@ -296,6 +296,8 @@ Run `rollback/20261113000008_drop_duplicate_indexes.down.sql` in the SQL editor.
 
 ### November 2026 database review (20261119000001 to 20261119000006)
 
+**Applied by hand 2026-11-21, never moved:** 20261119000005, 000001, 000002, 000004, 000003, 000006 and 000007, in the order below, in the production SQL editor; every self-check and validation passed. The 000005 validation now accepts "Users can view own reflections" (20261121000001 replaced the FOR ALL policy). Still to do: update `supabase/tests/grant_allowlist.sql` and `supabase/tests/held-migrations.txt` for these (and 20261121000001) and confirm in the CI database replay.
+
 Six independent hardening migrations from the read-only review of the applied migrations, plus one
 read-only audit. Each is owner-run in the SQL editor, ends with a self-check that raises (and so
 rolls the whole script back) if the end state is wrong, and has a rollback and a read-only

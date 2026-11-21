@@ -39,7 +39,10 @@ BEGIN
      WHERE schemaname = 'public' AND tablename = 'capstone_submissions' AND policyname = 'Users view own capstones'
   ) OR NOT EXISTS (
     SELECT 1 FROM pg_policies
-     WHERE schemaname = 'public' AND tablename = 'reflections' AND policyname = 'Users manage own reflections'
+     WHERE schemaname = 'public' AND tablename = 'reflections'
+       -- 20261121000001 replaced the FOR ALL "Users manage own reflections" with the
+       -- select-only "Users can view own reflections"; either is the learner's own-row read.
+       AND policyname IN ('Users manage own reflections', 'Users can view own reflections')
   ) THEN
     RAISE EXCEPTION '20261119000005 FAILED: a learner own-row policy is missing (this migration must not drop it)';
   END IF;

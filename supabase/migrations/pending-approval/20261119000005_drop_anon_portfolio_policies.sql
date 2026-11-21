@@ -25,7 +25,7 @@
 --   2. REVOKEs SELECT on public.capstone_submissions from PUBLIC and anon (its writes were already
 --      revoked in 20261024000002), and ALL on public.reflections from PUBLIC and anon.
 --   Learners keep their own-row policies: "Users view own capstones" (SELECT) and
---   "Users manage own reflections" (FOR ALL, own rows).
+--   "Users can view own reflections" (SELECT, own rows; it replaced the FOR ALL policy in 20261121000001).
 --
 -- Idempotent: DROP POLICY IF EXISTS, REVOKE and the self-check can all be re-run. No data is
 -- changed. Nothing here grants anything to anon or authenticated.
