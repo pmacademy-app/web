@@ -10,6 +10,7 @@
 
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { reflectionWriteBodySchema } from '@/lib/api/contracts/learner-writes'
 import { recordReflectionAction } from '@/lib/academy/lessons-db'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -31,8 +32,8 @@ export const GET = withRoute(
       throw new RouteError(400, 'VALIDATION', 'Missing lesson_id query parameter')
     }
 
-    const serviceSupabase = createServiceRoleClient()
-    const { data: reflection, error } = await serviceSupabase
+    const learnerDb = await getLearnerDbForRequest(request)
+    const { data: reflection, error } = await learnerDb
       .from('reflections')
       .select('*')
       .eq('user_id', requireUserId(actor))

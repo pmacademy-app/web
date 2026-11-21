@@ -22,6 +22,7 @@ import { isLessonIdFormat } from '@/lib/academy/lesson-ids'
 import { assertLessonAccessible } from '@/lib/academy/lessons-db'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { lessonProgressPatchBodySchema } from '@/lib/api/contracts/learner-writes'
 import { trackProductEvent } from '@/lib/events/product-events'
 import { createServiceRoleClient, type Database } from '@/lib/supabase'
@@ -94,12 +95,12 @@ export const GET = withRoute(
     summary: 'Unexpected failure fetching lesson progress',
     onDenied: warnUnauthorized,
   },
-  async ({ actor, params }) => {
+  async ({ request, actor, params }) => {
     const userId = requireUserId(actor)
     const lessonId = params.lessonId
-    const serviceSupabase = createServiceRoleClient()
+    const learnerDb = await getLearnerDbForRequest(request)
 
-    const progress = await findProgress(serviceSupabase, userId, lessonId)
+    const progress = await findProgress(learnerDb, userId, lessonId)
 
     if (!progress) {
       return Response.json({

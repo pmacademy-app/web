@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { loadCapstoneSubmission } from '@/lib/capstones/capstones-db'
-import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(
   {
@@ -12,7 +12,7 @@ export const GET = withRoute(
     operation: 'capstones.module.read',
     summary: 'Unexpected failure fetching capstone details',
   },
-  async ({ actor, params }) => {
+  async ({ request, actor, params }) => {
     const moduleSlug = params.module
     const capstoneDef = getCapstoneDefinition(moduleSlug)
 
@@ -24,7 +24,7 @@ export const GET = withRoute(
     }
 
     const userId = requireUserId(actor)
-    const supabase = createServiceRoleClient()
+    const supabase = await getLearnerDbForRequest(request)
     const [result, userProfileRes] = await Promise.all([
       loadCapstoneSubmission(supabase, userId, moduleSlug),
       supabase

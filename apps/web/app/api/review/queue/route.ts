@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { getReviewQueueData } from '@/lib/flashcards-service'
-import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(
   {
@@ -11,8 +11,8 @@ export const GET = withRoute(
     operation: 'review.queue.read',
     summary: 'Unexpected failure fetching the review queue',
   },
-  async ({ actor }) => {
-    const supabase = createServiceRoleClient()
+  async ({ request, actor }) => {
+    const supabase = await getLearnerDbForRequest(request)
     const queueData = await getReviewQueueData(supabase, requireUserId(actor))
 
     return NextResponse.json({

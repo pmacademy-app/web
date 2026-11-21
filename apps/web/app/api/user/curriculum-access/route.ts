@@ -13,7 +13,7 @@
 
 import { requireUserId } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
-import { createServiceRoleClient } from '@/lib/supabase'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { isModuleEntryUnlockTreatment } from '@/lib/academy/module-entry-unlock'
 
 export const GET = withRoute(
@@ -22,9 +22,9 @@ export const GET = withRoute(
     operation: 'user.curriculum_access.read',
     summary: 'Unexpected failure reading curriculum access state',
   },
-  async ({ actor }) => {
+  async ({ request, actor }) => {
     const userId = requireUserId(actor)
-    const supabase = createServiceRoleClient()
+    const supabase = await getLearnerDbForRequest(request)
 
     const [{ data: userRow }, { data: progressRows }] = await Promise.all([
       supabase.from('users').select('created_at, curriculum_access_override').eq('id', userId).maybeSingle(),

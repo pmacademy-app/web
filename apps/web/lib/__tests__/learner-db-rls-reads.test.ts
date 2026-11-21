@@ -82,3 +82,22 @@ describe('audited library reads and the dashboard', () => {
     expect(src).toContain('getReviewQueueData(learnerDb,')
   })
 })
+
+describe('learner writes run under RLS with no service-role fallback', () => {
+  it.each(['app/api/notifications/route.ts', 'app/api/settings/notifications/route.ts'])(
+    '%s reads and writes only with the caller token',
+    (file) => {
+      const src = read(file)
+      expect(src).toContain('getLearnerDbForRequest(request)')
+      expect(src).not.toContain('createServiceRoleClient')
+      expect(src).not.toContain('learnerFirst')
+    }
+  )
+
+  it('feedback uses the service role only for signed-out visitors', () => {
+    const src = read('app/api/feedback/route.ts')
+    expect(src).toContain('const learnerDb = userId ? await getLearnerDbForRequest(request) : supabase')
+    expect(src).not.toMatch(/await supabase\s*\.from\(/)
+    expect(src).not.toContain('learnerFirst')
+  })
+})

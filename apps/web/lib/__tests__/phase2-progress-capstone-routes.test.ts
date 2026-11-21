@@ -23,6 +23,7 @@ const loadCapstoneSubmission = vi.fn()
 
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: (req: Request) => getAuthenticatedUserFromRequest(req),
+  getLearnerDbForRequest: vi.fn(async () => fakeClient),
 }))
 
 vi.mock('@/lib/rate-limit', () => ({

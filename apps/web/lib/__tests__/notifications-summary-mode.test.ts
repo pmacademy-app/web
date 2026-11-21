@@ -17,6 +17,8 @@ vi.mock('@/lib/supabase', async (importOriginal) => ({
 
 vi.mock('@/lib/auth', () => ({
   getAuthenticatedUserFromRequest: vi.fn(async () => ({ id: 'usr_n', email: 'n@example.com' })),
+  // The route reads under RLS with the caller's token; here that client is the same fake.
+  getLearnerDbForRequest: vi.fn(async () => fake),
 }))
 
 vi.mock('@/lib/notifications/feature-flags/service', () => ({

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { goalUpdateSchema } from '@/lib/api/contracts/settings'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -14,8 +15,8 @@ export const GET = withRoute(
     domain: 'api',
     summary: 'Unexpected failure reading learner weekly goal settings',
   },
-  async ({ actor }) => {
-    const supabase = createServiceRoleClient()
+  async ({ request, actor }) => {
+    const supabase = await getLearnerDbForRequest(request)
     const { data: user, error } = await supabase
       .from('users')
       .select('weekly_goal_lessons, session_minutes')

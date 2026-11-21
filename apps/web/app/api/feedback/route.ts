@@ -5,7 +5,6 @@ import { parseBody } from '@/lib/api/contracts/body'
 import { feedbackSubmitBodySchema } from '@/lib/api/contracts/public-forms'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getLearnerDbForRequest } from '@/lib/auth'
-import { learnerFirst } from '@/lib/db/learner-first'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 
@@ -50,13 +49,11 @@ export const POST = withRoute(
 
     // Handle prompt dismissal without content
     if (action === 'dismiss' && promptKey && userId) {
-      await learnerFirst('feedback.prompt_dismiss', learnerDb, supabase, (db: typeof supabase) =>
-        db.from('user_feedback_prompts').upsert({
+      await learnerDb.from('user_feedback_prompts').upsert({
           user_id: userId,
           prompt_key: String(promptKey),
           action: 'dismissed',
         })
-      )
 
       return NextResponse.json({ success: true, dismissed: true })
     }
@@ -71,8 +68,7 @@ export const POST = withRoute(
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : null
     const cleanUrl = typeof pageUrl === 'string' ? pageUrl.trim().substring(0, 200) : null
 
-    const { data, error } = await learnerFirst('feedback.insert', learnerDb, supabase, (db: typeof supabase) =>
-      db
+    const { data, error } = await learnerDb
         .from('user_feedback')
         .insert({
           user_id: userId,
@@ -85,7 +81,6 @@ export const POST = withRoute(
         })
         .select('id, created_at')
         .single()
-    )
 
     if (error || !data) {
       void logSystemError({
@@ -101,13 +96,11 @@ export const POST = withRoute(
 
     // Record prompt key submission if prompted
     if (promptKey && userId) {
-      await learnerFirst('feedback.prompt_submitted', learnerDb, supabase, (db: typeof supabase) =>
-        db.from('user_feedback_prompts').upsert({
+      await learnerDb.from('user_feedback_prompts').upsert({
           user_id: userId,
           prompt_key: String(promptKey),
           action: 'submitted',
         })
-      )
     }
 
     return NextResponse.json({ success: true, feedbackId: data.id })

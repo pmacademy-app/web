@@ -6,7 +6,7 @@ import { parseBody } from '@/lib/api/contracts/body'
 import { certificateIssueBodySchema } from '@/lib/api/contracts/learner-writes'
 import { issueCertificateWithStatus, getUserCertificates } from '@/lib/certificates/certificates-db'
 import { dispatchCertificateGenerated } from '@/lib/certificates/issue-flow'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { getAuthenticatedUserFromRequest, getLearnerDbForRequest } from '@/lib/auth'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const GET = withRoute(
@@ -15,8 +15,8 @@ export const GET = withRoute(
     operation: 'certificates.read',
     summary: 'Unexpected failure fetching learner certificates',
   },
-  async ({ actor }) => {
-    const supabase = createServiceRoleClient()
+  async ({ request, actor }) => {
+    const supabase = await getLearnerDbForRequest(request)
     const certificates = await getUserCertificates(supabase, requireUserId(actor))
 
     return NextResponse.json({ success: true, certificates })

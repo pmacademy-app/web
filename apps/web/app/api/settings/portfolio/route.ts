@@ -6,6 +6,7 @@ import { invalidateLeaderboardCache } from '@/lib/leaderboard/leaderboard-db'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { portfolioSettingsUpdateSchema } from '@/lib/api/contracts/settings'
 import type { PortfolioSettingsData } from '@/lib/portfolio/portfolio-db'
 import {
@@ -22,10 +23,10 @@ export const GET = withRoute(
     domain: 'api',
     summary: 'Unexpected failure reading portfolio settings',
   },
-  async ({ actor }) => {
+  async ({ request, actor }) => {
     const userId = requireUserId(actor)
 
-    const supabase = createServiceRoleClient()
+    const supabase = await getLearnerDbForRequest(request)
     const [settings, submittedCapstones] = await Promise.all([
       getPortfolioSettings(supabase, userId),
       getLearnerSubmittedCapstones(supabase, userId),

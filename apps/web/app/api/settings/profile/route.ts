@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { getLearnerDbForRequest } from '@/lib/auth'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { profileUpdateSchema } from '@/lib/api/contracts/settings'
 import { isValidAvatarUrl } from '@/lib/avatar/avatar-service'
@@ -17,8 +18,8 @@ export const GET = withRoute(
     domain: 'api',
     summary: 'Unexpected failure reading learner profile settings',
   },
-  async ({ actor }) => {
-    const supabase = createServiceRoleClient()
+  async ({ request, actor }) => {
+    const supabase = await getLearnerDbForRequest(request)
     const { data: profile, error } = await supabase
       .from('users')
       .select('name, avatar_url, bio, linkedin_url, github_url, website_url, is_portfolio_public, username')
