@@ -39,7 +39,7 @@ type SkillRadarProgressRow = NonNullable<SkillRadarPreloadedData['progressRows']
 
 /** The user columns the public portfolio renders. Nothing else is read, so nothing else can leak. */
 const PUBLIC_PORTFOLIO_USER_COLUMNS =
-  'id, username, name, bio, avatar_url, linkedin_url, github_url, website_url, current_streak, longest_streak, total_xp, is_fellow, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count, portfolio_verification_override'
+  'id, username, name, bio, avatar_url, linkedin_url, github_url, website_url, current_streak, longest_streak, total_xp, is_fellow, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count, portfolio_verification_override, avatar_frame'
 
 export interface PublicCapstoneItem {
   id: string
@@ -86,6 +86,8 @@ export interface PublicPortfolioPayload {
     portfolioLayout: PortfolioSectionId[]
     featuredCapstoneId: string | null
     portfolioViewCount: number
+    /** Chosen avatar frame (NULL = automatic). */
+    avatarFrame: string | null
   }
   progress: {
     completedLessonsCount: number
@@ -302,6 +304,7 @@ export async function getPublicPortfolioData(
       levelInfo,
       isFellow: Boolean(user.is_fellow),
       isPortfolioVerified: verification.isVerified,
+      avatarFrame: (user as { avatar_frame?: string | null }).avatar_frame ?? null,
       isPortfolioPublic: user.is_portfolio_public ?? true,
       portfolioLayout,
       featuredCapstoneId,

@@ -381,6 +381,12 @@ Reflections become select-only for learners (every write is server-side) and the
 `user_notification_preferences` update policy gets WITH CHECK. Applied in the production SQL
 editor on 2026-11-21; its built-in checks passed. Kept here so the CLI does not apply it again.
 
+### `20261121000002_users_avatar_frame.sql` (avatar frames, applied by hand 2026-11-21, never moved)
+
+Adds nullable `users.avatar_frame` (CHECK to the six frame kinds; NULL = automatic) for the frame picker in
+Settings. Written only by `/api/settings/avatar-frame` through the service role. Applied in the production SQL
+editor on 2026-11-21; its self-check passed. In `supabase/tests/held-migrations.txt` so CI replays it.
+
 ### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
 
 Twelve SELECT-only queries that look for use of the holes these and earlier migrations closed:

@@ -79,3 +79,19 @@ export const FRAME_LABELS: Record<FrameKind, string> = {
   top3: 'Weekly top 3',
   fellow: 'PM Fellow',
 }
+
+/** Every frame kind, for validating a chosen frame. */
+export const FRAME_KINDS = ['level', 'streak', 'verified', 'certified', 'top3', 'fellow'] as const
+
+/**
+ * Frames a learner may pick in Settings. The level ring always; the streak ring and the
+ * Fellow frame once earned. Verified, certified and weekly top 3 are shown automatically
+ * when earned, since checking them needs data the picker does not load.
+ */
+export function choosableFrames(signals: Pick<FrameSignals, 'currentStreak' | 'isFellow'>): FrameKind[] {
+  const out: FrameKind[] = []
+  if (signals.isFellow) out.push('fellow')
+  if ((signals.currentStreak ?? 0) >= STREAK_FRAME_MIN_DAYS) out.push('streak')
+  out.push('level')
+  return out
+}

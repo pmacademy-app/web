@@ -5,7 +5,9 @@ import { describe, it, expect, afterEach } from 'vitest'
 import * as React from 'react'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { earnedFrames, resolveFrame, STREAK_FRAME_MIN_DAYS } from '@/lib/avatar/frames'
+import { choosableFrames, earnedFrames, resolveFrame, STREAK_FRAME_MIN_DAYS } from '@/lib/avatar/frames'
+import fs from 'node:fs'
+import path from 'node:path'
 import { AvatarFrame } from '@/components/avatar/AvatarFrame'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -106,5 +108,21 @@ describe('AvatarFrame', () => {
     expect(c.querySelector('[data-live="true"]')).not.toBeNull()
     const spinning = Array.from(c.querySelectorAll('circle')).filter((n) => (n.getAttribute('class') || '').includes('spin'))
     expect(spinning).toHaveLength(0)
+  })
+})
+
+describe('frame picker rules', () => {
+  it('offers the level ring always, streak and Fellow only once earned', () => {
+    expect(choosableFrames({})).toEqual(['level'])
+    expect(choosableFrames({ currentStreak: STREAK_FRAME_MIN_DAYS, isFellow: true })).toEqual(['fellow', 'streak', 'level'])
+  })
+
+  it('the save endpoint refuses frames that are not earned and writes only server-side', () => {
+    const src = fs.readFileSync(path.resolve(__dirname, '../../app/api/settings/avatar-frame/route.ts'), 'utf8')
+    expect(src).toContain("z.object({ frame: z.enum(FRAME_KINDS).nullable() }).strict()")
+    expect(src).toContain('You have not earned that frame yet.')
+    expect(src).toContain("const { error } = await supabase.from('users').update({ avatar_frame: body.frame })")
+    expect(src).toContain('const supabase = createServiceRoleClient()')
+    expect(src).toContain('rateLimit: [')
   })
 })

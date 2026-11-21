@@ -1713,6 +1713,7 @@ export type Database = {
           age_confirmed_at: string | null
           age_confirmed_minimum: number | null
           auth_provider: string
+          avatar_frame: string | null
           avatar_url: string | null
           bio: string | null
           career_role: string | null
@@ -1756,6 +1757,7 @@ export type Database = {
           age_confirmed_at?: string | null
           age_confirmed_minimum?: number | null
           auth_provider?: string
+          avatar_frame?: string | null
           avatar_url?: string | null
           bio?: string | null
           career_role?: string | null
@@ -1799,6 +1801,7 @@ export type Database = {
           age_confirmed_at?: string | null
           age_confirmed_minimum?: number | null
           auth_provider?: string
+          avatar_frame?: string | null
           avatar_url?: string | null
           bio?: string | null
           career_role?: string | null

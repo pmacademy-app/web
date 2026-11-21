@@ -10,6 +10,9 @@ import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
 import { showClientToast } from '@/lib/events/client-event-bus'
 import { ProfileUpdateResponse, ProfileGetResponse } from '@/lib/api/contracts/settings'
 import { WeeklyGoalCard } from '@/components/settings/WeeklyGoalCard'
+import { useRouter } from 'next/navigation'
+import { AvatarFrame } from '@/components/avatar/AvatarFrame'
+import { FRAME_LABELS, resolveFrame, type FrameKind } from '@/lib/avatar/frames'
 
 function buildProfileData(profile?: ProfileGetResponse['profile']) {
   return {
@@ -278,6 +281,97 @@ function ProfileFormContent({
   )
 }
 
+interface AvatarFrameResponse {
+  success: boolean
+  chosen: FrameKind | null
+  totalXp: number
+  currentStreak: number
+  choosable: FrameKind[]
+}
+
+const AUTO_ONLY: { kind: FrameKind; hint: string }[] = [
+  { kind: 'verified', hint: 'When your portfolio is verified' },
+  { kind: 'certified', hint: 'When you finish all 90 lessons' },
+  { kind: 'top3', hint: 'During a week you rank top 3' },
+]
+
+/**
+ * Choose the earned frame shown around your avatar (lib/avatar/frames.ts).
+ * "Automatic" shows the highest frame you hold; the rarer frames appear on their own.
+ */
+function AvatarFramePicker() {
+  const router = useRouter()
+  const { data, mutate } = useApiQuery<AvatarFrameResponse>('/api/settings/avatar-frame')
+  const [saving, setSaving] = useState<string | null>(null)
+  if (!data?.success) return null
+
+  const signals = { totalXp: data.totalXp, currentStreak: data.currentStreak, isFellow: data.choosable.includes('fellow') }
+  const options: { value: FrameKind | null; label: string }[] = [
+    { value: null, label: 'Automatic' },
+    ...data.choosable.map((kind) => ({ value: kind, label: FRAME_LABELS[kind] })),
+  ]
+
+  async function choose(value: FrameKind | null) {
+    setSaving(value ?? 'auto')
+    const res = await apiPost<{ success: boolean }>('/api/settings/avatar-frame', { frame: value })
+    setSaving(null)
+    if (res.ok) {
+      await mutate()
+      router.refresh()
+      showClientToast('Frame updated', 'Your avatar frame is saved.', 'success')
+    } else {
+      showClientToast('Frame not saved', res.error.message, 'error')
+    }
+  }
+
+  return (
+    <section className="rounded-xl border border-border/70 bg-card p-5 shadow-2xs space-y-4" aria-labelledby="avatar-frame-heading">
+      <div className="border-b border-border/60 pb-3">
+        <h2 id="avatar-frame-heading" className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          Avatar frame
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
+          Frames are earned. Pick the one you want people to see.
+        </p>
+      </div>
+      <div role="radiogroup" aria-label="Avatar frame" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {options.map((option) => {
+          const selected = (data.chosen ?? null) === option.value
+          const frame = resolveFrame(signals, option.value)
+          return (
+            <button
+              key={option.label}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              disabled={saving !== null}
+              onClick={() => void choose(option.value)}
+              className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-xs font-medium transition-colors ${
+                selected ? 'border-primary bg-primary/5 text-foreground' : 'border-border/60 text-muted-foreground hover:bg-muted/30'
+              }`}
+            >
+              <AvatarFrame frame={frame} size={64} motion="quiet">
+                <span className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                  {option.value === null ? 'A' : FRAME_LABELS[option.value][0]}
+                </span>
+              </AvatarFrame>
+              <span>{saving === (option.value ?? 'auto') ? 'Saving' : option.label}</span>
+            </button>
+          )
+        })}
+      </div>
+      <ul className="space-y-1 text-[11px] text-muted-foreground">
+        {AUTO_ONLY.map((item) => (
+          <li key={item.kind}>
+            <span className="font-semibold text-foreground">{FRAME_LABELS[item.kind]}</span>: appears automatically. {item.hint}.
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 export function ProfileSettingsTab() {
   const { data, isLoading, mutate } = useApiQuery<ProfileGetResponse>('/api/settings/profile')
 
@@ -293,6 +387,7 @@ export function ProfileSettingsTab() {
   return (
     <div className="space-y-4">
       <WeeklyGoalCard />
+      <AvatarFramePicker />
       <ProfileFormContent
         key={data?.profile?.name ?? 'empty'}
         profile={data?.profile}

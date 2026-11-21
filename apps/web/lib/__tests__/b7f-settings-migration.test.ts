@@ -207,6 +207,7 @@ describe('B7-F — migration scope', () => {
     const settings = migrated.filter((f) => f.startsWith('settings/'))
 
     expect(settings).toEqual([
+      'settings/avatar-frame/route.ts',
       'settings/delete-account/route.ts',
       'settings/goal/route.ts',
       'settings/notifications/route.ts',

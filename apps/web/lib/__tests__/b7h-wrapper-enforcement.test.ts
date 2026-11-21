@@ -214,9 +214,10 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // 74 since the admin console moved to its own repository: its 62 `admin/*` routes (all on
   // `withRoute`) left with it, and `internal/revalidate/route.ts` (the admin console's cache
   // invalidation call into this app, on `withRoute`) was added.
-  it('accounts for all 74 routes', () => {
-    expect(files).toHaveLength(74)
-    expect(migrated).toHaveLength(71)
+  // 75 since avatar frames added `settings/avatar-frame/route.ts` (the frame picker, on `withRoute`).
+  it('accounts for all 75 routes', () => {
+    expect(files).toHaveLength(75)
+    expect(migrated).toHaveLength(72)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
@@ -236,7 +237,8 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     // 10 auth routes since Google sign-in added auth/google and auth/complete-consent; 9 since
     // the unused auth/update-password route was removed.
     expect(inGroup('auth/')).toBe(9)
-    expect(inGroup('settings/')).toBe(12)
+    // 13 since the avatar frame picker added settings/avatar-frame.
+    expect(inGroup('settings/')).toBe(13)
     // 0 since the admin routes moved to the admin console repository.
     expect(inGroup('admin/')).toBe(0)
     expect(inGroup('internal/')).toBe(1)

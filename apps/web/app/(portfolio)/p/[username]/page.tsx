@@ -195,6 +195,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
         {/* Portfolio Hero */}
         <PortfolioHero
           user={user}
+          avatarFrame={user.avatarFrame}
           hasFullCertificate={progress.totalLessonsCount > 0 && progress.completedLessonsCount >= progress.totalLessonsCount}
         />
 
