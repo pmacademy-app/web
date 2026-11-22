@@ -215,9 +215,11 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // `withRoute`) left with it, and `internal/revalidate/route.ts` (the admin console's cache
   // invalidation call into this app, on `withRoute`) was added.
   // 75 since avatar frames added `settings/avatar-frame/route.ts` (the frame picker, on `withRoute`).
-  it('accounts for all 75 routes', () => {
-    expect(files).toHaveLength(75)
-    expect(migrated).toHaveLength(72)
+  // 78 since the mobile app's read routes added `curriculum/route.ts`, `lessons/[lessonId]/route.ts`
+  // and `progress/route.ts`, all on `withRoute`.
+  it('accounts for all 78 routes', () => {
+    expect(files).toHaveLength(78)
+    expect(migrated).toHaveLength(75)
   })
 
   it('allows a route.tsx handler only for the listed OG image routes', () => {
