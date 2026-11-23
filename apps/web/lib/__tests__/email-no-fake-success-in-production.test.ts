@@ -91,7 +91,7 @@ describe('No fake email success in production', () => {
     process.env.VERCEL_ENV = 'production'
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const { sendEmail } = await import('../email')
-    const result = await sendEmail({ to: 'learner@example.com', subject: 'Verify', html: '<p>hi</p>' })
+    const result = await sendEmail({ to: 'learner@example.com', subject: 'Verify', html: '<p>hi</p>', text: 'hi' })
     expect(result.success).toBe(false)
   })
 })

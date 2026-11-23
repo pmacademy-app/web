@@ -44,6 +44,9 @@ export class BrevoProvider implements NotificationProvider {
         timestamp: new Date().toISOString(),
       }
     }
+    if (!apiKey) {
+      return { success: false, providerName: this.name, error: 'BREVO_API_KEY is not configured', timestamp: new Date().toISOString() }
+    }
 
     try {
       const { name: senderName, email: senderEmail } = parseFromEmail(
