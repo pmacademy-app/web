@@ -727,7 +727,12 @@ export async function removeFriend(
   userId: string,
   friendId: string
 ): Promise<{ success: boolean }> {
-  await db.deleteFriendEdge(supabase, userId, friendId)
+  if (!UUID_PATTERN.test(friendId)) {
+    throw new PublicError('Invalid friend id.', { status: 400, code: 'VALIDATION' })
+  }
+
+  const { error } = await db.deleteFriendEdge(supabase, userId, friendId)
+  if (error) throw error
 
   return { success: true }
 }

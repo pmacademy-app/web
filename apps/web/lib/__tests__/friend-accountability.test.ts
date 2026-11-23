@@ -136,26 +136,73 @@ describe('Friend Accountability — Add Friend', () => {
     await expect(addFriend(supabase, 'user-alice', 'bob')).rejects.toBeTruthy()
   })
 
-  it('removeFriend deletes the row regardless of which side added the other', async () => {
-    const deleteChain: any = new Proxy(
-      {},
-      {
-        get(_t, prop) {
-          if (prop === 'then') return (resolve: (v: unknown) => void) => resolve({ data: null, error: null })
-          return () => deleteChain
-        },
-      }
-    )
-    const deleteSpy = vi.fn(() => deleteChain)
+  const ALICE = '11111111-1111-4111-8111-111111111111'
+  const BOB = '22222222-2222-4222-8222-222222222222'
+
+  /** Records every filter call on each delete, so tests can assert exactly what ran. */
+  function recordingDeleteClient(deleteResults: Array<{ error: unknown }> = []) {
+    const deletes: Array<Array<[string, unknown[]]>> = []
     const supabase = {
       from: vi.fn((table: string) => {
-        if (table === 'user_friends') return { delete: deleteSpy }
-        return chainable({ data: null })
+        if (table !== 'user_friends') return chainable({ data: null })
+        return {
+          delete: () => {
+            const calls: Array<[string, unknown[]]> = []
+            const result = deleteResults[deletes.length] ?? { error: null }
+            deletes.push(calls)
+            const chain: any = new Proxy(
+              {},
+              {
+                get(_t, prop) {
+                  if (prop === 'then') return (resolve: (v: unknown) => void) => resolve({ data: null, ...result })
+                  return (...args: unknown[]) => {
+                    calls.push([String(prop), args])
+                    return chain
+                  }
+                },
+              }
+            )
+            return chain
+          },
+        }
       }),
     } as any
+    return { supabase, deletes }
+  }
 
-    const result = await removeFriend(supabase, 'user-alice', 'user-bob')
+  it('removeFriend deletes both directions with plain equality filters', async () => {
+    const { supabase, deletes } = recordingDeleteClient()
+
+    const result = await removeFriend(supabase, ALICE, BOB)
+
     expect(result.success).toBe(true)
-    expect(deleteSpy).toHaveBeenCalled()
+    expect(deletes).toEqual([
+      [['eq', ['user_id', ALICE]], ['eq', ['friend_id', BOB]]],
+      [['eq', ['user_id', BOB]], ['eq', ['friend_id', ALICE]]],
+    ])
+  })
+
+  it('removeFriend never builds an or= filter from the friend id', async () => {
+    const { supabase, deletes } = recordingDeleteClient()
+
+    await removeFriend(supabase, ALICE, BOB)
+
+    const methods = deletes.flat().map(([method]) => method)
+    expect(methods).not.toContain('or')
+    expect(methods).not.toContain('filter')
+  })
+
+  it('removeFriend rejects a friend id that is not a uuid before touching the database', async () => {
+    const { supabase, deletes } = recordingDeleteClient()
+    const injection = `${BOB}),user_id.not.is.null,and(user_id.eq.${BOB}`
+
+    await expect(removeFriend(supabase, ALICE, injection)).rejects.toMatchObject({ code: 'VALIDATION' })
+    expect(deletes).toHaveLength(0)
+  })
+
+  it('removeFriend surfaces a delete error instead of reporting success', async () => {
+    const { supabase } = recordingDeleteClient([{ error: { message: 'boom' } }])
+
+    await expect(removeFriend(supabase, ALICE, BOB)).rejects.toEqual({ message: 'boom' })
   })
 })

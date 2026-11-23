@@ -283,11 +283,21 @@ export async function insertFriendEdge(
   return { error }
 }
 
-export async function deleteFriendEdge(db: Db, userId: string, friendId: string): Promise<void> {
-  await db
-    .from('user_friends')
-    .delete()
-    .or(
-      `and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`
-    )
+/**
+ * Deletes the friendship between two learners, whichever side added the other.
+ *
+ * Two parameterised deletes on purpose. The ids must never be interpolated into a
+ * PostgREST `or=` filter string: supabase-js does not escape it, and this runs on the
+ * service-role client, so a crafted id could widen the filter to every row.
+ */
+export async function deleteFriendEdge(
+  db: Db,
+  userId: string,
+  friendId: string
+): Promise<{ error: unknown }> {
+  const outgoing = await db.from('user_friends').delete().eq('user_id', userId).eq('friend_id', friendId)
+  if (outgoing.error) return { error: outgoing.error }
+
+  const incoming = await db.from('user_friends').delete().eq('user_id', friendId).eq('friend_id', userId)
+  return { error: incoming.error ?? null }
 }

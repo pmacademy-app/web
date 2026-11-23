@@ -11,7 +11,7 @@ const addFriendSchema = z.object({
 })
 
 const removeFriendSchema = z.object({
-  friendId: z.string().min(1, 'friendId parameter is required.'),
+  friendId: z.string().uuid('friendId must be a valid user id.'),
 })
 
 export const GET = withRoute(
