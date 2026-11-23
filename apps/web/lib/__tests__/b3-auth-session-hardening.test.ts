@@ -76,7 +76,14 @@ vi.mock('@supabase/supabase-js', () => {
                 error: null,
               }
             }
-            return { data: { session: null, user: null }, error: new Error('Invalid refresh token') }
+            // supabase-js reports an invalid refresh token as AuthApiError with status 400.
+            return {
+              data: { session: null, user: null },
+              error: Object.assign(new Error('Invalid Refresh Token: Refresh Token Not Found'), {
+                name: 'AuthApiError',
+                status: 400,
+              }),
+            }
           }),
           signOut: vi.fn(async () => ({ error: null })),
         },

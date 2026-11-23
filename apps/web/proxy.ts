@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import { isDefiniteRefreshFailure } from '@/lib/auth/refresh-failure'
 import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
 import { isAllowedApiOrigin } from '@/lib/security/origin-check'
 import { getClientIpBucket } from '@/lib/security/client-ip'
@@ -343,6 +344,9 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
 
   let user: ProxyUser | null = null
   let newSession: { access_token: string; refresh_token: string; expires_in?: number } | null = null
+  // True when the refresh could not be decided (network error, auth server 5xx). The
+  // refresh cookie may still be valid, so it must not be deleted.
+  let refreshUnavailable = false
 
   // 1. Verify access token with Supabase GoTrue
   if (accessToken || refreshToken) {
@@ -397,6 +401,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
     if (!user && refreshToken) {
       try {
         const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken })
+        if (error && !isDefiniteRefreshFailure(error)) refreshUnavailable = true
         if (!error && data?.session && data?.user) {
           user = {
             id: data.user.id,
@@ -408,6 +413,7 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
           newSession = data.session
         }
       } catch (err) {
+        refreshUnavailable = true
         console.error('[proxy] Refresh session error:', err)
       }
     }
@@ -591,6 +597,17 @@ async function routeRequest(request: NextRequest, requestId: string): Promise<Ne
   // ── Protected application routes ─────────────────────────────────────────
   if (isAppPage) {
     if (!user) {
+      if (refreshUnavailable) {
+        // The auth server could not be reached. Keep the cookies and ask the browser to
+        // retry, instead of signing the learner out over a temporary outage.
+        return new NextResponse(
+          '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="5"><title>Reconnecting</title><p style="font-family:system-ui,sans-serif;padding:2rem">We could not reach the sign-in service. Retrying in a few seconds...</p>',
+          {
+            status: 503,
+            headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '5', 'cache-control': 'no-store' },
+          }
+        )
+      }
       // Learners come back to the page they asked for after signing in.
       const response = redirectWithNext(LEARNER_LOGIN_PAGE, returnPathOf(request), request)
       response.cookies.delete('sb-access-token')

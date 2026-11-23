@@ -5,6 +5,8 @@ import { logSystemError } from '@/lib/monitoring/logger'
 import { log } from '@/lib/monitoring/log'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { clearSessionCookies, setSessionCookies } from '@/lib/auth/session-cookies'
+import { isDefiniteRefreshFailure } from '@/lib/auth/refresh-failure'
+import { AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 
 export const runtime = 'nodejs'
 
@@ -53,6 +55,15 @@ export const POST = withRoute(
       })
 
       const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken })
+
+      if (error && !isDefiniteRefreshFailure(error)) {
+        // Network error or auth server 5xx: the refresh token may still be valid, so the
+        // cookies are kept and the client is told to retry.
+        return NextResponse.json(
+          { error: AUTH_SERVICE_UNAVAILABLE_MESSAGE, code: 'SERVICE_UNAVAILABLE' },
+          { status: 503, headers: { 'retry-after': '5' } }
+        )
+      }
 
       if (error || !data.session || !data.user) {
         const response = NextResponse.json(
