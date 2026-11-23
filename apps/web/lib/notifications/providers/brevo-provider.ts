@@ -1,7 +1,7 @@
 import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, ProviderHealthResult } from './types'
 import type { NotificationChannel } from '../types'
 import { BRAND } from '@/lib/brand'
-import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
+import { EMAIL_HTTP_TIMEOUT_MS, isLiveProduction } from '../config'
 import { maskEmail, parseFromEmail } from '@/lib/email'
 
 /**
@@ -25,9 +25,17 @@ export class BrevoProvider implements NotificationProvider {
     }
 
     const apiKey = process.env.BREVO_API_KEY
+    if (isLiveProduction() && !apiKey) {
+      return {
+        success: false,
+        providerName: this.name,
+        error: 'BREVO_API_KEY is not configured',
+        timestamp: new Date().toISOString(),
+      }
+    }
     const isTest = (process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true') || process.env.BREVO_SIMULATE === 'true'
-    if (!apiKey || isTest) {
-      console.log(`[BrevoProvider:simulation] Simulating email send to ${recipientEmail} for template '${payload.templateKey}'`)
+    if (!isLiveProduction() && (!apiKey || isTest)) {
+      console.log(`[BrevoProvider:simulation] Simulating email send to ${maskEmail(recipientEmail)} for template '${payload.templateKey}'`)
       return {
         success: true,
         providerName: this.name,

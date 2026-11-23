@@ -7,7 +7,7 @@
  */
 
 import { BRAND } from '@/lib/brand'
-import { resolvePrimaryProvider } from '@/lib/notifications/config'
+import { isLiveProduction, resolvePrimaryProvider } from '@/lib/notifications/config'
 
 export interface EmailRecipient {
   email: string
@@ -170,7 +170,13 @@ export async function sendEmail({
   const hasAnyKey = Boolean(brevoApiKey || resendApiKey)
   const primaryProvider = resolvePrimaryProvider()
 
-  if (!hasAnyKey || isSimulated || isTest) {
+  // Production never simulates: a missing key is a failed send, not a fake success.
+  if (isLiveProduction() && !hasAnyKey) {
+    console.error('[email] No email provider key is configured in production; send failed')
+    return { success: false, error: 'No email provider is configured', statusCode: 503 }
+  }
+
+  if (!isLiveProduction() && (!hasAnyKey || isSimulated || isTest)) {
     console.log(
       `[email] Email sending simulated (isTest=${isTest}, simulate=${isSimulated}, primary=${primaryProvider}) to ${maskEmail(to)}: "${subject}" from "${fromEmail}"`
     )

@@ -40,10 +40,26 @@ export const EMAIL_HTTP_TIMEOUT_MS = 8000
  */
 export function resolvePrimaryProvider(): EmailProviderName {
   const explicit = process.env.PRIMARY_EMAIL_PROVIDER?.toLowerCase().trim()
-  if (explicit === 'brevo' || explicit === 'resend') return explicit
+  if (explicit === 'brevo' || explicit === 'resend') {
+    // In production, a named provider with no key would fail every send while the other
+    // provider sits configured and unused. Prefer the one that can actually send.
+    if (isLiveProduction() && !isProviderConfigured(explicit) && isProviderConfigured(getSecondaryProvider(explicit))) {
+      return getSecondaryProvider(explicit)
+    }
+    return explicit
+  }
   if (process.env.BREVO_API_KEY) return 'brevo'
   if (process.env.RESEND_API_KEY) return 'resend'
   return 'brevo'
+}
+
+/**
+ * True only on the Vercel production deployment. There, a missing provider key or a
+ * leftover *_SIMULATE flag must never turn a send into a fake success: verification
+ * and password-reset emails would be reported as delivered while nobody receives them.
+ */
+export function isLiveProduction(): boolean {
+  return process.env.VERCEL_ENV === 'production'
 }
 
 /** The other provider — the failover target for a given primary. */
