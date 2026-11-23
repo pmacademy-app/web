@@ -16,6 +16,26 @@ import { startOfDay } from '@/lib/time'
 import { lessonIdFromFlashcardId } from '@/lib/academy/lesson-ids'
 import { assertLessonAccessible } from '@/lib/academy/lessons-db'
 import { PublicError } from '@/lib/errors/public-error'
+import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
+
+/**
+ * Atomically claims today's review XP for one card. The xp_events read below is a
+ * check-then-insert with no unique key behind it (flashcard is left out of the
+ * once-per-source index on purpose), so parallel reviews of the same card all saw
+ * "not awarded" and all awarded, and changing timezone restarted the local day.
+ * The persistent limiter is a single-statement increment-and-check keyed on the UTC
+ * date, so exactly one caller per card per UTC day wins. Fails closed: if the limiter
+ * cannot be reached, no XP is awarded rather than possibly awarding twice.
+ */
+async function claimDailyFlashcardXp(userId: string, flashcardId: string): Promise<boolean> {
+  const utcDay = new Date().toISOString().slice(0, 10)
+  const { success } = await evaluatePersistentRateLimit(`flashcard_xp:${userId}:${flashcardId}:${utcDay}`, {
+    limit: 1,
+    windowMs: 26 * 60 * 60 * 1000,
+    failClosed: true,
+  })
+  return success
+}
 
 type SrsRow = Tables<'user_flashcard_srs'>
 
@@ -353,7 +373,7 @@ export async function recordFlashcardReview(
 
     if (xpReadError) throw readFailed('xp_events', xpReadError)
 
-    if (!awardedTodayCount) {
+    if (!awardedTodayCount && (await claimDailyFlashcardXp(userId, flashcardId))) {
       const xpConfig = await getRuntimeXpValues(supabase)
       await awardXp(
         supabase,
@@ -557,7 +577,7 @@ export async function recordBatchFlashcardReviews(
 
     const xpConfig = await getRuntimeXpValues(supabase)
     for (const cardId of cardIds) {
-      if (!awardedCardIds.has(cardId)) {
+      if (!awardedCardIds.has(cardId) && (await claimDailyFlashcardXp(userId, cardId))) {
         await awardXp(
           supabase,
           userId,

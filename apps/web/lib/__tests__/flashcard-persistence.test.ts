@@ -168,6 +168,9 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
               if (filters.source_type) {
                 rows = rows.filter((r) => r.source_type === filters.source_type)
               }
+              if (filters.source_id) {
+                rows = rows.filter((r) => r.source_id === filters.source_id)
+              }
               return resolve({ data: rows, count: rows.length, error: null })
             }
             return resolve({ data: [], error: null })
@@ -182,6 +185,29 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
   // ──────────────────────────────────────────────────────────────────────────
   // 1. Persistence & Composite PK Handling
   // ──────────────────────────────────────────────────────────────────────────
+  describe('0. Daily review XP is awarded once per card', () => {
+    it('awards XP once when the same card is reviewed in parallel', async () => {
+      const userId = 'usr_parallel_xp'
+      await Promise.all(
+        Array.from({ length: 5 }, () => recordFlashcardReview(mockSupabase, userId, 'fc-les_091713-1', 4, 'les_091713'))
+      )
+
+      const awards = mockStore.xpEvents.filter(
+        (e) => e.user_id === userId && e.source_type === 'flashcard' && e.source_id === 'fc-les_091713-1'
+      )
+      expect(awards).toHaveLength(1)
+    })
+
+    it('awards again for a different card the same day', async () => {
+      const userId = 'usr_two_cards_xp'
+      await recordFlashcardReview(mockSupabase, userId, 'fc-les_091713-1', 4, 'les_091713')
+      await recordFlashcardReview(mockSupabase, userId, 'fc-les_091713-2', 4, 'les_091713')
+
+      const awards = mockStore.xpEvents.filter((e) => e.user_id === userId && e.source_type === 'flashcard')
+      expect(awards.map((e) => e.source_id).sort()).toEqual(['fc-les_091713-1', 'fc-les_091713-2'])
+    })
+  })
+
   describe('1. Review Persistence & SM-2 State Updates', () => {
     it('persists flashcard review with lesson_id, ease_factor, and future next_review_at', async () => {
       const result = await recordFlashcardReview(
