@@ -5,7 +5,7 @@ import { verifyTheoryReadEngagement, getRuntimeXpValues, type XpValuesConfig } f
 import { getCoreReadingMinutes, sampleQuizQuestions } from './lesson-structure'
 import { getRecutVariant } from './experiment'
 import { isModuleEntryUnlockTreatment } from './module-entry-unlock'
-import { isLessonIdFormat } from './lesson-ids'
+import { isLessonIdFormat, LESSON_ID_PATTERN } from './lesson-ids'
 import type { CompiledLesson, CompiledQuizQuestion } from '@/types'
 import { updateUserStreak } from '../streaks/streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -14,7 +14,7 @@ import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp/xp-service'
 import { resolveLessonAccessFromRows, type LessonProgressStatusRow } from '../lessons-completion-service'
 import { fetchCurriculumData } from '../lesson-loader'
-import { findNewlyCompletedModule, moduleCompletedEventId } from './module-completion'
+import { findNewlyCompletedModule, getCapstoneForModule, moduleCompletedEventId } from './module-completion'
 import { CURRICULUM_LESSON_COUNT } from '../curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
 
@@ -815,6 +815,30 @@ async function runQuizCompletionHooks(
   }
 }
 
+/** Reflection key prefix for a module capstone: `capstone-<moduleSlug>`. */
+const CAPSTONE_REFLECTION_PREFIX = 'capstone-'
+
+/**
+ * A reflection may only be written for a real lesson the learner can open, or for a real
+ * module's capstone. Reflection XP is awarded once per key, so accepting any string let a
+ * learner earn the award again with every made-up id.
+ */
+async function assertReflectionTarget(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string
+): Promise<void> {
+  if (LESSON_ID_PATTERN.test(lessonId)) {
+    await assertLessonAccessible(supabase, userId, lessonId)
+    return
+  }
+  if (lessonId.startsWith(CAPSTONE_REFLECTION_PREFIX)) {
+    const moduleSlug = lessonId.slice(CAPSTONE_REFLECTION_PREFIX.length)
+    if (moduleSlug && getCapstoneForModule(moduleSlug)) return
+  }
+  throw new PublicError(LESSON_NOT_FOUND_MESSAGE, { status: 404, code: 'NOT_FOUND' })
+}
+
 export async function recordReflectionAction(
   supabase: SupabaseClient<Database>,
   userId: string,
@@ -822,6 +846,8 @@ export async function recordReflectionAction(
   content: string,
   isPublic: boolean
 ) {
+  await assertReflectionTarget(supabase, userId, lessonId)
+
   const { data: existing, error: selectError } = await supabase
     .from('reflections')
     .select('*')

@@ -76,7 +76,9 @@ export const MAX_REFLECTION_CHARS = 10_000
 
 const reflectionFieldsSchema = z
   .object({
-    lesson_id: z.string().max(200), // accepts stable les_XXXXXX IDs or legacy slugs
+    // A stable les_XXXXXX id or `capstone-<moduleSlug>`; recordReflectionAction checks the
+    // target is real and open to the learner before anything is written or awarded.
+    lesson_id: z.string().min(1).max(200),
     content: z
       .string()
       .min(1, 'Reflection content cannot be empty')

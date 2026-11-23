@@ -61,9 +61,20 @@ function buildFakeClient() {
           filters.push([column, value])
           return builder
         },
+        limit: () => builder,
+        order: () => builder,
+        gte: () => builder,
+        lte: () => builder,
+        in: () => builder,
+        is: () => builder,
+        neq: () => builder,
         maybeSingle: async () => {
           fakeDb.touched.push({ table, op })
           return { data: rows()[0] ?? null, error: null }
+        },
+        single: async () => {
+          fakeDb.touched.push({ table, op })
+          return { data: rows()[0] ?? {}, error: null }
         },
         then: (onFulfilled: (v: unknown) => unknown) => {
           fakeDb.touched.push({ table, op })
@@ -108,6 +119,7 @@ import { resolveFlashcardLessonId } from '@/lib/flashcards-service'
 import {
   assertLessonAccessible,
   getServedQuizQuestions,
+  recordReflectionAction,
   recordTheoryReadAction,
   scoreQuizSubmission,
   submitQuizAttempt,
@@ -358,6 +370,36 @@ describe('SEC-08: theory-read rejects an unknown lesson id', () => {
     const err = await rejection(recordTheoryReadAction(asClient(), actorState.userId, LESSON, 0, 0))
     expect(err).toMatchObject({ status: 403, code: 'LESSON_LOCKED' })
     expect(writes()).toEqual([])
+  })
+})
+
+describe('SEC-08: reflections only for real, open lessons or real capstones', () => {
+  const reflectionInserts = () => fakeDb.touched.filter((t) => t.table === 'reflections' && t.op === 'insert')
+
+  it('rejects made-up ids with 404 before any read or write', async () => {
+    for (const id of ['totally-made-up-1', 'les_doesnotexist0', 'capstone-nope', 'capstone-', 'LES_04IX6B']) {
+      const err = await rejection(recordReflectionAction(asClient(), actorState.userId, id, 'text', false))
+      expect(err).toMatchObject({ status: 404, code: 'NOT_FOUND' })
+    }
+    expect(fakeDb.touched.filter((t) => t.table === 'reflections' || t.table === 'xp_events')).toEqual([])
+    expect(writes()).toEqual([])
+  })
+
+  it('rejects a locked lesson with 403', async () => {
+    const err = await rejection(recordReflectionAction(asClient(), actorState.userId, LESSON, 'text', false))
+    expect(err).toMatchObject({ status: 403, code: 'LESSON_LOCKED' })
+    expect(writes()).toEqual([])
+  })
+
+  it('saves a reflection for a lesson the learner has opened', async () => {
+    fakeDb.tables.user_lesson_progress = [{ user_id: actorState.userId, lesson_id: LESSON, status: 'in_progress' }]
+    await recordReflectionAction(asClient(), actorState.userId, LESSON, 'text', false)
+    expect(reflectionInserts()).toHaveLength(1)
+  })
+
+  it('saves a reflection for a real module capstone', async () => {
+    await recordReflectionAction(asClient(), actorState.userId, 'capstone-foundations', 'text', false)
+    expect(reflectionInserts()).toHaveLength(1)
   })
 })
 
