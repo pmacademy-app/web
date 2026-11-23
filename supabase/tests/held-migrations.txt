@@ -17,3 +17,4 @@
 20261119000007_security_events.sql
 20261121000001_reflections_and_prefs_policies.sql
 20261121000002_users_avatar_frame.sql
+20261124000001_revoke_unused_table_privileges.sql

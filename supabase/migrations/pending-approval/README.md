@@ -387,6 +387,21 @@ Adds nullable `users.avatar_frame` (CHECK to the six frame kinds; NULL = automat
 Settings. Written only by `/api/settings/avatar-frame` through the service role. Applied in the production SQL
 editor on 2026-11-21; its self-check passed. In `supabase/tests/held-migrations.txt` so CI replays it.
 
+### `20261124000001_revoke_unused_table_privileges.sql` (leftover TRUNCATE, REFERENCES, TRIGGER, ready)
+
+The production check of 2026-11-24 showed anon and authenticated still hold TRUNCATE, REFERENCES and TRIGGER on
+`public.users` (and, from the legacy default, on most tables). This revokes those three from PUBLIC, anon and
+authenticated on every table and view in schema public. SELECT, INSERT, UPDATE and DELETE are untouched. Not
+reachable through PostgREST today; removed because TRUNCATE ignores RLS. No app change needed. Independent of
+every other file here. In `supabase/tests/held-migrations.txt` so CI replays it and runs its validation.
+
+Run:
+1. Paste it into the Supabase SQL editor and run it. The self-check raises (and rolls back) if a grant is left.
+2. Run `validation/20261124000001_revoke_unused_table_privileges_validation.sql`. Expect
+   `20261124000001 validation passed`, and SELECT as the only privilege left on `users` for both roles.
+
+Undo: `rollback/20261124000001_revoke_unused_table_privileges.down.sql` (re-grants all three; outage use only).
+
 ### `validation/20261119_past_exposure_audit.sql` (read-only, run once)
 
 Twelve SELECT-only queries that look for use of the holes these and earlier migrations closed:
