@@ -6,7 +6,8 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "main": false
+      "main": false,
+      "dependabot/**": false
     }
   }
 }
