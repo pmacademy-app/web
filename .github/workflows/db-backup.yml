@@ -61,10 +61,17 @@ jobs:
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          # Session pooler (IPv4). The direct host db.<ref>.supabase.co is IPv6 only on the
+          # free plan and GitHub-hosted runners have no IPv6, so the direct URL cannot connect.
+          # The pooler host is shown in Supabase under Connect > Direct > Session pooler.
+          SUPABASE_POOLER_HOST: aws-1-ap-south-1.pooler.supabase.com
         run: |
           set -euo pipefail
           mkdir -p dump_temp
-          DB_URL="postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres"
+          # URL-encode the password so characters like @ : / # do not break the URL.
+          DB_PASSWORD_ENC=$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')
+          echo "::add-mask::${DB_PASSWORD_ENC}"
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_ID}:${DB_PASSWORD_ENC}@${SUPABASE_POOLER_HOST}:5432/postgres"
 
           echo "Dumping roles..."
           supabase db dump --role-only --db-url "${DB_URL}" -f dump_temp/roles.sql
